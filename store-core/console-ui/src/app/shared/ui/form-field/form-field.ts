@@ -52,6 +52,8 @@ let nextId = 0;
 
       @if (control(); as bound) {
         <app-field-error [control]="bound" [fallback]="fallback()" />
+      } @else if (error(); as text) {
+        <app-field-error [text]="text" />
       }
 
       @if (hint()) {
@@ -75,6 +77,11 @@ export class FormField {
   readonly hint = input<string | null>(null);
   /** A message for this field in particular; `shared.validation.*` covers the rest. */
   readonly fallback = input('');
+  /**
+   * The message for a field with no `control` — one whose value lives in a signal and is checked by
+   * its own facade. Ignored when `control` is set, which stays the reactive-forms path.
+   */
+  readonly error = input<string | null>(null);
   /** Spans every column of a `.field-grid`. */
   readonly wide = input(false, {transform: booleanAttribute});
   /** Set when the projected control renders its own `<input id>` and wants an explicit label link. */

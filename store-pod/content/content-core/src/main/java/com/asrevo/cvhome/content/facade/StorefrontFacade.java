@@ -6,10 +6,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
@@ -22,6 +20,7 @@ import com.asrevo.cvhome.content.entity.ContentDescription;
 import com.asrevo.cvhome.content.entity.FaqGroup;
 import com.asrevo.cvhome.content.entity.PolicyVersion;
 import com.asrevo.cvhome.content.entity.PostCategory;
+import com.asrevo.cvhome.content.entity.SiteSettings;
 import com.asrevo.cvhome.content.errors.ContentNotFoundException;
 import com.asrevo.cvhome.content.model.BannerPlacement;
 import com.asrevo.cvhome.content.model.MenuHandle;
@@ -30,6 +29,8 @@ import com.asrevo.cvhome.content.model.banner.BannerMeta;
 import com.asrevo.cvhome.content.model.common.ContentTranslation;
 import com.asrevo.cvhome.content.model.faq.FaqMeta;
 import com.asrevo.cvhome.content.model.post.PostMeta;
+import com.asrevo.cvhome.content.model.section.SectionMeta;
+import com.asrevo.cvhome.content.model.site.SiteBranding;
 import com.asrevo.cvhome.content.model.storefront.SitemapEntry;
 import com.asrevo.cvhome.content.model.storefront.StorefrontBanner;
 import com.asrevo.cvhome.content.model.storefront.StorefrontFaq;
@@ -39,6 +40,7 @@ import com.asrevo.cvhome.content.model.storefront.StorefrontPage;
 import com.asrevo.cvhome.content.model.storefront.StorefrontPolicy;
 import com.asrevo.cvhome.content.model.storefront.StorefrontPost;
 import com.asrevo.cvhome.content.model.storefront.StorefrontPostList;
+import com.asrevo.cvhome.content.model.storefront.StorefrontSection;
 import com.asrevo.cvhome.content.model.storefront.StorefrontSeo;
 import com.asrevo.cvhome.content.model.storefront.StorefrontSite;
 import com.asrevo.cvhome.content.repository.ContentRepository;
@@ -48,11 +50,12 @@ import com.asrevo.cvhome.content.service.MenuService;
 import com.asrevo.cvhome.content.service.PolicyService;
 import com.asrevo.cvhome.content.service.PostCategoryService;
 import com.asrevo.cvhome.content.service.RedirectService;
+import com.asrevo.cvhome.content.service.SiteSettingsService;
 import com.asrevo.cvhome.content.service.binding.BannerBinding;
 import com.asrevo.cvhome.content.service.binding.FaqBinding;
 import com.asrevo.cvhome.content.service.binding.PostBinding;
+import com.asrevo.cvhome.content.service.binding.SectionBinding;
 import com.asrevo.cvhome.content.support.JsonCodec;
-import com.asrevo.cvhome.content.support.Strings;
 import com.asrevo.cvhome.store.core.entity.content.ContentType;
 
 import lombok.RequiredArgsConstructor;
@@ -65,8 +68,6 @@ import lombok.RequiredArgsConstructor;
 @Component
 @RequiredArgsConstructor
 public class StorefrontFacade {
-
-    private static final Set<String> SNIPPET_CODES = Set.of("meta-title", "meta-description");
 
     private static final String PAGE = "page";
 
@@ -100,6 +101,8 @@ public class StorefrontFacade {
 
     private final RedirectService redirects;
 
+    private final SiteSettingsService siteSettings;
+
     private final Clock clock;
 
     // ------------------------------------------------------------------------------------------------ site
@@ -110,22 +113,22 @@ public class StorefrontFacade {
         StorefrontSite site = new StorefrontSite();
         site.setServedLocale(language == null ? null : language.code());
 
-        Map<String, String> snippets = new LinkedHashMap<>();
-        for (Content box : contents.findVisibleByType(store, ContentType.BOX)) {
-            if (SNIPPET_CODES.contains(box.getCode())) {
-                pick(box, language).ifPresent(d -> snippets.put(camel(box.getCode()), bodyOrTitle(d)));
-            }
-        }
-        site.setSnippets(snippets);
+        SiteSettings settings = siteSettings.entity(store);
+        StorefrontSeo siteSeo = new StorefrontSeo();
+        siteSeo.setMetaTitle(siteSettings.seoValue(settings, "metaTitle", language));
+        siteSeo.setMetaDescription(siteSettings.seoValue(settings, "metaDescription", language));
+        siteSeo.setKeywords(siteSettings.seoValue(settings, "keywords", language));
+        SiteBranding branding = siteSettings.branding(settings, language);
+        siteSeo.setOgImageUrl(branding.og() == null ? null : branding.og().url());
+        site.setSeo(siteSeo);
+        site.setBranding(branding);
+        site.setSocialLinks(siteSettings.socialLinks(settings));
 
+        // The announcement is the live STRIP banner and nothing else. It used to fall back to a `header-message`
+        // snippet, which meant unpublishing the banner silently resurrected whatever that row still held.
         List<StorefrontBanner> strip = effectiveBanners(store, language, BannerPlacement.STRIP);
         if (!strip.isEmpty()) {
             site.setAnnouncement(strip.getFirst());
-        } else {
-            contents.findByCodeAndType("header-message", ContentType.BOX, store)
-                    .filter(Content::isVisible)
-                    .flatMap(box -> pick(box, language).map(d -> legacyAnnouncement(box, d)))
-                    .ifPresent(site::setAnnouncement);
         }
 
         Map<String, List<StorefrontMenuNode>> menuMap = new LinkedHashMap<>();
@@ -159,7 +162,6 @@ public class StorefrontFacade {
             throws ContentNotFoundException {
         Instant now = clock.instant();
         Content c = contents.findByCodeAndType(slug, ContentType.PAGE, store)
-                .or(() -> contents.findBySeUrl(store, ContentType.PAGE, slug, language))
                 .filter(x -> preview || x.servable(now))
                 .orElseThrow(() -> ContentNotFoundException.byName(slug, store));
         ContentDescription d = pick(c, language).orElseThrow(() -> ContentNotFoundException.byName(slug, store));
@@ -253,6 +255,53 @@ public class StorefrontFacade {
         for (PostCategory c : categories.byIds(store).values()) {
             out.add(new StorefrontLink(c.getSlug(), localised(PostCategoryService.names(c), language, c.getSlug()),
                     String.format(CATEGORY_HREF, c.getSlug()), CATEGORY));
+        }
+        return out;
+    }
+
+    // --------------------------------------------------------------------------------------------- sections
+
+    /**
+     * The store's home page, in order.
+     *
+     * <p>
+     * Before these existed the home page was a hard-coded list of four product groups in the storefront's loader,
+     * so a seller could neither reorder it nor put anything else on the page.
+     * </p>
+     */
+    @Transactional(readOnly = true)
+    public List<StorefrontSection> homeSections(StoreMerchantId store, LanguageCode language) {
+        Instant now = clock.instant();
+        List<Content> live = contents.findVisibleByType(store, ContentType.SECTION).stream()
+                .filter(c -> c.servable(now))
+                .sorted(Comparator.comparing((Content c) -> c.getSortOrder() == null ? 0 : c.getSortOrder()))
+                .toList();
+        List<Long> mediaIds = live.stream().map(c -> SectionBinding.meta(c).mediaId()).toList();
+        Map<Long, String> urls = media.urls(store, mediaIds);
+        List<StorefrontSection> out = new ArrayList<>();
+        for (Content c : live) {
+            Optional<ContentDescription> picked = pick(c, language);
+            if (picked.isEmpty()) {
+                continue;
+            }
+            ContentDescription d = picked.get();
+            SectionMeta m = SectionBinding.meta(c);
+            StorefrontSection s = new StorefrontSection();
+            s.setId(c.getId());
+            s.setSlug(c.getCode());
+            s.setSortOrder(c.getSortOrder());
+            s.setServedLocale(d.getLanguageCode().code());
+            s.setKind(m.kind());
+            s.setTargetValue(m.targetValue());
+            s.setTitle(title(d));
+            s.setSubtitle(d.getSubtitle());
+            s.setBody(d.getDescription());
+            s.setCtaLabel(d.getCtaLabel());
+            s.setCta(m.cta());
+            s.setImageUrl(m.mediaId() == null ? null : urls.get(m.mediaId()));
+            s.setItemLimit(m.itemLimit());
+            s.setLayout(m.layout());
+            out.add(s);
         }
         return out;
     }
@@ -485,17 +534,6 @@ public class StorefrontFacade {
         return seo;
     }
 
-    private static StorefrontBanner legacyAnnouncement(Content box, ContentDescription d) {
-        StorefrontBanner b = new StorefrontBanner();
-        b.setId(box.getId());
-        b.setPlacement(BannerPlacement.STRIP);
-        b.setPosition(0);
-        b.setServedLocale(d.getLanguageCode().code());
-        b.setTitle(title(d));
-        b.setBody(d.getDescription());
-        return b;
-    }
-
     private static StorefrontLink link(Content c, LanguageCode language, String type) {
         String title = pick(c, language).map(StorefrontFacade::title).orElse(c.getCode());
         return new StorefrontLink(c.getCode(), title, String.format(CONTENT_PATH, c.getCode()), type);
@@ -523,25 +561,12 @@ public class StorefrontFacade {
         return d.getName();
     }
 
-    private static String bodyOrTitle(ContentDescription d) {
-        return Strings.blank(d.getDescription()) ? title(d) : plain(d.getDescription());
-    }
-
     static String localised(Map<String, String> names, LanguageCode language, String fallback) {
         String v = language == null ? null : names.get(language.code());
         if (v != null) {
             return v;
         }
         return names.values().stream().findFirst().orElse(fallback);
-    }
-
-    static String camel(String code) {
-        String[] parts = code.split("-");
-        StringBuilder sb = new StringBuilder(parts[0]);
-        for (int i = 1; i < parts.length; i++) {
-            sb.append(parts[i].substring(0, 1).toUpperCase(Locale.ROOT)).append(parts[i].substring(1));
-        }
-        return sb.toString();
     }
 
     static String plain(String html) {

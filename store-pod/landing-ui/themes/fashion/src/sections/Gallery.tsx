@@ -17,7 +17,7 @@ export function Gallery({images, alt, brand}: { images: ProductImage[]; alt: str
         <div className="flex flex-col gap-4">
             <figure className="sheet sheen peel [--tilt:-0.6deg]">
                 <AspectBox className="bg-background" ratio={current?.imageUrl ? '4 / 5' : '4 / 3'}>
-                    <PosterImage key={current?.imageUrl ?? 'none'} src={current?.imageUrl} alt={current?.imageName || alt} title={alt} meta={brand} priority fit="contain" align="start"
+                    <PosterImage key={current?.imageUrl ?? 'none'} src={current?.imageUrl} alt={current?.altText || alt} title={alt} meta={brand} priority fit="contain" align="start"
                                  sizes="(max-width: 1024px) 100vw, 55vw"/>
                 </AspectBox>
             </figure>

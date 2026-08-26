@@ -43,14 +43,14 @@ class ProductTest {
     @Test
     void theFlaggedImageWinsAndOtherwiseTheLowestSortOrderDoes() {
         Product product = new Product();
-        ProductImage second = new ProductImage(product, "b.jpg", 2, false);
-        ProductImage first = new ProductImage(product, "a.jpg", 1, false);
+        ProductImage second = new ProductImage(product, 2L, "b.jpg", null, 2, false);
+        ProductImage first = new ProductImage(product, 1L, "a.jpg", null, 1, false);
         product.getImages().add(second);
         product.getImages().add(first);
 
         assertThat(product.defaultImage()).contains(first);
 
-        ProductImage flagged = new ProductImage(product, "c.jpg", 9, true);
+        ProductImage flagged = new ProductImage(product, 3L, "c.jpg", null, 9, true);
         product.getImages().add(flagged);
         assertThat(product.defaultImage()).contains(flagged);
     }

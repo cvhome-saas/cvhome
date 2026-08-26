@@ -16,27 +16,16 @@ import {phoneNumber} from '@shared/validators/phone-number';
 import {DnsCheckService} from '@api/dns/dns-check.service';
 import {
   CUSTOM_DOMAIN_PATTERN,
-  HOME_TITLE_MAX,
   SHORT_DESCRIPTION_MAX,
   SLUG_PATTERN,
-  SOCIAL_LINK_HOSTS,
   UNBACKED_DETAIL_FIELDS,
   bareHostname,
-  isSocialLinkProvider,
   type SettingsSectionKey,
   type StoreSettings,
 } from '@models/store-settings';
 
 /** How long the field waits after the last keystroke before asking a resolver anything. */
 const DNS_DEBOUNCE_MS = 600;
-
-/** One language's landing copy. */
-export type HomeCopyForm = FormGroup<{
-  title: FormControl<string>;
-  text: FormControl<string>;
-  metaDescription: FormControl<string>;
-  tags: FormControl<readonly string[]>;
-}>;
 
 export type DomainForm = FormGroup<{customDomain: FormControl<string>}>;
 
@@ -99,24 +88,15 @@ export type GatewayForm = FormGroup<{
   webhookSecret: FormControl<string>;
 }>;
 
-/** Sections with nothing editable still carry a group, so every key resolves to a form. */
-export type EmptyForm = FormGroup<Record<string, never>>;
-
 /*
  * The keyed groups. How many keys each has is the server's answer rather than a constant, so
  * they are indexed rather than spelled out — `reset` brings them in line with what arrived.
  */
-export type HomeForm = FormGroup<Record<string, HomeCopyForm>>;
-export type SocialLinksForm = FormGroup<Record<string, FormControl<string>>>;
 export type SocialLoginForm = FormGroup<Record<string, LoginProviderForm>>;
 export type PaymentsForm = FormGroup<Record<string, GatewayForm>>;
 
 export interface SettingsForms {
-  branding: EmptyForm;
-  home: HomeForm;
   domain: DomainForm;
-  social: SocialLinksForm;
-  slider: EmptyForm;
   details: DetailsForm;
   'social-login': SocialLoginForm;
   payments: PaymentsForm;
@@ -165,22 +145,18 @@ export class StoreSettingsFormService {
    */
   create(): SettingsForm {
     return new FormGroup<SettingsForms>({
-      branding: new FormGroup<Record<string, never>>({}),
       /*
        * Empty until a store loads. The languages a storefront is published in are the *store's*
        * supported set, which is data, not a constant — this used to be seeded from the console's
        * own en/ar locale list, which is a different list serving a different purpose. `reset` fills
        * it in, the same way the provider-keyed groups are filled in.
        */
-      home: new FormGroup<HomeForm['controls']>({}),
       domain: this.fb.group({
         customDomain: this.fb.control('', {
           validators: [Validators.pattern(CUSTOM_DOMAIN_PATTERN)],
           asyncValidators: [this.dnsPointsToPod()],
         }),
       }),
-      social: new FormGroup<SocialLinksForm['controls']>({}),
-      slider: new FormGroup<Record<string, never>>({}),
       details: this.details(),
       'social-login': new FormGroup<SocialLoginForm['controls']>({}),
       payments: new FormGroup<PaymentsForm['controls']>({}),
@@ -195,25 +171,6 @@ export class StoreSettingsFormService {
    */
   reset(form: SettingsForm, settings: StoreSettings): void {
     /*
-     * One group per language the store publishes in, plus any the box already holds copy for — a
-     * language dropped from `supportedLanguages` still has a description on the box, and hiding it
-     * would mean the next save quietly rewrote the box without it.
-     */
-    const homeLanguages = [
-      ...new Set([...settings.details.supportedLanguages, ...Object.keys(settings.home)]),
-    ];
-    this.syncKeys(form.controls.home, homeLanguages, () => this.homeCopy());
-    for (const language of homeLanguages) {
-      const copy = settings.home[language];
-      form.controls.home.controls[language].reset({
-        title: copy?.title ?? '',
-        text: copy?.text ?? '',
-        metaDescription: copy?.metaDescription ?? '',
-        tags: copy?.tags ?? [],
-      });
-    }
-
-    /*
      * Emptied, not prefilled. The field adds a domain — the router has no update, only allocate and
      * remove — so seeding it with an existing one invited the operator to "edit" a hostname and get a
      * second allocation instead. The allocated domains are a list above it now.
@@ -221,15 +178,6 @@ export class StoreSettingsFormService {
     this.podTarget.set(settings.podTarget);
     this.dnsCheckUnavailable.set(false);
     form.controls.domain.reset({customDomain: ''});
-
-    this.syncKeys(
-      form.controls.social,
-      settings.socialLinks.map((link) => link.provider),
-      (provider) => this.fb.control('', [Validators.pattern(SOCIAL_URL_PATTERN), socialProfileUrl(provider)]),
-    );
-    for (const link of settings.socialLinks) {
-      form.controls.social.controls[link.provider].reset(link.url);
-    }
 
     const login = form.controls['social-login'];
     this.syncKeys(
@@ -363,34 +311,6 @@ export class StoreSettingsFormService {
     };
   }
 
-  private homeCopy(): HomeCopyForm {
-    return this.fb.group({
-      /*
-       * Required only for a language that has copy in it. Unconditionally required would make the
-       * section unsavable until every translation was written; not required at all would let a
-       * language be filled in and then silently dropped, because a description with no name cannot
-       * be stored — `BaseDescription.name` is `@NotEmpty` and `NAME` is `nullable = false`, so the
-       * server answers 500 rather than a validation error. Over-length stays an error either way:
-       * it is the browser tab title.
-       */
-      title: this.fb.control('', [Validators.maxLength(HOME_TITLE_MAX)]),
-      text: this.fb.control(''),
-      /*
-       * 150–160 characters is a recommendation, not a constraint — a short meta description is
-       * worse for search and perfectly valid. The section shows a counter instead of an error.
-       */
-      metaDescription: this.fb.control(''),
-      /** Search keywords, stored comma-separated on the snippet's translation. */
-      tags: this.fb.control<readonly string[]>([]),
-    },
-    /*
-     * On the group, not on `title`. The rule reads three controls, and a validator hanging off
-     * `title` alone would not re-run when the body text it depends on changes — Angular revalidates
-     * a control when *its* value changes, not when a sibling's does.
-     */
-    {validators: [titleForCopy]});
-  }
-
   /*
    * `name`, `email` and `phone` are `@NotNull` on `MerchantStoreDetails` and `PUT /private/store`
    * is `@Valid`, so those three are required here because the server rejects the save otherwise —
@@ -456,8 +376,8 @@ export class StoreSettingsFormService {
    * what is gone. Existing controls are left in place so a reset does not rebuild the tree
    * the template is already bound to.
    *
-   * `make` is handed the key, because a social link's validator depends on which provider's row it
-   * is: the Facebook field and the TikTok field do not accept the same URLs.
+   * `make` is handed the key, because a login provider's controls depend on which provider's row it
+   * is: only the ones that carry credentials get a secret field.
    */
   private syncKeys<T extends FormGroup | FormControl>(
     group: FormGroup<Record<string, T>>,
@@ -502,69 +422,6 @@ export function credentialsWhenEnabled(fields: readonly string[]): ValidatorFn {
       return null;
     }
     return group.dirty ? {credentialsWhenEnabled: {fields: missing}} : null;
-  };
-}
-
-/**
- * A language that has landing copy needs a headline to carry it.
- *
- * `BaseDescription.name` is `@NotEmpty` and `NAME` is `nullable = false`, so a description without
- * one cannot be persisted — and because the console only sends the languages that have a title, a
- * language with body text and no title would not be sent at all and would look like it saved and
- * then vanished. The rule is enforced here so the operator is told before the round trip, and told
- * about the field that is actually missing.
- */
-export function titleForCopy(group: AbstractControl): ValidationErrors | null {
-  if (String(group.get('title')?.value ?? '').trim()) {
-    return null;
-  }
-  const hasCopy = ['text', 'metaDescription'].some((field) =>
-    String(group.get(field)?.value ?? '').trim(),
-  );
-  return hasCopy ? {titleForCopy: true} : null;
-}
-
-/**
- * A social profile link.
- *
- * The scheme is optional but allowed, because both shapes are real: the fixture this form was built
- * against held `instagram.com/acme`, and every store on the platform holds
- * `https://instagram.com/acme`. The stricter pattern rejected the stored values outright, which made
- * *Save changes* impossible on a store that had ever set a link — the section was unusable before a
- * character was typed. Whatever is entered is stored verbatim; the console does not rewrite it.
- */
-export const SOCIAL_URL_PATTERN = /^(https?:\/\/)?[^\s/]+\.[^\s]+$/;
-
-/**
- * A profile link that belongs to the provider whose row it is in.
- *
- * `SocialLink` is a provider and a free string, and nothing on the platform checks that the two
- * agree — so a TikTok URL sits happily in the Facebook row and the storefront renders it under a
- * Facebook mark, sending shoppers somewhere they did not mean to go. The host has to match, and
- * there has to be a profile after it: `facebook.com` on its own is the site, not a page on it.
- *
- * A provider the console does not know about — the enum is the server's and it may grow — is not
- * guessed at. It keeps the generic URL check and nothing more, the same known-set discipline
- * `shared/i18n/status-label.ts` applies to statuses.
- */
-export function socialProfileUrl(provider: string): ValidatorFn {
-  return (control: AbstractControl): ValidationErrors | null => {
-    const value = String(control.value ?? '').trim();
-    if (!value || !isSocialLinkProvider(provider)) {
-      return null;
-    }
-
-    const withoutScheme = value.replace(/^[a-z][a-z0-9+.-]*:\/\//i, '');
-    const [host, ...rest] = withoutScheme.split('/');
-    const hosts = SOCIAL_LINK_HOSTS[provider];
-    const bare = host.toLowerCase().replace(/:\d+$/, '');
-
-    // Suffix match, so `m.facebook.com` and `www.instagram.com` are the same site.
-    const onProvider = hosts.some((known) => bare === known || bare.endsWith(`.${known}`));
-    if (!onProvider) {
-      return {socialHost: {expected: hosts[0]}};
-    }
-    return rest.join('/').replace(/[?#].*$/, '').length > 0 ? null : {socialProfile: true};
   };
 }
 

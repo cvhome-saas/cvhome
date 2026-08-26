@@ -5,14 +5,23 @@ import type {StorefrontSeo} from '@store-front/types';
 import {getStore} from '@/shell/request/store-context';
 import {loadSite} from '@/shell/loaders/site';
 
-/** Store-level title/description from the `meta-title` / `meta-description` snippets (one site read, cached). */
+/** Store-level title, description and favicon, from the content site settings (one site read, cached). */
 export const loadStoreMetadata = cache(async (): Promise<Metadata> => {
     const [store, site] = await Promise.all([getStore().catch(() => undefined), loadSite()]);
-    const siteName = site.snippets['metaTitle'] || store?.name || '';
+    const siteName = site.seo.metaTitle || store?.name || '';
+    /*
+     * Exactly one icon, always. The favicon is its own slot — it used to fall back to the logo, which put a
+     * wide wordmark in a 16px tab — and the platform's own mark is the last resort.
+     *
+     * It is served from `public/` rather than `app/favicon.ico` on purpose: the file convention makes Next
+     * emit its own `<link rel="icon" sizes="256x256">` ahead of this one, so a store that had set a favicon
+     * shipped two competing icons and the browser picked by size heuristics rather than by the seller's choice.
+     */
+    const icon = site.branding.favicon?.url ?? site.branding.logo?.url ?? '/favicon.ico';
     return {
         title: {default: siteName, template: siteName ? `%s · ${siteName}` : '%s'},
-        description: site.snippets['metaDescription'] || undefined,
-        icons: store?.logo?.path ? {icon: store.logo.path} : undefined,
+        description: site.seo.metaDescription || undefined,
+        icons: {icon},
     };
 });
 

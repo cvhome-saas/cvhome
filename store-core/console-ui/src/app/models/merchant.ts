@@ -7,16 +7,10 @@
  * Only the fields the console reads today are declared. seller-core's copy declares the whole
  * aggregate — themes, slider images, social links, supported languages, the parent store — under
  * `strictNullChecks: false`, which stated that all of them are always present. They are not:
- * `logo`, `banner` and `address` are frequently null on a store that has not been filled in, and
+ * `address` is frequently null on a store that has not been filled in, and
  * `inBusinessSince` is a `LocalDate`, so it serializes as `YYYY-MM-DD` rather than an instant.
  * The rest is left to the store-settings module, which is the screen that actually edits it.
  */
-
-/** Mirrors `store-core/model/content/ReadableImage` — a name and a resolvable path. */
-export interface StoreImage {
-  readonly name?: string;
-  readonly path?: string;
-}
 
 /** Mirrors `store/model/references/ReadableBaseAddress` → `BaseAddress`. */
 export interface StoreAddress {
@@ -44,7 +38,6 @@ export interface MerchantStore {
   /** `LocalDate` on the server: `YYYY-MM-DD`, not an instant. */
   readonly inBusinessSince?: string;
   readonly address?: StoreAddress;
-  readonly logo?: StoreImage | null;
   readonly pod?: {readonly id: string};
 }
 
@@ -58,19 +51,6 @@ export interface MerchantStore {
 export interface SocialLink {
   readonly provider: string;
   readonly url: string;
-}
-
-/**
- * Mirrors `commons/domain/ReadableSliderImage` (a record) — and that is the whole of it.
- *
- * The design draws a scheduling tag, a click-through link and a `1600×640 · 248 KB · JPG` meta
- * line against each slide. None of those are stored: a slide is a position, a filename and a URL.
- * See lessons.md, "Store management — slider images carry no schedule, link or file metadata".
- */
-export interface SliderImage {
-  readonly priority: number;
-  readonly name: string;
-  readonly url?: string;
 }
 
 /** Mirrors `commons/domain/ManagerStoreDomain` (a record). No status field — see below. */
@@ -109,19 +89,15 @@ export interface ReadableMerchantStore extends MerchantStore {
   readonly dimension?: string;
   /** `WeightUnit` — kilograms or pounds. */
   readonly weight?: string;
-  readonly banner?: StoreImage | null;
-  readonly socialLinks?: readonly SocialLink[];
-  readonly sliderImages?: readonly SliderImage[];
   readonly storeDomains?: readonly ManagerStoreDomain[];
 }
 
 /**
  * Mirrors `merchant-commons/model/merchant/PersistableMerchantStore`.
  *
- * Three endpoints take this same body and each reads a different slice of it: `PUT /private/store`
- * updates the store proper, `PUT /private/store/social-links` reads only `socialLinks`, and
- * `PUT /private/store/marketing/slider-images` reads only `sliderImages`. That is why the two
- * marketing saves still send a store-shaped object rather than a bare list.
+ * Appearance is not in here. The logo, banner, slider images and social links moved to the content
+ * service, so `PUT /private/store` is the only endpoint that takes this body — the marketing and
+ * social-links routes that used to read slices of it are gone.
  *
  * seller-core's copy carried an `[key: string]: unknown` index signature, which let any misspelled
  * field through the compiler untouched. Removed here — under `strict` the fields are the contract.
@@ -148,8 +124,5 @@ export interface PersistableMerchantStore {
   readonly weight?: string;
   readonly retailerStore?: string;
   readonly address?: StoreAddress;
-  readonly socialLinks?: readonly SocialLink[];
-  /** Only `priority` and `name` are read back off this — the URL is derived by the server. */
-  readonly sliderImages?: readonly {readonly priority: number; readonly name: string}[];
   readonly storeDomains?: readonly ManagerStoreDomain[];
 }

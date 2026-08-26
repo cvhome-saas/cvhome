@@ -20,6 +20,7 @@ import com.asrevo.cvhome.content.errors.ContentNotFoundException;
 import com.asrevo.cvhome.content.errors.InvalidContentRequestException;
 import com.asrevo.cvhome.content.errors.MediaLimitException;
 import com.asrevo.cvhome.content.model.MediaKind;
+import com.asrevo.cvhome.content.model.MediaOwnerKind;
 import com.asrevo.cvhome.content.model.media.PersistableMediaAsset;
 import com.asrevo.cvhome.content.model.media.ReadableMediaAsset;
 import com.asrevo.cvhome.content.model.summary.ContentSummary;
@@ -34,6 +35,7 @@ import com.asrevo.cvhome.store.core.entity.content.ContentType;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -83,6 +85,8 @@ class MediaServiceTest {
     private static final String ACTOR = "ada";
 
     private static final String PNG = "image/png";
+
+    private static final String REF_TWO = "2";
 
     private static final String LOGO = "logo.png";
 
@@ -329,6 +333,8 @@ class MediaServiceTest {
         void readingAnAssetListsWhatUsesIt() throws Exception {
             MediaUsageRow row = new MediaUsageRow();
             row.setAssetId(5L);
+            row.setOwnerKind(MediaOwnerKind.CONTENT);
+            row.setOwnerRef(REF_TWO);
             row.setContentId(2L);
             row.setContentType(ContentType.PAGE);
             row.setField("og");
@@ -350,6 +356,8 @@ class MediaServiceTest {
         void usageOfAnAssetWhoseItemVanishedStillLists() throws Exception {
             MediaUsageRow row = new MediaUsageRow();
             row.setAssetId(5L);
+            row.setOwnerKind(MediaOwnerKind.CONTENT);
+            row.setOwnerRef("99");
             row.setContentId(99L);
             when(assets.findByIdAndStoreMerchantId(5L, STORE_ID)).thenReturn(Optional.of(asset(5L, LOGO)));
             when(usage.findByAssetId(5L)).thenReturn(List.of(row));
@@ -422,6 +430,8 @@ class MediaServiceTest {
         void deletingAReferencedAssetIsAConflictUnlessForced() {
             MediaUsageRow row = new MediaUsageRow();
             row.setAssetId(5L);
+            row.setOwnerKind(MediaOwnerKind.CONTENT);
+            row.setOwnerRef(REF_TWO);
             row.setContentId(2L);
             when(assets.findByIdAndStoreMerchantId(5L, STORE_ID)).thenReturn(Optional.of(asset(5L, LOGO)));
             when(usage.findByAssetId(5L)).thenReturn(List.of(row));
@@ -472,8 +482,9 @@ class MediaServiceTest {
 
         @Test
         void aStoreWithNoFoldersGetsTheStarterSet() {
+            when(folders.findByStoreMerchantIdAndKey(eq(STORE_ID), any())).thenReturn(Optional.empty());
             when(folders.findByStoreMerchantIdOrderByPositionAscIdAsc(STORE_ID))
-                    .thenReturn(List.of()).thenReturn(List.of(folder(1L, BANNERS_KEY)));
+                    .thenReturn(List.of(folder(1L, BANNERS_KEY)));
             when(assets.countByStoreMerchantIdAndFolderId(STORE_ID, 1L)).thenReturn(4L);
 
             assertThat(service.folders(ContentFixtures.STORE)).singleElement()
@@ -482,13 +493,30 @@ class MediaServiceTest {
         }
 
         @Test
-        void anExistingSetIsNotSeededAgain() {
+        void aCompleteStarterSetIsNotSeededAgain() {
+            when(folders.findByStoreMerchantIdAndKey(eq(STORE_ID), any()))
+                    .thenReturn(Optional.of(folder(1L, BANNERS_KEY)));
             when(folders.findByStoreMerchantIdOrderByPositionAscIdAsc(STORE_ID))
                     .thenReturn(List.of(folder(1L, BANNERS_KEY)));
 
             service.folders(ContentFixtures.STORE);
 
             verify(folders, never()).save(any());
+        }
+
+        /**
+         * The starter set used to be skipped whenever the store had any folder at all, so a seller who made one
+         * of their own before opening the library never got the defaults.
+         */
+        @Test
+        void aSellersOwnFolderDoesNotSuppressTheStarterSet() {
+            when(folders.findByStoreMerchantIdAndKey(eq(STORE_ID), any())).thenReturn(Optional.empty());
+            when(folders.findByStoreMerchantIdOrderByPositionAscIdAsc(STORE_ID))
+                    .thenReturn(List.of(folder(9L, "campaign")));
+
+            service.folders(ContentFixtures.STORE);
+
+            verify(folders, org.mockito.Mockito.times(5)).save(any());
         }
 
         @Test
@@ -620,6 +648,51 @@ class MediaServiceTest {
 
             assertThat(summary.getMedia().getBytesUsed()).isEqualTo(900);
             assertThat(counts).containsEntry("media", 3L);
+        }
+
+    }
+
+
+    /**
+     * The read a peer service makes when it holds asset ids and needs the records — catalog resolving a product's
+     * images. It doubles as catalog's ownership check, which is why an id from another store has to come back
+     * absent rather than as an error: the caller asks about a batch and acts on what it gets.
+     */
+    @Nested
+    class AssetsById {
+
+        private static final String MINE = "mine.png";
+
+        @Test
+        void onlyThisStoresAssetsComeBack() {
+            MediaAsset mine = asset(1L, MINE);
+            when(assets.findByStoreMerchantIdAndIdIn(eq(STORE_ID), anyList())).thenAnswer(i -> {
+                List<Long> wanted = i.getArgument(1);
+                return wanted.contains(1L) ? List.of(mine) : List.of();
+            });
+
+            List<ReadableMediaAsset> out = service.assets(ContentFixtures.STORE, List.of(1L, 99L));
+
+            assertThat(out).singleElement().extracting(ReadableMediaAsset::getId).isEqualTo(1L);
+        }
+
+        @Test
+        void anEmptyOrNullRequestAsksTheDatabaseNothing() {
+            assertThat(service.assets(ContentFixtures.STORE, List.of())).isEmpty();
+            assertThat(service.assets(ContentFixtures.STORE, null)).isEmpty();
+
+            verify(assets, never()).findByStoreMerchantIdAndIdIn(anyString(), anyList());
+        }
+
+        /** A repeated id is one row, not two: the caller's list is whatever it happened to collect. */
+        @Test
+        void repeatedAndNullIdsAreCollapsedBeforeTheQuery() {
+            MediaAsset mine = asset(1L, MINE);
+            when(assets.findByStoreMerchantIdAndIdIn(eq(STORE_ID), anyList())).thenReturn(List.of(mine));
+
+            assertThat(service.assets(ContentFixtures.STORE, java.util.Arrays.asList(1L, null, 1L))).hasSize(1);
+
+            verify(assets).findByStoreMerchantIdAndIdIn(STORE_ID, List.of(1L));
         }
 
     }

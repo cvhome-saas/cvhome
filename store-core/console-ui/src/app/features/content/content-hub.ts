@@ -17,12 +17,13 @@ import {SectionNav} from '@shared/ui/section-nav/section-nav';
 import {TabSwitcher, type TabItem} from '@shared/ui/tab-switcher/tab-switcher';
 import {ContentList} from './components/content-list/content-list';
 import {MediaTab} from './components/media-tab/media-tab';
+import {BrandingTab} from './components/branding-tab/branding-tab';
 import {MenusTab} from './components/menus-tab/menus-tab';
 import {PoliciesTab} from './components/policies-tab/policies-tab';
-import {SnippetsCard} from './components/snippets-card/snippets-card';
 import type {PolicyCompliance} from '@models/content';
 import {ContentHubFacade} from './facades/content-hub.facade';
 import {MediaLibraryFacade} from './facades/media-library.facade';
+import {BrandingFacade} from './facades/branding.facade';
 import {MenusFacade} from './facades/menus.facade';
 
 const LIST_TABS: readonly ContentListType[] = ['pages', 'posts', 'banners', 'faq', 'policies'];
@@ -36,9 +37,10 @@ const LIST_TABS: readonly ContentListType[] = ['pages', 'posts', 'banners', 'faq
  * the store-management rail already carries the disabled entry with the reason.
  */
 @Component({
-  providers: [MediaLibraryFacade, MenusFacade],
+  providers: [BrandingFacade, MediaLibraryFacade, MenusFacade],
   selector: 'app-content-hub',
   imports: [
+    BrandingTab,
     ContentList,
     Icon,
     KpiGrid,
@@ -48,7 +50,6 @@ const LIST_TABS: readonly ContentListType[] = ['pages', 'posts', 'banners', 'faq
     PageHeader,
     PoliciesTab,
     SectionNav,
-    SnippetsCard,
     TabSwitcher,
     TranslocoDirective,
   ],
@@ -57,6 +58,14 @@ const LIST_TABS: readonly ContentListType[] = ['pages', 'posts', 'banners', 'faq
 })
 export class ContentHub {
   private readonly router = inject(Router);
+  /**
+   * Injected here, not only in the tab, so *Save changes* can sit in the page header.
+   *
+   * The branding tab is three panels that one request commits. Store management — where this screen's
+   * fields used to live — puts a save that spans sections in the page header for exactly that reason,
+   * and a button in the first panel's header reads as saving the first panel.
+   */
+  protected readonly branding = inject(BrandingFacade);
   private readonly transloco = inject(TranslocoService);
   private readonly permissions = inject(ConsolePermissions);
   protected readonly facade = inject(ContentHubFacade);
@@ -102,6 +111,8 @@ export class ContentHub {
   });
 
   protected readonly createAvailable = computed(() => this.listType() !== null && this.canManage());
+
+  protected readonly brandingActions = computed(() => this.activeTab() === 'branding' && this.canManage());
 
   protected pickTab(key: string): void {
     this.router.navigate(['/content', key]);

@@ -34,9 +34,8 @@ Starting sort_order: 1
 */
 
 -- Page: about-us
-INSERT INTO content.content (content_id, code, content_type,
-                              link_to_menu, sort_order, visible, store_merchant_id, status, version)
-VALUES (31, 'about-us', 'PAGE', true, 1, true, '65f023632bc46470c104b75f', 'PUBLISHED', 1)
+INSERT INTO content.content (content_id, code, content_type, sort_order, visible, store_merchant_id, status, version)
+VALUES (31, 'about-us', 'PAGE', 1, true, '65f023632bc46470c104b75f', 'PUBLISHED', 1)
 on conflict (content_id) do nothing;
 
 INSERT INTO content.content_description (description_id, date_created, date_modified, description, name, title,
@@ -63,9 +62,8 @@ VALUES (62, now(), now(),
 on conflict (description_id) do nothing;
 
 -- Page: contact-us
-INSERT INTO content.content (content_id, code, content_type,
-                              link_to_menu, sort_order, visible, store_merchant_id, status, version)
-VALUES (32, 'contact-us', 'PAGE', true, 2, true, '65f023632bc46470c104b75f', 'PUBLISHED', 1)
+INSERT INTO content.content (content_id, code, content_type, sort_order, visible, store_merchant_id, status, version)
+VALUES (32, 'contact-us', 'PAGE', 2, true, '65f023632bc46470c104b75f', 'PUBLISHED', 1)
 on conflict (content_id) do nothing;
 
 INSERT INTO content.content_description (description_id, date_created, date_modified, description, name, title,
@@ -92,9 +90,8 @@ VALUES (64, now(), now(),
 on conflict (description_id) do nothing;
 
 -- Page: terms
-INSERT INTO content.content (content_id, code, content_type,
-                              link_to_menu, sort_order, visible, store_merchant_id, status, version)
-VALUES (33, 'terms', 'PAGE', false, 3, true, '65f023632bc46470c104b75f', 'PUBLISHED', 1)
+INSERT INTO content.content (content_id, code, content_type, sort_order, visible, store_merchant_id, status, version)
+VALUES (33, 'terms', 'PAGE', 3, true, '65f023632bc46470c104b75f', 'PUBLISHED', 1)
 on conflict (content_id) do nothing;
 
 INSERT INTO content.content_description (description_id, date_created, date_modified, description, name, title,
@@ -121,9 +118,8 @@ VALUES (66, now(), now(),
 on conflict (description_id) do nothing;
 
 -- Page: privacy
-INSERT INTO content.content (content_id, code, content_type,
-                              link_to_menu, sort_order, visible, store_merchant_id, status, version)
-VALUES (34, 'privacy', 'PAGE', false, 4, true, '65f023632bc46470c104b75f', 'PUBLISHED', 1)
+INSERT INTO content.content (content_id, code, content_type, sort_order, visible, store_merchant_id, status, version)
+VALUES (34, 'privacy', 'PAGE', 4, true, '65f023632bc46470c104b75f', 'PUBLISHED', 1)
 on conflict (content_id) do nothing;
 
 INSERT INTO content.content_description (description_id, date_created, date_modified, description, name, title,
@@ -150,9 +146,8 @@ VALUES (68, now(), now(),
 on conflict (description_id) do nothing;
 
 -- Page: location
-INSERT INTO content.content (content_id, code, content_type,
-                              link_to_menu, sort_order, visible, store_merchant_id, status, version)
-VALUES (35, 'location', 'PAGE', false, 5, true, '65f023632bc46470c104b75f', 'PUBLISHED', 1)
+INSERT INTO content.content (content_id, code, content_type, sort_order, visible, store_merchant_id, status, version)
+VALUES (35, 'location', 'PAGE', 5, true, '65f023632bc46470c104b75f', 'PUBLISHED', 1)
 on conflict (content_id) do nothing;
 
 INSERT INTO content.content_description (description_id, date_created, date_modified, description, name, title,
@@ -179,9 +174,8 @@ VALUES (70, now(), now(),
 on conflict (description_id) do nothing;
 
 -- Page: faq
-INSERT INTO content.content (content_id, code, content_type,
-                              link_to_menu, sort_order, visible, store_merchant_id, status, version)
-VALUES (36, 'faq', 'PAGE', false, 6, true, '65f023632bc46470c104b75f', 'PUBLISHED', 1)
+INSERT INTO content.content (content_id, code, content_type, sort_order, visible, store_merchant_id, status, version)
+VALUES (36, 'faq', 'PAGE', 6, true, '65f023632bc46470c104b75f', 'PUBLISHED', 1)
 on conflict (content_id) do nothing;
 
 INSERT INTO content.content_description (description_id, date_created, date_modified, description, name, title,
@@ -207,90 +201,30 @@ VALUES (72, now(), now(),
         'faq', 36, 'fr')
 on conflict (description_id) do nothing;
 
--- Box: header-message
-INSERT INTO content.content (content_id, code, content_type,
-                              link_to_menu, sort_order, visible, store_merchant_id, status, version)
-VALUES (37, 'header-message', 'BOX', false, 7, true, '65f023632bc46470c104b75f', 'PUBLISHED', 1)
+-- The store's appearance record. metaTitle/metaDescription were the `meta-title` and `meta-description` BOX rows;
+-- they are per-locale maps here. Logo and favicon stay empty until the seller uploads one.
+INSERT INTO content.site_settings (store_merchant_id, seo, social_links, updated_at)
+VALUES ('65f023632bc46470c104b75f', '{"metaTitle": {"en": "USA Electronics Hub | Latest Tech & Gadgets in America", "fr": "USA Electronics Hub | Tech & Gadgets de Pointe en Amérique"}, "metaDescription": {"en": "Shop the latest electronics, computers, TVs, and tech gadgets at USA Electronics Hub. Your trusted American source for top brands and fast US shipping.", "fr": "Achetez les derniers appareils électroniques, ordinateurs, téléviseurs et gadgets technologiques chez USA Electronics Hub. Votre source américaine de confiance pour les grandes marques et une expédition rapide aux États-Unis."}}'::jsonb, '[]'::jsonb, now())
+on conflict (store_merchant_id) do nothing;
+
+-- The announcement strip, which the `header-message` BOX used to carry. Negative ids are deliberate: content ids
+-- come from SM_SEQUENCER and only ever grow upward, so seed-only rows below zero can never collide.
+INSERT INTO content.content (content_id, code, content_type, sort_order, visible, store_merchant_id,
+                             status, version, placement, meta)
+VALUES (-13, 'announcement', 'BANNER', 0, true, '65f023632bc46470c104b75f', 'PUBLISHED', 1, 'STRIP',
+        '{"target": null, "artwork": null, "theme": null, "loggedInOnly": false}')
 on conflict (content_id) do nothing;
 
 INSERT INTO content.content_description (description_id, date_created, date_modified, description, name, title,
                                           meta_description, meta_keywords, meta_title, sef_url, content_id,
                                           language_code)
-VALUES (73, now(), now(),
-        'Proudly American! Free Standard US Shipping on orders over $50!',
-        'Header Message', 'Header Message',
-        '', '', '', '', 37, 'en')
-on conflict (description_id) do nothing;
-INSERT INTO content.content_description (description_id, date_created, date_modified, description, name, title,
-                                          meta_description, meta_keywords, meta_title, sef_url, content_id,
-                                          language_code)
-VALUES (74, now(), now(),
-        'Fièrement Américain !Livraison Standard Gratuite aux USA dès 50$ d''achat !',
-        'Message d''En-tête', 'Message d''En-tête',
-        '', '', '', '', 37, 'fr')
+VALUES (-32, now(), now(), 'Proudly American! Free Standard US Shipping on orders over $50!', 'Announcement', 'Announcement',
+        '', '', '', '', -13, 'en')
 on conflict (description_id) do nothing;
 
--- Box: agreement
-INSERT INTO content.content (content_id, code, content_type,
-                              link_to_menu, sort_order, visible, store_merchant_id, status, version)
-VALUES (38, 'agreement', 'BOX', false, 8, true, '65f023632bc46470c104b75f', 'PUBLISHED', 1)
-on conflict (content_id) do nothing;
-
 INSERT INTO content.content_description (description_id, date_created, date_modified, description, name, title,
                                           meta_description, meta_keywords, meta_title, sef_url, content_id,
                                           language_code)
-VALUES (75, now(), now(),
-        '<p style="text-align:center; font-size:0.9em; padding:5px;">By using this site, you agree to our <a href="/terms">Terms & Conditions</a>.</p>',
-        'User Agreement', 'User Agreement',
-        '', '', '', '', 38, 'en')
-on conflict (description_id) do nothing;
-INSERT INTO content.content_description (description_id, date_created, date_modified, description, name, title,
-                                          meta_description, meta_keywords, meta_title, sef_url, content_id,
-                                          language_code)
-VALUES (76, now(), now(),
-        '<p style="text-align:center; font-size:0.9em; padding:5px;">En utilisant ce site, vous acceptez nos <a href="/conditions-generales">Conditions Générales</a>.</p>',
-        'Accord Utilisateur', 'Accord Utilisateur',
-        '', '', '', '', 38, 'fr')
-on conflict (description_id) do nothing;
-
--- Box: meta-title
-INSERT INTO content.content (content_id, code, content_type,
-                              link_to_menu, sort_order, visible, store_merchant_id, status, version)
-VALUES (39, 'meta-title', 'BOX', false, 9, true, '65f023632bc46470c104b75f', 'PUBLISHED', 1)
-on conflict (content_id) do nothing;
-
-INSERT INTO content.content_description (description_id, date_created, date_modified, description, name, title,
-                                          meta_description, meta_keywords, meta_title, sef_url, content_id,
-                                          language_code)
-VALUES (77, now(), now(),
-        'USA Electronics Hub | Latest Tech & Gadgets in America',
-        '', '', '', '', '', '', 39, 'en')
-on conflict (description_id) do nothing;
-INSERT INTO content.content_description (description_id, date_created, date_modified, description, name, title,
-                                          meta_description, meta_keywords, meta_title, sef_url, content_id,
-                                          language_code)
-VALUES (78, now(), now(),
-        'USA Electronics Hub | Tech & Gadgets de Pointe en Amérique',
-        '', '', '', '', '', '', 39, 'fr')
-on conflict (description_id) do nothing;
-
--- Box: meta-description
-INSERT INTO content.content (content_id, code, content_type,
-                              link_to_menu, sort_order, visible, store_merchant_id, status, version)
-VALUES (40, 'meta-description', 'BOX', false, 10, true, '65f023632bc46470c104b75f', 'PUBLISHED', 1)
-on conflict (content_id) do nothing;
-
-INSERT INTO content.content_description (description_id, date_created, date_modified, description, name, title,
-                                          meta_description, meta_keywords, meta_title, sef_url, content_id,
-                                          language_code)
-VALUES (79, now(), now(),
-        'Shop the latest electronics, computers, TVs, and tech gadgets at USA Electronics Hub. Your trusted American source for top brands and fast US shipping.',
-        '', '', '', '', '', '', 40, 'en')
-on conflict (description_id) do nothing;
-INSERT INTO content.content_description (description_id, date_created, date_modified, description, name, title,
-                                          meta_description, meta_keywords, meta_title, sef_url, content_id,
-                                          language_code)
-VALUES (80, now(), now(),
-        'Achetez les derniers appareils électroniques, ordinateurs, téléviseurs et gadgets technologiques chez USA Electronics Hub. Votre source américaine de confiance pour les grandes marques et une expédition rapide aux États-Unis.',
-        '', '', '', '', '', '', 40, 'fr')
+VALUES (-31, now(), now(), 'Fièrement Américain !Livraison Standard Gratuite aux USA dès 50$ d''achat !', 'Announcement', 'Announcement',
+        '', '', '', '', -13, 'fr')
 on conflict (description_id) do nothing;

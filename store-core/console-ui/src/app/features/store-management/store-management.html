@@ -70,21 +70,6 @@
 
           <div class="settings-section" id="settings-section">
             @switch (section()) {
-              @case ('branding') {
-                <app-branding-section
-                  [branding]="store.branding"
-                  [storeName]="store.storeName"
-                  [uploading]="facade.uploading()"
-                  (picked)="facade.upload($event.kind, $event.file)"
-                />
-              }
-              @case ('home') {
-                <app-home-section
-                  [forms]="forms.home.controls"
-                  [locales]="languages()"
-                  [(language)]="activeLanguage"
-                />
-              }
               @case ('domain') {
                 <app-domain-section
                   [form]="forms.domain"
@@ -97,18 +82,6 @@
                   [busy]="isSaving()"
                   (verify)="facade.verifyDomain($event)"
                   (removed)="facade.removeDomain($event)"
-                />
-              }
-              @case ('social') {
-                <app-social-links-section [form]="forms.social" [links]="store.socialLinks" />
-              }
-              @case ('slider') {
-                <app-slider-section
-                  [slides]="store.slides"
-                  [uploading]="facade.uploading() === 'slide'"
-                  [reordering]="isSaving()"
-                  (picked)="facade.addSlide($event)"
-                  (reordered)="facade.saveSlides($event.slides, $event.messageKey)"
                 />
               }
               @case ('details') {

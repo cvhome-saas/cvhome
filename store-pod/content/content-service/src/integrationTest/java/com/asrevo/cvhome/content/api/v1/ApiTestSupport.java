@@ -80,6 +80,14 @@ final class ApiTestSupport {
         return tokens.staff(role, store);
     }
 
+    /**
+     * A service-to-service token for a peer in this pod — how catalog reaches the external media API. The
+     * resource has to match the configured pod name, or the "same store pod" check refuses it.
+     */
+    String s2s(String podName) {
+        return tokens.s2s(Tokens.SCOPE_STORE_POD, podName);
+    }
+
     ResponseEntity<String> get(String url, String token) {
         return client.get(url, token);
     }

@@ -118,13 +118,17 @@ export const DIMENSION_UNITS: readonly string[] = ['cm', 'cu', 'ft', 'in', 'm'];
 /**
  * One product's images, as the Media step holds them.
  *
- * `isDefault` is read-only after the first upload: no endpoint re-designates a product's default
- * image — `PATCH …/image/{imageId}` sets `sortOrder` and nothing else. See lessons.md.
+ * `isDefault` marks the storefront thumbnail, and it is the first image: `PUT …/product/{id}/images`
+ * writes the order and the flag together, so reordering re-designates it. The old `PATCH
+ * …/image/{imageId}` set `sortOrder` and nothing else, which is why this used to be read-only.
  */
 export interface ProductImageItem {
   readonly id: number;
+  /** The media library asset behind it, so the picker can show which ones are already attached. */
+  readonly mediaAssetId: number | null;
   readonly name: string;
   readonly url: string | null;
+  readonly altText: string | null;
   readonly order: number;
   readonly isDefault: boolean;
 }

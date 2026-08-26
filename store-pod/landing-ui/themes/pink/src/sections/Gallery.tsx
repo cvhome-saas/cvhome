@@ -17,7 +17,7 @@ export function Gallery({images, alt}: { images: ProductImage[]; alt: string }) 
     return (
         <div className="flex flex-col gap-2">
             <AspectBox className="wash hair border" ratio="1 / 1">
-                <Image src={current?.imageUrl || PLACEHOLDER_IMAGE} alt={current?.imageName || alt} fill priority
+                <Image src={current?.imageUrl || PLACEHOLDER_IMAGE} alt={current?.altText || alt} fill priority
                        sizes="(max-width: 1024px) 100vw, 50vw" className="object-contain"/>
             </AspectBox>
             {images.length > 1 && (

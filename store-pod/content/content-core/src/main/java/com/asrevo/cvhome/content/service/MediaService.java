@@ -33,6 +33,7 @@ import com.asrevo.cvhome.content.errors.InvalidContentRequestException;
 import com.asrevo.cvhome.content.errors.MediaLimitException;
 import com.asrevo.cvhome.content.errors.MediaStorageException;
 import com.asrevo.cvhome.content.model.MediaKind;
+import com.asrevo.cvhome.content.model.MediaOwnerKind;
 import com.asrevo.cvhome.content.model.media.MediaUsage;
 import com.asrevo.cvhome.content.model.media.PersistableMediaAsset;
 import com.asrevo.cvhome.content.model.media.ReadableMediaAsset;
@@ -246,6 +247,22 @@ public class MediaService implements SummaryService.MediaFigures {
     }
 
     /**
+     * The assets of this store among {@code ids}, for a caller that holds ids and needs the whole record. An id
+     * belonging to another store is simply absent, which is what lets a caller use this as its ownership check.
+     */
+    @Transactional(readOnly = true)
+    public List<ReadableMediaAsset> assets(StoreMerchantId store, List<Long> ids) {
+        List<Long> wanted = ids == null ? List.of()
+                : ids.stream().filter(java.util.Objects::nonNull).distinct().toList();
+        if (wanted.isEmpty()) {
+            return List.of();
+        }
+        return assets.findByStoreMerchantIdAndIdIn(store.getId(), wanted).stream()
+                .map(a -> toReadable(a, 0, List.of()))
+                .toList();
+    }
+
+    /**
      * Public URLs for a set of asset ids of this store — what bindings use to resolve artwork and hero images.
      */
     @Transactional(readOnly = true)
@@ -394,17 +411,27 @@ public class MediaService implements SummaryService.MediaFigures {
         });
     }
 
+    /**
+     * Creates whatever system folders this store is missing.
+     *
+     * <p>
+     * Keyed on each folder rather than on "the store has no folders at all": a seller who made a folder of their
+     * own before opening the library would otherwise never get the defaults, because the presence of their one
+     * folder looked like the defaults had already been seeded.
+     * </p>
+     */
     private void ensureDefaultFolders(StoreMerchantId store) {
-        if (!folders.findByStoreMerchantIdOrderByPositionAscIdAsc(store.getId()).isEmpty()) {
-            return;
-        }
         int position = 0;
         for (String[] def : DEFAULT_FOLDERS) {
+            int slot = position++;
+            if (folders.findByStoreMerchantIdAndKey(store.getId(), def[0]).isPresent()) {
+                continue;
+            }
             MediaFolder f = new MediaFolder();
             f.setStoreMerchantId(store.getId());
             f.setKey(def[0]);
             f.setName(def[1]);
-            f.setPosition(position++);
+            f.setPosition(slot);
             f.setSystem(true);
             folders.save(f);
         }
@@ -421,12 +448,20 @@ public class MediaService implements SummaryService.MediaFigures {
         return out;
     }
 
+    /**
+     * The owners of an asset. A content-owned row resolves its title from the item; every other kind uses the
+     * title its owner supplied when it registered, so this never calls out to another service.
+     */
     private List<MediaUsage> usageOf(Long assetId) {
         List<MediaUsage> out = new ArrayList<>();
         for (MediaUsageRow r : usage.findByAssetId(assetId)) {
-            String title = contents.findById(r.getContentId())
-                    .map(c -> ContentMapper.title(c, null)).orElse(null);
-            out.add(new MediaUsage(r.getContentType(), r.getContentId(), title, r.getField()));
+            // A null kind is a row written before the column existed; the DDL defaults those to CONTENT.
+            MediaOwnerKind kind = r.getOwnerKind() == null ? MediaOwnerKind.CONTENT : r.getOwnerKind();
+            String title = kind.local() && r.getContentId() != null
+                    ? contents.findById(r.getContentId()).map(c -> ContentMapper.title(c, null)).orElse(null)
+                    : r.getOwnerTitle();
+            out.add(new MediaUsage(kind, r.getOwnerRef(), r.getContentType(), r.getContentId(), title,
+                    r.getField()));
         }
         return out;
     }

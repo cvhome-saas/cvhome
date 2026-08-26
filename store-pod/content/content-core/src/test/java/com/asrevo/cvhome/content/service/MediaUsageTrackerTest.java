@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import com.asrevo.cvhome.content.ContentFixtures;
 import com.asrevo.cvhome.content.entity.Content;
 import com.asrevo.cvhome.content.entity.MediaUsageRow;
+import com.asrevo.cvhome.content.model.MediaOwnerKind;
 import com.asrevo.cvhome.content.repository.MediaUsageRepository;
 import com.asrevo.cvhome.store.core.entity.content.ContentType;
 
@@ -23,6 +24,8 @@ import static org.mockito.Mockito.verify;
  * must not leave a stale row behind.
  */
 class MediaUsageTrackerTest {
+
+    private static final String REF_ONE = "1";
 
     private static final String SLUG = "hello";
 
@@ -47,13 +50,15 @@ class MediaUsageTrackerTest {
 
         tracker.record(item, refs);
 
-        verify(repository).deleteByContentId(1L);
+        verify(repository).deleteByOwner(MediaOwnerKind.CONTENT, REF_ONE);
         var captor = org.mockito.ArgumentCaptor.forClass(java.util.List.class);
         verify(repository).saveAll(captor.capture());
         assertThat((java.util.List<MediaUsageRow>) captor.getValue()).singleElement().satisfies(r -> {
             assertThat(r.getAssetId()).isEqualTo(5L);
             assertThat(r.getField()).isEqualTo(HERO_FIELD);
             assertThat(r.getContentType()).isEqualTo(ContentType.POST);
+            assertThat(r.getOwnerKind()).isEqualTo(MediaOwnerKind.CONTENT);
+            assertThat(r.getOwnerRef()).isEqualTo(REF_ONE);
         });
     }
 
@@ -63,7 +68,7 @@ class MediaUsageTrackerTest {
 
         tracker.record(item, Map.of());
 
-        verify(repository).deleteByContentId(1L);
+        verify(repository).deleteByOwner(MediaOwnerKind.CONTENT, REF_ONE);
         verify(repository, never()).saveAll(any());
     }
 
@@ -71,7 +76,7 @@ class MediaUsageTrackerTest {
     void forgettingClearsTheItemsRows() {
         tracker.forget(ContentFixtures.content(1L, ContentType.POST, SLUG));
 
-        verify(repository).deleteByContentId(1L);
+        verify(repository).deleteByOwner(MediaOwnerKind.CONTENT, REF_ONE);
     }
 
 }

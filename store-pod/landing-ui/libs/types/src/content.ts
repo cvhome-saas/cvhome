@@ -9,7 +9,7 @@ export interface NavPage {
     inMenu: boolean
 }
 
-/** The announcement strip's view model: a live STRIP banner, else the `header-message` snippet. */
+/** The announcement strip's view model, decoded from the live STRIP banner. */
 export interface AnnouncementData {
     /** The per-session dismissal key. */
     code: string
@@ -78,9 +78,64 @@ export interface Banner {
     endsAt: string | null
 }
 
+/** A media asset, resolved for rendering. */
+export interface MediaRef {
+    id: number
+    url: string
+    alt: string | null
+    width: number | null
+    height: number | null
+}
+
+/**
+ * The store's brand imagery. Every slot is optional — a store that has uploaded nothing renders its name as a
+ * wordmark instead.
+ */
+export interface SiteBranding {
+    logo: MediaRef | null
+    logoDark: MediaRef | null
+    /** Distinct from the logo on purpose: the two used to be the same file, so a wide wordmark went in the tab. */
+    favicon: MediaRef | null
+    og: MediaRef | null
+}
+
+export interface SocialLink {
+    provider: string
+    url: string
+}
+
+/** What a home-page section renders. */
+export type HomeSectionKind =
+    'PRODUCT_GROUP' | 'CATEGORY_GRID' | 'BANNER_REF' | 'RICH_TEXT' | 'IMAGE' | 'POST_FEED' | 'FAQ_REF'
+
+/**
+ * One block of the store's home page. Before these existed the page was a hard-coded list of four product groups
+ * in the storefront's loader, so a seller could not reorder it or put anything else on it.
+ */
+export interface HomeSection {
+    id: number
+    slug: string
+    sortOrder: number
+    servedLocale: string | null
+    kind: HomeSectionKind
+    /** The product group code, category code, banner slug or FAQ group key this block draws. */
+    targetValue: string | null
+    title: string | null
+    subtitle: string | null
+    body: string | null
+    ctaLabel: string | null
+    cta: { kind: MenuTargetKind; value: string | null } | null
+    imageUrl: string | null
+    itemLimit: number | null
+    layout: string | null
+}
+
 export interface SiteContent {
     servedLocale: string | null
-    snippets: Record<string, string>
+    /** The store's own title and description, already resolved to the served locale. */
+    seo: StorefrontSeo
+    branding: SiteBranding
+    socialLinks: SocialLink[]
     announcement: Banner | null
     menus: { main: MenuNode[]; footer: MenuNode[] }
     footerPages: StorefrontLink[]

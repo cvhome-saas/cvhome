@@ -540,16 +540,6 @@
     "clearCustomerFilter": "Show all orders"
   },
   "storeSettings": {
-    "branding": {
-      "banner": "Banner",
-      "currentBannerAlt": "Current store banner",
-      "currentLogoAlt": "Current store logo",
-      "dropOrBrowse": "Drop an image, or browse",
-      "logo": "Logo",
-      "replaceOnly": "Uploading replaces the current image. The platform has no way to remove one once it is set.",
-      "subtitle": "Logo and banner shown across your storefront, invoices and emails.",
-      "title": "Store branding"
-    },
     "details": {
       "address": "Business address",
       "category": "Category",
@@ -654,25 +644,6 @@
       },
       "yourDomain": "your domain"
     },
-    "home": {
-      "fallbackNotice": "Untranslated languages fall back to English.",
-      "landingText": "Landing text",
-      "landingTextHint": "Shown under the headline on your storefront's front page.",
-      "landingTextPlaceholder": "A paragraph or two about what you sell and who you sell it to. This is the first thing a visitor reads.",
-      "landingTitle": "Landing page title",
-      "landingTitleFallback": "Keep the title to 60 characters or fewer.",
-      "landingTitleHint": "Shown as the H1 and browser tab title",
-      "landingTitlePlaceholder": "Everything your workplace runs on",
-      "metaDescription": "Meta description",
-      "metaPlaceholder": "One sentence describing the shop, for search results and link previews.",
-      "metaRecommended": "Recommended {min}–{max} characters",
-      "subtitle": "Landing copy and search metadata, written per language.",
-      "tags": "Tags",
-      "tagsLabel": "Home page tags",
-      "title": "Store home page",
-      "titleForCopy": "This language has copy but no title. Add one — a landing page cannot be stored without it.",
-      "writeIn": "Write home page copy in"
-    },
     "loading": "Loading store settings…",
     "loginProvider": {
       "google": "Google",
@@ -716,52 +687,19 @@
     "saveChanges": "Save changes",
     "saving": "Saving…",
     "section": {
-      "branding": "Store branding",
-      "home": "Store home page",
       "domain": "Store domain",
-      "social": "Store social links",
-      "slider": "Store slider images",
       "details": "Store details",
       "socialLogin": "Store social login",
       "payments": "Store payment config"
     },
     "sectionSaved": "{section} saved.",
     "sectionShort": {
-      "branding": "Branding",
-      "home": "Home page",
       "domain": "Domain",
-      "social": "Social links",
-      "slider": "Slider images",
       "details": "Details",
       "socialLogin": "Social login",
       "payments": "Payment config"
     },
     "sectionsLabel": "Store settings sections",
-    "slider": {
-      "deleteNumbered": "Delete slide {position}",
-      "deleted": "Slide deleted.",
-      "dropImages": "Drag & drop a slider image",
-      "moveDown": "Move slide {position} later",
-      "moveUp": "Move slide {position} earlier",
-      "none": "No slides yet. Add one below.",
-      "reordered": "Slider order saved.",
-      "slide": "Slide",
-      "slideNumber": "Slide {position}",
-      "slotsFull": "All {capacity} slots are used. Delete a slide before adding another.",
-      "subtitle": "Homepage carousel · {count} of {capacity} slots used",
-      "title": "Store slider images",
-      "uploaded": "Slide added.",
-      "viewNumbered": "View slide {position} full size"
-    },
-    "social": {
-      "addProfileUrl": "Add profile URL…",
-      "fallback": "Enter a profile URL, like instagram.com/your-store.",
-      "linkSet": "This link is set",
-      "needsProfile": "Add the profile itself, not just {host} — for example {host}/your-store.",
-      "subtitle": "Shown in the storefront footer. Leave blank to hide.",
-      "title": "Store social links",
-      "wrongSite": "This has to be a {host} link."
-    },
     "socialLogin": {
       "appId": "App ID",
       "appSecret": "App secret",
@@ -773,13 +711,6 @@
       "signInWith": "Sign in with {provider}",
       "subtitle": "Let customers sign in with an external provider.",
       "title": "Store social login"
-    },
-    "socialProvider": {
-      "facebook": "Facebook",
-      "x": "X",
-      "tiktok": "TikTok",
-      "instagram": "Instagram",
-      "github": "GitHub"
     },
     "state": {
       "enabled": "Enabled",
@@ -1844,8 +1775,7 @@
       "keywordsPlaceholder": "Add a keyword…"
     },
     "media": {
-      "drop": "Drop an image, or browse",
-      "hint": "The thumbnail is set when the first image is uploaded and cannot be moved to another image afterwards — the platform has no way to change it. Reordering the rest is free.",
+      "hint": "The storefront thumbnail is the first image. Move another one to the front to change it.",
       "image": "Product image",
       "moveDown": "Move image {position} later",
       "moveUp": "Move image {position} earlier",
@@ -1857,7 +1787,8 @@
       "storefrontThumbnail": "Storefront thumbnail",
       "subtitle": "The first image is the storefront thumbnail.",
       "title": "Images",
-      "view": "View image {position} full size"
+      "view": "View image {position} full size",
+      "pick": "Choose from media library"
     },
     "pricing": {
       "title": "Price and stock",
@@ -3032,7 +2963,8 @@
       "faq": "FAQ entries",
       "media": "Media library",
       "menus": "Navigation menus",
-      "policies": "Legal & policies"
+      "policies": "Legal & policies",
+      "branding": "Store appearance"
     },
     "create": {
       "pages": "New page",
@@ -3265,9 +3197,7 @@
       "parent": "Parent page",
       "noParent": "None — top level",
       "showInFooter": "Add to the footer menu",
-      "showInFooterHint": "Appears under Company alongside About and Contact.",
-      "linkToMenu": "Add to the main menu",
-      "linkToMenuHint": "Listed in the storefront navigation."
+      "showInFooterHint": "Appears under Company alongside About and Contact."
     },
     "post": {
       "newTitle": "New post",
@@ -3343,8 +3273,12 @@
         "BANNER": "Banner",
         "FAQ": "FAQ",
         "POLICY": "Policy",
-        "BOX": "Snippet",
-        "SECTION": "Section"
+        "SECTION": "Section",
+        "SITE_SETTINGS": "Store appearance",
+        "PRODUCT": "Product",
+        "CATEGORY": "Category",
+        "BRAND": "Brand",
+        "CONTENT": "Content"
       },
       "delete": {
         "title": "Delete {name}?",
@@ -3540,23 +3474,53 @@
       "notWritten": "Not written",
       "optional": "Optional"
     },
-    "snippets": {
-      "title": "Store snippets",
-      "subtitle": "Text fragments the storefront reads by code: site metadata, the announcement fallback, the checkout agreement.",
-      "live": "Live",
-      "hidden": "Hidden",
-      "notSet": "Not set",
-      "visible": "Visible on the storefront",
-      "titleField": "Title",
-      "bodyField": "Text",
-      "saved": "{code} saved.",
-      "describe": {
-        "meta-title": "The browser tab and search-result title of the whole site.",
-        "meta-description": "The site-wide meta description.",
-        "header-message": "The announcement bar, when no Announcement-strip banner is live.",
-        "agreement": "The checkout agreement, when no Terms policy is live.",
-        "other": "A legacy snippet this store still holds."
-      }
+    "branding": {
+      "title": "Brand images",
+      "subtitle": "The logo, favicon and share image the storefront uses.",
+      "loading": "Loading store appearance…",
+      "imagesLabel": "Brand images",
+      "save": "Save changes",
+      "discard": "Discard",
+      "saved": "Store appearance saved.",
+      "choose": "Choose",
+      "replace": "Replace",
+      "clear": "Clear",
+      "slot": {
+        "logo": "Logo",
+        "logoDark": "Logo (dark)",
+        "favicon": "Favicon",
+        "og": "Share image"
+      },
+      "slotHint": {
+        "logo": "Shown in the storefront header.",
+        "logoDark": "Used against dark backgrounds, when it differs.",
+        "favicon": "The browser-tab icon. Square, and legible at 16px.",
+        "og": "The default picture when a page is shared."
+      },
+      "seoTitle": "Search engine listing",
+      "seoSubtitle": "What search results and browser tabs show for the store itself.",
+      "copyIn": "Copy in",
+      "seo": {
+        "metaTitle": "Store title",
+        "metaDescription": "Store description"
+      },
+      "seoHint": {
+        "metaTitle": "Also the browser tab title on pages that set none of their own.",
+        "metaDescription": "The sentence under the title in search results."
+      },
+      "socialTitle": "Social links",
+      "socialSubtitle": "Shown in the storefront footer. Leave one empty to remove it.",
+      "socialPlaceholder": "https://…",
+      "socialProvider": {
+        "facebook": "Facebook",
+        "x": "X",
+        "tiktok": "TikTok",
+        "instagram": "Instagram",
+        "github": "GitHub"
+      },
+      "socialHost": "Use a {{host}} link.",
+      "socialUrl": "Enter a valid web address.",
+      "socialProfile": "Link to the profile page, not just the site."
     }
   }
 }

@@ -30,6 +30,7 @@ import com.asrevo.cvhome.content.model.storefront.StorefrontPage;
 import com.asrevo.cvhome.content.model.storefront.StorefrontPolicy;
 import com.asrevo.cvhome.content.model.storefront.StorefrontPost;
 import com.asrevo.cvhome.content.model.storefront.StorefrontPostList;
+import com.asrevo.cvhome.content.model.storefront.StorefrontSection;
 import com.asrevo.cvhome.content.model.storefront.StorefrontSite;
 import com.asrevo.cvhome.content.service.MenuService;
 
@@ -102,6 +103,16 @@ public class StorefrontApi {
     public ResponseEntity<List<StorefrontBanner>> banners(StoreMerchantId merchantStore, LanguageCode language,
                                                           @RequestParam(required = false) BannerPlacement placement) {
         return cached(storefront.effectiveBanners(merchantStore, language, placement));
+    }
+
+    /**
+     * The home page's blocks, in order. Kept out of {@code site} on purpose: {@code site} is fetched on every
+     * page, and only the home page needs these.
+     */
+    @GetMapping("home-sections")
+    public ResponseEntity<List<StorefrontSection>> homeSections(StoreMerchantId merchantStore,
+                                                                LanguageCode language) {
+        return cached(storefront.homeSections(merchantStore, language));
     }
 
     @GetMapping("faq")

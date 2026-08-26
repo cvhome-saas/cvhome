@@ -8,13 +8,13 @@ import type {Swiper as SwiperType} from 'swiper';
 import {A11y, Autoplay} from 'swiper/modules';
 import 'swiper/css';
 import {useDir} from '@store-front/i18n/use-dir';
-import type {SliderImage} from '@store-front/types';
+import type {Banner} from '@store-front/types';
 
 /**
- * The merchant's slider images in a plate frame with an NN / NN counter and plate arrows — a crate window,
+ * The store's CMS banners in a plate frame with an NN / NN counter and plate arrows — a crate window,
  * not a carousel with dots. Swiper is re-keyed on `dir` so RTL swipes the right way.
  */
-export function HeroFrame({slides}: { slides: SliderImage[] }) {
+export function HeroFrame({slides}: { slides: Banner[] }) {
     const t = useTranslations('PAGE.HOME');
     const dir = useDir();
     const [index, setIndex] = useState(0);
@@ -26,8 +26,8 @@ export function HeroFrame({slides}: { slides: SliderImage[] }) {
             <Swiper key={dir} dir={dir} modules={[Autoplay, A11y]} loop={slides.length > 1} onSwiper={setSwiper} onSlideChange={s => setIndex(s.realIndex)}
                     autoplay={slides.length > 1 ? {delay: 6000, disableOnInteraction: true} : false} a11y={{enabled: true}} className="aspect-[4/3] w-full bg-muted lg:aspect-[16/9]">
                 {slides.map((s, i) => (
-                    <SwiperSlide key={`${s.url}-${i}`} aria-label={t('HERO_SLIDE', {index: i + 1, total: slides.length})}>
-                        <Image src={s.url} alt="" fill priority={i === 0} sizes="(max-width: 1024px) 100vw, 55vw" className="object-cover"/>
+                    <SwiperSlide key={s.id} aria-label={t('HERO_SLIDE', {index: i + 1, total: slides.length})}>
+                        <Image src={s.desktopUrl ?? ''} alt={s.altText ?? ''} fill priority={i === 0} sizes="(max-width: 1024px) 100vw, 55vw" className="object-cover"/>
                     </SwiperSlide>
                 ))}
             </Swiper>

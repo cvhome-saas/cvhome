@@ -1,0 +1,9 @@
+plugins {
+    alias(libs.plugins.java.library.conventions)
+}
+
+dependencies {
+    api project(':store-pod:content:content-commons')
+    compileOnly libs.spring.web
+    annotationProcessor libs.lombok
+}

@@ -334,8 +334,9 @@ class ProductServiceImplTest {
 
         service.delete(STORE, 3L);
 
-        // the rows cascade with the product; the files on the CDN do not, so they are removed first
-        verify(productImageService).removeFiles(product);
+        // the rows cascade with the product; the media assets do not — other products may still show them — so
+        // the product's hold on them is released first
+        verify(productImageService).forget(product);
         verify(productRepository).delete(product);
     }
 

@@ -26,12 +26,7 @@ public enum MerchantErrors implements ErrorCode {
     /**
      * The platform's default store cannot be deleted — a rule about the data, not about the caller.
      */
-    DEFAULT_STORE_NOT_REMOVABLE("MERCHANT.STORE.DEFAULT_NOT_REMOVABLE", ErrorCategory.UNPROCESSABLE),
-
-    /**
-     * An uploaded image's bytes could not be read off the request.
-     */
-    UPLOADED_FILE_UNREADABLE("MERCHANT.UPLOAD.UNREADABLE", ErrorCategory.STORAGE);
+    DEFAULT_STORE_NOT_REMOVABLE("MERCHANT.STORE.DEFAULT_NOT_REMOVABLE", ErrorCategory.UNPROCESSABLE);
 
     private final String code;
 

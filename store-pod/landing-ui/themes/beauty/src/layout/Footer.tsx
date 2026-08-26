@@ -16,7 +16,7 @@ export async function Footer({data}: { ctx: PageContext; data: LayoutData }) {
         ...data.menus.footer.filter(n => n.kind !== 'PAGE' && n.href.startsWith('/')).map(n => ({key: n.href, href: n.href, label: n.label})),
         ...data.policies.map(pl => ({key: pl.href, href: pl.href, label: pl.title})),
     ];
-    const socials = (store.socialLinks ?? []).filter(s => SOCIAL_ICONS[s.provider.toLowerCase()]);
+    const socials = data.socialLinks.filter(s => SOCIAL_ICONS[s.provider.toLowerCase()]);
     const col = 'flex flex-col border-foreground p-4 md:border-s first:md:border-s-0';
     const h = 'q mb-3 font-display text-sm font-semibold uppercase tracking-wide';
     const row = 'q py-1 font-mono text-xs uppercase tracking-wide hover:underline hover:underline-offset-4';

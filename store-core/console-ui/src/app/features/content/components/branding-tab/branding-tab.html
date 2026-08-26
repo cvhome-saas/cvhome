@@ -1,0 +1,93 @@
+<ng-container *transloco="let t">
+  @if (facade.error(); as failure) {
+    <app-load-error [message]="failure.message" (retry)="facade.retry()" />
+  }
+
+  <app-busy-overlay [busy]="facade.isLoading() || facade.busy()" [label]="t('content.branding.loading')" reserve="panel">
+    <app-panel padded [title]="t('content.branding.title')" [subtitle]="t('content.branding.subtitle')">
+      <!--
+        Four slots rather than one logo: a wide wordmark is wrong in a 16px browser tab, and the
+        storefront needs a share image that is neither. They used to be one field, which is how the
+        logo ended up doubling as the favicon.
+      -->
+      <section class="branding-images" [attr.aria-label]="t('content.branding.imagesLabel')">
+        @for (slot of slots; track slot) {
+          <figure class="brand-slot">
+            <div class="brand-thumb">
+              @if (url(slot); as src) {
+                <img [src]="src" [alt]="t('content.branding.slot.' + slot)" />
+              } @else {
+                <app-icon name="images" [size]="20" />
+              }
+            </div>
+            <figcaption>
+              <strong>{{ t('content.branding.slot.' + slot) }}</strong>
+              <span class="brand-hint">{{ t('content.branding.slotHint.' + slot) }}</span>
+            </figcaption>
+            @if (canManage()) {
+              <div class="brand-slot-actions">
+                <button type="button" class="ghost-action" (click)="picking.set(slot)">
+                  {{ hasMedia(slot) ? t('content.branding.replace') : t('content.branding.choose') }}
+                </button>
+                @if (hasMedia(slot)) {
+                  <!-- Clearing is an ordinary write. Merchant, which used to own these, had no delete. -->
+                  <button type="button" class="ghost-action danger" (click)="facade.setMedia(slot, null)">
+                    {{ t('content.branding.clear') }}
+                  </button>
+                }
+              </div>
+            }
+          </figure>
+        }
+      </section>
+    </app-panel>
+
+    <app-panel padded [title]="t('content.branding.seoTitle')" [subtitle]="t('content.branding.seoSubtitle')">
+      <app-locale-switcher
+        panelAction
+        [languages]="locales()"
+        [active]="activeLanguage()"
+        (activeChange)="language.set($event)"
+        [filled]="filled()"
+        display="label"
+        [label]="t('content.branding.copyIn')"
+      />
+      <div class="branding-seo">
+        @for (field of seoFields; track field) {
+          <app-form-field wide [label]="t('content.branding.seo.' + field)" [hint]="t('content.branding.seoHint.' + field)">
+            <app-text-field
+              [value]="seoValue(field)"
+              (valueChange)="onSeo(field, $event)"
+              [disabled]="!canManage()"
+            />
+          </app-form-field>
+        }
+      </div>
+    </app-panel>
+
+    <app-panel padded [title]="t('content.branding.socialTitle')" [subtitle]="t('content.branding.socialSubtitle')">
+      <div class="branding-social">
+        @for (provider of facade.providers(); track provider) {
+          <app-form-field [label]="providerLabel(provider)" [error]="linkError(provider)">
+            <app-text-field
+              [value]="linkValue(provider)"
+              (valueChange)="facade.setSocialLink(provider, $event)"
+              type="url"
+              [icon]="providerIcon(provider)"
+              [invalid]="linkError(provider) !== null"
+              [placeholder]="t('content.branding.socialPlaceholder')"
+              [disabled]="!canManage()"
+            />
+          </app-form-field>
+        }
+      </div>
+    </app-panel>
+  </app-busy-overlay>
+
+  <app-media-picker-dialog
+    [open]="picking() !== null"
+    kind="IMAGE"
+    (picked)="onPicked($event)"
+    (closed)="picking.set(null)"
+  />
+</ng-container>

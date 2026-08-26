@@ -34,8 +34,11 @@ public class BindingRegistry {
                 .orElseThrow(() -> new IllegalArgumentException(String.format("No content binding for %s", type)));
     }
 
+    /**
+     * Every type the console lists. All of them have a workflow now that the legacy {@code BOX} rows are gone.
+     */
     public List<ContentType> workflowTypes() {
-        return bindings.keySet().stream().filter(ContentType::workflow).toList();
+        return List.copyOf(bindings.keySet());
     }
 
 }

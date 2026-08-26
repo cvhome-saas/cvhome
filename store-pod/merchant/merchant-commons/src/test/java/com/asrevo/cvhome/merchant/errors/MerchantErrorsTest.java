@@ -1,6 +1,5 @@
 package com.asrevo.cvhome.merchant.errors;
 
-import java.io.IOException;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -22,8 +21,6 @@ class MerchantErrorsTest {
     private static final StoreMerchantId OTHER = new StoreMerchantId("65f023632bc46470c104b75f");
 
     private static final String STORE_PARAM = "store";
-
-    private static final String FILE = "logo.png";
 
     @ParameterizedTest
     @EnumSource(MerchantErrors.class)
@@ -69,16 +66,5 @@ class MerchantErrorsTest {
         assertThat(e.payload().params()).containsEntry("pathStore", STORE).containsEntry("tenantStore", OTHER);
     }
 
-    @Test
-    void unreadableUploadKeepsItsCause() {
-        IOException cause = new IOException("broken pipe");
-
-        UploadedFileUnreadableException e = UploadedFileUnreadableException.of(FILE, cause);
-
-        assertThat(e.payload().errorCode()).isEqualTo(MerchantErrors.UPLOADED_FILE_UNREADABLE);
-        assertThat(e.payload().errorCode().category()).isEqualTo(ErrorCategory.STORAGE);
-        assertThat(e.payload().params()).containsEntry("fileName", FILE);
-        assertThat(e.getCause()).isSameAs(cause);
-    }
 
 }

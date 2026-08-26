@@ -52,8 +52,8 @@ export async function Header({ctx, data}: { ctx: PageContext; data: LayoutData }
             <div className="mx-auto flex h-header max-w-content items-center gap-3 px-gutter lg:h-[calc(var(--header-h-lg)-2.25rem)] lg:gap-8">
                 <MobileNav ctx={ctx} data={data}/>
                 <Link prefetch={false} href="/" className="flex shrink-0 items-center" aria-label={store.name}>
-                    {store.logo?.path ? (
-                        <Image src={store.logo.path} alt={store.logo.name || store.name} width={160} height={40}
+                    {data.branding.logo ? (
+                        <Image src={data.branding.logo.url} alt={data.branding.logo.alt || store.name} width={160} height={40}
                                className="h-8 w-auto max-w-[9rem] object-contain lg:h-10 lg:max-w-[12rem]" priority/>
                     ) : (
                         <span className="sign-lg text-base lg:text-xl">{store.name}</span>

@@ -6,6 +6,24 @@
         {{ createLabel() }}
       </button>
     }
+
+    <!-- The branding tab's save spans all three of its panels, so it belongs to the page. -->
+    @if (brandingActions()) {
+      @if (branding.dirty()) {
+        <button class="secondary-action" type="button" (click)="branding.discard()">
+          {{ t('content.branding.discard') }}
+        </button>
+      }
+      <button
+        class="primary-action"
+        type="button"
+        [disabled]="!branding.dirty() || branding.busy() || !branding.linksValid()"
+        (click)="branding.save()"
+      >
+        <app-icon name="check" />
+        {{ t('content.branding.save') }}
+      </button>
+    }
   </app-page-header>
 
   @if (facade.summaryError(); as failure) {
@@ -49,9 +67,6 @@
             (open)="openRow($event)"
             (create)="create()"
           />
-          @if (type === 'pages') {
-            <app-snippets-card [locales]="facade.localeOptions()" [defaultLocale]="facade.locales().defaultCode" [canManage]="canManage()" />
-          }
         } @else {
           @switch (activeTab()) {
             @case ('media') {
@@ -59,6 +74,9 @@
             }
             @case ('menus') {
               <app-menus-tab [locales]="facade.localeOptions()" [defaultLocale]="facade.locales().defaultCode" [canManage]="canManage()" />
+            }
+            @case ('branding') {
+              <app-branding-tab [locales]="facade.localeOptions()" [defaultLocale]="facade.locales().defaultCode" [canManage]="canManage()" />
             }
           }
         }

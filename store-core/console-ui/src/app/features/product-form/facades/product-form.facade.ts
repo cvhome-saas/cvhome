@@ -19,6 +19,7 @@ import {
   type RelatedProduct,
   type TranslationRow,
 } from '@models/products';
+import type {PersistableProductImage} from '@models/catalog';
 import type {AutocompleteOption} from '@shared/ui/autocomplete/autocomplete';
 import type {StepItem} from '@shared/ui/stepper/stepper';
 import {ToastService} from '@shared/ui/toast/toast';
@@ -387,13 +388,14 @@ export class ProductFormFacade {
 
   readonly uploading = signal(false);
 
-  uploadImages(files: readonly File[]): void {
+  /** Attaches assets the operator picked in the media library. */
+  attachImages(assets: readonly PersistableProductImage[]): void {
     const id = this.productId();
-    if (id === null || !files.length) {
+    if (id === null || !assets.length) {
       return;
     }
     this.uploading.set(true);
-    this.api.uploadImages(id, files, this.images()).subscribe({
+    this.api.attachImages(id, assets).subscribe({
       next: (gallery) => {
         this.uploading.set(false);
         this.images.set(gallery);
@@ -445,8 +447,22 @@ export class ProductFormFacade {
     const [moved] = gallery.splice(index, 1);
     gallery.splice(target, 0, moved);
 
+    /*
+     * The first image is the thumbnail, so the move re-designates it.
+     *
+     * The old upload endpoint fixed the default at the first upload and had no way to move it, which
+     * is why the step used to say so. `PUT …/product/{id}/images` takes the flag, so the constraint
+     * is gone — and leaving it pinned to whichever image happened to be uploaded first was worse
+     * than either rule: reordering carried the badge off position 1, so the panel said "the first
+     * image is the storefront thumbnail" directly above a grid where it demonstrably was not.
+     *
+     * Reordering is therefore also the answer to "how do I change the thumbnail": move it to the
+     * front. There is no separate control, because there is no separate concept.
+     */
+    const ordered = gallery.map((image, position) => ({...image, isDefault: position === 0}));
+
     this.uploading.set(true);
-    this.api.reorderImages(id, gallery).subscribe({
+    this.api.replaceImages(id, ordered).subscribe({
       next: (reordered) => {
         this.uploading.set(false);
         this.images.set(reordered);

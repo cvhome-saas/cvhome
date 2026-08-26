@@ -38,10 +38,10 @@ export async function Home({ctx, data}: PageProps<HomeData>) {
                             <ProductCard product={p} storeContext={ctx.storeContext} priority className="h-full"/>
                         </div>
                     ))}
-                    {!slides[0] && !heroProducts.length && data.hero.banner?.path && (
+                    {!slides[0] && !heroProducts.length && data.hero.banner?.desktopUrl && (
                         <figure className="sheet sheen peel relative col-span-2 aspect-[21/9] overflow-hidden lg:col-span-7">
                             {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img src={data.hero.banner.path} alt="" className="size-full object-cover"/>
+                            <img src={data.hero.banner.desktopUrl ?? ''} alt={data.hero.banner.altText ?? ''} className="size-full object-cover"/>
                         </figure>
                     )}
                 </section>
@@ -77,7 +77,7 @@ export async function Home({ctx, data}: PageProps<HomeData>) {
                 <PageShell width={ctx.layout.container} className="pt-section">
                     <ul className="wall grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3" aria-label={store.name}>
                         {leftover.map((s, i) => (
-                            <li key={`${s.url}-${i}`} className="min-w-0">
+                            <li key={s.id} className="min-w-0">
                                 <SlidePoster slide={s} index={usedSlides + i} total={slides.length} storeName={store.name} ratio="4 / 3"/>
                             </li>
                         ))}

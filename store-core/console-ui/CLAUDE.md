@@ -10,6 +10,8 @@ Transloco (en/ar, RTL), served on port 8011 behind `console-ui.gateway.com`.
 - **[`DESIGN.md`](./DESIGN.md)** — the visual system: tokens, the three themes, the named rules.
 - **[`lessons.md`](./lessons.md)** — every capability the backend does not have yet, and what the
   console does instead. Append-only.
+- **[`Todos.md`](./Todos.md)** — known debt that is agreed and not yet done. Check it before starting
+  anything that touches the design system; the open items are there because they keep recurring.
 
 ## Commands
 

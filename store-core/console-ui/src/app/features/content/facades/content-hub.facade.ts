@@ -22,6 +22,7 @@ const TAB_ICONS: Readonly<Record<ContentTab, IconName>> = {
   media: 'layoutGrid',
   menus: 'sitemap',
   policies: 'shield',
+  branding: 'palette',
 };
 
 /** The summary's `counts` key for each tab. */
@@ -33,6 +34,8 @@ const COUNT_KEYS: Readonly<Record<ContentTab, string>> = {
   media: 'media',
   menus: 'menus',
   policies: 'policies',
+  // One record per store, so there is nothing to count; the rail shows no badge for it.
+  branding: 'branding',
 };
 
 /**

@@ -19,7 +19,6 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OrderColumn;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import jakarta.validation.constraints.Email;
@@ -30,8 +29,6 @@ import com.asrevo.cvhome.commons.domain.CountryIsoCode;
 import com.asrevo.cvhome.commons.domain.CurrencyCode;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.ManagerStoreDomain;
-import com.asrevo.cvhome.commons.domain.SliderImage;
-import com.asrevo.cvhome.commons.domain.SocialLink;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.commons.domain.Theme;
 import com.asrevo.cvhome.commons.domain.ZoneCode;
@@ -136,22 +133,6 @@ public class MerchantStore extends SalesManagerEntity<StoreMerchantId, MerchantS
     private List<LanguageCode> languages = new ArrayList<>();
 
     @JsonIgnore
-    @ElementCollection(targetClass = SliderImage.class, fetch = FetchType.LAZY)
-    @OrderColumn(name = "PRIORITY")
-    @CollectionTable(name = "MERCHANT_SLIDER_IMAGES", joinColumns = {@JoinColumn(name = "STORE_MERCHANT_ID")})
-    @AttributeOverride(name = "priority",
-            column = @Column(name = "PRIORITY", insertable = false, updatable = false))
-    @AttributeOverride(name = "name", column = @Column(name = "NAME", length = 100))
-    private List<SliderImage> sliderImages = new ArrayList<>();
-
-    @JsonIgnore
-    @ElementCollection(targetClass = SocialLink.class, fetch = FetchType.LAZY)
-    @CollectionTable(name = "SOCIAL_LINKS", joinColumns = {@JoinColumn(name = "STORE_MERCHANT_ID")})
-    @AttributeOverride(name = "provider", column = @Column(name = "PROVIDER", length = 10))
-    @AttributeOverride(name = "url", column = @Column(name = "URL", length = 100))
-    private Set<SocialLink> socialLinks = new HashSet<>();
-
-    @JsonIgnore
     @ElementCollection(targetClass = ManagerStoreDomain.class, fetch = FetchType.LAZY)
     @CollectionTable(name = "STORE_DOMAINS", joinColumns = {@JoinColumn(name = "STORE_MERCHANT_ID")})
     @AttributeOverride(name = "domain", column = @Column(name = "DOMAIN", length = 100, unique = true))
@@ -182,14 +163,6 @@ public class MerchantStore extends SalesManagerEntity<StoreMerchantId, MerchantS
     @NotEmpty
     @Column(name = "STORE_EMAIL", length = 60, nullable = false)
     private String storeEmailAddress;
-
-    @JsonIgnore
-    @Column(name = "STORE_LOGO", length = 100)
-    private String storeLogo;
-
-    @JsonIgnore
-    @Column(name = "STORE_BANNER", length = 100)
-    private String storeBanner;
 
     @JsonIgnore
     @Column(name = "CURRENCY_ID", length = 6, nullable = false)

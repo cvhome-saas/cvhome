@@ -28,9 +28,10 @@
 
                 @if (image.isDefault) {
                   <!--
-                    A statement, not a control. There is no endpoint that moves the default to
-                    another image — see the component's own note and lessons.md. It is the first
-                    image, so reordering is what changes it.
+                    A statement, not a control — but the thing it states is now reachable: the
+                    thumbnail is the first image, so moving an image to the front is how it changes.
+                    That is one concept with one gesture rather than a second control that would
+                    express the same write.
                   -->
                   <span class="shot-main">{{ t('productForm.media.storefrontThumbnail') }}</span>
                 }
@@ -76,7 +77,9 @@
                 >
                   <app-icon name="arrowUp" [size]="13" />
                 </button>
-                <span class="shot-name" dir="ltr">{{ image.name }}</span>
+                <!-- The position when the image has no name of its own; an id would identify it to the
+                     database and to nobody looking at the screen. -->
+                <span class="shot-name" dir="ltr">{{ image.name || index + 1 }}</span>
                 <button
                   type="button"
                   [disabled]="index === count - 1 || facade.uploading()"
@@ -90,23 +93,28 @@
           }
 
           <!--
-            The last cell, sized like the tiles beside it. It carries the upload checks with it, so
-            an image that is the wrong shape or too small never becomes a multipart POST.
+            The last cell, sized like the tiles beside it. It opens the store's media library rather
+            than a file input: the bytes belong there, and picking an image already in it is the
+            common case once a store has uploaded a few.
           -->
           <li class="shot-drop">
-            <app-image-picker
-              [label]="t('productForm.media.drop')"
-              [assetName]="t('productForm.media.image')"
-              [rules]="imageRules"
-              [busy]="facade.uploading()"
-              (picked)="onPicked($event)"
-            />
+            <button type="button" class="shot-drop-button" [disabled]="facade.uploading()" (click)="picking.set(true)">
+              <app-icon name="images" />
+              <span>{{ t('productForm.media.pick') }}</span>
+            </button>
           </li>
         </ul>
 
         <p class="field-hint">{{ t('productForm.media.hint') }}</p>
       }
     </div>
+
+    <app-media-picker-dialog
+      [open]="picking()"
+      kind="IMAGE"
+      (picked)="onPicked($event)"
+      (closed)="picking.set(false)"
+    />
 
     <app-image-preview
       [open]="viewing() !== null"

@@ -7,9 +7,6 @@ dependencies {
     testImplementation libs.spring.data.jpa
     api project(':store-pod:commons:store-commons')
     api project(':store-pod:merchant:merchant-commons')
-    // api, not implementation: this module's service and facade signatures name cms-commons exception types,
-    // so a consumer has to see them to catch them.
-    api project(':store-pod:commons:store-modules:store-cms-commons')
     compileOnly libs.spring.data.jpa
     compileOnly libs.jakarta.validation.api
     compileOnly libs.jackson.annotations

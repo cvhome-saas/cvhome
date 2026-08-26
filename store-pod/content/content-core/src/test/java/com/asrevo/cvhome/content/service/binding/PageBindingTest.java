@@ -42,20 +42,18 @@ class PageBindingTest {
     }
 
     @Test
-    void applyCopiesTheNavigationFlagsAndParent() {
+    void applyCopiesTheTemplateFooterFlagAndParent() {
         Content c = ContentFixtures.content(1L, ContentType.PAGE, SLUG);
         PersistablePage dto = new PersistablePage();
         dto.setTemplate(PageTemplate.LANDING);
         dto.setParentId(4L);
         dto.setShowInFooter(true);
-        dto.setLinkToMenu(true);
 
         binding.apply(c, dto);
 
         assertThat(c.getTemplate()).isEqualTo(PageTemplate.LANDING);
         assertThat(c.getParentId()).isEqualTo(4L);
         assertThat(c.isShowInFooter()).isTrue();
-        assertThat(c.isLinkToMenu()).isTrue();
     }
 
     @Test

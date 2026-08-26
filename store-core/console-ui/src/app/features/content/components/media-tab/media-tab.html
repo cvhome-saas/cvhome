@@ -217,8 +217,10 @@
             <div class="field">
               <span class="field-label">{{ t('content.media.usedIn') }}</span>
               <ul class="usage-list">
-                @for (use of asset.usage; track use.itemType + use.itemId + use.field) {
-                  <li>{{ t('content.media.usageKind.' + use.itemType) }} · {{ use.itemTitle ?? '#' + use.itemId }}</li>
+                <!-- Owners outside this service — a catalog product, say — carry no content type, so the
+                     kind comes from ownerKind and the label from the title the owner supplied. -->
+                @for (use of asset.usage; track use.ownerKind + use.ownerRef + use.field) {
+                  <li>{{ t('content.media.usageKind.' + (use.itemType ?? use.ownerKind)) }} · {{ use.itemTitle ?? '#' + use.ownerRef }}</li>
                 }
               </ul>
             </div>

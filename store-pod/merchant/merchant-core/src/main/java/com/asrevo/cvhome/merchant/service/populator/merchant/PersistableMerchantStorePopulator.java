@@ -5,7 +5,6 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 
 import com.asrevo.cvhome.commons.domain.LanguageCode;
-import com.asrevo.cvhome.commons.domain.SliderImage;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.merchant.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.merchant.model.merchant.PersistableMerchantStore;
@@ -62,14 +61,6 @@ public class PersistableMerchantStorePopulator
             target.setId(new StoreMerchantId(source.getId()));
         }
 
-        if (store.getStoreLogo() != null) {
-            target.setStoreLogo(store.getStoreLogo());
-        }
-
-        if (store.getStoreBanner() != null) {
-            target.setStoreBanner(store.getStoreBanner());
-        }
-
         target.setInBusinessSince(source.getInBusinessSince());
 
         if (source.getDimension() != null) {
@@ -85,18 +76,8 @@ public class PersistableMerchantStorePopulator
         }
         target.setTheme(source.getTheme());
         target.setColorTheme(source.getColorTheme());
-        if (source.getSocialLinks() != null) {
-            target.setSocialLinks(source.getSocialLinks());
-        }
         if (source.getStoreDomains() != null) {
             target.setStoreDomains(source.getStoreDomains());
-        }
-        if (source.getSliderImages() != null) {
-            List<SliderImage> sliderImages = source.getSliderImages()
-                    .stream()
-                    .map(it -> new SliderImage(it.priority(), it.name()))
-                    .toList();
-            target.setSliderImages(sliderImages);
         }
         target.setStorephone(source.getPhone());
         target.setStoreEmailAddress(source.getEmail());

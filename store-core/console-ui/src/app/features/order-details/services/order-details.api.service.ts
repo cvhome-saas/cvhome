@@ -2,6 +2,7 @@ import {Injectable, inject} from '@angular/core';
 import {Observable, catchError, forkJoin, map, of} from 'rxjs';
 
 import {OrdersService} from '@api/orders/orders.service';
+import {SiteSettingsService} from '@api/content/site-settings.service';
 import {PaymentService} from '@api/payment/payment.service';
 import {ManagerStoreService} from '@api/tenancy/manager-store.service';
 import type {MerchantStore} from '@models/merchant';
@@ -34,6 +35,11 @@ export interface OrderDetail {
    */
   readonly seller: MerchantStore | null;
   /**
+   * The store's logo, for the letterhead. Read from the content service's site settings rather than
+   * the store record, which no longer holds appearance. Optional for the same reason as `seller`.
+   */
+  readonly sellerLogo: string | null;
+  /**
    * The payments taken against this order.
    *
    * Empty both when the order has none and when the payment service could not be reached — the two
@@ -58,6 +64,7 @@ export class OrderDetailsApi {
   private readonly orders = inject(OrdersService);
   private readonly stores = inject(ManagerStoreService);
   private readonly payments = inject(PaymentService);
+  private readonly siteSettings = inject(SiteSettingsService);
 
   load(orderId: number, storeId: string): Observable<OrderDetail> {
     return forkJoin({
@@ -67,6 +74,11 @@ export class OrderDetailsApi {
       // Optional, unlike the other three: the letterhead is the only thing that reads it, and an
       // order is still an order when the merchant service cannot be reached.
       seller: this.stores.getStoreDetail(storeId).pipe(catchError(() => of(null))),
+      // Optional, like the letterhead itself: a content outage costs the invoice its logo, not the order.
+      sellerLogo: this.siteSettings.get().pipe(
+        map((settings) => settings.branding?.logo?.url ?? null),
+        catchError(() => of(null)),
+      ),
       /*
        * The order's payments, found by the one link there is: checkout writes the order id into the
        * payment request's `ref`, which lands in `Transaction.requestRef`. It is a convention held in
@@ -81,9 +93,10 @@ export class OrderDetailsApi {
           catchError(() => of([] as readonly PaymentTransaction[])),
         ),
     }).pipe(
-      map(({order, history, countries, seller, payments}) => ({
+      map(({order, history, countries, seller, sellerLogo, payments}) => ({
         order,
         seller,
+        sellerLogo,
         // Newest first: a re-tried payment is the one being asked about.
         payments: [...payments].sort(byTransactionDate),
 

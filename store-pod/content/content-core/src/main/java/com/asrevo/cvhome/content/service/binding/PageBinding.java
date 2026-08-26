@@ -36,7 +36,6 @@ public class PageBinding implements ContentTypeBinding<PersistablePage, Readable
         entity.setTemplate(dto.getTemplate() != null ? dto.getTemplate() : PageTemplate.STANDARD);
         entity.setParentId(dto.getParentId());
         entity.setShowInFooter(dto.isShowInFooter());
-        entity.setLinkToMenu(dto.isLinkToMenu());
     }
 
     @Override
@@ -44,7 +43,6 @@ public class PageBinding implements ContentTypeBinding<PersistablePage, Readable
         dto.setTemplate(entity.getTemplate() != null ? entity.getTemplate() : PageTemplate.STANDARD);
         dto.setParentId(entity.getParentId());
         dto.setShowInFooter(entity.isShowInFooter());
-        dto.setLinkToMenu(entity.isLinkToMenu());
         dto.setStatus(entity.getStatus());
         dto.setLocales(ContentMapper.locales(entity));
         dto.setAudit(ContentMapper.audit(entity));

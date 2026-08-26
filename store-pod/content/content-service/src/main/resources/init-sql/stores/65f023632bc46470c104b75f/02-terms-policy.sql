@@ -1,11 +1,11 @@
 -- The store's TERMS policy: the checkout agreement reads GET /storefront/policies/TERMS, which
--- Module 13 made the only source (the legacy `agreement` box fallback is gone). Negative ids are
+-- is now the only source (the legacy `agreement` box is gone). Negative ids are
 -- deliberate — content ids come from SM_SEQUENCER and only ever grow upward, so seed-only rows
 -- below zero can never collide with rows the running service creates.
 
-INSERT INTO content.content (content_id, code, content_type, link_to_menu, sort_order, visible,
+INSERT INTO content.content (content_id, code, content_type, sort_order, visible,
                              store_merchant_id, status, version, policy_type, meta)
-VALUES (-3, 'terms-of-service', 'POLICY', false, 99, true, '65f023632bc46470c104b75f', 'PUBLISHED', 1, 'TERMS',
+VALUES (-3, 'terms-of-service', 'POLICY', 99, true, '65f023632bc46470c104b75f', 'PUBLISHED', 1, 'TERMS',
         '{"jurisdiction": null, "requiresAcceptance": true, "notifyCustomers": false,
            "displayAt": {"footer": true, "checkout": true, "signup": false}}')
 on conflict (content_id) do nothing;

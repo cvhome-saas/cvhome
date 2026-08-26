@@ -17,7 +17,7 @@ export function Gallery({images, alt}: { images: ProductImage[]; alt: string }) 
     return (
         <div className="flex flex-col gap-3">
             <AspectBox className="rounded-image bg-muted">
-                <Image src={current?.imageUrl || PLACEHOLDER_IMAGE} alt={current?.imageName || alt} fill priority sizes="(max-width: 1024px) 100vw, 50vw" className="object-contain"/>
+                <Image src={current?.imageUrl || PLACEHOLDER_IMAGE} alt={current?.altText || alt} fill priority sizes="(max-width: 1024px) 100vw, 50vw" className="object-contain"/>
             </AspectBox>
             {images.length > 1 && (
                 <ul className="flex gap-2 overflow-x-auto pb-1" aria-label={alt}>

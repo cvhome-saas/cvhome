@@ -74,7 +74,7 @@ public class SummaryService {
         counts.put("banners", repository.countByStoreMerchantIdAndContentType(store, ContentType.BANNER));
         counts.put("faq", repository.countByStoreMerchantIdAndContentType(store, ContentType.FAQ));
         counts.put("policies", repository.countByStoreMerchantIdAndContentType(store, ContentType.POLICY));
-        counts.put("snippets", repository.countByStoreMerchantIdAndContentType(store, ContentType.BOX));
+        counts.put("sections", repository.countByStoreMerchantIdAndContentType(store, ContentType.SECTION));
         counts.put("media", 0L);
         counts.put("menus", 0L);
 

@@ -19,7 +19,6 @@ import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
 import com.asrevo.cvhome.store.core.populator.AbstractDataPopulator;
-import com.asrevo.cvhome.store.utils.ImageFilePath;
 import com.asrevo.cvhome.store.utils.PriceUtils;
 
 import lombok.AllArgsConstructor;
@@ -38,7 +37,6 @@ public class ReadableOrderProductPopulator
 
     private final ProductDetailsComposer productDetailsComposer;
 
-    private final ImageFilePath imageUtils;
 
     private final ExternalMerchantStoreService externalMerchantStoreService;
 

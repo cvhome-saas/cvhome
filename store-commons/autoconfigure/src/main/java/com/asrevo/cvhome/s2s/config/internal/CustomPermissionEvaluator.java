@@ -23,6 +23,12 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
     private static final String MERCHANT_READ = "STORE-POD.MERCHANT.READ";
     private static final String CONTENT_ALL = "STORE-POD.CONTENT.*";
     private static final String CONTENT_READ = "STORE-POD.CONTENT.READ";
+
+    /**
+     * Pod-internal: catalog telling content which media its products use. Not CONTENT_ALL — that resolves to
+     * hasManageAccessOnStore, which only an org or store admin satisfies, and this caller is a service.
+     */
+    private static final String CONTENT_MEDIA_USAGE = "STORE-POD.CONTENT.MEDIA-USAGE";
     private static final String CATALOG_ALL = "STORE-POD.CATALOG.*";
     private static final String CHECKOUT_ALL = "STORE-POD.CHECKOUT.*";
     private static final String CUA_ALL = "STORE-POD.CUA.*";
@@ -50,7 +56,7 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
         String action = (String) permission;
         return switch (action) {
             case STORE_CREATE, CATALOG_RESERVE, INVENTORY_RESERVE, MERCHANT_ALL, MERCHANT_READ, CONTENT_ALL,
-                 CONTENT_READ, CATALOG_ALL, CHECKOUT_ALL, CUA_ALL, PAYMENT_ALL, INVENTORY_ALL,
+                 CONTENT_READ, CONTENT_MEDIA_USAGE, CATALOG_ALL, CHECKOUT_ALL, CUA_ALL, PAYMENT_ALL, INVENTORY_ALL,
                  CUSTOMER_ALL -> hasStorePodPermission(authentication, targetId, action);
             default -> hasStoreCorePermission(authentication, targetId, action);
         };
@@ -60,7 +66,8 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
         return switch (action) {
             case STORE_CREATE -> checker.hasAccessOnStoreCreate(authentication, (String) targetId, this.pod);
 
-            case CATALOG_RESERVE, INVENTORY_RESERVE -> checker.isSameStorePod(authentication, (StoreMerchantId) targetId, this.pod);
+            case CATALOG_RESERVE, INVENTORY_RESERVE, CONTENT_MEDIA_USAGE ->
+                    checker.isSameStorePod(authentication, (StoreMerchantId) targetId, this.pod);
 
             case MERCHANT_READ, CONTENT_READ -> checker.hasReadAccessOnStore(authentication, (StoreMerchantId) targetId,
                     this.pod);

@@ -10,7 +10,6 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.content.entity.Content;
 import com.asrevo.cvhome.content.model.ContentStatus;
@@ -64,17 +63,6 @@ public interface ContentRepository extends JpaRepository<Content, Long>, JpaSpec
     /**
      * Legacy lookup: a visible page whose per-language friendly URL matches.
      */
-    @Query("""
-            select c from Content c
-            left join fetch c.descriptions cd
-            where c.storeMerchantId = :store
-              and c.contentType = :type
-              and cd.languageCode = :language
-              and cd.seUrl = :seUrl
-              and c.visible = true""")
-    Optional<Content> findBySeUrl(@Param("store") StoreMerchantId store, @Param("type") ContentType type,
-                                  @Param("seUrl") String seUrl, @Param("language") LanguageCode language);
-
     @Query("""
             select distinct c from Content c
             left join fetch c.descriptions cd

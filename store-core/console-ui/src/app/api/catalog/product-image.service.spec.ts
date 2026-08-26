@@ -27,31 +27,29 @@ describe('ProductImageService', () => {
   });
 
   /*
-   * `image`, singular. seller-core posts to `/images` and the pod maps no such path, so uploading
-   * has never worked from the old console — see lessons.md, "Catalogue — two seller-core calls have
-   * never worked". `HttpClient` sets the multipart boundary from the `FormData`; a hand-set
-   * `Content-Type` would break it, so there must not be one.
+   * Asset ids, not bytes. The library holds the file; catalog holds the reference, which is what
+   * lets an image carry alt text, be reused across products and be protected from deletion.
    */
-  it('uploads multipart to the singular path, with the order and default flag as parameters', () => {
-    const file = new File(['x'], 'shot.png', {type: 'image/png'});
-    service.upload(7, file, 2, true).subscribe();
+  it('attaches library assets as JSON', () => {
+    service.attach(7, [{mediaAssetId: 11, altText: 'Front'}]).subscribe();
 
-    const request = http.expectOne((candidate) => candidate.url === `${BASE}/private/product/7/image`);
+    const request = http.expectOne((candidate) => candidate.url === `${BASE}/private/product/7/images`);
     expect(request.request.method).toBe('POST');
-    expect(request.request.body instanceof FormData).toBeTrue();
-    expect(request.request.headers.has('Content-Type')).toBeFalse();
-    expect(request.request.params.get('order')).toBe('2');
-    expect(request.request.params.get('defaultImage')).toBe('true');
-    request.flush(null);
+    expect(request.request.body).toEqual([{mediaAssetId: 11, altText: 'Front'}]);
+    request.flush([]);
   });
 
-  it('reorders with a PATCH whose whole request is the order parameter', () => {
-    service.reorder(7, 3, 1).subscribe();
-    const request = http.expectOne((candidate) =>
-      candidate.url === `${BASE}/private/product/7/image/3`);
-    expect(request.request.method).toBe('PATCH');
-    expect(request.request.params.get('order')).toBe('1');
-    request.flush(null);
+  /*
+   * The whole list in one PUT. Reordering used to be one PATCH per image, which left two images
+   * sharing a position when a call in the middle failed, and could not set the default at all.
+   */
+  it('replaces the whole gallery, order being the list order', () => {
+    service.replace(7, [{mediaAssetId: 22, defaultImage: true}, {mediaAssetId: 11}]).subscribe();
+
+    const request = http.expectOne((candidate) => candidate.url === `${BASE}/private/product/7/images`);
+    expect(request.request.method).toBe('PUT');
+    expect(request.request.body).toEqual([{mediaAssetId: 22, defaultImage: true}, {mediaAssetId: 11}]);
+    request.flush([]);
   });
 
   it('removes an image by id', () => {

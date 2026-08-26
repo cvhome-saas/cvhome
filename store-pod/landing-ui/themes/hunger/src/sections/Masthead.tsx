@@ -1,5 +1,5 @@
 import {getTranslations} from 'next-intl/server';
-import type {SliderImage, Store} from '@store-front/types';
+import type {Banner, Store} from '@store-front/types';
 import {Hero} from './Hero';
 
 /**
@@ -8,7 +8,7 @@ import {Hero} from './Hero';
  * to call), and the merchant's picture in a ruled frame beside it. With no slider image the type block
  * takes the full measure and the masthead simply gets shorter — the menu starts higher up the page.
  */
-export async function Masthead({store, slides}: { store: Store; slides: SliderImage[] }) {
+export async function Masthead({store, slides}: { store: Store; slides: Banner[] }) {
     const t = await getTranslations('COMPONENTS.FOOTER');
     const place = [store.address?.city, store.address?.country].filter(Boolean).join(' · ');
 

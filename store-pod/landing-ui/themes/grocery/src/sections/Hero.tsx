@@ -7,7 +7,7 @@ import {A11y, Autoplay, Pagination} from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import {useDir} from '@store-front/i18n/use-dir';
-import type {ImageFile, SliderImage} from '@store-front/types';
+import type {Banner} from '@store-front/types';
 import {cn} from '@store-front/ui/lib/utils';
 
 /**
@@ -17,11 +17,11 @@ import {cn} from '@store-front/ui/lib/utils';
  * Swiper needs `dir` explicitly and is re-keyed on dir so a locale switch re-initialises it.
  */
 export function Hero({slides, banner, storeName, facts, anchor}: {
-    slides: SliderImage[]; banner?: ImageFile; storeName: string; facts: string[]; anchor?: string;
+    slides: Banner[]; banner?: Banner; storeName: string; facts: string[]; anchor?: string;
 }) {
     const t = useTranslations('PAGE.HOME');
     const dir = useDir();
-    const hasImage = slides.length > 0 || !!banner?.path;
+    const hasImage = slides.length > 0 || !!banner?.desktopUrl;
     // the stage never swallows the first viewport: the first rail's crates stay in reach below it
     const stage = 'stage relative w-full overflow-hidden rounded-card border-2 bg-card aspect-[4/3] max-h-[38vh] sm:aspect-[16/9] sm:max-h-[46vh] lg:max-h-[56vh]';
     return (
@@ -50,15 +50,15 @@ export function Hero({slides, banner, storeName, facts, anchor}: {
                             autoplay={slides.length > 1 ? {delay: 6000, disableOnInteraction: true} : false}
                             a11y={{enabled: true}} className={stage}>
                         {slides.map((s, i) => (
-                            <SwiperSlide key={`${s.url}-${i}`} aria-label={t('HERO_SLIDE', {index: i + 1, total: slides.length})}>
-                                <Image src={s.url} alt="" fill priority={i === 0} sizes="(max-width: 1344px) 100vw, 820px" className="object-cover"/>
+                            <SwiperSlide key={s.id} aria-label={t('HERO_SLIDE', {index: i + 1, total: slides.length})}>
+                                <Image src={s.desktopUrl ?? ''} alt={s.altText ?? ''} fill priority={i === 0} sizes="(max-width: 1344px) 100vw, 820px" className="object-cover"/>
                             </SwiperSlide>
                         ))}
                     </Swiper>
                 </div>
-            ) : banner?.path ? (
+            ) : banner?.desktopUrl ? (
                 <div className={cn(stage, 'min-w-0')}>
-                    <Image src={banner.path} alt="" fill priority sizes="(max-width: 1344px) 100vw, 820px" className="object-cover"/>
+                    <Image src={banner.desktopUrl} alt={banner.altText ?? ''} fill priority sizes="(max-width: 1344px) 100vw, 820px" className="object-cover"/>
                 </div>
             ) : null}
         </section>

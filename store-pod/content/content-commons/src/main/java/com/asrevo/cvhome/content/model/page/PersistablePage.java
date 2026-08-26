@@ -24,9 +24,4 @@ public class PersistablePage extends PersistableContent {
      */
     private boolean showInFooter;
 
-    /**
-     * Legacy flag the storefront main navigation still reads through the compat list.
-     */
-    private boolean linkToMenu;
-
 }

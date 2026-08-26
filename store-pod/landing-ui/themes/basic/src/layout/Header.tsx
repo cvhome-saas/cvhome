@@ -17,8 +17,8 @@ export function Header({ctx, data}: { ctx: PageContext; data: LayoutData }) {
             <div className="mx-auto flex h-header max-w-content items-center gap-2 px-gutter lg:h-header-lg lg:gap-6">
                 <MobileNav ctx={ctx} data={data}/>
                 <Link prefetch={false} href="/" className="flex min-w-0 shrink-0 items-center" aria-label={store.name}>
-                    {store.logo?.path ? (
-                        <Image src={store.logo.path} alt={store.logo.name || store.name} width={160} height={40} className="h-8 w-auto max-w-[11rem] object-contain lg:h-9" priority/>
+                    {data.branding.logo ? (
+                        <Image src={data.branding.logo.url} alt={data.branding.logo.alt || store.name} width={160} height={40} className="h-8 w-auto max-w-[11rem] object-contain lg:h-9" priority/>
                     ) : (
                         <span className="display truncate text-2xl lg:text-3xl"><bdi dir="auto">{store.name}</bdi></span>
                     )}

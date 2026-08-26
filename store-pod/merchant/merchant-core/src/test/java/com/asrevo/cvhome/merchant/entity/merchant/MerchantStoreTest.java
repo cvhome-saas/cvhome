@@ -41,8 +41,6 @@ class MerchantStoreTest {
         assertThat(store.getInBusinessSince()).isEqualTo(LocalDate.now());
         assertThat(store.getAuditSection()).isNotNull();
         assertThat(store.getLanguages()).isEmpty();
-        assertThat(store.getSliderImages()).isEmpty();
-        assertThat(store.getSocialLinks()).isEmpty();
         assertThat(store.getStoreDomains()).isEmpty();
         assertThat(store.isUseCache()).isFalse();
         assertThat(store.isRequireLoginForOrderPlacement()).isFalse();

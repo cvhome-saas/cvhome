@@ -10,10 +10,6 @@ public enum ContentErrors implements ErrorCode {
 
     CONTENT_NOT_FOUND("CONTENT.NOT_FOUND", ErrorCategory.NOT_FOUND),
     SLUG_DUPLICATE("CONTENT.SLUG.DUPLICATE", ErrorCategory.CONFLICT),
-    /**
-     * Kept for the legacy compat surface — the same condition as {@link #SLUG_DUPLICATE}.
-     */
-    DUPLICATE_CODE("CONTENT.CODE.DUPLICATE", ErrorCategory.CONFLICT),
     VERSION_CONFLICT("CONTENT.VERSION.CONFLICT", ErrorCategory.CONFLICT),
     TRANSITION_NOT_ALLOWED("CONTENT.STATUS.TRANSITION_NOT_ALLOWED", ErrorCategory.UNPROCESSABLE),
     PUBLISH_INCOMPLETE("CONTENT.PUBLISH.INCOMPLETE", ErrorCategory.UNPROCESSABLE),

@@ -8,17 +8,18 @@
 
 import type {PageT} from '@models/page';
 
-/** The content types that have a workflow and a console list. `snippets` are the legacy BOX rows. */
+/** The content types that have a workflow and a console list. */
 export type ContentListType = 'pages' | 'posts' | 'banners' | 'faq' | 'policies';
 
 /** Every tab of the Content management hub. */
-export type ContentTab = ContentListType | 'media' | 'menus';
+export type ContentTab = ContentListType | 'branding' | 'media' | 'menus';
 
 export const CONTENT_LIST_TYPES: readonly ContentListType[] = ['pages', 'posts', 'banners', 'faq', 'policies'];
 
-export const CONTENT_TABS: readonly ContentTab[] = ['pages', 'posts', 'banners', 'faq', 'media', 'menus', 'policies'];
+export const CONTENT_TABS: readonly ContentTab[] =
+  ['pages', 'posts', 'banners', 'faq', 'media', 'menus', 'policies', 'branding'];
 
-export type ContentType = 'BOX' | 'PAGE' | 'SECTION' | 'POST' | 'BANNER' | 'FAQ' | 'POLICY';
+export type ContentType = 'PAGE' | 'SECTION' | 'POST' | 'BANNER' | 'FAQ' | 'POLICY';
 
 export type ContentStatus = 'DRAFT' | 'REVIEW' | 'SCHEDULED' | 'PUBLISHED' | 'ARCHIVED';
 
@@ -136,7 +137,6 @@ export interface PersistablePage extends PersistableContent {
   readonly template?: PageTemplate;
   readonly parentId?: number | null;
   readonly showInFooter?: boolean;
-  readonly linkToMenu?: boolean;
 }
 
 export type ReadablePage = PersistablePage & ReadableContentMeta;
@@ -298,8 +298,12 @@ export interface MediaFolder {
 }
 
 export interface MediaUsage {
-  readonly itemType: ContentType;
-  readonly itemId: number;
+  readonly ownerKind: MediaOwnerKind;
+  /** The owner's id within its kind — a content id as text, the store id, a product id. */
+  readonly ownerRef: string;
+  /** Set only when {@link ownerKind} is `CONTENT`. */
+  readonly itemType?: ContentType | null;
+  readonly itemId?: number | null;
   readonly itemTitle?: string | null;
   readonly field: string;
 }
@@ -335,11 +339,74 @@ export interface PersistableMediaAsset {
  * A store-level text fragment the storefront reads by code (the legacy "content box"). No workflow:
  * always live, `visible` toggles it.
  */
-export interface Snippet {
-  readonly id?: number;
-  readonly code?: string;
-  readonly visible: boolean;
-  readonly translations: readonly ContentTranslation[];
+/** What holds a reference to a media asset. Orthogonal to {@link ContentType}, not a replacement for it. */
+export type MediaOwnerKind = 'CONTENT' | 'SITE_SETTINGS' | 'PRODUCT' | 'CATEGORY' | 'BRAND';
+
+/** A media asset resolved for display: the id to write back, and the URL to show. */
+export interface MediaRef {
+  readonly id: number;
+  readonly url: string;
+  readonly alt: string | null;
+  readonly width: number | null;
+  readonly height: number | null;
+}
+
+/** The store's brand imagery. Every slot is optional. */
+export interface SiteBranding {
+  readonly logo: MediaRef | null;
+  readonly logoDark: MediaRef | null;
+  readonly favicon: MediaRef | null;
+  readonly og: MediaRef | null;
+}
+
+export interface SocialLink {
+  readonly provider: string;
+  readonly url: string;
+}
+
+/**
+ * How the store looks: brand imagery, social links and site-level SEO.
+ *
+ * These used to be spread across merchant (logo, banner, slider images, social links) and the legacy content
+ * snippets (`meta-title`, `meta-description`). This is the only place they live now. A `null` media slot
+ * clears it — which is how a logo finally becomes removable.
+ */
+export interface SiteSettings {
+  readonly logoMediaId: number | null;
+  readonly logoDarkMediaId: number | null;
+  readonly faviconMediaId: number | null;
+  readonly ogMediaId: number | null;
+  /** Per-field, per-locale: `{metaTitle: {en: '…', ar: '…'}, metaDescription: {…}}`. */
+  readonly seo: Readonly<Record<string, Readonly<Record<string, string>>>>;
+  readonly socialLinks: readonly SocialLink[];
+  readonly branding?: SiteBranding;
+  readonly updatedAt?: string | null;
+  readonly updatedBy?: string | null;
+}
+
+/** What a home-page section renders. */
+export type HomeSectionKind =
+  'PRODUCT_GROUP' | 'CATEGORY_GRID' | 'BANNER_REF' | 'RICH_TEXT' | 'IMAGE' | 'POST_FEED' | 'FAQ_REF';
+
+/**
+ * A block on the store's home page. The page used to be a hard-coded list of four product rails in the
+ * storefront's own code, so a seller could neither reorder it nor put anything else on it.
+ */
+export interface PersistableSection extends PersistableContent {
+  readonly kind: HomeSectionKind;
+  readonly targetValue?: string | null;
+  readonly mediaId?: number | null;
+  readonly itemLimit?: number | null;
+  readonly layout?: string | null;
+  readonly cta?: MenuTarget | null;
+}
+
+export interface ReadableSection extends PersistableSection {
+  readonly type: ContentType;
+  readonly status: ContentStatus;
+  readonly locales: readonly LocaleState[];
+  readonly audit?: ContentAudit;
+  readonly imageUrl?: string | null;
 }
 
 export interface ContentSummary {

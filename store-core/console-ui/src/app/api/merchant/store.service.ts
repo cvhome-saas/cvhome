@@ -5,11 +5,10 @@ import {CrudService} from '@core/http/crud.service';
 import type {
   PersistableMerchantStore,
   ReadableMerchantStore,
-  SliderImage,
 } from '@models/merchant';
 
 /**
- * The store as the merchant pod owns it — its identity, its marketing images, its social links.
+ * The store as the merchant pod owns it — its identity, its languages, its currency, its domains.
  * Distinct from `@api/tenancy/manager-store.service.ts`, which is tenancy's row about the store
  * (pod placement, provisioning, the store list) and cannot edit any of this.
  *
@@ -17,14 +16,10 @@ import type {
  * settings page always edits the store the console is currently working in. The controller reads
  * that as its `StoreMerchantId` argument.
  *
- * **Two of seller-core's methods are deliberately not ported.** `removeStoreLogo` and
- * `removeStoreBanner` post to `/v1/private/store/{store}/marketing/logo|banner` — paths missing
- * the `/spg/merchant/api` prefix every sibling carries, and mapped by no controller.
- * `MerchantStoreApi` has `addLogo` and `addBanner` and no delete counterpart, and
- * `PersistableMerchantStore` carries neither image, so an update cannot clear one either. Removing
- * a logo is simply not expressible. See lessons.md, "Store management — a logo or banner can be
- * uploaded but never removed". `updateSocialNetworks` is not ported either: no caller exists
- * anywhere in seller-ui and `POST /v1/private/store/{store}/marketing` is likewise unmapped.
+ * **Appearance is not here.** The logo, banner, slider images and social links moved to the content
+ * service, which owns the media library they come from — see `@api/content/site-settings.service.ts`.
+ * That also closed a hole this comment used to describe: merchant had upload endpoints and no delete
+ * counterpart, so a logo could be set and never removed. Clearing a slot is an ordinary `PUT` now.
  */
 const MERCHANT_STORE_API_BASE = '/spg/merchant/api/v1';
 
@@ -72,50 +67,4 @@ export class MerchantStoreService {
     return this.crudService.delete(`${MERCHANT_STORE_API_BASE}/private/store`);
   }
 
-  /**
-   * Replaces the store's social links.
-   *
-   * Takes a whole `PersistableMerchantStore` even though the controller reads only
-   * `getSocialLinks()` off it — that is the declared body type, not a convenience.
-   */
-  updateSocialLinks(store: PersistableMerchantStore): Observable<void> {
-    return this.crudService.put(`${MERCHANT_STORE_API_BASE}/private/store/social-links`, store);
-  }
-
-  /**
-   * Replaces the slider in one call, which is what makes reordering and deleting possible.
-   *
-   * There is no delete-slide and no reorder endpoint. Both are expressed by sending the list you
-   * want: drop an entry to delete it, renumber `priority` to reorder. Same store-shaped body as
-   * `updateSocialLinks`, for the same reason.
-   */
-  updateSliderImages(store: PersistableMerchantStore): Observable<void> {
-    return this.crudService.put(`${MERCHANT_STORE_API_BASE}/private/store/marketing/slider-images`, store);
-  }
-
-  addLogo(file: File): Observable<void> {
-    return this.crudService.post(`${MERCHANT_STORE_API_BASE}/private/store/marketing/logo`, this.upload(file));
-  }
-
-  addBanner(file: File): Observable<void> {
-    return this.crudService.post(`${MERCHANT_STORE_API_BASE}/private/store/marketing/banner`, this.upload(file));
-  }
-
-  /** Answers with the stored slide, whose `name` is a server-issued UUID rather than the filename. */
-  addSliderImage(file: File): Observable<SliderImage> {
-    return this.crudService.post(
-      `${MERCHANT_STORE_API_BASE}/private/store/marketing/add-slider-image`,
-      this.upload(file),
-    );
-  }
-
-  /**
-   * The controller takes `@RequestParam("file") MultipartFile`, so the part must be named `file`.
-   * `HttpClient` sets the multipart boundary itself; setting a `Content-Type` here would break it.
-   */
-  private upload(file: File): FormData {
-    const body = new FormData();
-    body.append('file', file, file.name);
-    return body;
-  }
 }

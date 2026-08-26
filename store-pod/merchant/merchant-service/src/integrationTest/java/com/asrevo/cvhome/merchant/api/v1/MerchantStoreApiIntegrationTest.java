@@ -167,8 +167,11 @@ class MerchantStoreApiIntegrationTest {
         assertThat(store.get(ID).asString()).isEqualTo(STORE_1);
         assertThat(store.get(NAME).asString()).isNotBlank();
         assertThat(store.get("supportedLanguages")).hasSize(2);
-        assertThat(store.get(SLIDER_IMAGES_FIELD)).hasSize(5);
-        assertThat(store.get(LOGO_FIELD).get(PATH_FIELD).asString()).contains(String.format("/files/%s/LOGO/", STORE_1));
+        assertThat(store.get("currency").asString()).isNotBlank();
+        // The store record is configuration now. Its logo, banner, slider and social links come from the content
+        // service's site settings, so the storefront reads them there rather than here.
+        assertThat(store.has(SLIDER_IMAGES_FIELD)).isFalse();
+        assertThat(store.has(LOGO_FIELD)).isFalse();
     }
 
     @Test
@@ -218,7 +221,6 @@ class MerchantStoreApiIntegrationTest {
         expect(api.send(HttpMethod.PUT, scoped(PRIVATE_STORE, STORE_1), other, storeBody(STORE_1, "Hijack")),
                 HttpStatus.FORBIDDEN);
         expect(api.send(HttpMethod.DELETE, scoped(PRIVATE_STORE, STORE_1), other, null), HttpStatus.FORBIDDEN);
-        expect(upload(scoped(LOGO, STORE_1), other, "x.png"), HttpStatus.FORBIDDEN);
     }
 
     @Test
@@ -231,7 +233,7 @@ class MerchantStoreApiIntegrationTest {
     void moderatorCanReadButNotChangeTheStore() {
         String moderator = tokens.staff(ROLE_STORE_MODERATOR, STORE_1);
 
-        expect(api.send(HttpMethod.PUT, scoped(SOCIAL_LINKS, STORE_1), moderator, "{\"socialLinks\":[]}"),
+        expect(api.send(HttpMethod.PUT, scoped(PRIVATE_STORE, STORE_1), moderator, storeBody(STORE_1, "Renamed")),
                 HttpStatus.FORBIDDEN);
         expect(api.send(HttpMethod.DELETE, scoped(PRIVATE_STORE, STORE_1), moderator, null), HttpStatus.FORBIDDEN);
     }
@@ -263,7 +265,7 @@ class MerchantStoreApiIntegrationTest {
     // ------------------------------------------------------------------------------------------- life cycle
 
     @Test
-    void storeLifecycleCreateUpdateUploadDelete() {
+    void storeLifecycleCreateUpdateDelete() {
         String name = slug("lifecycle");
         String id = createStore(name);
         String owner = tokens.staff(ROLE_STORE_ADMIN, id);
@@ -283,30 +285,12 @@ class MerchantStoreApiIntegrationTest {
         assertThat(updated.get(NAME).asString()).isEqualTo(renamed);
         assertThat(updated.get(STORE_DOMAINS_FIELD).get(0).get(DOMAIN_FIELD).asString()).isEqualTo(name);
 
-        // social links and ordered slider images
+        // Appearance is not merchant's any more: the logo, banner, slider and social links live in the content
+        // service's site settings and banners, so the marketing endpoints that used to sit here are gone.
+        expect(api.send(HttpMethod.POST, scoped(path(MARKETING, LOGO_FIELD), id), owner, null),
+                HttpStatus.NOT_FOUND);
         expect(api.send(HttpMethod.PUT, scoped(SOCIAL_LINKS, id), owner,
-                "{\"socialLinks\":[{\"provider\":\"INSTAGRAM\",\"url\":\"https://instagram.com/shop\"}]}"),
-                HttpStatus.OK);
-        expect(api.send(HttpMethod.PUT, scoped(SLIDER_IMAGES, id), owner,
-                "{\"sliderImages\":[{\"priority\":0,\"name\":\"first.png\"},{\"priority\":1,\"name\":\"second.png\"}]}"),
-                HttpStatus.CREATED);
-        JsonNode decorated = json(privateRead(id, owner));
-        assertThat(decorated.get("socialLinks").get(0).get("provider").asString()).isEqualTo("INSTAGRAM");
-        assertThat(decorated.get(SLIDER_IMAGES_FIELD)).hasSize(2);
-
-        // uploads land in MinIO and are reflected as CDN paths
-        expect(upload(scoped(LOGO, id), owner, LOGO_FILE), HttpStatus.CREATED);
-        expect(upload(scoped(BANNER, id), owner, "banner.png"), HttpStatus.CREATED);
-        ResponseEntity<String> slider = upload(scoped(ADD_SLIDER, id), owner, "slide.png");
-        expect(slider, HttpStatus.CREATED);
-        JsonNode slide = json(slider);
-        assertThat(slide.get("priority").asInt()).isEqualTo(2);
-        assertThat(slide.get(NAME).asString()).endsWith(".png");
-        assertThat(slide.get("url").asString()).contains(String.format("/files/%s/SLIDER/", id));
-        JsonNode withMedia = json(privateRead(id, owner));
-        assertThat(withMedia.get(LOGO_FIELD).get(NAME).asString()).isEqualTo(LOGO_FILE);
-        assertThat(withMedia.get(BANNER_FIELD).get(PATH_FIELD).asString()).contains(String.format("/files/%s/BANNER/", id));
-        assertThat(withMedia.get(SLIDER_IMAGES_FIELD)).hasSize(3);
+                "{\"socialLinks\":[]}"), HttpStatus.NOT_FOUND);
 
         // delete, then nothing is left
         expect(api.send(HttpMethod.DELETE, scoped(PRIVATE_STORE, id), owner, null), HttpStatus.OK);

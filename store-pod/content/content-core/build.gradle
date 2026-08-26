@@ -5,9 +5,6 @@ plugins {
 dependencies {
     api project(':store-pod:commons:store-commons')
     api project(':store-pod:content:content-commons')
-    // api, not implementation: the media service's signatures name cms-commons exception types, so a consumer has
-    // to see them to catch them.
-    api project(':store-pod:commons:store-modules:store-cms-commons')
     compileOnly libs.spring.data.jpa
     compileOnly libs.spring.tx
     compileOnly libs.jakarta.validation.api

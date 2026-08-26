@@ -1,6 +1,6 @@
 import {
     FaqDocument, Policy, PolicyType, PostList, PostSummary, SiteContent, SitemapEntry,
-    StorefrontPage, Banner, BannerPlacement, MenuNode,
+    StorefrontPage, Banner, BannerPlacement, MenuNode, HomeSection,
 } from "@store-front/types/content";
 import {storeBaseServiceUrl, StoreContext} from "@store-front/types/store-context";
 import {apiFetch, get, orUndefined} from "./http-utils";
@@ -37,6 +37,11 @@ export class ContentService {
 
     public static getBanners = async (ctx: StoreContext, placement?: BannerPlacement): Promise<Banner[]> => {
         return (await orUndefined(apiFetch<Banner[]>(sf(ctx, 'banners', placement ? `&placement=${placement}` : ''), get()))) ?? [];
+    }
+
+    /** The home page's blocks, in order. Degrades to none: the rest of the page still renders. */
+    public static getHomeSections = async (ctx: StoreContext): Promise<HomeSection[]> => {
+        return (await orUndefined(apiFetch<HomeSection[]>(sf(ctx, 'home-sections'), get()))) ?? [];
     }
 
     public static getFaq = async (ctx: StoreContext, group?: string): Promise<FaqDocument | undefined> => {

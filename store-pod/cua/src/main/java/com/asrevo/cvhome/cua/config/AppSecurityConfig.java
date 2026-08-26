@@ -31,6 +31,8 @@ public class AppSecurityConfig {
 
     private static final String LOGIN_PAGE = "/login";
 
+    private static final String ERROR_PAGE = "/error";
+
     @Bean
     @Order(3)
     SecurityFilterChain appSecurity(HttpSecurity http, JwtDecoder jwtDecoder,
@@ -40,6 +42,14 @@ public class AppSecurityConfig {
                         .requestMatchers(EndpointRequest.toAnyEndpoint())
                         .permitAll()
                         .requestMatchers(LOGIN_PAGE, "/register", "/api/v1/auth/me")
+                        .permitAll()
+                        /*
+                         * Permitted so a failure surfaces as a failure. `/error` was authenticated, so any
+                         * exception on a public page became a redirect to `/login` — and when it was the login
+                         * page that failed, that redirect looped forever. A shopper clicking "Login" on the
+                         * storefront got an endlessly reloading tab and no error anywhere they could see.
+                         */
+                        .requestMatchers(ERROR_PAGE)
                         .permitAll()
                         .requestMatchers("/swagger-ui.html")
                         .permitAll()
@@ -77,7 +87,7 @@ public class AppSecurityConfig {
         RequestMatcher getRequests = PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.GET, "/**");
         RequestMatcher notFavicon = new NegatedRequestMatcher(
                 PathPatternRequestMatcher.withDefaults().matcher("/favicon.*"));
-        RequestMatcher notError = new NegatedRequestMatcher(PathPatternRequestMatcher.withDefaults().matcher("/error"));
+        RequestMatcher notError = new NegatedRequestMatcher(PathPatternRequestMatcher.withDefaults().matcher(ERROR_PAGE));
         RequestMatcher saveRequestMatcher = new AndRequestMatcher(getRequests, notFavicon, notError);
         cache.setRequestMatcher(saveRequestMatcher);
         return cache;

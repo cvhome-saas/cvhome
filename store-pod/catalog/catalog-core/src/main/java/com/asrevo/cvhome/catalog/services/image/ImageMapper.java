@@ -8,35 +8,31 @@ import org.springframework.stereotype.Component;
 import com.asrevo.cvhome.catalog.entity.Product;
 import com.asrevo.cvhome.catalog.entity.ProductImage;
 import com.asrevo.cvhome.catalog.model.product.ReadableImage;
-import com.asrevo.cvhome.store.utils.ImageFilePath;
-
-import lombok.RequiredArgsConstructor;
 
 /**
- * Turns image rows into the urls a browser fetches. A file image resolves to the CDN path under the product's sku;
- * an external image is served from wherever it lives.
+ * Turns image rows into the urls a browser fetches.
+ *
+ * <p>
+ * There is no url building left to do: a library image carries the asset's public URL, cached when it was
+ * attached, and an external image is served from wherever it lives. Catalog used to assemble a CDN path out of
+ * the store id, the sku and a file name, which meant renaming a product's sku silently broke its pictures.
+ * </p>
  */
 @Component
-@RequiredArgsConstructor
 public class ImageMapper {
-
-    private final ImageFilePath imageFilePath;
 
     public ReadableImage toReadable(Product product, ProductImage image) {
         ReadableImage readable = new ReadableImage();
         readable.setId(image.getId());
-        readable.setImageName(image.getProductImage());
+        readable.setMediaAssetId(image.getMediaAssetId());
         readable.setImageType(image.getImageType());
         readable.setOrder(image.getSortOrder());
         readable.setDefaultImage(image.isDefaultImage());
+        readable.setAltText(image.getAltText());
         readable.setExternalUrl(image.getProductImageUrl());
+        readable.setImageUrl(image.resolvedUrl());
         if (image.isExternal()) {
-            readable.setImageUrl(image.getProductImageUrl());
             readable.setVideoUrl(image.getProductImageUrl());
-        } else {
-            readable.setImageUrl(imageFilePath.getContextPath()
-                    + imageFilePath.buildProductImageUtils(product.getStore(), product.getSku(),
-                    image.getProductImage()));
         }
         return readable;
     }

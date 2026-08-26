@@ -1,11 +1,8 @@
 package com.asrevo.cvhome.merchant.service.facade.merchant;
 
 import java.util.List;
-import java.util.Set;
 
 import com.asrevo.cvhome.commons.domain.LanguageCode;
-import com.asrevo.cvhome.commons.domain.SliderImage;
-import com.asrevo.cvhome.commons.domain.SocialLink;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.merchant.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.merchant.errors.DefaultStoreNotRemovableException;
@@ -13,8 +10,6 @@ import com.asrevo.cvhome.merchant.errors.DuplicateMerchantStoreException;
 import com.asrevo.cvhome.merchant.errors.MerchantStoreNotFoundException;
 import com.asrevo.cvhome.merchant.model.merchant.PersistableMerchantStore;
 import com.asrevo.cvhome.merchant.model.merchant.ReadableMerchantStore;
-import com.asrevo.cvhome.store.core.entity.content.InputContentFile;
-import com.asrevo.cvhome.store.core.modules.cms.errors.AssetUploadFailedException;
 
 /**
  * Layer between shop controllers, services and API with sm-core
@@ -43,34 +38,7 @@ public interface StoreFacade {
     void delete(StoreMerchantId storeMerchantId)
             throws DefaultStoreNotRemovableException, MerchantStoreNotFoundException;
 
-    /**
-     * Add MerchantStore logo
-     */
-    void addStoreLogo(StoreMerchantId storeMerchantId, InputContentFile cmsContentImage);
-
-    /**
-     * Add MerchantStore banner
-     */
-    void addStoreBanner(StoreMerchantId storeMerchantId, InputContentFile cmsContentImage);
-
-    /**
-     * Add MerchantStore banner
-     *
-     * @return
-     */
-    SliderImage addStoreSliderImage(StoreMerchantId storeMerchantId, InputContentFile cmsContentImage);
-
     void update(StoreMerchantId storeMerchantId, PersistableMerchantStore store)
             throws MerchantStoreNotFoundException;
-
-    void addLogo(StoreMerchantId storeMerchantId, InputContentFile content) throws AssetUploadFailedException;
-
-    void addBanner(StoreMerchantId storeMerchantId, InputContentFile content) throws AssetUploadFailedException;
-
-    void addSlider(StoreMerchantId storeMerchantId, InputContentFile content) throws AssetUploadFailedException;
-
-    void updateSocialLinks(StoreMerchantId id, Set<SocialLink> socialLinks);
-
-    void updateSliderImages(StoreMerchantId id, List<SliderImage> sliderImages);
 
 }

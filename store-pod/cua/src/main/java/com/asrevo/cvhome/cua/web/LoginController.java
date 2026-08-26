@@ -13,6 +13,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.cua.domain.SocialLoginConfigId;
 import com.asrevo.cvhome.cua.repo.SocialLoginConfigRepository;
@@ -33,6 +34,8 @@ public class LoginController {
 
     private final ExternalMerchantStoreService externalMerchantStoreService;
 
+    private final StoreLogoResolver storeLogo;
+
     @GetMapping("/login")
     public String login(HttpServletRequest request, Locale locale, HttpServletResponse response, Model model) {
         SavedRequest savedRequest = requestCache.getRequest(request, response);
@@ -43,11 +46,15 @@ public class LoginController {
                     .getFirst("client_id");
             if (clientId != null) {
 
-                ReadableMerchantStore store = externalMerchantStoreService.getStore(new StoreMerchantId(clientId));
+                StoreMerchantId storeId = new StoreMerchantId(clientId);
+                ReadableMerchantStore store = externalMerchantStoreService.getStore(storeId);
                 model.addAttribute("store", store);
+                // The logo is the content service's now, not a field on the merchant record.
+                model.addAttribute("storeLogo",
+                        storeLogo.logoUrl(storeId, new LanguageCode(locale.getLanguage())));
                 model.addAttribute("clientId", clientId);
                 List<SocialLoginConfigId> configs = socialLoginConfigRepository
-                        .findEnabledSocialLoginConfig(new StoreMerchantId(clientId));
+                        .findEnabledSocialLoginConfig(storeId);
                 model.addAttribute("socialLogins", configs);
             }
         }
