@@ -247,6 +247,22 @@ public class MediaService implements SummaryService.MediaFigures {
     }
 
     /**
+     * The assets of this store among {@code ids}, for a caller that holds ids and needs the whole record. An id
+     * belonging to another store is simply absent, which is what lets a caller use this as its ownership check.
+     */
+    @Transactional(readOnly = true)
+    public List<ReadableMediaAsset> assets(StoreMerchantId store, List<Long> ids) {
+        List<Long> wanted = ids == null ? List.of()
+                : ids.stream().filter(java.util.Objects::nonNull).distinct().toList();
+        if (wanted.isEmpty()) {
+            return List.of();
+        }
+        return assets.findByStoreMerchantIdAndIdIn(store.getId(), wanted).stream()
+                .map(a -> toReadable(a, 0, List.of()))
+                .toList();
+    }
+
+    /**
      * Public URLs for a set of asset ids of this store — what bindings use to resolve artwork and hero images.
      */
     @Transactional(readOnly = true)

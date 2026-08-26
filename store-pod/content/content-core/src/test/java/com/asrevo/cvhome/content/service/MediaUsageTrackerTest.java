@@ -50,7 +50,7 @@ class MediaUsageTrackerTest {
 
         tracker.record(item, refs);
 
-        verify(repository).deleteByOwnerKindAndOwnerRef(MediaOwnerKind.CONTENT, REF_ONE);
+        verify(repository).deleteByOwner(MediaOwnerKind.CONTENT, REF_ONE);
         var captor = org.mockito.ArgumentCaptor.forClass(java.util.List.class);
         verify(repository).saveAll(captor.capture());
         assertThat((java.util.List<MediaUsageRow>) captor.getValue()).singleElement().satisfies(r -> {
@@ -68,7 +68,7 @@ class MediaUsageTrackerTest {
 
         tracker.record(item, Map.of());
 
-        verify(repository).deleteByOwnerKindAndOwnerRef(MediaOwnerKind.CONTENT, REF_ONE);
+        verify(repository).deleteByOwner(MediaOwnerKind.CONTENT, REF_ONE);
         verify(repository, never()).saveAll(any());
     }
 
@@ -76,7 +76,7 @@ class MediaUsageTrackerTest {
     void forgettingClearsTheItemsRows() {
         tracker.forget(ContentFixtures.content(1L, ContentType.POST, SLUG));
 
-        verify(repository).deleteByOwnerKindAndOwnerRef(MediaOwnerKind.CONTENT, REF_ONE);
+        verify(repository).deleteByOwner(MediaOwnerKind.CONTENT, REF_ONE);
     }
 
 }

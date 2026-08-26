@@ -1,0 +1,42 @@
+### The media library as another pod service sees it (ExternalMediaApi)
+### Service-to-service only. In the running stack catalog calls these with its s2s client-credentials token;
+### the session cookie below is for driving them by hand.
+
+### Resolve assets by id. Ids belonging to another store are simply absent from the response, which is what
+### lets catalog use this as its ownership check before saving a product image.
+GET {{SELLER_UI_URL}}/spg/content/api/v1/private/content/external/media?ids=1,2,3&store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+
+### Replace the whole reference set for one owner. Idempotent: send it twice, get the same rows.
+PUT {{SELLER_UI_URL}}/spg/content/api/v1/private/content/external/media/usage?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Content-Type: application/json
+Cookie: SESSION={{SESSION_ID}}
+
+{
+  "ownerKind": "PRODUCT",
+  "ownerRef": "42",
+  "ownerTitle": "Blue sneakers",
+  "refs": [{"field": "image[0]", "assetId": 1}, {"field": "image[1]", "assetId": 2}]
+}
+
+### Release: the same call with no refs. There is no separate delete on purpose.
+PUT {{SELLER_UI_URL}}/spg/content/api/v1/private/content/external/media/usage?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Content-Type: application/json
+Cookie: SESSION={{SESSION_ID}}
+
+{"ownerKind": "PRODUCT", "ownerRef": "42", "ownerTitle": "Blue sneakers", "refs": []}
+
+### The asset now names the product that uses it, without content ever calling catalog
+GET {{SELLER_UI_URL}}/spg/content/api/v1/private/content/media/1/usage?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+
+### And deleting it is refused while the product holds it
+DELETE {{SELLER_UI_URL}}/spg/content/api/v1/private/content/media/1?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+
+### A store admin must NOT be able to write the usage index — that token is for services in the same pod
+PUT {{SELLER_UI_URL}}/spg/content/api/v1/private/content/external/media/usage?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Content-Type: application/json
+Cookie: SESSION={{STORE_ADMIN_SESSION_ID}}
+
+{"ownerKind": "PRODUCT", "ownerRef": "42", "ownerTitle": "Blue sneakers", "refs": []}

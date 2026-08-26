@@ -54,6 +54,7 @@ include(
         'store-pod:checkout:checkout-service',
         'store-pod:content:content-commons',
         'store-pod:content:content-core',
+        'store-pod:content:content-external-api',
         'store-pod:content:content-service',
         'store-pod:merchant:merchant-commons',
         'store-pod:merchant:merchant-core',

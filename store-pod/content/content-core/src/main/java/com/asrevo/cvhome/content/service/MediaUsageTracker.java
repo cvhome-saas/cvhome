@@ -51,7 +51,7 @@ public class MediaUsageTracker {
     @Transactional
     public void replace(StoreMerchantId store, MediaOwnerKind ownerKind, String ownerRef, ContentType contentType,
                         Long contentId, String ownerTitle, Map<String, Long> references) {
-        repository.deleteByOwnerKindAndOwnerRef(ownerKind, ownerRef);
+        repository.deleteByOwner(ownerKind, ownerRef);
         List<MediaUsageRow> rows = new ArrayList<>();
         references.forEach((field, assetId) -> {
             if (assetId != null) {
@@ -73,7 +73,7 @@ public class MediaUsageTracker {
 
     @Transactional
     public void forget(MediaOwnerKind ownerKind, String ownerRef) {
-        repository.deleteByOwnerKindAndOwnerRef(ownerKind, ownerRef);
+        repository.deleteByOwner(ownerKind, ownerRef);
     }
 
 }
