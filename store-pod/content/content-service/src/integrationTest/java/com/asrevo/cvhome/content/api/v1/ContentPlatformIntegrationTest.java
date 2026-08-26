@@ -95,6 +95,12 @@ class ContentPlatformIntegrationTest {
 
     private static final String BANNERS = "banners";
 
+    /** The storefront site payload's announcement node — read for its title and again for its body. */
+    private static final String ANNOUNCEMENT = "announcement";
+
+    /** The policies overview: which types a store has, and in what state. */
+    private static final String COMPLIANCE = "compliance";
+
     private static final String FAQ = "faq";
 
     private static final String POLICIES = "policies";
@@ -206,6 +212,30 @@ class ContentPlatformIntegrationTest {
 
     private ResponseEntity<String> send(HttpMethod method, String path, String body) {
         return api.send(method, scoped(path, STORE), admin, body);
+    }
+
+    /**
+     * Unpublishes whatever is currently live in a placement.
+     *
+     * Every placement in the demo seeds ships full, because a demo store with an empty hero is not a demo.
+     * A test that wants to publish into one has to free it first — which is what a seller replacing the
+     * starter content does too, so the test is exercising the real path rather than working around the seed.
+     */
+    private void retireLiveBanners(String placementQuery) {
+        for (JsonNode live : json(get(query(path(PRIVATE, BANNERS, EFFECTIVE), placementQuery)))) {
+            expect(send(HttpMethod.POST, path(PRIVATE, BANNERS, live.get(ID).asLong(), "unpublish"), null),
+                    HttpStatus.OK);
+        }
+    }
+
+    /** Deletes the demo store's starter policy of one type, so a test can own that type outright. */
+    private void retireSeededPolicy(String policyType) {
+        for (JsonNode row : json(get(path(PRIVATE, POLICIES, COMPLIANCE)))) {
+            if (policyType.equals(row.get("type").asString()) && row.hasNonNull(ID)) {
+                expect(send(HttpMethod.DELETE, path(PRIVATE, POLICIES, row.get(ID).asLong()), null),
+                        HttpStatus.NO_CONTENT);
+            }
+        }
     }
 
     private long createAndPublish(String type, String body) {
@@ -366,6 +396,9 @@ class ContentPlatformIntegrationTest {
 
     @Test
     void heroPlacementHoldsOneBannerAndStripFeedsTheAnnouncement() {
+        // HERO holds one, and the seeded store is already using it. Retire it before claiming the slot,
+        // as a seller replacing the starter banner would — the same move the STRIP half of this test makes.
+        retireLiveBanners(HERO_QUERY);
         long hero1 = createAndPublish(BANNERS, String.format(BANNER, slug(HERO_SLUG), HERO, "Hero one"));
         var second = send(HttpMethod.POST, path(PRIVATE, BANNERS), String.format(BANNER, slug(HERO_SLUG), HERO, "Hero two"));
         long hero2 = json(second).get(ID).asLong();
@@ -377,12 +410,8 @@ class ContentPlatformIntegrationTest {
         assertThat(effective.size()).isEqualTo(1);
         assertThat(effective.get(0).get(ID).asLong()).isEqualTo(hero1);
 
-        // The seeded store already has a live STRIP banner — the announcement that the `header-message` box
-        // became — and STRIP holds one. Retire it before claiming the slot, as a seller would.
-        for (JsonNode live : json(get(query(path(PRIVATE, BANNERS, EFFECTIVE), STRIP_QUERY)))) {
-            expect(send(HttpMethod.POST, path(PRIVATE, BANNERS, live.get(ID).asLong(), "unpublish"), null),
-                    HttpStatus.OK);
-        }
+        // Same for the announcement the `header-message` box became.
+        retireLiveBanners(STRIP_QUERY);
         // A strip with no message is not publishable: the storefront would render an empty bar.
         var mute = send(HttpMethod.POST, path(PRIVATE, BANNERS),
                 String.format(BANNER, slug("mute-strip"), "STRIP", STRIP_TITLE));
@@ -393,8 +422,8 @@ class ContentPlatformIntegrationTest {
         createAndPublish(BANNERS, String.format(STRIP_BANNER, slug("strip"), STRIP_TITLE, STRIP_MESSAGE));
         JsonNode site = json(getPublic(path(STOREFRONT, SITE)));
         // The title is the console's row label; the message the shopper reads is the body, links and all.
-        assertThat(site.get("announcement").get(TITLE).asString()).isEqualTo(STRIP_TITLE);
-        assertThat(site.get("announcement").get("body").asString()).contains("shop the sale").contains("/sale");
+        assertThat(site.get(ANNOUNCEMENT).get(TITLE).asString()).isEqualTo(STRIP_TITLE);
+        assertThat(site.get(ANNOUNCEMENT).get("body").asString()).contains("shop the sale").contains("/sale");
         assertThat(site.get(MENUS).has("main")).isTrue();
         assertThat(site.get("footerPages").size()).isGreaterThanOrEqualTo(1);
         JsonNode sfBanners = json(getPublic(query(path(STOREFRONT, BANNERS), HERO_QUERY)));
@@ -432,8 +461,9 @@ class ContentPlatformIntegrationTest {
         assertThat(readB.get("groupId").asLong()).isEqualTo(ordering);
         assertThat(readB.get("position").asInt()).isZero();
         // The starter groups are seeded in both languages and the name comes back in the store's own:
-        // this store is Arabic, so an English "Ordering" here would be the untranslated-seed bug.
-        assertThat(readB.get("groupName").asString()).isEqualTo("\u0627\u0644\u0637\u0644\u0628");
+        // this store is Arabic, so an English "Ordering & payment" here would be the untranslated-seed bug.
+        assertThat(readB.get("groupName").asString())
+                .isEqualTo("\u0627\u0644\u0637\u0644\u0628 \u0648\u0627\u0644\u062f\u0641\u0639");
 
         JsonNode sf = json(getPublic(path(STOREFRONT, FAQ)));
         assertThat(sf.get("jsonLd").asString()).contains("\"@type\":\"FAQPage\"").contains(QUESTION);
@@ -456,6 +486,12 @@ class ContentPlatformIntegrationTest {
     void publishingAPolicyCutsVersionsTheStorefrontServes() {
         String slug = slug(RETURNS_SLUG);
         String base = path(PRIVATE, POLICIES);
+        /*
+         * One live head per type, and the demo seeds ship all five — a store whose returns policy is the
+         * starter text is exactly what `TYPE_ACTIVE_EXISTS` is for. Retire the seeded head so this test can
+         * write the type's whole life from scratch; the conflict itself is asserted below, deliberately.
+         */
+        retireSeededPolicy(RETURNS);
         long id = createAndPublish(POLICIES, String.format(POLICY, slug, THIRTY_DAYS));
         String one = path(base, id);
         JsonNode read = json(get(one));
@@ -489,7 +525,7 @@ class ContentPlatformIntegrationTest {
         JsonNode old = json(getPublic(query(sfPolicy, "v=1")));
         assertThat(old.get(BODY).asString()).contains(THIRTY_DAYS);
 
-        JsonNode compliance = json(get(path(base, "compliance")));
+        JsonNode compliance = json(get(path(base, COMPLIANCE)));
         assertThat(compliance.toString()).contains("\"type\":\"RETURNS\"").contains("\"status\":\"PUBLISHED\"");
         assertThat(json(getPublic(path(STOREFRONT, SITE))).get(POLICIES).toString()).contains(RETURNS);
         assertThat(json(getPublic(path(STOREFRONT, "sitemap"))).toString()).contains("/policies/returns");
@@ -498,20 +534,25 @@ class ContentPlatformIntegrationTest {
     // ------------------------------------------------------------------------------------------------ menus
 
     /**
-     * MAIN starts empty and is whatever the seller builds. It used to be seeded from a legacy
-     * {@code link_to_menu} column that only the retired seller UI could write, so the navigation a seller saw
-     * came from data they had no way to edit.
+     * MAIN is whatever the seller last saved, and a save replaces the tree whole.
+     *
+     * It used to be derived from a legacy {@code link_to_menu} column that only the retired seller UI could
+     * write, so the navigation a seller saw came from data they had no way to edit. It is a plain menu now:
+     * the demo store seeds one, the seller overwrites it, and nothing merges the two.
      */
     @Test
-    void theMainMenuStartsEmptyAndRefusesDepth() {
+    void theMainMenuIsReplacedWholeAndRefusesDepth() {
         String mainMenu = path(PRIVATE, MENUS, MAIN);
         String sfMainMenu = path(STOREFRONT, MENUS, MAIN);
         JsonNode main = json(get(mainMenu));
-        assertThat(main.get(ITEMS)).isEmpty();
+        // The seeded menu, with nesting — not a stub, and not derived from anything.
+        assertThat(main.get(ITEMS).size()).as(main.toString()).isGreaterThan(1);
+        assertThat(main.get(ITEMS).get(0).get(CHILDREN)).isNotEmpty();
 
         var put = send(HttpMethod.PUT, mainMenu, MENU_TREE);
         expect(put, HttpStatus.OK);
         JsonNode saved = json(put);
+        // Two, not two-plus-the-seed: the PUT is a replacement, so nothing of the old tree survives it.
         assertThat(saved.get(ITEMS).size()).as(saved.toString()).isEqualTo(2);
         assertThat(saved.get(ITEMS).get(0).get(CHILDREN).size()).isEqualTo(2);
         assertThat(saved.get(ITEMS).get(0).get(CHILDREN).get(1).get("target").get("broken").asBoolean()).isTrue();
