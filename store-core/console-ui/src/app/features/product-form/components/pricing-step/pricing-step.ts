@@ -3,7 +3,7 @@ import {ReactiveFormsModule} from '@angular/forms';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 
 import {DIMENSION_UNITS, WEIGHT_UNITS} from '@models/products';
-import {FieldError} from '@shared/ui/form-field/field-error';
+import {FormField} from '@shared/ui/form-field/form-field';
 import {NoticeBar} from '@shared/ui/notice-bar/notice-bar';
 import {NumberField} from '@shared/ui/number-field/number-field';
 import {Panel} from '@shared/ui/panel/panel';
@@ -27,7 +27,7 @@ import type {ProductForm} from '../../services/product-draft-form.service';
 @Component({
   selector: 'app-pricing-step',
   imports: [
-    FieldError,
+    FormField,
     NoticeBar,
     NumberField,
     Panel,
@@ -37,7 +37,11 @@ import type {ProductForm} from '../../services/product-draft-form.service';
     TranslocoDirective,
   ],
   templateUrl: './pricing-step.html',
-  styleUrls: ['../editor-card.css', './pricing-step.css'],
+  styleUrls: [
+    '../../../../shared/styles/field.css',
+    '../editor-card.css',
+    './pricing-step.css',
+  ],
 })
 export class PricingStep {
   readonly form = input.required<ProductForm>();

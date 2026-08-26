@@ -5,6 +5,7 @@ import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 import {Autocomplete, type AutocompleteOption} from '@shared/ui/autocomplete/autocomplete';
 import {Checkbox} from '@shared/ui/checkbox/checkbox';
 import {Icon} from '@shared/ui/icon/icon';
+import {FormField} from '@shared/ui/form-field/form-field';
 import {NoticeBar} from '@shared/ui/notice-bar/notice-bar';
 import {Panel} from '@shared/ui/panel/panel';
 import {Select, type SelectOption} from '@shared/ui/select/select';
@@ -33,6 +34,7 @@ import type {ProductForm} from '../../services/product-draft-form.service';
   imports: [
     Autocomplete,
     Checkbox,
+    FormField,
     Icon,
     NoticeBar,
     Panel,
@@ -41,7 +43,12 @@ import type {ProductForm} from '../../services/product-draft-form.service';
     TranslocoDirective,
   ],
   templateUrl: './organize-step.html',
-  styleUrls: ['../editor-card.css', '../../../../shared/styles/product-picker.css', './organize-step.css'],
+  styleUrls: [
+    '../../../../shared/styles/field.css',
+    '../editor-card.css',
+    '../../../../shared/styles/product-picker.css',
+    './organize-step.css',
+  ],
 })
 export class OrganizeStep {
   readonly form = input.required<ProductForm>();

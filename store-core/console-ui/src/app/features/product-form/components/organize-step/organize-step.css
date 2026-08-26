@@ -16,7 +16,7 @@
 .category {
   display: flex;
   align-items: center;
-  gap: .5rem;
+  gap: var(--spacing-tight);
   /* The indent is the hierarchy — `--depth` is set per row. */
   padding-block: .35rem;
   padding-inline: calc(.5rem + var(--depth, 0) * 1.1rem) .5rem;
@@ -116,7 +116,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: .75rem;
+  gap: var(--spacing-field);
   padding: .5rem .6rem;
   border: 1px solid var(--border-soft);
   border-radius: var(--radius-md);
@@ -143,7 +143,7 @@
 }
 
 .related-empty {
-  padding: 1.25rem 0;
+  padding: var(--spacing-section) 0;
   color: var(--foreground-quiet);
   font-size: var(--text-xs);
   text-align: center;

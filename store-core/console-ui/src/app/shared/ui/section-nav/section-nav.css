@@ -20,7 +20,7 @@
 .nav-head {
   display: flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: var(--spacing-inline);
   padding-inline-end: 0.15rem;
 }
 
@@ -135,7 +135,7 @@
 }
 
 a.nav-item:hover {
-  padding-inline-start: 1rem;
+  padding-inline-start: var(--spacing-group);
   background: var(--input);
   color: var(--primary-emphasis);
 }

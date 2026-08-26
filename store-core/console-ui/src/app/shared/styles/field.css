@@ -29,7 +29,40 @@
 .field-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(15rem, 100%), 1fr));
-  gap: 1.25rem;
+  gap: var(--spacing-section);
+}
+
+/*
+ * What the platform will do with this value, or what shape it wants.
+ *
+ * `CLAUDE.md` has said this comes from here for as long as the file has existed, and it did not:
+ * three features imported this stylesheet, wrote `.field-hint`, and got the body's 12px-ised
+ * nothing. `app-form-field` and `editor-card.css` keep their own copies because they are
+ * encapsulated and cannot see this one — the values are the same on purpose.
+ */
+.field-hint {
+  margin: var(--spacing-inline) 0 0;
+  color: var(--foreground-quiet);
+  font-size: var(--text-2xs);
+  line-height: 1.5;
+}
+
+/*
+ * Names a *group* of controls: a list of checkboxes, a pair of artwork slots. Distinct from
+ * `app-form-field`'s `.field-label`, and deliberately not that component — a `<label>` may name one
+ * control, and wrapping a checkbox list in one means clicking the empty space toggles the first box.
+ *
+ * It lives here because it had no definition at all. `.field-label` was written out in four
+ * features that could not reach it: it is declared inside `app-form-field`'s encapsulated
+ * stylesheet, so the class name resolved to nothing and those labels rendered at the body's
+ * 16px/400 next to their siblings' 13px/600. Matches that treatment on purpose.
+ */
+.group-label {
+  display: block;
+  margin: 0 0 var(--spacing-tight);
+  color: var(--foreground-strong);
+  font-size: var(--text-xs);
+  font-weight: 600;
 }
 
 /* An address, a description, a URL — a value that needs the whole width rather than half of it. */
@@ -46,7 +79,7 @@
 .split {
   display: grid;
   grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-  gap: 1rem;
+  gap: var(--spacing-group);
   align-items: start;
 }
 

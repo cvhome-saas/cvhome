@@ -6,7 +6,7 @@
 .copy-field {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--spacing-tight);
   padding: 0.55rem 0.7rem;
   border: 1px solid var(--border);
   border-radius: var(--radius-md);

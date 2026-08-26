@@ -6,23 +6,23 @@
  * overlay, which would give the tab three independent spinners for one request.
  */
 app-panel + app-panel {
-  margin-block-start: 1.25rem;
+  margin-block-start: var(--spacing-section);
 }
 
 .branding-images {
   display: grid;
-  gap: 1rem;
+  gap: var(--spacing-group);
   grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
 }
 
 .brand-slot {
   display: grid;
-  gap: 0.75rem;
+  gap: var(--spacing-field);
   align-items: center;
   grid-template-areas: 'thumb caption' 'thumb actions';
   grid-template-columns: 4.5rem 1fr;
   margin: 0;
-  padding: 0.75rem;
+  padding: var(--spacing-field);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
 }
@@ -57,13 +57,13 @@ app-panel + app-panel {
 
 .brand-slot-actions {
   display: flex;
-  gap: 0.5rem;
+  gap: var(--spacing-tight);
   grid-area: actions;
 }
 
 .branding-seo,
 .branding-social {
   display: grid;
-  gap: 1rem;
+  gap: var(--spacing-group);
   grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
 }

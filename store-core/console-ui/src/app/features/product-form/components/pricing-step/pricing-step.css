@@ -11,7 +11,7 @@
 .measure-body {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: var(--spacing-section);
 }
 
 .measure-group {
@@ -22,7 +22,7 @@
 }
 
 .measure-legend {
-  padding: 0 0 .5rem;
+  padding: 0 0 var(--spacing-tight);
   color: var(--foreground-strong);
   font-size: var(--text-xs);
   font-weight: 600;

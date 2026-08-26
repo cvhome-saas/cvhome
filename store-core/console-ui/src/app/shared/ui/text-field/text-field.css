@@ -11,7 +11,7 @@
 .text-shell {
   display: flex;
   align-items: center;
-  gap: .5rem;
+  gap: var(--spacing-tight);
   inline-size: 100%;
   padding: .55rem .7rem;
   border: 1px solid var(--border);
@@ -104,6 +104,19 @@
   font-size: var(--text-3xs);
   font-variant-numeric: tabular-nums;
   user-select: none;
+}
+
+/*
+ * The counter sits at the end the value does not.
+ *
+ * The shell follows the page, but the input carries `dir="auto"` and flips to match what was typed
+ * in it. An Arabic value inside an English console therefore ends hard against the counter with
+ * only the shell's gap between them, and "25 / 255" reads as the tail of the sentence. In a
+ * left-to-right value the two are already a field's width apart, which is why this was only ever
+ * visible in Arabic — on the product form's short description, where it was reported.
+ */
+.text-shell:has(.text-input:dir(rtl)) .text-counter {
+  order: -1;
 }
 
 /* The uniqueness answer. Colour is redundant with the icon's shape, per the categorical rule. */

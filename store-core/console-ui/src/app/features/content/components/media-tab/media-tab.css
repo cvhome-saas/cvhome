@@ -1,7 +1,7 @@
 :host {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: var(--spacing-section);
   min-width: 0;
 }
 
@@ -9,7 +9,7 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--spacing-tight);
 }
 
 .chip {
@@ -96,16 +96,16 @@
 }
 
 .dropzone-wrap {
-  padding: 1.25rem 1.25rem 0;
+  padding: var(--spacing-section) var(--spacing-section) 0;
 }
 
 .asset-grid {
   list-style: none;
   margin: 0;
-  padding: 1.25rem;
+  padding: var(--spacing-section);
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
-  gap: 1rem;
+  gap: var(--spacing-group);
 }
 
 .asset-card {
@@ -178,7 +178,7 @@
   display: flex;
   align-items: center;
   gap: 0.3rem;
-  margin-block-start: 0.5rem;
+  margin-block-start: var(--spacing-tight);
 }
 
 .asset-actions .compact {
@@ -190,14 +190,14 @@
 .asset-list {
   list-style: none;
   margin: 0;
-  padding: 0.5rem 0;
+  padding: var(--spacing-tight) 0;
 }
 
 .asset-row {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  padding: 0.75rem 1.25rem;
+  gap: var(--spacing-group);
+  padding: var(--spacing-field) var(--spacing-section);
   border-block-end: 1px solid var(--border-soft);
 }
 
@@ -248,15 +248,15 @@
 .drawer-body {
   display: grid;
   grid-template-columns: minmax(12rem, 1fr) minmax(0, 2fr);
-  gap: 1.25rem;
-  padding: 1.25rem;
+  gap: var(--spacing-section);
+  padding: var(--spacing-section);
 }
 
 .drawer-preview {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.75rem;
+  gap: var(--spacing-field);
 }
 
 .drawer-preview img {
@@ -291,19 +291,19 @@
 .alt-row {
   display: grid;
   grid-template-columns: 9rem minmax(0, 1fr);
-  gap: 0.5rem;
+  gap: var(--spacing-tight);
 }
 
 .usage-list {
   margin: 0;
-  padding-inline-start: 1rem;
+  padding-inline-start: var(--spacing-group);
   font-size: var(--text-xs);
   color: var(--foreground);
 }
 
 .drawer-actions {
   display: flex;
-  gap: 0.5rem;
+  gap: var(--spacing-tight);
 }
 
 @container (max-width: 40rem) {

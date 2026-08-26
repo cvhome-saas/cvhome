@@ -11,7 +11,7 @@
   container: platform-billing / inline-size;
   display: grid;
   grid-template-columns: 250px minmax(0, 1fr);
-  gap: 1.5rem;
+  gap: var(--spacing-gutter);
   align-items: start;
   transition: grid-template-columns 0.28s cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -44,7 +44,7 @@
 .billing-body {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: var(--spacing-section);
   min-inline-size: 0;
 }
 
@@ -73,7 +73,7 @@
 .overview {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: var(--spacing-section);
 }
 
 /*
@@ -83,7 +83,7 @@
 .overview-pair {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(19rem, 1fr));
-  gap: 1.25rem;
+  gap: var(--spacing-section);
 }
 
 .book {
@@ -135,7 +135,7 @@
 .blocked-row {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: var(--spacing-field);
   inline-size: 100%;
   padding: 0.5rem 0.55rem;
   border: 0;

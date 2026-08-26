@@ -43,8 +43,11 @@
     >
       <div class="editor-body">
         <div class="field-grid">
-          <div class="field">
-            <label for="product-brand">{{ t('productForm.organize.brand') }}</label>
+          <app-form-field
+            [label]="t('productForm.organize.brand')"
+            [hint]="t('productForm.organize.brandHint')"
+            controlId="product-brand"
+          >
             <!--
               `formControlName`, not `[value]`: these options arrive with the snapshot, and a plain
               value binding is applied before they exist — the browser then discards it and shows
@@ -60,19 +63,20 @@
               [options]="brandOptions()"
               [ariaLabel]="t('productForm.organize.brand')"
             />
-            <p class="field-hint">{{ t('productForm.organize.brandHint') }}</p>
-          </div>
+          </app-form-field>
 
-          <div class="field">
-            <label for="product-type">{{ t('productForm.organize.type') }}</label>
+          <app-form-field
+            [label]="t('productForm.organize.type')"
+            [hint]="t('productForm.organize.typeHint')"
+            controlId="product-type"
+          >
             <app-select
               id="product-type"
               formControlName="typeCode"
               [options]="typeOptions()"
               [ariaLabel]="t('productForm.organize.type')"
             />
-            <p class="field-hint">{{ t('productForm.organize.typeHint') }}</p>
-          </div>
+          </app-form-field>
         </div>
       </div>
     </app-panel>

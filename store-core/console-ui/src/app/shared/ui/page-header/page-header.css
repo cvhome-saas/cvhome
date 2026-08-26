@@ -9,7 +9,7 @@
 .page-head {
   display: flex;
   align-items: flex-end;
-  gap: 1rem;
+  gap: var(--spacing-group);
 }
 
 .page-copy {

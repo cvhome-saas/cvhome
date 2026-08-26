@@ -30,10 +30,15 @@ Each of these has already cost someone an afternoon.
   §4 of `ARCHITECTURE.md` says which. A native select cannot be themed and a native checkbox reads
   as checked when it is not.
 - **No `@features/*` import from another feature.** What two features need belongs one tier down.
-- **`@shared/styles/field.css` is not global** — `.page-body`, `.split` and `.field-hint` come from it,
-  and every feature that uses them lists it in its own `styleUrls` beside its stylesheet. Omit it and
-  `.split` is a plain block: the panes stack at every width, while the component's *own* rules apply
-  normally, so it reads as a layout puzzle rather than a missing import.
+- **`@shared/styles/field.css` is not global** — `.field-grid`, `.field-wide`, `.split`, `.field-hint`
+  and `.group-label` come from it, and every feature that uses them lists it in its own `styleUrls`
+  beside its stylesheet. Omit it and `.split` is a plain block: the panes stack at every width, while
+  the component's *own* rules apply normally, so it reads as a layout puzzle rather than a missing
+  import. `npm run lint` checks this now — all three product-form steps had been missing it, which
+  laid the whole product form out with no grid and no gap.
+- **`.field-label` and `.required` belong to `app-form-field`** and are scoped to it. Writing either
+  in a feature's own markup styles nothing. Use the component; for a label that names a *group* of
+  controls, `.group-label` from `field.css` is the one that exists.
 - **No literal hex, and no physical direction property** (`margin-left`, `left`, `text-align: left`).
   Stylelint fails on both.
 - **No fixture standing in for a real answer.** If the platform cannot do it, the control says so

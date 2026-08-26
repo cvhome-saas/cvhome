@@ -9,7 +9,7 @@
 
 .trigger.labelled {
   gap: 0.35rem;
-  padding-inline: 0.75rem;
+  padding-inline: var(--spacing-field);
 }
 
 .menu {
@@ -24,7 +24,7 @@
 .menu-item {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--spacing-tight);
   width: 100%;
   padding: 0.5rem 0.65rem;
   border: 0;

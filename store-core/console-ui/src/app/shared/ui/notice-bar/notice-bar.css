@@ -2,7 +2,7 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.75rem 1rem;
+  gap: var(--spacing-field) var(--spacing-group);
   padding: 0.7rem 1.25rem;
   border-block-end: 1px solid var(--border-soft);
   background: var(--input);

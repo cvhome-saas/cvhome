@@ -53,7 +53,7 @@
         >
           <div class="artwork-grid">
             <div class="artwork-slot">
-              <p class="field-label">{{ t('content.banner.desktop') }}</p>
+              <p class="group-label">{{ t('content.banner.desktop') }}</p>
               @if (desktopUrl(); as url) {
                 <img [src]="url" alt="" />
               } @else {
@@ -73,7 +73,7 @@
               }
             </div>
             <div class="artwork-slot">
-              <p class="field-label">{{ t('content.banner.mobile') }}</p>
+              <p class="group-label">{{ t('content.banner.mobile') }}</p>
               @if (mobileUrl(); as url) {
                 <img [src]="url" alt="" />
               } @else {

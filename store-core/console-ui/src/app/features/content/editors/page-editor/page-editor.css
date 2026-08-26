@@ -5,7 +5,7 @@
 .template-cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
-  gap: 0.75rem;
+  gap: var(--spacing-field);
 }
 
 .template-card {
@@ -48,7 +48,7 @@
 }
 
 .side-grid + .side-grid {
-  margin-block-start: 1rem;
+  margin-block-start: var(--spacing-group);
 }
 
 .schedule-sheet {
@@ -64,7 +64,7 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--spacing-tight);
 }
 
 .schedule-row app-date-time-field {

@@ -18,14 +18,14 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--spacing-tight);
   padding: 0.6rem 1.25rem;
   border-block-end: 1px solid var(--border-soft);
   background: var(--muted);
 }
 
 .bulk-count {
-  margin-inline-end: 0.5rem;
+  margin-inline-end: var(--spacing-tight);
   font-size: var(--text-xs);
   font-weight: 600;
   color: var(--foreground-strong);
@@ -34,7 +34,7 @@
 .select-all {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--spacing-tight);
   font-size: var(--text-2xs);
   color: var(--muted-foreground);
   padding: 0.35rem 1.25rem;
@@ -44,7 +44,7 @@
 .cell-title {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: var(--spacing-field);
   min-width: 0;
 }
 

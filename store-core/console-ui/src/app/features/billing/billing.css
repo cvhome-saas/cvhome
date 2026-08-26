@@ -15,7 +15,7 @@
   container: billing / inline-size;
   display: grid;
   grid-template-columns: 250px minmax(0, 1fr);
-  gap: 1.5rem;
+  gap: var(--spacing-gutter);
   align-items: start;
   transition: grid-template-columns 0.28s cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -57,7 +57,7 @@
 .billing-grid {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: var(--spacing-section);
   min-inline-size: 0;
 }
 
@@ -66,7 +66,7 @@
 .plan-body {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: var(--spacing-section);
 }
 
 /* Band one: what this store is on, and the one control that changes it. */
@@ -75,7 +75,7 @@
   flex-wrap: wrap;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 1.25rem;
+  gap: var(--spacing-section);
 }
 
 /*
@@ -87,8 +87,8 @@
   flex-wrap: wrap;
   align-items: flex-end;
   justify-content: space-between;
-  gap: 1.25rem;
-  padding-block-start: 1.25rem;
+  gap: var(--spacing-section);
+  padding-block-start: var(--spacing-section);
   border-block-start: 1px solid var(--border-soft);
 }
 
@@ -149,7 +149,7 @@
 }
 
 .plan-facts dd {
-  margin: 0.25rem 0 0;
+  margin: var(--spacing-inline) 0 0;
   color: var(--foreground-strong);
   font-size: var(--text-sm);
   font-weight: 500;
@@ -163,7 +163,7 @@
 .plan-pending {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--spacing-tight);
   margin: 0;
   padding: 0.65rem 0.8rem;
   border: 1px solid var(--border);
@@ -177,7 +177,7 @@
   flex: none;
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: var(--spacing-tight);
 }
 
 .secondary-action.danger {
@@ -200,7 +200,7 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto auto auto;
   align-items: center;
-  gap: 1.25rem;
+  gap: var(--spacing-section);
   padding: 0.7rem 1.5rem;
   border-block-start: 1px solid var(--border-soft);
   transition: background-color var(--default-transition-duration);
@@ -277,7 +277,7 @@
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  gap: 1rem;
+  gap: var(--spacing-group);
   padding: 0.7rem 1.5rem;
   border-block-start: 1px solid var(--border-soft);
 }

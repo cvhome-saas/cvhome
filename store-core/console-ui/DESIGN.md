@@ -197,8 +197,18 @@ rounded:
   3xl: "20px"
   full: "9999px"
 spacing:
-  base: "0.25rem"
-  # Tailwind's numeric scale: p-2 = 0.5rem, p-4 = 1rem, p-6 = 1.5rem, py-28 = 7rem.
+  # Six named steps, derived from what the console already measured rather than invented, on
+  # Tailwind's `--spacing-*` key. Roles, not sizes: the failure they close was a developer with
+  # no var() to type picking whatever the component beside them used. Keep in step with
+  # src/styles/theme.css. Tailwind's numeric scale is unchanged beneath them: p-2 = 0.5rem,
+  # p-4 = 1rem, p-6 = 1.5rem, py-28 = 7rem.
+  inline: "0.25rem"   # a glyph and its word
+  tight: "0.5rem"     # inside one control: icon and label, chips in a row
+  field: "0.75rem"    # a label and its control
+  group: "1rem"       # one field and the next
+  section: "1.25rem"  # one panel and the next; a card's block interior
+  gutter: "1.5rem"    # a card's inline interior
+  panel-interior: "1.25rem 1.5rem"  # --panel-interior; the console's card padding
 elevation:
   lift: "0 20px 45px rgb(0 0 0 / 20%)"
   lift-primary: "0 12px 30px rgb(16 185 129 / 25%)"
@@ -268,9 +278,9 @@ This replaces the former Dark Territory Rule, which held that the world was dark
 
 **The Stable Vocabulary Rule.** Chrome may be re-hued; data may not. `--chart-1` through `--chart-6` name the same six hues in every theme, because "amber means pending" is something an operator learns once and should not have to relearn because they changed the colour of their sidebar. What does move per theme is `--chart-N-foreground`, the ink, which has to stay legible against a background that just changed. Colour also remains redundant with a label, value, or position in every theme.
 
-**The Token Rule.** Every colour, radius, shadow, and type step is a token, and every token name is a standard Tailwind one. A literal hex value in a stylesheet is a defect — if a value is missing, add it to the theme. The system is three files:
+**The Token Rule.** Every colour, radius, shadow, spacing step, and type step is a token, and every token name is a standard Tailwind one. A literal hex value in a stylesheet is a defect — if a value is missing, add it to the theme. The system is three files:
 
-- `src/styles/theme.css` — primitives and scales on standard Tailwind keys (`--color-*`, `--text-*`, `--radius-*`, `--breakpoint-*`). Tailwind's own palette is used as-is except for the brand steps, which are pinned; only the `forest` and `sage` ramps are authored outright.
+- `src/styles/theme.css` — primitives and scales on standard Tailwind keys (`--color-*`, `--text-*`, `--radius-*`, `--spacing-*`, `--breakpoint-*`). Tailwind's own palette is used as-is except for the brand steps, which are pinned; only the `forest` and `sage` ramps are authored outright.
 - `src/styles/theme-forest.css`, `-midnight.css`, `-daylight.css` — the identities, as semantic tokens in the shadcn/tweakcn vocabulary. **These are the only files that assign a colour to a role.**
 - `src/styles/theme-bridge.css` — re-exports those into Tailwind's namespaces (`bg-background`, `border-border`) and composes the type roles.
 
@@ -337,7 +347,7 @@ The primary content frame is `1100px`, centered on the forest canvas. Sections u
 
 Use repeated grids to express breadth: four columns for merchant proof, three for pillars, reviews, and plans, and two for contact. At `900px`, navigation becomes a drawer, four-column grids reduce to two, three-column grids stack, and sections tighten to `5rem 1.5rem`. At `600px`, merchant grids stack, actions become full-width columns, split headings become vertical, and form rows become single-column.
 
-Spacing is generous and rhythmic rather than token-dense: `1–1.5rem` within controls and cards, `2.5–4.5rem` between a heading and its proof, and `5–7rem` between major narrative regions.
+Marketing spacing is generous and rhythmic: `1–1.5rem` within controls and cards, `2.5–4.5rem` between a heading and its proof, and `5–7rem` between major narrative regions. The first of those is the tokenised range — `--spacing-group` through `--spacing-gutter`; the wider narrative measures stay literals, because they are page composition rather than component rhythm.
 
 Account-access surfaces use a balanced two-panel viewport: a story region and a centered entry region each occupy half the width, while the form stays capped near `26rem`. At `800px`, the regions stack and the form may widen to `32rem`; at `480px`, supporting benefits yield to the primary task and form padding tightens. This split is an authentication pattern, not a replacement for the centered marketing frame.
 

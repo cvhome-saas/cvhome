@@ -4,10 +4,13 @@
     <app-panel [title]="t('productForm.pricing.title')" [subtitle]="t('productForm.pricing.subtitle')">
       <div class="editor-body">
         <div class="field-grid">
-          <div class="field">
-            <label for="product-price">
-              {{ t('productForm.pricing.price') }} <span class="required" aria-hidden="true">*</span>
-            </label>
+          <app-form-field
+            required
+            [label]="t('productForm.pricing.price')"
+            [control]="form().controls.price"
+            [fallback]="t('productForm.pricing.priceInvalid')"
+            controlId="product-price"
+          >
             <!--
               The store's currency, as an ISO code, carried as the field's own prefix. There is no
               per-product currency on this platform, and a code rather than a symbol for the reason
@@ -21,14 +24,13 @@
               [min]="0"
               [ariaLabel]="t('productForm.pricing.price')"
             />
-            <app-field-error
-              [control]="form().controls.price"
-              [fallback]="t('productForm.pricing.priceInvalid')"
-            />
-          </div>
+          </app-form-field>
 
-          <div class="field">
-            <label for="product-quantity">{{ t('productForm.pricing.quantity') }}</label>
+          <app-form-field
+            [label]="t('productForm.pricing.quantity')"
+            [hint]="t('productForm.pricing.quantityHint')"
+            controlId="product-quantity"
+          >
             <app-number-field
               id="product-quantity"
               formControlName="quantity"
@@ -36,8 +38,7 @@
               [min]="0"
               [ariaLabel]="t('productForm.pricing.quantity')"
             />
-            <p class="field-hint">{{ t('productForm.pricing.quantityHint') }}</p>
-          </div>
+          </app-form-field>
         </div>
 
         <!--
@@ -129,8 +130,10 @@
           <legend class="measure-legend">{{ t('productForm.pricing.dimensions') }}</legend>
 
           <div class="measure-dimensions">
-            <div class="field">
-              <label for="product-length">{{ t('productForm.pricing.length') }}</label>
+            <app-form-field
+              [label]="t('productForm.pricing.length')"
+              controlId="product-length"
+            >
               <app-number-field
                 id="product-length"
                 formControlName="length"
@@ -138,12 +141,14 @@
                 [min]="0"
                 [ariaLabel]="t('productForm.pricing.length')"
               />
-            </div>
+            </app-form-field>
 
             <span class="measure-times" aria-hidden="true">&times;</span>
 
-            <div class="field">
-              <label for="product-width">{{ t('productForm.pricing.width') }}</label>
+            <app-form-field
+              [label]="t('productForm.pricing.width')"
+              controlId="product-width"
+            >
               <app-number-field
                 id="product-width"
                 formControlName="width"
@@ -151,12 +156,14 @@
                 [min]="0"
                 [ariaLabel]="t('productForm.pricing.width')"
               />
-            </div>
+            </app-form-field>
 
             <span class="measure-times" aria-hidden="true">&times;</span>
 
-            <div class="field">
-              <label for="product-height">{{ t('productForm.pricing.height') }}</label>
+            <app-form-field
+              [label]="t('productForm.pricing.height')"
+              controlId="product-height"
+            >
               <app-number-field
                 id="product-height"
                 formControlName="height"
@@ -164,7 +171,7 @@
                 [min]="0"
                 [ariaLabel]="t('productForm.pricing.height')"
               />
-            </div>
+            </app-form-field>
 
             <div class="field measure-unit">
               <label class="sr-only" for="product-dimension-unit">{{ t('productForm.pricing.dimensionUnit') }}</label>

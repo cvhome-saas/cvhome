@@ -3,7 +3,7 @@
 }
 
 .trend-body {
-  padding: 1.5rem;
+  padding: var(--spacing-gutter);
 }
 
 /*
@@ -12,5 +12,5 @@
  */
 app-echart {
   display: block;
-  block-size: var(--trend-chart-height, 15rem);
+  block-size: 15rem;
 }

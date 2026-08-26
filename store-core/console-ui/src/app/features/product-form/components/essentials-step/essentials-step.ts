@@ -52,7 +52,11 @@ import type {ProductForm} from '../../services/product-draft-form.service';
     NumberField,
   ],
   templateUrl: './essentials-step.html',
-  styleUrls: ['../editor-card.css', './essentials-step.css'],
+  styleUrls: [
+    '../../../../shared/styles/field.css',
+    '../editor-card.css',
+    './essentials-step.css',
+  ],
 })
 export class EssentialsStep {
   readonly form = input.required<ProductForm>();

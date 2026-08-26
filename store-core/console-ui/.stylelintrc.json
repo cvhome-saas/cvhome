@@ -12,13 +12,38 @@
     "",
     "Only genuinely direction-dependent properties are listed. `width` and `height` read the same in",
     "both directions, so banning them in favour of `inline-size`/`block-size` would have produced 180",
-    "findings that fix nothing — a rule that noisy gets switched off rather than obeyed."
+    "findings that fix nothing — a rule that noisy gets switched off rather than obeyed.",
+    "",
+    "Spacing \u2014 DESIGN.md's Token Rule covers 'every colour, radius, shadow and type step', and",
+    "spacing was the one scale never brought under it. theme.css now carries the six steps the",
+    "console actually measures on, named for the job each does. Two rules, because stylelint has no",
+    "baseline and one rule cannot say both things:",
+    "",
+    "  error   \u2014 a raw literal that IS one of the six steps. Every one of those has a token now, so",
+    "            typing the number again is by definition a regression. This is the half that has to",
+    "            hold: the debt regrew once already after being consolidated by hand.",
+    "",
+    "  warning \u2014 any other raw rem in a spacing property. 682 of these remain, off the scale",
+    "            (0.6rem \u00d782, 0.85rem \u00d775, 0.35rem \u00d773, 0.7rem \u00d756 ...). Snapping them to the nearest",
+    "            step moves at most 1.6px each, but it moves it on every screen and cannot be proved",
+    "            safe the way the on-scale sweep was \u2014 so they are a backlog, not a broken build. An",
+    "            error here would be the 180-finding rule the note above warns about.",
+    "",
+    "`lint:css` passes --quiet so the gate shows errors only; `npm run lint:css:debt` prints the",
+    "warnings when someone is working the backlog down. Warnings nobody can see past are the same as",
+    "no rule at all.",
+    "",
+    "Both leading-zero forms are matched: `.5rem` and `0.5rem` are the same measurement typed two",
+    "ways and the codebase held both."
   ],
   "rules": {
     "color-no-hex": true,
     "declaration-property-value-disallowed-list": {
       "/^(text-align)$/": ["left", "right"],
-      "/^(float|clear)$/": ["left", "right"]
+      "/^(float|clear)$/": ["left", "right"],
+      "/^(padding|margin|gap|row-gap|column-gap|(padding|margin)-(block|inline)(-(start|end))?|(padding|margin)-(top|bottom))$/": [
+        "/^(?=.*rem)(?:(?:0?\\.25|0?\\.5|0?\\.75|1|1\\.25|1\\.5)rem|0)(?:\\s+(?:(?:0?\\.25|0?\\.5|0?\\.75|1|1\\.25|1\\.5)rem|0))*$/"
+      ]
     },
     "property-disallowed-list": [
       "margin-left", "margin-right",
@@ -28,6 +53,10 @@
       "border-left-color", "border-right-color",
       "border-left-style", "border-right-style",
       "left", "right"
+    ],
+    "declaration-property-value-allowed-list": [
+      {"/^(padding|margin|gap|row-gap|column-gap|(padding|margin)-(block|inline)(-(start|end))?|(padding|margin)-(top|bottom))$/": ["/^(?!.*[0-9]rem)/"]},
+      {"severity": "warning"}
     ]
   },
   "ignoreFiles": ["src/styles/**", "dist/**", "node_modules/**", ".angular/**"]

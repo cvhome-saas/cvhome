@@ -28,14 +28,14 @@
 .pd-body {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  padding: 1.25rem;
+  gap: var(--spacing-group);
+  padding: var(--spacing-section);
 }
 
 .pd-head {
   display: flex;
   align-items: flex-start;
-  gap: 1rem;
+  gap: var(--spacing-group);
 }
 
 .pd-heading {
@@ -51,7 +51,7 @@
 }
 
 .pd-subtitle {
-  margin: 0.25rem 0 0;
+  margin: var(--spacing-inline) 0 0;
   color: var(--muted-foreground);
   font-size: var(--text-sm);
 }
@@ -93,8 +93,8 @@
 .pd-cycle {
   display: inline-flex;
   align-self: center;
-  gap: 0.25rem;
-  padding: 0.25rem;
+  gap: var(--spacing-inline);
+  padding: var(--spacing-inline);
   border: 1px solid var(--border);
   border-radius: var(--radius-full);
   background: var(--muted);
@@ -138,7 +138,7 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: var(--spacing-tight);
   padding: 1.1rem 1rem;
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
@@ -280,7 +280,7 @@
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
+  gap: var(--spacing-tight);
   margin: 0;
   padding: 2rem 1rem;
   color: var(--muted-foreground);

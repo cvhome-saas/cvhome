@@ -23,8 +23,8 @@
 .picker-head {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 1rem 1.25rem;
+  gap: var(--spacing-field);
+  padding: var(--spacing-group) var(--spacing-section);
   border-block-end: 1px solid var(--border-soft);
 }
 
@@ -37,12 +37,12 @@
 }
 
 .picker-upload {
-  padding: 1rem 1.25rem 0;
+  padding: var(--spacing-group) var(--spacing-section) 0;
 }
 
 .picker-body {
   overflow: auto;
-  padding: 1rem 1.25rem 1.25rem;
+  padding: var(--spacing-group) var(--spacing-section) var(--spacing-section);
 }
 
 .picker-grid {
@@ -51,7 +51,7 @@
   padding: 0;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
-  gap: 0.75rem;
+  gap: var(--spacing-field);
 }
 
 .asset {
@@ -90,7 +90,7 @@
 
 .picker-empty {
   margin: 0;
-  padding: 1rem;
+  padding: var(--spacing-group);
   color: var(--muted-foreground);
   font-size: var(--text-xs);
   text-align: center;

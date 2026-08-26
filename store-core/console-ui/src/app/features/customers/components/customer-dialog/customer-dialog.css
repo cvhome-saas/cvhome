@@ -48,7 +48,7 @@
   display: flex;
   flex: 1;
   align-items: center;
-  gap: 0.75rem;
+  gap: var(--spacing-field);
   min-inline-size: 0;
 }
 
@@ -148,7 +148,7 @@
 }
 
 .figures-note {
-  margin: 0.75rem 0 0;
+  margin: var(--spacing-field) 0 0;
   color: var(--muted-foreground);
   font-size: var(--text-2xs);
 }
@@ -166,7 +166,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.75rem;
+  gap: var(--spacing-field);
 }
 
 .block-head h3 {
@@ -227,7 +227,7 @@
 .order {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto auto auto;
-  gap: 0.75rem;
+  gap: var(--spacing-field);
   align-items: center;
   inline-size: 100%;
   padding: 0.55rem 0.7rem;

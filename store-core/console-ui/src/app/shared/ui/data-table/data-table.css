@@ -21,7 +21,7 @@
 .table-head {
   display: grid;
   grid-template-columns: var(--table-columns);
-  gap: 1rem;
+  gap: var(--spacing-group);
   padding: 0.7rem 1.25rem;
   border-bottom: 1px solid var(--border);
   background: var(--input);

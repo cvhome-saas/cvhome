@@ -7,7 +7,7 @@
 
 .legal {
   display: grid;
-  gap: 1.25rem;
+  gap: var(--spacing-section);
   justify-items: start;
   max-inline-size: 46rem;
   margin-inline: auto;
@@ -36,7 +36,7 @@ h1 {
 
 .pending {
   margin: 0;
-  padding: 1rem 1.25rem;
+  padding: var(--spacing-group) var(--spacing-section);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   background: var(--muted);

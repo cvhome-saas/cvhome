@@ -8,7 +8,7 @@
 .search-box {
   display: flex;
   align-items: center;
-  gap: .5rem;
+  gap: var(--spacing-tight);
   inline-size: 100%;
   min-inline-size: 0;
   padding: .4rem .7rem;

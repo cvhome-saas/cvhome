@@ -1,7 +1,7 @@
 .visibility {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: var(--spacing-field);
 }
 
 .switch-row {
@@ -23,7 +23,7 @@
   display: flex;
   align-items: flex-start;
   gap: 0.9rem;
-  padding: 1rem;
+  padding: var(--spacing-group);
   border: 1px solid var(--chart-5-wash);
   border-radius: var(--radius-lg);
   background: var(--chart-5-wash);
@@ -77,7 +77,7 @@
  * from the fields above it, rather than as a group that happens to be greyed out.
  */
 .unbacked {
-  padding: 1rem;
+  padding: var(--spacing-group);
   border: 1px dashed var(--border);
   border-radius: var(--radius-lg);
   background: var(--muted);
@@ -103,7 +103,7 @@
 .check-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
-  gap: 0.5rem;
+  gap: var(--spacing-tight);
 }
 
 .check {

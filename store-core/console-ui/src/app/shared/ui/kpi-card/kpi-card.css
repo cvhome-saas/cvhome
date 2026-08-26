@@ -1,6 +1,6 @@
 :host {
   display: block;
-  padding: 1.25rem;
+  padding: var(--spacing-section);
   border: 1px solid var(--border);
   border-radius: var(--radius-xl);
   background: var(--muted);
@@ -17,7 +17,7 @@
 .kpi-head {
   display: flex;
   align-items: flex-start;
-  gap: 1rem;
+  gap: var(--spacing-group);
 }
 
 .kpi-copy {
@@ -36,7 +36,7 @@
 
 .kpi-value {
   display: block;
-  margin-top: 0.5rem;
+  margin-top: var(--spacing-tight);
   color: var(--foreground-strong);
   font-size: var(--text-4xl);
   font-weight: var(--font-weight-semibold);

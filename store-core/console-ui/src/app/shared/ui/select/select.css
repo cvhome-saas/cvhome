@@ -16,7 +16,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: .5rem;
+  gap: var(--spacing-tight);
   inline-size: 100%;
   /*
    * The height is a custom property because a consumer cannot reach this element any other way:

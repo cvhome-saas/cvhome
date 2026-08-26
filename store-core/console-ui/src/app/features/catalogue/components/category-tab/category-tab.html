@@ -132,16 +132,18 @@
               />
             </app-form-field>
 
-            <div class="field">
-              <label for="category-order">{{ t('catalogue.categories.sortOrder') }}</label>
+            <app-form-field
+              [label]="t('catalogue.categories.sortOrder')"
+              [hint]="t('catalogue.categories.sortOrderHint')"
+              controlId="category-order"
+            >
               <app-number-field
                 id="category-order"
                 formControlName="sortOrder"
                 [decimals]="0"
                 [min]="0"
               />
-              <p class="field-hint">{{ t('catalogue.categories.sortOrderHint') }}</p>
-            </div>
+            </app-form-field>
 
             <div class="field field-wide">
               <app-toggle
