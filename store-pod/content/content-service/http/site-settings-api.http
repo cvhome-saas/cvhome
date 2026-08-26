@@ -1,0 +1,40 @@
+### How the store looks — brand imagery, social links, site SEO (SiteSettingsApi)
+### These used to live in merchant (logo, banner, slider images, social links) and in the legacy content
+### snippets (meta-title, meta-description). This is the only place they live now.
+
+### Read. The row is created on first read, so a store that has never been edited returns empty slots.
+GET {{SELLER_UI_URL}}/spg/content/api/v1/private/content/site-settings?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+
+### Replace the whole record. Media ids must belong to this store's library, or the call is 404 MEDIA.NOT_FOUND.
+PUT {{SELLER_UI_URL}}/spg/content/api/v1/private/content/site-settings?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Content-Type: application/json
+Cookie: SESSION={{SESSION_ID}}
+
+{
+  "logoMediaId": 1,
+  "faviconMediaId": 2,
+  "ogMediaId": null,
+  "seo": {
+    "metaTitle": {"en": "Acme Supply Co.", "ar": "أكمي للتوريدات"},
+    "metaDescription": {"en": "Workplace supplies, delivered.", "ar": "لوازم المكاتب، تصل إليك."}
+  },
+  "socialLinks": [
+    {"provider": "INSTAGRAM", "url": "https://instagram.com/acme"},
+    {"provider": "FACEBOOK", "url": "https://facebook.com/acme"}
+  ]
+}
+
+### Clearing the logo — merchant only ever had upload endpoints, so this was impossible before.
+PUT {{SELLER_UI_URL}}/spg/content/api/v1/private/content/site-settings?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Content-Type: application/json
+Cookie: SESSION={{SESSION_ID}}
+
+{"logoMediaId": null, "faviconMediaId": null, "ogMediaId": null, "seo": {}, "socialLinks": []}
+
+### Tenant isolation — a media id from another store must be refused
+PUT {{SELLER_UI_URL}}/spg/content/api/v1/private/content/site-settings?store={{OTHER_STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Content-Type: application/json
+Cookie: SESSION={{SESSION_ID}}
+
+{"logoMediaId": 1, "seo": {}, "socialLinks": []}

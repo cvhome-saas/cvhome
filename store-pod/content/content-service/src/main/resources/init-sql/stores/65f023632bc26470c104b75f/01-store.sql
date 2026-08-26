@@ -33,9 +33,8 @@ Starting description_id: 41
 Starting sort_order: 1
 */
 
-INSERT INTO content.content (content_id, code, content_type,
-                              link_to_menu, sort_order, visible, store_merchant_id, status, version)
-VALUES (21, 'about-us', 'PAGE', true, 1, true, '65f023632bc26470c104b75f', 'PUBLISHED', 1)
+INSERT INTO content.content (content_id, code, content_type, sort_order, visible, store_merchant_id, status, version)
+VALUES (21, 'about-us', 'PAGE', 1, true, '65f023632bc26470c104b75f', 'PUBLISHED', 1)
 on conflict (content_id) do nothing;
 
 INSERT INTO content.content_description (description_id, date_created, date_modified, description, name, title,
@@ -61,9 +60,8 @@ VALUES (42, now(), now(),
         'a-propos', 21, 'fr')
 on conflict (description_id) do nothing;
 
-INSERT INTO content.content (content_id, code, content_type,
-                              link_to_menu, sort_order, visible, store_merchant_id, status, version)
-VALUES (22, 'contact-us', 'PAGE', true, 2, true, '65f023632bc26470c104b75f', 'PUBLISHED', 1)
+INSERT INTO content.content (content_id, code, content_type, sort_order, visible, store_merchant_id, status, version)
+VALUES (22, 'contact-us', 'PAGE', 2, true, '65f023632bc26470c104b75f', 'PUBLISHED', 1)
 on conflict (content_id) do nothing;
 
 INSERT INTO content.content_description (description_id, date_created, date_modified, description, name, title,
@@ -87,9 +85,8 @@ VALUES (44, now(), now(),
         'contactez-nous', 22, 'fr')
 on conflict (description_id) do nothing;
 
-INSERT INTO content.content (content_id, code, content_type,
-                              link_to_menu, sort_order, visible, store_merchant_id, status, version)
-VALUES (23, 'terms', 'PAGE', false, 3, true, '65f023632bc26470c104b75f', 'PUBLISHED', 1)
+INSERT INTO content.content (content_id, code, content_type, sort_order, visible, store_merchant_id, status, version)
+VALUES (23, 'terms', 'PAGE', 3, true, '65f023632bc26470c104b75f', 'PUBLISHED', 1)
 on conflict (content_id) do nothing;
 
 INSERT INTO content.content_description (description_id, date_created, date_modified, description, name, title,
@@ -114,9 +111,8 @@ VALUES (46, now(), now(),
         'conditions-generales', 23, 'fr')
 on conflict (description_id) do nothing;
 
-INSERT INTO content.content (content_id, code, content_type,
-                              link_to_menu, sort_order, visible, store_merchant_id, status, version)
-VALUES (24, 'privacy', 'PAGE', false, 4, true, '65f023632bc26470c104b75f', 'PUBLISHED', 1)
+INSERT INTO content.content (content_id, code, content_type, sort_order, visible, store_merchant_id, status, version)
+VALUES (24, 'privacy', 'PAGE', 4, true, '65f023632bc26470c104b75f', 'PUBLISHED', 1)
 on conflict (content_id) do nothing;
 
 INSERT INTO content.content_description (description_id, date_created, date_modified, description, name, title,
@@ -141,9 +137,8 @@ VALUES (48, now(), now(),
         'politique-confidentialite', 24, 'fr')
 on conflict (description_id) do nothing;
 
-INSERT INTO content.content (content_id, code, content_type,
-                              link_to_menu, sort_order, visible, store_merchant_id, status, version)
-VALUES (25, 'location', 'PAGE', false, 5, true, '65f023632bc26470c104b75f', 'PUBLISHED', 1)
+INSERT INTO content.content (content_id, code, content_type, sort_order, visible, store_merchant_id, status, version)
+VALUES (25, 'location', 'PAGE', 5, true, '65f023632bc26470c104b75f', 'PUBLISHED', 1)
 on conflict (content_id) do nothing;
 
 INSERT INTO content.content_description (description_id, date_created, date_modified, description, name, title,
@@ -168,9 +163,8 @@ VALUES (50, now(), now(),
         'notre-emplacement', 25, 'fr')
 on conflict (description_id) do nothing;
 
-INSERT INTO content.content (content_id, code, content_type,
-                              link_to_menu, sort_order, visible, store_merchant_id, status, version)
-VALUES (26, 'faq', 'PAGE', false, 6, true, '65f023632bc26470c104b75f', 'PUBLISHED', 1)
+INSERT INTO content.content (content_id, code, content_type, sort_order, visible, store_merchant_id, status, version)
+VALUES (26, 'faq', 'PAGE', 6, true, '65f023632bc26470c104b75f', 'PUBLISHED', 1)
 on conflict (content_id) do nothing;
 
 INSERT INTO content.content_description (description_id, date_created, date_modified, description, name, title,
@@ -194,86 +188,30 @@ VALUES (52, now(), now(),
         'faq', 26, 'fr')
 on conflict (description_id) do nothing;
 
-INSERT INTO content.content (content_id, code, content_type,
-                              link_to_menu, sort_order, visible, store_merchant_id, status, version)
-VALUES (27, 'header-message', 'BOX', false, 7, true, '65f023632bc26470c104b75f', 'PUBLISHED', 1)
+-- The store's appearance record. metaTitle/metaDescription were the `meta-title` and `meta-description` BOX rows;
+-- they are per-locale maps here. Logo and favicon stay empty until the seller uploads one.
+INSERT INTO content.site_settings (store_merchant_id, seo, social_links, updated_at)
+VALUES ('65f023632bc26470c104b75f', '{"metaTitle": {"ar": "إيجيبت كار سيلز | شراء وبيع السيارات الجديدة والمستعملة في مصر", "fr": "Egypt Car Sales | Achat et Vente de Voitures Neuves et d''Occasion en Égypte"}, "metaDescription": {"ar": "منصة موثوقة لشراء وبيع السيارات في مصر. تصفح تشكيلة واسعة من السيارات الجديدة والمستعملة بأسعار تنافسية وجودة مضمونة مع إيجيبت كار سيلز.", "fr": "Plateforme de confiance pour l''achat et la vente de voitures en Égypte. Découvrez une large sélection de véhicules neufs et d''occasion à des prix compétitifs et une qualité garantie avec Egypt Car Sales."}}'::jsonb, '[]'::jsonb, now())
+on conflict (store_merchant_id) do nothing;
+
+-- The announcement strip, which the `header-message` BOX used to carry. Negative ids are deliberate: content ids
+-- come from SM_SEQUENCER and only ever grow upward, so seed-only rows below zero can never collide.
+INSERT INTO content.content (content_id, code, content_type, sort_order, visible, store_merchant_id,
+                             status, version, placement, meta)
+VALUES (-12, 'announcement', 'BANNER', 0, true, '65f023632bc26470c104b75f', 'PUBLISHED', 1, 'STRIP',
+        '{"target": null, "artwork": null, "theme": null, "loggedInOnly": false}')
 on conflict (content_id) do nothing;
 
 INSERT INTO content.content_description (description_id, date_created, date_modified, description, name, title,
                                           meta_description, meta_keywords, meta_title, sef_url, content_id,
                                           language_code)
-VALUES (53, now(), now(),
-        'عروض حصرية! تصفح أحدث السيارات المستعملة بحالة ممتازة وأسعار لا تقبل المنافسة.',
-        'رسالة الترويسة', 'رسالة الترويسة',
-        '', '', '', '', 27, 'ar')
-on conflict (description_id) do nothing;
-INSERT INTO content.content_description (description_id, date_created, date_modified, description, name, title,
-                                          meta_description, meta_keywords, meta_title, sef_url, content_id,
-                                          language_code)
-VALUES (54, now(), now(),
-        'Offres Exclusives! Découvrez nos dernières voitures d''occasion en excellent état à des prix imbattables.',
-        'Message d''En-tête', 'Message d''En-tête',
-        '', '', '', '', 27, 'fr')
+VALUES (-28, now(), now(), 'عروض حصرية! تصفح أحدث السيارات المستعملة بحالة ممتازة وأسعار لا تقبل المنافسة.', 'Announcement', 'Announcement',
+        '', '', '', '', -12, 'ar')
 on conflict (description_id) do nothing;
 
-INSERT INTO content.content (content_id, code, content_type,
-                              link_to_menu, sort_order, visible, store_merchant_id, status, version)
-VALUES (28, 'agreement', 'BOX', false, 8, true, '65f023632bc26470c104b75f', 'PUBLISHED', 1)
-on conflict (content_id) do nothing;
-
 INSERT INTO content.content_description (description_id, date_created, date_modified, description, name, title,
                                           meta_description, meta_keywords, meta_title, sef_url, content_id,
                                           language_code)
-VALUES (55, now(), now(),
-        '<p style="text-align:center; font-size:0.9em; padding:5px;">باستخدام هذا الموقع، فإنك توافق على <a href="/terms">الشروط والأحكام</a>.</p>',
-        'اتفاقية الاستخدام', 'اتفاقية الاستخدام',
-        '', '', '', '', 28, 'ar')
-on conflict (description_id) do nothing;
-INSERT INTO content.content_description (description_id, date_created, date_modified, description, name, title,
-                                          meta_description, meta_keywords, meta_title, sef_url, content_id,
-                                          language_code)
-VALUES (56, now(), now(),
-        '<p style="text-align:center; font-size:0.9em; padding:5px;">En utilisant ce site, vous acceptez nos <a href="/conditions-generales">Conditions Générales</a>.</p>',
-        'Accord Utilisateur', 'Accord Utilisateur',
-        '', '', '', '', 28, 'fr')
-on conflict (description_id) do nothing;
-
-INSERT INTO content.content (content_id, code, content_type,
-                              link_to_menu, sort_order, visible, store_merchant_id, status, version)
-VALUES (29, 'meta-title', 'BOX', false, 9, true, '65f023632bc26470c104b75f', 'PUBLISHED', 1)
-on conflict (content_id) do nothing;
-
-INSERT INTO content.content_description (description_id, date_created, date_modified, description, name, title,
-                                          meta_description, meta_keywords, meta_title, sef_url, content_id,
-                                          language_code)
-VALUES (57, now(), now(),
-        'إيجيبت كار سيلز | شراء وبيع السيارات الجديدة والمستعملة في مصر',
-        '', '', '', '', '', '', 29, 'ar')
-on conflict (description_id) do nothing;
-INSERT INTO content.content_description (description_id, date_created, date_modified, description, name, title,
-                                          meta_description, meta_keywords, meta_title, sef_url, content_id,
-                                          language_code)
-VALUES (58, now(), now(),
-        'Egypt Car Sales | Achat et Vente de Voitures Neuves et d''Occasion en Égypte',
-        '', '', '', '', '', '', 29, 'fr')
-on conflict (description_id) do nothing;
-
-INSERT INTO content.content (content_id, code, content_type,
-                              link_to_menu, sort_order, visible, store_merchant_id, status, version)
-VALUES (30, 'meta-description', 'BOX', false, 10, true, '65f023632bc26470c104b75f', 'PUBLISHED', 1)
-on conflict (content_id) do nothing;
-
-INSERT INTO content.content_description (description_id, date_created, date_modified, description, name, title,
-                                          meta_description, meta_keywords, meta_title, sef_url, content_id,
-                                          language_code)
-VALUES (59, now(), now(),
-        'منصة موثوقة لشراء وبيع السيارات في مصر. تصفح تشكيلة واسعة من السيارات الجديدة والمستعملة بأسعار تنافسية وجودة مضمونة مع إيجيبت كار سيلز.',
-        '', '', '', '', '', '', 30, 'ar')
-on conflict (description_id) do nothing;
-INSERT INTO content.content_description (description_id, date_created, date_modified, description, name, title,
-                                          meta_description, meta_keywords, meta_title, sef_url, content_id,
-                                          language_code)
-VALUES (60, now(), now(),
-        'Plateforme de confiance pour l''achat et la vente de voitures en Égypte. Découvrez une large sélection de véhicules neufs et d''occasion à des prix compétitifs et une qualité garantie avec Egypt Car Sales.',
-        '', '', '', '', '', '', 30, 'fr')
+VALUES (-27, now(), now(), 'Offres Exclusives! Découvrez nos dernières voitures d''occasion en excellent état à des prix imbattables.', 'Announcement', 'Announcement',
+        '', '', '', '', -12, 'fr')
 on conflict (description_id) do nothing;

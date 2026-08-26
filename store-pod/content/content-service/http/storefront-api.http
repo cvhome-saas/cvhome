@@ -15,6 +15,9 @@ GET {{SELLER_UI_URL}}/spg/content/api/v1/storefront/posts/quarterly-supply-budge
 ###
 GET {{SELLER_UI_URL}}/spg/content/api/v1/storefront/post-categories?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
 
+### Home-page sections, in order (public, 60s cache + ETag)
+GET {{SELLER_UI_URL}}/spg/content/api/v1/storefront/home-sections?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+
 ### Banners that win each placement
 GET {{SELLER_UI_URL}}/spg/content/api/v1/storefront/banners?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}&placement=HERO
 

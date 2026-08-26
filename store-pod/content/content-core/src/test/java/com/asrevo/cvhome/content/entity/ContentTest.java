@@ -18,21 +18,16 @@ class ContentTest {
 
     private static final String SLUG = "about-us";
 
+    /**
+     * The visible flag used to be the whole answer for the legacy BOX rows, so a draft that happened to carry
+     * it leaked to the storefront. Status is the only gate now, whatever the row's type.
+     */
     @Test
-    void aLegacyRowGoesByItsVisibleFlagAlone() {
-        Content box = ContentFixtures.content(1L, ContentType.BOX, SLUG);
-        assertThat(box.servable(ContentFixtures.NOW)).isFalse();
-
-        box.setVisible(true);
-        assertThat(box.servable(ContentFixtures.NOW)).isTrue();
-    }
-
-    @Test
-    void aRowWithoutATypeIsTreatedAsALegacyOne() {
+    void theVisibleFlagAloneNoLongerServesARow() {
         Content untyped = ContentFixtures.content(1L, null, SLUG);
         untyped.setVisible(true);
 
-        assertThat(untyped.servable(ContentFixtures.NOW)).isTrue();
+        assertThat(untyped.servable(ContentFixtures.NOW)).isFalse();
     }
 
     @Test

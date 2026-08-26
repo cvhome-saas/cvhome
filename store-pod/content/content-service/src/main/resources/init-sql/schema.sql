@@ -24,10 +24,7 @@ create table if not exists content.content
     date_modified     timestamp(6),
     updt_id           varchar(60),
     code              varchar(100) not null,
-    content_position  varchar(10),
     content_type      varchar(10),
-    link_to_menu      boolean,
-    product_group     varchar(255),
     sort_order        integer,
     visible           boolean,
     store_merchant_id varchar(50)  not null,
@@ -35,13 +32,13 @@ create table if not exists content.content
 );
 create index if not exists content_code_idx on content.content (code);
 
--- widen the type check (legacy databases carry the 3-value one under this name)
-alter table content.content drop constraint if exists content_content_type_check;
-alter table content.content add constraint content_content_type_check
-    check (content_type in ('BOX', 'PAGE', 'SECTION', 'POST', 'BANNER', 'FAQ', 'POLICY'));
+-- BOX held the store "snippets" (meta-title, header-message, agreement, LANDING_PAGE) — a workflow-less parallel
+-- to the components that say the same things better. Each moved to its successor: site SEO to site_settings, the
+-- announcement to a STRIP banner, the agreement to the live TERMS policy, the landing copy to SECTION rows.
+alter table content.content drop column if exists link_to_menu;
+alter table content.content drop column if exists product_group;
+alter table content.content drop column if exists content_position;
 alter table content.content drop constraint if exists content_content_position_check;
-alter table content.content add constraint content_content_position_check
-    check (content_position is null or content_position in ('LEFT', 'RIGHT'));
 
 alter table content.content add column if not exists status         varchar(12) not null default 'DRAFT';
 alter table content.content add column if not exists publish_at     timestamp(6);
@@ -78,7 +75,7 @@ create index if not exists content_store_type_status_idx on content.content (sto
 create index if not exists content_status_publish_at_idx on content.content (status, publish_at);
 create index if not exists content_store_placement_idx on content.content (store_merchant_id, placement, status);
 
--- migration of legacy rows: what was visible is published; BOX rows mirror visibility
+-- migration of legacy rows: what was visible is published
 update content.content
    set status = 'PUBLISHED'
  where visible = true and status = 'DRAFT' and created_by is null;
@@ -114,6 +111,15 @@ alter table content.content_description drop constraint if exists content_descri
 alter table content.content_description add constraint content_description_state_check
     check (state in ('MISSING', 'DRAFT', 'TRANSLATED', 'STALE'));
 create index if not exists content_description_content_idx on content.content_description (content_id);
+
+-- Purge the legacy BOX rows, then narrow the type check. Both wait until here: the descriptions have a foreign
+-- key to content, so they have to go first, and the check cannot be added while a BOX row still exists.
+delete from content.content_description where content_id in
+    (select content_id from content.content where content_type = 'BOX');
+delete from content.content where content_type = 'BOX';
+alter table content.content drop constraint if exists content_content_type_check;
+alter table content.content add constraint content_content_type_check
+    check (content_type in ('PAGE', 'SECTION', 'POST', 'BANNER', 'FAQ', 'POLICY'));
 
 -- ---------------------------------------------------------------------------------------------------------------
 -- revisions, status audit, redirects
@@ -260,16 +266,52 @@ create table if not exists content.media_asset
 create index if not exists media_asset_store_folder_idx on content.media_asset (store_merchant_id, folder_id);
 create index if not exists media_asset_store_kind_idx on content.media_asset (store_merchant_id, kind);
 
+-- The owner of a reference is (owner_kind, owner_ref), not just a content id: site settings hold the store's
+-- logo and favicon, and catalog registers its product images over ExternalMediaService. content_id/content_type
+-- stay populated for CONTENT rows so the existing index keeps its meaning, and are null for every other kind.
+-- owner_title is stored rather than resolved, so naming a product's usage never calls back into catalog.
 create table if not exists content.media_usage
 (
     id           bigint      not null primary key,
     asset_id     bigint      not null,
-    content_id   bigint      not null,
-    content_type varchar(10) not null,
+    owner_kind   varchar(20) not null default 'CONTENT',
+    owner_ref    varchar(120),
+    owner_title  varchar(200),
+    content_id   bigint,
+    content_type varchar(10),
     field        varchar(40) not null,
-    constraint media_usage_unique unique (asset_id, content_id, field)
+    constraint media_usage_unique unique (asset_id, owner_kind, owner_ref, field)
 );
+alter table content.media_usage add column if not exists owner_kind varchar(20) not null default 'CONTENT';
+alter table content.media_usage add column if not exists owner_ref varchar(120);
+alter table content.media_usage add column if not exists owner_title varchar(200);
+alter table content.media_usage alter column content_id drop not null;
+alter table content.media_usage alter column content_type drop not null;
+update content.media_usage set owner_ref = content_id::text where owner_ref is null;
+alter table content.media_usage alter column owner_ref set not null;
+alter table content.media_usage drop constraint if exists media_usage_unique;
+alter table content.media_usage add constraint media_usage_unique
+    unique (asset_id, owner_kind, owner_ref, field);
+alter table content.media_usage drop constraint if exists media_usage_owner_kind_check;
+alter table content.media_usage add constraint media_usage_owner_kind_check
+    check (owner_kind in ('CONTENT', 'SITE_SETTINGS', 'PRODUCT', 'CATEGORY', 'BRAND'));
 create index if not exists media_usage_content_idx on content.media_usage (content_id);
+create index if not exists media_usage_owner_idx on content.media_usage (owner_kind, owner_ref);
+
+-- How the store looks: brand imagery, social links, site-level SEO. One row per store, created lazily on first
+-- read. Not a content row — no slug, no workflow, no revisions, and read on every layout render.
+create table if not exists content.site_settings
+(
+    store_merchant_id  varchar(50) not null primary key,
+    logo_media_id      bigint,
+    logo_dark_media_id bigint,
+    favicon_media_id   bigint,
+    og_media_id        bigint,
+    seo                jsonb       not null default '{}'::jsonb,
+    social_links       jsonb       not null default '[]'::jsonb,
+    updated_at         timestamp(6),
+    updated_by         varchar(120)
+);
 
 create table if not exists content.media_quota
 (

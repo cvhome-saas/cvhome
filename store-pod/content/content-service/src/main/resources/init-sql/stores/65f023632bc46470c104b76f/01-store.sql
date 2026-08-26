@@ -9,10 +9,8 @@ domain for this store is fashion
 -- <<Begin Loop on l in ('0','1','2','3','4')
 -- End Loop>>
 
-
 -- <<Begin Loop on l in ('FACEBOOK','X','INSTAGRAM','TIKTOK')
 -- End Loop>>
-
 
 /*
 Generated content for store_id='65f023632bc46470c104b76f' (Fashion Domain) store name Riyadh Fashion Hub
@@ -25,9 +23,8 @@ Starting sort_order: 1
 */
 
 -- Page: about-us
-INSERT INTO content.content (content_id, code, content_type,
-                              link_to_menu, sort_order, visible, store_merchant_id, status, version)
-VALUES (1, 'about-us', 'PAGE', true, 1, true, '65f023632bc46470c104b76f', 'PUBLISHED', 1)
+INSERT INTO content.content (content_id, code, content_type, sort_order, visible, store_merchant_id, status, version)
+VALUES (1, 'about-us', 'PAGE', 1, true, '65f023632bc46470c104b76f', 'PUBLISHED', 1)
 on conflict (content_id) do nothing;
 
 -- Language: ar
@@ -55,9 +52,8 @@ VALUES (2, now(), now(),
 on conflict (description_id) do nothing;
 
 -- Page: contact-us
-INSERT INTO content.content (content_id, code, content_type,
-                              link_to_menu, sort_order, visible, store_merchant_id, status, version)
-VALUES (2, 'contact-us', 'PAGE', true, 2, true, '65f023632bc46470c104b76f', 'PUBLISHED', 1)
+INSERT INTO content.content (content_id, code, content_type, sort_order, visible, store_merchant_id, status, version)
+VALUES (2, 'contact-us', 'PAGE', 2, true, '65f023632bc46470c104b76f', 'PUBLISHED', 1)
 on conflict (content_id) do nothing;
 
 -- Language: ar
@@ -85,9 +81,8 @@ VALUES (4, now(), now(),
 on conflict (description_id) do nothing;
 
 -- Page: terms
-INSERT INTO content.content (content_id, code, content_type,
-                              link_to_menu, sort_order, visible, store_merchant_id, status, version)
-VALUES (3, 'terms', 'PAGE', false, 3, true, '65f023632bc46470c104b76f', 'PUBLISHED', 1)
+INSERT INTO content.content (content_id, code, content_type, sort_order, visible, store_merchant_id, status, version)
+VALUES (3, 'terms', 'PAGE', 3, true, '65f023632bc46470c104b76f', 'PUBLISHED', 1)
 on conflict (content_id) do nothing;
 
 -- Language: ar
@@ -115,9 +110,8 @@ VALUES (6, now(), now(),
 on conflict (description_id) do nothing;
 
 -- Page: privacy
-INSERT INTO content.content (content_id, code, content_type,
-                              link_to_menu, sort_order, visible, store_merchant_id, status, version)
-VALUES (4, 'privacy', 'PAGE', false, 4, true, '65f023632bc46470c104b76f', 'PUBLISHED', 1)
+INSERT INTO content.content (content_id, code, content_type, sort_order, visible, store_merchant_id, status, version)
+VALUES (4, 'privacy', 'PAGE', 4, true, '65f023632bc46470c104b76f', 'PUBLISHED', 1)
 on conflict (content_id) do nothing;
 
 -- Language: ar
@@ -145,9 +139,8 @@ VALUES (8, now(), now(),
 on conflict (description_id) do nothing;
 
 -- Page: location
-INSERT INTO content.content (content_id, code, content_type,
-                              link_to_menu, sort_order, visible, store_merchant_id, status, version)
-VALUES (5, 'location', 'PAGE', false, 5, true, '65f023632bc46470c104b76f', 'PUBLISHED', 1)
+INSERT INTO content.content (content_id, code, content_type, sort_order, visible, store_merchant_id, status, version)
+VALUES (5, 'location', 'PAGE', 5, true, '65f023632bc46470c104b76f', 'PUBLISHED', 1)
 on conflict (content_id) do nothing;
 
 -- Language: ar
@@ -174,9 +167,8 @@ VALUES (10, now(), now(),
 on conflict (description_id) do nothing;
 
 -- Page: faq
-INSERT INTO content.content (content_id, code, content_type,
-                              link_to_menu, sort_order, visible, store_merchant_id, status, version)
-VALUES (6, 'faq', 'PAGE', false, 6, true, '65f023632bc46470c104b76f', 'PUBLISHED', 1)
+INSERT INTO content.content (content_id, code, content_type, sort_order, visible, store_merchant_id, status, version)
+VALUES (6, 'faq', 'PAGE', 6, true, '65f023632bc46470c104b76f', 'PUBLISHED', 1)
 on conflict (content_id) do nothing;
 
 -- Language: ar
@@ -202,96 +194,30 @@ VALUES (12, now(), now(),
         'faq', 6, 'en')
 on conflict (description_id) do nothing;
 
--- Box: header-message
-INSERT INTO content.content (content_id, code, content_type,
-                              link_to_menu, sort_order, visible, store_merchant_id, status, version)
-VALUES (7, 'header-message', 'BOX', false, 7, true, '65f023632bc46470c104b76f', 'PUBLISHED', 1)
+-- The store's appearance record. metaTitle/metaDescription were the `meta-title` and `meta-description` BOX rows;
+-- they are per-locale maps here. Logo and favicon stay empty until the seller uploads one.
+INSERT INTO content.site_settings (store_merchant_id, seo, social_links, updated_at)
+VALUES ('65f023632bc46470c104b76f', '{"metaTitle": {"ar": "رياض فاشن هاب | أزياء عصرية وتشكيلات حصرية في الرياض", "en": "Riyadh Fashion Hub | Trendy Fashion & Exclusive Collections in Riyadh"}, "metaDescription": {"ar": "اكتشف أحدث صيحات الموضة والأزياء النسائية والرجالية في رياض فاشن هاب. تسوق أونلاين تشكيلات حصرية من الملابس، الأحذية، والإكسسوارات. توصيل لجميع أنحاء المملكة.", "en": "Discover the latest fashion trends for women and men at Riyadh Fashion Hub. Shop online for exclusive collections of clothing, shoes, and accessories. Delivery across Saudi Arabia."}}'::jsonb, '[]'::jsonb, now())
+on conflict (store_merchant_id) do nothing;
+
+-- The announcement strip, which the `header-message` BOX used to carry. Negative ids are deliberate: content ids
+-- come from SM_SEQUENCER and only ever grow upward, so seed-only rows below zero can never collide.
+INSERT INTO content.content (content_id, code, content_type, sort_order, visible, store_merchant_id,
+                             status, version, placement, meta)
+VALUES (-14, 'announcement', 'BANNER', 0, true, '65f023632bc46470c104b76f', 'PUBLISHED', 1, 'STRIP',
+        '{"target": null, "artwork": null, "theme": null, "loggedInOnly": false}')
 on conflict (content_id) do nothing;
 
--- Language: ar
 INSERT INTO content.content_description (description_id, date_created, date_modified, description, name, title,
                                           meta_description, meta_keywords, meta_title, sef_url, content_id,
                                           language_code)
-VALUES (13, now(), now(),
-        'تشكيلة العيد وصلت! تسوقي الآن لإطلالة عيد مميزة. شحن مجاني للطلبات فوق 350 ريال.',
-        'رسالة الترويسة', 'رسالة الترويسة',
-        '', '', '', '', 7, 'ar')
-on conflict (description_id) do nothing;
--- Language: en
-INSERT INTO content.content_description (description_id, date_created, date_modified, description, name, title,
-                                          meta_description, meta_keywords, meta_title, sef_url, content_id,
-                                          language_code)
-VALUES (14, now(), now(),
-        'Eid Collection Has Arrived! Shop now for a special Eid look. Free shipping on orders over 350 SAR.',
-        'Header Message', 'Header Message',
-        '', '', '', '', 7, 'en')
+VALUES (-36, now(), now(), 'تشكيلة العيد وصلت! تسوقي الآن لإطلالة عيد مميزة. شحن مجاني للطلبات فوق 350 ريال.', 'Announcement', 'Announcement',
+        '', '', '', '', -14, 'ar')
 on conflict (description_id) do nothing;
 
--- Box: agreement
-INSERT INTO content.content (content_id, code, content_type,
-                              link_to_menu, sort_order, visible, store_merchant_id, status, version)
-VALUES (8, 'agreement', 'BOX', false, 8, true, '65f023632bc46470c104b76f', 'PUBLISHED', 1)
-on conflict (content_id) do nothing;
-
--- Language: ar
 INSERT INTO content.content_description (description_id, date_created, date_modified, description, name, title,
                                           meta_description, meta_keywords, meta_title, sef_url, content_id,
                                           language_code)
-VALUES (15, now(), now(),
-        '<p style="text-align:center; font-size:0.9em; padding:5px;">باستخدامك للموقع، فإنك توافق على <a href="/terms">الشروط والأحكام</a>.</p>',
-        'اتفاقية الاستخدام', 'اتفاقية الاستخدام',
-        '', '', '', '', 8, 'ar')
-on conflict (description_id) do nothing;
--- Language: en
-INSERT INTO content.content_description (description_id, date_created, date_modified, description, name, title,
-                                          meta_description, meta_keywords, meta_title, sef_url, content_id,
-                                          language_code)
-VALUES (16, now(), now(),
-        '<p style="text-align:center; font-size:0.9em; padding:5px;">By using the site, you agree to our <a href="/terms">Terms & Conditions</a>.</p>',
-        'User Agreement', 'User Agreement',
-        '', '', '', '', 8, 'en')
-on conflict (description_id) do nothing;
-
--- Box: meta-title
-INSERT INTO content.content (content_id, code, content_type,
-                              link_to_menu, sort_order, visible, store_merchant_id, status, version)
-VALUES (9, 'meta-title', 'BOX', false, 9, true, '65f023632bc46470c104b76f', 'PUBLISHED', 1)
-on conflict (content_id) do nothing;
-
--- Language: ar
-INSERT INTO content.content_description (description_id, date_created, date_modified, description, name, title,
-                                          meta_description, meta_keywords, meta_title, sef_url, content_id,
-                                          language_code)
-VALUES (17, now(), now(),
-        'رياض فاشن هاب | أزياء عصرية وتشكيلات حصرية في الرياض', '', '', '', '', '', '', 9, 'ar')
-on conflict (description_id) do nothing;
--- Language: en
-INSERT INTO content.content_description (description_id, date_created, date_modified, description, name, title,
-                                          meta_description, meta_keywords, meta_title, sef_url, content_id,
-                                          language_code)
-VALUES (18, now(), now(),
-        'Riyadh Fashion Hub | Trendy Fashion & Exclusive Collections in Riyadh', '', '', '', '', '', '', 9, 'en')
-on conflict (description_id) do nothing;
-
--- Box: meta-description
-INSERT INTO content.content (content_id, code, content_type,
-                              link_to_menu, sort_order, visible, store_merchant_id, status, version)
-VALUES (10, 'meta-description', 'BOX', false, 10, true, '65f023632bc46470c104b76f', 'PUBLISHED', 1)
-on conflict (content_id) do nothing;
-
--- Language: ar
-INSERT INTO content.content_description (description_id, date_created, date_modified, description, name, title,
-                                          meta_description, meta_keywords, meta_title, sef_url, content_id,
-                                          language_code)
-VALUES (19, now(), now(),
-        'اكتشف أحدث صيحات الموضة والأزياء النسائية والرجالية في رياض فاشن هاب. تسوق أونلاين تشكيلات حصرية من الملابس، الأحذية، والإكسسوارات. توصيل لجميع أنحاء المملكة.',
-        '', '', '', '', '', '', 10, 'ar')
-on conflict (description_id) do nothing;
--- Language: en
-INSERT INTO content.content_description (description_id, date_created, date_modified, description, name, title,
-                                          meta_description, meta_keywords, meta_title, sef_url, content_id,
-                                          language_code)
-VALUES (20, now(), now(),
-        'Discover the latest fashion trends for women and men at Riyadh Fashion Hub. Shop online for exclusive collections of clothing, shoes, and accessories. Delivery across Saudi Arabia.',
-        '', '', '', '', '', '', 10, 'en')
+VALUES (-35, now(), now(), 'Eid Collection Has Arrived! Shop now for a special Eid look. Free shipping on orders over 350 SAR.', 'Announcement', 'Announcement',
+        '', '', '', '', -14, 'en')
 on conflict (description_id) do nothing;

@@ -33,7 +33,7 @@ import static org.mockito.Mockito.when;
 
 /**
  * Storefront navigation: two menus, one level of nesting, replaced whole. The MAIN menu is bootstrapped from the
- * legacy {@code linkToMenu} pages so a store that never opened the editor keeps the navigation it had.
+ * pages flagged {@code showInFooter}, so a store that never opened the editor still has a footer.
  */
 class MenuServiceTest {
 
@@ -134,9 +134,8 @@ class MenuServiceTest {
     }
 
     @Test
-    void bothMenusAreListedAndBootstrappedOnFirstRead() {
+    void bothMenusAreListedAndTheFooterIsBootstrappedOnFirstRead() {
         Content page = ContentFixtures.published(1L, ContentType.PAGE, ABOUT, LABEL);
-        page.setLinkToMenu(true);
         Content footerPage = ContentFixtures.published(2L, ContentType.PAGE, "terms", "Terms");
         footerPage.setShowInFooter(true);
         when(menus.findByStoreAndHandle(STORE_ID, MenuHandle.MAIN)).thenReturn(Optional.empty());
@@ -148,7 +147,9 @@ class MenuServiceTest {
         var out = service.list(ContentFixtures.STORE);
 
         assertThat(out).extracting("handle").containsExactly(MenuHandle.MAIN, MenuHandle.FOOTER);
-        assertThat(out.getFirst().getItemCount()).isEqualTo(1);
+        // MAIN starts empty: it used to be seeded from a legacy link_to_menu column only the retired seller UI
+        // could set, so the menu a seller saw was built from data they had no way to edit.
+        assertThat(out.getFirst().getItemCount()).isZero();
         assertThat(out.getLast().getItemCount()).isEqualTo(1);
     }
 

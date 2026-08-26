@@ -20,6 +20,7 @@ import com.asrevo.cvhome.content.errors.ContentNotFoundException;
 import com.asrevo.cvhome.content.errors.InvalidContentRequestException;
 import com.asrevo.cvhome.content.errors.MediaLimitException;
 import com.asrevo.cvhome.content.model.MediaKind;
+import com.asrevo.cvhome.content.model.MediaOwnerKind;
 import com.asrevo.cvhome.content.model.media.PersistableMediaAsset;
 import com.asrevo.cvhome.content.model.media.ReadableMediaAsset;
 import com.asrevo.cvhome.content.model.summary.ContentSummary;
@@ -83,6 +84,8 @@ class MediaServiceTest {
     private static final String ACTOR = "ada";
 
     private static final String PNG = "image/png";
+
+    private static final String REF_TWO = "2";
 
     private static final String LOGO = "logo.png";
 
@@ -329,6 +332,8 @@ class MediaServiceTest {
         void readingAnAssetListsWhatUsesIt() throws Exception {
             MediaUsageRow row = new MediaUsageRow();
             row.setAssetId(5L);
+            row.setOwnerKind(MediaOwnerKind.CONTENT);
+            row.setOwnerRef(REF_TWO);
             row.setContentId(2L);
             row.setContentType(ContentType.PAGE);
             row.setField("og");
@@ -350,6 +355,8 @@ class MediaServiceTest {
         void usageOfAnAssetWhoseItemVanishedStillLists() throws Exception {
             MediaUsageRow row = new MediaUsageRow();
             row.setAssetId(5L);
+            row.setOwnerKind(MediaOwnerKind.CONTENT);
+            row.setOwnerRef("99");
             row.setContentId(99L);
             when(assets.findByIdAndStoreMerchantId(5L, STORE_ID)).thenReturn(Optional.of(asset(5L, LOGO)));
             when(usage.findByAssetId(5L)).thenReturn(List.of(row));
@@ -422,6 +429,8 @@ class MediaServiceTest {
         void deletingAReferencedAssetIsAConflictUnlessForced() {
             MediaUsageRow row = new MediaUsageRow();
             row.setAssetId(5L);
+            row.setOwnerKind(MediaOwnerKind.CONTENT);
+            row.setOwnerRef(REF_TWO);
             row.setContentId(2L);
             when(assets.findByIdAndStoreMerchantId(5L, STORE_ID)).thenReturn(Optional.of(asset(5L, LOGO)));
             when(usage.findByAssetId(5L)).thenReturn(List.of(row));

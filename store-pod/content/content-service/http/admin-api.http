@@ -4,30 +4,6 @@
 GET {{SELLER_UI_URL}}/spg/content/api/v1/private/content/summary?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
 Cookie: SESSION={{SESSION_ID}}
 
-### Snippets (legacy BOX rows): list, read, upsert, delete
-GET {{SELLER_UI_URL}}/spg/content/api/v1/private/content/snippets?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
-Cookie: SESSION={{SESSION_ID}}
-
-###
-GET {{SELLER_UI_URL}}/spg/content/api/v1/private/content/snippets/LANDING_PAGE?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
-Cookie: SESSION={{SESSION_ID}}
-
-###
-PUT {{SELLER_UI_URL}}/spg/content/api/v1/private/content/snippets/LANDING_PAGE?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
-Content-Type: application/json
-Cookie: SESSION={{SESSION_ID}}
-
-{
-  "visible": true,
-  "translations": [
-    {"language": "en", "title": "Workplace supplies, delivered", "body": "<p>Everything your office needs.</p>", "metaDescription": "Acme Supply Co.", "keywords": "office supplies, b2b"}
-  ]
-}
-
-###
-DELETE {{SELLER_UI_URL}}/spg/content/api/v1/private/content/snippets/LANDING_PAGE?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
-Cookie: SESSION={{SESSION_ID}}
-
 ### Redirects written by slug changes of published pages
 GET {{SELLER_UI_URL}}/spg/content/api/v1/private/content/redirects?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
 Cookie: SESSION={{SESSION_ID}}

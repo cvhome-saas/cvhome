@@ -33,6 +33,7 @@ import com.asrevo.cvhome.content.errors.InvalidContentRequestException;
 import com.asrevo.cvhome.content.errors.MediaLimitException;
 import com.asrevo.cvhome.content.errors.MediaStorageException;
 import com.asrevo.cvhome.content.model.MediaKind;
+import com.asrevo.cvhome.content.model.MediaOwnerKind;
 import com.asrevo.cvhome.content.model.media.MediaUsage;
 import com.asrevo.cvhome.content.model.media.PersistableMediaAsset;
 import com.asrevo.cvhome.content.model.media.ReadableMediaAsset;
@@ -421,12 +422,20 @@ public class MediaService implements SummaryService.MediaFigures {
         return out;
     }
 
+    /**
+     * The owners of an asset. A content-owned row resolves its title from the item; every other kind uses the
+     * title its owner supplied when it registered, so this never calls out to another service.
+     */
     private List<MediaUsage> usageOf(Long assetId) {
         List<MediaUsage> out = new ArrayList<>();
         for (MediaUsageRow r : usage.findByAssetId(assetId)) {
-            String title = contents.findById(r.getContentId())
-                    .map(c -> ContentMapper.title(c, null)).orElse(null);
-            out.add(new MediaUsage(r.getContentType(), r.getContentId(), title, r.getField()));
+            // A null kind is a row written before the column existed; the DDL defaults those to CONTENT.
+            MediaOwnerKind kind = r.getOwnerKind() == null ? MediaOwnerKind.CONTENT : r.getOwnerKind();
+            String title = kind.local() && r.getContentId() != null
+                    ? contents.findById(r.getContentId()).map(c -> ContentMapper.title(c, null)).orElse(null)
+                    : r.getOwnerTitle();
+            out.add(new MediaUsage(kind, r.getOwnerRef(), r.getContentType(), r.getContentId(), title,
+                    r.getField()));
         }
         return out;
     }

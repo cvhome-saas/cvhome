@@ -40,7 +40,6 @@ import com.asrevo.cvhome.content.model.PolicyType;
 import com.asrevo.cvhome.store.core.constants.SchemaConstant;
 import com.asrevo.cvhome.store.core.entity.common.audit.AuditListener;
 import com.asrevo.cvhome.store.core.entity.common.audit.AuditSection;
-import com.asrevo.cvhome.store.core.entity.content.ContentPosition;
 import com.asrevo.cvhome.store.core.entity.content.ContentType;
 import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
 
@@ -94,18 +93,11 @@ public class Content extends SalesManagerEntity<Long, Content> implements Serial
     private String code;
 
     /**
-     * Legacy visibility. Kept in step with {@link #status} for workflow rows ({@code visible == PUBLISHED}) and the
-     * only switch for BOX rows.
+     * Legacy visibility, kept in step with {@link #status} ({@code visible == PUBLISHED}). Retained because the
+     * storefront's older queries filter on it; {@link #servable(Instant)} reads the status instead.
      */
     @Column(name = "VISIBLE")
     private boolean visible;
-
-    @Column(name = "LINK_TO_MENU")
-    private boolean linkToMenu;
-
-    @Column(name = "CONTENT_POSITION", length = 10)
-    @Enumerated(value = EnumType.STRING)
-    private ContentPosition contentPosition;
 
     @Column(name = "CONTENT_TYPE", length = 10)
     @Enumerated(value = EnumType.STRING)
@@ -113,9 +105,6 @@ public class Content extends SalesManagerEntity<Long, Content> implements Serial
 
     @Column(name = "SORT_ORDER")
     private Integer sortOrder = 0;
-
-    @Column(name = "PRODUCT_GROUP")
-    private String productGroup;
 
     // --- workflow columns (content platform) ---
 
@@ -195,13 +184,15 @@ public class Content extends SalesManagerEntity<Long, Content> implements Serial
     }
 
     /**
-     * Whether the storefront may serve this row right now: a BOX/SECTION row when visible, a workflow row when
-     * {@code PUBLISHED} and inside its window.
+     * Whether the storefront may serve this row right now: {@code PUBLISHED} and inside its window.
+     *
+     * <p>
+     * {@code visible} is not consulted — {@link com.asrevo.cvhome.content.service.PublishingService} keeps it in
+     * step with the status, so it carries no information the status does not. It used to be the whole answer for
+     * the legacy {@code BOX} rows, which had no workflow at all.
+     * </p>
      */
     public boolean servable(Instant now) {
-        if (contentType == null || !contentType.workflow()) {
-            return visible;
-        }
         if (status != ContentStatus.PUBLISHED) {
             return false;
         }

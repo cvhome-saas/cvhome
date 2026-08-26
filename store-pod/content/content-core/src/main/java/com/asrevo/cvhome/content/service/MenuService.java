@@ -32,8 +32,13 @@ import lombok.RequiredArgsConstructor;
 
 /**
  * Storefront navigation: two menus per store (MAIN, FOOTER), one level of nesting, replaced whole by the editor.
- * The MAIN menu is bootstrapped on first read from the legacy {@code linkToMenu} pages, so a store that never
- * opened the editor keeps the navigation it had.
+ *
+ * <p>
+ * FOOTER is bootstrapped on first read from the pages flagged {@code showInFooter}, so a store that never opened
+ * the editor still has a footer. MAIN starts empty: it used to be seeded from a legacy {@code linkToMenu} column
+ * that only the retired seller UI could set, which meant the menu a seller saw depended on data they had no way
+ * to edit.
+ * </p>
  */
 @Service
 @RequiredArgsConstructor
@@ -148,8 +153,7 @@ public class MenuService implements SummaryService.MediaFigures {
         menu = menus.saveAndFlush(menu);
         int position = 0;
         for (Content page : contents.findVisibleByType(store, ContentType.PAGE)) {
-            boolean include = handle == MenuHandle.MAIN ? page.isLinkToMenu() : page.isShowInFooter();
-            if (!include) {
+            if (handle != MenuHandle.FOOTER || !page.isShowInFooter()) {
                 continue;
             }
             MenuItem item = new MenuItem();

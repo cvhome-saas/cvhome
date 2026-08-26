@@ -60,7 +60,7 @@ class SummaryServiceTest {
         ContentSummary summary = service.summary(ContentFixtures.STORE, QUOTA);
 
         assertThat(summary.getCounts()).containsOnlyKeys("pages", "posts", "banners", "faq", "policies",
-                "snippets", MEDIA_KEY, "menus");
+                "sections", MEDIA_KEY, "menus");
         assertThat(summary.getMedia().getBytesQuota()).isEqualTo(QUOTA);
         assertThat(summary.getAwaitingTranslation().getTotal()).isZero();
     }

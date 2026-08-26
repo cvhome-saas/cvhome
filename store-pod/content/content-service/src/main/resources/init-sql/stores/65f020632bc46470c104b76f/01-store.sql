@@ -18,9 +18,8 @@ Starting sort_order: 1
 */
 
 -- Page: about-us
-INSERT INTO content.content (content_id, code, content_type,
-                              link_to_menu, sort_order, visible, store_merchant_id, status, version)
-VALUES (11, 'about-us', 'PAGE', true, 1, true, '65f020632bc46470c104b76f', 'PUBLISHED', 1)
+INSERT INTO content.content (content_id, code, content_type, sort_order, visible, store_merchant_id, status, version)
+VALUES (11, 'about-us', 'PAGE', 1, true, '65f020632bc46470c104b76f', 'PUBLISHED', 1)
 on conflict (content_id) do nothing;
 
 -- Language: fr
@@ -47,9 +46,8 @@ VALUES (22, now(), now(),
 on conflict (description_id) do nothing;
 
 -- Page: contact-us
-INSERT INTO content.content (content_id, code, content_type,
-                              link_to_menu, sort_order, visible, store_merchant_id, status, version)
-VALUES (12, 'contact-us', 'PAGE', true, 2, true, '65f020632bc46470c104b76f', 'PUBLISHED', 1)
+INSERT INTO content.content (content_id, code, content_type, sort_order, visible, store_merchant_id, status, version)
+VALUES (12, 'contact-us', 'PAGE', 2, true, '65f020632bc46470c104b76f', 'PUBLISHED', 1)
 on conflict (content_id) do nothing;
 
 -- Language: fr
@@ -76,9 +74,8 @@ VALUES (24, now(), now(),
 on conflict (description_id) do nothing;
 
 -- Page: terms
-INSERT INTO content.content (content_id, code, content_type,
-                              link_to_menu, sort_order, visible, store_merchant_id, status, version)
-VALUES (13, 'terms', 'PAGE', false, 3, true, '65f020632bc46470c104b76f', 'PUBLISHED', 1)
+INSERT INTO content.content (content_id, code, content_type, sort_order, visible, store_merchant_id, status, version)
+VALUES (13, 'terms', 'PAGE', 3, true, '65f020632bc46470c104b76f', 'PUBLISHED', 1)
 on conflict (content_id) do nothing;
 
 -- Language: fr
@@ -105,9 +102,8 @@ VALUES (26, now(), now(),
 on conflict (description_id) do nothing;
 
 -- Page: privacy
-INSERT INTO content.content (content_id, code, content_type,
-                              link_to_menu, sort_order, visible, store_merchant_id, status, version)
-VALUES (14, 'privacy', 'PAGE', false, 4, true, '65f020632bc46470c104b76f', 'PUBLISHED', 1)
+INSERT INTO content.content (content_id, code, content_type, sort_order, visible, store_merchant_id, status, version)
+VALUES (14, 'privacy', 'PAGE', 4, true, '65f020632bc46470c104b76f', 'PUBLISHED', 1)
 on conflict (content_id) do nothing;
 
 -- Language: fr
@@ -135,9 +131,8 @@ VALUES (28, now(), now(),
 on conflict (description_id) do nothing;
 
 -- Page: location
-INSERT INTO content.content (content_id, code, content_type,
-                              link_to_menu, sort_order, visible, store_merchant_id, status, version)
-VALUES (15, 'location', 'PAGE', false, 5, true, '65f020632bc46470c104b76f', 'PUBLISHED', 1)
+INSERT INTO content.content (content_id, code, content_type, sort_order, visible, store_merchant_id, status, version)
+VALUES (15, 'location', 'PAGE', 5, true, '65f020632bc46470c104b76f', 'PUBLISHED', 1)
 on conflict (content_id) do nothing;
 
 -- Language: fr
@@ -164,9 +159,8 @@ VALUES (30, now(), now(),
 on conflict (description_id) do nothing;
 
 -- Page: faq
-INSERT INTO content.content (content_id, code, content_type,
-                              link_to_menu, sort_order, visible, store_merchant_id, status, version)
-VALUES (16, 'faq', 'PAGE', false, 6, true, '65f020632bc46470c104b76f', 'PUBLISHED', 1)
+INSERT INTO content.content (content_id, code, content_type, sort_order, visible, store_merchant_id, status, version)
+VALUES (16, 'faq', 'PAGE', 6, true, '65f020632bc46470c104b76f', 'PUBLISHED', 1)
 on conflict (content_id) do nothing;
 
 -- Language: fr
@@ -192,98 +186,30 @@ VALUES (32, now(), now(),
         'faq', 16, 'en')
 on conflict (description_id) do nothing;
 
--- Box: header-message
-INSERT INTO content.content (content_id, code, content_type,
-                              link_to_menu, sort_order, visible, store_merchant_id, status, version)
-VALUES (17, 'header-message', 'BOX', false, 7, true, '65f020632bc46470c104b76f', 'PUBLISHED', 1)
+-- The store's appearance record. metaTitle/metaDescription were the `meta-title` and `meta-description` BOX rows;
+-- they are per-locale maps here. Logo and favicon stay empty until the seller uploads one.
+INSERT INTO content.site_settings (store_merchant_id, seo, social_links, updated_at)
+VALUES ('65f020632bc46470c104b76f', '{"metaTitle": {"fr": "Beauté Élégante Paris | Soins de Luxe, Maquillage & Parfums d''Exception", "en": "Beauté Élégante Paris | Luxury Skincare, Makeup & Exquisite Perfumes"}, "metaDescription": {"fr": "Découvrez l''univers de Beauté Élégante Paris. Votre destination pour les soins de la peau haut de gamme, le maquillage de créateur et les parfums rares au cœur de Paris. Élégance et savoir-faire français.", "en": "Explore the world of Beauté Élégante Paris. Your destination for premium skincare, designer makeup, and rare fragrances in the heart of Paris. French elegance and expertise."}}'::jsonb, '[]'::jsonb, now())
+on conflict (store_merchant_id) do nothing;
+
+-- The announcement strip, which the `header-message` BOX used to carry. Negative ids are deliberate: content ids
+-- come from SM_SEQUENCER and only ever grow upward, so seed-only rows below zero can never collide.
+INSERT INTO content.content (content_id, code, content_type, sort_order, visible, store_merchant_id,
+                             status, version, placement, meta)
+VALUES (-11, 'announcement', 'BANNER', 0, true, '65f020632bc46470c104b76f', 'PUBLISHED', 1, 'STRIP',
+        '{"target": null, "artwork": null, "theme": null, "loggedInOnly": false}')
 on conflict (content_id) do nothing;
 
--- Language: fr
 INSERT INTO content.content_description (description_id, date_created, date_modified, description, name, title,
                                           meta_description, meta_keywords, meta_title, sef_url, content_id,
                                           language_code)
-VALUES (33, now(), now(),
-        'Livraison offerte en France métropolitaine dès 75€ d''achat.',
-        'Message d''En-tête', 'Message d''En-tête',
-        '', '', '', '', 17, 'fr')
-on conflict (description_id) do nothing;
--- Language: en
-INSERT INTO content.content_description (description_id, date_created, date_modified, description, name, title,
-                                          meta_description, meta_keywords, meta_title, sef_url, content_id,
-                                          language_code)
-VALUES (34, now(), now(),
-        'Free shipping in mainland France on orders over €75.',
-        'Header Message', 'Header Message',
-        '', '', '', '', 17, 'en')
+VALUES (-24, now(), now(), 'Free shipping in mainland France on orders over €75.', 'Announcement', 'Announcement',
+        '', '', '', '', -11, 'en')
 on conflict (description_id) do nothing;
 
--- Box: agreement
-INSERT INTO content.content (content_id, code, content_type,
-                              link_to_menu, sort_order, visible, store_merchant_id, status, version)
-VALUES (18, 'agreement', 'BOX', false, 8, true, '65f020632bc46470c104b76f', 'PUBLISHED', 1)
-on conflict (content_id) do nothing;
-
--- Language: fr
 INSERT INTO content.content_description (description_id, date_created, date_modified, description, name, title,
                                           meta_description, meta_keywords, meta_title, sef_url, content_id,
                                           language_code)
-VALUES (35, now(), now(),
-        '<p style="text-align:center; font-size:0.9em; padding:5px;">En naviguant sur ce site, vous acceptez nos <a href="/conditions-generales">Conditions Générales</a>.</p>',
-        'Accord Utilisateur', 'Accord Utilisateur',
-        '', '', '', '', 18, 'fr')
-on conflict (description_id) do nothing;
--- Language: en
-INSERT INTO content.content_description (description_id, date_created, date_modified, description, name, title,
-                                          meta_description, meta_keywords, meta_title, sef_url, content_id,
-                                          language_code)
-VALUES (36, now(), now(),
-        '<p style="text-align:center; font-size:0.9em; padding:5px;">By browsing this site, you agree to our <a href="/terms">Terms & Conditions</a>.</p>',
-        'User Agreement', 'User Agreement',
-        '', '', '', '', 18, 'en')
-on conflict (description_id) do nothing;
-
--- NEW BOX: meta-title
-INSERT INTO content.content (content_id, code, content_type,
-                              link_to_menu, sort_order, visible, store_merchant_id, status, version)
-VALUES (19, 'meta-title', 'BOX', false, 9, true, '65f020632bc46470c104b76f', 'PUBLISHED', 1)
-on conflict (content_id) do nothing;
-
--- Language: fr
-INSERT INTO content.content_description (description_id, date_created, date_modified, description, name, title,
-                                          meta_description, meta_keywords, meta_title, sef_url, content_id,
-                                          language_code)
-VALUES (37, now(), now(),
-        'Beauté Élégante Paris | Soins de Luxe, Maquillage & Parfums d''Exception',
-        '', '', '', '', '', '', 19, 'fr')
-on conflict (description_id) do nothing;
--- Language: en
-INSERT INTO content.content_description (description_id, date_created, date_modified, description, name, title,
-                                          meta_description, meta_keywords, meta_title, sef_url, content_id,
-                                          language_code)
-VALUES (38, now(), now(),
-        'Beauté Élégante Paris | Luxury Skincare, Makeup & Exquisite Perfumes',
-        '', '', '', '', '', '', 19, 'en')
-on conflict (description_id) do nothing;
-
--- NEW BOX: meta-description
-INSERT INTO content.content (content_id, code, content_type,
-                              link_to_menu, sort_order, visible, store_merchant_id, status, version)
-VALUES (20, 'meta-description', 'BOX', false, 10, true, '65f020632bc46470c104b76f', 'PUBLISHED', 1)
-on conflict (content_id) do nothing;
-
--- Language: fr
-INSERT INTO content.content_description (description_id, date_created, date_modified, description, name, title,
-                                          meta_description, meta_keywords, meta_title, sef_url, content_id,
-                                          language_code)
-VALUES (39, now(), now(),
-        'Découvrez l''univers de Beauté Élégante Paris. Votre destination pour les soins de la peau haut de gamme, le maquillage de créateur et les parfums rares au cœur de Paris. Élégance et savoir-faire français.',
-        '', '', '', '', '', '', 20, 'fr')
-on conflict (description_id) do nothing;
--- Language: en
-INSERT INTO content.content_description (description_id, date_created, date_modified, description, name, title,
-                                          meta_description, meta_keywords, meta_title, sef_url, content_id,
-                                          language_code)
-VALUES (40, now(), now(),
-        'Explore the world of Beauté Élégante Paris. Your destination for premium skincare, designer makeup, and rare fragrances in the heart of Paris. French elegance and expertise.',
-        '', '', '', '', '', '', 20, 'en')
+VALUES (-23, now(), now(), 'Livraison offerte en France métropolitaine dès 75€ d''achat.', 'Announcement', 'Announcement',
+        '', '', '', '', -11, 'fr')
 on conflict (description_id) do nothing;

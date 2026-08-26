@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.asrevo.cvhome.content.entity.MediaUsageRow;
+import com.asrevo.cvhome.content.model.MediaOwnerKind;
 
 public interface MediaUsageRepository extends JpaRepository<MediaUsageRow, Long> {
 
@@ -14,7 +15,7 @@ public interface MediaUsageRepository extends JpaRepository<MediaUsageRow, Long>
 
     long countByAssetId(Long assetId);
 
-    void deleteByContentId(Long contentId);
+    void deleteByOwnerKindAndOwnerRef(MediaOwnerKind ownerKind, String ownerRef);
 
     void deleteByAssetId(Long assetId);
 

@@ -69,11 +69,13 @@ class ContentApiIntegrationTest {
 
     private static final String ABOUT_US = "about-us";
 
-    private static final String SNIPPETS = "snippets";
+    private static final String SITE_SETTINGS = "site-settings";
 
-    private static final String LANDING_PAGE = "LANDING_PAGE";
+    private static final String SHOP_TITLE = "Acme Supply Co.";
 
-    private static final String KEYWORDS = "a, b";
+    private static final String SEO = "seo";
+
+    private static final String META_TITLE = "metaTitle";
 
     private static final String PUBLISH = "publish";
 
@@ -84,7 +86,7 @@ class ContentApiIntegrationTest {
     private static final String STOREFRONT_PAGE = "%s/pages/%s?store=%s&lang=%s";
 
     private static final String PAGE_BODY = """
-            {%s"slug":"%s","template":"STANDARD","linkToMenu":true,
+            {%s"slug":"%s","template":"STANDARD",
              "translations":[{"language":"en","title":"%s","body":"%s"},
                              {"language":"ar","title":"عنوان","body":""}]}""";
 
@@ -292,22 +294,41 @@ class ContentApiIntegrationTest {
     // ---------------------------------------------------------------------------------- summary + snippets
 
     @Test
-    void summaryCountsAndSnippetsRoundTrip() {
+    void summaryCountsAndSiteSettingsRoundTrip() {
         JsonNode summary = json(api.get(scoped(SUMMARY, STORE_A), admin));
         JsonNode counts = summary.get("counts");
         assertThat(counts.get(PAGES_SEGMENT).asLong()).isGreaterThanOrEqualTo(6);
-        assertThat(counts.get(SNIPPETS).asLong()).isGreaterThanOrEqualTo(4);
+        assertThat(counts.has("sections")).isTrue();
         assertThat(summary.get("publishedItems").asLong()).isGreaterThanOrEqualTo(6);
         assertThat(summary.get("media").get("bytesQuota").asLong()).isGreaterThan(0);
 
-        String snippetUrl = scoped(path(PRIVATE, SNIPPETS, LANDING_PAGE), STORE_A);
-        var saved = put(snippetUrl, """
-                {"visible":true,"translations":[{"language":"en","title":"Welcome","body":"<p>Hi</p>",
-                 "metaDescription":"meta","keywords":"a, b"}]}""");
+        // The store's title and description used to be `meta-title` / `meta-description` BOX rows. The seed
+        // carries them across, so they read back before anything is written.
+        String settingsUrl = scoped(path(PRIVATE, SITE_SETTINGS), STORE_A);
+        assertThat(json(api.get(settingsUrl, admin)).get(SEO).has(META_TITLE)).isTrue();
+
+        var saved = put(settingsUrl, """
+                {"logoMediaId":null,"faviconMediaId":null,"ogMediaId":null,
+                 "seo":{"metaTitle":{"en":"Acme Supply Co."}},
+                 "socialLinks":[{"provider":"INSTAGRAM","url":"https://instagram.com/acme"}]}""");
         expect(saved, HttpStatus.OK);
-        JsonNode s = json(api.get(snippetUrl, admin));
-        assertThat(s.get(CODE).asString()).isEqualTo(LANDING_PAGE);
-        assertThat(s.get("translations").get(0).get("keywords").asString()).isEqualTo(KEYWORDS);
+
+        JsonNode s = json(api.get(settingsUrl, admin));
+        assertThat(s.get(SEO).get(META_TITLE).get("en").asString()).isEqualTo(SHOP_TITLE);
+        assertThat(s.get("socialLinks").get(0).get("provider").asString()).isEqualTo("INSTAGRAM");
+        assertThat(s.get("branding").get("logo").isNull()).isTrue();
+    }
+
+    /**
+     * A media id from another store must not be attachable, or one seller could point at another's asset.
+     */
+    @Test
+    void siteSettingsRefuseAMediaIdFromAnotherStore() {
+        var refused = put(scoped(path(PRIVATE, SITE_SETTINGS), STORE_A),
+                """
+                {"logoMediaId":999999,"seo":{},"socialLinks":[]}""");
+        expect(refused, HttpStatus.NOT_FOUND);
+        assertThat(refused.getBody()).contains("MEDIA.NOT_FOUND");
     }
 
 }

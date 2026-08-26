@@ -76,6 +76,10 @@ class ContentPlatformIntegrationTest {
 
     private static final String HERO_QUERY = "placement=HERO";
 
+    private static final String STRIP_QUERY = "placement=STRIP";
+
+    private static final String EFFECTIVE = "effective";
+
     private static final String STRIP_TITLE = "Free delivery over 250";
 
     private static final String QUESTION = "How fast?";
@@ -353,10 +357,16 @@ class ContentPlatformIntegrationTest {
         expect(publish2, HttpStatus.UNPROCESSABLE_CONTENT);
         assertThat(publish2.getBody()).contains("CONTENT.BANNER.CAPACITY_EXCEEDED");
 
-        JsonNode effective = json(get(query(path(PRIVATE, BANNERS, "effective"), HERO_QUERY)));
+        JsonNode effective = json(get(query(path(PRIVATE, BANNERS, EFFECTIVE), HERO_QUERY)));
         assertThat(effective.size()).isEqualTo(1);
         assertThat(effective.get(0).get(ID).asLong()).isEqualTo(hero1);
 
+        // The seeded store already has a live STRIP banner — the announcement that the `header-message` box
+        // became — and STRIP holds one. Retire it before claiming the slot, as a seller would.
+        for (JsonNode live : json(get(query(path(PRIVATE, BANNERS, EFFECTIVE), STRIP_QUERY)))) {
+            expect(send(HttpMethod.POST, path(PRIVATE, BANNERS, live.get(ID).asLong(), "unpublish"), null),
+                    HttpStatus.OK);
+        }
         createAndPublish(BANNERS, String.format(BANNER, slug("strip"), "STRIP", STRIP_TITLE));
         JsonNode site = json(getPublic(path(STOREFRONT, SITE)));
         assertThat(site.get("announcement").get(TITLE).asString()).isEqualTo(STRIP_TITLE);
@@ -466,14 +476,17 @@ class ContentPlatformIntegrationTest {
 
     // ------------------------------------------------------------------------------------------------ menus
 
+    /**
+     * MAIN starts empty and is whatever the seller builds. It used to be seeded from a legacy
+     * {@code link_to_menu} column that only the retired seller UI could write, so the navigation a seller saw
+     * came from data they had no way to edit.
+     */
     @Test
-    void menusBootstrapFromLegacyPagesAndRefuseDepth() {
+    void theMainMenuStartsEmptyAndRefusesDepth() {
         String mainMenu = path(PRIVATE, MENUS, MAIN);
         String sfMainMenu = path(STOREFRONT, MENUS, MAIN);
         JsonNode main = json(get(mainMenu));
-        // the seeded store has about-us and contact-us with link_to_menu
-        assertThat(main.get(ITEMS).toString()).contains(ABOUT_US).contains("contact-us");
-        assertThat(json(getPublic(sfMainMenu)).toString()).contains("/content/about-us");
+        assertThat(main.get(ITEMS)).isEmpty();
 
         var put = send(HttpMethod.PUT, mainMenu, MENU_TREE);
         expect(put, HttpStatus.OK);

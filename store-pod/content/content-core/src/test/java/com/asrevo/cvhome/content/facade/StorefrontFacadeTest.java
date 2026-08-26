@@ -15,6 +15,7 @@ import com.asrevo.cvhome.content.entity.ContentDescription;
 import com.asrevo.cvhome.content.entity.FaqGroup;
 import com.asrevo.cvhome.content.entity.PolicyVersion;
 import com.asrevo.cvhome.content.entity.PostCategory;
+import com.asrevo.cvhome.content.entity.SiteSettings;
 import com.asrevo.cvhome.content.errors.ContentNotFoundException;
 import com.asrevo.cvhome.content.model.BannerPlacement;
 import com.asrevo.cvhome.content.model.PolicyType;
@@ -23,6 +24,7 @@ import com.asrevo.cvhome.content.model.banner.BannerArtwork;
 import com.asrevo.cvhome.content.model.banner.BannerMeta;
 import com.asrevo.cvhome.content.model.banner.BannerTarget;
 import com.asrevo.cvhome.content.model.post.PostMeta;
+import com.asrevo.cvhome.content.model.site.SiteBranding;
 import com.asrevo.cvhome.content.model.storefront.SitemapEntry;
 import com.asrevo.cvhome.content.model.storefront.StorefrontBanner;
 import com.asrevo.cvhome.content.model.storefront.StorefrontFaq;
@@ -39,6 +41,7 @@ import com.asrevo.cvhome.content.service.MenuService;
 import com.asrevo.cvhome.content.service.PolicyService;
 import com.asrevo.cvhome.content.service.PostCategoryService;
 import com.asrevo.cvhome.content.service.RedirectService;
+import com.asrevo.cvhome.content.service.SiteSettingsService;
 import com.asrevo.cvhome.content.service.binding.BannerBinding;
 import com.asrevo.cvhome.content.support.JsonCodec;
 import com.asrevo.cvhome.store.core.entity.content.ContentType;
@@ -59,13 +62,11 @@ class StorefrontFacadeTest {
 
     private static final String ARABIC_TITLE = "عن";
 
-    private static final String META_TITLE_CODE = "meta-title";
-
-    private static final String META_TITLE_KEY = "metaTitle";
-
-    private static final String AGREEMENT_CODE = "agreement";
-
     private static final String EN = "en";
+
+    private static final String META_TITLE_FIELD = "metaTitle";
+
+    private static final String SHOP_TITLE = "Example shop";
 
     private static final String NEWS_NAME = "News";
 
@@ -79,15 +80,11 @@ class StorefrontFacadeTest {
 
     private static final String TERMS_SLUG = "terms";
 
-    private static final String HEADER_MESSAGE_CODE = "header-message";
-
     private static final String ABOUT_PATH = "/content/about";
 
     private static final String TERMS_PATH = "/policies/terms";
 
     private static final String SALE_TITLE = "Sale!";
-
-    private static final String FREE_SHIPPING = "Free shipping";
 
     private static final String LEGACY_URL = "uber-uns";
 
@@ -155,6 +152,8 @@ class StorefrontFacadeTest {
 
     private RedirectService redirects;
 
+    private SiteSettingsService siteSettings;
+
     private StorefrontFacade facade;
 
     @BeforeEach
@@ -167,8 +166,13 @@ class StorefrontFacadeTest {
         faq = mock(FaqService.class);
         banners = mock(BannerBinding.class);
         redirects = mock(RedirectService.class);
+        siteSettings = mock(SiteSettingsService.class);
+        when(siteSettings.entity(any())).thenReturn(new SiteSettings());
+        when(siteSettings.branding(any(SiteSettings.class), any()))
+                .thenReturn(new SiteBranding(null, null, null, null));
+        when(siteSettings.socialLinks(any())).thenReturn(List.of());
         facade = new StorefrontFacade(contents, menus, media, policies, categories, faq, banners, redirects,
-                ContentFixtures.clock());
+                siteSettings, ContentFixtures.clock());
     }
 
     private static PostCategory category(Long id, String slug, Map<String, String> names) {
@@ -244,12 +248,6 @@ class StorefrontFacadeTest {
         }
 
         @Test
-        void aSnippetCodeBecomesACamelCaseKey() {
-            assertThat(StorefrontFacade.camel(META_TITLE_CODE)).isEqualTo(META_TITLE_KEY);
-            assertThat(StorefrontFacade.camel(AGREEMENT_CODE)).isEqualTo(AGREEMENT_CODE);
-        }
-
-        @Test
         void aLocalisedNameFallsBackToAnyOtherThenTheGivenDefault() {
             assertThat(StorefrontFacade.localised(Map.of(EN, NEWS_NAME), ContentFixtures.EN, NEWS_SLUG))
                     .isEqualTo(NEWS_NAME);
@@ -264,18 +262,15 @@ class StorefrontFacadeTest {
     class Site {
 
         @Test
-        void theSiteCarriesSnippetsMenusFooterPagesAndPolicyLinks() {
-            Content snippet = ContentFixtures.published(1L, ContentType.BOX, META_TITLE_CODE, "Example shop");
-            Content ignored = ContentFixtures.published(2L, ContentType.BOX, AGREEMENT_CODE, TERMS_TITLE);
+        void theSiteCarriesSeoMenusFooterPagesAndPolicyLinks() {
+            SiteSettings settings = new SiteSettings();
+            when(siteSettings.entity(ContentFixtures.STORE)).thenReturn(settings);
+            when(siteSettings.seoValue(settings, META_TITLE_FIELD, ContentFixtures.EN)).thenReturn(SHOP_TITLE);
             Content footerPage = ContentFixtures.published(3L, ContentType.PAGE, ABOUT, ABOUT_TITLE);
             footerPage.setShowInFooter(true);
             Content policyHead = ContentFixtures.published(4L, ContentType.POLICY, TERMS_SLUG, TERMS_TITLE);
             policyHead.setPolicyType(PolicyType.TERMS);
-            when(contents.findVisibleByType(ContentFixtures.STORE, ContentType.BOX))
-                    .thenReturn(List.of(snippet, ignored));
             when(contents.findVisibleByType(ContentFixtures.STORE, ContentType.BANNER)).thenReturn(List.of());
-            when(contents.findByCodeAndType(HEADER_MESSAGE_CODE, ContentType.BOX, ContentFixtures.STORE))
-                    .thenReturn(Optional.empty());
             when(contents.findVisibleByType(ContentFixtures.STORE, ContentType.PAGE)).thenReturn(List.of(footerPage));
             when(contents.findVisibleByType(ContentFixtures.STORE, ContentType.POLICY))
                     .thenReturn(List.of(policyHead));
@@ -285,8 +280,7 @@ class StorefrontFacadeTest {
             StorefrontSite site = facade.site(ContentFixtures.STORE, ContentFixtures.EN);
 
             assertThat(site.getServedLocale()).isEqualTo(EN);
-            assertThat(site.getSnippets()).containsOnlyKeys(META_TITLE_KEY);
-            assertThat(site.getSnippets()).containsEntry(META_TITLE_KEY, "body");
+            assertThat(site.getSeo().getMetaTitle()).isEqualTo(SHOP_TITLE);
             assertThat(site.getMenus()).containsOnlyKeys("main", "footer");
             assertThat(site.getFooterPages()).extracting(StorefrontLink::getHref).containsExactly(ABOUT_PATH);
             assertThat(site.getPolicies()).extracting(StorefrontLink::getHref).containsExactly(TERMS_PATH);
@@ -297,7 +291,6 @@ class StorefrontFacadeTest {
         void aStripBannerBecomesTheAnnouncement() {
             Content banner = ContentFixtures.published(1L, ContentType.BANNER, "sale", SALE_TITLE);
             banner.setPlacement(BannerPlacement.STRIP);
-            when(contents.findVisibleByType(ContentFixtures.STORE, ContentType.BOX)).thenReturn(List.of());
             when(contents.findVisibleByType(ContentFixtures.STORE, ContentType.BANNER)).thenReturn(List.of(banner));
             when(banners.effective(banner)).thenReturn(true);
             when(media.urls(any(), anyList())).thenReturn(new java.util.HashMap<>());
@@ -311,31 +304,25 @@ class StorefrontFacadeTest {
             assertThat(site.getAnnouncement().getTitle()).isEqualTo(SALE_TITLE);
         }
 
+        /**
+         * The announcement used to fall back to a {@code header-message} snippet, so unpublishing the strip
+         * banner silently resurrected whatever that row still held. There is one source now.
+         */
         @Test
-        void withoutAStripBannerTheLegacyHeaderMessageIsUsed() {
-            Content box = ContentFixtures.published(1L, ContentType.BOX, HEADER_MESSAGE_CODE, FREE_SHIPPING);
-            when(contents.findVisibleByType(ContentFixtures.STORE, ContentType.BOX)).thenReturn(List.of());
+        void withoutAStripBannerThereIsNoAnnouncement() {
             when(contents.findVisibleByType(ContentFixtures.STORE, ContentType.BANNER)).thenReturn(List.of());
-            when(contents.findByCodeAndType(HEADER_MESSAGE_CODE, ContentType.BOX, ContentFixtures.STORE))
-                    .thenReturn(Optional.of(box));
             when(contents.findVisibleByType(ContentFixtures.STORE, ContentType.PAGE)).thenReturn(List.of());
             when(contents.findVisibleByType(ContentFixtures.STORE, ContentType.POLICY)).thenReturn(List.of());
             when(menus.resolved(any(), any(), any(), any())).thenReturn(List.of());
 
-            StorefrontSite site = facade.site(ContentFixtures.STORE, ContentFixtures.EN);
-
-            assertThat(site.getAnnouncement().getPlacement()).isEqualTo(BannerPlacement.STRIP);
-            assertThat(site.getAnnouncement().getTitle()).isEqualTo(FREE_SHIPPING);
+            assertThat(facade.site(ContentFixtures.STORE, ContentFixtures.EN).getAnnouncement()).isNull();
         }
 
         @Test
         void withNoFooterPagesEveryServablePageIsListed() {
             Content page = ContentFixtures.published(1L, ContentType.PAGE, ABOUT, ABOUT_TITLE);
             Content draft = ContentFixtures.content(2L, ContentType.PAGE, "draft");
-            when(contents.findVisibleByType(ContentFixtures.STORE, ContentType.BOX)).thenReturn(List.of());
             when(contents.findVisibleByType(ContentFixtures.STORE, ContentType.BANNER)).thenReturn(List.of());
-            when(contents.findByCodeAndType(HEADER_MESSAGE_CODE, ContentType.BOX, ContentFixtures.STORE))
-                    .thenReturn(Optional.empty());
             when(contents.findVisibleByType(ContentFixtures.STORE, ContentType.PAGE))
                     .thenReturn(List.of(page, draft));
             when(contents.findVisibleByType(ContentFixtures.STORE, ContentType.POLICY)).thenReturn(List.of());
@@ -350,10 +337,7 @@ class StorefrontFacadeTest {
             Content policyHead = ContentFixtures.published(1L, ContentType.POLICY, TERMS_SLUG, TERMS_TITLE);
             policyHead.setPolicyType(PolicyType.TERMS);
             Content untyped = ContentFixtures.published(2L, ContentType.POLICY, "misc", "Misc");
-            when(contents.findVisibleByType(ContentFixtures.STORE, ContentType.BOX)).thenReturn(List.of());
             when(contents.findVisibleByType(ContentFixtures.STORE, ContentType.BANNER)).thenReturn(List.of());
-            when(contents.findByCodeAndType(HEADER_MESSAGE_CODE, ContentType.BOX, ContentFixtures.STORE))
-                    .thenReturn(Optional.empty());
             when(contents.findVisibleByType(ContentFixtures.STORE, ContentType.PAGE)).thenReturn(List.of());
             when(contents.findVisibleByType(ContentFixtures.STORE, ContentType.POLICY))
                     .thenReturn(List.of(policyHead, untyped));
@@ -374,7 +358,6 @@ class StorefrontFacadeTest {
             draft.getDescriptions().add(ContentFixtures.description(draft, ContentFixtures.EN, ABOUT_TITLE, BODY));
             when(contents.findByCodeAndType(ABOUT, ContentType.PAGE, ContentFixtures.STORE))
                     .thenReturn(Optional.of(draft));
-            when(contents.findBySeUrl(any(), any(), any(), any())).thenReturn(Optional.empty());
             when(media.url(any(), any())).thenReturn(Optional.empty());
 
             assertThatThrownBy(() -> facade.page(ContentFixtures.STORE, ContentFixtures.EN, ABOUT, false))
@@ -395,17 +378,17 @@ class StorefrontFacadeTest {
                     .isInstanceOf(ContentNotFoundException.class);
         }
 
+        /**
+         * A page is its slug and nothing else. The per-language {@code sef_url} used to be a second, silent way
+         * in, which meant two URLs served the same page and neither was canonical.
+         */
         @Test
-        void aPageIsAlsoFoundByItsLegacyFriendlyUrl() throws Exception {
-            Content page = ContentFixtures.published(1L, ContentType.PAGE, ABOUT, ABOUT_TITLE);
+        void aPageIsNotFoundByItsLegacyFriendlyUrl() {
             when(contents.findByCodeAndType(LEGACY_URL, ContentType.PAGE, ContentFixtures.STORE))
                     .thenReturn(Optional.empty());
-            when(contents.findBySeUrl(ContentFixtures.STORE, ContentType.PAGE, LEGACY_URL, ContentFixtures.EN))
-                    .thenReturn(Optional.of(page));
-            when(media.url(any(), any())).thenReturn(Optional.empty());
 
-            assertThat(facade.page(ContentFixtures.STORE, ContentFixtures.EN, LEGACY_URL, false).getSlug())
-                    .isEqualTo(ABOUT);
+            assertThatThrownBy(() -> facade.page(ContentFixtures.STORE, ContentFixtures.EN, LEGACY_URL, false))
+                    .isInstanceOf(ContentNotFoundException.class);
         }
 
         @Test
