@@ -12,11 +12,12 @@ import type {PageT} from '@models/page';
 export type ContentListType = 'pages' | 'posts' | 'banners' | 'faq' | 'policies';
 
 /** Every tab of the Content management hub. */
-export type ContentTab = ContentListType | 'media' | 'menus';
+export type ContentTab = ContentListType | 'branding' | 'media' | 'menus';
 
 export const CONTENT_LIST_TYPES: readonly ContentListType[] = ['pages', 'posts', 'banners', 'faq', 'policies'];
 
-export const CONTENT_TABS: readonly ContentTab[] = ['pages', 'posts', 'banners', 'faq', 'media', 'menus', 'policies'];
+export const CONTENT_TABS: readonly ContentTab[] =
+  ['pages', 'posts', 'banners', 'faq', 'media', 'menus', 'policies', 'branding'];
 
 export type ContentType = 'PAGE' | 'SECTION' | 'POST' | 'BANNER' | 'FAQ' | 'POLICY';
 

@@ -57,6 +57,9 @@
             @case ('menus') {
               <app-menus-tab [locales]="facade.localeOptions()" [defaultLocale]="facade.locales().defaultCode" [canManage]="canManage()" />
             }
+            @case ('branding') {
+              <app-branding-tab [locales]="facade.localeOptions()" [defaultLocale]="facade.locales().defaultCode" [canManage]="canManage()" />
+            }
           }
         }
       </div>

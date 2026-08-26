@@ -17,11 +17,13 @@ import {SectionNav} from '@shared/ui/section-nav/section-nav';
 import {TabSwitcher, type TabItem} from '@shared/ui/tab-switcher/tab-switcher';
 import {ContentList} from './components/content-list/content-list';
 import {MediaTab} from './components/media-tab/media-tab';
+import {BrandingTab} from './components/branding-tab/branding-tab';
 import {MenusTab} from './components/menus-tab/menus-tab';
 import {PoliciesTab} from './components/policies-tab/policies-tab';
 import type {PolicyCompliance} from '@models/content';
 import {ContentHubFacade} from './facades/content-hub.facade';
 import {MediaLibraryFacade} from './facades/media-library.facade';
+import {BrandingFacade} from './facades/branding.facade';
 import {MenusFacade} from './facades/menus.facade';
 
 const LIST_TABS: readonly ContentListType[] = ['pages', 'posts', 'banners', 'faq', 'policies'];
@@ -35,9 +37,10 @@ const LIST_TABS: readonly ContentListType[] = ['pages', 'posts', 'banners', 'faq
  * the store-management rail already carries the disabled entry with the reason.
  */
 @Component({
-  providers: [MediaLibraryFacade, MenusFacade],
+  providers: [BrandingFacade, MediaLibraryFacade, MenusFacade],
   selector: 'app-content-hub',
   imports: [
+    BrandingTab,
     ContentList,
     Icon,
     KpiGrid,
