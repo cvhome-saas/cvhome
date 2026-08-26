@@ -1,4 +1,6 @@
 import {ComponentFixture, TestBed, fakeAsync, tick} from '@angular/core/testing';
+import {provideHttpClient} from '@angular/common/http';
+import {provideHttpClientTesting} from '@angular/common/http/testing';
 import {Router, provideRouter} from '@angular/router';
 import {Observable, of} from 'rxjs';
 
@@ -32,7 +34,10 @@ const SAVED: ProductDraft = draft({
     {language: 'en', name: 'Runner', description: 'Fast', friendlyUrl: 'runner', title: '', metaDescription: '', highlights: '', keyWords: ''},
     {language: 'ar', name: 'عداء', description: '', friendlyUrl: '', title: '', metaDescription: '', highlights: '', keyWords: ''},
   ],
-  images: [{id: 4, mediaAssetId: 4, name: 'a.jpg', url: null, altText: null, order: 0, isDefault: true}],
+  images: [
+    {id: 4, mediaAssetId: 4, name: 'a.jpg', url: null, altText: null, order: 0, isDefault: true},
+    {id: 5, mediaAssetId: 5, name: 'b.jpg', url: null, altText: null, order: 1, isDefault: false},
+  ],
 });
 
 function snapshot(product: ProductDraft): ProductFormSnapshot {
@@ -88,7 +93,15 @@ class FakeProductFormApi {
     return of([]);
   }
 
-  reorderImages(): Observable<readonly ProductImageItem[]> {
+  /** What a reorder actually sent, so a spec can read the flags off it. */
+  readonly replaced: (readonly ProductImageItem[])[] = [];
+
+  replaceImages(_id: number, ordered: readonly ProductImageItem[]): Observable<readonly ProductImageItem[]> {
+    this.replaced.push(ordered);
+    return of(ordered);
+  }
+
+  attachImages(): Observable<readonly ProductImageItem[]> {
     return of([]);
   }
 
@@ -115,6 +128,13 @@ describe('ProductForm', () => {
       imports: [ProductForm, ...translocoTesting().imports],
       providers: [
         provideRouter([]),
+        /*
+         * The Media step's library picker reaches `MediaService`, which is an `HttpClient` client.
+         * Without these the step's whole panel fails to render — the injector throws inside change
+         * detection and Angular swallows it, so the symptom is an empty step rather than an error.
+         */
+        provideHttpClient(),
+        provideHttpClientTesting(),
         {provide: ConsoleApi, useValue: Object.assign(new FakeConsoleApi(), {stores: CONSOLE_STORES_FAKE})},
         {provide: ProductFormApi, useValue: api},
         /*
@@ -362,5 +382,28 @@ describe('ProductForm', () => {
     const element = load('7');
 
     expect(element.querySelector('app-tag-input')).not.toBeNull();
+  }));
+
+  /*
+   * The storefront thumbnail is the first image, and reordering is the only thing that sets it.
+   *
+   * It used to be pinned to whichever image was uploaded first, because the upload endpoint fixed it
+   * and nothing could move it. `PUT …/product/{id}/images` writes the order and the flag together,
+   * so that is no longer true — and leaving it pinned meant a reorder carried the badge off
+   * position 1, under a panel that says in as many words that the first image is the thumbnail.
+   *
+   * Driven through the facade rather than the step's buttons: the rule is the facade's, and the
+   * buttons are already covered by their own labels.
+   */
+  it('makes the first image the storefront thumbnail when the order changes', fakeAsync(() => {
+    load('7');
+    const facade = fixture.componentInstance['facade'];
+
+    facade.moveImage(1, -1);
+    tick();
+
+    const sent = api.replaced.at(-1)!;
+    expect(sent.map((image) => image.id)).toEqual([5, 4]);
+    expect(sent.map((image) => image.isDefault)).toEqual([true, false]);
   }));
 });

@@ -1775,7 +1775,7 @@
       "keywordsPlaceholder": "Add a keyword…"
     },
     "media": {
-      "hint": "The thumbnail is set when the first image is uploaded and cannot be moved to another image afterwards — the platform has no way to change it. Reordering the rest is free.",
+      "hint": "The storefront thumbnail is the first image. Move another one to the front to change it.",
       "image": "Product image",
       "moveDown": "Move image {position} later",
       "moveUp": "Move image {position} earlier",

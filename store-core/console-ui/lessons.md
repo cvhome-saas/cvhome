@@ -1411,24 +1411,28 @@ now being built per [`../../.agents/plans/console-ui-content.md`](../../.agents/
 - **Placeholder:** the field states that the code is the seller's own, and the uniqueness check
   reports rather than proposes.
 
-## Catalogue — a product's default image cannot be changed after upload
+## Catalogue — a product's default image cannot be changed after upload — CLOSED
 
-- **Screen:** `/products/:id`, step 2 — "First image is the storefront thumbnail", and the MAIN badge
-  the design puts on a hoverable image.
-- **What the UI needs:** to pick which of a product's images is the storefront thumbnail, at any
+- **Screen:** `/products/:id`, step 2 — "The storefront thumbnail is the first image".
+- **What the UI needed:** to pick which of a product's images is the storefront thumbnail, at any
   time.
-- **What is missing:** the flag can only be set **at upload**. `POST …/product/{id}/image` takes
-  `?defaultImage=`, and `PATCH …/product/{id}/image/{imageId}` sets `sortOrder` and nothing else —
-  no endpoint re-designates an existing image. Worse, `ProductImageApi.buildContentImages` sets the
+- **What was missing:** the flag could only be set **at upload**. `POST …/product/{id}/image` took
+  `?defaultImage=`, and `PATCH …/product/{id}/image/{imageId}` set `sortOrder` and nothing else, so
+  no endpoint re-designated an existing image. `ProductImageApi.buildContentImages` also set the
   flag on the new image without clearing it on the old one, so uploading with `defaultImage=true`
-  onto a product that already has a default leaves **two** images flagged.
-- **Why it is required:** the first photograph a seller happens to upload is not usually the one
-  they want on the category grid, and today they must delete and re-upload the whole gallery to
-  change it.
-- **Expected contract:** `PATCH …/product/{id}/image/{imageId}?defaultImage=true`, clearing the flag
-  on every sibling in the same transaction.
-- **Placeholder:** the Media step marks which image is the thumbnail and does not offer to change
-  it. `product-image.service.ts` carries the note at the call site.
+  onto a product that already had a default left **two** images flagged.
+- **How it closed:** the media move to the content service replaced both endpoints with
+  `PUT …/product/{id}/images`, which writes the whole gallery — order and default together, in one
+  transaction — so uniqueness is a property of the write rather than something nothing enforced.
+- **What the console does now:** the thumbnail is the first image, and reordering re-designates it.
+  There is no separate control, because there is no separate concept: "make this the thumbnail" and
+  "move this to the front" are the same write. The rule lives in `ProductFormFacade.moveImage`.
+- **The trap this left behind.** Closing the endpoint gap did not close the UI gap by itself. The
+  facade kept `isDefault` pinned to whichever image already had it, so a reorder carried the badge
+  off position 1 while the panel above still said the first image was the thumbnail — the screen
+  contradicted itself, and no test noticed because the flag was being round-tripped faithfully.
+  When a platform constraint lifts, the copy and the behaviour that were written around it both
+  have to be revisited; neither one fails loudly on its own.
 
 ## Catalogue — two seller-core calls have never worked
 
@@ -1785,10 +1789,10 @@ behind it worth keeping.
 - **`shareReplay` caches a failure as faithfully as a value.** A reference read that 404s while a
   service is warming up would be replayed to every reader for the rest of the session. The cache
   drops its entry on error so the next reader tries again.
-- **A product can have two default images.** `defaultImage: true` on more than one row of
-  `product_image` for the same product — the upload endpoint sets the flag without clearing the
-  previous one, and nothing enforces uniqueness. Which image the storefront picks is then arbitrary.
-  Not fixed here; `store-pod` is not modified by a module.
+- **A product could have two default images.** `defaultImage: true` on more than one row of
+  `product_image` for the same product — the old upload endpoint set the flag without clearing the
+  previous one, and nothing enforced uniqueness, so which image the storefront picked was arbitrary.
+  Closed by `PUT …/product/{id}/images`, which replaces the gallery in one transaction.
 
 ## Billing — entitlements are ceilings with no usage behind them
 

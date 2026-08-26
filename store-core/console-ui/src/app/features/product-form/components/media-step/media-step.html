@@ -28,9 +28,10 @@
 
                 @if (image.isDefault) {
                   <!--
-                    A statement, not a control. There is no endpoint that moves the default to
-                    another image — see the component's own note and lessons.md. It is the first
-                    image, so reordering is what changes it.
+                    A statement, not a control — but the thing it states is now reachable: the
+                    thumbnail is the first image, so moving an image to the front is how it changes.
+                    That is one concept with one gesture rather than a second control that would
+                    express the same write.
                   -->
                   <span class="shot-main">{{ t('productForm.media.storefrontThumbnail') }}</span>
                 }
@@ -76,7 +77,9 @@
                 >
                   <app-icon name="arrowUp" [size]="13" />
                 </button>
-                <span class="shot-name" dir="ltr">{{ image.name }}</span>
+                <!-- The position when the image has no name of its own; an id would identify it to the
+                     database and to nobody looking at the screen. -->
+                <span class="shot-name" dir="ltr">{{ image.name || index + 1 }}</span>
                 <button
                   type="button"
                   [disabled]="index === count - 1 || facade.uploading()"

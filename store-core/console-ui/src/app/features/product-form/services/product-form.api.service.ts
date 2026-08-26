@@ -354,7 +354,7 @@ export class ProductFormApi {
           .map((image) => ({
             id: image.id,
             mediaAssetId: image.mediaAssetId ?? null,
-            name: image.altText ?? String(image.id),
+            name: image.altText ?? '',
             url: image.imageUrl ?? image.externalUrl ?? null,
             altText: image.altText ?? null,
             order: image.order ?? 0,
@@ -468,7 +468,7 @@ function toDraft(
       .map((image) => ({
         id: image.id,
         mediaAssetId: image.mediaAssetId ?? null,
-        name: image.altText ?? String(image.id),
+        name: image.altText ?? '',
         url: image.imageUrl ?? image.externalUrl ?? null,
         altText: image.altText ?? null,
         order: image.order ?? 0,

@@ -48,9 +48,18 @@ export class MediaStep {
   /** The library browser, opened from the last cell of the grid. */
   protected readonly picking = signal(false);
 
+  /**
+   * Attaches the picked asset, carrying its name across.
+   *
+   * The title first, then the file it was uploaded as. Sending `null` when an asset has no title —
+   * which most do not — left the storefront rendering `alt=""` and left this grid captioning the
+   * tile with the gallery row's database id, because that was the only thing the read had to fall
+   * back on. A filename is a worse alt text than a written one and a much better one than nothing.
+   */
   protected onPicked(asset: MediaAsset): void {
     this.picking.set(false);
-    this.facade.attachImages([{mediaAssetId: asset.id, altText: asset.title ?? null}]);
+    const name = asset.title?.trim() || asset.originalFilename || null;
+    this.facade.attachImages([{mediaAssetId: asset.id, altText: name}]);
   }
 
   protected onViewerToggled(open: boolean): void {
