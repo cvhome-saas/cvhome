@@ -9,7 +9,7 @@ import {Icon} from '@shared/ui/icon/icon';
 import {NoticeBar} from '@shared/ui/notice-bar/notice-bar';
 import {Panel} from '@shared/ui/panel/panel';
 import {Toggle} from '@shared/ui/toggle/toggle';
-import {Tree, type TreeMove, type TreeNode} from '@shared/ui/tree/tree';
+import {Tree, type TreeMove, type TreeNode, type TreeNodeId} from '@shared/ui/tree/tree';
 import {NumberField} from '@shared/ui/number-field/number-field';
 import type {CategoryNode} from '@models/taxonomy';
 import {CopyFields} from '../copy-fields/copy-fields';
@@ -93,8 +93,8 @@ export class CategoryTab {
     return trail;
   });
 
-  protected onSelect(id: number): void {
-    this.facade.select('categories', id);
+  protected onSelect(id: TreeNodeId): void {
+    this.facade.select('categories', Number(id));
   }
 
   protected onMove(move: TreeMove): void {

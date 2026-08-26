@@ -3,6 +3,7 @@ import {
   ElementRef,
   Injector,
   afterNextRender,
+  booleanAttribute,
   computed,
   effect,
   inject,
@@ -13,14 +14,26 @@ import {
 } from '@angular/core';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 
+import {Badge} from '@shared/ui/badge/badge';
 import {Icon} from '@shared/ui/icon/icon';
+
+/**
+ * How a node is identified.
+ *
+ * A number for a record the server has already numbered; a string for a draft that has no id yet —
+ * the menu editor keys its rows by a local `k1`, `k2`, because an unsaved link has no identity
+ * until the menu is saved. The component never does arithmetic on an id, so both work.
+ */
+export type TreeNodeId = string | number;
 
 /** One node, as the consumer supplies it. Children are nested; the component flattens for display. */
 export interface TreeNode {
-  readonly id: number;
+  readonly id: TreeNodeId;
   readonly label: string;
-  /** A quiet figure at the end of the row — a product count, a member count. */
+  /** A quiet figure at the end of the row — a product count, a member count, a link's target. */
   readonly meta?: string;
+  /** An amber badge at the end of the row — a broken target, a warning worth seeing unopened. */
+  readonly warn?: string;
   /** Drawn as an eye / eye-off toggle. Omit the field to leave the column out for this row. */
   readonly visible?: boolean;
   readonly children: readonly TreeNode[];
@@ -32,22 +45,33 @@ let nextTreeId = 0;
 const TYPEAHEAD_RESET_MS = 500;
 
 /**
+ * How much of a row's height, at each end, asks to insert rather than to nest.
+ *
+ * A quarter each, leaving half the row for nesting: re-parenting is the commoner intent and the
+ * one with no keyboard-free alternative, so it gets the bigger target. Only consulted when
+ * `reorderable` is on.
+ */
+const EDGE_BAND = .25;
+
+/**
  * Where a drop lands.
  *
  * `'inside'` nests the node into the target. `'out'` makes it the target's *sibling*, which is how
- * a node is promoted one level — the target is then its current parent.
+ * a node is promoted one level — the target is then its current parent. Both are always available.
  *
- * There is deliberately no before/after. Ordering siblings needs `sortOrder`, and on this platform
- * that is unwritable (`PUT /private/category/{id}` fails for every caller) *and* unreadable (the
- * hierarchy does not return children in `sortOrder` order). A drop zone for it would be a gesture
- * that cannot change anything. See lessons.md, "Catalogue — sibling order is not expressible, twice
- * over".
+ * `'before'` and `'after'` put the node among the target's siblings, and are reachable **only when
+ * the consumer sets `reorderable`**. That is not a default because sibling order is not something
+ * every hierarchy on this platform can express: the catalogue's `sortOrder` is unwritable
+ * (`PUT /private/category/{id}` fails for every caller) *and* unread (the hierarchy does not return
+ * children in `sortOrder` order), so offering the gesture there would be offering one that cannot
+ * change anything. See lessons.md, "Catalogue — sibling order is not expressible, twice over". A
+ * menu, whose order is saved with the whole tree, turns it on.
  */
-export type DropPosition = 'inside' | 'out';
+export type DropPosition = 'inside' | 'out' | 'before' | 'after';
 
 export interface TreeMove {
-  readonly nodeId: number;
-  readonly targetId: number;
+  readonly nodeId: TreeNodeId;
+  readonly targetId: TreeNodeId;
   readonly position: DropPosition;
 }
 
@@ -55,7 +79,7 @@ export interface TreeMove {
 interface FlatNode {
   readonly node: TreeNode;
   readonly depth: number;
-  readonly parentId: number | null;
+  readonly parentId: TreeNodeId | null;
   readonly hasChildren: boolean;
   readonly expanded: boolean;
   /** Position among its siblings, and how many siblings there are — for the ARIA contract. */
@@ -67,8 +91,14 @@ interface FlatNode {
  * A hierarchy the operator can read, navigate and rearrange.
  *
  * Nothing in `shared/ui/` did hierarchy before this: `data-table` is flat by construction and
- * `action-list` has no depth. The category tree is the first consumer and the shape is general —
- * a labelled node, an optional figure, an optional visibility flag, and children.
+ * `action-list` has no depth. The catalogue's category tree was the first consumer and the
+ * storefront navigation editor the second; the shape is general — a labelled node, an optional
+ * figure, an optional warning, an optional visibility flag, and children.
+ *
+ * **What a consumer can and cannot do is an input, not a guess.** `reorderable` and `maxDepth`
+ * exist because the two hierarchies differ in what their servers accept: the catalogue cannot
+ * express sibling order at all, and a menu cannot nest past one level. Rather than drawing every
+ * affordance and letting half of them fail, the tree draws only what the consumer says is real.
  *
  * **Drag is the fast path, not the only path.** A tree that can only be rearranged by dragging is
  * a tree a keyboard cannot rearrange, and re-parenting a category is not an optional nicety. Every
@@ -95,7 +125,7 @@ interface FlatNode {
  */
 @Component({
   selector: 'app-tree',
-  imports: [Icon, TranslocoDirective],
+  imports: [Badge, Icon, TranslocoDirective],
   templateUrl: './tree.html',
   styleUrl: './tree.css',
   host: {
@@ -105,18 +135,40 @@ interface FlatNode {
 export class Tree {
   readonly nodes = input.required<readonly TreeNode[]>();
   /** Which node is being edited beside the tree. */
-  readonly selectedId = input<number | null>(null);
+  readonly selectedId = input<TreeNodeId | null>(null);
   /** Ids whose children are hidden. Collapsed rather than expanded, so a new tree opens fully open. */
-  readonly collapsed = input<ReadonlySet<number>>(new Set<number>());
+  readonly collapsed = input<ReadonlySet<TreeNodeId>>(new Set<TreeNodeId>());
   /** Names the tree for assistive tech, e.g. "Category tree". */
   readonly label = input.required<string>();
+  /**
+   * The translated singular for what a row *is* — "category", "link".
+   *
+   * The primitive's own strings interpolate it rather than naming one consumer, which is what they
+   * did while the catalogue was the only caller: a menu editor that told an operator to "move a
+   * category out" would be describing someone else's screen.
+   */
+  readonly itemNoun = input.required<string>();
   /** Turns off every control that writes, while a move is in flight. */
   readonly busy = input(false);
   /** Whether rows offer the eye toggle. Off for a tree whose nodes have no visibility. */
   readonly showVisibility = input(true);
+  /**
+   * Whether siblings can be reordered.
+   *
+   * Off by default, and deliberately so — see `DropPosition`. Off means no up/down buttons, no
+   * `Alt+Arrow` vertical shortcuts, no menu items for them, and one whole-row drop zone.
+   */
+  readonly reorderable = input(false, {transform: booleanAttribute});
+  /**
+   * How deep the tree may go, counted in levels from 1.
+   *
+   * A nest that would push the moved subtree past this is refused — by the button, the shortcut and
+   * the drop zone alike. The menus server accepts one level of nesting, so its editor passes 2.
+   */
+  readonly maxDepth = input(Number.POSITIVE_INFINITY);
 
-  readonly selectedIdChange = output<number>();
-  readonly toggleCollapsed = output<number>();
+  readonly selectedIdChange = output<TreeNodeId>();
+  readonly toggleCollapsed = output<TreeNodeId>();
   readonly visibilityToggled = output<TreeNode>();
   readonly moved = output<TreeMove>();
   readonly addChild = output<TreeNode>();
@@ -130,10 +182,10 @@ export class Tree {
    * Distinct from `selectedId`, which is the record open in the editor. Falls back to the selection
    * and then to the first row, so a freshly loaded tree always has somewhere for Tab to land.
    */
-  private readonly focusedId = signal<number | null>(null);
+  private readonly focusedId = signal<TreeNodeId | null>(null);
 
   /** Which row's action menu is open, if any. */
-  protected readonly openMenuFor = signal<number | null>(null);
+  protected readonly openMenuFor = signal<TreeNodeId | null>(null);
 
   /**
    * The node whose move is in flight.
@@ -141,7 +193,7 @@ export class Tree {
    * The page reloads the whole tree from the server after every move, so focus would otherwise be
    * lost on each one. This is the marker the restoring effect below watches for.
    */
-  private readonly pendingFocusId = signal<number | null>(null);
+  private readonly pendingFocusId = signal<TreeNodeId | null>(null);
 
   /**
    * The node list as it stood when the action fired.
@@ -228,8 +280,8 @@ export class Tree {
   }
 
   /** The id being dragged, and the row it is currently over. Pointer state only — never a source of truth. */
-  protected readonly dragging = signal<number | null>(null);
-  protected readonly dropTarget = signal<{id: number; position: DropPosition} | null>(null);
+  protected readonly dragging = signal<TreeNodeId | null>(null);
+  protected readonly dropTarget = signal<{id: TreeNodeId; position: DropPosition} | null>(null);
 
   private readonly rows = viewChildren<ElementRef<HTMLElement>>('row');
   private readonly menuItems = viewChildren<ElementRef<HTMLButtonElement>>('menuItem');
@@ -245,7 +297,7 @@ export class Tree {
     const collapsed = this.collapsed();
     const out: FlatNode[] = [];
 
-    const walk = (nodes: readonly TreeNode[], depth: number, parentId: number | null): void => {
+    const walk = (nodes: readonly TreeNode[], depth: number, parentId: TreeNodeId | null): void => {
       nodes.forEach((node, index) => {
         const hasChildren = node.children.length > 0;
         const expanded = hasChildren && !collapsed.has(node.id);
@@ -358,7 +410,23 @@ export class Tree {
   private handleAction(event: KeyboardEvent, row: FlatNode): boolean {
     const rtl = this.isRtl(event);
     switch (event.key) {
-      // No Alt+Up / Alt+Down: sibling order cannot be changed on this platform. See `DropPosition`.
+      /*
+       * Not RTL-swapped, unlike the horizontal pair: mirroring the writing direction does not
+       * mirror which way is up. Both fall through untouched when `reorderable` is off, which is
+       * how a tree that cannot express sibling order keeps `Alt+Arrow` free — see `DropPosition`.
+       */
+      case 'ArrowUp':
+        if (!this.reorderable()) {
+          return false;
+        }
+        this.moveUp(row);
+        return true;
+      case 'ArrowDown':
+        if (!this.reorderable()) {
+          return false;
+        }
+        this.moveDown(row);
+        return true;
       case 'ArrowRight':
         if (rtl) {
           this.unnest(row);
@@ -482,18 +550,52 @@ export class Tree {
 
   /* --------------------------------------------------------- the accessible moves ---- */
 
-  /** Whether the row above can adopt this one. The row above is a sibling or an uncle, never a child. */
+  /**
+   * Whether the sibling above can adopt this row.
+   *
+   * Two conditions: there *is* a sibling above, and the subtree still fits under `maxDepth` once
+   * it has dropped a level. The depth test is what stops a menu link that already has children
+   * being nested into a third level the server would refuse.
+   */
   protected canNest(row: FlatNode): boolean {
-    return row.index > 1;
+    return row.index > 1 && row.depth + 2 + heightOf(row.node) <= this.maxDepth();
   }
 
   protected nest(row: FlatNode): void {
     const previous = this.siblingOf(row, -1);
-    if (this.busy() || !previous) {
+    if (this.busy() || !previous || !this.canNest(row)) {
       return;
     }
     this.beginAction(row, 'nesting');
     this.moved.emit({nodeId: row.node.id, targetId: previous.id, position: 'inside'});
+  }
+
+  /* The vertical pair. Both are inert — and undrawn — unless the consumer opted into reordering. */
+
+  protected canMoveUp(row: FlatNode): boolean {
+    return this.reorderable() && row.index > 1;
+  }
+
+  protected canMoveDown(row: FlatNode): boolean {
+    return this.reorderable() && row.index < row.size;
+  }
+
+  protected moveUp(row: FlatNode): void {
+    const previous = this.siblingOf(row, -1);
+    if (this.busy() || !previous || !this.canMoveUp(row)) {
+      return;
+    }
+    this.beginAction(row, 'movingUp');
+    this.moved.emit({nodeId: row.node.id, targetId: previous.id, position: 'before'});
+  }
+
+  protected moveDown(row: FlatNode): void {
+    const next = this.siblingOf(row, 1);
+    if (this.busy() || !next || !this.canMoveDown(row)) {
+      return;
+    }
+    this.beginAction(row, 'movingDown');
+    this.moved.emit({nodeId: row.node.id, targetId: next.id, position: 'after'});
   }
 
   protected toggleVisibility(row: FlatNode): void {
@@ -622,9 +724,9 @@ export class Tree {
    * Walks `nodes()` rather than `flat()`, because a node inside a collapsed branch is by definition
    * not in the flattened list.
    */
-  private collapsedAncestorsOf(id: number): readonly number[] {
-    const trail: number[] = [];
-    const walk = (nodes: readonly TreeNode[], ancestors: readonly number[]): boolean => {
+  private collapsedAncestorsOf(id: TreeNodeId): readonly TreeNodeId[] {
+    const trail: TreeNodeId[] = [];
+    const walk = (nodes: readonly TreeNode[], ancestors: readonly TreeNodeId[]): boolean => {
       for (const node of nodes) {
         if (node.id === id) {
           trail.push(...ancestors.filter((ancestor) => this.collapsed().has(ancestor)));
@@ -640,7 +742,7 @@ export class Tree {
     return trail;
   }
 
-  private findNode(nodes: readonly TreeNode[], id: number): TreeNode | null {
+  private findNode(nodes: readonly TreeNode[], id: TreeNodeId): TreeNode | null {
     for (const node of nodes) {
       if (node.id === id) {
         return node;
@@ -668,19 +770,56 @@ export class Tree {
     this.dragging.set(node.id);
   }
 
-  /** Whether the row under the pointer is a legal parent for what is being dragged. */
+  /** Whether the row under the pointer is a legal target for what is being dragged, and how. */
   protected onDragOver(node: TreeNode, event: DragEvent): void {
     const dragged = this.dragging();
     if (dragged === null || dragged === node.id || this.contains(dragged, node.id)) {
       return;
     }
+    const position = this.dropPositionFor(node, event);
+    if (position === null) {
+      return;
+    }
     event.preventDefault();
 
-    // The whole row is one target. There is no edge zone, because there is no reordering to
-    // express — see `DropPosition`.
-    if (this.dropTarget()?.id !== node.id) {
-      this.dropTarget.set({id: node.id, position: 'inside'});
+    const current = this.dropTarget();
+    if (current?.id !== node.id || current.position !== position) {
+      this.dropTarget.set({id: node.id, position});
     }
+  }
+
+  /**
+   * Which drop the pointer is asking for, or `null` if the row cannot take this node at all.
+   *
+   * Without reordering the whole row is one `inside` target, as it always was. With it, the row
+   * splits into thirds — the outer bands insert among the siblings, the middle nests — so the same
+   * gesture expresses both, and neither needs a modifier key nobody would find. The bands are a
+   * quarter each rather than a third because nesting is the commoner intent and deserves the
+   * bigger target.
+   */
+  private dropPositionFor(node: TreeNode, event: DragEvent): DropPosition | null {
+    const row = this.flat().find((candidate) => candidate.node.id === node.id);
+    const dragged = this.findNode(this.nodes(), this.dragging() as TreeNodeId);
+    const fits =
+      row !== undefined &&
+      dragged !== null &&
+      row.depth + 2 + heightOf(dragged) <= this.maxDepth();
+
+    if (!this.reorderable()) {
+      return fits ? 'inside' : null;
+    }
+
+    const box = (event.currentTarget as HTMLElement).getBoundingClientRect();
+    const offset = (event.clientY - box.top) / (box.height || 1);
+    if (offset < EDGE_BAND) {
+      return 'before';
+    }
+    if (offset > 1 - EDGE_BAND) {
+      return 'after';
+    }
+    // The middle band asked to nest. If the depth cap refuses, fall back to the nearer edge rather
+    // than going inert under the pointer — the operator gets *a* drop instead of a dead row.
+    return fits ? 'inside' : offset < .5 ? 'before' : 'after';
   }
 
   protected onDrop(event: DragEvent): void {
@@ -704,8 +843,15 @@ export class Tree {
   }
 
   /** Whether `ancestorId`'s subtree holds `id` — a node cannot be dropped inside itself. */
-  private contains(ancestorId: number, id: number): boolean {
+  private contains(ancestorId: TreeNodeId, id: TreeNodeId): boolean {
     const ancestor = this.findNode(this.nodes(), ancestorId);
     return ancestor ? this.findNode(ancestor.children, id) !== null : false;
   }
+}
+
+/** How many levels a subtree adds below its own root. A childless node is 0. */
+function heightOf(node: TreeNode): number {
+  return node.children.length === 0
+    ? 0
+    : 1 + Math.max(...node.children.map(heightOf));
 }

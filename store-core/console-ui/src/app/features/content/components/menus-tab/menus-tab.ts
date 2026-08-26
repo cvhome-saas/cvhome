@@ -1,41 +1,75 @@
-import {Component, computed, inject, input, signal} from '@angular/core';
+import {Component, computed, effect, inject, input, signal} from '@angular/core';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 
 import type {ReferenceOption} from '@core/reference/reference-data.service';
 import {MENU_TARGET_KINDS, type MenuHandle, type MenuTargetKind} from '@models/content';
-import {Badge} from '@shared/ui/badge/badge';
 import {BusyOverlay} from '@shared/ui/busy-overlay/busy-overlay';
+import {EmptyState} from '@shared/ui/empty-state/empty-state';
+import {FormField} from '@shared/ui/form-field/form-field';
 import {Icon} from '@shared/ui/icon/icon';
 import {LoadError} from '@shared/ui/load-error/load-error';
 import {LocaleSwitcher} from '@shared/ui/locale-switcher/locale-switcher';
+import {NoticeBar} from '@shared/ui/notice-bar/notice-bar';
 import {Panel} from '@shared/ui/panel/panel';
 import {Select, type SelectOption} from '@shared/ui/select/select';
+import {TabSwitcher, type TabItem} from '@shared/ui/tab-switcher/tab-switcher';
 import {TextField} from '@shared/ui/text-field/text-field';
-import {MenusFacade, blankItem, type MenuDraftItem} from '../../facades/menus.facade';
+import {Toggle} from '@shared/ui/toggle/toggle';
+import {Tree, type TreeMove, type TreeNode, type TreeNodeId} from '@shared/ui/tree/tree';
+import {
+  MENU_MAX_DEPTH,
+  MenusFacade,
+  targetNeedsValue,
+  type MenuDraftItem,
+} from '../../facades/menus.facade';
 
 const HANDLES: readonly MenuHandle[] = ['MAIN', 'FOOTER'];
 
+/** The fixed paths the two index kinds resolve to. They have no target to pick. */
+const INDEX_PATHS: Partial<Record<MenuTargetKind, string>> = {
+  BLOG_INDEX: '/blog',
+  FAQ_INDEX: '/help',
+};
+
 /**
- * "Storefront navigation": the Main and Footer menus as editable lists — label in the chosen
- * language, target kind and value, up/down, indent under the previous root, visibility, remove — and
- * Save per menu. Arrow buttons rather than drag-and-drop (see lessons.md); one level of nesting, as
- * the server enforces.
+ * "Storefront navigation": one menu at a time as a tree, with the open link edited beside it.
+ *
+ * It used to be both menus at once, each link a fully expanded form row — label field, kind select,
+ * value field and six buttons — in a two-column grid. Fourteen links put roughly sixty controls on
+ * screen for an operator who had come to move one of them, and the hierarchy, which is the thing a
+ * menu *is*, was the faintest signal in the row: an indent on a flat list, with no chevron, no
+ * collapse and a grip icon for a drag that did not exist.
+ *
+ * So it borrows the shape the catalogue's categories tab already proved, down to the primitive:
+ * `app-tree` on the left showing only shape, an editor on the right showing only the open link.
+ * Two screens that do the same job now look and drive the same way, and the accessible tree — one
+ * tab stop, `Alt+Arrow` moves, a row menu that advertises the shortcuts — comes with it rather than
+ * being reimplemented badly here.
+ *
+ * **The draft is still the model.** `PUT /menus/{handle}` replaces a menu whole, so edits land in
+ * the local draft as they are typed and *Save menu* is the only commit. There is no per-link save
+ * button, because there is no per-link endpoint to hang one on.
  */
 @Component({
   selector: 'app-menus-tab',
   imports: [
-    Badge,
     BusyOverlay,
+    EmptyState,
+    FormField,
     Icon,
     LoadError,
     LocaleSwitcher,
+    NoticeBar,
     Panel,
     Select,
+    TabSwitcher,
     TextField,
+    Toggle,
     TranslocoDirective,
+    Tree,
   ],
   templateUrl: './menus-tab.html',
-  styleUrl: './menus-tab.css',
+  styleUrls: ['../../../../shared/styles/field.css', './menus-tab.css'],
 })
 export class MenusTab {
   private readonly transloco = inject(TranslocoService);
@@ -45,10 +79,50 @@ export class MenusTab {
   readonly defaultLocale = input.required<string>();
   readonly canManage = input(true);
 
-  protected readonly handles = HANDLES;
+  protected readonly maxDepth = MENU_MAX_DEPTH;
   protected readonly language = signal<string>('');
+  /** Collapsed rather than expanded, so a menu opens fully open — the tree's own convention. */
+  protected readonly collapsed = signal<ReadonlySet<TreeNodeId>>(new Set<TreeNodeId>());
 
   protected readonly activeLanguage = computed(() => this.language() || this.defaultLocale());
+
+  /** "Arabic", not "ar" — the hint beside the label field is prose, not a wire value. */
+  protected readonly activeLanguageName = computed(() => {
+    const code = this.activeLanguage();
+    return this.locales().find((locale) => locale.code === code)?.label ?? code;
+  });
+
+  constructor() {
+    /*
+     * A link opened in one menu means nothing in the other, and leaving the key set would leave the
+     * tree with a selection it cannot draw. Cleared on the switch rather than tolerated, so the
+     * editor shows its empty state and says so.
+     */
+    let previous = this.facade.handle();
+    effect(() => {
+      const handle = this.facade.handle();
+      if (handle !== previous) {
+        previous = handle;
+        this.facade.selectedKey.set(null);
+      }
+    });
+  }
+
+  protected readonly tabs = computed<readonly TabItem[]>(() => {
+    this.transloco.activeLang();
+    const drafts = this.facade.drafts();
+    const dirty = this.facade.dirty();
+    return HANDLES.map((handle) => ({
+      key: handle,
+      label: this.transloco.translate(`content.menus.handle.${handle}`),
+      // The count, or a dot when the menu has edits the server has not seen — a menu can be dirty
+      // without its count changing, and that is exactly the state worth flagging.
+      badge: dirty[handle] ? '•' : String(countOf(drafts[handle])),
+      badgeTone: dirty[handle] ? ('amber' as const) : ('slate' as const),
+    }));
+  });
+
+  protected readonly linkCount = computed(() => countOf(this.facade.currentItems()));
 
   protected readonly kindOptions = computed<readonly SelectOption[]>(() => {
     this.transloco.activeLang();
@@ -62,184 +136,151 @@ export class MenusTab {
     this.facade.pages().map((page) => ({value: page.slug, label: page.title})),
   );
 
-  /** Languages that have at least one label filled, for the switcher's dots. */
+  /** Languages that have at least one label filled anywhere, for the switcher's dots. */
   protected readonly filled = computed<ReadonlySet<string>>(() => {
     const set = new Set<string>();
-    for (const items of Object.values(this.facade.drafts())) {
+    const walk = (items: readonly MenuDraftItem[]): void => {
       for (const item of items) {
-        for (const code of Object.keys(item.labels)) {
-          if (item.labels[code]?.trim()) {
+        for (const [code, label] of Object.entries(item.labels)) {
+          if (label?.trim()) {
             set.add(code);
           }
         }
+        walk(item.children);
       }
-    }
+    };
+    Object.values(this.facade.drafts()).forEach(walk);
     return set;
   });
 
-  protected items(handle: MenuHandle): MenuDraftItem[] {
-    return this.facade.drafts()[handle];
-  }
+  /**
+   * The menu as the tree wants it: shape, name, visibility — and nothing else.
+   *
+   * **No `meta`.** The target used to ride along there, and in this panel's width a full URL won
+   * the row: the label track collapsed and every row showed where a link went rather than what it
+   * was called. The target is one click away in the editor, which is the point of splitting them.
+   * `warn` stays, because a broken link is a state you have to be able to *find*, not one you go
+   * looking for.
+   *
+   * A link with no label in the language being edited says so rather than borrowing its target as
+   * a name — a missing translation is worth seeing, and disguising it as a label hides it.
+   */
+  protected readonly treeNodes = computed<readonly TreeNode[]>(() => {
+    const language = this.activeLanguage();
+    const broken = this.transloco.translate('content.menus.broken');
+    const untitled = this.transloco.translate('content.menus.untitled');
 
-  protected label(item: MenuDraftItem): string {
-    return item.labels[this.activeLanguage()] ?? '';
+    const toNode = (item: MenuDraftItem): TreeNode => ({
+      id: item.key,
+      label: item.labels[language]?.trim() || untitled,
+      warn: item.broken ? broken : undefined,
+      visible: item.visible,
+      children: item.children.map(toNode),
+    });
+
+    return this.facade.currentItems().map(toNode);
+  });
+
+  protected readonly selectedPath = computed(() => {
+    const key = this.facade.selectedKey();
+    if (key === null) {
+      return '';
+    }
+    const trail = (items: readonly MenuDraftItem[], above: readonly string[]): string[] | null => {
+      for (const item of items) {
+        const here = [...above, this.labelOf(item)];
+        if (item.key === key) {
+          return here;
+        }
+        const deeper = trail(item.children, here);
+        if (deeper) {
+          return deeper;
+        }
+      }
+      return null;
+    };
+    return (trail(this.facade.currentItems(), []) ?? []).join(' / ');
+  });
+
+  protected labelOf(item: MenuDraftItem): string {
+    return (
+      item.labels[this.activeLanguage()]?.trim() ||
+      this.transloco.translate('content.menus.untitled')
+    );
   }
 
   protected needsValue(kind: MenuTargetKind): boolean {
-    return kind !== 'BLOG_INDEX' && kind !== 'FAQ_INDEX';
+    return targetNeedsValue(kind);
   }
 
-  private commit(handle: MenuHandle, items: MenuDraftItem[]): void {
-    this.facade.update(handle, items);
+  protected fixedPath(kind: MenuTargetKind): string {
+    return INDEX_PATHS[kind] ?? '';
   }
 
-  private clone(handle: MenuHandle): MenuDraftItem[] {
-    return this.items(handle).map((item) => ({
-      ...item,
-      labels: {...item.labels},
-      children: item.children.map((c) => ({...c, labels: {...c.labels}, children: []})),
-    }));
+  /* ------------------------------------------------------------------------ the tree ---- */
+
+  protected onSelect(id: TreeNodeId): void {
+    this.facade.selectedKey.set(String(id));
   }
 
-  protected setLabel(handle: MenuHandle, item: MenuDraftItem, value: string): void {
-    const items = this.clone(handle);
-    const target = this.find(items, item.key);
-    if (target) {
-      target.labels[this.activeLanguage()] = value;
-      this.commit(handle, items);
+  protected onToggleCollapsed(id: TreeNodeId): void {
+    const next = new Set(this.collapsed());
+    if (!next.delete(id)) {
+      next.add(id);
+    }
+    this.collapsed.set(next);
+  }
+
+  protected onToggleVisible(node: TreeNode): void {
+    this.facade.setField(this.facade.handle(), String(node.id), {visible: !node.visible});
+  }
+
+  protected onMove(move: TreeMove): void {
+    this.facade.applyMove(this.facade.handle(), move);
+  }
+
+  /** Adding opens the new link, because an operator who adds one is about to label it. */
+  protected onAdd(parentKey?: string): void {
+    const key = this.facade.addItem(this.facade.handle(), parentKey);
+    if (key !== null) {
+      this.facade.selectedKey.set(key);
     }
   }
 
-  protected setKind(handle: MenuHandle, item: MenuDraftItem, kind: string): void {
-    const items = this.clone(handle);
-    const target = this.find(items, item.key);
-    if (target) {
-      target.kind = kind as MenuTargetKind;
-      if (!this.needsValue(target.kind)) {
-        target.value = '';
-      } else if (target.kind === 'URL' && !target.value) {
-        target.value = '/';
-      } else if (target.kind === 'PAGE') {
-        target.value = this.pageOptions()[0]?.value ?? '';
+  protected expandAll(): void {
+    this.collapsed.set(new Set());
+  }
+
+  protected collapseAll(): void {
+    const keys = new Set<TreeNodeId>();
+    const walk = (items: readonly MenuDraftItem[]): void => {
+      for (const item of items) {
+        if (item.children.length) {
+          keys.add(item.key);
+        }
+        walk(item.children);
       }
-      target.broken = false;
-      this.commit(handle, items);
-    }
+    };
+    walk(this.facade.currentItems());
+    this.collapsed.set(keys);
   }
 
-  protected setValue(handle: MenuHandle, item: MenuDraftItem, value: string): void {
-    const items = this.clone(handle);
-    const target = this.find(items, item.key);
-    if (target) {
-      target.value = value;
-      target.broken = false;
-      this.commit(handle, items);
-    }
+  /* ---------------------------------------------------------------------- the editor ---- */
+
+  protected setLabel(item: MenuDraftItem, value: string): void {
+    this.facade.setLabel(this.facade.handle(), item.key, this.activeLanguage(), value);
   }
 
-  protected toggleVisible(handle: MenuHandle, item: MenuDraftItem): void {
-    const items = this.clone(handle);
-    const target = this.find(items, item.key);
-    if (target) {
-      target.visible = !target.visible;
-      this.commit(handle, items);
-    }
+  protected patch(item: MenuDraftItem, patch: Partial<MenuDraftItem>): void {
+    this.facade.setField(this.facade.handle(), item.key, patch);
   }
 
-  protected remove(handle: MenuHandle, item: MenuDraftItem): void {
-    const items = this.clone(handle).filter((root) => root.key !== item.key);
-    for (const root of items) {
-      root.children = root.children.filter((child) => child.key !== item.key);
-    }
-    this.commit(handle, items);
+  protected remove(item: MenuDraftItem): void {
+    this.facade.removeItem(this.facade.handle(), item.key);
   }
+}
 
-  protected add(handle: MenuHandle): void {
-    const item = blankItem();
-    this.commit(handle, [...this.clone(handle), item]);
-  }
-
-  /** Moves a root or a child one slot within its own list. */
-  protected move(handle: MenuHandle, item: MenuDraftItem, delta: -1 | 1): void {
-    const items = this.clone(handle);
-    const list = this.listOf(items, item.key);
-    if (!list) {
-      return;
-    }
-    const index = list.findIndex((i) => i.key === item.key);
-    const next = index + delta;
-    if (next < 0 || next >= list.length) {
-      return;
-    }
-    [list[index], list[next]] = [list[next], list[index]];
-    this.commit(handle, items);
-  }
-
-  /** A root becomes the last child of the root above it; a child becomes a root after its parent. */
-  protected indent(handle: MenuHandle, item: MenuDraftItem): void {
-    const items = this.clone(handle);
-    const index = items.findIndex((root) => root.key === item.key);
-    if (index <= 0) {
-      return;
-    }
-    const [moved] = items.splice(index, 1);
-    const parent = items[index - 1];
-    parent.children = [...parent.children, ...moved.children, {...moved, children: []}];
-    this.commit(handle, items);
-  }
-
-  protected outdent(handle: MenuHandle, item: MenuDraftItem): void {
-    const items = this.clone(handle);
-    const parentIndex = items.findIndex((root) =>
-      root.children.some((child) => child.key === item.key),
-    );
-    if (parentIndex < 0) {
-      return;
-    }
-    const parent = items[parentIndex];
-    const child = parent.children.find((c) => c.key === item.key) as MenuDraftItem;
-    parent.children = parent.children.filter((c) => c.key !== item.key);
-    items.splice(parentIndex + 1, 0, {...child, children: []});
-    this.commit(handle, items);
-  }
-
-  protected isChild(handle: MenuHandle, item: MenuDraftItem): boolean {
-    return this.items(handle).some((root) => root.children.some((child) => child.key === item.key));
-  }
-
-  /** Roots and children flattened for rendering, each tagged with its depth. */
-  protected rows(handle: MenuHandle): readonly {item: MenuDraftItem; depth: number}[] {
-    const out: {item: MenuDraftItem; depth: number}[] = [];
-    for (const root of this.items(handle)) {
-      out.push({item: root, depth: 0});
-      for (const child of root.children) {
-        out.push({item: child, depth: 1});
-      }
-    }
-    return out;
-  }
-
-  protected handleLabel(handle: MenuHandle): string {
-    return this.transloco.translate(`content.menus.handle.${handle}`);
-  }
-
-  private find(items: MenuDraftItem[], key: string): MenuDraftItem | undefined {
-    for (const root of items) {
-      if (root.key === key) {
-        return root;
-      }
-      const child = root.children.find((c) => c.key === key);
-      if (child) {
-        return child;
-      }
-    }
-    return undefined;
-  }
-
-  private listOf(items: MenuDraftItem[], key: string): MenuDraftItem[] | undefined {
-    if (items.some((root) => root.key === key)) {
-      return items;
-    }
-    return items.find((root) => root.children.some((c) => c.key === key))?.children;
-  }
+/** Every link in a menu, at any depth — what the tab badge counts. */
+function countOf(items: readonly MenuDraftItem[]): number {
+  return items.reduce((total, item) => total + 1 + countOf(item.children), 0);
 }

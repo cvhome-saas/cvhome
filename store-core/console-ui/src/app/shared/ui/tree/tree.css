@@ -9,12 +9,17 @@
 }
 
 /*
- * The row is a grid rather than a flex line so the label truncates and the trailing controls keep
- * their place: a long category name must not push the move buttons off the panel.
+ * A flex line whose label is the only part that shrinks.
+ *
+ * It was a grid, sized column by column — which broke the moment a row had optional parts. `meta`
+ * and `warn` are per-row, so an absent one shifted every following control into the wrong track,
+ * and `1fr` on the label meant "whatever is left after the auto tracks take their max-content
+ * width" — a menu row with a full URL in `meta` collapsed the label to nothing. Flex says the
+ * thing this row is actually about, which a track list could not: the name gives up its width
+ * last, and only to itself.
  */
 .tree-row {
-  display: grid;
-  grid-template-columns: auto auto minmax(0, 1fr) auto auto auto;
+  display: flex;
   align-items: center;
   gap: var(--spacing-tight);
   /* The indent is the hierarchy. `--depth` is set per row; everything else is constant. */
@@ -49,22 +54,37 @@
 }
 
 /*
- * One drop state, because there is one drop: into the row. Sibling ordering is not expressible on
- * this platform, so there are no edge zones to mark. See `DropPosition`.
+ * Nesting fills the row, because the whole row is what the pointer is aiming at.
  */
 .tree-row.drop-inside {
   background: var(--accent-strong);
   box-shadow: inset 0 0 0 2px var(--edge-strong);
 }
 
+/*
+ * Inserting draws a rule on the edge it would land against — a line *between* rows, which is the
+ * only honest picture of an insertion. Drawn with `box-shadow` rather than a border so it costs no
+ * layout and cannot shift the rows below it as the pointer crosses bands. Only reachable when the
+ * consumer set `reorderable`; see `DropPosition`.
+ */
+.tree-row.drop-before {
+  box-shadow: inset 0 2px 0 0 var(--edge-strong);
+}
+
+.tree-row.drop-after {
+  box-shadow: inset 0 -2px 0 0 var(--edge-strong);
+}
+
 .grip {
   display: flex;
+  flex: none;
   color: var(--foreground-quiet);
   cursor: grab;
 }
 
 .chevron,
 .chevron-gap {
+  flex: none;
   inline-size: 1.15rem;
   block-size: 1.15rem;
 }
@@ -86,6 +106,7 @@
 }
 
 .node-label {
+  flex: 1;
   min-inline-size: 0;
   overflow: hidden;
   font-weight: 500;
@@ -98,16 +119,49 @@
   font-weight: 600;
 }
 
+/*
+ * Truncating, and capped. It was a product count when the catalogue was the only consumer, and a
+ * count is three characters; a consumer that puts a path here must not out-bid the name for width.
+ */
 .node-meta {
+  flex: 0 1 auto;
+  min-inline-size: 0;
+  max-inline-size: 8rem;
+  overflow: hidden;
   color: var(--foreground-quiet);
   font-size: var(--text-3xs);
   font-variant-numeric: tabular-nums;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/*
+ * The row's own controls, tightened.
+ *
+ * `.icon-action`'s `2.25rem` minimum is a toolbar's tap target and right there. A tree row can hold
+ * six of them, which is 220px — over half of a tree panel, and more than the names beside them:
+ * with `reorderable` on, every label in the menu editor truncated so that six buttons nobody was
+ * looking at could keep their padding. They are icon-only, `tabindex="-1"`, revealed on hover, and
+ * every one of them is also in the row menu, which is the path that is guaranteed to be reachable.
+ * Touch keeps the full target, where hover does not exist and these are the only path.
+ */
+.tree-row .icon-action {
+  min-inline-size: 1.75rem;
+  --icon-size: .85rem;
+}
+
+@media (hover: none) {
+  .tree-row .icon-action {
+    min-inline-size: 2.25rem;
+    --icon-size: .95rem;
+  }
 }
 
 .row-moves {
   display: flex;
+  flex: none;
   gap: .1rem;
-  /* Quiet until the row is touched: five glyphs on every row of a large tree is noise. */
+  /* Quiet until the row is touched: a row of glyphs on every row of a large tree is noise. */
   opacity: 0;
   transition: opacity var(--default-transition-duration);
 }

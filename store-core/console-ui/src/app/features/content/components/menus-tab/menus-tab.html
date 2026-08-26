@@ -4,91 +4,245 @@
   }
 
   <app-busy-overlay [busy]="facade.isLoading() || facade.busy()" [label]="t('content.menus.loading')" reserve="panel">
-    <app-panel [title]="t('content.menus.title')" [subtitle]="t('content.menus.subtitle')">
-      <app-locale-switcher
-        panelAction
-        [languages]="locales()"
-        [active]="activeLanguage()"
-        (activeChange)="language.set($event)"
-        [filled]="filled()"
-        display="label"
-        [label]="t('content.menus.labelsIn')"
-      />
-      <div class="menus-grid">
-        @for (handle of handles; track handle) {
-          <section class="menu" [attr.aria-label]="handleLabel(handle)">
-            <header class="menu-head">
-              <app-icon [name]="handle === 'MAIN' ? 'menu' : 'list'" [size]="14" />
-              <strong>{{ handleLabel(handle) }}</strong>
-              <app-badge tone="slate" shape="square">{{ rows(handle).length }}</app-badge>
-              <span class="spacer"></span>
+    <div class="menus">
+      <div class="menus-head">
+        <app-tab-switcher
+          [tabs]="tabs()"
+          [active]="facade.handle()"
+          (activeChange)="facade.handle.set($any($event))"
+          [label]="t('content.menus.menusLabel')"
+          panelId="menu-panel"
+        />
+        <app-locale-switcher
+          [languages]="locales()"
+          [active]="activeLanguage()"
+          (activeChange)="language.set($event)"
+          [filled]="filled()"
+          display="label"
+          [label]="t('content.menus.labelsIn')"
+        />
+      </div>
+
+      <div class="split" id="menu-panel">
+        <app-panel
+          class="list-panel"
+          [title]="t('content.menus.handle.' + facade.handle())"
+          [subtitle]="t('content.menus.subtitle', {count: linkCount()})"
+        >
+          <div panelAction class="panel-controls">
+            <button class="ghost-action" type="button" (click)="expandAll()">
+              {{ t('content.menus.expandAll') }}
+            </button>
+            <button class="ghost-action" type="button" (click)="collapseAll()">
+              {{ t('content.menus.collapseAll') }}
+            </button>
+          </div>
+
+          <div class="tree-wrap">
+            <app-tree
+              [nodes]="treeNodes()"
+              [selectedId]="facade.selectedKey()"
+              [collapsed]="collapsed()"
+              [label]="t('content.menus.treeLabel')"
+              [itemNoun]="t('content.menus.noun')"
+              [busy]="facade.busy() || !canManage()"
+              reorderable
+              [maxDepth]="maxDepth"
+              (selectedIdChange)="onSelect($event)"
+              (toggleCollapsed)="onToggleCollapsed($event)"
+              (visibilityToggled)="onToggleVisible($event)"
+              (moved)="onMove($event)"
+              (addChild)="onAdd($any($event.id))"
+            />
+
+            @if (canManage()) {
+              <button class="secondary-action add-root" type="button" (click)="onAdd()">
+                <app-icon name="plus" />
+                {{ t('content.menus.addLink') }}
+              </button>
+            }
+
+            <!--
+              The drag gesture is not discoverable and the row buttons only appear on hover — the
+              same trade the category tree makes, and it answers it the same way.
+            -->
+            <p class="tree-hint">{{ t('content.menus.dragHint') }}</p>
+          </div>
+        </app-panel>
+
+        <app-panel
+          class="editor-panel"
+          [title]="facade.selected() ? labelOf(facade.selected()!) : t('content.menus.noneTitle')"
+          [subtitle]="facade.selected() ? selectedPath() : null"
+        >
+          @if (facade.selected(); as link) {
+            <div class="editor-body">
               @if (canManage()) {
-                @if (facade.dirty()[handle]) {
-                  <button class="ghost-action" type="button" (click)="facade.discard(handle)">{{ t('content.menus.discard') }}</button>
+                <div class="editor-head">
+                  <span class="editor-kind">
+                    <app-icon [name]="link.visible ? 'eye' : 'eyeOff'" [size]="14" />
+                    {{ link.visible ? t('content.menus.visibleOn') : t('content.menus.visibleOff') }}
+                  </span>
+                  <button class="danger-action" type="button" (click)="remove(link)">
+                    <app-icon name="trash" />
+                    {{ t('content.menus.delete') }}
+                  </button>
+                </div>
+              }
+
+              <!--
+                Removing a link takes its sub-links with it. The dialog-free draft model means the
+                only undo is Discard, which throws away every other edit too — so the warning has to
+                arrive before the click, not after it.
+              -->
+              @if (link.children.length > 0) {
+                <app-notice-bar
+                  icon="alertCircle"
+                  tone="amber"
+                  [message]="t('content.menus.hasChildren', {count: link.children.length})"
+                />
+              }
+
+              @if (link.broken) {
+                <app-notice-bar
+                  icon="xCircle"
+                  tone="red"
+                  [message]="t('content.menus.brokenHint')"
+                />
+              }
+
+              <app-form-field
+                [label]="t('content.menus.label')"
+                [hint]="t('content.menus.labelHint', {language: activeLanguageName()})"
+                controlId="menu-label"
+                wide
+              >
+                <app-text-field
+                  id="menu-label"
+                  [value]="link.labels[activeLanguage()] ?? ''"
+                  (valueChange)="setLabel(link, $event)"
+                  [placeholder]="t('content.menus.label')"
+                  [disabled]="!canManage()"
+                  [maxLength]="80"
+                />
+              </app-form-field>
+
+              <hr class="divider" />
+
+              <div class="field-grid">
+                <app-form-field [label]="t('content.menus.target')" controlId="menu-kind">
+                  <app-select
+                    id="menu-kind"
+                    [options]="kindOptions()"
+                    [value]="link.kind"
+                    (valueChange)="patch(link, {kind: $any($event)})"
+                    [disabled]="!canManage()"
+                  />
+                </app-form-field>
+
+                @if (needsValue(link.kind)) {
+                  <app-form-field
+                    [label]="t('content.menus.value')"
+                    [hint]="t('content.menus.valueHint.' + link.kind)"
+                    controlId="menu-value"
+                  >
+                    @if (link.kind === 'PAGE' && pageOptions().length) {
+                      <app-select
+                        id="menu-value"
+                        [options]="pageOptions()"
+                        [value]="link.value"
+                        (valueChange)="patch(link, {value: $event})"
+                        [disabled]="!canManage()"
+                      />
+                    } @else {
+                      <app-text-field
+                        id="menu-value"
+                        latin
+                        mono
+                        [value]="link.value"
+                        (valueChange)="patch(link, {value: $event})"
+                        [placeholder]="t('content.menus.valuePlaceholder.' + link.kind)"
+                        [disabled]="!canManage()"
+                        [maxLength]="255"
+                      />
+                    }
+                  </app-form-field>
+                } @else {
+                  <!--
+                    Nothing to pick: these two kinds resolve to one fixed path each. Shown rather
+                    than omitted, so the panel still answers "where does this go".
+                  -->
+                  <app-form-field [label]="t('content.menus.value')">
+                    <p class="fixed-target" dir="ltr">{{ fixedPath(link.kind) }}</p>
+                  </app-form-field>
                 }
-                <button class="primary-action" type="button" [disabled]="!facade.dirty()[handle] || facade.busy()" (click)="facade.save(handle)">
-                  <app-icon name="check" />{{ t('content.menus.save') }}
+
+                <div class="field field-wide">
+                  <app-toggle
+                    [checked]="link.visible"
+                    (checkedChange)="patch(link, {visible: $event})"
+                    [disabled]="!canManage()"
+                    [label]="t('content.menus.visible')"
+                    [description]="link.visible ? t('content.menus.visibleOn') : t('content.menus.visibleOff')"
+                  />
+                </div>
+
+                <div class="field field-wide">
+                  <app-toggle
+                    [checked]="link.openInNewTab"
+                    (checkedChange)="patch(link, {openInNewTab: $event})"
+                    [disabled]="!canManage()"
+                    [label]="t('content.menus.openInNewTab')"
+                    [description]="t('content.menus.openInNewTabHint')"
+                  />
+                </div>
+              </div>
+            </div>
+          } @else {
+            <app-empty-state icon="sitemap" [message]="t('content.menus.empty')">
+              @if (canManage()) {
+                <button class="secondary-action" type="button" (click)="onAdd()">
+                  {{ t('content.menus.addLink') }}
                 </button>
               }
-            </header>
-
-            <ol class="menu-rows">
-              @for (row of rows(handle); track row.item.key) {
-                <li class="menu-row" [class.child]="row.depth === 1" [class.hidden-item]="!row.item.visible">
-                  <div class="row-grip" aria-hidden="true"><app-icon name="grip" [size]="12" /></div>
-                  <app-text-field
-                    class="row-label"
-                    [value]="label(row.item)"
-                    (valueChange)="setLabel(handle, row.item, $event)"
-                    [placeholder]="t('content.menus.labelPlaceholder')"
-                    [ariaLabel]="t('content.menus.label')"
-                    [disabled]="!canManage()"
-                    [maxLength]="80"
-                  />
-                  <app-select
-                    class="row-kind"
-                    [options]="kindOptions()"
-                    [value]="row.item.kind"
-                    (valueChange)="setKind(handle, row.item, $event)"
-                    [ariaLabel]="t('content.menus.target')"
-                    [disabled]="!canManage()"
-                  />
-                  @if (needsValue(row.item.kind)) {
-                    @if (row.item.kind === 'PAGE' && pageOptions().length) {
-                      <app-select class="row-value" [options]="pageOptions()" [value]="row.item.value" (valueChange)="setValue(handle, row.item, $event)" [ariaLabel]="t('content.menus.value')" [disabled]="!canManage()" />
-                    } @else {
-                      <app-text-field class="row-value" latin mono [value]="row.item.value" (valueChange)="setValue(handle, row.item, $event)" [ariaLabel]="t('content.menus.value')" [placeholder]="t('content.menus.valuePlaceholder.' + row.item.kind)" [disabled]="!canManage()" [maxLength]="255" />
-                    }
-                  } @else {
-                    <span class="row-value fixed" dir="ltr">{{ row.item.kind === 'BLOG_INDEX' ? '/blog' : '/help' }}</span>
-                  }
-                  @if (row.item.broken) {
-                    <app-badge tone="amber" shape="square">{{ t('content.menus.broken') }}</app-badge>
-                  }
-                  @if (canManage()) {
-                    <div class="row-actions">
-                      <button class="icon-action" type="button" [title]="t('content.menus.moveUp')" [attr.aria-label]="t('content.menus.moveUp')" (click)="move(handle, row.item, -1)"><app-icon name="arrowUp" [size]="13" /></button>
-                      <button class="icon-action" type="button" [title]="t('content.menus.moveDown')" [attr.aria-label]="t('content.menus.moveDown')" (click)="move(handle, row.item, 1)"><app-icon name="arrowDown" [size]="13" /></button>
-                      @if (row.depth === 0) {
-                        <button class="icon-action" type="button" [disabled]="row.item.children.length > 0" [title]="t('content.menus.indent')" [attr.aria-label]="t('content.menus.indent')" (click)="indent(handle, row.item)"><app-icon name="arrowRight" [size]="13" /></button>
-                      } @else {
-                        <button class="icon-action" type="button" [title]="t('content.menus.outdent')" [attr.aria-label]="t('content.menus.outdent')" (click)="outdent(handle, row.item)"><app-icon name="arrowLeft" [size]="13" /></button>
-                      }
-                      <button class="icon-action" type="button" [attr.aria-pressed]="row.item.visible" [title]="row.item.visible ? t('content.menus.hide') : t('content.menus.show')" [attr.aria-label]="row.item.visible ? t('content.menus.hide') : t('content.menus.show')" (click)="toggleVisible(handle, row.item)"><app-icon [name]="row.item.visible ? 'eye' : 'eyeOff'" [size]="13" /></button>
-                      <button class="icon-action danger" type="button" [title]="t('content.menus.remove')" [attr.aria-label]="t('content.menus.remove')" (click)="remove(handle, row.item)"><app-icon name="trash" [size]="13" /></button>
-                    </div>
-                  }
-                </li>
-              } @empty {
-                <li class="menu-empty">{{ t('content.menus.empty') }}</li>
-              }
-            </ol>
-            @if (canManage()) {
-              <button class="secondary-action add-link" type="button" (click)="add(handle)"><app-icon name="plus" />{{ t('content.menus.addLink') }}</button>
-            }
-          </section>
-        }
+            </app-empty-state>
+          }
+        </app-panel>
       </div>
-    </app-panel>
+
+      @if (canManage()) {
+        <!--
+          One save bar for the menu, not one per link: `PUT /menus/{handle}` replaces the whole tree
+          and there is no per-link endpoint a row button could call.
+        -->
+        <div class="menus-actions">
+          @if (facade.dirty()[facade.handle()]) {
+            <span class="unsaved">
+              <app-icon name="info" [size]="13" />
+              {{ t('content.menus.unsaved') }}
+            </span>
+          }
+          <span class="spacer"></span>
+          <button
+            class="secondary-action"
+            type="button"
+            [disabled]="!facade.dirty()[facade.handle()] || facade.busy()"
+            (click)="facade.discard(facade.handle())"
+          >
+            {{ t('content.menus.discard') }}
+          </button>
+          <button
+            class="primary-action"
+            type="button"
+            [disabled]="!facade.dirty()[facade.handle()] || facade.busy()"
+            [attr.aria-busy]="facade.busy()"
+            (click)="facade.save(facade.handle())"
+          >
+            <app-icon name="check" />
+            {{ t('content.menus.save') }}
+          </button>
+        </div>
+      }
+    </div>
   </app-busy-overlay>
 </ng-container>

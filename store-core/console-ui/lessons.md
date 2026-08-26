@@ -1645,9 +1645,12 @@ seller-ui writes. Nothing is missing from the platform here; what is missing is 
      same order it had before and the operator would see nothing happen.
 - **Expected contract:** sort `children` by `sortOrder` in the hierarchy populator, and either fix
   the update or add `PUT …/category/{id}/order`.
-- **Placeholder:** sibling reordering is **removed** — the row's up/down buttons, their `Alt+Arrow`
-  shortcuts and their menu items, and the tree's before/after drop zones. Dropping onto a row now
-  always nests, which is the one rearrangement the platform can actually perform. Nesting, promoting
+- **Placeholder:** sibling reordering is **off for this tree** — the row's up/down buttons, their
+  `Alt+Arrow` shortcuts and their menu items, and the before/after drop zones. Dropping onto a
+  category row always nests, which is the one rearrangement the platform can actually perform.
+  (`app-tree` grew the machinery back for the menu editor, whose order the server does accept; it
+  is behind the `reorderable` input, and the catalogue leaves it off. Turning it on here would need
+  both blockers above fixed.) Nesting, promoting
   out of a parent, visibility, add and delete are all real and all verified.
 
 ## Catalogue — the console-side lessons from the hardening pass
@@ -3239,10 +3242,13 @@ for `hasAccessOnBillingQuotaCheck` to be widened so a human could call
 
 ## Content — drag-and-drop reorder is up/down buttons
 
-- **Screens:** the FAQ and menu editors ("drag to reorder").
-- **What is missing:** a drag-and-drop primitive in `shared/ui/`; the console has none and the
-  slider section set the precedent of arrow buttons.
-- **Decision:** arrow buttons and keyboard; the server takes the whole order either way.
+- **Screen:** the FAQ editor ("drag to reorder").
+- **What is missing:** nothing structural any more. `shared/ui/tree` is a drag-and-drop hierarchy
+  primitive, and the menu editor — which this entry used to cover — now uses it: dragging, row
+  buttons and `Alt+Arrow` all reach the same moves, with `reorderable` turning on the sibling
+  ordering the catalogue cannot have. FAQ is a flat list rather than a tree, so it is still waiting
+  on a flat equivalent.
+- **Decision:** arrow buttons and keyboard for FAQ; the server takes the whole order either way.
 
 ## Content — "email existing customers about the change" is recorded, not sent
 
