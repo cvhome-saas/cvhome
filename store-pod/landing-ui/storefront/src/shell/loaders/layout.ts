@@ -33,6 +33,8 @@ export const loadLayoutData = cache(async (): Promise<LayoutData> => {
         announcement: site.announcement ? bannerAsAnnouncement(site.announcement) : undefined,
         menus: site.menus,
         policies: site.policies,
+        branding: site.branding,
+        socialLinks: site.socialLinks,
         search: getSearchProvider().capabilities,
     };
 });

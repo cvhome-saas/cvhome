@@ -38,14 +38,14 @@ export function primaryImage(p: Product): { src: string; alt: string } {
     const img = p.image ?? sortedImages(p)[0];
     return {
         src: img?.imageUrl || PLACEHOLDER_IMAGE,
-        alt: p.description?.name || img?.imageName || '',
+        alt: img?.altText || p.description?.name || '',
     };
 }
 
 export function secondaryImage(p: Product): { src: string; alt: string } | undefined {
     const images = sortedImages(p);
     const img = images.find(i => i.imageUrl !== (p.image?.imageUrl ?? images[0]?.imageUrl));
-    return img ? {src: img.imageUrl, alt: p.description?.name || img.imageName || ''} : undefined;
+    return img ? {src: img.imageUrl, alt: img.altText || p.description?.name || ''} : undefined;
 }
 
 export const productHref = (p: Product): string => p.description ? `/product/${p.description.friendlyUrl}` : '#';

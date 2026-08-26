@@ -5,9 +5,16 @@ import {parseDescription} from '@store-front/services/description-view-util';
 import type {AnnouncementData, Banner, NavPage, SiteContent, StorefrontLink} from '@store-front/types';
 import {getStoreContext} from '@/shell/request/store-context';
 
-const EMPTY: SiteContent = {servedLocale: null, snippets: {}, announcement: null, menus: {main: [], footer: []}, footerPages: [], policies: []};
+const NO_SEO = {metaTitle: null, metaDescription: null, keywords: null, canonicalUrl: null, noindex: false, ogImageUrl: null};
 
-/** The storefront `site` document — snippets, announcement, menus, footer pages, policies — once per request. */
+const NO_BRANDING = {logo: null, logoDark: null, favicon: null, og: null};
+
+const EMPTY: SiteContent = {
+    servedLocale: null, seo: NO_SEO, branding: NO_BRANDING, socialLinks: [],
+    announcement: null, menus: {main: [], footer: []}, footerPages: [], policies: [],
+};
+
+/** The storefront `site` document — SEO, branding, socials, announcement, menus, pages, policies — per request. */
 export const loadSite = cache(async (): Promise<SiteContent> => {
     const ctx = await getStoreContext();
     return (await ContentService.getSite(ctx)) ?? EMPTY;
@@ -21,7 +28,9 @@ export function linkAsNavPage(link: StorefrontLink, inMenu: boolean): NavPage {
 /** The announcement strip's banner, decoded for the themes' Announcement bars. */
 export function bannerAsAnnouncement(banner: Banner): AnnouncementData {
     return {
-        code: 'header-message',
+        // The dismissal key is stable across banners on purpose: a shopper who closed the strip should not have
+        // it reappear because the merchant edited the copy.
+        code: 'announcement',
         html: parseDescription({description: banner.body || (banner.title ?? '')} as never),
     };
 }

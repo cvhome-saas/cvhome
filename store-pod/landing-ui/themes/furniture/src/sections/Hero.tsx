@@ -6,11 +6,11 @@ import {A11y, Pagination} from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import {useDir} from '@store-front/i18n/use-dir';
-import type {SliderImage} from '@store-front/types';
+import type {Banner} from '@store-front/types';
 import {PlanPlate} from '../components/PlanPlate';
 
 /**
- * The window beside the directory board: the merchant's slider images, cut square in a hairline frame
+ * The window beside the directory board: the store's CMS banners, cut square in a hairline frame
  * with a ruled caption plate in the lower corner. Swiper needs `dir` explicitly (it does not read CSS
  * direction) and is re-keyed on dir so a locale switch re-initialises it.
  *
@@ -27,7 +27,7 @@ import {PlanPlate} from '../components/PlanPlate';
  * moves for longer than five seconds with no way to stop it (WCAG 2.2.2). The pagination gives a reader
  * every slide on demand.
  */
-export function Hero({slides, caption, planCaption}: { slides: SliderImage[]; caption: string; planCaption: string }) {
+export function Hero({slides, caption, planCaption}: { slides: Banner[]; caption: string; planCaption: string }) {
     const t = useTranslations('PAGE.HOME');
     const dir = useDir();
     return (
@@ -43,9 +43,9 @@ export function Hero({slides, caption, planCaption}: { slides: SliderImage[]; ca
                         pagination={{clickable: true}}
                         a11y={{enabled: true}} className="size-full">
                     {slides.map((s, i) => (
-                        <SwiperSlide key={`${s.url}-${i}`} aria-label={t('HERO_SLIDE', {index: i + 1, total: slides.length})}>
+                        <SwiperSlide key={s.id} aria-label={t('HERO_SLIDE', {index: i + 1, total: slides.length})}>
                             <div className="relative size-full">
-                                <Image src={s.url} alt="" fill priority={i === 0} sizes="(max-width: 1024px) 100vw, 55vw" className="object-cover"/>
+                                <Image src={s.desktopUrl ?? ''} alt={s.altText ?? ''} fill priority={i === 0} sizes="(max-width: 1024px) 100vw, 55vw" className="object-cover"/>
                             </div>
                         </SwiperSlide>
                     ))}

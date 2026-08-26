@@ -27,10 +27,10 @@ export async function Home({ctx, data}: PageProps<HomeData>) {
                     </h1>
                     {hasSlides && <div className="order-2 min-w-0 lg:col-start-2 lg:row-span-2 lg:row-start-1"><HeroFrame slides={data.hero.slides}/></div>}
                     <div className="order-3 flex min-w-0 flex-col gap-5 lg:col-start-1 lg:row-start-2 lg:self-start">
-                        {data.hero.banner?.path && !hasSlides && (
+                        {data.hero.banner?.desktopUrl && !hasSlides && (
                             <div className="plate relative aspect-[21/9] overflow-hidden bg-muted">
                                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                                <img src={data.hero.banner.path} alt="" className="size-full object-cover"/>
+                                <img src={data.hero.banner.desktopUrl ?? ''} alt={data.hero.banner.altText ?? ''} className="size-full object-cover"/>
                             </div>
                         )}
                         {firstGroup && (

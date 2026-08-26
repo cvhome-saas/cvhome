@@ -22,7 +22,7 @@ export async function Footer({data}: { ctx: PageContext; data: LayoutData }) {
         ...data.menus.footer.filter(n => n.kind !== 'PAGE' && n.href.startsWith('/')).map(n => ({key: n.href, href: n.href, label: n.label})),
         ...data.policies.map(pl => ({key: pl.href, href: pl.href, label: pl.title})),
     ];
-    const socials = (store.socialLinks ?? []).filter(s => SOCIAL_ICONS[s.provider.toLowerCase()]);
+    const socials = data.socialLinks.filter(s => SOCIAL_ICONS[s.provider.toLowerCase()]);
     const address = [store.address?.address, store.address?.city, store.address?.postalCode, store.address?.country].filter(Boolean).join(', ');
 
     return (

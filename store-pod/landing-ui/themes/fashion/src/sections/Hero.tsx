@@ -1,6 +1,6 @@
 import {getTranslations} from 'next-intl/server';
 import type {HomeData, PageContext} from '@store-front/theme';
-import type {SliderImage} from '@store-front/types';
+import type {Banner} from '@store-front/types';
 import {cn} from '@store-front/ui/lib/utils';
 import {PosterImage} from '../components/PosterImage';
 
@@ -9,12 +9,12 @@ import {PosterImage} from '../components/PosterImage';
  * place on the wall (the first one here in the hero, the rest lead later stretches).
  */
 export function SlidePoster({slide, index, total, storeName, priority, className, ratio = '4 / 3'}: {
-    slide: SliderImage; index: number; total: number; storeName: string; priority?: boolean; className?: string; ratio?: string;
+    slide: Banner; index: number; total: number; storeName: string; priority?: boolean; className?: string; ratio?: string;
 }) {
     // the ratio rides a variable so a `lg:aspect-auto` on the same element can still win (an inline style could not be overridden)
     return (
         <figure className={cn('sheet sheen peel relative min-w-0 overflow-hidden aspect-(--ratio)', className)} style={{'--ratio': ratio} as React.CSSProperties}>
-            <PosterImage src={slide.url} alt="" title={storeName} tone="faint" meta={`${String(index + 1).padStart(2, '0')} / ${String(total).padStart(2, '0')}`}
+            <PosterImage src={slide.desktopUrl ?? ''} alt={slide.altText ?? ''} title={storeName} tone="faint" meta={`${String(index + 1).padStart(2, '0')} / ${String(total).padStart(2, '0')}`}
                          sizes="(max-width: 1024px) 100vw, 40vw" priority={priority}/>
         </figure>
     );

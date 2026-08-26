@@ -18,7 +18,7 @@ export function Gallery({images, alt}: { images: ProductImage[]; alt: string }) 
     return (
         <div className="flex flex-col">
             <AspectBox className="plate relative bg-muted">
-                <Image src={current?.imageUrl || PLACEHOLDER_IMAGE} alt={current?.imageName || alt} fill priority sizes="(max-width: 1024px) 100vw, 55vw" className="object-contain"/>
+                <Image src={current?.imageUrl || PLACEHOLDER_IMAGE} alt={current?.altText || alt} fill priority sizes="(max-width: 1024px) 100vw, 55vw" className="object-contain"/>
                 {images.length > 0 && <span className="plate absolute bottom-3 end-3 px-2 py-1 font-mono text-xs tabular-nums" dir="ltr">{pad(index + 1)} / {pad(Math.max(images.length, 1))}</span>}
             </AspectBox>
             {images.length > 1 && (

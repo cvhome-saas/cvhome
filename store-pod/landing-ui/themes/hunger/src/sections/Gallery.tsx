@@ -20,7 +20,7 @@ export function Gallery({images, alt}: { images: ProductImage[]; alt: string }) 
     return (
         <div className="flex flex-col">
             <AspectBox className="crop border border-foreground bg-muted">
-                <Image src={current?.imageUrl || PLACEHOLDER_IMAGE} alt={current?.imageName || alt} fill priority
+                <Image src={current?.imageUrl || PLACEHOLDER_IMAGE} alt={current?.altText || alt} fill priority
                        sizes="(max-width: 1024px) 100vw, 50vw" className="object-cover"/>
             </AspectBox>
             {images.length > 1 && (

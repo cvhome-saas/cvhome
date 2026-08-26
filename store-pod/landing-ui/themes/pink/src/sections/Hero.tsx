@@ -6,7 +6,7 @@ import {A11y, Autoplay, Pagination} from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import {useDir} from '@store-front/i18n/use-dir';
-import type {SliderImage} from '@store-front/types';
+import type {Banner} from '@store-front/types';
 import {cn} from '@store-front/ui/lib/utils';
 import {StarMark} from '../components/Marks';
 
@@ -20,7 +20,7 @@ export type CoverLine = { id: string; title: string; count: number; href: string
  * re-initialises it.
  */
 export function Hero({slides, storeName, lines, actionHref}: {
-    slides: SliderImage[]; storeName: string; lines: CoverLine[]; actionHref?: string;
+    slides: Banner[]; storeName: string; lines: CoverLine[]; actionHref?: string;
 }) {
     const t = useTranslations('PAGE.HOME');
     const dir = useDir();
@@ -58,9 +58,9 @@ export function Hero({slides, storeName, lines, actionHref}: {
                                 autoplay={slides.length > 1 ? {delay: 5000, disableOnInteraction: true} : false}
                                 a11y={{enabled: true}} className="!h-full !w-full">
                             {slides.map((s, i) => (
-                                <SwiperSlide key={`${s.url}-${i}`} aria-label={t('HERO_SLIDE', {index: i + 1, total: slides.length})}
+                                <SwiperSlide key={s.id} aria-label={t('HERO_SLIDE', {index: i + 1, total: slides.length})}
                                              className="relative !h-auto min-h-64 self-stretch lg:min-h-[30rem]">
-                                    <Image src={s.url} alt="" fill priority={i === 0} sizes="(max-width: 1024px) 100vw, 40vw" className="object-cover"/>
+                                    <Image src={s.desktopUrl ?? ''} alt={s.altText ?? ''} fill priority={i === 0} sizes="(max-width: 1024px) 100vw, 40vw" className="object-cover"/>
                                 </SwiperSlide>
                             ))}
                         </Swiper>

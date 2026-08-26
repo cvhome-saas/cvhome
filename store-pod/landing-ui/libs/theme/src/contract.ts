@@ -1,8 +1,8 @@
 import type {ComponentType, ReactNode} from 'react';
 import type {
-    AnnouncementData, Banner, BreadcrumbItem, Category, ColorSchema, FaqDocument, ImageFile, ListingFacets,
+    AnnouncementData, Banner, BreadcrumbItem, Category, ColorSchema, FaqDocument, HomeSection, ListingFacets,
     ListingQuery, MenuNode, NavPage, Policy, PostList, PostSummary, Product, ProductGroupCode, ProductListingPage,
-    SearchCapabilities, SliderImage, Store, StoreContext, StorefrontLink, StorefrontSeo,
+    SearchCapabilities, SiteBranding, SocialLink, Store, StoreContext, StorefrontLink, StorefrontSeo,
 } from '@store-front/types';
 import type {ColorRoleTokens} from './tokens';
 
@@ -70,6 +70,12 @@ export interface LayoutData {
     menus: { main: MenuNode[]; footer: MenuNode[] };
     /** Live legal policies, for the footer and checkout. */
     policies: StorefrontLink[];
+    /**
+     * The store's brand imagery, from the content service's media library. Not on `store`: keeping it there
+     * would have the merchant record still claiming to own appearance.
+     */
+    branding: SiteBranding;
+    socialLinks: SocialLink[];
     search: SearchCapabilities;
 }
 
@@ -80,9 +86,15 @@ export interface RootLayoutProps {
 }
 
 export interface HomeData {
-    hero: { slides: SliderImage[]; banner?: ImageFile };
-    /** CMS banners that win each placement right now; empty when the merchant uses only slider images. */
+    /**
+     * What goes at the top of the page. The slides are CMS banners now — merchant's separate slider is gone, so
+     * the two competing hero concepts the storefront used to merge are one.
+     */
+    hero: { slides: Banner[]; banner?: Banner };
+    /** CMS banners that win each placement right now. */
     banners: { hero: Banner[]; carousel: Banner[]; strip?: Banner };
+    /** The merchant-ordered blocks of the page, replacing a hard-coded list of four product groups. */
+    sections: HomeSection[];
     groups: { code: ProductGroupCode; title: string; products: Product[] }[];
 }
 

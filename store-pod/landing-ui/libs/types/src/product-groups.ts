@@ -90,8 +90,11 @@ export interface ProductPrice {
 
 export interface Image {
     id: number
-    imageName: string
+    /** The content media asset behind this image; null for an external url or a video. */
+    mediaAssetId: number | null
     imageUrl: string
+    /** Overrides the asset's own alt text for this product. */
+    altText: string | null
     externalUrl: any
     videoUrl: any
     imageType: number

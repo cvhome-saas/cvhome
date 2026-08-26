@@ -6,7 +6,7 @@ import {A11y, Autoplay, Pagination} from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import {useDir} from '@store-front/i18n/use-dir';
-import type {SliderImage} from '@store-front/types';
+import type {Banner} from '@store-front/types';
 
 /**
  * The picture panel of the masthead: the merchant's slider printed inside a ruled frame, never full-bleed
@@ -14,7 +14,7 @@ import type {SliderImage} from '@store-front/types';
  * edge, the way a folded menu numbers its faces. Swiper needs `dir` explicitly (it does not read CSS
  * direction) and is re-keyed on dir so a locale switch re-initialises it.
  */
-export function Hero({slides}: { slides: SliderImage[] }) {
+export function Hero({slides}: { slides: Banner[] }) {
     const t = useTranslations('PAGE.HOME');
     const dir = useDir();
     if (slides.length === 0) return null;
@@ -25,8 +25,8 @@ export function Hero({slides}: { slides: SliderImage[] }) {
                     autoplay={slides.length > 1 ? {delay: 6000, disableOnInteraction: true} : false}
                     a11y={{enabled: true}} className="size-full bg-muted">
                 {slides.map((s, i) => (
-                    <SwiperSlide key={`${s.url}-${i}`} aria-label={t('HERO_SLIDE', {index: i + 1, total: slides.length})}>
-                        <Image src={s.url} alt="" fill priority={i === 0} sizes="(max-width: 1024px) 100vw, 40vw" className="object-cover"/>
+                    <SwiperSlide key={s.id} aria-label={t('HERO_SLIDE', {index: i + 1, total: slides.length})}>
+                        <Image src={s.desktopUrl ?? ''} alt={s.altText ?? ''} fill priority={i === 0} sizes="(max-width: 1024px) 100vw, 40vw" className="object-cover"/>
                     </SwiperSlide>
                 ))}
             </Swiper>

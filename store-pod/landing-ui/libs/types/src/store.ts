@@ -1,5 +1,11 @@
 import {ColorTheme} from "./color-schema";
 
+/**
+ * The store record: configuration, not appearance.
+ *
+ * Its logo, banner, slider images and social links used to live here. They moved to the content service, which
+ * owns the media library they come from, and reach the themes through `LayoutData` instead.
+ */
 export interface Store {
     id: string
     code: string
@@ -19,14 +25,10 @@ export interface Store {
     weight: string
     currentUserLanguage: any
     address: StoreAddress | undefined
-    logo: ImageFile | undefined
-    banner: ImageFile | undefined
     parent: any
     supportedLanguages: string[] | undefined
     readableAudit: ReadableAudit
     colorTheme: ColorTheme | undefined
-    sliderImages: SliderImage[] | undefined
-    socialLinks: SocialLink[] | undefined
 }
 
 export interface StoreAddress {
@@ -36,11 +38,6 @@ export interface StoreAddress {
     postalCode: string
     city: string
     active: boolean
-}
-
-export interface ImageFile {
-    name: string
-    path: string
 }
 
 
@@ -73,12 +70,3 @@ export enum Theme {
     JEWELLERY = 'JEWELLERY',
 }
 
-export interface SliderImage {
-    priority: number
-    url: string
-}
-
-export interface SocialLink {
-    provider: string
-    url: string
-}

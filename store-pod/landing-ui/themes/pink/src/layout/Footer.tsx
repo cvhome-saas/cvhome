@@ -19,7 +19,7 @@ export async function Footer({data}: { ctx: PageContext; data: LayoutData }) {
         ...data.menus.footer.filter(n => n.kind !== 'PAGE' && n.href.startsWith('/')).map(n => ({key: n.href, href: n.href, label: n.label})),
         ...data.policies.map(pl => ({key: pl.href, href: pl.href, label: pl.title})),
     ];
-    const socials = (store.socialLinks ?? []).filter(s => SOCIAL_ICONS[s.provider.toLowerCase()]);
+    const socials = data.socialLinks.filter(s => SOCIAL_ICONS[s.provider.toLowerCase()]);
     const column = 'flex flex-col gap-2.5';
     const heading = 'cover-line pb-2 opacity-70';
     const linkCls = 'text-sm font-medium hover:underline';
