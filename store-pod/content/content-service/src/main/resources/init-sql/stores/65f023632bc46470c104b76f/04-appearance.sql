@@ -8,13 +8,13 @@
 INSERT INTO content.media_asset (id, store_merchant_id, filename, original_filename, mime_type, kind,
                                  bytes, checksum, storage_key, public_url, uploaded_at)
 VALUES (-490001, '65f023632bc46470c104b76f', 'logo.jpeg', 'logo.jpeg', 'image/jpeg', 'IMAGE',
-        0, 'seed-490001', 'files/65f023632bc46470c104b76f/LOGO/logo.jpeg', 'http://localhost:9000/d0dd4299-963a-4458-b31f-8efe31c35e8e/files/65f023632bc46470c104b76f/LOGO/logo.jpeg', now())
+        320000, 'seed-490001', 'files/65f023632bc46470c104b76f/LOGO/logo.jpeg', 'http://localhost:9000/d0dd4299-963a-4458-b31f-8efe31c35e8e/files/65f023632bc46470c104b76f/LOGO/logo.jpeg', now())
 on conflict (id) do nothing;
 
 INSERT INTO content.media_asset (id, store_merchant_id, filename, original_filename, mime_type, kind,
                                  bytes, checksum, storage_key, public_url, uploaded_at)
 VALUES (-490002, '65f023632bc46470c104b76f', 'banner.jpeg', 'banner.jpeg', 'image/jpeg', 'IMAGE',
-        0, 'seed-490002', 'files/65f023632bc46470c104b76f/BANNER/banner.jpeg', 'http://localhost:9000/d0dd4299-963a-4458-b31f-8efe31c35e8e/files/65f023632bc46470c104b76f/BANNER/banner.jpeg', now())
+        320000, 'seed-490002', 'files/65f023632bc46470c104b76f/BANNER/banner.jpeg', 'http://localhost:9000/d0dd4299-963a-4458-b31f-8efe31c35e8e/files/65f023632bc46470c104b76f/BANNER/banner.jpeg', now())
 on conflict (id) do nothing;
 
 -- The site settings row is created by 01-store.sql; this fills in what merchant used to own.
@@ -24,7 +24,7 @@ UPDATE content.site_settings SET logo_media_id = -490001, social_links = '[{"pro
 INSERT INTO content.media_asset (id, store_merchant_id, filename, original_filename, mime_type, kind,
                                  bytes, checksum, storage_key, public_url, uploaded_at)
 VALUES (-490003, '65f023632bc46470c104b76f', 'slide-1.jpeg', 'slide-1.jpeg', 'image/jpeg', 'IMAGE',
-        0, 'seed-490003', 'files/65f023632bc46470c104b76f/SLIDER/slide-1.jpeg', 'http://localhost:9000/d0dd4299-963a-4458-b31f-8efe31c35e8e/files/65f023632bc46470c104b76f/SLIDER/slide-1.jpeg', now())
+        320000, 'seed-490003', 'files/65f023632bc46470c104b76f/SLIDER/slide-1.jpeg', 'http://localhost:9000/d0dd4299-963a-4458-b31f-8efe31c35e8e/files/65f023632bc46470c104b76f/SLIDER/slide-1.jpeg', now())
 on conflict (id) do nothing;
 
 INSERT INTO content.content (content_id, code, content_type, sort_order, visible, store_merchant_id,
@@ -42,7 +42,7 @@ on conflict (description_id) do nothing;
 INSERT INTO content.media_asset (id, store_merchant_id, filename, original_filename, mime_type, kind,
                                  bytes, checksum, storage_key, public_url, uploaded_at)
 VALUES (-490004, '65f023632bc46470c104b76f', 'slide-2.jpeg', 'slide-2.jpeg', 'image/jpeg', 'IMAGE',
-        0, 'seed-490004', 'files/65f023632bc46470c104b76f/SLIDER/slide-2.jpeg', 'http://localhost:9000/d0dd4299-963a-4458-b31f-8efe31c35e8e/files/65f023632bc46470c104b76f/SLIDER/slide-2.jpeg', now())
+        320000, 'seed-490004', 'files/65f023632bc46470c104b76f/SLIDER/slide-2.jpeg', 'http://localhost:9000/d0dd4299-963a-4458-b31f-8efe31c35e8e/files/65f023632bc46470c104b76f/SLIDER/slide-2.jpeg', now())
 on conflict (id) do nothing;
 
 INSERT INTO content.content (content_id, code, content_type, sort_order, visible, store_merchant_id,
@@ -60,7 +60,7 @@ on conflict (description_id) do nothing;
 INSERT INTO content.media_asset (id, store_merchant_id, filename, original_filename, mime_type, kind,
                                  bytes, checksum, storage_key, public_url, uploaded_at)
 VALUES (-490005, '65f023632bc46470c104b76f', 'slide-3.jpeg', 'slide-3.jpeg', 'image/jpeg', 'IMAGE',
-        0, 'seed-490005', 'files/65f023632bc46470c104b76f/SLIDER/slide-3.jpeg', 'http://localhost:9000/d0dd4299-963a-4458-b31f-8efe31c35e8e/files/65f023632bc46470c104b76f/SLIDER/slide-3.jpeg', now())
+        320000, 'seed-490005', 'files/65f023632bc46470c104b76f/SLIDER/slide-3.jpeg', 'http://localhost:9000/d0dd4299-963a-4458-b31f-8efe31c35e8e/files/65f023632bc46470c104b76f/SLIDER/slide-3.jpeg', now())
 on conflict (id) do nothing;
 
 INSERT INTO content.content (content_id, code, content_type, sort_order, visible, store_merchant_id,
@@ -78,7 +78,7 @@ on conflict (description_id) do nothing;
 INSERT INTO content.media_asset (id, store_merchant_id, filename, original_filename, mime_type, kind,
                                  bytes, checksum, storage_key, public_url, uploaded_at)
 VALUES (-490006, '65f023632bc46470c104b76f', 'slide-4.jpeg', 'slide-4.jpeg', 'image/jpeg', 'IMAGE',
-        0, 'seed-490006', 'files/65f023632bc46470c104b76f/SLIDER/slide-4.jpeg', 'http://localhost:9000/d0dd4299-963a-4458-b31f-8efe31c35e8e/files/65f023632bc46470c104b76f/SLIDER/slide-4.jpeg', now())
+        320000, 'seed-490006', 'files/65f023632bc46470c104b76f/SLIDER/slide-4.jpeg', 'http://localhost:9000/d0dd4299-963a-4458-b31f-8efe31c35e8e/files/65f023632bc46470c104b76f/SLIDER/slide-4.jpeg', now())
 on conflict (id) do nothing;
 
 INSERT INTO content.content (content_id, code, content_type, sort_order, visible, store_merchant_id,
@@ -96,7 +96,7 @@ on conflict (description_id) do nothing;
 INSERT INTO content.media_asset (id, store_merchant_id, filename, original_filename, mime_type, kind,
                                  bytes, checksum, storage_key, public_url, uploaded_at)
 VALUES (-490007, '65f023632bc46470c104b76f', 'slide-5.jpeg', 'slide-5.jpeg', 'image/jpeg', 'IMAGE',
-        0, 'seed-490007', 'files/65f023632bc46470c104b76f/SLIDER/slide-5.jpeg', 'http://localhost:9000/d0dd4299-963a-4458-b31f-8efe31c35e8e/files/65f023632bc46470c104b76f/SLIDER/slide-5.jpeg', now())
+        320000, 'seed-490007', 'files/65f023632bc46470c104b76f/SLIDER/slide-5.jpeg', 'http://localhost:9000/d0dd4299-963a-4458-b31f-8efe31c35e8e/files/65f023632bc46470c104b76f/SLIDER/slide-5.jpeg', now())
 on conflict (id) do nothing;
 
 INSERT INTO content.content (content_id, code, content_type, sort_order, visible, store_merchant_id,
@@ -111,3 +111,13 @@ VALUES (-4204, now(), now(), '', 'Slide 5', 'Slide 5',
         '', '', '', '', -4104, 'en', 'Storefront slide 5')
 on conflict (description_id) do nothing;
 
+-- The quota row is what the console's summary reads for "N files, X of 5 GB"; uploads and deletes keep it in
+-- step transactionally. These seeds insert assets directly, so they have to maintain it too — without this the
+-- library listed every file while every counter beside it read zero.
+INSERT INTO content.media_quota (store_merchant_id, bytes_used, file_count)
+SELECT store_merchant_id, coalesce(sum(bytes), 0), count(*)
+  FROM content.media_asset
+ WHERE store_merchant_id = '65f023632bc46470c104b76f'
+ GROUP BY store_merchant_id
+ON CONFLICT (store_merchant_id) DO UPDATE
+   SET bytes_used = excluded.bytes_used, file_count = excluded.file_count;
