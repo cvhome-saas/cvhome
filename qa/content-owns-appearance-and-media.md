@@ -8,7 +8,8 @@ in order to believe it works — and the things most likely to be wrong.
 - **Scope** — content · catalog · merchant · checkout · payment · console-ui · landing-ui
 - **Change** — branch `feat/content-owns-appearance`, plan
   `.agents/plans/content-owns-appearance-and-media.md`
-- **Cases** — 34
+- **Cases** — 37 · 21 verified, 4 unit-only, 12 outstanding (all of them console writes needing a signed-in
+  operator; the read side of every one of them is verified)
 
 Each case is tagged:
 
@@ -45,6 +46,22 @@ it and every storefront image 404s. That is a pre-existing local-stack gap, not 
 `local-stack-minio-demo-images` note for how to regenerate the placeholders. The seeds register the objects at
 the keys that generator writes: `products/<store>/<sku>/SMALL/<file>` for product photos and
 `files/<store>/{LOGO,BANNER,SLIDER}/<file>` for the store's own images.
+
+**Populating MinIO.** Every seeded asset row names a `storage_key`, so the objects can be generated from the
+database rather than guessed. This takes about a minute and makes the storefront render fully:
+
+```bash
+# one placeholder per aspect: products are square, banner/slider wide, the logo a wordmark strip
+# (sips is enough — no image library needed; see the local-stack-minio-demo-images note)
+psql ... -tAc 'select storage_key from content.media_asset order by 1' > keys.txt
+# stage a local tree mirroring the bucket, one file per key, then upload it in one sync
+AWS_ACCESS_KEY_ID=minioadmin AWS_SECRET_ACCESS_KEY=minioadmin \
+  aws --endpoint-url http://localhost:9000 s3 cp --recursive --content-type image/jpeg \
+      stage/ s3://d0dd4299-963a-4458-b31f-8efe31c35e8e/
+```
+
+938 keys across the four demo stores. Until they exist the storefront renders with broken images — that is the
+local-stack gap, not a fault in the change.
 
 **Sign-in.** Console `http://gateway.com:8000` — `org1-admin` / `admin`. The console works one store at a
 time; use the store switcher in the header.
@@ -93,18 +110,18 @@ The console's **Content → Store appearance** tab is the only place these live 
 - **Expect** — the thumbnail empties and the storefront falls back to the store name. This was impossible
   before: merchant had upload endpoints and no delete.
 
-### APP-04 — The favicon is not the logo · [not verified]
+### APP-04 — The favicon is not the logo · [verified]
 
 - **Steps** — set a Logo and a different Favicon. Save. Open the storefront.
 - **Expect** — the browser tab shows the favicon, the header shows the logo. They used to be one field.
 
-### APP-05 — Social links round-trip, and an emptied one is removed · [not verified]
+### APP-05 — Social links round-trip, and an emptied one is removed · [partly verified]
 
 - **Steps** — fill two providers, Save; reload; empty one, Save.
 - **Expect** — the storefront footer shows two, then one. The whole set is sent each time and the server
   replaces, which is what makes clearing work.
 
-### APP-06 — Per-locale SEO · [not verified]
+### APP-06 — Per-locale SEO · [verified]
 
 - **Steps** — switch the locale chip, write a different Store title, Save, reload.
 - **Expect** — both languages hold their own copy; the storefront `<title>` follows `?lang=`.
@@ -115,17 +132,19 @@ The console's **Content → Store appearance** tab is the only place these live 
 - **Expect** — the tab loads and every field is disabled; Save is absent. A direct
   `PUT /spg/content/api/v1/private/content/site-settings` returns **403**.
 
-### APP-08 — Store management has no appearance left · [verified]
+### APP-08 — Store management has no appearance left · [not verified]
 
 - **Steps** — open **Store management**.
 - **Expect** — four sections: details, domains, payments, social login. No branding, home, slider or social
   links. `POST …/private/store/marketing/logo` returns **404**.
+- **Note** — needs a signed-in session. Unauthenticated the removed routes answer **401**, because security runs
+  ahead of routing, so a curl without a token cannot tell "gone" from "not logged in".
 
 ---
 
 ## SEC — Home-page sections
 
-### SEC-01 — The seeded home page still renders · critical · [not verified]
+### SEC-01 — The seeded home page still renders · critical · [verified]
 
 - **Steps** — open the storefront home page.
 - **Expect** — the hero carousel shows the five seeded slides (now CMS `CAROUSEL` banners, formerly merchant's
@@ -241,12 +260,12 @@ The console's **Content → Store appearance** tab is the only place these live 
 - **Expect** — the strip disappears. It used to fall back to a `header-message` snippet, so unpublishing
   silently resurrected whatever that row still held.
 
-### SF-02 — The checkout agreement comes from the live TERMS policy · [not verified]
+### SF-02 — The checkout agreement comes from the live TERMS policy · [verified]
 
 - **Steps** — edit the TERMS policy's text, publish a new version, open checkout.
 - **Expect** — the new text. No `agreement` box is consulted.
 
-### SF-03 — Product alt text · [not verified]
+### SF-03 — Product alt text · [verified]
 
 - **Steps** — set alt text on an asset in the library; open a product card that shows it.
 - **Expect** — the `alt` is that text. It used to be the *filename*.
@@ -297,6 +316,11 @@ Things that broke once during this change, and would break quietly again.
   folders at all. See MED-06.
 - **A media filter test asserted against page one of the whole library.** With hundreds of seeded assets that
   says nothing about the asset under test. Any new filter assertion should be scoped.
+- **A store's favicon competed with the framework's.** `storefront/src/app/favicon.ico` is a Next file
+  convention, so the page shipped two `<link rel="icon">` — the framework's, with an explicit `sizes="256x256"`,
+  ahead of the store's. The browser then chose by size heuristics rather than by the seller's choice. Found by
+  running APP-04 and fixed by moving the file to `public/` and always resolving exactly one icon. **Check for a
+  single icon link** whenever the metadata changes.
 - **`social_links` came back from jsonb as maps, not `SocialLink`s.** A generic `List` deserialisation returns
   maps and the cast only fails later, when the response is written — as a 500 with "Failed to write request".
 
