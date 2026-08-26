@@ -16,7 +16,6 @@ import {phoneNumber} from '@shared/validators/phone-number';
 import {DnsCheckService} from '@api/dns/dns-check.service';
 import {
   CUSTOM_DOMAIN_PATTERN,
-  HOME_TITLE_MAX,
   SHORT_DESCRIPTION_MAX,
   SLUG_PATTERN,
   UNBACKED_DETAIL_FIELDS,
@@ -27,14 +26,6 @@ import {
 
 /** How long the field waits after the last keystroke before asking a resolver anything. */
 const DNS_DEBOUNCE_MS = 600;
-
-/** One language's landing copy. */
-export type HomeCopyForm = FormGroup<{
-  title: FormControl<string>;
-  text: FormControl<string>;
-  metaDescription: FormControl<string>;
-  tags: FormControl<readonly string[]>;
-}>;
 
 export type DomainForm = FormGroup<{customDomain: FormControl<string>}>;
 
@@ -97,22 +88,15 @@ export type GatewayForm = FormGroup<{
   webhookSecret: FormControl<string>;
 }>;
 
-/** Sections with nothing editable still carry a group, so every key resolves to a form. */
-export type EmptyForm = FormGroup<Record<string, never>>;
-
 /*
  * The keyed groups. How many keys each has is the server's answer rather than a constant, so
  * they are indexed rather than spelled out — `reset` brings them in line with what arrived.
  */
-export type HomeForm = FormGroup<Record<string, HomeCopyForm>>;
 export type SocialLoginForm = FormGroup<Record<string, LoginProviderForm>>;
 export type PaymentsForm = FormGroup<Record<string, GatewayForm>>;
 
 export interface SettingsForms {
-  branding: EmptyForm;
-  home: HomeForm;
   domain: DomainForm;
-  slider: EmptyForm;
   details: DetailsForm;
   'social-login': SocialLoginForm;
   payments: PaymentsForm;
@@ -161,21 +145,18 @@ export class StoreSettingsFormService {
    */
   create(): SettingsForm {
     return new FormGroup<SettingsForms>({
-      branding: new FormGroup<Record<string, never>>({}),
       /*
        * Empty until a store loads. The languages a storefront is published in are the *store's*
        * supported set, which is data, not a constant — this used to be seeded from the console's
        * own en/ar locale list, which is a different list serving a different purpose. `reset` fills
        * it in, the same way the provider-keyed groups are filled in.
        */
-      home: new FormGroup<HomeForm['controls']>({}),
       domain: this.fb.group({
         customDomain: this.fb.control('', {
           validators: [Validators.pattern(CUSTOM_DOMAIN_PATTERN)],
           asyncValidators: [this.dnsPointsToPod()],
         }),
       }),
-      slider: new FormGroup<Record<string, never>>({}),
       details: this.details(),
       'social-login': new FormGroup<SocialLoginForm['controls']>({}),
       payments: new FormGroup<PaymentsForm['controls']>({}),
@@ -330,34 +311,6 @@ export class StoreSettingsFormService {
     };
   }
 
-  private homeCopy(): HomeCopyForm {
-    return this.fb.group({
-      /*
-       * Required only for a language that has copy in it. Unconditionally required would make the
-       * section unsavable until every translation was written; not required at all would let a
-       * language be filled in and then silently dropped, because a description with no name cannot
-       * be stored — `BaseDescription.name` is `@NotEmpty` and `NAME` is `nullable = false`, so the
-       * server answers 500 rather than a validation error. Over-length stays an error either way:
-       * it is the browser tab title.
-       */
-      title: this.fb.control('', [Validators.maxLength(HOME_TITLE_MAX)]),
-      text: this.fb.control(''),
-      /*
-       * 150–160 characters is a recommendation, not a constraint — a short meta description is
-       * worse for search and perfectly valid. The section shows a counter instead of an error.
-       */
-      metaDescription: this.fb.control(''),
-      /** Search keywords, stored comma-separated on the snippet's translation. */
-      tags: this.fb.control<readonly string[]>([]),
-    },
-    /*
-     * On the group, not on `title`. The rule reads three controls, and a validator hanging off
-     * `title` alone would not re-run when the body text it depends on changes — Angular revalidates
-     * a control when *its* value changes, not when a sibling's does.
-     */
-    {validators: [titleForCopy]});
-  }
-
   /*
    * `name`, `email` and `phone` are `@NotNull` on `MerchantStoreDetails` and `PUT /private/store`
    * is `@Valid`, so those three are required here because the server rejects the save otherwise —
@@ -472,24 +425,6 @@ export function credentialsWhenEnabled(fields: readonly string[]): ValidatorFn {
   };
 }
 
-/**
- * A language that has landing copy needs a headline to carry it.
- *
- * `BaseDescription.name` is `@NotEmpty` and `NAME` is `nullable = false`, so a description without
- * one cannot be persisted — and because the console only sends the languages that have a title, a
- * language with body text and no title would not be sent at all and would look like it saved and
- * then vanished. The rule is enforced here so the operator is told before the round trip, and told
- * about the field that is actually missing.
- */
-export function titleForCopy(group: AbstractControl): ValidationErrors | null {
-  if (String(group.get('title')?.value ?? '').trim()) {
-    return null;
-  }
-  const hasCopy = ['text', 'metaDescription'].some((field) =>
-    String(group.get(field)?.value ?? '').trim(),
-  );
-  return hasCopy ? {titleForCopy: true} : null;
-}
 
 
 /**

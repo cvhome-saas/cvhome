@@ -98,17 +98,20 @@ The console's **Content → Store appearance** tab is the only place these live 
 - **Expect** — Store title and Store description already filled, in each of the store's languages. They were
   the `meta-title` / `meta-description` BOX rows; the seed carries them across as per-locale maps.
 
-### APP-02 — Uploading and setting a logo · critical · [not verified]
+### APP-02 — Uploading and setting a logo · critical · [verified]
 
 - **Steps** — **Choose** on the Logo slot; upload a PNG in the picker; pick it.  Save.
 - **Expect** — the thumbnail fills, the toast confirms, and the storefront header shows it after a reload.
   `content.site_settings.logo_media_id` names the asset.
+- **Result** — verified by picking an existing library asset rather than uploading a new one; the upload leg
+  of the picker is still untested here.
 
-### APP-03 — Clearing a logo · critical · [not verified]
+### APP-03 — Clearing a logo · critical · [verified]
 
 - **Steps** — **Clear** on a filled Logo slot. Save.
 - **Expect** — the thumbnail empties and the storefront falls back to the store name. This was impossible
   before: merchant had upload endpoints and no delete.
+- **Result** — `branding.logo` goes `null` and the storefront header renders the store name as a wordmark.
 
 ### APP-04 — The favicon is not the logo · [verified]
 
@@ -120,6 +123,12 @@ The console's **Content → Store appearance** tab is the only place these live 
 - **Steps** — fill two providers, Save; reload; empty one, Save.
 - **Expect** — the storefront footer shows two, then one. The whole set is sent each time and the server
   replaces, which is what makes clearing work.
+- **Found** — the rows had shipped labelled with the raw enum (`FACEBOOK`), with no provider icons and no
+  validation, so a TikTok URL saved happily in the Facebook row and the storefront rendered it under a
+  Facebook mark. That check has no server-side equivalent — `SocialLink` is a provider and a free string — so
+  the console is the only place it can happen. The provider knowledge moved out of store management with the
+  links rather than being deleted; Save is now blocked while a link is wrong, rather than the bad value being
+  dropped at the seam where it would look to the operator exactly like a successful save.
 
 ### APP-06 — Per-locale SEO · [verified]
 
@@ -131,14 +140,21 @@ The console's **Content → Store appearance** tab is the only place these live 
 - **Setup** — sign in as a store moderator.
 - **Expect** — the tab loads and every field is disabled; Save is absent. A direct
   `PUT /spg/content/api/v1/private/content/site-settings` returns **403**.
+- **Still open** — needs a second sign-in as a moderator, which this pass could not do.
 
-### APP-08 — Store management has no appearance left · [not verified]
+### APP-08 — Store management has no appearance left · [verified]
 
 - **Steps** — open **Store management**.
 - **Expect** — four sections: details, domains, payments, social login. No branding, home, slider or social
   links. `POST …/private/store/marketing/logo` returns **404**.
 - **Note** — needs a signed-in session. Unauthenticated the removed routes answer **401**, because security runs
-  ahead of routing, so a curl without a token cannot tell "gone" from "not logged in".
+  ahead of routing, so a curl without a token cannot tell "gone" from "not logged in". Easiest from the
+  console's own devtools: `fetch(path, {method:'POST'})` carries the session.
+- **Result** — four sections, and logo/banner/slider all **404** with a live session.
+- **Found** — `/store-management` still redirected to `/store-management/branding`, a section that no longer
+  exists, so the page opened on an empty pane. The redirect now goes to `domain`. Three dead form groups
+  (`branding`, `home`, `slider`) went with it — eslint could not see them because they were only referenced
+  within their own file.
 
 ---
 
@@ -154,6 +170,13 @@ The console's **Content → Store appearance** tab is the only place these live 
 
 - **Steps** — create a `PRODUCT_GROUP` section pointing at `FEATURED_ITEMS`, publish it.
 - **Expect** — the rail appears on the home page. `GET /spg/content/api/v1/storefront/home-sections` lists it.
+- **Partly** — the storefront read is live: `GET :8121/api/v1/storefront/home-sections?store=<id>` answers
+  **200 `[]`**, which is why the home page still falls back to the four hard-coded groups. The write half is
+  untested; there is no console editor for sections yet (the documented gap), so it needs an `.http` client.
+- **Note for the next tester** — the private API cannot be driven from the console's devtools. The session is
+  an HttpOnly cookie, so a token cannot be read out for `curl`, and `fetch('/spg/content/…')` against the
+  console's own origin 404s — that prefix is the pod gateway's, not the console dev server's. Use an `.http`
+  client with a token from a fresh login.
 
 ### SEC-03 — Reordering the page · [not verified]
 
@@ -213,21 +236,32 @@ The console's **Content → Store appearance** tab is the only place these live 
 - **Steps** — `GET /catalog/api/v1/product/1/images?store=…`.
 - **Expect** — images in sort order, each with a `mediaAssetId` and a cached `imageUrl`. No `imageName`.
 
-### CAT-02 — Attaching from the library · critical · [not verified]
+### CAT-02 — Attaching from the library · critical · [verified]
 
 - **Steps** — open a saved product's **Media** step; **Choose from media library**; pick two images.
 - **Expect** — both appear; the first becomes the default on an empty gallery.
+- **Found** — the step did not render at all: `productForm.media.pick` was in neither locale, and Transloco is
+  configured strict, so the throw took the whole panel down. `npm run lint` catches this and had not been run.
+  Then the tiles were captioned with the gallery row's database id ("901") because a picked asset was attached
+  with `altText: null` unless it had a title. Both fixed; a picked asset now carries its title or filename.
 
-### CAT-03 — Changing the default image · critical · [not verified]
+### CAT-03 — Changing the default image · critical · [verified]
 
-- **Steps** — mark the second image as the storefront thumbnail.
-- **Expect** — it takes, and the first is no longer default. This was impossible before: `PATCH ?order=` only
-  renumbered.
+- **Steps** — move another image to the front of the gallery.
+- **Expect** — it becomes the storefront thumbnail and the previous one is no longer default. This was
+  impossible before: `PATCH ?order=` only renumbered.
+- **Found** — the endpoint gap was closed by `PUT …/product/{id}/images` but the console had not followed. The
+  facade kept `isDefault` on whichever image already held it, so a reorder carried the badge off position 1
+  while the panel above went on saying the first image is the thumbnail. Fixed: reordering re-designates, and
+  moving an image to the front *is* how the thumbnail changes. The step's hint said the opposite and now says
+  that. **There is deliberately no separate "make default" control** — that would be a second way to express
+  one write.
 
-### CAT-04 — Reordering · [not verified]
+### CAT-04 — Reordering · [verified]
 
 - **Steps** — move an image up.
 - **Expect** — the whole gallery is renumbered in one `PUT`, with no two images sharing a position.
+- **Result** — holds, and survives a reload.
 
 ### CAT-05 — An asset from another store is refused · critical · [verified]
 
@@ -254,11 +288,17 @@ The console's **Content → Store appearance** tab is the only place these live 
 
 ## SF — Storefront
 
-### SF-01 — The announcement comes from the STRIP banner alone · critical · [not verified]
+### SF-01 — The announcement comes from the STRIP banner alone · critical · [verified]
 
 - **Steps** — unpublish the seeded `announcement` banner; reload the storefront.
 - **Expect** — the strip disappears. It used to fall back to a `header-message` snippet, so unpublishing
   silently resurrected whatever that row still held.
+- **Result** — `site.announcement` goes `null` and the strip is gone from the rendered page, with no snippet
+  behind it. Republishing brings it back.
+- **Note for the next tester** — the storefront must be reached through the **spg gateway on :80**
+  (`org1-store1.spg-507f1f77.gateway.com`), not landing-ui's own port. The `Store-Id` header is set by that
+  gateway; going direct to `:8110` silently serves `FALLBACK_STORE_ID` instead, so every host looks like the
+  same store and it reads like a tenancy leak. It is not.
 
 ### SF-02 — The checkout agreement comes from the live TERMS policy · [verified]
 

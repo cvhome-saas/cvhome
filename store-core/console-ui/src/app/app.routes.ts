@@ -476,7 +476,10 @@ export const routes: Routes = [
         data: {titleKey: 'route.createStore.title', breadcrumbKey: 'shell.breadcrumb.createStore'},
       },
       // The section is part of the URL, so a settings card is linkable and survives a reload.
-      {path: '', redirectTo: 'branding', pathMatch: 'full'},
+      // `domain` because it is the first section; `branding` used to be, and stayed here after
+      // appearance moved to the content hub — the page then opened on a section that no longer
+      // existed and rendered an empty pane.
+      {path: '', redirectTo: 'domain', pathMatch: 'full'},
       {
         // Guarded here rather than on the parent so `create` above stays reachable — it is
         // the only exit from first run.

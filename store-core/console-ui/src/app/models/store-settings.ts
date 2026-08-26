@@ -375,12 +375,7 @@ export const GATEWAY_STATE_TAG: Readonly<Record<'on' | 'off', StateTag>> = {
   off: {labelKey: 'storeSettings.state.off', tone: 'slate'},
 };
 
-/** How many slides the carousel holds, for the "3 of 8 slots used" line. */
-export const SLIDER_CAPACITY = 8;
-
 /** The mockup's own hints, as numbers the validators and counters both read. */
-export const HOME_TITLE_MAX = 60;
-export const META_DESCRIPTION_MIN = 150;
 export const META_DESCRIPTION_MAX = 160;
 export const SHORT_DESCRIPTION_MAX = 160;
 

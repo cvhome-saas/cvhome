@@ -35,6 +35,7 @@ import com.asrevo.cvhome.store.core.entity.content.ContentType;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -647,6 +648,51 @@ class MediaServiceTest {
 
             assertThat(summary.getMedia().getBytesUsed()).isEqualTo(900);
             assertThat(counts).containsEntry("media", 3L);
+        }
+
+    }
+
+
+    /**
+     * The read a peer service makes when it holds asset ids and needs the records — catalog resolving a product's
+     * images. It doubles as catalog's ownership check, which is why an id from another store has to come back
+     * absent rather than as an error: the caller asks about a batch and acts on what it gets.
+     */
+    @Nested
+    class AssetsById {
+
+        private static final String MINE = "mine.png";
+
+        @Test
+        void onlyThisStoresAssetsComeBack() {
+            MediaAsset mine = asset(1L, MINE);
+            when(assets.findByStoreMerchantIdAndIdIn(eq(STORE_ID), anyList())).thenAnswer(i -> {
+                List<Long> wanted = i.getArgument(1);
+                return wanted.contains(1L) ? List.of(mine) : List.of();
+            });
+
+            List<ReadableMediaAsset> out = service.assets(ContentFixtures.STORE, List.of(1L, 99L));
+
+            assertThat(out).singleElement().extracting(ReadableMediaAsset::getId).isEqualTo(1L);
+        }
+
+        @Test
+        void anEmptyOrNullRequestAsksTheDatabaseNothing() {
+            assertThat(service.assets(ContentFixtures.STORE, List.of())).isEmpty();
+            assertThat(service.assets(ContentFixtures.STORE, null)).isEmpty();
+
+            verify(assets, never()).findByStoreMerchantIdAndIdIn(anyString(), anyList());
+        }
+
+        /** A repeated id is one row, not two: the caller's list is whatever it happened to collect. */
+        @Test
+        void repeatedAndNullIdsAreCollapsedBeforeTheQuery() {
+            MediaAsset mine = asset(1L, MINE);
+            when(assets.findByStoreMerchantIdAndIdIn(eq(STORE_ID), anyList())).thenReturn(List.of(mine));
+
+            assertThat(service.assets(ContentFixtures.STORE, java.util.Arrays.asList(1L, null, 1L))).hasSize(1);
+
+            verify(assets).findByStoreMerchantIdAndIdIn(STORE_ID, List.of(1L));
         }
 
     }

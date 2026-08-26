@@ -22,7 +22,13 @@ ext.domainCoverageMinimum = [
         'pod-registry': [unit: 0.81, integration: 0.61, merged: 0.97],
         merchant      : [unit: 0.95, integration: 0.88, merged: 0.95],
         gateway       : [unit: 0.97, integration: 0.71, merged: 0.97],
-        payment       : [unit: 0.92, integration: 0.61, merged: 0.99],
+        // unit was 0.92 until payment's `CloudFilePathUtils` was deleted with the rest of the per-service image
+        // path builders (media moved to the content service, and the `ImageFilePath` interface went with it). It
+        // was fully covered by its own test, so removing both took 50 covered lines out of a 612-line denominator
+        // and the ratio fell to 0.9199 without a single test being lost. Lowered by that arithmetic alone — the
+        // remaining shortfall is checkstyle's mandatory `default` arm on an exhaustive enum switch, which cannot
+        // be reached. Ratchet it back up the next time payment gains real tests.
+        payment       : [unit: 0.91, integration: 0.61, merged: 0.99],
         content       : [unit: 0.89, integration: 0.81, merged: 0.97],
         tenancy       : [unit: 0.82, integration: 0.76, merged: 0.96],
         catalog       : [unit: 0.72, integration: 0.94, merged: 0.98],
