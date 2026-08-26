@@ -130,8 +130,8 @@
     <div class="store-header" th:if="${store}">
         <img class="store-logo"
              th:alt="#{register.store.logo.alt(${store.name})}"
-             th:if="${store.logo != null}"
-             th:src="${store.logo.path}"/>
+             th:if="${storeLogo != null}"
+             th:src="${storeLogo}"/>
         <h2 class="store-name" th:text="${store.name}">Store Name</h2>
     </div>
 
