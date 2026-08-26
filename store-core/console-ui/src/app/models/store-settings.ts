@@ -12,12 +12,12 @@ import type {Tone} from '@models/ui';
  * rewrite. Provider lists are the real enums, not the mockup's inventions.
  */
 
+/**
+ * Store *configuration*. Appearance — branding, the home page, the slider and social links — moved to the
+ * content service, which owns the media library those images come from, and is edited in the content hub.
+ */
 export type SettingsSectionKey =
-  | 'branding'
-  | 'home'
   | 'domain'
-  | 'social'
-  | 'slider'
   | 'details'
   | 'social-login'
   | 'payments';
@@ -378,21 +378,7 @@ export const PAYMENT_TYPE_DESCRIPTION_KEY: Readonly<Record<PaymentType, string>>
 
 export interface StoreSettings {
   readonly storeName: string;
-  readonly branding: BrandingSettings;
-  /**
-   * Keyed by *storefront* language, not by console locale.
-   *
-   * The two are different lists and conflating them was wrong in both directions: the console runs
-   * in English and Arabic, while a storefront may be published in any of the store's supported
-   * languages — so a store trading in French had nowhere to write its French landing copy, and a
-   * console reader could write Arabic copy for a store that does not publish Arabic.
-   */
-  readonly home: Readonly<Record<string, HomePageCopy>>;
-  /** The `LANDING_PAGE` box's id, or `null` when the store has never saved one — create versus update. */
-  readonly homeBoxId: number | null;
   readonly domains: readonly StoreDomain[];
-  readonly socialLinks: readonly SocialLinkSetting[];
-  readonly slides: readonly SliderSlide[];
   readonly details: StoreDetails;
   readonly socialLogin: readonly SocialLoginConfig[];
   readonly payments: readonly PaymentGatewayConfig[];
@@ -435,11 +421,7 @@ export interface SettingsSection {
 
 /** The sub-nav, in the mockup's order. */
 export const SECTIONS: readonly SettingsSection[] = [
-  {key: 'branding', labelKey: 'storeSettings.section.branding', shortLabelKey: 'storeSettings.sectionShort.branding', icon: 'palette'},
-  {key: 'home', labelKey: 'storeSettings.section.home', shortLabelKey: 'storeSettings.sectionShort.home', icon: 'desktop'},
   {key: 'domain', labelKey: 'storeSettings.section.domain', shortLabelKey: 'storeSettings.sectionShort.domain', icon: 'globe'},
-  {key: 'social', labelKey: 'storeSettings.section.social', shortLabelKey: 'storeSettings.sectionShort.social', icon: 'share'},
-  {key: 'slider', labelKey: 'storeSettings.section.slider', shortLabelKey: 'storeSettings.sectionShort.slider', icon: 'images'},
   {key: 'details', labelKey: 'storeSettings.section.details', shortLabelKey: 'storeSettings.sectionShort.details', icon: 'building'},
   {key: 'social-login', labelKey: 'storeSettings.section.socialLogin', shortLabelKey: 'storeSettings.sectionShort.socialLogin', icon: 'signIn'},
   {key: 'payments', labelKey: 'storeSettings.section.payments', shortLabelKey: 'storeSettings.sectionShort.payments', icon: 'creditCard'},

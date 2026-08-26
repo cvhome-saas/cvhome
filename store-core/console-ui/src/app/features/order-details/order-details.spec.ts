@@ -49,6 +49,7 @@ const SELLER: MerchantStore = {
 const DETAIL: OrderDetail = {
   order: ORDER,
   seller: SELLER,
+  sellerLogo: null,
   history: [
     {id: 1, orderStatus: 'CREATED', comments: 'Order placed', date: '2026-08-04T10:15:00Z'},
     {id: 2, orderStatus: 'PROCESSING', comments: 'Picking started', date: '2026-08-04T14:00:00Z'},

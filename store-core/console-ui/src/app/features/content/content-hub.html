@@ -49,9 +49,6 @@
             (open)="openRow($event)"
             (create)="create()"
           />
-          @if (type === 'pages') {
-            <app-snippets-card [locales]="facade.localeOptions()" [defaultLocale]="facade.locales().defaultCode" [canManage]="canManage()" />
-          }
         } @else {
           @switch (activeTab()) {
             @case ('media') {

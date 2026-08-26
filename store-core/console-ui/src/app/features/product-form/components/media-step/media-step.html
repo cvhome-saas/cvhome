@@ -90,23 +90,28 @@
           }
 
           <!--
-            The last cell, sized like the tiles beside it. It carries the upload checks with it, so
-            an image that is the wrong shape or too small never becomes a multipart POST.
+            The last cell, sized like the tiles beside it. It opens the store's media library rather
+            than a file input: the bytes belong there, and picking an image already in it is the
+            common case once a store has uploaded a few.
           -->
           <li class="shot-drop">
-            <app-image-picker
-              [label]="t('productForm.media.drop')"
-              [assetName]="t('productForm.media.image')"
-              [rules]="imageRules"
-              [busy]="facade.uploading()"
-              (picked)="onPicked($event)"
-            />
+            <button type="button" class="shot-drop-button" [disabled]="facade.uploading()" (click)="picking.set(true)">
+              <app-icon name="images" />
+              <span>{{ t('productForm.media.pick') }}</span>
+            </button>
           </li>
         </ul>
 
         <p class="field-hint">{{ t('productForm.media.hint') }}</p>
       }
     </div>
+
+    <app-media-picker-dialog
+      [open]="picking()"
+      kind="IMAGE"
+      (picked)="onPicked($event)"
+      (closed)="picking.set(false)"
+    />
 
     <app-image-preview
       [open]="viewing() !== null"

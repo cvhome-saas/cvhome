@@ -195,25 +195,6 @@ export class StoreSettingsFormService {
    */
   reset(form: SettingsForm, settings: StoreSettings): void {
     /*
-     * One group per language the store publishes in, plus any the box already holds copy for — a
-     * language dropped from `supportedLanguages` still has a description on the box, and hiding it
-     * would mean the next save quietly rewrote the box without it.
-     */
-    const homeLanguages = [
-      ...new Set([...settings.details.supportedLanguages, ...Object.keys(settings.home)]),
-    ];
-    this.syncKeys(form.controls.home, homeLanguages, () => this.homeCopy());
-    for (const language of homeLanguages) {
-      const copy = settings.home[language];
-      form.controls.home.controls[language].reset({
-        title: copy?.title ?? '',
-        text: copy?.text ?? '',
-        metaDescription: copy?.metaDescription ?? '',
-        tags: copy?.tags ?? [],
-      });
-    }
-
-    /*
      * Emptied, not prefilled. The field adds a domain — the router has no update, only allocate and
      * remove — so seeding it with an existing one invited the operator to "edit" a hostname and get a
      * second allocation instead. The allocated domains are a list above it now.
@@ -221,15 +202,6 @@ export class StoreSettingsFormService {
     this.podTarget.set(settings.podTarget);
     this.dnsCheckUnavailable.set(false);
     form.controls.domain.reset({customDomain: ''});
-
-    this.syncKeys(
-      form.controls.social,
-      settings.socialLinks.map((link) => link.provider),
-      (provider) => this.fb.control('', [Validators.pattern(SOCIAL_URL_PATTERN), socialProfileUrl(provider)]),
-    );
-    for (const link of settings.socialLinks) {
-      form.controls.social.controls[link.provider].reset(link.url);
-    }
 
     const login = form.controls['social-login'];
     this.syncKeys(

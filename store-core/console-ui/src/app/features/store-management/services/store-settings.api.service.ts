@@ -1,7 +1,6 @@
 import {Injectable, inject} from '@angular/core';
 import {Observable, catchError, forkJoin, map, of, switchMap} from 'rxjs';
 
-import {SnippetsService} from '@api/content/snippets.service';
 import {SocialLoginConfigService} from '@api/cua/social-login-config.service';
 import {DnsCheckService, type CnameOutcome} from '@api/dns/dns-check.service';
 import {MerchantRouterService} from '@api/merchant/router.service';
@@ -16,7 +15,6 @@ import type {
 } from '@models/payment';
 import type {
   ContentTranslation,
-  Snippet,
 } from '@models/content';
 import type {
   ManagerStoreDomain,
@@ -57,15 +55,6 @@ export type SectionPatch = Readonly<Record<string, unknown>>;
  * added seconds ago looks exactly like one that never will be, and telling the operator their DNS is
  * broken while it propagates is the unhelpful reading.
  */
-/**
- * The snippet the storefront's landing copy lives in.
- *
- * seller-ui's code, kept deliberately: it is the only identifier for this copy that has ever been
- * written down, and matching it means a store that was edited in the old console is editable in the
- * new one rather than growing a second, orphaned snippet.
- */
-const HOME_BOX_CODE = 'LANDING_PAGE';
-
 /** The order the five providers are shown in when the reference call is the leg that failed. */
 const SOCIAL_LINK_ORDER = ['INSTAGRAM', 'FACEBOOK', 'X', 'TIKTOK', 'GITHUB'] as const;
 
@@ -94,7 +83,6 @@ export class StoreSettingsApi {
   private readonly router = inject(MerchantRouterService);
   private readonly saas = inject(SaasService);
   private readonly dns = inject(DnsCheckService);
-  private readonly content = inject(SnippetsService);
   private readonly socialLogin = inject(SocialLoginConfigService);
   private readonly payments = inject(PaymentConfigurationService);
 
@@ -124,7 +112,6 @@ export class StoreSettingsApi {
    * the three the console edits — `buildDescriptions` replaces the description it matches by
    * language, so a field left out is a field cleared. This is where the rest comes from.
    */
-  private loadedHomeBox: Snippet | null = null;
 
   /**
    * The payment configurations the server last sent.
@@ -160,11 +147,6 @@ export class StoreSettingsApi {
       saas: this.optionalOne(this.saas.saasProperties()),
       pod: this.optionalOne(this.saas.storePod()),
       /*
-       * A store that has never saved landing copy has no box, and the read is a 404 — which is the
-       * normal first state of this section, not a fault. `null` means "create on first save".
-       */
-      homeBox: this.optionalOne(this.content.get(HOME_BOX_CODE)),
-      /*
        * Four legs on two other pods. Each is optional for the same reason as the rest: cua being
        * down is not a reason the store's own details cannot be edited. A failed provider list
        * leaves that section showing only what the store has already configured.
@@ -176,10 +158,9 @@ export class StoreSettingsApi {
     }).pipe(
       map((loaded) => {
         const {store, themes, colorThemes, socialLinkProviders, languages} = loaded;
-        const {allocations, saas, pod, homeBox} = loaded;
+        const {allocations, saas, pod} = loaded;
         const {loginProviders, loginConfigs, paymentTypes, paymentConfigs} = loaded;
         this.loadedStore = store;
-        this.loadedHomeBox = homeBox;
         this.loadedPayments = paymentConfigs;
         this.podTarget = podHostname(saas, pod);
 
@@ -202,16 +183,11 @@ export class StoreSettingsApi {
         };
         return {
           storeName: store.name,
-          branding: this.branding(store),
           details: this.details(store),
           domains,
           podTarget: this.podTarget,
-          home: this.home(homeBox),
-          homeBoxId: homeBox?.id ?? null,
           socialLogin: this.socialLoginConfigs(loginProviders, loginConfigs, store, storefront),
           payments: this.paymentGateways(paymentTypes, paymentConfigs, store.id, storefront),
-          socialLinks: this.socialLinks(store, socialLinkProviders),
-          slides: this.slides(store),
           choices,
         };
       }),
@@ -229,41 +205,6 @@ export class StoreSettingsApi {
     switch (key) {
       case 'details':
         return this.stores.update(this.persistable(patch)).pipe(switchMap(() => this.loadSettings()));
-
-      /*
-       * Branding is uploads, which have already been sent by the time Save is reachable; the
-       * slider is the same. Neither form carries a control, so there is nothing to submit — a
-       * reload is the honest answer.
-       */
-      case 'branding':
-      case 'slider':
-        return this.loadSettings();
-
-      /*
-       * The whole set is sent every time and the server replaces rather than merges
-       * (`MerchantStoreServiceImpl.updateSocialLinks` does a bare `setSocialLinks`), so an emptied
-       * field genuinely clears that provider's link — which is the only way to remove one.
-       */
-      case 'social':
-        return this.stores
-          .updateSocialLinks(this.socialLinksBody(patch))
-          .pipe(switchMap(() => this.loadSettings()));
-
-      /*
-       * `PUT /snippets/{code}` upserts, so there is no create-versus-update decision and no `exists`
-       * pre-flight: the same call is right the first time and every time after.
-       */
-      case 'home': {
-        const snippet = this.homeSnippetBody(patch);
-        /*
-         * Nothing written in any language and no snippet yet: there is nothing to create. A snippet
-         * with no copy is a storefront fragment that renders nothing, so it is not worth making.
-         */
-        if (!this.loadedHomeBox?.id && snippet.translations.length === 0) {
-          return this.loadSettings();
-        }
-        return this.content.put(HOME_BOX_CODE, snippet).pipe(switchMap(() => this.loadSettings()));
-      }
 
       /*
        * Adding a domain, not editing one. The section's field is an input to an action: the router
@@ -306,14 +247,6 @@ export class StoreSettingsApi {
     return this.stores.delete();
   }
 
-  uploadLogo(file: File): Observable<StoreSettings> {
-    return this.stores.addLogo(file).pipe(switchMap(() => this.loadSettings()));
-  }
-
-  uploadBanner(file: File): Observable<StoreSettings> {
-    return this.stores.addBanner(file).pipe(switchMap(() => this.loadSettings()));
-  }
-
   /** Removes a hostname from the store. The subdomain cannot be removed — the section does not offer it. */
   removeDomain(domain: string): Observable<StoreSettings> {
     return this.router.remove(domain).pipe(switchMap(() => this.loadSettings()));
@@ -334,28 +267,6 @@ export class StoreSettingsApi {
       return of(null);
     }
     return this.dns.checkCname(domain, target).pipe(map((outcome) => DOMAIN_OUTCOME[outcome]));
-  }
-
-  /** Uploads one slide and answers with the document; the pod names the file, so a reload is the only way to learn it. */
-  addSlide(file: File): Observable<StoreSettings> {
-    return this.stores.addSliderImage(file).pipe(switchMap(() => this.loadSettings()));
-  }
-
-  /**
-   * Replaces the slider with exactly this list.
-   *
-   * There is no delete-slide and no reorder endpoint — both are expressed by sending the list you
-   * want, which is why the section hands over the whole thing. `priority` is renumbered from zero
-   * here rather than in the component, so the contract lives next to the call that relies on it.
-   */
-  saveSlides(slides: readonly SliderSlide[]): Observable<StoreSettings> {
-    const store = this.requireLoadedStore();
-    return this.stores
-      .updateSliderImages({
-        ...this.storeBody(store),
-        sliderImages: slides.map((slide, index) => ({priority: index, name: slide.name})),
-      })
-      .pipe(switchMap(() => this.loadSettings()));
   }
 
   /** A reference list whose absence degrades one select rather than the page. */
@@ -416,112 +327,6 @@ export class StoreSettingsApi {
   }
 
   /**
-   * One row per provider the platform supports, whether or not the store has filled it in.
-   *
-   * The row list is the server's provider enum rather than the store's saved links: a provider with no
-   * link still needs a field to type one into. A provider the store has a link for but the enum no
-   * longer lists is kept as well, so an existing link is never silently dropped from the form — and
-   * therefore never silently cleared by the next save, which sends the whole set.
-   */
-  private socialLinks(
-    store: ReadableMerchantStore,
-    providers: readonly string[],
-  ): readonly SocialLinkSetting[] {
-    const saved = new Map((store.socialLinks ?? []).map((link) => [link.provider, link.url]));
-    const known = providers.length > 0 ? providers : [...SOCIAL_LINK_ORDER];
-    const all = [...new Set([...known, ...saved.keys()])];
-    return all.map((provider) => ({
-      provider,
-      icon: isSocialLinkProvider(provider) ? SOCIAL_LINK_ICON[provider] : SOCIAL_LINK_FALLBACK_ICON,
-      url: saved.get(provider) ?? '',
-    }));
-  }
-
-  /**
-   * The landing snippet's translations, keyed by language. `tags` are the comma-separated keywords
-   * the new content service stores and reads back.
-   */
-  private home(snippet: Snippet | null): Readonly<Record<string, HomePageCopy>> {
-    const copy: Record<string, HomePageCopy> = {};
-
-    for (const translation of snippet?.translations ?? []) {
-      if (!translation.language) {
-        continue;
-      }
-      copy[translation.language] = {
-        title: translation.title ?? '',
-        text: translation.body ?? '',
-        metaDescription: translation.metaDescription ?? '',
-        tags: (translation.keywords ?? '')
-          .split(',')
-          .map((tag) => tag.trim())
-          .filter((tag) => tag.length > 0),
-      };
-    }
-    return copy;
-  }
-
-  /**
-   * The landing snippet as a save body.
-   *
-   * Every language in the patch is sent, whether or not it was touched: the server treats the list
-   * as authoritative and deletes the locales it does not carry, so an omitted language would not be
-   * "unchanged" but gone. Only the languages that have a headline are sent — a locale with no title
-   * and no body is "missing", and the server would not store it anyway.
-   */
-  private homeSnippetBody(patch: SectionPatch): Snippet {
-    const stored = new Map(
-      (this.loadedHomeBox?.translations ?? []).map((translation) => [translation.language, translation]),
-    );
-
-    const translations: ContentTranslation[] = Object.entries(patch)
-      .map(([language, raw]) => {
-        const slice = this.slice(raw);
-        const tags = Array.isArray(slice['tags']) ? (slice['tags'] as readonly unknown[]) : [];
-        return {
-          ...stored.get(language),
-          language,
-          title: this.text(slice['title'], '').trim(),
-          body: this.text(slice['text'], ''),
-          metaDescription: this.text(slice['metaDescription'], ''),
-          keywords: tags.map((tag) => String(tag).trim()).filter((tag) => tag.length > 0).join(', '),
-        };
-      })
-      .filter((translation) => translation.title.length > 0);
-
-    return {
-      id: this.loadedHomeBox?.id,
-      code: HOME_BOX_CODE,
-      // A snippet the storefront can render. Nothing in the console hides one, so nothing sets it false.
-      visible: true,
-      translations,
-    };
-  }
-
-  /** The carousel, in priority order. `name` is the pod's UUID for the file, not a title. */
-  private slides(store: ReadableMerchantStore): readonly SliderSlide[] {
-    return [...(store.sliderImages ?? [])]
-      .sort((left, right) => left.priority - right.priority)
-      .map((slide) => ({priority: slide.priority, name: slide.name, url: slide.url ?? null}));
-  }
-
-  /**
-   * The social-links save body.
-   *
-   * `PUT /private/store/social-links` takes a whole `PersistableMerchantStore` and reads only
-   * `getSocialLinks()` off it, so the rest is carried through from the loaded store rather than
-   * invented. An empty field is dropped rather than sent as `{provider, url: ''}` — the set is the
-   * links that exist, and a link to nowhere is not one.
-   */
-  private socialLinksBody(patch: SectionPatch): PersistableMerchantStore {
-    const store = this.requireLoadedStore();
-    const links = Object.entries(patch)
-      .map(([provider, url]) => ({provider, url: this.text(url, '').trim()}))
-      .filter((link) => link.url.length > 0);
-    return {...this.storeBody(store), socialLinks: links};
-  }
-
-  /**
    * The parts of the store every marketing save has to carry unchanged.
    *
    * All three of these endpoints take the same store-shaped body, and the populator behind the plain
@@ -541,8 +346,6 @@ export class StoreSettingsApi {
       supportedLanguages: store.supportedLanguages,
       countryIsoCode: store.countryIsoCode,
       address: store.address,
-      socialLinks: store.socialLinks,
-      sliderImages: store.sliderImages?.map((slide) => ({priority: slide.priority, name: slide.name})),
       storeDomains: store.storeDomains,
     };
   }
@@ -560,22 +363,6 @@ export class StoreSettingsApi {
       return languages;
     }
     return store.defaultLanguage ? [store.defaultLanguage] : [];
-  }
-
-  /**
-   * The store's marketing images.
-   *
-   * `ReadableImage` is a name and a path, and the path is where the pod put the file — which is
-   * not necessarily a URL this browser can reach. The section renders a lettermark when the image
-   * fails to load rather than assuming it will. See lessons.md, "Orders — the store's logo URL is
-   * not reachable from the browser", which is the same gap seen from the invoice.
-   *
-   */
-  private branding(store: ReadableMerchantStore): BrandingSettings {
-    return {
-      logo: store.logo?.name ? {name: store.logo.name, url: store.logo.path ?? null} : null,
-      banner: store.banner?.name ? {name: store.banner.name, url: store.banner.path ?? null} : null,
-    };
   }
 
   private details(store: ReadableMerchantStore): StoreDetails {
@@ -648,8 +435,6 @@ export class StoreSettingsApi {
       template: store.template,
       currencyFormatNational: store.currencyFormatNational,
       storeDomains: store.storeDomains,
-      socialLinks: store.socialLinks,
-      sliderImages: store.sliderImages?.map((slide) => ({priority: slide.priority, name: slide.name})),
 
       name: this.text(patch['name'], store.name ?? ''),
       email: this.text(patch['supportEmail'], store.email ?? ''),

@@ -21,10 +21,6 @@ import type {
  */
 const SETTINGS: StoreSettings = {
   storeName: 'Acme Supply Co.',
-  branding: {
-    logo: {name: 'acme-logo.svg', url: null},
-    banner: {name: 'acme-banner-summer.jpg', url: null},
-  },
   details: {
     name: 'Acme Supply Co.',
     supportEmail: 'help@acmesupply.co',
@@ -55,25 +51,11 @@ const SETTINGS: StoreSettings = {
     published: false,
     maintenanceMode: false,
   },
-  home: {
-    en: {title: 'Everything your workplace runs on', text: 'Bulk pricing applies.', metaDescription: '', tags: []},
-    ar: {title: 'كل ما يحتاجه مكان عملك', text: '', metaDescription: '', tags: []},
-  },
-  homeBoxId: 41,
   domains: [
     {domain: 'acme-supply', type: 'SUB_DOMAIN', hostname: 'acme-supply.myshop-p1.example.io'},
     {domain: 'shop.acmesupply.co', type: 'CUSTOM_DOMAIN', hostname: 'shop.acmesupply.co'},
   ],
   podTarget: 'myshop-p1.example.io',
-  socialLinks: [
-    {provider: 'INSTAGRAM', icon: 'instagram', url: 'instagram.com/acmesupply'},
-    {provider: 'FACEBOOK', icon: 'facebook', url: ''},
-    {provider: 'X', icon: 'xSocial', url: ''},
-  ],
-  slides: [
-    {priority: 0, name: 'b8f0-first', url: null},
-    {priority: 1, name: 'c210-second', url: null},
-  ],
   socialLogin: [
     {
       providerId: 'GOOGLE',
@@ -215,15 +197,6 @@ class FakeStoreSettingsApi {
     return of(this.settings);
   }
 
-  saveSlides(slides: readonly SliderSlide[]): Observable<StoreSettings> {
-    this.savedSlides.push(slides.map((slide) => slide.name));
-    this.settings = {
-      ...this.settings,
-      slides: slides.map((slide, index) => ({...slide, priority: index})),
-    };
-    return of(this.settings);
-  }
-
   nextVerify(outcome: DomainStatus): void {
     this.verifyOutcome = outcome;
   }
@@ -272,7 +245,7 @@ describe('StoreManagement', () => {
   });
 
   /** Creates the page on a section and settles the initial request. */
-  function load(section: SettingsSectionKey = 'branding'): {
+  function load(section: SettingsSectionKey = 'details'): {
     fixture: ComponentFixture<StoreManagement>;
     element: HTMLElement;
   } {
@@ -368,20 +341,6 @@ describe('StoreManagement', () => {
     );
   }
 
-  it('renders the branding section by default and none of the console chrome', fakeAsync(() => {
-    const {element} = load();
-
-    expect(element.querySelector('app-branding-section')).not.toBeNull();
-    // The rail is `app-section-nav` now — promoted to shared when billing grew the same shape.
-    expect(element.querySelector('app-section-nav')).not.toBeNull();
-    expect(element.querySelector('app-details-section')).toBeNull();
-
-    // Chrome belongs to the shell; a page must not grow its own.
-    expect(element.querySelector('.toolbar')).toBeNull();
-    expect(element.querySelector('.sidebar')).toBeNull();
-    expect(element.querySelector('app-plan-banner')).toBeNull();
-  }));
-
   it('loads the settings once and names the store under the title', fakeAsync(() => {
     const {element} = load();
 
@@ -400,7 +359,7 @@ describe('StoreManagement', () => {
   it('veils the page until the first response arrives', fakeAsync(() => {
     api.deferred = true;
     const fixture = TestBed.createComponent(StoreManagement);
-    fixture.componentRef.setInput('section', 'branding');
+    fixture.componentRef.setInput('section', 'details');
     settle(fixture);
     const element = fixture.nativeElement as HTMLElement;
 
@@ -431,7 +390,8 @@ describe('StoreManagement', () => {
     const {element} = load();
 
     const links = Array.from(element.querySelectorAll<HTMLAnchorElement>('.nav-item[href]'));
-    expect(links.length).toBe(8);
+    // Four: appearance — branding, the home page, the slider and social links — is the content hub's now.
+    expect(links.length).toBe(4);
     expect(links.map((link) => link.getAttribute('href'))).toContain('/store-management/payments');
   }));
 
@@ -628,15 +588,6 @@ describe('StoreManagement', () => {
     }
   }));
 
-  it('offers no way to remove a logo, because the platform has none', fakeAsync(() => {
-    const {element} = load('branding');
-
-    const labels = Array.from(element.querySelectorAll('button')).map((button) =>
-      (button.textContent ?? '').toLowerCase(),
-    );
-    expect(labels.some((label) => label.includes('remove'))).toBeFalse();
-  }));
-
   it('collapses a gateway\'s credentials when it is switched off', fakeAsync(() => {
     const {fixture, element} = load('payments');
 
@@ -732,57 +683,6 @@ describe('StoreManagement', () => {
     settle(fixture);
     // Touched now, so the rule bites — but only because the operator went near it.
     expect(saveButton(element).disabled).toBeTrue();
-  }));
-
-  it('accepts a stored social link that carries its scheme', fakeAsync(() => {
-    const {fixture, element} = load('social');
-
-    /*
-     * Every link on a real store is a full URL. The pattern used to demand a bare host, which made
-     * the whole group invalid on load and Save unreachable before a character was typed.
-     */
-    expect(saveButton(element).disabled).toBeTrue();
-
-    type(element, '#social-FACEBOOK', 'https://facebook.com/acme-supply');
-    settle(fixture);
-
-    expect(saveButton(element).disabled).toBeFalse();
-    saveButton(element).click();
-    settle(fixture);
-
-    expect(api.saves[0].key).toBe('social');
-    expect(api.saves[0].patch['FACEBOOK']).toBe('https://facebook.com/acme-supply');
-  }));
-
-  it('refuses a social link that points at the wrong site', fakeAsync(() => {
-    const {fixture, element} = load('social');
-
-    type(element, '#social-FACEBOOK', 'https://tiktok.com/@acme-supply');
-    settle(fixture);
-
-    expect(saveButton(element).disabled).toBeTrue();
-    expect(socialField(element, 'FACEBOOK').querySelector('app-field-error')?.textContent).toContain(
-      'has to be a facebook.com link',
-    );
-
-    // twitter.com is still X: a decade of links point at it and X redirects them.
-    type(element, '#social-X', 'https://twitter.com/acme-supply');
-    type(element, '#social-FACEBOOK', 'https://m.facebook.com/acme-supply');
-    settle(fixture);
-
-    expect(saveButton(element).disabled).toBeFalse();
-  }));
-
-  it('refuses a social link to the site rather than to a page on it', fakeAsync(() => {
-    const {fixture, element} = load('social');
-
-    type(element, '#social-FACEBOOK', 'facebook.com');
-    settle(fixture);
-
-    expect(saveButton(element).disabled).toBeTrue();
-    expect(socialField(element, 'FACEBOOK').querySelector('app-field-error')?.textContent).toContain(
-      'not just facebook.com',
-    );
   }));
 
   it('checks the typed domain on its own, without being asked', fakeAsync(() => {
@@ -938,99 +838,6 @@ describe('StoreManagement', () => {
     expect(element.querySelector('.field-warning')?.textContent).toContain('could not reach');
   }));
 
-  it('reorders and deletes slides by sending the list it wants', fakeAsync(() => {
-    const {fixture, element} = load('slider');
-
-    const rows = () => Array.from(element.querySelectorAll('.slide .slide-ref')).map(
-      (ref) => ref.textContent?.trim(),
-    );
-    expect(rows()).toEqual(['b8f0-first', 'c210-second']);
-
-    // "Move later" on the first slide: there is no reorder endpoint, only the whole list.
-    element.querySelectorAll<HTMLButtonElement>('.slide')[0]
-      .querySelectorAll<HTMLButtonElement>('.icon-action')[1]
-      .click();
-    settle(fixture);
-
-    expect(api.savedSlides[0]).toEqual(['c210-second', 'b8f0-first']);
-    expect(rows()).toEqual(['c210-second', 'b8f0-first']);
-
-    element.querySelectorAll<HTMLButtonElement>('.slide')[0]
-      .querySelector<HTMLButtonElement>('.icon-action.danger')!
-      .click();
-    settle(fixture);
-
-    expect(api.savedSlides[1]).toEqual(['b8f0-first']);
-  }));
-
-  it('tracks the languages the store publishes in, not the console\'s own two', fakeAsync(() => {
-    const {fixture, element} = load('home');
-    const title = () => element.querySelector<HTMLInputElement>('#home-title')!.value;
-    // Scoped to the section: the page's own section rail is a tab switcher too.
-    // A radio group now, not a tablist — see `app-locale-switcher`.
-    const tabs = () =>
-      Array.from(element.querySelectorAll<HTMLButtonElement>('app-home-section .chip'));
-
-    /*
-     * `supportedLanguages` is ['en', 'ar'] here, and the track is named rather than coded — five
-     * storefront languages shown as "EN FR AR ES RU" is a puzzle rather than a label.
-     */
-    expect(tabs().map((tab) => tab.textContent?.trim().split('\n')[0])).toEqual([
-      'English',
-      'Arabic',
-    ]);
-    // Opens on the store's default language, which is what its storefront shows first.
-    expect(title()).toBe(SETTINGS.home['en'].title);
-
-    tabs().find((tab) => tab.textContent?.includes('Arabic'))!.click();
-    settle(fixture);
-
-    expect(title()).toBe(SETTINGS.home['ar'].title);
-  }));
-
-  it('saves every language at once, because one box holds them all', fakeAsync(() => {
-    const {fixture, element} = load('home');
-
-    type(element, '#home-title', 'Workplace supplies, delivered');
-    settle(fixture);
-    saveButton(element).click();
-    settle(fixture);
-
-    expect(api.saves[0].key).toBe('home');
-    const patch = api.saves[0].patch as Record<string, {title: string}>;
-    expect(patch['en'].title).toBe('Workplace supplies, delivered');
-    // Untouched, and still sent: a language left out of the body is one the server forgets.
-    expect(patch['ar'].title).toBe(SETTINGS.home['ar'].title);
-  }));
-
-  it('refuses a language with copy but no title, which the platform cannot store', fakeAsync(() => {
-    const {fixture, element} = load('home');
-
-    // Arabic starts with a title in this fixture; clear it and leave the body behind.
-    type(element, '#home-text', 'Bulk pricing applies.');
-    type(element, '#home-title', '');
-    settle(fixture);
-
-    expect(saveButton(element).disabled).toBeTrue();
-    expect(element.querySelector('.cross-field-error')?.textContent).toContain('no title');
-    expect(api.saves.length).toBe(0);
-  }));
-
-  it('renders the keyword field editable and submits it with the language', fakeAsync(() => {
-    const {fixture, element} = load('home');
-
-    // The new content service stores keywords on the translation, so the field is no longer disabled.
-    expect(element.querySelector<HTMLInputElement>('app-tag-input input')!.disabled).toBeFalse();
-
-    type(element, '#home-title', 'Workplace supplies, delivered');
-    settle(fixture);
-    saveButton(element).click();
-    settle(fixture);
-
-    const patch = api.saves[0].patch as Record<string, Record<string, unknown>>;
-    expect(patch['en']['tags']).toEqual([]);
-  }));
-
   it('reloads the whole document when the open store changes', fakeAsync(() => {
     const {fixture, element} = load('details');
 
@@ -1056,7 +863,7 @@ describe('StoreManagement', () => {
   it('surfaces a failed load with a retry that refetches', fakeAsync(() => {
     api.failure = new Error('Unable to reach store settings.');
     const fixture = TestBed.createComponent(StoreManagement);
-    fixture.componentRef.setInput('section', 'branding');
+    fixture.componentRef.setInput('section', 'details');
     settle(fixture);
     const element = fixture.nativeElement as HTMLElement;
 
@@ -1070,7 +877,7 @@ describe('StoreManagement', () => {
 
     expect(api.loads).toBe(2);
     expect(element.querySelector('app-load-error')).toBeNull();
-    expect(element.querySelector('app-branding-section')).not.toBeNull();
+    expect(element.querySelector('app-details-section')).not.toBeNull();
   }));
 
   it('navigates when a section is picked from the narrow tab track', fakeAsync(() => {

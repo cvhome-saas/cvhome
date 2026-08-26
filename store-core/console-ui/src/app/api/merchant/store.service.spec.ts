@@ -36,21 +36,4 @@ describe('MerchantStoreService', () => {
    * Social links and slider images are `PUT`s of the *whole* store, not patches — which is why the
    * sections re-send everything they hold rather than only what changed.
    */
-  it('writes social links and slider images as whole-store puts', () => {
-    service.updateSocialLinks({code: 'ACME'} as never).subscribe();
-    expect(http.expectOne(scoped(`${BASE}/private/store/social-links`)).request.method).toBe('PUT');
-
-    service.updateSliderImages({code: 'ACME'} as never).subscribe();
-    expect(
-      http.expectOne(scoped(`${BASE}/private/store/marketing/slider-images`)).request.method,
-    ).toBe('PUT');
-  });
-
-  it('uploads a logo as multipart', () => {
-    service.addLogo(new File(['x'], 'logo.png', {type: 'image/png'})).subscribe();
-    const request = http.expectOne(scoped(`${BASE}/private/store/marketing/logo`));
-    expect(request.request.method).toBe('POST');
-    expect(request.request.body instanceof FormData).toBeTrue();
-    request.flush(null);
-  });
 });

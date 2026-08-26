@@ -9,14 +9,10 @@ import {PageHeader} from '@shared/ui/page-header/page-header';
 import {TabSwitcher, type TabItem} from '@shared/ui/tab-switcher/tab-switcher';
 import {ToastService} from '@shared/ui/toast/toast';
 import type {SettingsSectionKey} from '@models/store-settings';
-import {BrandingSection} from './components/branding-section/branding-section';
 import {DetailsSection} from './components/details-section/details-section';
 import {DomainSection} from './components/domain-section/domain-section';
-import {HomeSection} from './components/home-section/home-section';
 import {PaymentsSection} from './components/payments-section/payments-section';
 import {SectionNav} from '@shared/ui/section-nav/section-nav';
-import {SliderSection} from './components/slider-section/slider-section';
-import {SocialLinksSection} from './components/social-links-section/social-links-section';
 import {SocialLoginSection} from './components/social-login-section/social-login-section';
 import {StoreSettingsFacade} from './facades/store-settings.facade';
 
@@ -36,17 +32,13 @@ import {StoreSettingsFacade} from './facades/store-settings.facade';
   selector: 'app-store-management',
   imports: [
     LoadError,
-    BrandingSection,
     BusyOverlay,
     DetailsSection,
     DomainSection,
-    HomeSection,
     Icon,
     PageHeader,
     PaymentsSection,
     SectionNav,
-    SliderSection,
-    SocialLinksSection,
     SocialLoginSection,
     TabSwitcher,
     TranslocoDirective,

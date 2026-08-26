@@ -61,7 +61,7 @@ export class StoreSettingsFacade {
   private readonly document = inject(DOCUMENT);
 
   /** Which card is open. Set from the route param, so a section is linkable. */
-  readonly activeSection = signal<SettingsSectionKey>('branding');
+  readonly activeSection = signal<SettingsSectionKey>('details');
 
   /**
    * The languages the storefront's landing copy can be written in.
@@ -76,10 +76,7 @@ export class StoreSettingsFacade {
     if (!settings) {
       return [];
     }
-    const codes = [
-      ...new Set([...settings.details.supportedLanguages, ...Object.keys(settings.home)]),
-    ];
-    return codes.map((code) => ({code, label: this.reference.languageName(code)}));
+    return settings.details.supportedLanguages.map((code) => ({code, label: this.reference.languageName(code)}));
   });
 
   /**
@@ -149,9 +146,6 @@ export class StoreSettingsFacade {
   readonly settings = this.loaded;
   readonly isSaving = signal(false);
   readonly isDeleting = signal(false);
-  /** An upload in flight, named so the section can show which tile is busy. */
-  readonly uploading = signal<'logo' | 'banner' | 'slide' | null>(null);
-
   /**
    * Bumped by every form event — value, status, touched and pristine changes alike.
    *
@@ -319,43 +313,6 @@ export class StoreSettingsFacade {
   }
 
   /**
-   * Uploads a logo or a banner.
-   *
-   * Sent the moment a file is chosen rather than held for *Save changes*: the endpoint is a
-   * multipart POST of its own, so there is nothing for the section's (empty) form to submit, and
-   * an image that appears only after a separate save is a confusing thing to offer.
-   */
-  upload(kind: 'logo' | 'banner', file: File): void {
-    if (this.uploading()) {
-      return;
-    }
-    this.uploading.set(kind);
-
-    /*
-     * Held for a beat, the same way the DNS check is. A small image on a local pod round-trips
-     * faster than the eye registers a spinner, so without this the well flickered and an operator
-     * could not tell an upload that ran from a click that missed.
-     */
-    const request = kind === 'logo' ? this.api.uploadLogo(file) : this.api.uploadBanner(file);
-    forkJoin({settings: request, _visible: timer(UPLOAD_MIN_VISIBLE_MS)})
-      .pipe(
-        map((answer) => answer.settings),
-        takeUntilDestroyed(this.destroyRef),
-      )
-      .subscribe({
-      next: (settings) => {
-        this.uploading.set(null);
-        this.snapshot.set(settings);
-        this.toast.success(this.transloco.translate(`storeSettings.branding.${kind}Uploaded`));
-      },
-      error: (failure: unknown) => {
-        this.uploading.set(null);
-        this.toast.danger(this.apiErrors.messageFor(failure));
-      },
-    });
-  }
-
-  /**
    * Deletes the store, then sends the operator somewhere that still exists.
    *
    * The server refuses to remove an org's default store, so a failure here is usually a rule
@@ -471,66 +428,6 @@ export class StoreSettingsFacade {
           this.isSaving.set(false);
           this.snapshot.set(settings);
           this.toast.success(this.transloco.translate('storeSettings.domain.removed', {domain}));
-        },
-        error: (failure: unknown) => {
-          this.isSaving.set(false);
-          this.toast.danger(this.apiErrors.messageFor(failure));
-        },
-      });
-  }
-
-  /**
-   * Adds a slide.
-   *
-   * Sent on selection rather than held for *Save changes*, for the same reason the logo is: it is a
-   * multipart POST of its own and the slider form has no controls to submit. The pod names the file,
-   * so the answer has to come from a reload rather than from the upload.
-   */
-  addSlide(file: File): void {
-    if (this.uploading()) {
-      return;
-    }
-    this.uploading.set('slide');
-
-    forkJoin({settings: this.api.addSlide(file), _visible: timer(UPLOAD_MIN_VISIBLE_MS)})
-      .pipe(
-        map((answer) => answer.settings),
-        takeUntilDestroyed(this.destroyRef),
-      )
-      .subscribe({
-        next: (settings) => {
-          this.uploading.set(null);
-          this.snapshot.set(settings);
-          this.toast.success(this.transloco.translate('storeSettings.slider.uploaded'));
-        },
-        error: (failure: unknown) => {
-          this.uploading.set(null);
-          this.toast.danger(this.apiErrors.messageFor(failure));
-        },
-      });
-  }
-
-  /**
-   * Replaces the slider with the list the section built — a reorder or a delete.
-   *
-   * There is no reorder endpoint and no delete-slide endpoint; sending the list you want is the whole
-   * API. Applied immediately rather than through *Save changes* so the two act the same way as adding
-   * one, and so a half-applied reorder cannot be left sitting in a form.
-   */
-  saveSlides(slides: readonly SliderSlide[], messageKey: string): void {
-    if (this.isSaving()) {
-      return;
-    }
-    this.isSaving.set(true);
-
-    this.api
-      .saveSlides(slides)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (settings) => {
-          this.isSaving.set(false);
-          this.snapshot.set(settings);
-          this.toast.success(this.transloco.translate(messageKey));
         },
         error: (failure: unknown) => {
           this.isSaving.set(false);

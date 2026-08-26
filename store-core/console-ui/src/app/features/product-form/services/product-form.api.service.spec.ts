@@ -12,6 +12,7 @@ import type {PageT} from '@core/table/table.types';
 import type {
   PersistableProductDefinition,
   ReadableCategory,
+  PersistableProductImage,
   ReadableImage,
   ReadableManufacturer,
   ReadableProductDefinition,
@@ -45,8 +46,8 @@ const DEFINITION: ReadableProductDefinition = {
   manufacturer: {id: 3, code: 'NIKE', descriptions: null},
   categories: [category(1, 'MEN'), category(11, 'MEN_SHOES')],
   images: [
-    {id: 5, imageName: 'b.jpg', order: 1, defaultImage: false},
-    {id: 4, imageName: 'a.jpg', order: 0, defaultImage: true},
+    {id: 5, mediaAssetId: 55, altText: 'b.jpg', order: 1, defaultImage: false},
+    {id: 4, mediaAssetId: 44, altText: 'a.jpg', order: 0, defaultImage: true},
   ],
   descriptions: [
     {language: 'en', name: 'Runner', description: '<p>Fast</p>', friendlyUrl: 'runner'},
@@ -120,22 +121,22 @@ class FakeProductService {
 }
 
 class FakeImageService {
-  readonly uploads: {order: number; defaultImage: boolean}[] = [];
-  readonly reorders: {imageId: number; order: number}[] = [];
+  readonly attached: PersistableProductImage[][] = [];
+  readonly replaced: PersistableProductImage[][] = [];
   gallery: ReadableImage[] = [...DEFINITION.images];
-  failUploadAt: number | null = null;
+  failAttach = false;
 
-  upload(_productId: number, _file: File, order: number, defaultImage: boolean): Observable<void> {
-    if (this.failUploadAt === order) {
-      return throwError(() => new Error('upload failed'));
+  attach(_productId: number, items: readonly PersistableProductImage[]): Observable<ReadableImage[]> {
+    if (this.failAttach) {
+      return throwError(() => new Error('attach failed'));
     }
-    this.uploads.push({order, defaultImage});
-    return of(undefined);
+    this.attached.push([...items]);
+    return of([]);
   }
 
-  reorder(_productId: number, imageId: number, order: number): Observable<void> {
-    this.reorders.push({imageId, order});
-    return of(undefined);
+  replace(_productId: number, items: readonly PersistableProductImage[]): Observable<ReadableImage[]> {
+    this.replaced.push([...items]);
+    return of([]);
   }
 
   remove(): Observable<void> {
@@ -370,64 +371,47 @@ describe('ProductFormApi', () => {
 
   /* ------------------------------------------------------------------------ images ---- */
 
-  it('claims the default only for the first image on a product that has none', (done) => {
+  it('attaches the whole batch in one request', (done) => {
     images.gallery = [];
 
-    api.uploadImages(7, [new File([''], 'a.jpg'), new File([''], 'b.jpg')], []).subscribe(() => {
-      expect(images.uploads).toEqual([
-        {order: 0, defaultImage: true},
-        {order: 1, defaultImage: false},
-      ]);
+    api.attachImages(7, [{mediaAssetId: 11}, {mediaAssetId: 22}]).subscribe(() => {
+      // One request, not one per image. The pod appends the batch and decides the order and the
+      // default itself; the old upload path had to go one at a time or two racing uploads both saw
+      // "no default yet" and the product ended up with two.
+      expect(images.attached).toEqual([[{mediaAssetId: 11}, {mediaAssetId: 22}]]);
       done();
     });
   });
 
-  it('never claims the default when the product already has one', (done) => {
-    /*
-     * `buildContentImages` sets the flag without clearing it on the old default, so asking for it
-     * twice leaves two. See lessons.md.
-     */
-    api
-      .uploadImages(7, [new File([''], 'c.jpg')], [
-        {id: 4, name: 'a.jpg', url: null, order: 0, isDefault: true},
-      ])
-      .subscribe(() => {
-        expect(images.uploads).toEqual([{order: 1, defaultImage: false}]);
-        done();
-      });
-  });
-
-  it('renumbers the whole gallery on a reorder', (done) => {
+  it('replaces the whole gallery on a reorder, carrying the default with it', (done) => {
     const ordered = [
-      {id: 5, name: 'b.jpg', url: null, order: 1, isDefault: false},
-      {id: 4, name: 'a.jpg', url: null, order: 0, isDefault: true},
+      {id: 5, mediaAssetId: 55, name: 'b.jpg', url: null, altText: 'b', order: 1, isDefault: false},
+      {id: 4, mediaAssetId: 44, name: 'a.jpg', url: null, altText: 'a', order: 0, isDefault: true},
     ];
 
-    api.reorderImages(7, ordered).subscribe(() => {
-      // `PATCH …?order=` does not renumber the images it displaces, so writing only the moved one
-      // leaves two sharing a position.
-      expect(images.reorders).toEqual([
-        {imageId: 5, order: 0},
-        {imageId: 4, order: 1},
+    api.replaceImages(7, ordered).subscribe(() => {
+      expect(images.replaced).toEqual([
+        [
+          {mediaAssetId: 55, externalUrl: null, altText: 'b', defaultImage: false},
+          {mediaAssetId: 44, externalUrl: null, altText: 'a', defaultImage: true},
+        ],
       ]);
       done();
     });
   });
 
-  it('reports a batch that failed partway rather than answering a half-truth', (done) => {
+  it('reports a failed attach rather than answering a half-truth', (done) => {
     /*
-     * The first upload landed and the second did not. The caller must hear about it — recovering
-     * the gallery is `ProductFormFacade.refreshGallery`, because only the facade has somewhere to
-     * put the answer.
+     * Recovering the gallery is `ProductFormFacade.refreshGallery`, because only the facade has
+     * somewhere to put the answer.
      */
     images.gallery = [];
-    images.failUploadAt = 1;
+    images.failAttach = true;
 
-    api.uploadImages(7, [new File([''], 'a.jpg'), new File([''], 'b.jpg')], []).subscribe({
-      next: () => fail('a failed batch must not answer as though it succeeded'),
+    api.attachImages(7, [{mediaAssetId: 11}]).subscribe({
+      next: () => fail('a failed attach must not answer as though it succeeded'),
       error: (failure: Error) => {
-        expect(failure.message).toContain('upload failed');
-        expect(images.uploads).toEqual([{order: 0, defaultImage: true}]);
+        expect(failure.message).toContain('attach failed');
         done();
       },
     });
@@ -441,7 +425,7 @@ describe('ProductFormApi', () => {
       return original();
     };
 
-    api.uploadImages(7, [new File([''], 'a.jpg')], []).subscribe((gallery) => {
+    api.attachImages(7, [{mediaAssetId: 11}]).subscribe((gallery) => {
       expect(subscribes).toBe(1);
       expect(gallery.map((image) => image.name)).toEqual(['a.jpg', 'b.jpg']);
       done();

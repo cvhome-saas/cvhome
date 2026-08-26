@@ -85,12 +85,10 @@ export class PageEditor {
     template: FormControl<PageTemplate>;
     parentId: FormControl<number | null>;
     showInFooter: FormControl<boolean>;
-    linkToMenu: FormControl<boolean>;
   }> = this.fb.group({
     template: this.fb.control<PageTemplate>('STANDARD'),
     parentId: this.fb.control<number | null>(null),
     showInFooter: this.fb.control(false),
-    linkToMenu: this.fb.control(false),
   });
 
   /** Other pages, as parent candidates. */
@@ -123,7 +121,6 @@ export class PageEditor {
             template: item.template ?? 'STANDARD',
             parentId: item.parentId ?? null,
             showInFooter: !!item.showInFooter,
-            linkToMenu: !!item.linkToMenu,
           });
         }),
       );

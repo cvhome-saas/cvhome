@@ -212,13 +212,30 @@ export interface ProductSpecification {
 /** `model/product/ReadableImage` → `Entity`. */
 export interface ReadableImage {
   readonly id: number;
-  readonly imageName?: string;
-  /** The pod's own path. Not necessarily a URL this browser can reach — see the Media step. */
+  /** The content media asset behind this image; null for an external url or a video. */
+  readonly mediaAssetId?: number | null;
+  /** The asset's public URL, cached by catalog when the image was attached. */
   readonly imageUrl?: string;
+  /** Overrides the asset's own alt text for this product. */
+  readonly altText?: string | null;
   readonly externalUrl?: string;
   readonly videoUrl?: string;
   readonly imageType?: number;
   readonly order?: number;
+  readonly defaultImage?: boolean;
+}
+
+/**
+ * One image to attach to a product: either an asset picked from the media library, or an external url.
+ *
+ * Catalog does not accept files. Bytes go to the library, which dedupes them, reads their dimensions,
+ * tracks what uses them and refuses to delete one a product still holds.
+ */
+export interface PersistableProductImage {
+  readonly mediaAssetId?: number | null;
+  readonly externalUrl?: string | null;
+  readonly videoUrl?: string | null;
+  readonly altText?: string | null;
   readonly defaultImage?: boolean;
 }
 

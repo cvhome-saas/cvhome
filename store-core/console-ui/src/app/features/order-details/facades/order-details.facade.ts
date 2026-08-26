@@ -238,7 +238,7 @@ export class OrderDetailsFacade {
 
     return {
       name,
-      logo: store?.logo?.path?.trim() || null,
+      logo: this.detail.hasValue() ? (this.detail.value()?.sellerLogo ?? null) : null,
       lines: [address?.address, [address?.postalCode, address?.city].filter(Boolean).join(' '), address?.stateProvince, country]
         .map((line) => line?.trim())
         .filter((line): line is string => !!line),

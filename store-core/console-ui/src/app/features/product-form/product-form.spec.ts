@@ -32,7 +32,7 @@ const SAVED: ProductDraft = draft({
     {language: 'en', name: 'Runner', description: 'Fast', friendlyUrl: 'runner', title: '', metaDescription: '', highlights: '', keyWords: ''},
     {language: 'ar', name: 'عداء', description: '', friendlyUrl: '', title: '', metaDescription: '', highlights: '', keyWords: ''},
   ],
-  images: [{id: 4, name: 'a.jpg', url: null, order: 0, isDefault: true}],
+  images: [{id: 4, mediaAssetId: 4, name: 'a.jpg', url: null, altText: null, order: 0, isDefault: true}],
 });
 
 function snapshot(product: ProductDraft): ProductFormSnapshot {

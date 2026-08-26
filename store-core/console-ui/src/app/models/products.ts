@@ -123,8 +123,11 @@ export const DIMENSION_UNITS: readonly string[] = ['cm', 'cu', 'ft', 'in', 'm'];
  */
 export interface ProductImageItem {
   readonly id: number;
+  /** The media library asset behind it, so the picker can show which ones are already attached. */
+  readonly mediaAssetId: number | null;
   readonly name: string;
   readonly url: string | null;
+  readonly altText: string | null;
   readonly order: number;
   readonly isDefault: boolean;
 }

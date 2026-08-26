@@ -19,7 +19,6 @@ import {ContentList} from './components/content-list/content-list';
 import {MediaTab} from './components/media-tab/media-tab';
 import {MenusTab} from './components/menus-tab/menus-tab';
 import {PoliciesTab} from './components/policies-tab/policies-tab';
-import {SnippetsCard} from './components/snippets-card/snippets-card';
 import type {PolicyCompliance} from '@models/content';
 import {ContentHubFacade} from './facades/content-hub.facade';
 import {MediaLibraryFacade} from './facades/media-library.facade';
@@ -48,7 +47,6 @@ const LIST_TABS: readonly ContentListType[] = ['pages', 'posts', 'banners', 'faq
     PageHeader,
     PoliciesTab,
     SectionNav,
-    SnippetsCard,
     TabSwitcher,
     TranslocoDirective,
   ],

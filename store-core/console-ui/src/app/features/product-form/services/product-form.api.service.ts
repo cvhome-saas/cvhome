@@ -9,6 +9,7 @@ import {ProductService} from '@api/catalog/product.service';
 import {InventoryService} from '@api/inventory/inventory.service';
 import type {
   PersistableProductDefinition,
+  PersistableProductImage,
   ProductDescription,
   ReadableCategory,
   ReadableProductDefinition,
@@ -291,26 +292,17 @@ export class ProductFormApi {
   /* ---------------------------------------------------------------------- images ---- */
 
   /**
-   * Upload images and answer the product's whole gallery afterwards.
+   * Attaches library assets and answers the product's whole gallery afterwards.
    *
-   * `defaultImage` is sent only when the product has none — see `ProductImageService.upload` for
-   * why that is the only honest value: no endpoint re-designates a default, and passing `true` for
-   * a product that already has one leaves two.
-   *
-   * `concat` again: the pod assigns `sortOrder` from the `order` parameter and reads the existing
-   * image set to decide the default, so two uploads racing would both see "no default yet".
+   * One request, not one per image: the pod appends the batch, assigns the order and decides the
+   * default itself. The old upload path had to send files one at a time because two racing uploads
+   * would both see "no default yet" and the product would end up with two.
    */
-  uploadImages(
+  attachImages(
     productId: number,
-    files: readonly File[],
-    existing: readonly ProductImageItem[],
+    assets: readonly PersistableProductImage[],
   ): Observable<readonly ProductImageItem[]> {
-    const startOrder = existing.reduce((max, image) => Math.max(max, image.order), -1) + 1;
-    const hasDefault = existing.some((image) => image.isDefault);
-    const uploads = files.map((file, index) =>
-      this.images.upload(productId, file, startOrder + index, !hasDefault && index === 0),
-    );
-    return this.settling(productId, concat(...uploads));
+    return this.settling(productId, this.images.attach(productId, assets));
   }
 
   removeImage(productId: number, imageId: number): Observable<readonly ProductImageItem[]> {
@@ -335,18 +327,23 @@ export class ProductFormApi {
   }
 
   /**
-   * Move an image to a new position, renumbering the ones it displaced.
+   * Replaces the gallery: order is the list order, and the item flagged default wins.
    *
-   * `PATCH …?order=` sets one image's `sortOrder` and does not renumber its neighbours, so moving
-   * an image without rewriting the rest leaves two images sharing a position and the gallery in
-   * whatever order the database returns. The whole list is renumbered, in order.
+   * One request for the whole list. Reordering used to be one `PATCH` per image, which left two
+   * images sharing a position whenever a call in the middle failed — and could not set the default
+   * at all.
    */
-  reorderImages(
+  replaceImages(
     productId: number,
     ordered: readonly ProductImageItem[],
   ): Observable<readonly ProductImageItem[]> {
-    const calls = ordered.map((image, index) => this.images.reorder(productId, image.id, index));
-    return this.settling(productId, concat(...calls));
+    const body: PersistableProductImage[] = ordered.map((image) => ({
+      mediaAssetId: image.mediaAssetId,
+      externalUrl: image.mediaAssetId === null ? image.url : null,
+      altText: image.altText,
+      defaultImage: image.isDefault,
+    }));
+    return this.settling(productId, this.images.replace(productId, body));
   }
 
   private gallery(productId: number): Observable<readonly ProductImageItem[]> {
@@ -356,8 +353,10 @@ export class ProductFormApi {
           .sort((left, right) => (left.order ?? 0) - (right.order ?? 0))
           .map((image) => ({
             id: image.id,
-            name: image.imageName ?? String(image.id),
+            mediaAssetId: image.mediaAssetId ?? null,
+            name: image.altText ?? String(image.id),
             url: image.imageUrl ?? image.externalUrl ?? null,
+            altText: image.altText ?? null,
             order: image.order ?? 0,
             isDefault: image.defaultImage ?? false,
           })),
@@ -468,8 +467,10 @@ function toDraft(
       .sort((left, right) => (left.order ?? 0) - (right.order ?? 0))
       .map((image) => ({
         id: image.id,
-        name: image.imageName ?? String(image.id),
+        mediaAssetId: image.mediaAssetId ?? null,
+        name: image.altText ?? String(image.id),
         url: image.imageUrl ?? image.externalUrl ?? null,
+        altText: image.altText ?? null,
         order: image.order ?? 0,
         isDefault: image.defaultImage ?? false,
       })),

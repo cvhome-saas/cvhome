@@ -291,7 +291,7 @@ class ContentApiIntegrationTest {
         expect(api.get(scoped(PAGES, STORE_A), null), HttpStatus.UNAUTHORIZED);
     }
 
-    // ---------------------------------------------------------------------------------- summary + snippets
+    // ----------------------------------------------------------------------------- summary + site settings
 
     @Test
     void summaryCountsAndSiteSettingsRoundTrip() {
