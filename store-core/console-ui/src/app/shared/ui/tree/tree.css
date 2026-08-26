@@ -16,7 +16,7 @@
   display: grid;
   grid-template-columns: auto auto minmax(0, 1fr) auto auto auto;
   align-items: center;
-  gap: .5rem;
+  gap: var(--spacing-tight);
   /* The indent is the hierarchy. `--depth` is set per row; everything else is constant. */
   padding-block: .45rem;
   padding-inline: calc(.5rem + var(--depth, 0) * 1.15rem) .5rem;
@@ -120,7 +120,7 @@
 }
 
 .tree-empty {
-  padding: 1.5rem .5rem;
+  padding: var(--spacing-gutter) var(--spacing-tight);
   color: var(--foreground-quiet);
   font-size: var(--text-xs);
   text-align: center;

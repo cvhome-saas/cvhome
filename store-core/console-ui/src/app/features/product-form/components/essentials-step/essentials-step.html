@@ -181,23 +181,28 @@
               <app-textarea id="product-meta" formControlName="metaDescription" [rows]="2" />
             </app-form-field>
 
-            <div class="field field-wide">
-              <span class="field-label" [id]="'product-keywords-label'">
-                {{ t('productForm.essentials.keywords') }}
-              </span>
-              <!--
-                Chips, not a comma-separated string. The column stores one string and always has, so
-                the split and join happen here — but "wireless, noise cancelling" typed into a text
-                box is a format an operator has to be told about, and a chip is not.
-              -->
+            <!--
+              Chips, not a comma-separated string. The column stores one string and always has, so
+              the split and join happen here — but "wireless, noise cancelling" typed into a text
+              box is a format an operator has to be told about, and a chip is not.
+
+              `app-form-field` with no `control`: the value lives in a signal rather than the
+              reactive form, which is exactly what the optional `control` input is for. Hand-rolling
+              the wrapper instead left `.field-label` resolving to nothing — it is defined inside
+              `app-form-field`'s encapsulated stylesheet and cannot be reached from out here.
+            -->
+            <app-form-field
+              wide
+              [label]="t('productForm.essentials.keywords')"
+              [hint]="t('productForm.essentials.keywordsHint')"
+            >
               <app-tag-input
                 [tags]="keywords()"
                 (tagsChange)="onKeywords($event)"
                 [label]="t('productForm.essentials.keywords')"
                 [placeholder]="t('productForm.essentials.keywordsPlaceholder')"
               />
-              <p class="field-hint">{{ t('productForm.essentials.keywordsHint') }}</p>
-            </div>
+            </app-form-field>
           </div>
         }
       </div>

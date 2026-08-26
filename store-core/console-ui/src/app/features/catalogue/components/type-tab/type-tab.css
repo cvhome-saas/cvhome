@@ -1,7 +1,7 @@
 .type-list {
   display: flex;
   flex-direction: column;
-  gap: .5rem;
+  gap: var(--spacing-tight);
   margin: 0;
   padding: .9rem;
   list-style: none;
@@ -93,7 +93,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
+  gap: var(--spacing-group);
   flex-wrap: wrap;
 }
 

@@ -60,8 +60,10 @@
 
       <app-panel [title]="t('content.post.organise')" padded>
         <div class="field-grid side-grid" [formGroup]="extra">
+          <!-- A group of checkboxes, so a group label rather than `app-form-field`: a `<label>`
+               names one control, and wrapping the list makes its empty space toggle the first box. -->
           <div class="field field-wide">
-            <p class="field-label">{{ t('content.post.categories') }}</p>
+            <p class="group-label">{{ t('content.post.categories') }}</p>
             @if (categoryOptions().length) {
               <div class="category-list">
                 @for (category of categoryOptions(); track category.id) {
@@ -77,15 +79,14 @@
               <p class="field-hint">{{ t('content.post.noCategories') }}</p>
             }
           </div>
-          <div class="field field-wide">
-            <p class="field-label">{{ t('content.post.tags') }}</p>
+          <app-form-field wide [label]="t('content.post.tags')">
             <app-tag-input
               [tags]="extra.controls.tags.value"
               (tagsChange)="setTags($event)"
               [label]="t('content.post.tags')"
               [disabled]="!canManage()"
             />
-          </div>
+          </app-form-field>
           <app-form-field
             wide
             [label]="t('content.post.author')"

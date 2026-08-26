@@ -4,8 +4,8 @@
 }
 
 .store-switcher {
-  margin-top: 0.75rem;
-  padding-top: 1rem;
+  margin-top: var(--spacing-field);
+  padding-top: var(--spacing-group);
   border-top: 1px solid var(--border);
 }
 
@@ -144,7 +144,7 @@
   inline-size: 100%;
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: var(--spacing-field);
   padding: 0.7rem;
   border: 0;
   border-radius: var(--radius-lg);
@@ -205,7 +205,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
+  gap: var(--spacing-tight);
   padding: 0.6rem 0.75rem;
   border: 1px dashed var(--edge);
   border-radius: var(--radius-lg);

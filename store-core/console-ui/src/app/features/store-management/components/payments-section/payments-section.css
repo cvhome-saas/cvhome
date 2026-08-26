@@ -1,5 +1,5 @@
 .providers {
-  gap: 1rem;
+  gap: var(--spacing-group);
 }
 
 /* Inside a card body rather than under a panel header, so it takes the card's own shape. */

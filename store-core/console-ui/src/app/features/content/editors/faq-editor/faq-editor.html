@@ -108,16 +108,18 @@
               [min]="0"
             />
           </app-form-field>
-          <div class="field field-wide">
-            <p class="field-label">{{ t('content.faq.keywords') }}</p>
+          <app-form-field
+            wide
+            [label]="t('content.faq.keywords')"
+            [hint]="t('content.faq.keywordsHint')"
+          >
             <app-tag-input
               [tags]="extra.controls.keywords.value"
               (tagsChange)="setKeywords($event)"
               [label]="t('content.faq.keywords')"
               [disabled]="!canManage()"
             />
-            <p class="field-hint">{{ t('content.faq.keywordsHint') }}</p>
-          </div>
+          </app-form-field>
           <div class="field field-wide">
             <app-toggle
               formControlName="showInCheckoutHelp"

@@ -6,7 +6,7 @@
 .wizard {
   display: grid;
   grid-template-columns: 15rem minmax(0, 1fr) 17rem;
-  gap: 1rem;
+  gap: var(--spacing-group);
   align-items: start;
 }
 
@@ -38,7 +38,7 @@
 .side {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: var(--spacing-group);
 }
 
 .side {
@@ -67,7 +67,7 @@
 .check {
   display: flex;
   align-items: center;
-  gap: .5rem;
+  gap: var(--spacing-tight);
   color: var(--foreground-subtle);
   font-size: var(--text-2xs);
 }
@@ -111,7 +111,7 @@
   display: grid;
   grid-template-columns: 2rem minmax(0, 1fr) auto;
   align-items: center;
-  gap: .5rem;
+  gap: var(--spacing-tight);
   font-size: var(--text-2xs);
 }
 

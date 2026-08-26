@@ -1,6 +1,6 @@
 .domain-row {
   display: flex;
-  gap: 0.5rem;
+  gap: var(--spacing-tight);
 }
 
 /*
@@ -29,7 +29,7 @@
 /* ---- Status panel ------------------------------------------------------------------- */
 
 .status {
-  padding: 1rem;
+  padding: var(--spacing-group);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   background: var(--muted);
@@ -83,7 +83,7 @@
 }
 
 .status-body {
-  margin: 0.5rem 0 0;
+  margin: var(--spacing-tight) 0 0;
   color: var(--secondary-foreground);
   font-size: var(--text-xs);
   line-height: 1.6;
@@ -101,7 +101,7 @@
 .dns-row {
   display: grid;
   grid-template-columns: 5rem 1fr 1.4fr;
-  gap: 1rem;
+  gap: var(--spacing-group);
   align-items: center;
   padding: 0.6rem 1rem;
 }
@@ -131,7 +131,7 @@
 .dns-hint {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--spacing-tight);
   margin-block-start: 0.6rem;
   --icon-size: 0.8rem;
 }
@@ -159,7 +159,7 @@
  */
 .domain-row.info-row {
   flex-wrap: wrap;
-  margin-block-start: 0.5rem;
+  margin-block-start: var(--spacing-tight);
 }
 
 .domain-row.info-row .info-copy strong {

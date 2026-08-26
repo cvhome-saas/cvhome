@@ -7,7 +7,7 @@
 
 .outcome {
   display: grid;
-  gap: 1rem;
+  gap: var(--spacing-group);
   justify-items: center;
   align-content: center;
   min-block-size: 100vh;

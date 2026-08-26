@@ -139,6 +139,24 @@
   --radius-3xl: 20px;
   --radius-full: calc(infinity * 1px);
 
+  /* ------------------------------------------------------------------- space ---- */
+
+  /*
+   * Derived from what the console already measures rather than invented: these are the six
+   * steps the existing stylesheets land on, named for the job each one does. The names are
+   * roles, not sizes, because the failure this closes was a developer with no `var()` to
+   * type picking whatever the component beside them used.
+   *
+   * Anything coarser than `gutter` — 1.75rem and up — is a page measure rather than a
+   * component rhythm and stays a literal; there are 23 of those and they share no job.
+   */
+  --spacing-inline: 0.25rem; /* a glyph and its word */
+  --spacing-tight: 0.5rem; /* inside one control: icon and label, chips in a row */
+  --spacing-field: 0.75rem; /* a label and its control */
+  --spacing-group: 1rem; /* one field and the next */
+  --spacing-section: 1.25rem; /* one panel and the next; a card's block interior */
+  --spacing-gutter: 1.5rem; /* a card's inline interior */
+
   /* ------------------------------------------------------------------ motion ---- */
 
   /* Hover, focus and colour changes. Tailwind's default is 150ms. */
@@ -172,4 +190,20 @@
   --paper-rule: #e2e8f0;
   --paper-wash: #f1f5f9;
   --paper-line: #334155;
+}
+
+/*
+ * The panel interior, as one value, so the measurement that defines the console's card
+ * rhythm exists once. Deliberately not a `--spacing-*` key: that namespace also generates
+ * the single-axis utilities, and `pt-panel` would emit an invalid two-value
+ * `padding-top`. Sits beside the scale rather than in a theme file because it is the same
+ * measurement in Forest, Midnight and Daylight alike.
+ *
+ * `interior`, not `pad`: order-details and create-store each still carry a `.panel-pad`
+ * *class*, at 1.25rem and 1.5rem respectively — neither of them this value. Those are the
+ * drift `Panel.padded` was meant to end and they are still owed; a token sharing their
+ * name would read as their definition.
+ */
+:root {
+  --panel-interior: var(--spacing-section) var(--spacing-gutter);
 }

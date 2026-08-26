@@ -6,13 +6,13 @@
 .pods-stack {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: var(--spacing-gutter);
 }
 
 .cell-pod {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: var(--spacing-field);
   min-inline-size: 0;
 }
 
@@ -63,7 +63,7 @@
 .cell-endpoint {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--spacing-tight);
   min-inline-size: 0;
 }
 
@@ -104,7 +104,7 @@
 .cell-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 0.25rem;
+  gap: var(--spacing-inline);
 }
 
 /* The chevron points the way the page reads, so it mirrors under RTL. */

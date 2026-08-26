@@ -9,7 +9,7 @@
 .field {
   display: flex;
   align-items: center;
-  gap: .5rem;
+  gap: var(--spacing-tight);
   padding: .55rem .7rem;
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
@@ -80,7 +80,7 @@
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  gap: .75rem;
+  gap: var(--spacing-field);
   padding: .45rem .55rem;
   border-radius: var(--radius-md);
   color: var(--secondary-foreground);

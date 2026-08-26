@@ -15,7 +15,7 @@
 .console-body {
   display: flex;
   align-items: flex-start;
-  gap: 1.5rem;
+  gap: var(--spacing-gutter);
   padding: 1.5rem 2rem 2.5rem;
   transition: gap 0.28s var(--ease-emphasis);
 }
@@ -29,7 +29,7 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: var(--spacing-gutter);
 }
 
 .mobile-nav-toggle {
@@ -44,7 +44,7 @@
   .console-body {
     position: relative;
     gap: 0;
-    padding: 1rem;
+    padding: var(--spacing-group);
   }
 
   .mobile-nav-toggle {

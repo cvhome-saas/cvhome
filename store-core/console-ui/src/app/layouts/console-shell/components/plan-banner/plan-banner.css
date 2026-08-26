@@ -5,7 +5,7 @@
 .plan-banner {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: var(--spacing-group);
   block-size: 49px;
   padding: 0 2rem;
   background: var(--accent);
@@ -28,7 +28,7 @@
 .upgrade {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--spacing-tight);
   padding: 0.5rem 0.9rem;
   border: 1px solid var(--primary);
   border-radius: var(--radius-md);
@@ -55,7 +55,7 @@
 }
 
 .dismiss {
-  padding: 0.25rem;
+  padding: var(--spacing-inline);
   border: 0;
   background: none;
   color: var(--muted-foreground);
@@ -74,7 +74,7 @@
     padding: 0.7rem 2.5rem 0.7rem 1rem;
     align-items: flex-start;
     flex-wrap: wrap;
-    gap: 0.75rem;
+    gap: var(--spacing-field);
   }
 
   .plan-banner p {
@@ -106,7 +106,13 @@
  * countdown was part of why the old banner was ignorable.
  */
 .plan-banner.warn {
-  background: var(--warning-veil, var(--muted));
+  /*
+   * `--warning-veil` was defined by no theme, so this silently fell back to `--muted` and the
+   * warn state was painted exactly like danger and like the default — the distinction the
+   * comment above describes did not exist on screen. `--chart-4-wash` is the amber this
+   * selector already uses for its border and icon, and every theme defines it.
+   */
+  background: var(--chart-4-wash);
   border-bottom-color: var(--chart-4-foreground);
 }
 

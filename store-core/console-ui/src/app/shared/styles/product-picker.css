@@ -22,7 +22,7 @@
 .picker-head {
   display: flex;
   align-items: baseline;
-  gap: .5rem;
+  gap: var(--spacing-tight);
 }
 
 .picker-count {

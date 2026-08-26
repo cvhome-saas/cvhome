@@ -1,7 +1,7 @@
 :host {
   display: grid;
   justify-items: center;
-  gap: .75rem;
+  gap: var(--spacing-field);
   margin: 0;
   padding: 3.5rem 1.25rem;
   color: var(--muted-foreground);

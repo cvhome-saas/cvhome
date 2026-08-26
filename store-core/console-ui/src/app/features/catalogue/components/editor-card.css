@@ -20,7 +20,7 @@
   display: flex;
   flex-direction: column;
   gap: 1.1rem;
-  padding: 1.25rem;
+  padding: var(--spacing-section);
 }
 
 /*
@@ -57,7 +57,7 @@
   display: flex;
   justify-content: flex-end;
   gap: .6rem;
-  padding-block-start: .25rem;
+  padding-block-start: var(--spacing-inline);
 }
 
 /* The line that says whether the language on screen has been written yet. */

@@ -32,7 +32,7 @@
   display: grid;
   place-items: start center;
   /* Anchored to the top of the refreshing region, and sticky so it survives scrolling. */
-  padding-block-start: 1.25rem;
+  padding-block-start: var(--spacing-section);
   pointer-events: none;
 }
 

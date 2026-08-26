@@ -128,7 +128,7 @@
 }
 
 .rich-text .rt-editable h2 {
-  margin-block: 1rem .5rem;
+  margin-block: var(--spacing-group) var(--spacing-tight);
   color: var(--foreground-strong);
   font-size: var(--text-base);
   font-weight: 600;

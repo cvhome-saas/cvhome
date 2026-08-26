@@ -10,15 +10,15 @@
 .auth-message { position: relative; max-width: 32rem; margin: auto 0; animation: rise .55s ease both; }
 .auth-message > p.eyebrow { display: inline-flex; margin: 0; align-items: center; gap: .6rem; padding: .4rem .9rem; border: 1px solid var(--edge); border-radius: var(--radius-full); color: var(--primary-soft); font-size: .75rem; font-weight: 500; letter-spacing: .08em; line-height: 1.2; text-transform: uppercase; }
 .auth-message h1 { margin: 1.75rem 0 0; color: var(--foreground-strong); font-size: clamp(2.6rem, 4vw, 3rem); font-weight: 300; line-height: 1.12; letter-spacing: -.035em; }
-.auth-message > p { max-width: 34ch; margin: 1.5rem 0 0; color: var(--muted-foreground); font-size: 1.0625rem; font-weight: 350; line-height: 1.75; text-wrap: pretty; }
-.auth-message ul { display: grid; gap: 1rem; margin: 3rem 0 0; padding: 0; list-style: none; }
-.auth-message li { display: flex; align-items: flex-start; gap: .75rem; color: var(--secondary-foreground); font-size: .9375rem; font-weight: 350; line-height: 1.6; }
+.auth-message > p { max-width: 34ch; margin: var(--spacing-gutter) 0 0; color: var(--muted-foreground); font-size: 1.0625rem; font-weight: 350; line-height: 1.75; text-wrap: pretty; }
+.auth-message ul { display: grid; gap: var(--spacing-group); margin: 3rem 0 0; padding: 0; list-style: none; }
+.auth-message li { display: flex; align-items: flex-start; gap: var(--spacing-field); color: var(--secondary-foreground); font-size: .9375rem; font-weight: 350; line-height: 1.6; }
 .auth-message li svg { flex: none; width: 15px; margin-top: .28rem; fill: none; stroke: var(--primary-emphasis); stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.8; }
 
 .trust { position: relative; margin: 0; color: var(--foreground-quiet); font-size: .8125rem; font-weight: 350; }
 
 @media (max-width: 800px) {
-  .auth-story { min-height: auto; padding: 1.5rem; border-inline-end: 0; }
+  .auth-story { min-height: auto; padding: var(--spacing-gutter); border-inline-end: 0; }
   .auth-message { margin: 4.5rem 0 3rem; }
   .auth-message ul { margin-top: 2rem; }
   .trust { display: none; }

@@ -5,7 +5,7 @@
 .zone {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: var(--spacing-group);
   padding: 1.1rem 1.25rem;
   border: 2px dashed var(--border);
   border-radius: var(--radius-lg);

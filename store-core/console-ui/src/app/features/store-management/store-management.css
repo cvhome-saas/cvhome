@@ -30,7 +30,7 @@
 .settings-layout {
   display: grid;
   grid-template-columns: 250px minmax(0, 1fr);
-  gap: 1.5rem;
+  gap: var(--spacing-gutter);
   align-items: start;
   transition: grid-template-columns 0.28s cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -42,7 +42,7 @@
 .settings-section {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: var(--spacing-gutter);
   min-width: 0;
 }
 

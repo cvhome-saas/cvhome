@@ -11,8 +11,8 @@
 .tree-wrap {
   display: flex;
   flex-direction: column;
-  gap: .75rem;
-  padding: .75rem;
+  gap: var(--spacing-field);
+  padding: var(--spacing-field);
 }
 
 .add-root {
@@ -30,7 +30,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
+  gap: var(--spacing-group);
   flex-wrap: wrap;
 }
 

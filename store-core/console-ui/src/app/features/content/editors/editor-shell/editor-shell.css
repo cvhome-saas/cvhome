@@ -1,13 +1,13 @@
 :host {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: var(--spacing-section);
 }
 
 .editor-layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 20rem;
-  gap: 1.25rem;
+  gap: var(--spacing-section);
   align-items: start;
 }
 
@@ -15,7 +15,7 @@
 .editor-side {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: var(--spacing-section);
   min-width: 0;
 }
 

@@ -2,7 +2,7 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 1rem;
+  gap: var(--spacing-group);
   padding: 0.85rem 1.25rem;
   background: var(--input);
 }
@@ -18,7 +18,7 @@
 .page-strip {
   display: flex;
   flex: none;
-  gap: 0.25rem;
+  gap: var(--spacing-inline);
 }
 
 .page-number,

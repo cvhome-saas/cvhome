@@ -15,7 +15,7 @@
   z-index: 50;
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: var(--spacing-group);
   padding: 0.85rem 1.25rem;
   border: 1px solid var(--border);
   border-radius: var(--radius-2xl);
@@ -29,7 +29,7 @@
   flex: 1;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--spacing-tight);
   color: var(--muted-foreground);
   font-size: var(--text-xs);
   font-weight: 500;
@@ -157,7 +157,7 @@
 .notifications > header {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--spacing-tight);
   padding: 0.85rem 1rem;
   border-bottom: 1px solid var(--border-soft);
 }
@@ -187,7 +187,7 @@
 .notifications li > button {
   inline-size: 100%;
   display: flex;
-  gap: 0.75rem;
+  gap: var(--spacing-field);
   padding: 0.85rem 1rem;
   border: 0;
   border-inline-start: 2px solid transparent;
@@ -251,7 +251,7 @@
 
 .notification-copy small {
   display: block;
-  margin-top: 0.25rem;
+  margin-top: var(--spacing-inline);
   color: var(--foreground-subtle);
   font-size: var(--text-3xs);
 }

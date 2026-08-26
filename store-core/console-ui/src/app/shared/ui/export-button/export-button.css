@@ -14,7 +14,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
+  gap: var(--spacing-tight);
   min-block-size: 2.25rem;
   padding: 0.5rem 0.95rem;
   border: 1px solid var(--border);

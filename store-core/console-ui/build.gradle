@@ -6,3 +6,14 @@ plugins {
 bootBuildImage {
   imageGroup = "store-core"
 }
+
+/*
+ * `npm run lint` is the only thing that enforces the Token Rule and the logical-property rule that
+ * `.stylelintrc.json` describes, and until this it ran nowhere — not in `check`, not in CI, not in
+ * a hook. That is why the spacing debt in `Todos.md` regrew after being consolidated once. Wired
+ * here rather than in `com.asrevo.ui-conventions` because that plugin is shared with landing-ui,
+ * which has not been surveyed and would fail on five lint scripts it has never run.
+ */
+tasks.named('check') {
+  dependsOn('npm_run_lint')
+}

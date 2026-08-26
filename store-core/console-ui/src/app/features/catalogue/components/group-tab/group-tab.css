@@ -12,7 +12,7 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto auto;
   align-items: center;
-  gap: .75rem;
+  gap: var(--spacing-field);
   padding: .7rem .8rem;
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
@@ -82,7 +82,7 @@
 
 .list-empty,
 .member-empty {
-  padding: 1.5rem 0;
+  padding: var(--spacing-gutter) 0;
   color: var(--foreground-quiet);
   font-size: var(--text-xs);
   text-align: center;
@@ -97,9 +97,9 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
+  gap: var(--spacing-group);
   flex-wrap: wrap;
-  margin-block-end: 1rem;
+  margin-block-end: var(--spacing-group);
 }
 
 .members {
@@ -128,7 +128,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: .75rem;
+  gap: var(--spacing-field);
   padding: .5rem .6rem;
   border: 1px solid var(--border-soft);
   border-radius: var(--radius-md);

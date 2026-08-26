@@ -16,8 +16,8 @@
 .section-body {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
-  padding: 1.5rem;
+  gap: var(--spacing-section);
+  padding: var(--spacing-gutter);
 }
 
 /* ---- Fields ------------------------------------------------------------------------ */
@@ -56,7 +56,7 @@
 
 .field-foot {
   display: flex;
-  gap: 1rem;
+  gap: var(--spacing-group);
 }
 
 .field-foot .counter {
@@ -89,7 +89,7 @@ app-field-error {
 .info-row {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: var(--spacing-group);
   padding: 0.85rem 1rem;
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
@@ -225,8 +225,8 @@ app-field-error {
 .provider-body {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-  padding: 1rem;
+  gap: var(--spacing-group);
+  padding: var(--spacing-group);
   border-block-start: 1px solid var(--border-soft);
 }
 
@@ -262,7 +262,7 @@ app-field-error {
 
 @container settings (max-width: 34rem) {
   .section-body {
-    padding: 1rem;
+    padding: var(--spacing-group);
   }
 
   .info-row {

@@ -48,7 +48,7 @@
   flex: 1;
   min-inline-size: 0;
   margin: 0.35rem 0;
-  padding-inline-end: 0.25rem;
+  padding-inline-end: var(--spacing-inline);
   color: var(--foreground);
   font-size: var(--text-xs);
   font-weight: 500;

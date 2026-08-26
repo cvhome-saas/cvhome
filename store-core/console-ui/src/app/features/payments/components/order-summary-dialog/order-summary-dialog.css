@@ -20,21 +20,21 @@
 
 .summary-body {
   display: grid;
-  gap: 1rem;
+  gap: var(--spacing-group);
   padding: 1.35rem;
 }
 
 .summary-head {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: var(--spacing-field);
 }
 
 .summary-heading {
   display: flex;
   flex: 1;
   align-items: baseline;
-  gap: 0.5rem;
+  gap: var(--spacing-tight);
   min-width: 0;
 }
 
@@ -170,7 +170,7 @@
   margin: 0;
   padding-inline-start: 0;
   /* Room under the last row so the fade never sits on top of a figure. */
-  padding-block-end: 0.75rem;
+  padding-block-end: var(--spacing-field);
   overflow-y: auto;
   list-style: none;
   scrollbar-width: thin;
@@ -188,7 +188,7 @@
 .summary-line {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 2.75rem minmax(7rem, auto);
-  gap: 0.75rem;
+  gap: var(--spacing-field);
   align-items: baseline;
   font-size: var(--text-xs);
 }
@@ -216,7 +216,7 @@
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  gap: 0.75rem;
+  gap: var(--spacing-field);
   padding-block-start: 0.85rem;
   border-block-start: 1px solid var(--border);
   color: var(--secondary-foreground);

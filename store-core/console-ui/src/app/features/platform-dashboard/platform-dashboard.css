@@ -5,7 +5,7 @@
 .platform-stack {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: var(--spacing-gutter);
 }
 
 /*
@@ -16,7 +16,7 @@
 .panel-row {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(22rem, 1fr));
-  gap: 1.5rem;
+  gap: var(--spacing-gutter);
 }
 
 /*

@@ -141,7 +141,7 @@
   display: grid;
   justify-items: center;
   gap: 0.35rem;
-  padding: 1rem;
+  padding: var(--spacing-group);
   text-align: center;
   --icon-size: 1.4rem;
 }
@@ -174,7 +174,7 @@
   display: flex;
   align-items: flex-start;
   gap: 0.4rem;
-  margin: 0.5rem 0 0;
+  margin: var(--spacing-tight) 0 0;
   color: var(--foreground-subtle);
   font-size: var(--text-2xs);
   line-height: 1.5;

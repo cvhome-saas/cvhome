@@ -7,7 +7,7 @@
 .kpi-grid {
   display: grid;
   grid-template-columns: repeat(var(--kpi-columns, 4), minmax(0, 1fr));
-  gap: 1.25rem;
+  gap: var(--spacing-section);
 }
 
 .kpi-grid app-kpi-card {

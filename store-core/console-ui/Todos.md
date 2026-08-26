@@ -6,58 +6,49 @@ owed.
 
 ---
 
-## Spacing has no tokens, so every screen re-invents it
+## Spacing off the scale, in 682 declarations
 
-**Status:** open · **Cost:** ~half a day · **Blast radius:** every stylesheet in `src/app`
+**Status:** open · **Cost:** ~2 days · **Blast radius:** every stylesheet in `src/app`
 
-### The problem
+### Where this stands
 
-`theme.css` tokenises colour, radius (`--radius-xs` … `--radius-3xl`, eight steps) and type
-(`--text-2xs` … `--text-lg`). **Spacing is the one scale that was never tokenised.** Every padding
-and every gap in the console is a raw literal, so the same measurement is retyped per component and
-drifts. Today, in `src/app`:
+The scale itself exists now. `styles/theme.css` carries six steps named for the job each one does —
+`--spacing-inline` (0.25rem) through `--spacing-gutter` (1.5rem) — plus `--panel-interior`, the
+console's card padding, as one value. 431 declarations that already sat on those steps were
+converted, and `.stylelintrc.json` errors on any of the six typed as a literal, so *that* half
+cannot regrow. `npm run lint` is finally wired into `gradle check`, which it never was.
 
-- `padding: 1rem` × 14, `1.25rem` × 12, `1.35rem` × 11, `1.5rem` × 10, `1.75rem` × 4 — five values
-  doing one job with nothing to say which is correct.
-- `gap: 1rem` × 55, `0.75rem` × 47, `1.25rem` × 36, `1.5rem` × 35, `0.85rem` × 29.
-- The panel interior, `1.25rem 1.5rem`, is declared in **six** places: twice in `panel.css` (head and
-  padded body) and hand-rolled again in `order-details.css`, `create-store.css` and `first-run.css`
-  (twice). `Panel.padded` was introduced to end exactly this and consolidated five of them; four have
-  since grown back.
+What is left is the tail: **682 padding, gap and margin declarations on values the scale does not
+have.** They are warnings, not errors — run `npm run lint:css:debt` to see them.
 
-### Why it keeps coming back
+```
+0.6rem  x82    0.85rem x75    0.35rem x73    0.7rem x56    0.4rem x54    0.15rem x52
+```
 
-Because there is nothing to reach for. A developer writing a new panel has no `var(--space-…)` to
-type, so they type a number, and the number they pick is whatever the component beside them used —
-or, if they are reading the design mock rather than the code, whatever the mock happened to render
-at. Two failures in the store-appearance tab came from this in one sitting (see the fix in
-`ebd9395cd`):
+Worst files: `marketing.css` (76), `order-details.css` (48), `create-store.css` (38),
+`first-run.css` (23), `console-toolbar.css` (21).
 
-1. Its three panels never passed `padded`, so the body sat flush at x=589 while every heading was
-   inset to x=613. Nothing failed; the tab simply looked wrong, and only against a sibling screen.
-2. The hub's `gap: 1.25rem` lives on `.hub-section` and reaches only a tab's *direct* children. The
-   tab wraps its panels in one `app-busy-overlay`, so the gap silently did not apply and the panels
-   stacked with their borders touching.
+### Why it was not finished in the same pass
 
-Neither is catchable by `ng build`, `ng test` or stylelint as configured. Both are the same root
-cause: the rhythm is implicit.
+Every one of these has to move to be tokenised — `0.85rem` is not `0.75rem`. Snapping the tail to
+the nearest step moves at most 0.1rem (1.6px) per declaration, which is invisible in isolation, but
+it is a visual change on every screen in the console and it cannot be proved safe the way the
+first half was. The 431 already-on-scale conversions were verified by substituting the tokens back
+and diffing against `HEAD`: 114 stylesheets, zero changed values. There is no equivalent proof for
+a snap, only a review.
 
-### What to do
+So it is a deliberate deferral, not an oversight. It needs someone with the screens in front of
+them, probably a file or two at a time, in both Forest and Daylight.
 
-1. Add a spacing scale to `styles/theme.css` beside the radius block, on `:root` so component
-   stylesheets read it through `var()` the same way. Derive the steps from what the console already
-   uses rather than inventing a new scale — the four that carry real weight are the field gap
-   (`0.75rem`), the group gap (`1rem`), the section gap (`1.25rem`) and the card interior
-   (`1.25rem 1.5rem`).
-2. Express the panel interior and the section rhythm as tokens, and have `Panel.padded` and
-   `.hub-section` read them, so the two numbers that define the page rhythm exist once.
-3. Sweep the four hand-rolled copies of the panel interior onto `Panel.padded`.
-4. Add a stylelint rule rejecting raw `rem` in `padding`/`gap` outside `theme.css`. Without step 4
-   this regrows — it already has once.
+### Two smaller things in the same territory
 
-### Also worth fixing while in here
-
-`--surface-sunken` and `--text-muted` were used in `branding-tab.css` and are defined by no theme,
-so they silently resolved to nothing. stylelint does not currently reject an undefined custom
-property. Whatever rule lands for step 4 should cover unknown `--*` names too; that class of bug is
-invisible until someone looks at the screen.
+- **`.panel-pad` is still two different measurements.** `order-details.css` defines it as
+  `1.25rem` and `create-store.css` as `1.5rem`, and neither is `--panel-interior`
+  (`1.25rem 1.5rem`), which is what a panel body actually uses. 13 templates reference the class.
+  This is the exact drift `Panel.padded` was introduced to end, and `panel.ts`'s doc comment still
+  describes it in the past tense. Fixing it changes padding on those pages, which is why it is
+  here and not in the last commit.
+- **Three panel-lookalike cards.** `create-store.css` `.progress-head`, `first-run.css`
+  `.progress-head` and `.help` build a bordered `--muted` card by hand at `--radius-2xl`, where
+  `app-panel` is `--radius-xl`. They read the spacing tokens now, so they no longer *drift*, but
+  they are still a fourth copy of a component that exists.

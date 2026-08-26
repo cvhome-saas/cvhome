@@ -5,7 +5,7 @@
 .steps {
   display: flex;
   flex-direction: column;
-  gap: .25rem;
+  gap: var(--spacing-inline);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -33,7 +33,7 @@
   inline-size: 100%;
   display: flex;
   align-items: flex-start;
-  gap: .75rem;
+  gap: var(--spacing-field);
   padding: .6rem .7rem;
   border: 0;
   border-radius: var(--radius-lg);

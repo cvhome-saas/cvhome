@@ -10,7 +10,7 @@
 .account-stack {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: var(--spacing-gutter);
 }
 
 /* ------------------------------------------------------------------------ identity ---- */
@@ -19,7 +19,7 @@
   display: flex;
   align-items: center;
   gap: 0.85rem;
-  margin-block-end: 1.25rem;
+  margin-block-end: var(--spacing-section);
 }
 
 .avatar {
@@ -106,7 +106,7 @@
 .choice-option {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: var(--spacing-field);
   padding: 0.65rem 0.85rem;
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
@@ -187,9 +187,9 @@
 .browser-only {
   display: flex;
   align-items: flex-start;
-  gap: 0.5rem;
-  margin: 1.5rem 0 0;
-  padding-block-start: 1rem;
+  gap: var(--spacing-tight);
+  margin: var(--spacing-gutter) 0 0;
+  padding-block-start: var(--spacing-group);
   border-block-start: 1px solid var(--border-soft);
   color: var(--muted-foreground);
   font-size: var(--text-xs);

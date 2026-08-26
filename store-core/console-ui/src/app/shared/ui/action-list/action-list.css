@@ -4,7 +4,7 @@
 
 .action-list {
   margin: 0;
-  padding: 0.5rem 0.75rem 1rem;
+  padding: var(--spacing-tight) var(--spacing-field) var(--spacing-group);
   list-style: none;
 }
 
@@ -12,7 +12,7 @@
   inline-size: 100%;
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: var(--spacing-group);
   padding: 0.9rem 0.75rem;
   border: 0;
   border-radius: var(--radius-lg);

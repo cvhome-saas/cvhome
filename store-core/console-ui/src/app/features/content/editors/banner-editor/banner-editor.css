@@ -5,7 +5,7 @@
 .placement-cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
-  gap: 0.75rem;
+  gap: var(--spacing-field);
 }
 
 .placement-card {
@@ -38,7 +38,7 @@
 .artwork-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
-  gap: 1rem;
+  gap: var(--spacing-group);
 }
 
 .artwork-slot img {
@@ -63,8 +63,8 @@
 .artwork-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-block-start: 0.5rem;
+  gap: var(--spacing-tight);
+  margin-block-start: var(--spacing-tight);
 }
 
 .side-grid {
@@ -76,7 +76,7 @@
   flex-direction: column;
   gap: 0.35rem;
   min-block-size: 8rem;
-  padding: 1rem;
+  padding: var(--spacing-group);
   border-radius: var(--radius-lg);
   background: linear-gradient(135deg, var(--chart-2-wash), var(--chart-1-wash));
   background-size: cover;
@@ -87,7 +87,7 @@
 .banner-preview.strip {
   min-block-size: 0;
   align-items: center;
-  padding: 0.5rem 1rem;
+  padding: var(--spacing-tight) var(--spacing-group);
 }
 
 .banner-preview strong {

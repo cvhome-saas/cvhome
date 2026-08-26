@@ -11,8 +11,8 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 1rem;
-  padding: 1.25rem 1.5rem;
+  gap: var(--spacing-group);
+  padding: var(--panel-interior);
   border-bottom: 1px solid var(--border-soft);
 }
 
@@ -29,7 +29,7 @@
 }
 
 .panel-subtitle {
-  margin: 0.25rem 0 0;
+  margin: var(--spacing-inline) 0 0;
   color: var(--muted-foreground);
   font-size: var(--text-xs);
 }
@@ -47,5 +47,5 @@
 
 /* The standard interior, for a body that is content rather than a table. See `padded`. */
 :host(.padded) .panel-body {
-  padding: 1.25rem 1.5rem;
+  padding: var(--panel-interior);
 }
