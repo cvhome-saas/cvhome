@@ -82,6 +82,9 @@ class ContentPlatformIntegrationTest {
 
     private static final String STRIP_TITLE = "Free delivery over 250";
 
+    // Single-quoted so the literal drops straight into the JSON payload; jsoup rewrites it on the way in.
+    private static final String STRIP_MESSAGE = "Free delivery over 250 \u2014 <a href='/sale'>shop the sale</a>";
+
     private static final String QUESTION = "How fast?";
 
     private static final String RETURNS_SLUG = "returns";
@@ -139,6 +142,14 @@ class ContentPlatformIntegrationTest {
     private static final String BANNER = """
             {"slug":"%s","placement":"%s","target":{"kind":"URL","value":"/x"},
              "translations":[{"language":"en","title":"%s","subtitle":"sub","ctaLabel":"Go"}]}""";
+
+    /**
+     * The announcement strip: no artwork, no headline over it, and its message in the body — where the
+     * {@code header-message} box it replaced kept it, and the one banner field the publish gate insists on.
+     */
+    private static final String STRIP_BANNER = """
+            {"slug":"%s","placement":"STRIP",
+             "translations":[{"language":"en","title":"%s","body":"%s"}]}""";
 
     private static final String FAQ_ENTRY = """
             {"slug":"%s","groupId":%d,"keywords":["delivery"],"showInCheckoutHelp":true,
@@ -372,9 +383,18 @@ class ContentPlatformIntegrationTest {
             expect(send(HttpMethod.POST, path(PRIVATE, BANNERS, live.get(ID).asLong(), "unpublish"), null),
                     HttpStatus.OK);
         }
-        createAndPublish(BANNERS, String.format(BANNER, slug("strip"), "STRIP", STRIP_TITLE));
+        // A strip with no message is not publishable: the storefront would render an empty bar.
+        var mute = send(HttpMethod.POST, path(PRIVATE, BANNERS),
+                String.format(BANNER, slug("mute-strip"), "STRIP", STRIP_TITLE));
+        var mutePublish = send(HttpMethod.POST, path(PRIVATE, BANNERS, json(mute).get(ID).asLong(), PUBLISH), null);
+        expect(mutePublish, HttpStatus.UNPROCESSABLE_CONTENT);
+        assertThat(mutePublish.getBody()).contains("CONTENT.PUBLISH.INCOMPLETE");
+
+        createAndPublish(BANNERS, String.format(STRIP_BANNER, slug("strip"), STRIP_TITLE, STRIP_MESSAGE));
         JsonNode site = json(getPublic(path(STOREFRONT, SITE)));
+        // The title is the console's row label; the message the shopper reads is the body, links and all.
         assertThat(site.get("announcement").get(TITLE).asString()).isEqualTo(STRIP_TITLE);
+        assertThat(site.get("announcement").get("body").asString()).contains("shop the sale").contains("/sale");
         assertThat(site.get(MENUS).has("main")).isTrue();
         assertThat(site.get("footerPages").size()).isGreaterThanOrEqualTo(1);
         JsonNode sfBanners = json(getPublic(query(path(STOREFRONT, BANNERS), HERO_QUERY)));
@@ -436,10 +456,6 @@ class ContentPlatformIntegrationTest {
     void publishingAPolicyCutsVersionsTheStorefrontServes() {
         String slug = slug(RETURNS_SLUG);
         String base = path(PRIVATE, POLICIES);
-        // a template exists
-        JsonNode template = json(get(query(path(base, "templates"), "type=RETURNS&jurisdiction=NL")));
-        assertThat(template.get("translations").size()).isEqualTo(2);
-
         long id = createAndPublish(POLICIES, String.format(POLICY, slug, THIRTY_DAYS));
         String one = path(base, id);
         JsonNode read = json(get(one));

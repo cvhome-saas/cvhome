@@ -15,12 +15,14 @@ import type {TranslationForm} from '../../services/content-editor-form.service';
 /** Which of the translation's fields this editor shows, and what it calls them. */
 export interface CopyFields {
   readonly titleKey: string;
+  /** A note under the title, for the types where the title is not what the shopper reads. */
+  readonly titleHintKey?: string;
   readonly bodyKey?: string;
   readonly excerptKey?: string;
   readonly subtitleKey?: string;
   readonly ctaLabelKey?: string;
   readonly altTextKey?: string;
-  /** Rich text (pages, posts, FAQ answers, policies) or a plain textarea (banners have no body). */
+  /** Rich text (pages, posts, FAQ answers, policies, the announcement strip) or a plain textarea. */
   readonly richBody?: boolean;
 }
 
@@ -62,6 +64,7 @@ export interface CopyFields {
         <app-form-field
           wide
           [label]="t(fields().titleKey)"
+          [hint]="fields().titleHintKey ? t(fields().titleHintKey!) : ''"
           [control]="form().controls.title"
           required
           [controlId]="id('title')"

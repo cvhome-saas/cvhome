@@ -66,7 +66,7 @@ export interface Banner {
     servedLocale: string | null
     title: string | null
     subtitle: string | null
-    /** Rich text; only the announcement strip carries one. */
+    /** Rich text. Only the announcement strip carries one — it is the strip's message, not a caption. */
     body: string | null
     ctaLabel: string | null
     target: { kind: 'COLLECTION' | 'PRODUCT' | 'PAGE' | 'URL'; value: string } | null
@@ -148,9 +148,6 @@ export interface StorefrontPage {
     servedLocale: string
     title: string
     body: string
-    template: 'STANDARD' | 'LANDING' | 'CONTACT' | 'FAQ_PAGE' | null
-    /** Reserved for the page builder. */
-    blocks: unknown[]
     seo: StorefrontSeo
     breadcrumbs: StorefrontLink[]
     updatedAt: string | null

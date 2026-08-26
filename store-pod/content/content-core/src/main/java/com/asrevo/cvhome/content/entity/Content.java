@@ -35,7 +35,6 @@ import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.content.model.BannerPlacement;
 import com.asrevo.cvhome.content.model.ContentStatus;
-import com.asrevo.cvhome.content.model.PageTemplate;
 import com.asrevo.cvhome.content.model.PolicyType;
 import com.asrevo.cvhome.store.core.constants.SchemaConstant;
 import com.asrevo.cvhome.store.core.entity.common.audit.AuditListener;
@@ -49,8 +48,8 @@ import lombok.Setter;
 /**
  * One CMS item of any type — the legacy {@code content} table, carried forward and extended. Legacy {@code BOX} and
  * {@code PAGE} rows keep their columns and meaning; the workflow columns ({@code status}, {@code publishAt},
- * {@code version} …) and the type-specific ones ({@code placement}, {@code policyType}, {@code template},
- * {@code meta}) were added with the content platform and all default so an existing row stays valid.
+ * {@code version} …) and the type-specific ones ({@code placement}, {@code policyType}, {@code meta}) were added
+ * with the content platform and all default so an existing row stays valid.
  */
 @Entity
 @EntityListeners(value = AuditListener.class)
@@ -131,10 +130,6 @@ public class Content extends SalesManagerEntity<Long, Content> implements Serial
     @Column(name = "PARENT_ID")
     private Long parentId;
 
-    @Column(name = "TEMPLATE", length = 20)
-    @Enumerated(value = EnumType.STRING)
-    private PageTemplate template;
-
     @Column(name = "NOINDEX", nullable = false)
     private boolean noindex;
 
@@ -163,7 +158,7 @@ public class Content extends SalesManagerEntity<Long, Content> implements Serial
 
     /**
      * Type-specific payload nothing queries on, as a JSON document (post hero/tags, banner artwork/target, FAQ
-     * keywords, policy jurisdiction…). Page rows reserve {@code blocks} here for the future builder.
+     * keywords, policy jurisdiction…).
      */
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "META")

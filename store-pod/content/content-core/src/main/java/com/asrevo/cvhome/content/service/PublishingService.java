@@ -134,7 +134,7 @@ public class PublishingService {
             problems.add(FieldError.of(String.format(FIELD, locale, "title"), ContentErrors.PUBLISH_INCOMPLETE,
                     "Title is required."));
         }
-        if (binding.requiresBody() && Strings.blank(source.getDescription())) {
+        if (binding.requiresBody(entity) && Strings.blank(source.getDescription())) {
             problems.add(FieldError.of(String.format(FIELD, locale, "body"), ContentErrors.PUBLISH_INCOMPLETE,
                     "Body is required."));
         }

@@ -23,6 +23,20 @@ class HtmlSanitizerTest {
         assertThat(clean).contains("<img").contains("src=\"http://localhost:9000/b/x.png\"");
     }
 
+    /**
+     * A merchant linking to their own pages is the common case — an announcement strip is barely worth having
+     * without it — and jsoup drops a relative href unless the fragment is parsed against a base URL.
+     */
+    @Test
+    void keepsLinksToTheStoreItsOwnPages() {
+        String clean = HtmlSanitizer.clean(
+                "<p>Sale <a href=\"/content/sale\">here</a>, <a href=\"#terms\">terms</a>, "
+                        + "<a href=\"mailto:a@b.c\">mail</a>, <a href=\"javascript:x()\">no</a></p>");
+
+        assertThat(clean).contains("href=\"/content/sale\"").contains("href=\"mailto:a@b.c\"")
+                .doesNotContain("javascript:");
+    }
+
     @Test
     void passesNullAndBlankThrough() {
         assertThat(HtmlSanitizer.clean(null)).isNull();

@@ -86,7 +86,7 @@ class ContentApiIntegrationTest {
     private static final String STOREFRONT_PAGE = "%s/pages/%s?store=%s&lang=%s";
 
     private static final String PAGE_BODY = """
-            {%s"slug":"%s","template":"STANDARD",
+            {%s"slug":"%s",
              "translations":[{"language":"en","title":"%s","body":"%s"},
                              {"language":"ar","title":"عنوان","body":""}]}""";
 

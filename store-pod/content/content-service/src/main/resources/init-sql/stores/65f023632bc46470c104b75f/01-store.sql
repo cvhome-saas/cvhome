@@ -209,6 +209,8 @@ on conflict (store_merchant_id) do nothing;
 
 -- The announcement strip, which the `header-message` BOX used to carry. Negative ids are deliberate: content ids
 -- come from SM_SEQUENCER and only ever grow upward, so seed-only rows below zero can never collide.
+-- The message sits in `description`, not `name`: a STRIP banner shows no artwork and no headline, so its body is
+-- what the shopper reads (rich, so it can link) and `name` is only the label the console list shows.
 INSERT INTO content.content (content_id, code, content_type, sort_order, visible, store_merchant_id,
                              status, version, placement, meta)
 VALUES (-13, 'announcement', 'BANNER', 0, true, '65f023632bc46470c104b75f', 'PUBLISHED', 1, 'STRIP',

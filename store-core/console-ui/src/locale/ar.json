@@ -3121,7 +3121,10 @@
       "question": "السؤال",
       "answer": "الإجابة",
       "heading": "العنوان",
-      "policyBody": "نص السياسة"
+      "policyBody": "نص السياسة",
+      "bannerLabel": "التسمية",
+      "bannerLabelHint": "اسم البانر في قائمة المحتوى لديك. لا يراه المتسوقون.",
+      "message": "الرسالة"
     },
     "seo": {
       "title": "الرابط والبحث",
@@ -3167,32 +3170,13 @@
       "policyType": "اختير النوع",
       "headingAndBody": "كُتب العنوان والنص",
       "effectiveDate": "حُدّد تاريخ السريان",
-      "legalReview": "مراجعة قانونية لـ {languages}"
+      "legalReview": "مراجعة قانونية لـ {languages}",
+      "message": "كُتبت رسالة الإعلان"
     },
     "page": {
       "newTitle": "صفحة جديدة",
       "editTitle": "صفحة",
       "context": "المحتوى والرابط والظهور لصفحة في المتجر",
-      "templateTitle": "القالب",
-      "templateSubtitle": "كيف يصفّ المتجر الصفحة.",
-      "template": {
-        "STANDARD": {
-          "label": "صفحة عادية",
-          "hint": "عنوان ونص منسّق. للسياسات وصفحات عن الشركة."
-        },
-        "LANDING": {
-          "label": "صفحة هبوط",
-          "hint": "واجهة وأقسام ودعوات للإجراء للحملات."
-        },
-        "CONTACT": {
-          "label": "صفحة تواصل",
-          "hint": "نموذج وعنوان وساعات العمل."
-        },
-        "FAQ_PAGE": {
-          "label": "صفحة الأسئلة الشائعة",
-          "hint": "تجلب الأسئلة المجمّعة من المكتبة."
-        }
-      },
       "visibility": "الظهور",
       "parent": "الصفحة الأم",
       "noParent": "بدون — المستوى الأعلى",
@@ -3383,7 +3367,10 @@
       "audienceHint": "استهداف الشرائح والدول غير متاح على المنصة بعد.",
       "preview": "معاينة",
       "previewHeadline": "عنوانك الرئيسي",
-      "previewHint": "تحلّ الصورة محل التدرّج بعد رفعها."
+      "previewHint": "تحلّ الصورة محل التدرّج بعد رفعها.",
+      "identityTitle": "العنوان",
+      "previewMessage": "إعلانك",
+      "previewStripHint": "يمتد الشريط أعلى كل صفحة في المتجر. تبقى الروابط داخل الرسالة قابلة للنقر."
     },
     "faq": {
       "newTitle": "سؤال شائع جديد",
@@ -3438,12 +3425,9 @@
           "hint": "أي نص قانوني آخر."
         }
       },
-      "templateHint": "ابدأ من قالب {type}، أو الصق نصك.",
-      "insertTemplate": "إدراج القالب",
-      "templateInserted": "أُدرج القالب — راجعه قبل النشر.",
       "appliesTitle": "أين تسري",
       "jurisdiction": "الاختصاص القضائي",
-      "jurisdictionHint": "مثل NL — يحدد القالب وقواعد الامتثال.",
+      "jurisdictionHint": "مثال: NL — يحدّد قواعد الامتثال المطبَّقة.",
       "effectiveFrom": "تاريخ السريان",
       "effectiveFromHint": "يظهر مع الإصدار؛ الفارغ يعني عند النشر.",
       "requiresAcceptance": "اشتراط الموافقة عند الدفع",

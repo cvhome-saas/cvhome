@@ -31,7 +31,5 @@ export const loadContent = cache(async (url: string, preview?: string): Promise<
             ...page.breadcrumbs.map(b => ({id: b.slug, name: b.title, href: b.href})),
         ],
         seo: page.seo,
-        template: page.template,
-        blocks: page.blocks,
     };
 });

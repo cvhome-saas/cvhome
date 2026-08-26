@@ -133,10 +133,17 @@ public class MenuService implements SummaryService.MediaFigures {
         return out;
     }
 
+    /**
+     * The rail badge counts links, not menus. Every store has exactly the two handles, so counting those made the
+     * badge a hard-coded 2 sitting next to an editor that said "No links yet" — the rail contradicting the panel
+     * beside it. Children count too: they are links a seller added.
+     */
     @Override
+    @Transactional(readOnly = true)
     public void contribute(StoreMerchantId store, com.asrevo.cvhome.content.model.summary.ContentSummary summary,
                            Map<String, Long> counts) {
-        counts.put("menus", (long) MenuHandle.values().length);
+        counts.put("menus", menus.findByStore(store.getId()).stream()
+                .mapToLong(menu -> menu.getItems().size()).sum());
     }
 
     // --------------------------------------------------------------------------------------------- helpers

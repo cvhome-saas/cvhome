@@ -1,20 +1,14 @@
 package com.asrevo.cvhome.content.service;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.time.Clock;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.content.entity.Content;
 import com.asrevo.cvhome.content.entity.PolicyVersion;
@@ -24,7 +18,6 @@ import com.asrevo.cvhome.content.model.PolicyType;
 import com.asrevo.cvhome.content.model.PolicyVersionStatus;
 import com.asrevo.cvhome.content.model.common.ContentTranslation;
 import com.asrevo.cvhome.content.model.policy.PolicyCompliance;
-import com.asrevo.cvhome.content.model.policy.PolicyTemplate;
 import com.asrevo.cvhome.content.model.policy.PublishPolicyVersionRequest;
 import com.asrevo.cvhome.content.model.policy.ReadablePolicyVersion;
 import com.asrevo.cvhome.content.repository.ContentRepository;
@@ -52,22 +45,12 @@ public class PolicyService {
 
     private static final String US = "US";
 
-    private static final String AR = "ar";
-
     private static final Map<PolicyType, List<String>> REQUIRED_BY = Map.of(
             PolicyType.TERMS, List.of(EU, UK, US),
             PolicyType.PRIVACY, List.of(EU, UK, US),
             PolicyType.RETURNS, List.of(EU, UK),
             PolicyType.COOKIES, List.of(EU, UK),
             PolicyType.SHIPPING, List.of());
-
-    private static final Map<PolicyType, String[]> TITLES = Map.of(
-            PolicyType.TERMS, new String[] {"Terms of service", "شروط الخدمة"},
-            PolicyType.PRIVACY, new String[] {"Privacy policy", "سياسة الخصوصية"},
-            PolicyType.RETURNS, new String[] {"Returns & refunds", "الإرجاع والاسترداد"},
-            PolicyType.SHIPPING, new String[] {"Shipping policy", "سياسة الشحن"},
-            PolicyType.COOKIES, new String[] {"Cookie notice", "إشعار ملفات تعريف الارتباط"},
-            PolicyType.CUSTOM, new String[] {"Policy", "سياسة"});
 
     private final PolicyVersionRepository versions;
 
@@ -197,45 +180,6 @@ public class PolicyService {
                     head == null ? null : head.getStatus(), head == null ? null : head.getId()));
         }
         return out;
-    }
-
-    /**
-     * Starter text from the classpath ({@code policy-templates/<type>[-<jurisdiction>].<lang>.html}).
-     */
-    public PolicyTemplate template(PolicyType type, String jurisdiction) {
-        List<ContentTranslation> translations = new ArrayList<>();
-        String base = type.name().toLowerCase(Locale.ROOT);
-        String j = jurisdiction == null ? "" : jurisdiction.trim().toLowerCase(Locale.ROOT);
-        for (String lang : List.of("en", AR)) {
-            String body = read(String.format("policy-templates/%s-%s.%s.html", base, j, lang));
-            if (body == null) {
-                body = read(String.format("policy-templates/%s.%s.html", base, lang));
-            }
-            if (body != null) {
-                ContentTranslation t = new ContentTranslation();
-                t.setLanguage(new LanguageCode(lang));
-                t.setTitle(titleOf(type, lang));
-                t.setBody(body);
-                translations.add(t);
-            }
-        }
-        return new PolicyTemplate(type, jurisdiction, translations);
-    }
-
-    private static String titleOf(PolicyType type, String lang) {
-        return TITLES.get(type)[AR.equals(lang) ? 1 : 0];
-    }
-
-    private static String read(String path) {
-        ClassPathResource res = new ClassPathResource(path);
-        if (!res.exists()) {
-            return null;
-        }
-        try (InputStream in = res.getInputStream()) {
-            return new String(in.readAllBytes(), StandardCharsets.UTF_8);
-        } catch (IOException _) {
-            return null;
-        }
     }
 
     public static boolean isLive(Content head, Optional<PolicyVersion> live) {

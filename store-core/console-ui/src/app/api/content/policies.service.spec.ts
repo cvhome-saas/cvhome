@@ -17,22 +17,9 @@ describe('PoliciesService', () => {
 
   const BASE = '/spg/content/api/v1/private/content/policies';
 
-  it('reads compliance and a template, filtered by jurisdiction only when one is given', () => {
+  it('reads compliance, scoped to the store', () => {
     service.compliance().subscribe();
     http.expectOne(scoped(`${BASE}/compliance`)).flush([]);
-
-    service.template('TERMS', 'EU').subscribe();
-    const withJurisdiction = http.expectOne((r) => r.url === `${BASE}/templates`);
-    expect(withJurisdiction.request.params.get('type')).toBe('TERMS');
-    expect(withJurisdiction.request.params.get('jurisdiction')).toBe('EU');
-    expect(withJurisdiction.request.params.get('store')).toBe(TEST_STORE);
-    withJurisdiction.flush({} as never);
-
-    // `null` and `''` both mean "no jurisdiction" — the parameter must vanish, not read "null".
-    service.template('TERMS', null).subscribe();
-    const bare = http.expectOne((r) => r.url === `${BASE}/templates`);
-    expect(bare.request.params.has('jurisdiction')).toBeFalse();
-    bare.flush({} as never);
   });
 
   it('reads the version history and one version', () => {

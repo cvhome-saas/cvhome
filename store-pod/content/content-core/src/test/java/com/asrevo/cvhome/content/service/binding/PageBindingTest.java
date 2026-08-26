@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test;
 
 import com.asrevo.cvhome.content.ContentFixtures;
 import com.asrevo.cvhome.content.entity.Content;
-import com.asrevo.cvhome.content.model.PageTemplate;
 import com.asrevo.cvhome.content.model.page.PersistablePage;
 import com.asrevo.cvhome.content.model.page.ReadablePage;
 import com.asrevo.cvhome.store.core.entity.content.ContentType;
@@ -12,8 +11,8 @@ import com.asrevo.cvhome.store.core.entity.content.ContentType;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Static pages. A page whose template was never chosen renders as STANDARD in both directions, so a legacy row
- * with a null column never reaches the storefront without one.
+ * Static pages. A page is a slug, copy and two placement flags — the {@code template} choice this used to cover is
+ * gone: it stored a layout no theme ever read.
  */
 class PageBindingTest {
 
@@ -33,50 +32,29 @@ class PageBindingTest {
     }
 
     @Test
-    void anUnchosenTemplateBecomesStandardOnWrite() {
-        Content c = ContentFixtures.content(1L, ContentType.PAGE, SLUG);
-
-        binding.apply(c, new PersistablePage());
-
-        assertThat(c.getTemplate()).isEqualTo(PageTemplate.STANDARD);
-    }
-
-    @Test
-    void applyCopiesTheTemplateFooterFlagAndParent() {
+    void applyCopiesTheFooterFlagAndParent() {
         Content c = ContentFixtures.content(1L, ContentType.PAGE, SLUG);
         PersistablePage dto = new PersistablePage();
-        dto.setTemplate(PageTemplate.LANDING);
         dto.setParentId(4L);
         dto.setShowInFooter(true);
 
         binding.apply(c, dto);
 
-        assertThat(c.getTemplate()).isEqualTo(PageTemplate.LANDING);
         assertThat(c.getParentId()).isEqualTo(4L);
         assertThat(c.isShowInFooter()).isTrue();
     }
 
     @Test
-    void aLegacyRowWithoutATemplateStillReadsAsStandard() {
+    void populateCarriesTheStatusLocalesAndAudit() {
         Content c = ContentFixtures.published(1L, ContentType.PAGE, SLUG, ABOUT_TITLE);
+        c.setShowInFooter(true);
         ReadablePage dto = new ReadablePage();
 
         binding.populate(c, dto);
 
-        assertThat(dto.getTemplate()).isEqualTo(PageTemplate.STANDARD);
+        assertThat(dto.isShowInFooter()).isTrue();
         assertThat(dto.getLocales()).hasSize(1);
         assertThat(dto.getAudit()).isNotNull();
-    }
-
-    @Test
-    void aChosenTemplateSurvivesTheRoundTrip() {
-        Content c = ContentFixtures.published(1L, ContentType.PAGE, SLUG, ABOUT_TITLE);
-        c.setTemplate(PageTemplate.LANDING);
-        ReadablePage dto = new ReadablePage();
-
-        binding.populate(c, dto);
-
-        assertThat(dto.getTemplate()).isEqualTo(PageTemplate.LANDING);
     }
 
 }

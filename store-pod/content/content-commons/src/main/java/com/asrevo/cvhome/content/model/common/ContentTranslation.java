@@ -26,6 +26,12 @@ import lombok.Setter;
  * subtitle, ctaLabel and altText; FAQ entries use title (question) and body (answer); policies use title (heading)
  * and body.
  * </p>
+ *
+ * <p>
+ * The one banner that breaks that rule is the {@code STRIP} announcement: it renders no artwork and no headline,
+ * so its message is the {@code body} — rich text, which is how it can carry a link. Its {@code title} is only the
+ * label the console list shows.
+ * </p>
  */
 @Getter
 @Setter

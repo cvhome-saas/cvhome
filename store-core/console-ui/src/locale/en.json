@@ -3121,7 +3121,10 @@
       "question": "Question",
       "answer": "Answer",
       "heading": "Heading",
-      "policyBody": "Policy text"
+      "policyBody": "Policy text",
+      "bannerLabel": "Label",
+      "bannerLabelHint": "Names the banner in your content list. Shoppers never see it.",
+      "message": "Message"
     },
     "seo": {
       "title": "URL & search",
@@ -3167,32 +3170,13 @@
       "policyType": "Type selected",
       "headingAndBody": "Heading and body written",
       "effectiveDate": "Effective date set",
-      "legalReview": "Legal review for {languages}"
+      "legalReview": "Legal review for {languages}",
+      "message": "Announcement message written"
     },
     "page": {
       "newTitle": "New page",
       "editTitle": "Page",
       "context": "Content, URL and visibility for a storefront page",
-      "templateTitle": "Template",
-      "templateSubtitle": "How the storefront lays the page out.",
-      "template": {
-        "STANDARD": {
-          "label": "Standard page",
-          "hint": "Title and rich text. For policies, about and company pages."
-        },
-        "LANDING": {
-          "label": "Landing page",
-          "hint": "Hero, sections and calls to action for campaigns."
-        },
-        "CONTACT": {
-          "label": "Contact page",
-          "hint": "Form, address block and opening hours."
-        },
-        "FAQ_PAGE": {
-          "label": "FAQ page",
-          "hint": "Pulls grouped entries from the FAQ library."
-        }
-      },
       "visibility": "Visibility",
       "parent": "Parent page",
       "noParent": "None — top level",
@@ -3383,7 +3367,10 @@
       "audienceHint": "Segments and country targeting are not available on this platform yet.",
       "preview": "Preview",
       "previewHeadline": "Your headline",
-      "previewHint": "Artwork replaces the gradient once uploaded."
+      "previewHint": "Artwork replaces the gradient once uploaded.",
+      "identityTitle": "Address",
+      "previewMessage": "Your announcement",
+      "previewStripHint": "The strip spans the top of every storefront page. Links in the message stay clickable."
     },
     "faq": {
       "newTitle": "New FAQ entry",
@@ -3438,12 +3425,9 @@
           "hint": "Any other legal text."
         }
       },
-      "templateHint": "Start from the {type} template, or paste your own text.",
-      "insertTemplate": "Insert template",
-      "templateInserted": "Template inserted — review it before publishing.",
       "appliesTitle": "Where it applies",
       "jurisdiction": "Jurisdiction",
-      "jurisdictionHint": "e.g. NL — picks the template and the compliance rules.",
+      "jurisdictionHint": "e.g. NL — picks the compliance rules that apply.",
       "effectiveFrom": "Effective date",
       "effectiveFromHint": "Shown with the version; empty means on publish.",
       "requiresAcceptance": "Require acceptance at checkout",

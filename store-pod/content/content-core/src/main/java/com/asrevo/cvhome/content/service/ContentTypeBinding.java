@@ -44,11 +44,18 @@ public interface ContentTypeBinding<P extends PersistableContent, R extends P> {
     }
 
     /**
-     * Whether a complete translation needs a body as well as a title (pages, posts, FAQ, policies do; banners
-     * do not).
+     * Whether a complete translation needs a body as well as a title, for the whole type.
      */
     default boolean requiresBody() {
         return true;
+    }
+
+    /**
+     * The same question for one row, which is what callers should ask. Pages, posts, FAQ entries and policies
+     * always need a body; banners do not — except the announcement strip, whose message <em>is</em> its body.
+     */
+    default boolean requiresBody(Content entity) {
+        return requiresBody();
     }
 
     /**

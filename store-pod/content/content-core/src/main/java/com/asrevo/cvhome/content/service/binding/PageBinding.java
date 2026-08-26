@@ -3,7 +3,6 @@ package com.asrevo.cvhome.content.service.binding;
 import org.springframework.stereotype.Component;
 
 import com.asrevo.cvhome.content.entity.Content;
-import com.asrevo.cvhome.content.model.PageTemplate;
 import com.asrevo.cvhome.content.model.page.PersistablePage;
 import com.asrevo.cvhome.content.model.page.ReadablePage;
 import com.asrevo.cvhome.content.service.ContentMapper;
@@ -33,14 +32,12 @@ public class PageBinding implements ContentTypeBinding<PersistablePage, Readable
 
     @Override
     public void apply(Content entity, PersistablePage dto) {
-        entity.setTemplate(dto.getTemplate() != null ? dto.getTemplate() : PageTemplate.STANDARD);
         entity.setParentId(dto.getParentId());
         entity.setShowInFooter(dto.isShowInFooter());
     }
 
     @Override
     public void populate(Content entity, ReadablePage dto) {
-        dto.setTemplate(entity.getTemplate() != null ? entity.getTemplate() : PageTemplate.STANDARD);
         dto.setParentId(entity.getParentId());
         dto.setShowInFooter(entity.isShowInFooter());
         dto.setStatus(entity.getStatus());

@@ -13,7 +13,7 @@ once during the build and could break again.
 - **Scope** — content · console-ui · landing-ui · spg · uaa permission evaluator
 - **Change** — PR #276, branch `feat/mirror-console-ui`, plans `.agents/plans/console-ui-content.md`
   (Module 12) and `.agents/plans/console-ui-retire-seller-ui.md` (Module 13 / content phase 7)
-- **Cases** — 81 (16 verified, 19 covered by tests only, 46 never run end to end)
+- **Cases** — 80 (16 verified, 19 covered by tests only, 45 never run end to end)
 - **Storage** — media uploads go to MinIO in `docker-compose-lcl.yml`. It runs **without a volume**, so
   everything uploaded is gone after a container restart. That is the local stack, not a defect.
 
@@ -452,13 +452,6 @@ fallback is gone, which is why all four demo stores were given a seeded TERMS po
 - **Expect** — a card per type with its "required by" regions and its real status: TERMS published, the rest
   missing with a Create call to action. Publish one and its card changes without a hard reload.
 
-### POL-06 — Templates fill both languages · [not verified]
-
-- **Steps** — create a COOKIES policy and press **Insert template**.
-- **Expect** — English and Arabic starter text and headings arrive together, editable, and the request
-  (`GET /policies/templates?type=COOKIES`) returns 200 for every type — an unknown jurisdiction falls back to
-  the plain template rather than erroring.
-
 ---
 
 ## MNU — Navigation menus
@@ -879,8 +872,14 @@ and nothing consumes it — there is no customer-notification channel on the pla
 **Content is store-scoped, with no org-level sharing.** An item belongs to the store it was created in; the
 design's "Stores: All stores" picker is omitted rather than shown disabled.
 
-**No storefront builder.** `template`, `meta.blocks` and `ContentData.blocks` are a deliberate seam with no UI
-behind them.
+**No storefront builder, and no seam left for one.** The page `template` column (STANDARD/LANDING/CONTACT/
+FAQ_PAGE) and the `blocks` placeholders were removed: the console stored a layout choice, the storefront carried
+it to the theme contract, and every theme rendered the same title and prose, so the four cards changed nothing.
+A builder would arrive as its own feature rather than as a dormant column.
+
+**No policy starter text.** The classpath `policy-templates/` and the *Insert template* button are gone. They
+worked, and that was the problem: shipping canned legal text invites a merchant to publish a privacy policy
+nobody read. A policy starts empty and the merchant writes or pastes their own.
 
 **Delete is permanent.** No soft-delete window and no trash, for any content type or media asset.
 

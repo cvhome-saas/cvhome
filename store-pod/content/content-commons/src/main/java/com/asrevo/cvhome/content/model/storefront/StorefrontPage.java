@@ -5,8 +5,6 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.util.List;
 
-import com.asrevo.cvhome.content.model.PageTemplate;
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -26,13 +24,6 @@ public class StorefrontPage implements Serializable {
     private String title;
 
     private String body;
-
-    private PageTemplate template;
-
-    /**
-     * Reserved for the page builder; empty until then.
-     */
-    private List<Object> blocks = List.of();
 
     private StorefrontSeo seo;
 

@@ -64,7 +64,7 @@ export interface LayoutData {
      * Kept so themes that have not adopted `menus` keep rendering; derived from the site document.
      */
     pages: NavPage[];
-    /** The announcement strip (live STRIP banner, else the `header-message` snippet). */
+    /** The announcement strip: the live STRIP banner's message. The `header-message` snippet it replaced is gone. */
     announcement?: AnnouncementData;
     /** The merchant-managed menus, with resolved hrefs. Empty arrays when the store has not configured them. */
     menus: { main: MenuNode[]; footer: MenuNode[] };
@@ -120,9 +120,6 @@ export interface ContentData {
     html: string;
     breadcrumbs: BreadcrumbItem[];
     seo?: StorefrontSeo;
-    template?: 'STANDARD' | 'LANDING' | 'CONTACT' | 'FAQ_PAGE' | null;
-    /** Reserved for the page builder; always empty today. */
-    blocks?: unknown[];
 }
 
 export interface BlogIndexData {
