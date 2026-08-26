@@ -1,7 +1,12 @@
-.branding-actions {
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
+/*
+ * The hub lays its tabs out with a 1.25rem gap between panels, but that gap belongs to `.hub-section`
+ * and only reaches a tab's *direct* children. This tab puts its three panels inside one
+ * `app-busy-overlay` — one load and one save cover all three — so to the hub they are a single child
+ * and the panels stacked with their borders touching. Restated here rather than by splitting the
+ * overlay, which would give the tab three independent spinners for one request.
+ */
+app-panel + app-panel {
+  margin-block-start: 1.25rem;
 }
 
 .branding-images {
@@ -29,8 +34,8 @@
   overflow: hidden;
   aspect-ratio: 1;
   border-radius: var(--radius-sm);
-  background: var(--surface-sunken);
-  color: var(--text-muted);
+  background: var(--input);
+  color: var(--muted-foreground);
 }
 
 .brand-thumb img {
@@ -46,7 +51,7 @@
 }
 
 .brand-hint {
-  color: var(--text-muted);
+  color: var(--foreground-quiet);
   font-size: var(--text-xs);
 }
 

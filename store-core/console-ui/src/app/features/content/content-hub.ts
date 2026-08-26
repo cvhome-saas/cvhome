@@ -58,6 +58,14 @@ const LIST_TABS: readonly ContentListType[] = ['pages', 'posts', 'banners', 'faq
 })
 export class ContentHub {
   private readonly router = inject(Router);
+  /**
+   * Injected here, not only in the tab, so *Save changes* can sit in the page header.
+   *
+   * The branding tab is three panels that one request commits. Store management — where this screen's
+   * fields used to live — puts a save that spans sections in the page header for exactly that reason,
+   * and a button in the first panel's header reads as saving the first panel.
+   */
+  protected readonly branding = inject(BrandingFacade);
   private readonly transloco = inject(TranslocoService);
   private readonly permissions = inject(ConsolePermissions);
   protected readonly facade = inject(ContentHubFacade);
@@ -103,6 +111,8 @@ export class ContentHub {
   });
 
   protected readonly createAvailable = computed(() => this.listType() !== null && this.canManage());
+
+  protected readonly brandingActions = computed(() => this.activeTab() === 'branding' && this.canManage());
 
   protected pickTab(key: string): void {
     this.router.navigate(['/content', key]);
