@@ -1,0 +1,434 @@
+/*
+ * hunger — "The Letterbox Menu".
+ * The store is the folded takeaway menu that came through the door: dishes are numbered printed lines,
+ * not photo cards; prices fall in one tabular column down the whole sheet; sections are bands of the
+ * second ink plate; state is printed in outline, never toasted. Two plates only — ink and the merchant's
+ * PRIMARY — on white menu stock. Colour roles are NOT set here: they come from the merchant's ColorTheme
+ * preset through the bridge (inline style on <html>).
+ */
+[data-theme="hunger"] {
+    /* fonts — next/font variables from fonts.ts */
+    --font-body: var(--font-hunger-sans), var(--font-hunger-arabic), ui-sans-serif, system-ui, sans-serif;
+    --font-heading: var(--font-hunger-display), var(--font-hunger-arabic), var(--font-hunger-sans), "Arial Narrow", sans-serif;
+    --font-code: ui-monospace, SFMono-Regular, Menlo, monospace;
+
+    /* type scale — small print stays small, the masthead prints big: a menu's violent scale contrast */
+    --type-xs: 0.6875rem;
+    --type-sm: 0.8125rem;
+    --type-base: 0.9375rem;
+    --type-lg: 1.0625rem;
+    --type-xl: 1.25rem;
+    --type-2xl: 1.5rem;
+    --type-3xl: 2rem;
+    --type-4xl: 2.75rem;
+    --type-5xl: 3.75rem;
+    --type-6xl: 5.25rem;
+    --line-tight: 0.9;
+    --line-snug: 1.18;
+    --line-normal: 1.5;
+    --line-relaxed: 1.7;
+    --track-tight: -0.01em;
+    --track-normal: 0;
+    --track-wide: 0.1em;
+
+    /* spacing & density — a dense sheet */
+    --density: 0.95;
+    --space-unit: calc(0.25rem * var(--density));
+    --section-y: 2.5rem;
+    --gutter: 1rem;
+
+    /* radius — none. Nothing on a printed sheet has a rounded corner. */
+    --r-control: 0;
+    --r-card: 0;
+    --r-image: 0;
+    --r-badge: 0;
+    --r-overlay: 0;
+
+    /* borders & elevation — the sheet is flat; only what floats above it casts anything */
+    --border-width: 1px;
+    --elev-sm: 0 1px 0 0 color-mix(in srgb, var(--foreground) 12%, transparent);
+    --elev-md: 0 2px 6px -2px color-mix(in srgb, var(--foreground) 22%, transparent);
+    --elev-lg: 0 6px 18px -8px color-mix(in srgb, var(--foreground) 28%, transparent);
+    --elev-overlay: 0 20px 48px -16px color-mix(in srgb, var(--foreground) 40%, transparent);
+
+    /* containers — a menu column set to a readable measure */
+    --width-narrow: 40rem;
+    --width-content: 74rem;
+    --width-wide: 90rem;
+
+    /* motion — the press clock: one impression, no bounce */
+    --motion-fast: 90ms;
+    --motion-base: 150ms;
+    --motion-slow: 480ms;
+    --easing-standard: cubic-bezier(0.2, 0, 0, 1);
+    --easing-emphasized: cubic-bezier(0.9, 0, 0.1, 1);
+
+    /* layout */
+    --header-h: 3.5rem;
+    --header-h-lg: 4.25rem;
+    --product-aspect: 4 / 3;
+
+    /* world materials */
+    --stock: var(--background);
+    --ink: var(--foreground);
+    --rule: color-mix(in srgb, var(--foreground) 26%, var(--background));
+    --rule-strong: var(--foreground);
+    --wash: color-mix(in srgb, var(--primary) 8%, var(--background));
+    --small-print: color-mix(in srgb, var(--foreground) 62%, var(--background));
+    --leader-dot: color-mix(in srgb, var(--foreground) 42%, var(--background));
+
+    /* the registration crop mark: four corner brackets, drawn once and reused by every attention state */
+    --crop-marks:
+        linear-gradient(var(--primary), var(--primary)), linear-gradient(var(--primary), var(--primary)),
+        linear-gradient(var(--primary), var(--primary)), linear-gradient(var(--primary), var(--primary)),
+        linear-gradient(var(--primary), var(--primary)), linear-gradient(var(--primary), var(--primary)),
+        linear-gradient(var(--primary), var(--primary)), linear-gradient(var(--primary), var(--primary));
+    --crop-sizes: 11px 2px, 2px 11px, 11px 2px, 2px 11px, 11px 2px, 2px 11px, 11px 2px, 2px 11px;
+    --crop-positions:
+        left top, left top, right top, right top,
+        left bottom, left bottom, right bottom, right bottom;
+
+    /* browser surfaces are printed too */
+    caret-color: var(--primary);
+    accent-color: var(--primary);
+    scrollbar-color: color-mix(in srgb, var(--foreground) 32%, transparent) transparent;
+    scrollbar-width: thin;
+}
+
+/* Arabic editions lead with Alexandria on both roles: next/font's metric fallback for the Latin faces
+   carries Arabic glyphs and would otherwise catch them first. Alexandria's Latin sets the few Latin words. */
+[data-theme="hunger"]:lang(ar) {
+    --font-body: var(--font-hunger-arabic), var(--font-hunger-sans), ui-sans-serif, system-ui, sans-serif;
+    --font-heading: var(--font-hunger-arabic), var(--font-hunger-display), var(--font-hunger-sans), sans-serif;
+}
+
+@media (min-width: 1024px) {
+    [data-theme="hunger"] {
+        --section-y: 3.5rem;
+        --gutter: 2rem;
+    }
+}
+
+[data-theme="hunger"] ::selection {
+    background: var(--primary);
+    color: var(--primary-foreground);
+}
+
+[data-theme="hunger"] a {
+    text-underline-offset: 0.18em;
+    text-decoration-thickness: 1px;
+}
+
+/* Keyboard attention is a registration crop mark, not a browser ring. Anything that can carry a
+   pseudo-element gets the marks; form controls, which cannot, keep a printed rule so focus stays visible. */
+[data-theme="hunger"] :is(input, textarea, select, [role="combobox"]):focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+[data-theme="hunger"] :is(a, button, summary, [role="radio"], [role="tab"], [role="option"], [tabindex]):focus-visible {
+    outline: none;
+    /* libs/ui's Button paints a 3px ring as a box-shadow on focus-visible; the crop marks are this
+       theme's attention state, so the ring underneath them is suppressed here rather than forked there. */
+    box-shadow: none;
+    position: relative;
+}
+[data-theme="hunger"] :is(a, button, summary, [role="radio"], [role="tab"], [role="option"], [tabindex]):focus-visible::after {
+    content: "";
+    position: absolute;
+    inset: -5px;
+    pointer-events: none;
+    background-image: var(--crop-marks);
+    background-repeat: no-repeat;
+    background-size: var(--crop-sizes);
+    background-position: var(--crop-positions);
+}
+
+/* ---- world grammar as small utilities (scoped to the theme) ------------------------------------ */
+/* Layered under Tailwind's utilities so `text-*`, `p-*`, `lg:grid` … on the same element still win. */
+@layer components {
+    /* the printed voice — masthead, section bands, dish numbers, prices, marks */
+    [data-theme="hunger"] .press {
+        font-family: var(--font-heading);
+        font-weight: 800;
+        line-height: var(--line-tight);
+        letter-spacing: 0.005em;
+        word-spacing: -0.07em;
+        text-transform: uppercase;
+        font-variant-numeric: tabular-nums lining-nums;
+        text-wrap: balance;
+    }
+
+    /* Arabic has no case, and Alexandria sets wider: no faux caps, no tracking */
+    [data-theme="hunger"] :is(.press, .mark, .dish-no, .fold, .price):lang(ar) {
+        text-transform: none;
+        letter-spacing: 0;
+    }
+    [data-theme="hunger"] .press:lang(ar) { line-height: 1.25; }
+
+    /* a dish name: the printed voice at reading case, set tight so a wrapped name still reads as one line */
+    [data-theme="hunger"] .dish-name {
+        font-family: var(--font-heading);
+        font-weight: 700;
+        line-height: 1.02;
+        letter-spacing: 0.005em;
+        word-spacing: -0.05em;
+        text-wrap: pretty;
+    }
+    [data-theme="hunger"] .dish-name:lang(ar) { line-height: 1.3; word-spacing: normal; letter-spacing: 0; }
+
+    /* the second plate: a flat field of the merchant primary. Never a gradient, never a shadow. */
+    [data-theme="hunger"] .plate {
+        background: var(--primary);
+        color: var(--primary-foreground);
+    }
+    [data-theme="hunger"] .plate-ink {
+        background: var(--foreground);
+        color: var(--background);
+    }
+
+    /* every price on the sheet falls in one tabular column */
+    [data-theme="hunger"] .price {
+        font-family: var(--font-heading);
+        font-weight: 800;
+        line-height: 1;
+        font-variant-numeric: tabular-nums lining-nums;
+        white-space: nowrap;
+        font-feature-settings: "tnum" 1, "lnum" 1;
+    }
+
+    /* the fold: a section crease across the sheet */
+    [data-theme="hunger"] .crease {
+        border-top: 1px solid var(--rule);
+        box-shadow: 0 1px 0 0 color-mix(in srgb, var(--background) 92%, var(--foreground));
+    }
+
+    /* the dotted leader that carries the eye from a dish name to its price */
+    [data-theme="hunger"] .leader {
+        flex: 1 1 auto;
+        min-width: 1.5rem;
+        align-self: end;
+        margin-bottom: 0.32em;
+        border-bottom: 1px dotted var(--leader-dot);
+    }
+
+    /* a printed mark: SALE, SOLD OUT, ONLY N LEFT, an attribute, a heat pip. Outline, square, micro caps. */
+    [data-theme="hunger"] .mark {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.1rem 0.35rem;
+        border: 1px solid currentColor;
+        font-family: var(--font-heading);
+        font-weight: 700;
+        font-size: var(--type-xs);
+        line-height: 1.35;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        white-space: nowrap;
+        font-variant-numeric: tabular-nums;
+    }
+    [data-theme="hunger"] .mark-sale { background: var(--primary); color: var(--primary-foreground); border-color: var(--primary); }
+    [data-theme="hunger"] .mark-offer { background: var(--accent); color: var(--accent-foreground); border-color: var(--accent); }
+    [data-theme="hunger"] .mark-out { color: var(--small-print); }
+
+    /* the dish number: the thing you order by. A boxed three-digit slot; filled once it is in the order. */
+    [data-theme="hunger"] .dish-no {
+        min-width: 2.5rem;
+        max-width: 7rem;
+        min-height: 1.65rem;
+        padding-inline: 0.3rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        display: inline-block;
+        text-align: center;
+        border: 1px solid var(--rule-strong);
+        font-family: var(--font-heading);
+        font-weight: 800;
+        font-size: var(--type-sm);
+        line-height: 1.6rem;
+        letter-spacing: 0.04em;
+        font-variant-numeric: tabular-nums lining-nums;
+        transition: background-color var(--motion-fast) var(--easing-standard),
+                    color var(--motion-fast) var(--easing-standard);
+    }
+    [data-theme="hunger"] .dish-no[data-ordered="true"] {
+        background: var(--primary);
+        color: var(--primary-foreground);
+        border-color: var(--primary);
+    }
+
+    /* a dish line: the whole product, printed. Hairline rule, wash on hover, crop marks on attention. */
+    [data-theme="hunger"] .dish {
+        position: relative;
+        border-bottom: 1px solid var(--rule);
+        transition: background-color var(--motion-fast) var(--easing-standard);
+    }
+    [data-theme="hunger"] .dish:hover { background: var(--wash); }
+
+    /* designed attention: registration crop marks close around whatever is being targeted */
+    [data-theme="hunger"] .crop { position: relative; }
+    [data-theme="hunger"] .crop::after {
+        content: "";
+        position: absolute;
+        inset: -5px;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity var(--motion-fast) var(--easing-standard);
+        background-image: var(--crop-marks);
+        background-repeat: no-repeat;
+        background-size: var(--crop-sizes);
+        background-position: var(--crop-positions);
+    }
+    [data-theme="hunger"] .crop:is(:hover, :focus-within)::after { opacity: 1; }
+
+    /* the fold tab: a category on the index strip. The active one lights across its whole width. */
+    [data-theme="hunger"] .fold {
+        display: inline-flex;
+        align-items: center;
+        align-self: stretch;
+        gap: 0.4rem;
+        min-height: 2.75rem;
+        padding-inline: 0.85rem;
+        border: 1px solid var(--rule-strong);
+        font-family: var(--font-heading);
+        font-weight: 700;
+        font-size: var(--type-base);
+        letter-spacing: 0.045em;
+        text-transform: uppercase;
+        white-space: nowrap;
+        transition: background-color var(--motion-fast) var(--easing-standard),
+                    color var(--motion-fast) var(--easing-standard);
+    }
+    [data-theme="hunger"] .fold:hover { background: var(--wash); }
+    [data-theme="hunger"] .fold[aria-current="page"],
+    [data-theme="hunger"] .fold[data-active="true"] {
+        background: var(--primary);
+        color: var(--primary-foreground);
+        border-color: var(--primary);
+    }
+    [data-theme="hunger"] .fold > .count {
+        font-family: var(--font-body);
+        font-weight: 500;
+        font-size: var(--type-xs);
+        letter-spacing: 0;
+        opacity: 0.7;
+        font-variant-numeric: tabular-nums;
+    }
+
+    /* the one authored moment: the second plate comes down over the line that was just ordered */
+    [data-theme="hunger"] .impression {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding-inline: 0.75rem;
+        pointer-events: none;
+        background: var(--primary);
+        color: var(--primary-foreground);
+        font-family: var(--font-heading);
+        font-weight: 800;
+        font-size: var(--type-lg);
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        animation: hunger-impression var(--motion-slow) var(--easing-emphasized) both;
+    }
+    @keyframes hunger-impression {
+        0% { opacity: 0; clip-path: inset(0 100% 0 0); }
+        18% { opacity: 1; clip-path: inset(0 0 0 0); }
+        72% { opacity: 1; clip-path: inset(0 0 0 0); }
+        100% { opacity: 0; clip-path: inset(0 0 0 0); }
+    }
+    [dir="rtl"] [data-theme="hunger"] .impression,
+    [data-theme="hunger"][dir="rtl"] .impression { animation-name: hunger-impression-rtl; }
+    @keyframes hunger-impression-rtl {
+        0% { opacity: 0; clip-path: inset(0 0 0 100%); }
+        18% { opacity: 1; clip-path: inset(0 0 0 0); }
+        72% { opacity: 1; clip-path: inset(0 0 0 0); }
+        100% { opacity: 0; clip-path: inset(0 0 0 0); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+        [data-theme="hunger"] .impression,
+        [dir="rtl"] [data-theme="hunger"] .impression { animation: hunger-impression-still var(--motion-slow) linear both; }
+        @keyframes hunger-impression-still { 0% { opacity: 0; } 15% { opacity: 1; } 75% { opacity: 1; } 100% { opacity: 0; } }
+    }
+
+    /* the press still running: the same wipe, looped, for redirects and long waits */
+    @keyframes hunger-wipe {
+        0% { inset-inline-start: -35%; }
+        100% { inset-inline-start: 100%; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+        [data-theme="hunger"] [class*="hunger-wipe"] { animation: none; inset-inline-start: 0; width: 100%; opacity: 0.5; }
+    }
+
+    /* quiet horizontal scroll strips (the fold index, gallery stubs) */
+    [data-theme="hunger"] .scroll-x {
+        overflow-x: auto;
+        overscroll-behavior-x: contain;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+    }
+    [data-theme="hunger"] .scroll-x::-webkit-scrollbar { display: none; }
+
+    /* long-form CMS, policy and dish copy */
+    [data-theme="hunger"] .prose-hunger { line-height: var(--line-relaxed); max-width: 68ch; }
+    [data-theme="hunger"] .prose-hunger :is(p, ul, ol) { margin-bottom: 1rem; }
+    [data-theme="hunger"] .prose-hunger :is(h2, h3) {
+        font-family: var(--font-heading);
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.02em;
+        line-height: 1.05;
+        margin-top: 2rem;
+        margin-bottom: 0.5rem;
+        padding-bottom: 0.35rem;
+        border-bottom: 2px solid var(--rule-strong);
+    }
+    [data-theme="hunger"] .prose-hunger h2 { font-size: var(--type-2xl); }
+    [data-theme="hunger"] .prose-hunger h3 { font-size: var(--type-xl); border-bottom-width: 1px; }
+    [data-theme="hunger"] .prose-hunger ul { list-style: square; padding-inline-start: 1.15rem; }
+    [data-theme="hunger"] .prose-hunger ol { list-style: decimal; padding-inline-start: 1.35rem; }
+    [data-theme="hunger"] .prose-hunger li { margin-bottom: 0.25rem; }
+    [data-theme="hunger"] .prose-hunger a { text-decoration: underline; text-decoration-color: var(--primary); }
+    [data-theme="hunger"] .prose-hunger img { max-width: 100%; height: auto; }
+}
+
+/* ---- third-party (Swiper) overrides: Swiper ships unlayered CSS, so these must stay unlayered too ---- */
+/* the masthead plate's slider: numbered page stubs printed along the bottom-end edge */
+[data-theme="hunger"] .sheet .swiper-pagination {
+    position: absolute;
+    left: auto;
+    right: auto;
+    inset-inline-end: 0;
+    inset-inline-start: auto;
+    bottom: 0;
+    width: auto;
+    z-index: 11;
+    display: flex;
+    gap: 0;
+}
+[data-theme="hunger"] .sheet .swiper-pagination-bullet {
+    width: 1.6rem;
+    height: 1.35rem;
+    margin: 0;
+    border-radius: 0;
+    background: var(--background);
+    color: var(--foreground);
+    opacity: 1;
+    border-inline-start: 1px solid var(--rule-strong);
+    border-top: 1px solid var(--rule-strong);
+    font-family: var(--font-hunger-display), sans-serif;
+    font-weight: 800;
+    font-size: 0.75rem;
+    line-height: 1.35rem;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+}
+[data-theme="hunger"] .sheet .swiper-pagination-bullet-active {
+    background: var(--primary);
+    color: var(--primary-foreground);
+    border-color: var(--primary);
+}

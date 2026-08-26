@@ -243,6 +243,41 @@ const THEME_DEFAULTS = {
         background: o(0.96, 0.005, 250), foreground: o(0.21, 0.015, 260),
         primary: o(0.80, 0.16, 85), secondary: o(0.86, 0.055, 245), accent: o(0.49, 0.20, 28),
     },
+    'pink': {
+        note: 'Tokyo Girls Issue: paper-white stock, plum-black ink, hot-pink cover flood with dark text; petal wash support; cover-line yellow statement.',
+        background: o(0.985, 0.006, 350), foreground: o(0.20, 0.030, 340),
+        primary: o(0.62, 0.235, 352), secondary: o(0.90, 0.055, 350), accent: o(0.88, 0.175, 95),
+    },
+    'hunger': {
+        note: 'The Letterbox Menu: white menu stock, black ink, a menu-red second plate on mastheads, section bands and every ADD; 20%-tint red wash; spot-green offer and mark ink.',
+        background: o(0.99, 0.005, 70), foreground: o(0.18, 0.012, 45),
+        primary: o(0.47, 0.215, 27), secondary: o(0.905, 0.050, 30), accent: o(0.45, 0.125, 158),
+    },
+    'furniture': {
+        note: 'The Home Floor Directory: bone-plaster ground, warm-graphite ink, deep enamel-green directory boards and every action; bone wash support; signal-orange plate statement.',
+        background: o(0.975, 0.006, 85), foreground: o(0.205, 0.012, 60),
+        primary: o(0.415, 0.105, 168), secondary: o(0.90, 0.014, 85), accent: o(0.475, 0.185, 33),
+    },
+    'glasses': {
+        note: 'TODO Glasses: replace with the palette of the chosen visual world (copied from starter).',
+        background: o(0.99, 0.004, 90), foreground: o(0.20, 0.010, 60),
+        primary: o(0.22, 0.010, 60), secondary: o(0.88, 0.012, 80), accent: o(0.48, 0.21, 25),
+    },
+    'cosmetics': {
+        note: 'TODO Cosmetics: replace with the palette of the chosen visual world (copied from starter).',
+        background: o(0.99, 0.004, 90), foreground: o(0.20, 0.010, 60),
+        primary: o(0.22, 0.010, 60), secondary: o(0.88, 0.012, 80), accent: o(0.48, 0.21, 25),
+    },
+    'sports': {
+        note: 'TODO Sports: replace with the palette of the chosen visual world (copied from starter).',
+        background: o(0.99, 0.004, 90), foreground: o(0.20, 0.010, 60),
+        primary: o(0.22, 0.010, 60), secondary: o(0.88, 0.012, 80), accent: o(0.48, 0.21, 25),
+    },
+    'jewellery': {
+        note: 'TODO Jewellery: replace with the palette of the chosen visual world (copied from starter).',
+        background: o(0.99, 0.004, 90), foreground: o(0.20, 0.010, 60),
+        primary: o(0.22, 0.010, 60), secondary: o(0.88, 0.012, 80), accent: o(0.48, 0.21, 25),
+    },
     // @theme-defaults:end
 };
 

@@ -8,7 +8,9 @@
       "RECOMMENDED": "Recommandé",
       "SHOP_NOW": "Acheter",
       "HERO_SLIDE": "Diapositive {index} sur {total}",
-      "SINCE": "Depuis {year}"
+      "SINCE": "Depuis {year}",
+      "CONTENTS": "Sommaire",
+      "ITEMS_COUNT": "{count, plural, =0 {aucun article} =1 {1 article} other {# articles}}"
     },
     "PRODUCT": {
       "HOME_TITLE": "Détails du produit",
@@ -36,7 +38,8 @@
       "GALLERY_IMAGE": "Image {index} sur {total}",
       "UNAVAILABLE_COMBINATION": "Indisponible",
       "DETAILS": "Détails",
-      "SPECIFICATIONS": "Caractéristiques"
+      "SPECIFICATIONS": "Caractéristiques",
+      "NO_RECORD": "Le fabricant n'a pas encore indiqué de dimensions pour cette pièce."
     },
     "CHECKOUT": {
       "TITLE": "Paiement",
@@ -207,7 +210,8 @@
       "SALE": "Promo",
       "LOW_STOCK": "Stock limité",
       "ADDED": "Ajouté",
-      "CATALOGUE_NO": "N°"
+      "CATALOGUE_NO": "N°",
+      "IN_BASKET": "Dans le panier ({count})"
     },
     "HEADER": {
       "HOME_TITLE": "Accueil",
@@ -345,7 +349,15 @@
     "HOME": "Accueil",
     "LANGUAGE_LABEL": "Langue",
     "CURRENCY": "Devise",
-    "ITEMS": "Articles"
+    "ITEMS": "Articles",
+    "DIRECTORY": "Répertoire",
+    "FLOOR": "Étage",
+    "DEPARTMENT": "Rayon",
+    "PLATE": "Planche {number}",
+    "FLOORS_COUNT": "{count, plural, =0 {aucun étage} =1 {1 étage} other {# étages}}",
+    "MANUFACTURER": "Fabricant",
+    "AVAILABILITY": "Disponibilité",
+    "PRODUCT_RECORD": "Fiche produit"
   },
   "STATES": {
     "REDIRECTING_LOGIN": "Redirection vers la connexion…",
@@ -368,6 +380,7 @@
     "EMPTY_ORDERS_TITLE": "Aucune commande pour l'instant",
     "EMPTY_ORDERS_BODY": "Vos commandes apparaîtront ici après votre premier achat.",
     "EMPTY_SEARCH_TITLE": "Aucun résultat",
-    "EMPTY_SEARCH_BODY": "Essayez un autre mot."
+    "EMPTY_SEARCH_BODY": "Essayez un autre mot.",
+    "BACK_TO_DIRECTORY": "Retour au répertoire"
   }
 }

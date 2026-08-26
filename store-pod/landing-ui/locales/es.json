@@ -8,7 +8,9 @@
       "RECOMMENDED": "Recomendados",
       "SHOP_NOW": "Comprar ahora",
       "HERO_SLIDE": "Diapositiva {index} de {total}",
-      "SINCE": "Desde {year}"
+      "SINCE": "Desde {year}",
+      "CONTENTS": "Contenido",
+      "ITEMS_COUNT": "{count, plural, =0 {sin artículos} =1 {1 artículo} other {# artículos}}"
     },
     "PRODUCT": {
       "HOME_TITLE": "Detalles del Producto",
@@ -36,7 +38,8 @@
       "GALLERY_IMAGE": "Imagen {index} de {total}",
       "UNAVAILABLE_COMBINATION": "No disponible",
       "DETAILS": "Detalles",
-      "SPECIFICATIONS": "Especificaciones"
+      "SPECIFICATIONS": "Especificaciones",
+      "NO_RECORD": "El fabricante aún no ha indicado medidas para esta pieza."
     },
     "CHECKOUT": {
       "TITLE": "Pago",
@@ -207,7 +210,8 @@
       "SALE": "Oferta",
       "LOW_STOCK": "Pocas unidades",
       "ADDED": "Añadido",
-      "CATALOGUE_NO": "N.º"
+      "CATALOGUE_NO": "N.º",
+      "IN_BASKET": "En la cesta ({count})"
     },
     "HEADER": {
       "HOME_TITLE": "Inicio",
@@ -345,7 +349,15 @@
     "HOME": "Inicio",
     "LANGUAGE_LABEL": "Idioma",
     "CURRENCY": "Moneda",
-    "ITEMS": "Artículos"
+    "ITEMS": "Artículos",
+    "DIRECTORY": "Directorio",
+    "FLOOR": "Planta",
+    "DEPARTMENT": "Departamento",
+    "PLATE": "Lámina {number}",
+    "FLOORS_COUNT": "{count, plural, =0 {sin plantas} =1 {1 planta} other {# plantas}}",
+    "MANUFACTURER": "Fabricante",
+    "AVAILABILITY": "Disponibilidad",
+    "PRODUCT_RECORD": "Ficha del producto"
   },
   "STATES": {
     "REDIRECTING_LOGIN": "Redirigiendo al inicio de sesión…",
@@ -368,6 +380,7 @@
     "EMPTY_ORDERS_TITLE": "Aún no hay pedidos",
     "EMPTY_ORDERS_BODY": "Tus pedidos aparecerán aquí cuando hagas uno.",
     "EMPTY_SEARCH_TITLE": "Sin resultados",
-    "EMPTY_SEARCH_BODY": "Prueba con otra palabra."
+    "EMPTY_SEARCH_BODY": "Prueba con otra palabra.",
+    "BACK_TO_DIRECTORY": "Volver al directorio"
   }
 }

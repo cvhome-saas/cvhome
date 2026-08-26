@@ -68,6 +68,9 @@ export enum Theme {
     TOOLS = 'TOOLS',
     BASIC = 'BASIC',
     GROCERY = 'GROCERY',
+    PINK = 'PINK',
+    HUNGER = 'HUNGER',
+    JEWELLERY = 'JEWELLERY',
 }
 
 export interface SliderImage {
