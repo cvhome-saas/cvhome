@@ -60,7 +60,7 @@ export class CartService {
     public static checkout = async (storeContext: StoreContext, code: string, checkoutCart: CheckoutCart): Promise<Order> => {
         return apiFetch<Order>(
             `${storeBaseServiceUrl('checkout', storeContext)}/api/v1/cart/${code}/checkout?store=${storeContext.store}&lang=${storeContext.locale}`,
-            post(checkoutCart));
+            post(checkoutCart, {auth: true}));
     }
 
     /** Must fail: an empty country list makes the address form unusable without saying why. */

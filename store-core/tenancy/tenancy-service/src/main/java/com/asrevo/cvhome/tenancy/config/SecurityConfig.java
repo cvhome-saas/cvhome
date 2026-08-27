@@ -6,10 +6,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
-
-import com.asrevo.cvhome.s2s.jwt.UaaJwtGrantedAuthoritiesConverter;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -32,14 +29,6 @@ public class SecurityConfig {
                 .oauth2ResourceServer(it -> it.jwt(withDefaults()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .build();
-    }
-
-    @Bean
-    public JwtAuthenticationConverter converter() {
-        JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
-        UaaJwtGrantedAuthoritiesConverter uaaJwtGrantedAuthoritiesConverter = new UaaJwtGrantedAuthoritiesConverter();
-        converter.setJwtGrantedAuthoritiesConverter(uaaJwtGrantedAuthoritiesConverter);
-        return converter;
     }
 
 }

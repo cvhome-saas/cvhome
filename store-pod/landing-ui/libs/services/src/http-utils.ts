@@ -6,6 +6,7 @@ import {
     ProblemFieldError,
     ServerErrorCategory,
 } from "@store-front/types/api-error";
+import {AuthEventType} from "@store-front/types/auth";
 
 /**
  * Mirrors the status each `ErrorCategory` fixes, for the responses that carry no problem body at all —
@@ -144,7 +145,37 @@ export async function apiFetch<T>(url: string, init?: RequestInit): Promise<T> {
     } catch (cause) {
         throw toNetworkError(cause, url);
     }
+    if (response.status === 401 && sentCredential(init)) {
+        discardRejectedToken();
+    }
     return handleResponse<T>(response, url);
+}
+
+function sentCredential(init?: RequestInit): boolean {
+    const headers = init?.headers as Record<string, string> | undefined;
+    return Boolean(headers && headers['Authorization']);
+}
+
+/**
+ * Drop a token the server has just refused, and tell the app the shopper is signed out.
+ *
+ * A rejected token is not a transient failure — it is expired, or it was minted by an issuer this pod no
+ * longer trusts. Left in `sessionStorage` it is presented again on every subsequent call and every reload, so
+ * one bad token used to wedge the session until someone cleared storage by hand. `useUser` already listens for
+ * `auth-change`, so clearing here is enough for the UI to fall back to signed-out.
+ */
+function discardRejectedToken(): void {
+    if (typeof window === 'undefined') {
+        return;
+    }
+    if (!sessionStorage.getItem('access_token')) {
+        return;
+    }
+    console.warn('Access token rejected; discarding it and continuing signed out.');
+    sessionStorage.removeItem('access_token');
+    sessionStorage.removeItem('id_token');
+    sessionStorage.removeItem('refresh_token');
+    window.dispatchEvent(new CustomEvent('auth-change', {detail: {type: AuthEventType.LOGOUT}}));
 }
 
 /**
@@ -164,8 +195,21 @@ export async function orUndefined<T>(promise: Promise<T>): Promise<T | undefined
     }
 }
 
-function buildHeader<T>(method: string, it?: T): RequestInit {
-    const accessToken = typeof window !== 'undefined' ? sessionStorage.getItem('access_token') : undefined;
+/**
+ * Whether a call carries the shopper's bearer token.
+ *
+ * `auth: true` means "send it if we have one" — which covers both the endpoints that require identity
+ * (`/private/customer/**`, cua's `/auth/me`) and the ones that merely use it when present (checkout, order
+ * status, which link the order to a signed-in shopper and enforce a store's login requirement).
+ */
+export interface RequestOptions {
+    auth?: boolean;
+}
+
+function buildHeader<T>(method: string, it?: T, options?: RequestOptions): RequestInit {
+    const accessToken = options?.auth && typeof window !== 'undefined'
+        ? sessionStorage.getItem('access_token')
+        : undefined;
     const headers: Record<string, string> = {};
     if (it) {
         headers["Content-Type"] = "application/json";
@@ -183,18 +227,24 @@ function buildHeader<T>(method: string, it?: T): RequestInit {
     return result;
 }
 
-export function post<T>(it: T) {
-    return buildHeader('POST', it);
+export function post<T>(it: T, options?: RequestOptions) {
+    return buildHeader('POST', it, options);
 }
 
-export function put<T>(it: T) {
-    return buildHeader('PUT', it);
+export function put<T>(it: T, options?: RequestOptions) {
+    return buildHeader('PUT', it, options);
 }
 
-export function del() {
-    return buildHeader('DELETE');
+export function del(options?: RequestOptions) {
+    return buildHeader('DELETE', undefined, options);
 }
 
-export function get() {
-    return buildHeader('GET');
+/**
+ * Anonymous by default. Every call used to carry whatever was in `sessionStorage`, which meant a stale token
+ * was presented to the catalog and content APIs that have no interest in identity — and, while those APIs
+ * answered a rejected token with a 500, wedged the whole storefront for a signed-in shopper. Public reads have
+ * no business carrying a credential; pass `{auth: true}` where identity is actually part of the request.
+ */
+export function get(options?: RequestOptions) {
+    return buildHeader('GET', undefined, options);
 }

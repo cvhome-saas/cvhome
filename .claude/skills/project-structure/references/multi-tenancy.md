@@ -156,7 +156,7 @@ public Flux<RouteDefinition> getRouteDefinitions() {
   `onErrorResume` so a tenancy outage degrades to the existing routes instead of dropping them.
 - A request to `/spg/**?store=<id>&pod=<podId>` matches the route for that pod. `StripPrefix=1` removes `/spg`,
   and **`TokenRelay` forwards the seller's OAuth2 token** into the pod — which the pod accepts because `uaa` is
-  in its `issuer-uri-set` (`authentication.md`).
+  one of its configured realms (`authentication.md`).
 - Routes refresh every minute, so **a newly created pod becomes reachable without redeploying the gateway.**
 
 So console-ui edits a product in any pod through one origin, and pod selection is just a query parameter.

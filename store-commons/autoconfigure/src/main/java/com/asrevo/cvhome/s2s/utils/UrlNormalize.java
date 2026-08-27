@@ -10,6 +10,19 @@ public final class UrlNormalize {
     private UrlNormalize() {
     }
 
+    /**
+     * {@link #normalizeUri} for values that arrived in a token rather than in configuration. A presented issuer
+     * that will not parse as a URI is not something to fail on — leaving it as-is lets it simply match nothing
+     * and be reported as unsupported, rather than surfacing as a decoding failure.
+     */
+    public static String normalizeQuietly(String uriString) {
+        try {
+            return normalizeUri(uriString);
+        } catch (JwtException e) {
+            return uriString;
+        }
+    }
+
     public static String normalizeUri(String uriString) throws JwtException {
         if (uriString == null || uriString.trim().isEmpty()) {
             throw new JwtException("URI string cannot be null or empty for normalization.");

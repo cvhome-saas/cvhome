@@ -72,8 +72,9 @@ defaults:
     # `{{#each services}}` iterates the *source* services only — Compose services are a separate list and are not
     # in it. spg is configured under com.asrevo.cvhome.services like any other service but runs as a container, so
     # its port has to be set by hand below. Leave it out and it stays 80 while spg listens on the shifted port:
-    # the pod's `issuer-uri-set` then trusts `…gateway.com:80/cua`, which UrlNormalize collapses to the portless
-    # form, and a shopper token issued by `…gateway.com:1080/cua` is rejected as an unsupported issuer.
+    # the pod's `cua` realm then trusts `…gateway.com:80/cua` while a shopper token is issued by
+    # `…gateway.com:1080/cua`, and the token is rejected as an unsupported issuer. (A default port on either
+    # side no longer matters — issuers are matched normalized — but a genuinely different port still does.)
     SPRING_APPLICATION_JSON: >-
       {
         "com.asrevo.cvhome.app.handlers[0].schema": "http",

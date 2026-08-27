@@ -54,7 +54,7 @@ export class AuthService {
      * a cua outage look like a logout and reopen the login dialog in a loop.
      */
     static async getMe(context: StoreContext): Promise<AuthUser> {
-        return apiFetch<AuthUser>(`${storeBaseServiceUrl('cua', context)}/api/v1/auth/me`, get());
+        return apiFetch<AuthUser>(`${storeBaseServiceUrl('cua', context)}/api/v1/auth/me`, get({auth: true}));
     }
 
     static async exchangeToken(context: StoreContext, code: string): Promise<TokenResponse> {
