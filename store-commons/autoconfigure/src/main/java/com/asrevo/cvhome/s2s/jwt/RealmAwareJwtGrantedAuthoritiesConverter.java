@@ -35,9 +35,10 @@ import lombok.extern.slf4j.Slf4j;
  * </p>
  *
  * <p>
- * A realm with no {@code grants} is unrestricted — the staff realm, whose clients carry arbitrary scopes, and
- * the legacy realm synthesised from a flat {@code issuer-uri-set}. An unknown issuer is unrestricted too, which
- * costs nothing: the decoder rejected it long before this converter ran.
+ * A realm with no {@code grants} is unrestricted — the staff realm, whose clients carry arbitrary scopes. An
+ * unknown issuer is unrestricted too. On a resource server that cannot happen, because the decoder rejected it
+ * long before this converter ran; it is reachable only where an authorization server verifies its own tokens
+ * with its own signature-only decoder, and there the issuer is necessarily its own.
  * </p>
  */
 @Slf4j

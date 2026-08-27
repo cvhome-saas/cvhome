@@ -4,8 +4,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 
+import com.asrevo.cvhome.s2s.jwt.IssuerRealmProperties;
 import com.asrevo.cvhome.s2s.jwt.IssuerRegistry;
-import com.asrevo.cvhome.s2s.jwt.IssuerUriSetConfigrationProperties;
 
 /**
  * The realm registry, shared by the servlet decoder, the reactive decoder and the authorities converter. It sits
@@ -16,8 +16,8 @@ import com.asrevo.cvhome.s2s.jwt.IssuerUriSetConfigrationProperties;
 public class IssuerRegistryConfiguration {
 
     @Bean
-    @Conditional(IssuerUriSetCondition.class)
-    IssuerRegistry issuerRegistry(IssuerUriSetConfigrationProperties properties) {
+    @Conditional(IssuerRealmsCondition.class)
+    IssuerRegistry issuerRegistry(IssuerRealmProperties properties) {
         return properties.toRegistry();
     }
 

@@ -26,22 +26,22 @@ import com.asrevo.cvhome.s2s.jwt.RealmIssuerValidator;
 
 @Configuration
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.REACTIVE)
-@Import(IssuerUriSetReactiveJwtDecoderConfiguration.IssuerUriSetReactiveJwtDecoderConfigurationImpl.class)
+@Import(MultiIssuerReactiveJwtDecoderConfiguration.MultiIssuerReactiveJwtDecoderConfigurationImpl.class)
 @SuppressWarnings("java:S1118")
-public class IssuerUriSetReactiveJwtDecoderConfiguration {
+public class MultiIssuerReactiveJwtDecoderConfiguration {
 
-    static class IssuerUriSetReactiveJwtDecoderConfigurationImpl {
+    static class MultiIssuerReactiveJwtDecoderConfigurationImpl {
 
         private final List<OAuth2TokenValidator<Jwt>> additionalValidators;
 
-        IssuerUriSetReactiveJwtDecoderConfigurationImpl(
+        MultiIssuerReactiveJwtDecoderConfigurationImpl(
                 ObjectProvider<OAuth2TokenValidator<Jwt>> additionalValidators) {
             this.additionalValidators = additionalValidators.orderedStream().toList();
         }
 
         @Bean
-        @Conditional(IssuerUriSetCondition.class)
-        MultiIssuerReactiveJwtDecoder jwtDecoderByIssuerUri(IssuerRegistry registry,
+        @Conditional(IssuerRealmsCondition.class)
+        MultiIssuerReactiveJwtDecoder multiIssuerJwtDecoder(IssuerRegistry registry,
                 ObjectProvider<JwkSetUriReactiveJwtDecoderBuilderCustomizer> customizers) {
 
             Function<IssuerRealm, ReactiveJwtDecoder> decoderFactory = realm -> {

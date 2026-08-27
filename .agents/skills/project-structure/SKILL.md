@@ -108,7 +108,8 @@ and merchants; `cua` (:8124, store-pod) authenticates storefront shoppers.** Sep
 tables, separate issuers — same underlying Spring tech, so they look alike in code.
 
 Pod services are resource servers that accept tokens from **both**, via `MultiIssuerJwtDecoder` and the
-`issuer-uri-set` list in `store-pod-lcl-config.yml`. The `cua` issuer is spg-fronted *with* the `/cua` prefix,
+`issuers` realm map in `store-pod-lcl-config.yml` — which also caps what each realm may confer, so a
+shopper token cannot grant staff authority whatever it claims. The `cua` issuer is spg-fronted *with* the `/cua` prefix,
 which is why the Caddyfile preserves that prefix for `cua` alone. Services authenticate to each other with a
 `client_credentials` `s2s` client against `uaa` (scope `store_core` or `store_pod`).
 

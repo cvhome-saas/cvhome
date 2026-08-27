@@ -139,14 +139,23 @@ Same `lb://` URLs as local; only the discovery client behind them changes (`serv
 Both set the **multi-issuer JWT list** — the reason pod services accept tokens from both authorization servers:
 
 ```yaml
-spring.security.oauth2.resourceserver.jwt.issuer-uri-set:
-  - ${...services.uaa.schema}://${...services.uaa.domain}                       # seller/admin
-  - ${...services.uaa.schema}://${...services.uaa.domain}:${...services.uaa.port}
-  - ${...services.spg.schema}://${...services.spg.domain}/cua                   # shopper
-  - ${...services.spg.schema}://${...services.spg.domain}:${...services.spg.port}/cua
+spring.security.oauth2.resourceserver.jwt.issuers:
+  uaa:                                                                          # seller/admin
+    uris:
+      - ${...services.uaa.schema}://${...services.uaa.domain}
+      - ${...services.uaa.schema}://${...services.uaa.domain}:${...services.uaa.port}
+    jwk-set-uri: ${...services.uaa.schema}://${...services.uaa.domain}:${...services.uaa.port}/oauth2/jwks
+  cua:                                                                          # shopper
+    uris:
+      - ${...services.spg.schema}://${...services.spg.domain}/cua
+      - ${...services.spg.schema}://${...services.spg.domain}:${...services.spg.port}/cua
+    jwk-set-uri: ${...services.spg.schema}://${...services.spg.domain}:${...services.spg.port}/cua/oauth2/jwks
+    grants: [ROLE_CUSTOMER, SCOPE_OPENID]
 ```
 
-Note these interpolate from `common-config.yml`, so fixing a port there fixes issuer validation too. Details in
+`common-config.yml` declares only the `uaa` realm, which is why store-core services reject a shopper token
+outright. Note these interpolate from `common-config.yml`, so fixing a port there fixes issuer validation too —
+though issuers are matched normalized now, so a default port on either side no longer decides it. Details in
 `authentication.md`.
 
 `store-pod-lcl-config.yml` additionally configures local **MinIO** as the CDN/storage provider

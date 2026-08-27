@@ -35,7 +35,7 @@ The `/merchant` prefix is stripped by Caddy, so the service itself sees the iden
 
 `{$NAMESPACE}` is `gateway.com` locally and `store-pod-<id>.cvhome.lcl` on AWS — the routing table itself never
 changes between environments. `cua` keeps its prefix because OAuth2 issuer and redirect URIs must match the
-externally visible URL; that same `…/cua` string is what appears in the pod's `issuer-uri-set`
+externally visible URL; that same `…/cua` string is what appears in the pod's `cua` realm
 (`authentication.md`).
 
 ### `store-core-gateway` — path → platform service

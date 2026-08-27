@@ -19,6 +19,7 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import com.asrevo.cvhome.cua.security.CustomOAuth2UserService;
 import com.asrevo.cvhome.cua.security.CustomOidcUserService;
+import com.asrevo.cvhome.s2s.jwt.MultiIssuerJwtDecoder;
 
 import lombok.RequiredArgsConstructor;
 
@@ -69,13 +70,13 @@ public class AppSecurityConfig {
 
     @Bean
     @Order(2)
-    SecurityFilterChain customerApiSecurity(HttpSecurity http, JwtDecoder jwtDecoderByIssuerUri) {
+    SecurityFilterChain customerApiSecurity(HttpSecurity http, MultiIssuerJwtDecoder multiIssuerJwtDecoder) {
         http.securityMatcher("/api/v1/private/social-login-config/**")
                 .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(org.springframework.security.config.http.SessionCreationPolicy.STATELESS))
-                .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.decoder(jwtDecoderByIssuerUri)));
+                .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.decoder(multiIssuerJwtDecoder)));
         return http.build();
     }
 

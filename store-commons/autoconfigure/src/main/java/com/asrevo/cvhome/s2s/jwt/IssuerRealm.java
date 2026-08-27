@@ -22,9 +22,9 @@ import com.asrevo.cvhome.s2s.utils.UrlNormalize;
  * </p>
  *
  * <p>
- * {@link #grants} is the authority ceiling. An empty set means "unrestricted", which is what an unnamed legacy
- * realm and the staff realm both use; naming it — {@code [ROLE_CUSTOMER]} for cua — makes the shopper boundary
- * something the resource server enforces rather than something it assumes. Before this existed, the only thing
+ * {@link #grants} is the authority ceiling. An empty set means "unrestricted", which is what the staff realm
+ * uses; naming it — {@code [ROLE_CUSTOMER]} for cua — makes the shopper boundary something the resource server
+ * enforces rather than something it assumes. Before this existed, the only thing
  * stopping a cua token from carrying {@code ROLE_ORG_ADMIN} was that cua's own token customizer hard-codes
  * {@code CUSTOMER}: an unwritten invariant holding a trust boundary together across two services.
  * </p>

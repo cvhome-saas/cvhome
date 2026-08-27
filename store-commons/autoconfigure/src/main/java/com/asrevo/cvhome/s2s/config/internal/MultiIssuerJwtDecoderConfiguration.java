@@ -26,22 +26,22 @@ import com.asrevo.cvhome.s2s.jwt.RealmIssuerValidator;
 
 @Configuration
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
-@Import(IssuerUriSetJwtDecoderConfiguration.IssuerUriSetJwtDecoderConfigurationImpl.class)
+@Import(MultiIssuerJwtDecoderConfiguration.MultiIssuerJwtDecoderConfigurationImpl.class)
 @SuppressWarnings("java:S1118")
-public class IssuerUriSetJwtDecoderConfiguration {
+public class MultiIssuerJwtDecoderConfiguration {
 
     @Configuration
-    static class IssuerUriSetJwtDecoderConfigurationImpl {
+    static class MultiIssuerJwtDecoderConfigurationImpl {
 
         private final List<OAuth2TokenValidator<Jwt>> additionalValidators;
 
-        IssuerUriSetJwtDecoderConfigurationImpl(ObjectProvider<OAuth2TokenValidator<Jwt>> additionalValidators) {
+        MultiIssuerJwtDecoderConfigurationImpl(ObjectProvider<OAuth2TokenValidator<Jwt>> additionalValidators) {
             this.additionalValidators = additionalValidators.orderedStream().toList();
         }
 
         @Bean
-        @Conditional(IssuerUriSetCondition.class)
-        MultiIssuerJwtDecoder jwtDecoderByIssuerUri(IssuerRegistry registry,
+        @Conditional(IssuerRealmsCondition.class)
+        MultiIssuerJwtDecoder multiIssuerJwtDecoder(IssuerRegistry registry,
                                                     ObjectProvider<JwkSetUriJwtDecoderBuilderCustomizer> customizers) {
 
             Function<IssuerRealm, JwtDecoder> decoderFactory = realm -> {

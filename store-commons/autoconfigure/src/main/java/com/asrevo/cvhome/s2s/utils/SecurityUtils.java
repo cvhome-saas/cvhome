@@ -70,9 +70,9 @@ public final class SecurityUtils {
      *
      * <p>
      * Deliberately not "is from realm X". A principal carries a {@code REALM_} authority only where realms are
-     * configured, so asking the positive question would refuse every token under the legacy flat trust list and
-     * under Boot's single-issuer support. Asking the negative one refuses a shopper token presented for a staff
-     * check where the realm is known, and stays out of the way where it is not.
+     * configured, so asking the positive question would refuse every token on a service running under Boot's
+     * own single-issuer support. Asking the negative one refuses a shopper token presented for a staff check
+     * where the realm is known, and stays out of the way where it is not.
      * </p>
      */
     public static boolean isForeignRealm(Authentication authentication, String realm) {

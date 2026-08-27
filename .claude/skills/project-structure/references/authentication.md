@@ -32,26 +32,60 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri-set:
-            - ${...services.uaa.schema}://${...services.uaa.domain}
-            - ${...services.uaa.schema}://${...services.uaa.domain}:${...services.uaa.port}
-            - ${...services.spg.schema}://${...services.spg.domain}/cua
-            - ${...services.spg.schema}://${...services.spg.domain}:${...services.spg.port}/cua
+          issuers:
+            uaa:                                   # staff and service principals
+              uris:
+                - ${...services.uaa.schema}://${...services.uaa.domain}
+                - ${...services.uaa.schema}://${...services.uaa.domain}:${...services.uaa.port}
+              jwk-set-uri: ${...services.uaa.schema}://${...services.uaa.domain}:${...services.uaa.port}/oauth2/jwks
+            cua:                                   # shoppers
+              uris:
+                - ${...services.spg.schema}://${...services.spg.domain}/cua
+                - ${...services.spg.schema}://${...services.spg.domain}:${...services.spg.port}/cua
+              jwk-set-uri: ${...services.spg.schema}://${...services.spg.domain}:${...services.spg.port}/cua/oauth2/jwks
+              grants:
+                - ROLE_CUSTOMER
+                - SCOPE_OPENID
 ```
 
-Four entries = two issuers × (with port / without port), because the same service is reachable both ways
-depending on environment. The `cua` issuer is the **spg-fronted** URL with the `/cua` prefix — which is exactly
-why `spg`'s Caddyfile uses `handle /cua*` (prefix preserved, `X-Forwarded-Prefix: /cua`) rather than
-`handle_path` like every other route. Strip that prefix and OAuth2 issuer validation breaks.
+Issuers are keyed by **realm**, not listed flat, because a realm is not a URL: the same server answers on
+several equivalent forms (with or without a default port, a shifted port under a named stack, a path prefix).
+Every `uris` entry is matched **normalized** — `UrlNormalize` drops `:80` under http and `:443` under https —
+so an operator-entered pod endpoint that happens to carry an explicit default port still matches. Listing both
+port forms is belt and braces rather than load-bearing.
+
+`grants` is the realm's authority ceiling, applied after claim parsing. It is what makes a cua token
+structurally incapable of granting staff authority: both authorization servers write their roles into the same
+`roles` claim, so without it a shopper token claiming `ORG_ADMIN` would have been granted it. The staff realm
+declares no `grants` because its clients carry arbitrary scopes. Every principal also gains a `REALM_<name>`
+authority, which `StoreRoleAccessChecker` uses to refuse a staff check for a shopper principal and vice versa.
+
+`jwk-set-uri` is preferred over OIDC discovery: discovery costs a blocking network call on the first
+authenticated request, its failure is not cached, and `withIssuerLocation` asserts the discovered `issuer`
+string equals the location requested — too literal for a realm reachable at several equivalent URIs. Discovery
+remains the fallback when a realm declares no `jwk-set-uri`.
+
+The `cua` issuer is the **spg-fronted** URL with the `/cua` prefix — which is exactly why `spg`'s Caddyfile uses
+`handle /cua*` (prefix preserved, `X-Forwarded-Prefix: /cua`) rather than `handle_path` like every other route.
+Strip that prefix and OAuth2 issuer validation breaks. cua pins that issuer from `pod-info.pod.endpoint.endpoint`
+and **refuses to start without it**: unpinned, Spring Authorization Server derives the issuer from the request
+host, which is the shopper's storefront host — a per-store subdomain or an arbitrary `CUSTOM_DOMAIN`, a set no
+trust list can enumerate.
 
 Supporting classes in `store-commons:autoconfigure` (`com.asrevo.cvhome.s2s.*`):
 
 - `jwt/MultiIssuerJwtDecoder`, `jwt/MultiIssuerReactiveJwtDecoder` — issuer-aware decoding (servlet + reactive;
   the gateway is WebFlux, everything else is MVC)
-- `jwt/IssuerUriSetConfigrationProperties`, `config/internal/IssuerUriSetCondition`,
-  `IssuerUriSetJwtDecoderConfiguration`, `IssuerUriSetReactiveJwtDecoderConfiguration` — bind and activate the
-  set above
+- `jwt/IssuerRealm`, `jwt/IssuerRegistry` — the realms and the trust decision (normalized issuer matching; an
+  untrusted, unparseable or issuer-less token fails as `BadJwtException`, which Spring maps to 401 — a bare
+  `JwtException` becomes an `AuthenticationServiceException` and escapes the filter chain as a 500)
+- `jwt/IssuerRealmProperties`, `config/internal/IssuerRealmsCondition`, `IssuerRegistryConfiguration`,
+  `MultiIssuerJwtDecoderConfiguration`, `MultiIssuerReactiveJwtDecoderConfiguration` — bind and activate the
+  realms above
+- `jwt/RealmIssuerValidator` — post-decode `iss` check against the realm's URIs, compared normalized
 - `jwt/UaaJwtGrantedAuthoritiesConverter` — claims → Spring authorities
+- `jwt/RealmAwareJwtGrantedAuthoritiesConverter` — the same, capped at the issuing realm's `grants`, registered
+  once for every service by `config/internal/JwtAuthenticationConverterConfiguration`
 - `services/{PermissionAccessChecker, StoreRoleAccessChecker, StoreSecurityService, StoreOrgOwnerRetriever}`,
   `config/internal/{ServletPermissionConfig, CustomPermissionEvaluator}` — tenant-aware authorization. This is
   what backs `@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")` on

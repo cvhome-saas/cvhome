@@ -14,39 +14,18 @@ import lombok.Setter;
 @ConfigurationProperties(prefix = "spring.security.oauth2.resourceserver.jwt")
 @Getter
 @Setter
-public class IssuerUriSetConfigrationProperties {
-
-    /**
-     * The realm this service falls back to when only the legacy {@link #issuerUriSet} is configured. Unnamed
-     * realms confer no authority ceiling, which is the behaviour that existed before realms did.
-     */
-    public static final String LEGACY_REALM = "default";
+public class IssuerRealmProperties {
 
     /**
      * Every identity server this service accepts, keyed by realm name — {@code uaa} for staff and services,
-     * {@code cua} for shoppers. Prefer this over {@link #issuerUriSet}: it is what lets a resource server tell
-     * a shopper token from a staff one, and cap what each may confer.
+     * {@code cua} for shoppers.
      */
     private Map<String, Realm> issuers = new LinkedHashMap<>();
 
-    /**
-     * The flat, realm-blind trust list this replaced. Still honoured so the two forms can coexist during a
-     * rollout, but it grants every issuer identical authority — which is exactly the property realms exist to
-     * remove.
-     *
-     * @deprecated configure {@link #issuers} instead.
-     */
-    @Deprecated(since = "1.0.16")
-    private Set<String> issuerUriSet;
-
-    /** The configured realms, or a single unrestricted one synthesised from {@link #issuerUriSet}. */
     public IssuerRegistry toRegistry() {
         List<IssuerRealm> realms = new ArrayList<>();
         this.issuers.forEach((name, realm) -> realms
                 .add(new IssuerRealm(name, Set.copyOf(realm.getUris()), realm.getJwkSetUri(), realm.getGrants())));
-        if (realms.isEmpty() && this.issuerUriSet != null && !this.issuerUriSet.isEmpty()) {
-            realms.add(new IssuerRealm(LEGACY_REALM, this.issuerUriSet, null, Set.of()));
-        }
         return new IssuerRegistry(realms);
     }
 
