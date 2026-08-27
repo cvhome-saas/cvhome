@@ -48,8 +48,12 @@ products; manufacturer and option-value facets; sort by newest/oldest (catalog `
 quantity edit; checkout with COD / Stripe / PayPal / manual transfer; customer profile, addresses, orders and
 order history; five locales; merchant logo, banner, slider images, social links, address/email/phone.
 
-Constraints (do not fabricate): **no text search endpoint** (search UI is suggestions-only over categories
-and pages until the backend adds one); **no reviews/ratings API** (rating fields exist but cannot be
+What search can do: **full-text product search** across the store's languages, at `/search`, with autocomplete
+in the header — filtered by category, brand and product type, with counted facets and a did-you-mean. Themes
+still branch on `SearchCapabilities`, because a deployment can be pointed at a catalog without the endpoint.
+
+Constraints (do not fabricate): **no price or in-stock filter on search** (price and stock live in the
+inventory service, keyed by sku, so the catalog cannot filter or sort on them); **no reviews/ratings API** (rating fields exist but cannot be
 written or listed); **no wishlist**; **no promotions/coupon API**; prices are formatted by the API — never
 reformat; images are served unoptimised; category has no image field; sort by price/name is not supported
 by the catalog.
@@ -69,7 +73,8 @@ benchmarks exist — do not invent them.
 ## Product Principles
 
 1. Behaviour is shared, identity is not: themes compose, they never re-implement cart/checkout/account.
-2. Honest surfaces: only show what the platform can do (no fake search, reviews or promotions).
+2. Honest surfaces: only show what the platform can do (no fake reviews or promotions; search renders
+   according to the capabilities the shell reports, never as an assumption).
 3. Mobile and RTL are first-class, not adaptations.
 4. Every state is designed: loading, empty, error, not-found, out-of-stock, sale.
 5. The merchant's brand wins: their colours, their images, their content — the theme frames them.

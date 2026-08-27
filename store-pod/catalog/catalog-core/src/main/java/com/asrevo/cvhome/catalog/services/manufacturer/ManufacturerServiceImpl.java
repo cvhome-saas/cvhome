@@ -1,6 +1,7 @@
 package com.asrevo.cvhome.catalog.services.manufacturer;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -66,13 +67,21 @@ public class ManufacturerServiceImpl implements ManufacturerService {
     @Transactional
     public Long save(StoreMerchantId store, PersistableManufacturer source) throws ManufacturerNotFoundException {
         Manufacturer manufacturer;
-        if (source.getId() == null || source.getId() <= 0) {
+        boolean isNew = source.getId() == null || source.getId() <= 0;
+        if (isNew) {
             manufacturer = new Manufacturer();
             manufacturer.setStoreMerchantId(store);
         } else {
             manufacturer = require(store, source.getId());
         }
+        // The brand name is part of the search document of every product carrying it, so a rename invalidates
+        // all of them. A new brand has no products yet, and a save that only moved the code or the sort order
+        // has not changed what anyone can search for — neither is worth the rebuild.
+        Map<LanguageCode, String> namesBefore = isNew ? Map.of() : manufacturer.names();
         ManufacturerMapper.apply(source, manufacturer);
+        if (!isNew && !namesBefore.equals(manufacturer.names())) {
+            manufacturer.renamed();
+        }
         return manufacturerRepository.save(manufacturer).getId();
     }
 

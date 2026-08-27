@@ -5,6 +5,7 @@ import {layoutConfig} from './config';
 import {Root} from './layout/Root';
 import {Home} from './pages/Home';
 import {Category} from './pages/Category';
+import {Search} from './pages/Search';
 import {Product} from './pages/Product';
 import {Content} from './pages/Content';
 import {BlogIndex} from './pages/BlogIndex';
@@ -21,6 +22,7 @@ import {EmptyState} from './states/EmptyState';
 import {Redirecting} from './states/Redirecting';
 import {HomeSkeleton} from './states/skeletons/HomeSkeleton';
 import {CategorySkeleton} from './states/skeletons/CategorySkeleton';
+import {SearchSkeleton} from './states/skeletons/SearchSkeleton';
 import {ProductSkeleton} from './states/skeletons/ProductSkeleton';
 import {ContentSkeleton} from './states/skeletons/ContentSkeleton';
 import {CheckoutSkeleton} from './states/skeletons/CheckoutSkeleton';
@@ -49,11 +51,12 @@ export default defineTheme({
         }),
     },
     layout: {config: layoutConfig, Root},
-    pages: {Home, Category, Product, Content, BlogIndex, BlogPost, Faq, Policy, Checkout, CheckoutResult, Customer, Order},
+    pages: {Home, Category, Search, Product, Content, BlogIndex, BlogPost, Faq, Policy, Checkout, CheckoutResult, Customer, Order},
     states: {
         PageSkeleton: {
             home: HomeSkeleton,
             category: CategorySkeleton,
+            search: SearchSkeleton,
             product: ProductSkeleton,
             content: ContentSkeleton,
             checkout: CheckoutSkeleton,

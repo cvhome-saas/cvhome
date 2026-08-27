@@ -1,5 +1,7 @@
 import type {ThemeDefinition} from './contract';
 
+// `Search` is deliberately absent: it is optional in ThemePages, and the shell renders a fallback for any
+// theme that has not implemented one. Adding it here would break the build for every theme that has not.
 const PAGES = ['Home', 'Category', 'Product', 'Content', 'BlogIndex', 'BlogPost', 'Faq', 'Policy', 'Checkout', 'CheckoutResult', 'Customer', 'Order'] as const;
 const SKELETONS = ['home', 'category', 'product', 'content', 'checkout', 'customer', 'order'] as const;
 const STATES = ['ErrorState', 'NotFound', 'EmptyState', 'Redirecting'] as const;

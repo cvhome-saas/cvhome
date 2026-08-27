@@ -15,7 +15,8 @@ store-pod/landing-ui/
 │   ├── types/             @store-front/types      — Store, Product (options/variants typed), listing, search, Theme enum
 │   ├── services/          @store-front/services   — API clients, product-presenter, cart-manager
 │   ├── hooks/             @store-front/hooks      — useCart, useUser, useCustomer, useCheckoutForm, useOrderStatus,
-│   │                                                useProductListing, useProductPurchase, useSearch
+│   │                                                useProductListing, useProductSearch, useProductPurchase,
+│   │                                                useSearch, useSearchProvider, productSearchProvider
 │   ├── ui/                @store-front/ui         — shadcn primitives shared once (+ Skeleton, EmptyState, ErrorState, Price, …)
 │   ├── i18n/              @store-front/i18n       — routing, Link/useRouter, direction, useDir()
 │   └── theme/             @store-front/theme      — ThemeDefinition contract, token schema, colour bridge, defineTheme()
@@ -84,6 +85,26 @@ Direction briefs live in `themes/README.md`.
 - RTL-safe: logical utilities, `DrawerContent side="start|end"`, Swiper `dir={useDir()}`.
 - No `@/` imports in themes/libs (ESLint). Primitives from `@store-front/ui`, never forked.
 - Behaviour from `@store-front/hooks`; every state (loading/empty/error/not-found) rendered.
+- Search UI follows `SearchCapabilities` from `LayoutData`, via `useSearchProvider(capabilities)` — a theme
+  never picks a provider itself, and never assumes text search is available.
+
+## Product search
+
+The catalog answers two public endpoints: `/api/v2/products/search` (a ranked page plus counted category,
+brand and type facets, a did-you-mean, and the language the results actually came from) and
+`/api/v2/products/suggest` (autocomplete, capped and cached, no count query).
+
+- `ProductSearchService` in `libs/services` calls them, then merges price and stock from the inventory
+  service exactly as the category listing does.
+- One provider, `productSearchProvider` in `libs/hooks`, backs every theme's `SearchBox`. It used to be
+  copied into each theme with `{text: false}` hard-coded, which meant the shell's capability flags never
+  reached the browser.
+- `storefront/src/shell/search/index.ts` chooses it; `NEXT_PUBLIC_STOREFRONT_SEARCH_PROVIDER=navigation`
+  falls back to categories-and-pages suggestions, `none` turns the box off.
+- `/{locale}/search` renders `theme.pages.Search` when the theme has one, otherwise the shell's fallback.
+  It is `noindex, follow` and excluded from the sitemap — a results page has no content of its own.
+- Not filterable: price and in-stock. They live in the inventory service keyed by sku, so the catalog cannot
+  filter or sort on them; they are merged in after paging.
 
 ## Checkout redirect flow
 

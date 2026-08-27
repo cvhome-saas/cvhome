@@ -5,6 +5,7 @@ plugins {
 dependencies {
     compileOnly libs.spring.web
     api project(':store-pod:commons:store-commons')
+    api libs.namastack.outbox.api
     api project(':store-pod:merchant:merchant-commons')
     api project(':store-pod:commons:customer:customer-commons')
     api project(':store-pod:commons:reference:reference-commons')

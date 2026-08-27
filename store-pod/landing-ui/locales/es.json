@@ -193,6 +193,32 @@
     "POLICY": {
       "VERSION": "Versión {version}",
       "EFFECTIVE": "En vigor desde el {date}"
+    },
+    "SEARCH": {
+      "TITLE": "Buscar",
+      "HEADING": "Resultados de «{query}»",
+      "HEADING_EMPTY_QUERY": "Todos los productos",
+      "RESULTS_COUNT": "{count, plural, =0 {Sin productos} =1 {1 producto} other {# productos}}",
+      "DID_YOU_MEAN": "¿Quisiste decir «{suggestion}»?",
+      "OTHER_LANGUAGE": "Mostrando resultados en otro idioma de esta tienda.",
+      "PLACEHOLDER": "Buscar productos",
+      "SUBMIT": "Buscar",
+      "FILTERS": "Filtros",
+      "SHOW_FILTERS": "Mostrar filtros",
+      "CLEAR_FILTERS": "Borrar filtros",
+      "FILTER_BY_CATEGORY": "Categoría",
+      "FILTER_BY_BRAND": "Marca",
+      "FILTER_BY_TYPE": "Tipo",
+      "SORT_LABEL": "Ordenar por",
+      "SORT": {
+        "RELEVANCE": "Relevancia",
+        "NEWEST": "Más recientes",
+        "OLDEST": "Más antiguos"
+      },
+      "PAGE_OF": "Página {page} de {total}",
+      "PREVIOUS": "Anterior",
+      "NEXT": "Siguiente",
+      "SEARCH_ERROR": "No pudimos realizar esa búsqueda."
     }
   },
   "COMPONENTS": {
@@ -281,7 +307,8 @@
       "CATEGORIES": "Categorías",
       "PAGES": "Páginas",
       "PRODUCTS": "Productos",
-      "SUGGESTIONS_ONLY": "Mostrando categorías y páginas"
+      "SUGGESTIONS_ONLY": "Mostrando categorías y páginas",
+      "SEE_ALL": "Ver todos los resultados"
     }
   },
   "ERRORS": {

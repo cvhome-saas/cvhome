@@ -2,7 +2,8 @@ import type {ComponentType, ReactNode} from 'react';
 import type {
     AnnouncementData, Banner, BreadcrumbItem, Category, ColorSchema, FaqDocument, HomeSection, ListingFacets,
     ListingQuery, MenuNode, NavPage, Policy, PostList, PostSummary, Product, ProductGroupCode, ProductListingPage,
-    SearchCapabilities, SiteBranding, SocialLink, Store, StoreContext, StorefrontLink, StorefrontSeo,
+    ProductSearchPage, ProductSearchQuery, SearchCapabilities, SearchFacets, SiteBranding, SocialLink, Store,
+    StoreContext, StorefrontLink, StorefrontSeo,
 } from '@store-front/types';
 import type {ColorRoleTokens} from './tokens';
 
@@ -40,7 +41,8 @@ export interface ThemeLayoutConfig {
     productGrid: { base: 1 | 2; sm: number; lg: number; xl: number };
     productImageAspect: '1/1' | '3/4' | '4/5' | '4/3';
     container: 'narrow' | 'content' | 'wide' | 'fluid';
-    search: 'header' | 'overlay' | 'hidden';
+    /** `page` sends the box straight to /search instead of opening a dropdown under it. */
+    search: 'header' | 'overlay' | 'page' | 'hidden';
 }
 
 /* ------------------------------------------------------------------------------------------------ */
@@ -105,6 +107,22 @@ export interface CategoryData {
     initial: ProductListingPage;
     query: ListingQuery;
     facets: ListingFacets;
+}
+
+/**
+ * What the search results page renders.
+ *
+ * `initial` is loaded server-side so results never first-paint empty, exactly like the category listing. The
+ * facet counts come back with it, over the same predicate, so a filter the rail offers always leads somewhere.
+ */
+export interface SearchData {
+    query: ProductSearchQuery;
+    initial: ProductSearchPage;
+    facets: SearchFacets;
+    /** Set only when the query matched nothing and a close product name was found. */
+    didYouMean?: string;
+    /** The language the results came from, when it is not the one the shopper is browsing in. */
+    fallbackLanguage?: string;
 }
 
 export interface ProductData {
@@ -187,9 +205,21 @@ export interface ThemePages {
     CheckoutResult: ComponentType<PageProps<CheckoutResultData>>;
     Customer: ComponentType<PageProps<CustomerData>>;
     Order: ComponentType<PageProps<OrderData>>;
+    /**
+     * Optional, unlike every other page.
+     *
+     * A theme that does not implement it gets a plain results page from the shell, composed from that theme's
+     * own product grid and states — so search works everywhere from the day the endpoint lands, and a theme
+     * adopts a designed page when someone designs one. Making it required would have meant twelve bespoke
+     * pages before any shopper could search at all.
+     */
+    Search?: ComponentType<PageProps<SearchData>>;
 }
 
 export type PageSkeletonKind = 'home' | 'category' | 'product' | 'content' | 'checkout' | 'customer' | 'order';
+
+/** Skeletons a theme may add beyond the required set; the shell falls back to a related one when absent. */
+export type OptionalPageSkeletonKind = 'search';
 export type NotFoundKind = 'product' | 'category' | 'page' | 'route';
 export type EmptyKind = 'cart' | 'listing' | 'orders' | 'search';
 export type RedirectReason = 'login' | 'callback';
@@ -199,7 +229,7 @@ export type RedirectReason = 'login' | 'callback';
  * (error boundaries, hooks) and MUST therefore be `'use client'` modules themselves.
  */
 export interface ThemeStates {
-    PageSkeleton: Record<PageSkeletonKind, ComponentType>;
+    PageSkeleton: Record<PageSkeletonKind, ComponentType> & Partial<Record<OptionalPageSkeletonKind, ComponentType>>;
     ErrorState: ComponentType<{ error: Error & { digest?: string }; reset: () => void }>;
     NotFound: ComponentType<{ kind: NotFoundKind }>;
     EmptyState: ComponentType<{ kind: EmptyKind; action?: ReactNode }>;

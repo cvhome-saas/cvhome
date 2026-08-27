@@ -110,7 +110,7 @@ public class ProductServiceImpl implements ProductService {
         Product product = new Product();
         product.setStore(store);
         applyDefinition(store, source, product);
-        return productRepository.save(product).getId();
+        return productRepository.save(product.searchIndexStale()).getId();
     }
 
     @Override
@@ -118,7 +118,9 @@ public class ProductServiceImpl implements ProductService {
     public void update(StoreMerchantId store, Long id, PersistableProductDefinition source)
             throws ProductNotFoundException, ManufacturerReferenceUnresolvableException,
             ProductTypeReferenceUnresolvableException, CategoryReferenceUnresolvableException {
-        applyDefinition(store, source, require(store, id));
+        Product product = require(store, id);
+        applyDefinition(store, source, product);
+        productRepository.save(product.searchIndexStale());
     }
 
     private void applyDefinition(StoreMerchantId store, PersistableProductDefinition source, Product product)
@@ -143,6 +145,7 @@ public class ProductServiceImpl implements ProductService {
         Product product = require(store, id);
         product.setAvailable(source.isAvailable());
         product.setProductShipeable(source.isProductShipeable());
+        productRepository.save(product.searchIndexStale());
     }
 
     @Override
@@ -155,13 +158,16 @@ public class ProductServiceImpl implements ProductService {
             throw CategoryAlreadyAttachedException.of(categoryId, productId);
         }
         product.getCategories().add(category);
+        productRepository.save(product.searchIndexStale());
     }
 
     @Override
     @Transactional
     public void removeFromCategory(StoreMerchantId store, Long productId, Long categoryId)
             throws ProductNotFoundException, CategoryNotFoundException {
-        require(store, productId).getCategories().remove(requireCategory(store, categoryId));
+        Product product = require(store, productId);
+        product.getCategories().remove(requireCategory(store, categoryId));
+        productRepository.save(product.searchIndexStale());
     }
 
     @Override
@@ -177,7 +183,7 @@ public class ProductServiceImpl implements ProductService {
         // be used by other products, and deleting someone's uploads because a product went away would be wrong.
         product.getImages().clear();
         productImageService.forget(product);
-        productRepository.delete(product);
+        productRepository.delete(product.searchIndexPurged());
     }
 
     private Product require(StoreMerchantId store, Long id) throws ProductNotFoundException {

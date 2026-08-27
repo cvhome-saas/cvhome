@@ -1,11 +1,8 @@
 package com.asrevo.cvhome.catalog.repositories;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-
-import jakarta.persistence.criteria.Predicate;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -63,28 +60,34 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
     List<Product> findByStoreAndCategories(StoreMerchantId store, Collection<Long> categoryIds);
 
     /**
+     * Loads a page's worth of products with everything the mapper reads already attached.
+     *
+     * <p>
+     * Deliberately unpaged and driven by a list of ids the caller has already paged: fetch-joining collections
+     * and paginating in the same query makes Hibernate fall back to paging in memory, which on a large
+     * catalogue means reading all of it to return twenty-four rows. Two cheap queries beat that.
+     * </p>
+     */
+    @Query("""
+            select distinct p from Product p
+            left join fetch p.descriptions
+            left join fetch p.images
+            left join fetch p.manufacturer m left join fetch m.descriptions
+            left join fetch p.type t left join fetch t.descriptions
+            where p.id in ?1""")
+    List<Product> findAllHydrated(Collection<Long> ids);
+
+    /**
      * The listing behind the console's product table and the storefront's category page. Sorting comes from the
      * caller's {@code Pageable} and must name direct columns of {@code Product}.
      */
     default Page<Product> search(StoreMerchantId store, ProductFilter filter, Pageable pageable) {
-        Specification<Product> spec = (root, query, cb) -> {
-            List<Predicate> predicates = new ArrayList<>();
-            predicates.add(cb.equal(root.get("store"), store));
-            if (filter.getAvailable() != null) {
-                predicates.add(cb.equal(root.get("available"), filter.getAvailable()));
-            }
-            if (filter.getSku() != null && !filter.getSku().isBlank()) {
-                predicates.add(cb.like(cb.lower(root.get("sku")), "%%%s%%".formatted(filter.getSku().toLowerCase())));
-            }
-            if (filter.getManufacturerId() != null) {
-                predicates.add(cb.equal(root.get("manufacturer").get(ID), filter.getManufacturerId()));
-            }
-            if (filter.getCategoryIds() != null && !filter.getCategoryIds().isEmpty()) {
-                predicates.add(root.join("categories").get(ID).in(filter.getCategoryIds()));
-                query.distinct(true);
-            }
-            return cb.and(predicates.toArray(Predicate[]::new));
-        };
-        return findAll(spec, pageable);
+        return findAll(Specification.allOf(
+                ProductSpecifications.inStore(store),
+                ProductSpecifications.available(filter.getAvailable()),
+                ProductSpecifications.skuLike(filter.getSku()),
+                ProductSpecifications.byManufacturers(
+                        filter.getManufacturerId() == null ? null : List.of(filter.getManufacturerId())),
+                ProductSpecifications.inCategories(filter.getCategoryIds())), pageable);
     }
 }
