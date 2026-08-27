@@ -2,3 +2,19 @@ spring:
   sql:
     init:
       data-locations: classpath:init-sql/data-common.sql, classpath:init-sql/data-test-stores.sql, classpath:init-sql/stores/*/*.sql
+
+com:
+  asrevo:
+    cvhome:
+      # cua pins its OAuth2 issuer to the pod endpoint and refuses to start without one — a cua that cannot pin
+      # its issuer derives it from the request host and mints tokens no resource server will accept. Only the
+      # lcl and fargate profiles carry `pod-info`, so a context started under this profile needs its own. The
+      # values match store-pod-lcl-config.yml deliberately: this profile seeds the same demo stores.
+      pod-info:
+        pod:
+          id: 507f1f77bcf86cd799439011
+          name: pod-507f1f77
+          endpoint:
+            endpoint: ${com.asrevo.cvhome.services.spg.schema}://${com.asrevo.cvhome.pod.domain}
+            type: EXTERNAL
+          domain: ${com.asrevo.cvhome.pod.domain}
