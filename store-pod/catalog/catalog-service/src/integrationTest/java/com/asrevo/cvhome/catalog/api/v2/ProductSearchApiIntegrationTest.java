@@ -13,7 +13,10 @@ import org.springframework.http.HttpStatus;
 
 import com.asrevo.cvhome.catalog.api.CatalogApiSupport;
 import com.asrevo.cvhome.catalog.config.ExternalClientsTestConfiguration;
-import com.asrevo.cvhome.catalog.services.product.ProductSearchIndexer;
+import com.asrevo.cvhome.catalog.model.product.event.BrandRenamedEvent;
+import com.asrevo.cvhome.catalog.model.product.event.ProductSearchIndexPurgedEvent;
+import com.asrevo.cvhome.catalog.model.product.event.ProductSearchIndexStaleEvent;
+import com.asrevo.cvhome.catalog.service.CatalogSearchOutboxHandler;
 import com.asrevo.cvhome.testsupport.annotations.StorageIntegrationTest;
 import com.asrevo.cvhome.testsupport.security.TestJwtSigner;
 
@@ -29,6 +32,7 @@ import static com.asrevo.cvhome.catalog.api.CatalogApiSupport.SKU;
 import static com.asrevo.cvhome.catalog.api.CatalogApiSupport.STORE_A;
 import static com.asrevo.cvhome.catalog.api.CatalogApiSupport.STORE_B;
 import static com.asrevo.cvhome.catalog.api.CatalogApiSupport.TOTAL_ELEMENTS;
+import static com.asrevo.cvhome.catalog.api.CatalogApiSupport.V1_PRIVATE;
 import static com.asrevo.cvhome.catalog.api.CatalogApiSupport.V2;
 import static com.asrevo.cvhome.catalog.api.CatalogApiSupport.V2_PRIVATE;
 import static com.asrevo.cvhome.catalog.api.CatalogApiSupport.expect;
@@ -44,8 +48,8 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * <p>
  * The index is maintained through the outbox, which polls, so nothing here races the poller: a test that changes
- * a product drives {@link ProductSearchIndexer} itself. What the outbox is responsible for — that an event is
- * registered at all — is asserted in the unit tests instead.
+ * a product hands the event straight to {@link CatalogSearchOutboxHandler}. That an event is registered at all is
+ * asserted in the unit tests instead.
  * </p>
  */
 @StorageIntegrationTest
@@ -55,6 +59,8 @@ class ProductSearchApiIntegrationTest {
     private static final String PRODUCTS = "products";
 
     private static final String PRODUCT = "product";
+
+    private static final String MANUFACTURER = "manufacturer";
 
     private static final String EN = "en";
 
@@ -69,6 +75,10 @@ class ProductSearchApiIntegrationTest {
     private static final String EVERY_RESULT = "count=50";
 
     /** The products the write cases create for themselves, so they never disturb the seeded fixtures. */
+    private static final String BRAND_BODY = """
+            {"code":"%s","order":2,
+             "descriptions":[{"language":"en","name":"%s","title":"T","description":"d","friendlyUrl":"brand"}]}""";
+
     private static final String TRAINER = "%s Trainer";
 
     private static final String PURGEABLE = "Purgeable";
@@ -108,8 +118,17 @@ class ProductSearchApiIntegrationTest {
     @Autowired
     private TestJwtSigner signer;
 
+    /**
+     * The bean the outbox calls, driven directly.
+     *
+     * <p>
+     * Going through the handler rather than the indexer underneath it means these cases exercise the same
+     * path a delivered event would, wiring included — without waiting on the poller, which would make every
+     * one of them a race.
+     * </p>
+     */
     @Autowired
-    private ProductSearchIndexer indexer;
+    private CatalogSearchOutboxHandler outboxHandler;
 
     private CatalogApiSupport api;
 
@@ -370,7 +389,7 @@ class ProductSearchApiIntegrationTest {
 
         expect(api.send(HttpMethod.PUT, scoped(path(V2_PRIVATE, PRODUCT, productId), STORE_A), admin(),
                 productBody(sku, "%s Runner".formatted(invented))), HttpStatus.OK);
-        indexer.reindex(productId);
+        reindex(productId);
 
         JsonNode after = search(STORE_A, EN, invented, A_PAGE);
         assertThat(skus(after)).contains(sku);
@@ -383,9 +402,31 @@ class ProductSearchApiIntegrationTest {
         long productId = createProduct(sku, TRAINER.formatted(PURGEABLE));
         assertThat(skus(search(STORE_A, EN, PURGEABLE, A_PAGE))).contains(sku);
 
-        indexer.purge(productId);
+        purge(productId);
 
         assertThat(skus(search(STORE_A, EN, PURGEABLE, A_PAGE))).doesNotContain(sku);
+    }
+
+    /**
+     * A brand's name is part of every one of its products' search documents, so renaming it has to make them
+     * findable under the new name — and that is one event covering many products, not one event each.
+     */
+    @Test
+    void renamingABrandMakesItsProductsFindableUnderTheNewName() {
+        String invented = "Zephyrine";
+        assertThat(search(STORE_A, EN, invented, A_PAGE).get(TOTAL_ELEMENTS).asLong()).isZero();
+
+        String sku = "SKU-SEARCH-BRAND";
+        String brandCode = "SEARCH-BRAND";
+        long brandId = createBrand(brandCode, "Plainname");
+        long productId = createProduct(sku, TRAINER.formatted("Branded"), brandCode);
+        reindex(productId);
+
+        expect(api.send(HttpMethod.PUT, scoped(path(V1_PRIVATE, MANUFACTURER, brandId), STORE_A), admin(),
+                BRAND_BODY.formatted(brandCode, invented)), HttpStatus.OK);
+        outboxHandler.handleBrandRenamedEvent(BrandRenamedEvent.from(brandId, STORE_A));
+
+        assertThat(skus(search(STORE_A, EN, invented, A_PAGE))).contains(sku);
     }
 
     // -------------------------------------------------------------------------------------------------- rebuild
@@ -401,7 +442,7 @@ class ProductSearchApiIntegrationTest {
     void rebuildingRestoresWhatWasPurged() {
         String sku = "SKU-SEARCH-REBUILD";
         long productId = createProduct(sku, TRAINER.formatted(REBUILDABLE));
-        indexer.purge(productId);
+        purge(productId);
         assertThat(skus(search(STORE_A, EN, REBUILDABLE, A_PAGE))).doesNotContain(sku);
 
         expect(api.send(HttpMethod.POST, scoped(REBUILD, STORE_A), admin(), ""), HttpStatus.ACCEPTED);
@@ -415,22 +456,48 @@ class ProductSearchApiIntegrationTest {
         return api.token(ADMIN, STORE_A);
     }
 
+    /** Exactly what the outbox delivers when a product is saved. */
+    private void reindex(long productId) {
+        outboxHandler.handleProductSearchIndexStaleEvent(ProductSearchIndexStaleEvent.from(productId, STORE_A));
+    }
+
+    /** Exactly what the outbox delivers when a product is deleted. */
+    private void purge(long productId) {
+        outboxHandler.handleProductSearchIndexPurgedEvent(ProductSearchIndexPurgedEvent.from(productId, STORE_A));
+    }
+
     /**
      * Creates a product and indexes it, standing in for the outbox round trip the poller would otherwise make.
      */
     private long createProduct(String sku, String name) {
+        return createProduct(sku, name, null);
+    }
+
+    private long createProduct(String sku, String name, String brandCode) {
         var created = api.send(HttpMethod.POST, scoped(path(V2_PRIVATE, PRODUCT), STORE_A), admin(),
-                productBody(sku, name));
+                productBody(sku, name, brandCode));
         expect(created, HttpStatus.CREATED);
         long id = json(created).get(ID).asLong();
-        indexer.reindex(id);
+        reindex(id);
         return id;
     }
 
     private static String productBody(String sku, String name) {
+        return productBody(sku, name, null);
+    }
+
+    private static String productBody(String sku, String name, String brandCode) {
         return """
-                {"sku":"%s","visible":true,"shipeable":true,"virtual":false,"sortOrder":1,
+                {"sku":"%s","visible":true,"shipeable":true,"virtual":false,"sortOrder":1,%s
                  "descriptions":[{"language":"%s","name":"%s","friendlyUrl":"%s"}]}"""
-                .formatted(sku, EN, name, sku.toLowerCase());
+                .formatted(sku, brandCode == null ? "" : " \"manufacturer\":\"%s\",".formatted(brandCode),
+                        EN, name, sku.toLowerCase());
+    }
+
+    private long createBrand(String code, String name) {
+        var created = api.send(HttpMethod.POST, scoped(path(V1_PRIVATE, MANUFACTURER), STORE_A), admin(),
+                BRAND_BODY.formatted(code, name));
+        expect(created, HttpStatus.CREATED);
+        return json(created).get(ID).asLong();
     }
 }

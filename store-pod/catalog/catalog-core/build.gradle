@@ -9,6 +9,8 @@ dependencies {
     testImplementation libs.spring.data.jpa
     testImplementation libs.spring.web
     testImplementation libs.jakarta.persistence.api
+    // TsVectorType implements a Hibernate UserType, so the interface has to resolve to test it.
+    testImplementation libs.hibernate.core
     // StoreEntitlements is exercised for real rather than mocked: its cache is the behaviour under test.
     testImplementation libs.caffeine
     api project(':store-pod:commons:store-commons')
@@ -25,6 +27,5 @@ dependencies {
     compileOnly libs.commons.io
     compileOnly libs.hibernate.core
     implementation libs.commons.validator
-    compileOnly libs.hibernate.core
     annotationProcessor libs.lombok
 }

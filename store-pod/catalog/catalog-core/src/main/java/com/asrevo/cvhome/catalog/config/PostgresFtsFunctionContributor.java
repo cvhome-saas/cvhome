@@ -53,15 +53,5 @@ public class PostgresFtsFunctionContributor implements FunctionContributor {
                 .setExactArgumentCount(3)
                 .setInvariantType(types.resolve(FLOAT))
                 .register();
-
-        // Trigram closeness of a product name to what was typed, normalised on both sides by the same function
-        // the index was built with. word_similarity compares the query against the best-matching run of words
-        // inside the name; plain similarity would compare it against the whole name, so a two-word query against
-        // a five-word product name scores near zero however well it actually matches.
-        registry.patternDescriptorBuilder("trgm_similarity",
-                        "public.word_similarity(catalog.search_normalize(?2), ?1)")
-                .setExactArgumentCount(2)
-                .setInvariantType(types.resolve(FLOAT))
-                .register();
     }
 }

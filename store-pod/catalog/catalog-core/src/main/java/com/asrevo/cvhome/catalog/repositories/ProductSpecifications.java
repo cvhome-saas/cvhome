@@ -32,14 +32,6 @@ public final class ProductSpecifications {
 
     private static final String SEARCH_DOCUMENT = "searchDocument";
 
-    private static final String NAME_NORMALIZED = "nameNormalized";
-
-    /**
-     * How alike a product name has to be to a query before it counts as "did you mean". Below roughly this,
-     * pg_trgm starts offering things a shopper would not recognise as their own typo.
-     */
-    private static final float SIMILARITY_FLOOR = 0.3f;
-
     private ProductSpecifications() {
     }
 
@@ -126,31 +118,6 @@ public final class ProductSpecifications {
     }
 
     /**
-     * The fallback when the tsquery matched nothing: names that merely look like what was typed.
-     *
-     * <p>
-     * Deliberately separate from {@link #matchesText}. Running both together would let a loose trigram match
-     * dilute a page of exact hits; this only ever answers a query that already came back empty.
-     * </p>
-     */
-    public static Specification<Product> similarTo(String queryText, StoreMerchantId store, LanguageCode language) {
-        if (queryText == null || queryText.isBlank()) {
-            return always();
-        }
-        return (root, query, cb) -> {
-            Subquery<Integer> sub = query.subquery(Integer.class);
-            Root<ProductSearchIndex> index = sub.from(ProductSearchIndex.class);
-            sub.select(cb.literal(1));
-            sub.where(cb.and(
-                    cb.equal(index.get(PRODUCT_ID), root.get(ID)),
-                    cb.equal(index.get(STORE), store),
-                    cb.equal(index.get(LANGUAGE_CODE), language.code()),
-                    cb.greaterThan(similarity(cb, index, queryText), SIMILARITY_FLOOR)));
-            return cb.exists(sub);
-        };
-    }
-
-    /**
      * The rank of this product's match, as a correlated scalar subquery.
      *
      * <p>
@@ -169,10 +136,5 @@ public final class ProductSpecifications {
                 cb.equal(index.get(STORE), store),
                 cb.equal(index.get(LANGUAGE_CODE), language.code())));
         return sub;
-    }
-
-    private static Expression<Float> similarity(CriteriaBuilder cb, Root<ProductSearchIndex> index,
-                                                String queryText) {
-        return cb.function("trgm_similarity", Float.class, index.get(NAME_NORMALIZED), cb.literal(queryText));
     }
 }
