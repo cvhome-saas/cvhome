@@ -13,7 +13,7 @@ once during the build and could break again.
 - **Scope** — content · console-ui · landing-ui · spg · uaa permission evaluator
 - **Change** — PR #276, branch `feat/mirror-console-ui`, plans `.agents/plans/console-ui-content.md`
   (Module 12) and `.agents/plans/console-ui-retire-seller-ui.md` (Module 13 / content phase 7)
-- **Cases** — 81 (16 verified, 19 covered by tests only, 46 never run end to end)
+- **Cases** — 80 (16 verified, 19 covered by tests only, 45 never run end to end)
 - **Storage** — media uploads go to MinIO in `docker-compose-lcl.yml`. It runs **without a volume**, so
   everything uploaded is gone after a container restart. That is the local stack, not a defect.
 
@@ -452,55 +452,82 @@ fallback is gone, which is why all four demo stores were given a seeded TERMS po
 - **Expect** — a card per type with its "required by" regions and its real status: TERMS published, the rest
   missing with a Create call to action. Publish one and its card changes without a hard reload.
 
-### POL-06 — Templates fill both languages · [not verified]
-
-- **Steps** — create a COOKIES policy and press **Insert template**.
-- **Expect** — English and Arabic starter text and headings arrive together, editable, and the request
-  (`GET /policies/templates?type=COOKIES`) returns 200 for every type — an unknown jurisdiction falls back to
-  the plain template rather than erroring.
-
 ---
 
 ## MNU — Navigation menus
 
-Two menus per store (MAIN, FOOTER), **one level of nesting**, replaced whole by the editor. A store that never
-opened the editor gets its MAIN menu bootstrapped on first read from the legacy `linkToMenu` pages, so nobody
-loses navigation.
+Two menus per store (MAIN, FOOTER), **one level of nesting**, replaced whole by the editor. A demo store ships
+both menus seeded, with nesting; a save replaces the tree wholesale rather than merging into it.
 
-### MNU-01 — The main menu bootstraps from the legacy pages · critical · [unit only]
+The editor is a **tree beside an item editor**, the same shape as `/catalogue/categories` and the same
+`app-tree` primitive: a Main / Footer switch at the top, the menu as a tree on the left, the open link's fields
+on the right, and one Save / Discard bar for the whole menu. Edits land in a local draft as they are typed —
+there is no per-link save, because `PUT /menus/{handle}` replaces the tree whole.
 
-`ContentPlatformIntegrationTest.menusBootstrapFromLegacyPagesAndRefuseDepth`.
+### MNU-01 — A save replaces the whole tree, not part of it · critical · [unit only]
 
-- **Steps** — on an untouched store, open `/content/menus` and compare with the storefront navigation.
-- **Expect** — the seeded pages marked `link_to_menu` are there, in order, with per-locale labels — not an
-  empty editor.
+`ContentPlatformIntegrationTest.theMainMenuIsReplacedWholeAndRefusesDepth`. MAIN used to be derived on first
+read from a legacy `link_to_menu` column that only the retired seller UI could write — navigation a seller saw
+and could not edit. It is a plain menu now.
+
+- **Steps** — on an untouched store, open `/content/menus` and compare with the storefront navigation. Then
+  rebuild the menu from scratch and save.
+- **Expect** — the seeded links are there, nested, in order, with per-locale labels — not an empty editor. After
+  the save, only what was on screen survives: nothing of the seeded tree is merged back in.
 
 ### MNU-02 — Three levels are refused · high · [unit only]
 
 Same test.
 
-- **Expect** — 422 `CONTENT.MENU.DEPTH_EXCEEDED`; the indent control stops offering a third level.
+- **Expect** — 422 `CONTENT.MENU.DEPTH_EXCEEDED`, and the console never gets that far: nesting a link that
+  already has sub-links is disabled on the row button, in the `Shift+F10` menu and as a drop target, and
+  "Add link inside" is refused on a link that is already a child.
 
 ### MNU-03 — Saving the tree replaces it exactly · critical · [not verified]
 
 The whole tree is written in one request, so a partial save is a real risk.
 
-- **Steps** — reorder two items, indent one under another, hide a third, remove a fourth, save, reload, then
-  read `/storefront/menus/MAIN`.
+- **Steps** — reorder two items, nest one under another, hide a third, remove a fourth, save, reload, then
+  read `/storefront/menus/MAIN`. Do each move three ways across the run — by drag, by the row's own buttons,
+  and from the keyboard (`Alt+↑`/`Alt+↓` to reorder, `Alt+←`/`Alt+→` to move in and out).
 - **Expect** — console and storefront agree; positions renumber per level; the hidden item is absent from the
-  storefront but still in the editor; nothing duplicated.
+  storefront but still in the editor; nothing duplicated. The three paths must produce identical trees.
+- **Also** — removing a link warns how many sub-links go with it *before* the button is pressed, and takes
+  them; the editor stays open on the same link across the save, even though the draft keys are reissued.
 
 ### MNU-04 — A broken internal link is flagged, not served · high · [not verified]
 
 - **Steps** — point a menu item at a page, then unpublish that page.
-- **Expect** — the console marks the item **broken**; the storefront menu simply omits it. A shopper must never
-  reach a 404 from the navigation.
+- **Expect** — the console marks the item **broken** — an amber badge on its tree row, so it is findable
+  without opening anything, and a red notice in the editor saying what to do; the storefront menu simply omits
+  it. A shopper must never reach a 404 from the navigation.
 
 ### MNU-05 — Invalid targets are refused at save · [not verified]
 
 - **Steps** — a URL item with `example.com` (no scheme, no leading slash); a PAGE item with no value.
 - **Expect** — 400 `CONTENT.MENU.TARGET_INVALID` with a message naming the rule, and the whole save is rejected
   — not a half-written tree.
+
+### MNU-06 — The tree drives from the keyboard alone · high · [not verified]
+
+The editor's only rearrangement gesture used to be a button; it is a tree now, and a tree that only a mouse can
+rearrange is a regression for anyone who cannot use one.
+
+- **Steps** — Tab into the tree (it is **one** tab stop, not one per row). Arrow through it, expand with `→`,
+  collapse with `←`, `Enter` to open a link in the editor. `Alt` with the arrows to move. `Shift+F10` for the
+  row menu.
+- **Expect** — arrowing moves focus and *nothing else*: a half-typed label in the editor survives it. Every
+  move announces itself, and where the link ended up, on the live region. The row menu lists all six moves with
+  their shortcuts, and unavailable ones are `aria-disabled` rather than gone.
+- **In Arabic** — the indent mirrors, `Alt+←`/`Alt+→` swap with it, and `Alt+↑`/`Alt+↓` do **not**: up is up in
+  both directions.
+
+### MNU-07 — Open in a new tab round-trips · low · [not verified]
+
+`openInNewTab` has been on the wire the whole time with no control anywhere in the console.
+
+- **Steps** — set it on a link, save, reload, read `/storefront/menus/MAIN`.
+- **Expect** — the toggle comes back on, and the storefront renders `target="_blank"`.
 
 ---
 
@@ -879,8 +906,14 @@ and nothing consumes it — there is no customer-notification channel on the pla
 **Content is store-scoped, with no org-level sharing.** An item belongs to the store it was created in; the
 design's "Stores: All stores" picker is omitted rather than shown disabled.
 
-**No storefront builder.** `template`, `meta.blocks` and `ContentData.blocks` are a deliberate seam with no UI
-behind them.
+**No storefront builder, and no seam left for one.** The page `template` column (STANDARD/LANDING/CONTACT/
+FAQ_PAGE) and the `blocks` placeholders were removed: the console stored a layout choice, the storefront carried
+it to the theme contract, and every theme rendered the same title and prose, so the four cards changed nothing.
+A builder would arrive as its own feature rather than as a dormant column.
+
+**No policy starter text.** The classpath `policy-templates/` and the *Insert template* button are gone. They
+worked, and that was the problem: shipping canned legal text invites a merchant to publish a privacy policy
+nobody read. A policy starts empty and the merchant writes or pastes their own.
 
 **Delete is permanent.** No soft-delete window and no trash, for any content type or media asset.
 

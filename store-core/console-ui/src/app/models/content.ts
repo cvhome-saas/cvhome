@@ -28,8 +28,6 @@ export const CONTENT_STATUSES: readonly ContentStatus[] = ['DRAFT', 'REVIEW', 'S
 /** How complete one locale of an item is. */
 export type TranslationState = 'MISSING' | 'DRAFT' | 'TRANSLATED' | 'STALE';
 
-export type PageTemplate = 'STANDARD' | 'LANDING' | 'CONTACT' | 'FAQ_PAGE';
-
 export type BannerPlacement = 'HERO' | 'CAROUSEL' | 'COLLECTION' | 'STRIP';
 
 export const BANNER_PLACEMENTS: readonly BannerPlacement[] = ['HERO', 'CAROUSEL', 'COLLECTION', 'STRIP'];
@@ -134,7 +132,6 @@ export interface ReadableContentMeta {
 }
 
 export interface PersistablePage extends PersistableContent {
-  readonly template?: PageTemplate;
   readonly parentId?: number | null;
   readonly showInFooter?: boolean;
 }
@@ -242,12 +239,6 @@ export interface PolicyCompliance {
   readonly requiredBy: readonly string[];
   readonly status: ContentStatus | null;
   readonly id: number | null;
-}
-
-export interface PolicyTemplate {
-  readonly type: PolicyType;
-  readonly jurisdiction?: string | null;
-  readonly translations: readonly ContentTranslation[];
 }
 
 export interface PublishPolicyVersionRequest {

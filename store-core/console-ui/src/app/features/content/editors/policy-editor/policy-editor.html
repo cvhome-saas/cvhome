@@ -39,21 +39,6 @@
             </button>
           }
         </div>
-        @if (canManage()) {
-          <div class="template-row">
-            <span>{{
-              t('content.policy.templateHint', {type: typeLabel(extra.controls.policyType.value)})
-            }}</span>
-            <button
-              class="secondary-action"
-              type="button"
-              [disabled]="templateBusy()"
-              (click)="insertTemplate()"
-            >
-              <app-icon name="sparkles" />{{ t('content.policy.insertTemplate') }}
-            </button>
-          </div>
-        }
       </app-panel>
 
       <app-locale-copy

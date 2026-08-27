@@ -19,33 +19,6 @@
     (deleteDismissed)="deleteOpen.set(false)"
   >
     <ng-container main>
-      <app-panel
-        [title]="t('content.page.templateTitle')"
-        [subtitle]="t('content.page.templateSubtitle')"
-        padded
-      >
-        <div
-          class="template-cards"
-          role="radiogroup"
-          [attr.aria-label]="t('content.page.templateTitle')"
-        >
-          @for (template of templates; track template) {
-            <button
-              class="template-card"
-              type="button"
-              role="radio"
-              [class.active]="extra.controls.template.value === template"
-              [attr.aria-checked]="extra.controls.template.value === template"
-              [disabled]="!canManage()"
-              (click)="pickTemplate(template)"
-            >
-              <strong>{{ templateLabel(template) }}</strong>
-              <small>{{ templateHint(template) }}</small>
-            </button>
-          }
-        </div>
-      </app-panel>
-
       @if (activeTranslation(); as form) {
         <app-locale-copy
           [forms]="facade.translations()"

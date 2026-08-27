@@ -6,7 +6,7 @@ import {map} from 'rxjs';
 
 import {ContentItemsService} from '@api/content/content-items.service';
 import {ConsoleShellFacade} from '@layouts/console-shell/facades/console-shell.facade';
-import type {PageTemplate, PersistablePage, ReadablePage} from '@models/content';
+import type {PersistablePage, ReadablePage} from '@models/content';
 import {ConsolePermissions} from '@shared/auth/console-permissions';
 import {DateTimeField} from '@shared/ui/date-time-field/date-time-field';
 import {FormField} from '@shared/ui/form-field/form-field';
@@ -24,8 +24,6 @@ import {ContentEditorFacade} from '../../facades/content-editor.facade';
 import {ContentHubFacade} from '../../facades/content-hub.facade';
 import {EditorShell, type EditorCommand} from '../editor-shell/editor-shell';
 
-const TEMPLATES: readonly PageTemplate[] = ['STANDARD', 'LANDING', 'CONTACT', 'FAQ_PAGE'];
-
 const COPY: CopyFields = {
   titleKey: 'content.copy.pageTitle',
   bodyKey: 'content.copy.body',
@@ -33,11 +31,13 @@ const COPY: CopyFields = {
 };
 
 /**
- * `New Page.dc.html`: template cards, the per-language title and body, URL & search, and a sidebar
- * with publish date, footer/menu toggles, parent page and the before-publishing checklist.
+ * `New Page.dc.html`: the per-language title and body, URL & search, and a sidebar with publish
+ * date, footer/menu toggles, parent page and the before-publishing checklist.
  *
  * Not built: the "Stores" picker (an item belongs to the store it was created in — the service is
- * store-scoped) and the storefront preview.
+ * store-scoped) and the storefront preview. The design's template cards are gone rather than not
+ * built: they stored a layout (LANDING/CONTACT/FAQ_PAGE) that no theme ever read, so choosing one
+ * changed nothing anywhere. A page builder would arrive as its own feature, not as four buttons.
  * TODO(lessons.md): in-console storefront preview — see lessons.md, "Content — no in-console
  * storefront preview". The preview token endpoint exists; the console lacks the storefront host.
  */
@@ -74,7 +74,6 @@ export class PageEditor {
   /** The route's `:id`; absent on `new`. */
   readonly id = input<string>();
 
-  protected readonly templates = TEMPLATES;
   protected readonly copyFields = COPY;
   protected readonly deleteOpen = signal(false);
   protected readonly scheduleOpen = signal(false);
@@ -82,11 +81,9 @@ export class PageEditor {
   protected readonly canManage = computed(() => this.permissions.canManageContent());
 
   protected readonly extra: FormGroup<{
-    template: FormControl<PageTemplate>;
     parentId: FormControl<number | null>;
     showInFooter: FormControl<boolean>;
   }> = this.fb.group({
-    template: this.fb.control<PageTemplate>('STANDARD'),
     parentId: this.fb.control<number | null>(null),
     showInFooter: this.fb.control(false),
   });
@@ -118,7 +115,6 @@ export class PageEditor {
       untracked(() =>
         this.facade.init('pages', raw ? Number(raw) : null, this.extra, (item) => {
           this.extra.reset({
-            template: item.template ?? 'STANDARD',
             parentId: item.parentId ?? null,
             showInFooter: !!item.showInFooter,
           });
@@ -180,19 +176,6 @@ export class PageEditor {
       },
     ];
   });
-
-  protected templateLabel(template: PageTemplate): string {
-    return this.transloco.translate(`content.page.template.${template}.label`);
-  }
-
-  protected templateHint(template: PageTemplate): string {
-    return this.transloco.translate(`content.page.template.${template}.hint`);
-  }
-
-  protected pickTemplate(template: PageTemplate): void {
-    this.extra.controls.template.setValue(template);
-    this.extra.controls.template.markAsDirty();
-  }
 
   protected onParent(value: string): void {
     this.extra.controls.parentId.setValue(value === '' ? null : Number(value));

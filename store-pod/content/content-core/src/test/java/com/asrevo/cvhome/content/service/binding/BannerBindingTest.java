@@ -80,6 +80,19 @@ class BannerBindingTest {
         assertThat(binding.storefrontPath(banner(1L, BannerPlacement.HERO, ContentStatus.DRAFT))).isNull();
     }
 
+    /**
+     * The announcement strip is the one banner whose copy is a body: it renders no artwork and no headline, so its
+     * message is the {@code description} — which is what the {@code header-message} box it replaced held. Every
+     * other placement lays its copy over artwork and needs no body at all.
+     */
+    @Test
+    void onlyTheAnnouncementStripNeedsABody() {
+        assertThat(binding.requiresBody(banner(1L, BannerPlacement.STRIP, ContentStatus.DRAFT))).isTrue();
+        assertThat(binding.requiresBody(banner(2L, BannerPlacement.HERO, ContentStatus.DRAFT))).isFalse();
+        assertThat(binding.requiresBody(banner(3L, BannerPlacement.CAROUSEL, ContentStatus.DRAFT))).isFalse();
+        assertThat(binding.requiresBody(ContentFixtures.content(4L, ContentType.BANNER, HERO_SLUG))).isFalse();
+    }
+
     @Test
     void applyWritesPlacementWindowAndMeta() {
         Content c = ContentFixtures.content(1L, ContentType.BANNER, HERO_SLUG);

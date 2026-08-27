@@ -4,10 +4,6 @@
 GET {{SELLER_UI_URL}}/spg/content/api/v1/private/content/policies/compliance?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
 Cookie: SESSION={{SESSION_ID}}
 
-### Starter text
-GET {{SELLER_UI_URL}}/spg/content/api/v1/private/content/policies/templates?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}&type=RETURNS&jurisdiction=NL
-Cookie: SESSION={{SESSION_ID}}
-
 ### Create the head
 POST {{SELLER_UI_URL}}/spg/content/api/v1/private/content/policies?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
 Content-Type: application/json

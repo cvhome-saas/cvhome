@@ -237,11 +237,4 @@ class PolicyServiceTest {
                 .satisfies(c -> assertThat(c.getStatus()).isNull());
     }
 
-    @Test
-    void aTemplateWithoutAFileOnTheClasspathCarriesNoText() {
-        assertThat(service.template(PolicyType.CUSTOM, "  ZZ  ").getTranslations()).isEmpty();
-        assertThat(service.template(PolicyType.CUSTOM, null).getJurisdiction()).isNull();
-        assertThat(service.template(PolicyType.CUSTOM, null).getType()).isEqualTo(PolicyType.CUSTOM);
-    }
-
 }

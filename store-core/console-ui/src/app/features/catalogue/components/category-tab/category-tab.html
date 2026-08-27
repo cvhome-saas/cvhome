@@ -26,12 +26,13 @@
           [selectedId]="facade.selectedCategoryId()"
           [collapsed]="facade.collapsed()"
           [label]="t('catalogue.categories.treeLabel')"
+          [itemNoun]="t('catalogue.categories.noun')"
           [busy]="facade.busy()"
           (selectedIdChange)="onSelect($event)"
           (toggleCollapsed)="facade.toggleCollapsed($event)"
           (visibilityToggled)="facade.toggleCategoryVisible($event)"
           (moved)="onMove($event)"
-          (addChild)="facade.startCreate($event.id)"
+          (addChild)="facade.startCreate(+$event.id)"
         />
 
         <button class="secondary-action add-root" type="button" (click)="facade.startCreate()">

@@ -377,32 +377,41 @@
     "tree": {
       "expand": "Expand {name}",
       "collapse": "Collapse {name}",
-      "toggleVisibility": "Show or hide {name} in the storefront navigation",
-      "visible": "Shown in the storefront navigation",
-      "hidden": "Hidden from the storefront navigation",
+      "toggleVisibility": "Show or hide {name} in the storefront",
+      "visible": "Shown in the storefront",
+      "hidden": "Hidden from the storefront",
       "nest": "Move {name} into the row above it",
       "nestShort": "Move into the row above",
       "unnest": "Move {name} out of its parent",
       "unnestShort": "Move out",
-      "addChild": "Add a category inside {name}",
-      "addChildShort": "Add inside",
+      "addChild": "Add a {noun} inside {name}",
+      "addChildShort": "Add {noun} inside",
       "empty": "Nothing here yet.",
       "actions": "Actions for {name}",
-      "keyboardHint": "Use Alt with the left and right arrows to move a category in or out. Press Shift F10 for more actions.",
-      "visibilityShort": "Show in navigation",
+      "keyboardHint": "Use Alt with the left and right arrows to move a {noun} in or out. Press Shift F10 for more actions.",
+      "visibilityShort": "Show in the storefront",
       "keys": {
         "nest": "Alt+→",
         "unnest": "Alt+←",
         "visibility": "Alt+V",
-        "addChild": "Alt+N"
+        "addChild": "Alt+N",
+        "moveUp": "Alt+↑",
+        "moveDown": "Alt+↓"
       },
       "announce": {
         "nesting": "Moving {name} in",
         "unnesting": "Moving {name} out",
-        "hiding": "Hiding {name} from the storefront navigation",
-        "showing": "Showing {name} in the storefront navigation",
-        "settled": "{name}, level {level}, {position} of {size}"
-      }
+        "hiding": "Hiding {name} from the storefront",
+        "showing": "Showing {name} in the storefront",
+        "settled": "{name}, level {level}, {position} of {size}",
+        "movingUp": "Moving {name} up",
+        "movingDown": "Moving {name} down"
+      },
+      "keyboardHintReorder": "Use Alt with the up and down arrows to reorder a {noun}, and with the left and right arrows to move it in or out. Press Shift F10 for more actions.",
+      "moveUp": "Move {name} up among its siblings",
+      "moveDown": "Move {name} down among its siblings",
+      "moveUpShort": "Move up",
+      "moveDownShort": "Move down"
     },
     "validation": {
       "required": "This field is required.",
@@ -1580,7 +1589,8 @@
       "hasChildren": "This category has {count, plural, one {# category} other {# categories}} inside it. Deleting it deletes them too.",
       "create": "Create category",
       "save": "Save category",
-      "delete": "Delete"
+      "delete": "Delete",
+      "noun": "category"
     },
     "brands": {
       "title": "Brands",
@@ -3121,7 +3131,10 @@
       "question": "Question",
       "answer": "Answer",
       "heading": "Heading",
-      "policyBody": "Policy text"
+      "policyBody": "Policy text",
+      "bannerLabel": "Label",
+      "bannerLabelHint": "Names the banner in your content list. Shoppers never see it.",
+      "message": "Message"
     },
     "seo": {
       "title": "URL & search",
@@ -3167,32 +3180,13 @@
       "policyType": "Type selected",
       "headingAndBody": "Heading and body written",
       "effectiveDate": "Effective date set",
-      "legalReview": "Legal review for {languages}"
+      "legalReview": "Legal review for {languages}",
+      "message": "Announcement message written"
     },
     "page": {
       "newTitle": "New page",
       "editTitle": "Page",
       "context": "Content, URL and visibility for a storefront page",
-      "templateTitle": "Template",
-      "templateSubtitle": "How the storefront lays the page out.",
-      "template": {
-        "STANDARD": {
-          "label": "Standard page",
-          "hint": "Title and rich text. For policies, about and company pages."
-        },
-        "LANDING": {
-          "label": "Landing page",
-          "hint": "Hero, sections and calls to action for campaigns."
-        },
-        "CONTACT": {
-          "label": "Contact page",
-          "hint": "Form, address block and opening hours."
-        },
-        "FAQ_PAGE": {
-          "label": "FAQ page",
-          "hint": "Pulls grouped entries from the FAQ library."
-        }
-      },
       "visibility": "Visibility",
       "parent": "Parent page",
       "noParent": "None — top level",
@@ -3293,8 +3287,7 @@
       "empty": "No files of this kind yet."
     },
     "menus": {
-      "title": "Storefront navigation",
-      "subtitle": "Main and footer menus · one level of nesting",
+      "subtitle": "{count, plural, one {1 link} other {# links}} · one level of nesting",
       "loading": "Loading menus…",
       "labelsIn": "Labels in",
       "handle": {
@@ -3311,7 +3304,6 @@
         "URL": "URL"
       },
       "label": "Label",
-      "labelPlaceholder": "Label",
       "target": "Target kind",
       "value": "Target",
       "valuePlaceholder": {
@@ -3324,18 +3316,36 @@
         "FAQ_INDEX": ""
       },
       "broken": "Broken link",
-      "moveUp": "Move up",
-      "moveDown": "Move down",
-      "indent": "Nest under the item above",
-      "outdent": "Move out to top level",
-      "hide": "Hide from the storefront",
-      "show": "Show on the storefront",
-      "remove": "Remove",
-      "empty": "No links yet.",
+      "empty": "Pick a link from the menu to edit it, or add one.",
       "addLink": "Add link",
       "save": "Save menu",
       "discard": "Discard",
-      "saved": "{menu} saved."
+      "saved": "{menu} saved.",
+      "menusLabel": "Which menu to edit",
+      "noun": "link",
+      "treeLabel": "Menu tree",
+      "dragHint": "Drag a link onto another to nest it, or onto the gap between two to reorder. Every move is on the row buttons too, and works from the keyboard.",
+      "expandAll": "Expand all",
+      "collapseAll": "Collapse all",
+      "untitled": "Untitled link",
+      "noneTitle": "No link selected",
+      "labelHint": "What the storefront shows, in {language}. Other languages keep their own labels.",
+      "valueHint": {
+        "PAGE": "Which published page this opens.",
+        "CATEGORY": "The category handle, as it appears in the catalogue.",
+        "PRODUCT": "The product handle, as it appears in the catalogue.",
+        "POLICY": "Which policy this opens.",
+        "URL": "A path on this store, or a full address elsewhere."
+      },
+      "brokenHint": "This target no longer resolves. Pick another, or the link will 404 on the storefront.",
+      "hasChildren": "Removing this link removes {count, plural, one {its one sub-link} other {its # sub-links}} with it.",
+      "visible": "Show in the storefront",
+      "visibleOn": "Shown in the storefront",
+      "visibleOff": "Hidden from the storefront",
+      "openInNewTab": "Open in a new tab",
+      "openInNewTabHint": "Usually only worth it for an address outside this store.",
+      "delete": "Remove link",
+      "unsaved": "This menu has unsaved changes."
     },
     "banner": {
       "newTitle": "New banner",
@@ -3383,7 +3393,10 @@
       "audienceHint": "Segments and country targeting are not available on this platform yet.",
       "preview": "Preview",
       "previewHeadline": "Your headline",
-      "previewHint": "Artwork replaces the gradient once uploaded."
+      "previewHint": "Artwork replaces the gradient once uploaded.",
+      "identityTitle": "Address",
+      "previewMessage": "Your announcement",
+      "previewStripHint": "The strip spans the top of every storefront page. Links in the message stay clickable."
     },
     "faq": {
       "newTitle": "New FAQ entry",
@@ -3438,12 +3451,9 @@
           "hint": "Any other legal text."
         }
       },
-      "templateHint": "Start from the {type} template, or paste your own text.",
-      "insertTemplate": "Insert template",
-      "templateInserted": "Template inserted — review it before publishing.",
       "appliesTitle": "Where it applies",
       "jurisdiction": "Jurisdiction",
-      "jurisdictionHint": "e.g. NL — picks the template and the compliance rules.",
+      "jurisdictionHint": "e.g. NL — picks the compliance rules that apply.",
       "effectiveFrom": "Effective date",
       "effectiveFromHint": "Shown with the version; empty means on publish.",
       "requiresAcceptance": "Require acceptance at checkout",

@@ -5,28 +5,19 @@ import {Observable} from 'rxjs';
 import {CrudService} from '@core/http/crud.service';
 import type {
   PolicyCompliance,
-  PolicyTemplate,
-  PolicyType,
   PublishPolicyVersionRequest,
   ReadablePolicyVersion,
   SavedContent,
 } from '@models/content';
 import {CONTENT_PRIVATE} from './content-api';
 
-/** Versions, compliance and templates; the policy head itself goes through `ContentItemsService`. */
+/** Versions and compliance; the policy head itself goes through `ContentItemsService`. */
 @Injectable({providedIn: 'root'})
 export class PoliciesService {
   private readonly crudService = inject(CrudService);
 
   compliance(): Observable<readonly PolicyCompliance[]> {
     return this.crudService.get(`${CONTENT_PRIVATE}/policies/compliance`);
-  }
-
-  template(type: PolicyType, jurisdiction?: string | null): Observable<PolicyTemplate> {
-    return this.crudService.get(`${CONTENT_PRIVATE}/policies/templates`, {
-      type,
-      jurisdiction: jurisdiction || undefined,
-    });
   }
 
   versions(id: number): Observable<readonly ReadablePolicyVersion[]> {

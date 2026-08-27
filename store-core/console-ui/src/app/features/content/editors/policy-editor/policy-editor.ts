@@ -23,7 +23,6 @@ import {ConsolePermissions} from '@shared/auth/console-permissions';
 import {Badge} from '@shared/ui/badge/badge';
 import {DateTimeField} from '@shared/ui/date-time-field/date-time-field';
 import {FormField} from '@shared/ui/form-field/form-field';
-import {Icon} from '@shared/ui/icon/icon';
 import {Panel} from '@shared/ui/panel/panel';
 import {TextField} from '@shared/ui/text-field/text-field';
 import {ToastService} from '@shared/ui/toast/toast';
@@ -45,10 +44,14 @@ const COPY: CopyFields = {
 };
 
 /**
- * `New Policy.dc.html`: type cards with "Insert template", heading and body per language, where it
- * applies (jurisdiction, effective date, acceptance and notification toggles, display flags), the
- * version history (restore an old version's text onto the draft) and the checkout preview.
- * Publishing cuts an immutable version; the storefront and checkout read the live one.
+ * `New Policy.dc.html`: type cards, heading and body per language, where it applies (jurisdiction,
+ * effective date, acceptance and notification toggles, display flags), the version history (restore
+ * an old version's text onto the draft) and the checkout preview. Publishing cuts an immutable
+ * version; the storefront and checkout read the live one.
+ *
+ * The design's "Insert template" is gone, and not for want of working: it did. Shipping canned legal
+ * text invites a merchant to publish a privacy policy nobody read, which is a liability the platform
+ * should not hand out. A policy starts empty and the merchant writes or pastes their own.
  */
 @Component({
   selector: 'app-policy-editor',
@@ -57,7 +60,6 @@ const COPY: CopyFields = {
     DateTimeField,
     EditorShell,
     FormField,
-    Icon,
     LocaleCopy,
     Panel,
     PublishChecklist,
@@ -91,7 +93,6 @@ export class PolicyEditor {
   protected readonly deleteOpen = signal(false);
   protected readonly scheduleOpen = signal(false);
   protected readonly scheduleAt = signal('');
-  protected readonly templateBusy = signal(false);
   protected readonly canManage = computed(() => this.permissions.canManageContent());
 
   protected readonly extra: FormGroup<{
@@ -218,33 +219,6 @@ export class PolicyEditor {
       this.facade.common.controls.slug.setValue(type.toLowerCase());
       this.facade.common.controls.slug.markAsDirty();
     }
-  }
-
-  /** Starter text for the chosen type, poured into every language the template has. */
-  protected insertTemplate(): void {
-    this.templateBusy.set(true);
-    this.policiesApi
-      .template(
-        this.extra.controls.policyType.value,
-        this.extra.controls.jurisdiction.value || null,
-      )
-      .subscribe({
-        next: (template) => {
-          this.templateBusy.set(false);
-          for (const t of template.translations) {
-            const form = this.facade.translationFor(t.language);
-            if (form) {
-              form.patchValue({title: t.title ?? '', body: t.body ?? ''});
-              form.markAsDirty();
-            }
-          }
-          this.toast.success(this.transloco.translate('content.policy.templateInserted'));
-        },
-        error: (failure: unknown) => {
-          this.templateBusy.set(false);
-          this.apiErrors.notify(failure);
-        },
-      });
   }
 
   protected restoreVersion(version: ReadablePolicyVersion): void {

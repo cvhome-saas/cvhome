@@ -22,7 +22,7 @@ import {
 } from '@models/taxonomy';
 import type {AutocompleteOption} from '@shared/ui/autocomplete/autocomplete';
 import type {TabItem} from '@shared/ui/tab-switcher/tab-switcher';
-import type {TreeMove, TreeNode} from '@shared/ui/tree/tree';
+import type {TreeMove, TreeNode, TreeNodeId} from '@shared/ui/tree/tree';
 import {ToastService} from '@shared/ui/toast/toast';
 import {ProductSearch} from '@api/catalog/product-search.service';
 import {CatalogueApi} from '../services/catalogue.api.service';
@@ -243,7 +243,7 @@ export class CatalogueFacade {
   });
 
   /** Which branches are folded away. Collapsed rather than expanded, so a fresh tree opens open. */
-  readonly collapsed = signal<ReadonlySet<number>>(new Set<number>());
+  readonly collapsed = signal<ReadonlySet<TreeNodeId>>(new Set<TreeNodeId>());
 
   readonly selectedCategory = computed(() => {
     const id = this.selectedCategoryId();
@@ -569,7 +569,7 @@ export class CatalogueFacade {
    * commit whatever half-finished copy is sitting in the editor beside it.
    */
   toggleCategoryVisible(node: TreeNode): void {
-    this.run(this.api.setCategoryVisible(node.id, !node.visible), 'catalogue.saved.visibility');
+    this.run(this.api.setCategoryVisible(Number(node.id), !node.visible), 'catalogue.saved.visibility');
   }
 
   setGroupActive(code: string, active: boolean): void {
@@ -591,16 +591,27 @@ export class CatalogueFacade {
    * regardless. See lessons.md.
    */
   moveCategory(move: TreeMove): void {
+    /*
+     * The tree can express `before` and `after`, but only for a consumer that sets `reorderable`.
+     * This one does not, so those cannot arrive — and if one somehow did, doing nothing beats
+     * issuing a write the platform would drop on the floor.
+     */
+    if (move.position !== 'inside' && move.position !== 'out') {
+      return;
+    }
+    const nodeId = Number(move.nodeId);
+    const targetId = Number(move.targetId);
+
     if (move.position === 'inside') {
-      this.run(this.api.moveCategory(move.nodeId, move.targetId), 'catalogue.saved.moved');
+      this.run(this.api.moveCategory(nodeId, targetId), 'catalogue.saved.moved');
       return;
     }
 
-    const target = find(flatten(this.categories()), (candidate) => candidate.id === move.targetId);
+    const target = find(flatten(this.categories()), (candidate) => candidate.id === targetId);
     if (!target) {
       return;
     }
-    this.run(this.api.moveCategory(move.nodeId, target.parentId), 'catalogue.saved.moved');
+    this.run(this.api.moveCategory(nodeId, target.parentId), 'catalogue.saved.moved');
   }
 
   /** Promote a category out of its parent — the tree's "move out" button. */
@@ -608,7 +619,7 @@ export class CatalogueFacade {
     this.run(this.api.moveCategory(nodeId, null), 'catalogue.saved.moved');
   }
 
-  toggleCollapsed(id: number): void {
+  toggleCollapsed(id: TreeNodeId): void {
     const next = new Set(this.collapsed());
     if (!next.delete(id)) {
       next.add(id);

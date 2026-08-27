@@ -1,10 +1,13 @@
 package com.asrevo.cvhome.content.service;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -143,20 +146,36 @@ public class FaqService {
             c.setParentId(m.getGroupId());
             c.setSortOrder(m.getPosition());
         }
-        // renumber per group, keeping the requested order
+        Set<Long> requested = new HashSet<>();
+        for (FaqReorder m : moves) {
+            requested.add(m.getId());
+        }
+        renumber(all.values(), requested);
+        contents.saveAll(all.values());
+    }
+
+    /**
+     * Renumbers every group 0..n, keeping the order the caller asked for.
+     *
+     * An entry the caller actually moved wins a tie on position; id only breaks a tie between two entries
+     * that were both already there. Without that, dropping an entry at position 0 of a group that already
+     * had one landed it at 1 — the seller asked for the front and got second place, because the rows that
+     * were there first carry lower ids. Id remains the last resort, so the ordering is still total.
+     */
+    private void renumber(Collection<Content> entries, Set<Long> requested) {
         Map<Long, List<Content>> perGroup = new LinkedHashMap<>();
-        for (Content c : all.values()) {
+        for (Content c : entries) {
             perGroup.computeIfAbsent(c.getParentId(), k -> new ArrayList<>()).add(c);
         }
         for (List<Content> list : perGroup.values()) {
             list.sort(Comparator.comparing((Content c) -> c.getSortOrder() == null ? 0 : c.getSortOrder())
+                    .thenComparing((Content c) -> requested.contains(c.getId()) ? 0 : 1)
                     .thenComparing(Content::getId));
             int i = 0;
             for (Content c : list) {
                 c.setSortOrder(i++);
             }
         }
-        contents.saveAll(all.values());
     }
 
     /**

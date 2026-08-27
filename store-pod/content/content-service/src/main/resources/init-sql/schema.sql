@@ -40,6 +40,12 @@ alter table content.content drop column if exists product_group;
 alter table content.content drop column if exists content_position;
 alter table content.content drop constraint if exists content_content_position_check;
 
+-- `template` (STANDARD/LANDING/CONTACT/FAQ_PAGE) offered a page layout no theme ever read: the console stored the
+-- choice, the storefront carried it to the theme contract, and every theme rendered the same title and prose. The
+-- column and its check go rather than keep selling a promise; a real page builder would land as its own thing.
+alter table content.content drop constraint if exists content_template_check;
+alter table content.content drop column if exists template;
+
 alter table content.content add column if not exists status         varchar(12) not null default 'DRAFT';
 alter table content.content add column if not exists publish_at     timestamp(6);
 alter table content.content add column if not exists unpublish_at   timestamp(6);
@@ -47,7 +53,6 @@ alter table content.content add column if not exists version        integer     
 alter table content.content add column if not exists created_by     varchar(120);
 alter table content.content add column if not exists updated_by     varchar(120);
 alter table content.content add column if not exists parent_id      bigint;
-alter table content.content add column if not exists template       varchar(20);
 alter table content.content add column if not exists noindex        boolean     not null default false;
 alter table content.content add column if not exists canonical_url  varchar(500);
 alter table content.content add column if not exists og_media_id    bigint;
@@ -61,9 +66,6 @@ alter table content.content add column if not exists meta           jsonb;
 alter table content.content drop constraint if exists content_status_check;
 alter table content.content add constraint content_status_check
     check (status in ('DRAFT', 'REVIEW', 'SCHEDULED', 'PUBLISHED', 'ARCHIVED'));
-alter table content.content drop constraint if exists content_template_check;
-alter table content.content add constraint content_template_check
-    check (template is null or template in ('STANDARD', 'LANDING', 'CONTACT', 'FAQ_PAGE'));
 alter table content.content drop constraint if exists content_placement_check;
 alter table content.content add constraint content_placement_check
     check (placement is null or placement in ('HERO', 'CAROUSEL', 'COLLECTION', 'STRIP'));

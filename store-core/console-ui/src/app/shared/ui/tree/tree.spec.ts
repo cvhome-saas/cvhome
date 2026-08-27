@@ -32,6 +32,7 @@ const TREE: readonly TreeNode[] = [
       [collapsed]="collapsed()"
       [busy]="busy()"
       label="Category tree"
+      itemNoun="category"
       (selectedIdChange)="selected.push($event)"
       (toggleCollapsed)="toggled.push($event)"
       (visibilityToggled)="visibility.push($event.id)"
@@ -201,12 +202,15 @@ describe('Tree', () => {
     expect(host.moves).toEqual([{nodeId: 12, targetId: 11, position: 'inside'}]);
   }));
 
-  it('offers no sibling reordering — the platform cannot express it', fakeAsync(() => {
+  it('offers no sibling reordering unless the consumer asks for it', fakeAsync(() => {
     press(rows()[2], 'ArrowUp', {altKey: true});
     press(rows()[1], 'ArrowDown', {altKey: true});
     tick();
+    fixture.detectChanges();
 
     expect(host.moves).toEqual([]);
+    // Nor are the buttons drawn, so nothing advertises a move that cannot happen.
+    expect(element.querySelectorAll('[title="Move up"]').length).toBe(0);
   }));
 
   it('refuses to nest a first child, which has nothing before it', fakeAsync(() => {
@@ -280,6 +284,18 @@ describe('Tree', () => {
     expect(live?.textContent).toContain('3');
   }));
 
+  it('shows a warning badge only on the rows that carry one', () => {
+    host.nodes.set([
+      {...node(1, 'Electronics'), warn: 'Broken link'},
+      node(2, 'Furniture'),
+    ]);
+    fixture.detectChanges();
+
+    const badges = Array.from(element.querySelectorAll('app-badge'));
+    expect(badges.length).toBe(1);
+    expect(badges[0].textContent).toContain('Broken link');
+  });
+
   /* ------------------------------------------------------------------------- drag ---- */
 
   it('refuses a drop onto a node inside the one being dragged', () => {
@@ -296,4 +312,113 @@ describe('Tree', () => {
     expect(over.defaultPrevented).toBe(false);
     expect(descendant.className).not.toContain('drop-inside');
   });
+});
+
+/**
+ * The same primitive with the two inputs a menu sets. Its own host, because `reorderable` and
+ * `maxDepth` change what is drawn rather than only what is emitted — and the point of both is that
+ * the catalogue's tree above is untouched by them.
+ */
+@Component({
+  imports: [Tree],
+  template: `
+    <app-tree
+      [nodes]="nodes()"
+      label="Menu tree"
+      itemNoun="link"
+      reorderable
+      [maxDepth]="2"
+      (moved)="moves.push($event)"
+    />
+  `,
+})
+class ReorderHost {
+  readonly nodes = signal<readonly TreeNode[]>(TREE);
+  readonly moves: TreeMove[] = [];
+}
+
+describe('Tree, reorderable', () => {
+  let fixture: ComponentFixture<ReorderHost>;
+  let host: ReorderHost;
+  let element: HTMLElement;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [ReorderHost, ...translocoTesting().imports],
+      providers: [...translocoTesting().providers],
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(ReorderHost);
+    host = fixture.componentInstance;
+    element = fixture.nativeElement as HTMLElement;
+    fixture.detectChanges();
+  });
+
+  const rows = (): HTMLElement[] => Array.from(element.querySelectorAll<HTMLElement>('.tree-row'));
+
+  const press = (row: HTMLElement, key: string, init: KeyboardEventInit = {}): void => {
+    row.dispatchEvent(new KeyboardEvent('keydown', {key, bubbles: true, ...init}));
+  };
+
+  it('moves a node among its siblings with Alt and the vertical arrows', fakeAsync(() => {
+    // Displays sits after Audio, so it can go up; Audio is first, so it can go down.
+    press(rows()[2], 'ArrowUp', {altKey: true});
+    tick();
+    expect(host.moves).toEqual([{nodeId: 12, targetId: 11, position: 'before'}]);
+
+    press(rows()[1], 'ArrowDown', {altKey: true});
+    tick();
+    expect(host.moves[1]).toEqual({nodeId: 11, targetId: 12, position: 'after'});
+  }));
+
+  it('does not swap the vertical arrows under RTL — up is up either way', fakeAsync(() => {
+    element.querySelector('.tree')!.setAttribute('dir', 'rtl');
+    fixture.detectChanges();
+
+    press(rows()[2], 'ArrowUp', {altKey: true});
+    tick();
+
+    expect(host.moves).toEqual([{nodeId: 12, targetId: 11, position: 'before'}]);
+  }));
+
+  it('refuses to move the first sibling up or the last one down', fakeAsync(() => {
+    press(rows()[1], 'ArrowUp', {altKey: true});
+    press(rows()[2], 'ArrowDown', {altKey: true});
+    tick();
+
+    expect(host.moves).toEqual([]);
+  }));
+
+  it('draws the vertical pair on the row and in its menu', fakeAsync(() => {
+    press(rows()[2], 'F10', {shiftKey: true});
+    tick();
+    fixture.detectChanges();
+
+    expect(element.querySelectorAll('[title="Move up"]').length).toBeGreaterThan(0);
+    const shortcuts = Array.from(element.querySelectorAll('.tree-row-menu kbd')).map((k) => k.textContent);
+    expect(shortcuts).toContain('Alt+\u2191');
+    expect(shortcuts).toContain('Alt+\u2193');
+  }));
+
+  it('refuses a nest that would push the subtree past maxDepth', fakeAsync(() => {
+    // Electronics has children, so nesting it under Furniture would make a third level. It is the
+    // second root, so `canNest` would otherwise allow it.
+    host.nodes.set([node(2, 'Furniture'), node(1, 'Electronics', [node(11, 'Audio')])]);
+    fixture.detectChanges();
+
+    press(rows()[1], 'ArrowRight', {altKey: true});
+    tick();
+
+    expect(host.moves).toEqual([]);
+  }));
+
+  it('still nests a childless node, which fits', fakeAsync(() => {
+    host.nodes.set([node(2, 'Furniture'), node(1, 'Electronics')]);
+    fixture.detectChanges();
+
+    press(rows()[1], 'ArrowRight', {altKey: true});
+    tick();
+
+    expect(host.moves).toEqual([{nodeId: 1, targetId: 2, position: 'inside'}]);
+  }));
 });

@@ -39,6 +39,8 @@ class MenuServiceTest {
 
     private static final String EN = "en";
 
+    private static final String MENUS = "menus";
+
     private static final String MAIN_MENU_NAME = "Main menu";
 
     private static final String SALE_PATH = "/sale";
@@ -325,13 +327,33 @@ class MenuServiceTest {
         assertThat(nodes).extracting(StorefrontMenuNode::getLabel).containsExactly(LABEL, PATH_B);
     }
 
+    /**
+     * Links, not menus. Both handles exist for every store, so counting them made the rail badge a permanent 2
+     * beside an editor reading "No links yet"; a nested child is a link a seller added, so it counts too.
+     */
     @Test
-    void theSummaryCountsBothMenus() {
+    void theSummaryCountsTheLinksInBothMenus() {
+        Menu main = menu(1L, MenuHandle.MAIN);
+        main.getItems().add(item(10L, main, null, MenuTargetKind.PAGE, ABOUT, 0));
+        main.getItems().add(item(11L, main, 10L, MenuTargetKind.URL, SALE_PATH, 0));
+        Menu footer = menu(2L, MenuHandle.FOOTER);
+        footer.getItems().add(item(20L, footer, null, MenuTargetKind.URL, SALE_PATH, 0));
+        when(menus.findByStore(STORE_ID)).thenReturn(List.of(main, footer));
         Map<String, Long> counts = new java.util.LinkedHashMap<>();
 
         service.contribute(ContentFixtures.STORE, new ContentSummary(), counts);
 
-        assertThat(counts).containsEntry("menus", 2L);
+        assertThat(counts).containsEntry(MENUS, 3L);
+    }
+
+    @Test
+    void aStoreThatNeverOpenedTheEditorCountsNoLinks() {
+        when(menus.findByStore(STORE_ID)).thenReturn(List.of());
+        Map<String, Long> counts = new java.util.LinkedHashMap<>();
+
+        service.contribute(ContentFixtures.STORE, new ContentSummary(), counts);
+
+        assertThat(counts).containsEntry(MENUS, 0L);
     }
 
     @Test

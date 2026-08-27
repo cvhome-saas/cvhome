@@ -104,3 +104,19 @@
   font-size: var(--text-2xs);
   font-weight: 600;
 }
+
+/* The strip preview mirrors the storefront's announcement bar: one centred line, links underlined. */
+.banner-preview .strip-message {
+  font-size: var(--text-sm);
+  text-align: center;
+}
+
+.banner-preview .strip-message :is(p, h1, h2, h3) {
+  margin: 0;
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+.banner-preview .strip-message a {
+  text-decoration: underline;
+}

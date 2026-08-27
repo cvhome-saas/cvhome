@@ -164,8 +164,10 @@ public class ContentItemService {
         c.setCreatedBy(actor);
         c.setUpdatedBy(actor);
         ContentMapper.applyCommon(c, dto);
-        ContentMapper.applyTranslations(c, dto.getTranslations(), language, binding.requiresBody());
+        // The binding runs first: whether a locale is complete can depend on a type-specific column it sets
+        // (a banner's placement decides whether the body is its message or unused).
         binding.apply(c, dto);
+        ContentMapper.applyTranslations(c, dto.getTranslations(), language, binding.requiresBody(c));
         c = repository.saveAndFlush(c);
         binding.afterSave(c);
         trackMedia(binding, c);
@@ -189,12 +191,12 @@ public class ContentItemService {
         String oldPath = binding.storefrontPath(c);
         boolean wasPublished = c.getStatus() == ContentStatus.PUBLISHED;
         ContentMapper.applyCommon(c, dto);
+        binding.apply(c, dto);
         boolean sourceChanged = ContentMapper.applyTranslations(c, dto.getTranslations(), language,
-                binding.requiresBody());
+                binding.requiresBody(c));
         if (sourceChanged && wasPublished) {
             markOthersStale(c, language);
         }
-        binding.apply(c, dto);
         c = saveAndTouch(c, actor);
         binding.afterSave(c);
         trackMedia(binding, c);
@@ -218,7 +220,7 @@ public class ContentItemService {
         List<ContentTranslation> all = new ArrayList<>(ContentMapper.translations(c));
         all.removeIf(t -> locale.equals(t.getLanguage()));
         all.add(translation);
-        ContentMapper.applyTranslations(c, all, null, binding.requiresBody());
+        ContentMapper.applyTranslations(c, all, null, binding.requiresBody(c));
         c = saveAndTouch(c, actor);
         revisions.record(c, toReadable(binding, c), actor);
         return new SavedContent(c.getId(), c.getStatus(), c.getVersion());

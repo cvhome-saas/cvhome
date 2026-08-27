@@ -20,7 +20,6 @@ Cookie: SESSION={{SESSION_ID}}
 
 {
   "slug": "careers",
-  "template": "STANDARD",
   "showInFooter": true,
   "linkToMenu": false,
   "noindex": false,
@@ -42,7 +41,6 @@ Cookie: SESSION={{SESSION_ID}}
 {
   "version": 1,
   "slug": "careers",
-  "template": "STANDARD",
   "translations": [
     {"language": "en", "title": "Careers at Acme", "body": "<p>Updated.</p>"}
   ]

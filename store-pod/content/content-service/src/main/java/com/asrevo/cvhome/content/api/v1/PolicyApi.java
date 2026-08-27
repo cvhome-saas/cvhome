@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.asrevo.cvhome.commons.domain.LanguageCode;
@@ -23,12 +22,10 @@ import com.asrevo.cvhome.content.errors.ContentNotFoundException;
 import com.asrevo.cvhome.content.errors.ContentRuleException;
 import com.asrevo.cvhome.content.errors.InvalidContentRequestException;
 import com.asrevo.cvhome.content.model.ContentStatus;
-import com.asrevo.cvhome.content.model.PolicyType;
 import com.asrevo.cvhome.content.model.common.PublishRequest;
 import com.asrevo.cvhome.content.model.common.SavedContent;
 import com.asrevo.cvhome.content.model.policy.PersistablePolicy;
 import com.asrevo.cvhome.content.model.policy.PolicyCompliance;
-import com.asrevo.cvhome.content.model.policy.PolicyTemplate;
 import com.asrevo.cvhome.content.model.policy.PublishPolicyVersionRequest;
 import com.asrevo.cvhome.content.model.policy.ReadablePolicy;
 import com.asrevo.cvhome.content.model.policy.ReadablePolicyVersion;
@@ -55,14 +52,6 @@ public class PolicyApi extends WorkflowContentApi<PersistablePolicy, ReadablePol
     @PreAuthorize(ContentPermissions.READ)
     public List<PolicyCompliance> compliance(StoreMerchantId merchantStore, LanguageCode language) {
         return policies.compliance(merchantStore);
-    }
-
-    @GetMapping("templates")
-    @PreAuthorize(ContentPermissions.READ)
-    public PolicyTemplate template(StoreMerchantId merchantStore, LanguageCode language,
-                                   @RequestParam PolicyType type,
-                                   @RequestParam(required = false) String jurisdiction) {
-        return policies.template(type, jurisdiction);
     }
 
     @GetMapping("{id}/versions")

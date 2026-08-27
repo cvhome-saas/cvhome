@@ -101,39 +101,46 @@
         [locales]="hub.localeOptions()"
         [defaultLocale]="hub.locales().defaultCode"
         [written]="facade.written()"
-        [fields]="copyFields"
+        [fields]="copyFields()"
         [language]="facade.language()"
         (languageChange)="facade.chooseLanguage($event)"
       />
 
-      <app-panel [title]="t('content.banner.targetTitle')" padded>
+      <!-- The strip has no link of its own: the message carries its own anchors. Only the slug is
+           left, and it stays because every content item is addressed by one. -->
+      <app-panel
+        [title]="isStrip() ? t('content.banner.identityTitle') : t('content.banner.targetTitle')"
+        padded
+      >
         <div class="field-grid" [formGroup]="extra">
-          <app-form-field
-            [label]="t('content.banner.targetKindLabel')"
-            [control]="extra.controls.targetKind"
-            controlId="banner-target-kind"
-          >
-            <app-select
-              id="banner-target-kind"
-              [options]="targetKinds()"
-              [value]="extra.controls.targetKind.value"
-              (valueChange)="onTargetKind($event)"
-              [disabled]="!canManage()"
-            />
-          </app-form-field>
-          <app-form-field
-            [label]="t('content.banner.targetValue')"
-            [hint]="t('content.banner.targetValueHint')"
-            [control]="extra.controls.targetValue"
-            controlId="banner-target-value"
-          >
-            <app-text-field
-              id="banner-target-value"
-              formControlName="targetValue"
-              latin
-              [maxLength]="255"
-            />
-          </app-form-field>
+          @if (!isStrip()) {
+            <app-form-field
+              [label]="t('content.banner.targetKindLabel')"
+              [control]="extra.controls.targetKind"
+              controlId="banner-target-kind"
+            >
+              <app-select
+                id="banner-target-kind"
+                [options]="targetKinds()"
+                [value]="extra.controls.targetKind.value"
+                (valueChange)="onTargetKind($event)"
+                [disabled]="!canManage()"
+              />
+            </app-form-field>
+            <app-form-field
+              [label]="t('content.banner.targetValue')"
+              [hint]="t('content.banner.targetValueHint')"
+              [control]="extra.controls.targetValue"
+              controlId="banner-target-value"
+            >
+              <app-text-field
+                id="banner-target-value"
+                formControlName="targetValue"
+                latin
+                [maxLength]="255"
+              />
+            </app-form-field>
+          }
           <app-form-field
             [label]="t('content.editor.slug')"
             [control]="facade.common.controls.slug"
@@ -189,17 +196,25 @@
           [class.strip]="isStrip()"
           [style.background-image]="desktopUrl() ? 'url(' + desktopUrl() + ')' : null"
         >
-          <strong dir="auto">{{
-            activeTranslation()?.controls?.title?.value || t('content.banner.previewHeadline')
-          }}</strong>
-          @if (!isStrip()) {
-            <span dir="auto">{{ activeTranslation()?.controls?.subtitle?.value }}</span>
-            @if (activeTranslation()?.controls?.ctaLabel?.value; as cta) {
+          @let copy = activeTranslation()?.getRawValue();
+          @if (isStrip()) {
+            <!-- The strip renders its message, not its label; Angular sanitises the HTML on the way in. -->
+            <div
+              class="strip-message"
+              dir="auto"
+              [innerHTML]="copy?.body || t('content.banner.previewMessage')"
+            ></div>
+          } @else {
+            <strong dir="auto">{{ copy?.title || t('content.banner.previewHeadline') }}</strong>
+            <span dir="auto">{{ copy?.subtitle }}</span>
+            @if (copy?.ctaLabel; as cta) {
               <em>{{ cta }}</em>
             }
           }
         </div>
-        <p class="field-hint">{{ t('content.banner.previewHint') }}</p>
+        <p class="field-hint">
+          {{ isStrip() ? t('content.banner.previewStripHint') : t('content.banner.previewHint') }}
+        </p>
       </app-panel>
 
       <app-publish-checklist [title]="t('content.checklist.title')" [items]="checklist()" />

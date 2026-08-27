@@ -31,7 +31,8 @@ import lombok.RequiredArgsConstructor;
 
 /**
  * Banners and promos. Placement and window are columns (the storefront queries them); target, artwork, theme and
- * audience live in {@code meta}. Copy per locale: headline = title, subtext = subtitle, button = ctaLabel, alt.
+ * audience live in {@code meta}. Copy per locale: headline = title, subtext = subtitle, button = ctaLabel, alt —
+ * except {@code STRIP}, the announcement, which carries its message in the body instead.
  */
 @Component
 @RequiredArgsConstructor
@@ -63,6 +64,16 @@ public class BannerBinding implements ContentTypeBinding<PersistableBanner, Read
     @Override
     public boolean requiresBody() {
         return false;
+    }
+
+    /**
+     * The announcement strip is the one banner with no artwork and no headline of its own: what the shopper reads
+     * is the body, kept rich so a merchant can link out of it. It is a leftover of the {@code header-message} box
+     * this placement replaced, and it is deliberate — the console edits the same field.
+     */
+    @Override
+    public boolean requiresBody(Content entity) {
+        return entity.getPlacement() == BannerPlacement.STRIP;
     }
 
     @Override

@@ -171,7 +171,6 @@ public class StorefrontFacade {
         p.setServedLocale(d.getLanguageCode().code());
         p.setTitle(title(d));
         p.setBody(d.getDescription());
-        p.setTemplate(c.getTemplate());
         p.setSeo(seo(c, d, store));
         List<StorefrontLink> crumbs = new ArrayList<>();
         if (c.getParentId() != null) {
