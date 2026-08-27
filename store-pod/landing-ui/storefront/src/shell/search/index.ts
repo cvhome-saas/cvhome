@@ -1,24 +1,26 @@
-import type {SearchProvider} from '@store-front/hooks/use-search';
-import {noopSearchProvider} from '@store-front/hooks/use-search';
-import {navigationSearchProvider, productSearchProvider} from '@store-front/hooks/product-search-provider';
+import {FULL_SEARCH, NAVIGATION_SEARCH, NO_SEARCH, type SearchCapabilities} from '@store-front/types';
 
 /**
- * Which search provider the storefront ships.
+ * What this deployment's search can answer, decided server-side and handed to themes in `LayoutData`.
  *
- * The catalog has a full-text endpoint now, so the default searches products. The alternatives stay because a
+ * Capabilities, not a provider. The providers live in a `'use client'` module, and importing one here would
+ * hand the server a client reference proxy rather than the object — reading `.capabilities` off it silently
+ * yields `undefined`, and the first thing to break is every page that renders a search box. The server settles
+ * what is possible; `useSearchProvider(capabilities)` picks the matching provider in the browser.
+ *
+ * The catalog has a full-text endpoint, so the default is the full set. The alternatives stay because a
  * capability is a claim about a deployment, not about the code: `navigation` for a pod whose catalog predates
- * the endpoint, `none` to turn the box off entirely. Themes branch on `capabilities`, so each of these renders
- * honestly rather than promising a search that answers nothing.
+ * the endpoint, `none` to turn the box off entirely.
  */
-export function getSearchProvider(): SearchProvider {
+export function getSearchCapabilities(): SearchCapabilities {
     switch (process.env.NEXT_PUBLIC_STOREFRONT_SEARCH_PROVIDER) {
         case 'none':
-            return noopSearchProvider;
+            return NO_SEARCH;
         case 'navigation':
         case 'category-nav':
-            return navigationSearchProvider;
+            return NAVIGATION_SEARCH;
         case 'product':
         default:
-            return productSearchProvider;
+            return FULL_SEARCH;
     }
 }

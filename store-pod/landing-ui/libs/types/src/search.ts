@@ -19,6 +19,12 @@ export interface SearchCapabilities {
 
 export const NO_SEARCH: SearchCapabilities = {text: false, suggestions: false};
 
+/** Products, categories and pages — what a catalog with the search endpoint can answer. */
+export const FULL_SEARCH: SearchCapabilities = {text: true, suggestions: true};
+
+/** Categories and pages only, for a deployment whose catalog predates the search endpoint. */
+export const NAVIGATION_SEARCH: SearchCapabilities = {text: false, suggestions: true};
+
 export type SearchHitKind = 'product' | 'category' | 'page';
 
 export interface SearchHit {

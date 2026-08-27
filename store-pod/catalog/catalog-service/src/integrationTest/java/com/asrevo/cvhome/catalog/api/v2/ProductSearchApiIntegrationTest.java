@@ -220,6 +220,23 @@ class ProductSearchApiIntegrationTest {
         assertThat(result.get(DID_YOU_MEAN).asString()).containsIgnoringCase(SEEDED_NAME_FRAGMENT);
     }
 
+    /**
+     * Several mistyped words against a long product name.
+     *
+     * <p>
+     * The case that plain {@code similarity} cannot answer: it scores the query against the whole name, so
+     * "runing shoos" against "Nike Tempo Running Shorts (Women)" comes out at 0.25 and falls under any floor
+     * worth having. Scored against the best-matching run of words inside the name it is 0.60.
+     * </p>
+     */
+    @Test
+    void aTypoInSeveralWordsStillFindsALongName() {
+        JsonNode result = search(STORE_A, EN, "runing shoos", A_PAGE);
+
+        assertThat(result.get(DID_YOU_MEAN).isNull()).isFalse();
+        assertThat(result.get(TOTAL_ELEMENTS).asLong()).isPositive();
+    }
+
     // ------------------------------------------------------------------------------------------------ tenancy
 
     /**

@@ -68,7 +68,7 @@ public interface ProductSearchIndexRepository extends JpaRepository<ProductSearc
               and p.available = true
               and (i.name_normalized ilike '%' || catalog.search_normalize(:q) || '%'
                 or i.search_document @@ catalog.search_prefix_tsquery(:q, :language))
-            order by public.similarity(i.name_normalized, catalog.search_normalize(:q)) desc, i.product_id
+            order by public.word_similarity(catalog.search_normalize(:q), i.name_normalized) desc, i.product_id
             limit :limit
             """, nativeQuery = true)
     List<Long> suggestProductIds(@Param("store") String store, @Param("language") String language,
@@ -77,6 +77,13 @@ public interface ProductSearchIndexRepository extends JpaRepository<ProductSearc
     /**
      * The closest product name to something that matched nothing — the "did you mean". Returns the name as the
      * merchant wrote it, not the normalised form the comparison ran on.
+     *
+     * <p>
+     * {@code word_similarity}, not {@code similarity}: the latter compares the query against the whole name, so
+     * two mistyped words against a five-word product name score near zero however good the match is. This
+     * compares them against the best-matching run of words inside the name, which is the question actually
+     * being asked.
+     * </p>
      */
     @Query(value = """
             select pd.name
@@ -87,8 +94,8 @@ public interface ProductSearchIndexRepository extends JpaRepository<ProductSearc
             where i.store_merchant_id = :store
               and i.language_code = :language
               and p.available = true
-              and public.similarity(i.name_normalized, catalog.search_normalize(:q)) > :floor
-            order by public.similarity(i.name_normalized, catalog.search_normalize(:q)) desc
+              and public.word_similarity(catalog.search_normalize(:q), i.name_normalized) > :floor
+            order by public.word_similarity(catalog.search_normalize(:q), i.name_normalized) desc
             limit 1
             """, nativeQuery = true)
     Optional<String> bestNearMiss(@Param("store") String store, @Param("language") String language,

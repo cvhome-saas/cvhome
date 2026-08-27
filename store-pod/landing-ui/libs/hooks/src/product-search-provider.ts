@@ -117,7 +117,9 @@ export const navigationSearchProvider: SearchProvider = {
  * The provider matching what the shell said this deployment can do.
  *
  * A theme calls this instead of choosing for itself, so "can we search products" is answered in one place. The
- * capabilities arrive in `LayoutData`, put there by the shell's `getSearchProvider()`.
+ * capabilities arrive in `LayoutData`, put there by the shell's `getSearchCapabilities()`. They are decided
+ * server-side and the providers are only ever constructed here, in the browser: this module is `'use client'`,
+ * and a server importing it would get a client reference proxy rather than the objects.
  */
 export function useSearchProvider(capabilities: SearchCapabilities): SearchProvider {
     return useMemo(() => {
