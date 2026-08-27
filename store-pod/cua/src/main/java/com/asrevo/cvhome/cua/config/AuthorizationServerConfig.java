@@ -27,6 +27,11 @@ import com.nimbusds.jose.proc.SecurityContext;
 @EnableWebSecurity
 public class AuthorizationServerConfig {
 
+    private static final String UNPINNED_ISSUER = """
+            cua cannot pin its OAuth2 issuer: com.asrevo.cvhome.pod-info.pod.endpoint.endpoint is not \
+            configured. Without it the issuer is derived from the request host, and every token this server \
+            mints is rejected downstream.""";
+
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE)
     SecurityFilterChain authorizationServerSecurity(HttpSecurity http, JwtDecoder jwtDecoder) {
@@ -75,9 +80,7 @@ public class AuthorizationServerConfig {
     AuthorizationServerSettings authorizationServerSettings(PodInfoProperties properties) {
         Pod pod = properties.pod();
         if (Objects.isNull(pod) || Objects.isNull(pod.endpoint()) || Objects.isNull(pod.endpoint().endpoint())) {
-            throw new IllegalStateException("cua cannot pin its OAuth2 issuer: "
-                    + "com.asrevo.cvhome.pod-info.pod.endpoint.endpoint is not configured. Without it the issuer is "
-                    + "derived from the request host, and every token this server mints is rejected downstream.");
+            throw new IllegalStateException(UNPINNED_ISSUER);
         }
         String issuer = UrlNormalize.normalizeUri("%s/cua".formatted(pod.endpoint().endpoint()));
         return AuthorizationServerSettings.builder().issuer(issuer).build();
