@@ -1,6 +1,6 @@
 import {storeBaseServiceUrl, StoreContext} from "@store-front/types/store-context";
 import {ProductSearchPage, ProductSearchQuery, ProductSuggestion} from "@store-front/types/search";
-import {apiFetch, get, orUndefined} from "./http-utils";
+import {apiFetch, orUndefined, publicGet} from "./http-utils";
 import {InventoryService} from "./inventory-service";
 import {SORT_MAP} from "./product-category";
 
@@ -31,7 +31,7 @@ export class ProductSearchService {
                                   facets = true): Promise<ProductSearchPage> => {
         const page = await apiFetch<ProductSearchPage>(
             `${storeBaseServiceUrl('catalog', storeContext)}/api/v2/products/search?store=${storeContext.store}&lang=${storeContext.locale}&${searchQueryToParams(query, facets)}`,
-            get());
+            publicGet());
         // Price and stock live in the inventory service, keyed by sku. The merge degrades — results without
         // prices still list — the results themselves must not.
         await InventoryService.enrichProducts(storeContext, page.content);
@@ -47,7 +47,7 @@ export class ProductSearchService {
         if (!term.trim()) return [];
         const suggestions = await orUndefined(apiFetch<ProductSuggestion[]>(
             `${storeBaseServiceUrl('catalog', storeContext)}/api/v2/products/suggest?store=${storeContext.store}&lang=${storeContext.locale}&q=${encodeURIComponent(term.trim())}&limit=${limit}`,
-            {...get(), signal}));
+            {...publicGet(), signal}));
         return suggestions ?? [];
     }
 }
