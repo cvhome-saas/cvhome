@@ -193,6 +193,32 @@
     "POLICY": {
       "VERSION": "Версия {version}",
       "EFFECTIVE": "Действует с {date}"
+    },
+    "SEARCH": {
+      "TITLE": "Поиск",
+      "HEADING": "Результаты по запросу «{query}»",
+      "HEADING_EMPTY_QUERY": "Все товары",
+      "RESULTS_COUNT": "{count, plural, =0 {Нет товаров} one {# товар} few {# товара} many {# товаров} other {# товара}}",
+      "DID_YOU_MEAN": "Возможно, вы имели в виду «{suggestion}»?",
+      "OTHER_LANGUAGE": "Показаны результаты на другом языке этого магазина.",
+      "PLACEHOLDER": "Поиск товаров",
+      "SUBMIT": "Найти",
+      "FILTERS": "Фильтры",
+      "SHOW_FILTERS": "Показать фильтры",
+      "CLEAR_FILTERS": "Сбросить фильтры",
+      "FILTER_BY_CATEGORY": "Категория",
+      "FILTER_BY_BRAND": "Бренд",
+      "FILTER_BY_TYPE": "Тип",
+      "SORT_LABEL": "Сортировка",
+      "SORT": {
+        "RELEVANCE": "По релевантности",
+        "NEWEST": "Сначала новые",
+        "OLDEST": "Сначала старые"
+      },
+      "PAGE_OF": "Страница {page} из {total}",
+      "PREVIOUS": "Назад",
+      "NEXT": "Вперёд",
+      "SEARCH_ERROR": "Не удалось выполнить поиск."
     }
   },
   "COMPONENTS": {
@@ -281,7 +307,8 @@
       "CATEGORIES": "Категории",
       "PAGES": "Страницы",
       "PRODUCTS": "Товары",
-      "SUGGESTIONS_ONLY": "Показаны категории и страницы"
+      "SUGGESTIONS_ONLY": "Показаны категории и страницы",
+      "SEE_ALL": "Показать все результаты"
     }
   },
   "ERRORS": {

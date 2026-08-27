@@ -193,6 +193,32 @@
     "POLICY": {
       "VERSION": "Version {version}",
       "EFFECTIVE": "En vigueur à partir du {date}"
+    },
+    "SEARCH": {
+      "TITLE": "Recherche",
+      "HEADING": "Résultats pour « {query} »",
+      "HEADING_EMPTY_QUERY": "Tous les produits",
+      "RESULTS_COUNT": "{count, plural, =0 {Aucun produit} =1 {1 produit} other {# produits}}",
+      "DID_YOU_MEAN": "Vouliez-vous dire « {suggestion} » ?",
+      "OTHER_LANGUAGE": "Résultats affichés dans une autre langue de cette boutique.",
+      "PLACEHOLDER": "Rechercher des produits",
+      "SUBMIT": "Rechercher",
+      "FILTERS": "Filtres",
+      "SHOW_FILTERS": "Afficher les filtres",
+      "CLEAR_FILTERS": "Effacer les filtres",
+      "FILTER_BY_CATEGORY": "Catégorie",
+      "FILTER_BY_BRAND": "Marque",
+      "FILTER_BY_TYPE": "Type",
+      "SORT_LABEL": "Trier par",
+      "SORT": {
+        "RELEVANCE": "Pertinence",
+        "NEWEST": "Plus récents",
+        "OLDEST": "Plus anciens"
+      },
+      "PAGE_OF": "Page {page} sur {total}",
+      "PREVIOUS": "Précédent",
+      "NEXT": "Suivant",
+      "SEARCH_ERROR": "Nous n'avons pas pu effectuer cette recherche."
     }
   },
   "COMPONENTS": {
@@ -281,7 +307,8 @@
       "CATEGORIES": "Catégories",
       "PAGES": "Pages",
       "PRODUCTS": "Produits",
-      "SUGGESTIONS_ONLY": "Catégories et pages uniquement"
+      "SUGGESTIONS_ONLY": "Catégories et pages uniquement",
+      "SEE_ALL": "Voir tous les résultats"
     }
   },
   "ERRORS": {

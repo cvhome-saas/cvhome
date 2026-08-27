@@ -6,7 +6,7 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
     const host = h.get('x-forwarded-host') ?? h.get('host') ?? 'localhost';
     const proto = h.get('x-forwarded-proto') ?? 'http';
     return {
-        rules: [{userAgent: '*', allow: '/', disallow: ['/*/checkout', '/*/customer', '/*/login', '/*/callback']}],
+        rules: [{userAgent: '*', allow: '/', disallow: ['/*/checkout', '/*/customer', '/*/login', '/*/callback', '/*/search']}],
         sitemap: `${proto}://${host}/sitemap.xml`,
     };
 }

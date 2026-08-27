@@ -3,8 +3,11 @@ package com.asrevo.cvhome.catalog.entity;
 import java.io.Serial;
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -25,8 +28,13 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.TableGenerator;
+import jakarta.persistence.Transient;
 import jakarta.persistence.UniqueConstraint;
 
+import org.springframework.data.domain.AfterDomainEventPublication;
+
+import com.asrevo.cvhome.catalog.model.product.event.ProductSearchIndexPurgedEvent;
+import com.asrevo.cvhome.catalog.model.product.event.ProductSearchIndexStaleEvent;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.constants.SchemaConstant;
@@ -35,6 +43,7 @@ import com.asrevo.cvhome.store.core.entity.common.audit.AuditSection;
 import com.asrevo.cvhome.store.core.entity.common.audit.Auditable;
 import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -130,6 +139,20 @@ public class Product extends SalesManagerEntity<Long, Product> implements Audita
     @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     private Set<ProductImage> images = new HashSet<>();
 
+    /**
+     * Whether this product owes the search index an update. Not persisted, and not part of the product's shape:
+     * it lives only for as long as it takes the repository to publish the event.
+     */
+    @Transient
+    @Getter(AccessLevel.NONE)
+    @Setter(AccessLevel.NONE)
+    private boolean searchIndexStale;
+
+    @Transient
+    @Getter(AccessLevel.NONE)
+    @Setter(AccessLevel.NONE)
+    private boolean searchIndexPurged;
+
     public Optional<ProductDescription> description(LanguageCode language) {
         return descriptions.stream().filter(d -> language.equals(d.getLanguageCode())).findFirst();
     }
@@ -156,5 +179,54 @@ public class Product extends SalesManagerEntity<Long, Product> implements Audita
 
     public int getSortOrder() {
         return sortOrder == null ? 0 : sortOrder;
+    }
+
+    /**
+     * Something searchable about this product changed — its copy, sku, brand or categories.
+     *
+     * <p>
+     * The event is only handed to the outbox when the aggregate goes through the repository, so a caller that
+     * mutates a managed product and relies on dirty checking has to {@code save} it afterwards even though the
+     * row would have been written anyway.
+     * </p>
+     */
+    public Product searchIndexStale() {
+        this.searchIndexStale = true;
+        return this;
+    }
+
+    /**
+     * This product is being deleted; its index rows go with it.
+     */
+    public Product searchIndexPurged() {
+        this.searchIndexPurged = true;
+        return this;
+    }
+
+    /**
+     * Built here rather than at the call site because a newly created product has no id until the insert has run,
+     * and Spring Data reads this after the repository call — so the event carries the real id, and a caller does
+     * not have to save twice to get one.
+     */
+    @Override
+    protected Collection<Object> domainEvents() {
+        if (!searchIndexStale && !searchIndexPurged) {
+            return super.domainEvents();
+        }
+        List<Object> events = new ArrayList<>(super.domainEvents());
+        if (searchIndexPurged) {
+            events.add(ProductSearchIndexPurgedEvent.from(id, store.getId()));
+        } else {
+            events.add(ProductSearchIndexStaleEvent.from(id, store.getId()));
+        }
+        return events;
+    }
+
+    @Override
+    @AfterDomainEventPublication
+    protected void clearDomainEvents() {
+        super.clearDomainEvents();
+        this.searchIndexStale = false;
+        this.searchIndexPurged = false;
     }
 }

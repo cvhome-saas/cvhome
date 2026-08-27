@@ -14,5 +14,6 @@ export * from './order-service';
 export * from './pkce-utils';
 export * from './product-category';
 export * from './product-presenter';
+export * from './product-search-service';
 export * from './product-service';
 export * from './store-service';

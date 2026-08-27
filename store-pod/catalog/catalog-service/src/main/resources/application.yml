@@ -27,3 +27,16 @@ reservation:
     minutes: 45
   cleanup:
     interval: 60000
+
+namastack:
+  outbox:
+    multicaster:
+      enabled: true
+    polling:
+      fixed:
+        interval: 2s
+      batch-size: 10
+    jpa:
+      schema-initialization:
+        enabled: false
+      schema-name: ${spring.application.name}

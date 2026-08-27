@@ -1,18 +1,26 @@
-import type {SearchProvider} from '@store-front/hooks/use-search';
-import {noopSearchProvider} from '@store-front/hooks/use-search';
-import {categoryNavSearchProvider} from './category-nav-search-provider';
+import {FULL_SEARCH, NAVIGATION_SEARCH, NO_SEARCH, type SearchCapabilities} from '@store-front/types';
 
 /**
- * Which search provider the storefront ships. Today there is no catalog text-search endpoint, so the
- * default is suggestions-only over navigation data. When the backend adds text search, add a provider
- * here and flip the default — themes already branch on `capabilities`.
+ * What this deployment's search can answer, decided server-side and handed to themes in `LayoutData`.
+ *
+ * Capabilities, not a provider. The providers live in a `'use client'` module, and importing one here would
+ * hand the server a client reference proxy rather than the object — reading `.capabilities` off it silently
+ * yields `undefined`, and the first thing to break is every page that renders a search box. The server settles
+ * what is possible; `useSearchProvider(capabilities)` picks the matching provider in the browser.
+ *
+ * The catalog has a full-text endpoint, so the default is the full set. The alternatives stay because a
+ * capability is a claim about a deployment, not about the code: `navigation` for a pod whose catalog predates
+ * the endpoint, `none` to turn the box off entirely.
  */
-export function getSearchProvider(): SearchProvider {
+export function getSearchCapabilities(): SearchCapabilities {
     switch (process.env.NEXT_PUBLIC_STOREFRONT_SEARCH_PROVIDER) {
         case 'none':
-            return noopSearchProvider;
+            return NO_SEARCH;
+        case 'navigation':
         case 'category-nav':
+            return NAVIGATION_SEARCH;
+        case 'product':
         default:
-            return categoryNavSearchProvider;
+            return FULL_SEARCH;
     }
 }

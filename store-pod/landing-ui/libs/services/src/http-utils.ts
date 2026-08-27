@@ -248,3 +248,15 @@ export function del(options?: RequestOptions) {
 export function get(options?: RequestOptions) {
     return buildHeader('GET', undefined, options);
 }
+
+/**
+ * A GET that carries no credentials.
+ *
+ * {@link get} attaches the shopper's access token to everything, which is wrong twice over for a public
+ * read: it hands a credential to an endpoint that never asked for one, and any token the browser is holding
+ * — expired, malformed, issued by the other authorization server — becomes a way for a public request to
+ * fail. A catalogue that anyone can browse should be fetched the same way whether or not someone is signed in.
+ */
+export function publicGet(): RequestInit {
+    return {method: 'GET', headers: {}};
+}

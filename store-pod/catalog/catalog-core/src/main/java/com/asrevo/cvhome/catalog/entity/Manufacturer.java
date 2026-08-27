@@ -2,8 +2,10 @@ package com.asrevo.cvhome.catalog.entity;
 
 import java.io.Serial;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.CascadeType;
@@ -20,6 +22,7 @@ import jakarta.persistence.Table;
 import jakarta.persistence.TableGenerator;
 import jakarta.persistence.UniqueConstraint;
 
+import com.asrevo.cvhome.catalog.model.product.event.BrandRenamedEvent;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.constants.SchemaConstant;
@@ -76,5 +79,25 @@ public class Manufacturer extends SalesManagerEntity<Long, Manufacturer> impleme
 
     public int getOrder() {
         return order == null ? 0 : order;
+    }
+
+    /**
+     * The brand's name in every language it has one, keyed by language. Used to tell an actual rename from a save
+     * that only touched the code or the sort order — a rename has to rebuild the search document of every product
+     * carrying this brand, and that is not work worth doing speculatively.
+     */
+    public Map<LanguageCode, String> names() {
+        return descriptions.stream()
+                .filter(d -> d.getLanguageCode() != null && d.getName() != null)
+                .collect(Collectors.toMap(ManufacturerDescription::getLanguageCode, ManufacturerDescription::getName,
+                        (first, second) -> first));
+    }
+
+    /**
+     * This brand's name changed, so every product that carries it has a stale search document.
+     */
+    public Manufacturer renamed() {
+        this.registerEvent(BrandRenamedEvent.from(this.id, this.storeMerchantId.getId()));
+        return this;
     }
 }

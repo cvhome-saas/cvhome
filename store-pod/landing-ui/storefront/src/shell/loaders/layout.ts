@@ -4,7 +4,7 @@ import {CategoryService} from '@store-front/services/category-service';
 import type {LayoutData} from '@store-front/theme';
 import type {NavPage} from '@store-front/types';
 import {getStore, getStoreContext} from '@/shell/request/store-context';
-import {getSearchProvider} from '@/shell/search';
+import {getSearchCapabilities} from '@/shell/search';
 import {bannerAsAnnouncement, linkAsNavPage, loadSite} from './site';
 
 /**
@@ -35,6 +35,6 @@ export const loadLayoutData = cache(async (): Promise<LayoutData> => {
         policies: site.policies,
         branding: site.branding,
         socialLinks: site.socialLinks,
-        search: getSearchProvider().capabilities,
+        search: getSearchCapabilities(),
     };
 });

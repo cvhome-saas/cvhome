@@ -101,7 +101,8 @@ themes/<id>/
     ├── config.ts           ThemeLayoutConfig (cart drawer/page, mobile nav kind, grid, aspect, container, search)
     ├── layout/             Root, Header, Nav, MobileNav, HeaderActions, CartDrawer, Announcement, Footer
     ├── pages/              Home, Category, Product, Content, Checkout, CheckoutResult, Customer, Order
-    ├── sections/           Hero, ProductRail, Listing, BuyBox, Gallery, SearchBox, CheckoutForm, OrderSummary, …
+    │                       (+ Search — the only optional page; without it the shell renders a fallback)
+    ├── sections/           Hero, ProductRail, Listing, BuyBox, Gallery, SearchBox, SearchResults, CheckoutForm, …
     ├── components/         ProductCard, ProductGrid, ProductBadges, CartLineItem, Breadcrumbs, PageShell, …
     └── states/             ErrorState*, NotFound, EmptyState*, Redirecting*, skeletons/*   (* = 'use client')
 ```
@@ -130,12 +131,48 @@ exist. `white` / `black` / `transparent` remain.
 
 ## 5. Step 3 — contract checklist (before you call it done)
 
+### The Search page (the one optional page)
+
+`ThemePages.Search` is optional, and `defineTheme()` does not require it. A theme without one gets
+`storefront/src/shell/theme/default-search-page.tsx` — built only from design tokens, so it inherits the
+theme's type, colour and spacing rather than looking like a different shop. That is why search worked
+everywhere the day the catalog endpoint landed, instead of waiting for twelve bespoke pages.
+
+To give a theme a designed one, copy the three files from `basic`, which is the reference implementation:
+
+```
+src/pages/Search.tsx                       heading, count, the did-you-mean line, then the results section
+src/sections/SearchResults.tsx             'use client' — useProductSearch(): facets, chips, sort, grid, paging
+src/states/skeletons/SearchSkeleton.tsx    optional; the shell falls back to the category skeleton
+```
+
+then register both in `src/index.ts`:
+
+```ts
+pages:  {Home, Category, Search, Product, …}
+states: {PageSkeleton: {…, category: CategorySkeleton, search: SearchSkeleton}}
+```
+
+Behaviour comes from `useProductSearch` (paging, sorting, facet toggling, URL sync, retry) — a sibling of
+`useProductListing`, not a replacement for it: the category page hits an endpoint that has no search term and
+no multi-select facets. Never re-implement either.
+
+What the catalog can filter on is category, brand and product type. **Price and stock are not filterable or
+sortable**: they live in the inventory service keyed by sku, and are merged into results after paging. A rail
+that offered a price filter would be promising something the platform cannot do.
+
+`ThemeLayoutConfig.search` picks the header treatment: `header` (inline box), `overlay`, `page` (the box is a
+link straight to `/search`) or `hidden`.
+
 - [ ] `defineTheme()` accepts it (`npm run build` passes — it throws on a missing page/state)
 - [ ] Every `THEME_OWNED_TOKENS` entry set in `tokens.css`; no hard-coded colours anywhere
 - [ ] Fonts load (`<html class>` carries the next/font variable; CSS has the `@font-face`)
 - [ ] Every page and every state renders: home, category (sort/page/filter, empty, error), product (variants,
       out of stock, sale), cart drawer (empty → add → qty → remove), checkout, success/cancel, customer
       (login redirect), order, content, 404 product/category/page, thrown error, store-not-found
+- [ ] Search: the header box submits to `/search`, its dropdown shows product hits and a "see all" row, and
+      `/search?q=…` renders — the theme's own `pages/Search.tsx` if it has one, otherwise the shell fallback.
+      The box must be driven by `useSearchProvider(capabilities)`, never by a provider the theme picks itself
 - [ ] RTL: `/ar/` — logical utilities only (`ps/pe/ms/me/start/end/text-start/text-end`), Swiper gets `dir`,
       drawers use `DrawerContent side="start|end"`, icons that imply direction get `rtl:rotate-180`
 - [ ] Mobile nav, tablet and desktop verified; header hamburger; grids adapt per `config.productGrid`
@@ -182,7 +219,8 @@ import {defineTheme, type ThemeDefinition, type PageProps, type HomeData} from '
 import {Button, Badge, Price, QuantityStepper, Drawer, DrawerContent, Skeleton, EmptyState, ErrorState} from '@store-front/ui';  // or deep: '@store-front/ui/button'
 import {Link, useRouter, usePathname} from '@store-front/i18n/navigation';
 import {useDir} from '@store-front/i18n/use-dir';
-import {useCart, useUser, useCustomer, useCheckoutForm, useOrderStatus, useProductListing, useProductPurchase, useSearch} from '@store-front/hooks';
+import {useCart, useUser, useCustomer, useCheckoutForm, useOrderStatus, useProductListing, useProductPurchase,
+        useProductSearch, useSearch, useSearchProvider} from '@store-front/hooks';
 import {isOnSale, isOutOfStock, discountPercent, primaryImage, productHref} from '@store-front/services/product-presenter';
 import type {Product, Category, Store, StoreContext} from '@store-front/types';
 ```

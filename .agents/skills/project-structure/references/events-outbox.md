@@ -2,11 +2,17 @@
 
 Where a service-to-service **call** would create temporal coupling (the caller fails if the callee is down),
 cvhome uses **domain events published through a transactional outbox** instead. Currently wired in
-`tenancy-service` and `payment-service`.
+`tenancy-service`, `payment-service` and `catalog-service`.
 
 Library: `io.namastack:namastack-outbox` (`namastack-outbox = 1.7.1` in the version catalog) —
-`-starter-jpa` in payment, `-starter-jdbc` in tenancy, `-api` in the `-commons`/`-events` modules that
-only need the annotations.
+`-starter-jpa` in payment and catalog, `-starter-jdbc` in tenancy, `-api` in the `-commons`/`-events`
+modules that only need the annotations.
+
+Not every use is cross-service. `catalog-service` uses the outbox to keep its own **product search index**
+current: a product edit registers `ProductSearchIndexStaleEvent`, and the handler rebuilds that product's
+search document. A database trigger would have been immediate, but the outbox buys retries, ordered
+per-product processing and a batched brand rename — at the cost of the index being eventually consistent by
+about a poll interval. Worth knowing when reading a test: assert through the handler, not through the poller.
 
 ## The DDD layer: aggregate roots register events
 
@@ -229,7 +235,14 @@ That is exactly why `@OutboxEvent(key = ...)` matters:
 ```java
 @OutboxEvent(key = "#this.internalRef()")          // all events for one payment stay sequenced
 @OutboxEvent(key = "#this.store().id().toString()") // all events for one store stay sequenced
+@OutboxEvent(key = "#this.partitionKey()")          // catalog: one product's reindexes stay sequenced,
+                                                    // different products proceed in parallel
 ```
+
+**The key expression must evaluate to a `String`.** A numeric id needs a `String`-returning accessor —
+catalog's events expose `partitionKey()` returning `String.valueOf(productId)` for exactly this reason.
+Returning the raw `Long` fails at publish time, which in practice means the *write* that registered the
+event fails, not the handler.
 
 **Choose the key as the entity whose event order must be preserved.** Too coarse a key (a constant, or the
 store id where the payment ref would do) serializes unrelated work and becomes a throughput bottleneck; too

@@ -129,6 +129,10 @@ Next steps
      new-work + concept-seed (the roll is mandatory), then build page by page, finish review,
      documenter writes themes/${id}/DESIGN.md.
   2. Edit themes/${id}/src/{tokens.css,fonts.ts,config.ts,layout,pages,sections,components,states}.
+     Every page in ThemePages is required except Search: a theme without pages/Search.tsx gets the
+     shell's plain results page, built from tokens so it still looks like this theme. Copy
+     themes/basic/src/{pages/Search.tsx,sections/SearchResults.tsx,states/skeletons/SearchSkeleton.tsx}
+     when you want a designed one, and register `search` in states.PageSkeleton alongside it.
      Its default palette (ColorTheme DEFAULT) is generated into themes/${id}/src/colors.ts — edit the
      '${id}' seed in libs/types/scripts/build-color-schemas.mjs (THEME_DEFAULTS), then
      \`npm run gen:colors -w libs/types\`; never hand-edit colors.ts.

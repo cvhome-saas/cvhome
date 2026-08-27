@@ -36,6 +36,12 @@ state rendered; RTL + mobile first-class; merchant colour roles respected (the t
 default palette is the palette of its chosen visual world, seeded in the generator (never hand-written hex) so
 it passes the same contrast rules as the presets.
 
+Every page in the contract is required except **Search**. A theme without `pages/Search.tsx` gets the shell's
+fallback results page, which is built from tokens and so still wears the theme's type, colour and spacing;
+`basic` is the reference implementation to copy when a theme wants a designed one. What is *not* optional is
+the header box: it submits to `/search`, and it takes its provider from `useSearchProvider(capabilities)` so
+it never claims a search the deployment cannot answer.
+
 ## Directions
 
 | id | Target merchant · replaces enum values | Structural thesis (header · hero · card · PDP · listing · cart) | Colour strategy · density | Not a recolour because |

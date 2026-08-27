@@ -193,6 +193,32 @@
     "POLICY": {
       "VERSION": "الإصدار {version}",
       "EFFECTIVE": "ساري من {date}"
+    },
+    "SEARCH": {
+      "TITLE": "البحث",
+      "HEADING": "نتائج البحث عن «{query}»",
+      "HEADING_EMPTY_QUERY": "كل المنتجات",
+      "RESULTS_COUNT": "{count, plural, =0 {لا توجد منتجات} =1 {منتج واحد} =2 {منتجان} few {# منتجات} many {# منتجًا} other {# منتج}}",
+      "DID_YOU_MEAN": "هل تقصد «{suggestion}»؟",
+      "OTHER_LANGUAGE": "نعرض النتائج بلغة أخرى يكتب بها هذا المتجر.",
+      "PLACEHOLDER": "ابحث عن المنتجات",
+      "SUBMIT": "بحث",
+      "FILTERS": "عوامل التصفية",
+      "SHOW_FILTERS": "إظهار عوامل التصفية",
+      "CLEAR_FILTERS": "مسح عوامل التصفية",
+      "FILTER_BY_CATEGORY": "الفئة",
+      "FILTER_BY_BRAND": "العلامة التجارية",
+      "FILTER_BY_TYPE": "النوع",
+      "SORT_LABEL": "ترتيب حسب",
+      "SORT": {
+        "RELEVANCE": "الأكثر صلة",
+        "NEWEST": "الأحدث",
+        "OLDEST": "الأقدم"
+      },
+      "PAGE_OF": "صفحة {page} من {total}",
+      "PREVIOUS": "السابق",
+      "NEXT": "التالي",
+      "SEARCH_ERROR": "تعذّر تنفيذ البحث."
     }
   },
   "COMPONENTS": {
@@ -281,7 +307,8 @@
       "CATEGORIES": "الفئات",
       "PAGES": "الصفحات",
       "PRODUCTS": "المنتجات",
-      "SUGGESTIONS_ONLY": "عرض الفئات والصفحات"
+      "SUGGESTIONS_ONLY": "عرض الفئات والصفحات",
+      "SEE_ALL": "عرض كل النتائج"
     }
   },
   "ERRORS": {
