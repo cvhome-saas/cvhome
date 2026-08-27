@@ -8,4 +8,5 @@ export * from './use-product-listing';
 export * from './use-product-search';
 export * from './use-product-purchase';
 export * from './use-search';
+export * from './use-search-combobox';
 export * from './use-user';
