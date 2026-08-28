@@ -51,11 +51,11 @@ public class ProductImageServiceImpl implements ProductImageService {
             throws ProductNotFoundException, ProductImageAssetUnknownException, RemoteServiceUnavailableException,
             RemoteServiceTimeoutException {
         Product product = requireProduct(store, productId);
-        Map<Long, String> urls = resolve(store, items);
+        Map<Long, String> paths = resolve(store, items);
         int position = product.getImages().stream().mapToInt(ProductImage::getSortOrder).max().orElse(-1) + 1;
         boolean needsDefault = product.getImages().stream().noneMatch(ProductImage::isDefaultImage);
         for (PersistableProductImage item : items) {
-            ProductImage image = row(product, item, urls, position++);
+            ProductImage image = row(product, item, paths, position++);
             if (item.isDefaultImage() || needsDefault) {
                 clearDefault(product);
                 image.setDefaultImage(true);
@@ -74,7 +74,7 @@ public class ProductImageServiceImpl implements ProductImageService {
             throws ProductNotFoundException, ProductImageAssetUnknownException, RemoteServiceUnavailableException,
             RemoteServiceTimeoutException {
         Product product = requireProduct(store, productId);
-        Map<Long, String> urls = resolve(store, items);
+        Map<Long, String> paths = resolve(store, items);
         productImageRepository.deleteAll(product.getImages());
         product.getImages().clear();
         productImageRepository.flush();
@@ -82,7 +82,7 @@ public class ProductImageServiceImpl implements ProductImageService {
         int position = 0;
         boolean defaulted = false;
         for (PersistableProductImage item : items) {
-            ProductImage image = row(product, item, urls, position++);
+            ProductImage image = row(product, item, paths, position++);
             if (item.isDefaultImage() && !defaulted) {
                 image.setDefaultImage(true);
                 defaulted = true;
@@ -116,11 +116,16 @@ public class ProductImageServiceImpl implements ProductImageService {
     }
 
     /**
-     * Confirms every asset belongs to this store and caches its public URL.
+     * Confirms every asset belongs to this store and caches its path in the bucket.
+     *
+     * <p>
+     * The path rather than the url content composed from it: the two services read the same CDN setting, so
+     * catalog can build the address itself when a product is read and a CDN move needs no backfill here.
+     * </p>
      *
      * <p>
      * Content answering with the asset omitted is how an id from another store is caught, so this doubles as the
-     * ownership check. A transport failure is allowed to propagate: a row with no url renders as a broken image
+     * ownership check. A transport failure is allowed to propagate: a row with no path renders as a broken image
      * on the storefront, which is worse than a save the seller can retry.
      * </p>
      */
@@ -132,16 +137,16 @@ public class ProductImageServiceImpl implements ProductImageService {
         if (ids.isEmpty()) {
             return Map.of();
         }
-        Map<Long, String> urls = new LinkedHashMap<>();
+        Map<Long, String> paths = new LinkedHashMap<>();
         for (ReadableMediaAsset asset : media.resolve(store, ids)) {
-            urls.put(asset.getId(), asset.getUrl());
+            paths.put(asset.getId(), asset.getPath());
         }
         for (Long id : ids) {
-            if (!urls.containsKey(id)) {
+            if (!paths.containsKey(id)) {
                 throw ProductImageAssetUnknownException.of(id, store);
             }
         }
-        return urls;
+        return paths;
     }
 
     /**
@@ -173,10 +178,10 @@ public class ProductImageServiceImpl implements ProductImageService {
         return product.getSku();
     }
 
-    private static ProductImage row(Product product, PersistableProductImage item, Map<Long, String> urls,
+    private static ProductImage row(Product product, PersistableProductImage item, Map<Long, String> paths,
                                     int position) {
         ProductImage image = new ProductImage(product, item.getMediaAssetId(),
-                urls.get(item.getMediaAssetId()), item.getAltText(), position, false);
+                paths.get(item.getMediaAssetId()), item.getAltText(), position, false);
         if (item.getMediaAssetId() == null) {
             image.setImageType(ProductImage.TYPE_EXTERNAL_URL);
             image.setProductImageUrl(item.getVideoUrl() != null ? item.getVideoUrl() : item.getExternalUrl());

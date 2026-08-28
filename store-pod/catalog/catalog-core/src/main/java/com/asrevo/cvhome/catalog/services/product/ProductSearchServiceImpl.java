@@ -21,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.asrevo.cvhome.catalog.entity.Category;
 import com.asrevo.cvhome.catalog.entity.Manufacturer;
 import com.asrevo.cvhome.catalog.entity.Product;
-import com.asrevo.cvhome.catalog.entity.ProductImage;
 import com.asrevo.cvhome.catalog.entity.ProductType;
 import com.asrevo.cvhome.catalog.model.product.ProductSearchCriteria;
 import com.asrevo.cvhome.catalog.model.product.ProductSearchSort;
@@ -37,6 +36,7 @@ import com.asrevo.cvhome.catalog.repositories.ProductRepository;
 import com.asrevo.cvhome.catalog.repositories.ProductSearchIndexRepository;
 import com.asrevo.cvhome.catalog.repositories.ProductSpecifications;
 import com.asrevo.cvhome.catalog.repositories.ProductTypeRepository;
+import com.asrevo.cvhome.catalog.services.image.ImageMapper;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 
@@ -81,6 +81,8 @@ public class ProductSearchServiceImpl implements ProductSearchService {
     private final ProductSearchIndexer indexer;
 
     private final ProductMapper productMapper;
+
+    private final ImageMapper imageMapper;
 
     @Override
     @Transactional(readOnly = true)
@@ -291,7 +293,7 @@ public class ProductSearchServiceImpl implements ProductSearchService {
         if (product.getManufacturer() != null) {
             product.getManufacturer().description(language).ifPresent(d -> suggestion.setBrand(d.getName()));
         }
-        product.defaultImage().map(ProductImage::resolvedUrl).ifPresent(suggestion::setImageUrl);
+        product.defaultImage().map(imageMapper::url).ifPresent(suggestion::setImageUrl);
         return suggestion;
     }
 

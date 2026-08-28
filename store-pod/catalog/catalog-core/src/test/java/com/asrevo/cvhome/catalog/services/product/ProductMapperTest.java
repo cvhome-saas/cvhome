@@ -81,7 +81,7 @@ class ProductMapperTest {
 
     @BeforeEach
     void setUp() {
-        mapper = new ProductMapper(new ImageMapper(), merchantStoreService);
+        mapper = new ProductMapper(new ImageMapper("https://cdn.example/bucket"), merchantStoreService);
     }
 
     // ------------------------------------------------------------------------------------------------- fixtures

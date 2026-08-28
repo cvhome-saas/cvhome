@@ -31,7 +31,7 @@ public class MinioTestConfiguration {
     @Bean
     DynamicPropertyRegistrar cdnProperties(MinIOContainer container) {
         return registry -> {
-            registry.add("com.asrevo.cvhome.cdn.basePath", () -> String.format("%s/%s", container.getS3URL(), BUCKET));
+            registry.add("com.asrevo.cvhome.cdn.base-path", () -> String.format("%s/%s", container.getS3URL(), BUCKET));
             registry.add("com.asrevo.cvhome.cdn.storage.bucket", () -> BUCKET);
             registry.add("com.asrevo.cvhome.cdn.storage.provider", () -> StorageProviderType.MINIO);
             registry.add("com.asrevo.cvhome.cdn.storage.region", () -> REGION);

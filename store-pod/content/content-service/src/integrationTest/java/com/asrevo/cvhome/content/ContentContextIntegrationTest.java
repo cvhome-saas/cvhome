@@ -1,10 +1,16 @@
 package com.asrevo.cvhome.content;
 
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.content.service.MediaService;
+import com.asrevo.cvhome.s2s.model.CdnProperties;
 import com.asrevo.cvhome.testsupport.annotations.StorageIntegrationTest;
+import com.asrevo.cvhome.testsupport.security.Tokens;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -16,9 +22,15 @@ class ContentContextIntegrationTest {
 
     private final JdbcTemplate jdbcTemplate;
 
+    private final CdnProperties cdn;
+
+    private final MediaService media;
+
     @Autowired
-    ContentContextIntegrationTest(JdbcTemplate jdbcTemplate) {
+    ContentContextIntegrationTest(JdbcTemplate jdbcTemplate, CdnProperties cdn, MediaService media) {
         this.jdbcTemplate = jdbcTemplate;
+        this.cdn = cdn;
+        this.media = media;
     }
 
     @Test
@@ -89,6 +101,34 @@ class ContentContextIntegrationTest {
         assertThat(pagesPerStore).hasSize(STORES_SEEDED);
         assertThat(pagesPerStore).allMatch(count -> count.equals(pagesPerStore.get(0)));
         assertThat(pagesPerStore.get(0)).isGreaterThanOrEqualTo(6);
+    }
+
+    /**
+     * Seeded assets are served from the CDN this environment configures.
+     *
+     * <p>
+     * The seed writes a storage key and nothing about the host; the url comes from that key and
+     * {@code com.asrevo.cvhome.cdn.base-path} when the asset is read. It used to carry a whole url too, so every
+     * environment came up serving the demo library from one developer's MinIO — and a second local stack, whose
+     * MinIO is port-shifted, could not fetch it at all. Here the base is the MinIO container's address, which is
+     * a value no script could have written down.
+     * </p>
+     */
+    @Test
+    void seededAssetsAreServedFromTheConfiguredCdn() {
+        StoreMerchantId store = new StoreMerchantId(Tokens.STORE_1);
+        List<Long> ids = jdbcTemplate.queryForList("""
+                select id
+                  from content.media_asset
+                 where store_merchant_id = ?
+                 order by id
+                 limit 5
+                """, Long.class, store.getId());
+        assertThat(ids).isNotEmpty();
+
+        assertThat(media.urls(store, ids).values())
+                .isNotEmpty()
+                .allSatisfy(url -> assertThat(url).startsWith(this.cdn.basePath()));
     }
 
 }
