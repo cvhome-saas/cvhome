@@ -24,6 +24,9 @@ export function SearchBox({storeContext, capabilities, className}: { storeContex
     const provider = useSearchProvider(capabilities);
     const {query, setQuery, result, loading, clear} = useSearch(storeContext, provider);
     const [focused, setFocused] = useState(false);
+    // `focused` is the panel, not the DOM: submitting closes it while the input keeps focus, so onFocus
+    // will not fire again. Typing or clicking the field reopens it — otherwise a second search from the
+    // results page silently has no suggestions until focus leaves the input and comes back.
     const open = focused && query.trim().length > 0;
     // Enter goes to the results page. Only when the platform can actually answer a text query — with
     // suggestions alone there is nothing behind /search worth sending anyone to.
@@ -56,7 +59,7 @@ export function SearchBox({storeContext, capabilities, className}: { storeContex
                     <SearchIcon className="pointer-events-none absolute start-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"/>
                     <Input id="pink-search" name="q" type="search" role="combobox" aria-expanded={open} aria-controls={combobox.listboxId} aria-autocomplete="list" {...combobox.inputProps} value={query}
                            placeholder={t('LABEL')}
-                           onChange={e => setQuery(e.target.value)} onFocus={() => setFocused(true)} className="w-56 ps-8 pe-8"/>
+                           onChange={e => { setQuery(e.target.value); setFocused(true); }} onFocus={() => setFocused(true)} onClick={() => setFocused(true)} className="w-56 ps-8 pe-8"/>
                     {query && (
                         <Button type="button" variant="ghost" size="icon-sm" aria-label={t('LABEL')} onClick={clear} className="absolute end-0.5 top-1/2 -translate-y-1/2">
                             <XIcon/>

@@ -54,8 +54,9 @@ import lombok.extern.slf4j.Slf4j;
 public class ProductSearchServiceImpl implements ProductSearchService {
 
     /**
-     * Matches {@code ProductSpecifications}' floor: below this a trigram match stops looking like the shopper's
-     * own typo and starts looking like a different product.
+     * Below this a trigram match stops looking like the shopper's own typo and starts looking like a different
+     * product. It is read against whole words — see {@link ProductSearchIndexRepository#bestNearMiss}, which is
+     * where a floor this low stopped being safe on a query of three or four characters.
      */
     private static final float SIMILARITY_FLOOR = 0.3f;
 

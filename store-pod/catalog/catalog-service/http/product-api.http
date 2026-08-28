@@ -81,6 +81,63 @@ Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
 ### the listing (public; the console reads the same one) — filters: sku, available, categoryIds, manufacturerId
 GET {{LANDING_UI_URL}}/catalog/api/v2/products?store={{STORE_ID}}&lang={{LANG}}&sku=NK&count=5&page=0
 
+### full-text search — relevance-ordered, with the counted filter rail
+GET {{LANDING_UI_URL}}/catalog/api/v2/products/search?store={{STORE_ID}}&lang={{LANG}}&q=nike&facets=true&count=5&page=0
+
+> {%
+    client.test("relevant and counted", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        client.assert(response.body.totalElements > 0, "no results for a seeded brand");
+        client.assert(response.body.facets.brands.length > 0, "no brand buckets");
+    });
+%}
+
+### the same term in Arabic — the merchant's own copy, not a transliteration
+GET {{LANDING_UI_URL}}/catalog/api/v2/products/search?store={{STORE_ID}}&lang=ar&q=نايكي&count=5
+
+### a typo — results for the correction, and `didYouMean` naming it
+GET {{LANDING_UI_URL}}/catalog/api/v2/products/search?store={{STORE_ID}}&lang={{LANG}}&q=runing&count=5
+
+> {%
+    client.test("corrected", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        client.assert(response.body.didYouMean, "no didYouMean for a typo");
+    });
+%}
+
+### a term the shop does not carry — an empty page and no correction invented for it
+GET {{LANDING_UI_URL}}/catalog/api/v2/products/search?store={{STORE_ID}}&lang={{LANG}}&q=lego&count=5
+
+> {%
+    client.test("no false correction", function () {
+        client.assert(response.body.totalElements === 0, "unexpected results");
+        client.assert(!response.body.didYouMean, "corrected an absent term into " + response.body.didYouMean);
+    });
+%}
+
+### a blank term degrades to a filtered listing — what the results page needs when the term is cleared
+GET {{LANDING_UI_URL}}/catalog/api/v2/products/search?store={{STORE_ID}}&lang={{LANG}}&q=&sort=NEWEST&facets=false&count=5
+
+### autocomplete — capped at 10 however large `limit` is, cacheable for 30s
+GET {{LANDING_UI_URL}}/catalog/api/v2/products/suggest?store={{STORE_ID}}&lang={{LANG}}&q=invinc&limit=8
+
+> {%
+    client.test("suggested", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        client.assert(response.body.length <= 10, "over the cap");
+    });
+%}
+
+### tenant isolation: store1's sku, asked of store2 — 0 results, never a leak
+GET {{LANDING_UI_URL}}/catalog/api/v2/products/search?store={{STORE_ID_2}}&lang={{LANG}}&q=SKU-NK-RUN-001&count=5
+
+### rebuild the store's search index — 202, no body (for after the document's shape changes)
+POST {{SELLER_UI_URL}}/spg/catalog/api/v2/private/products/search-index/rebuild?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+### rebuild without a session — 401
+POST {{SELLER_UI_URL}}/spg/catalog/api/v2/private/products/search-index/rebuild?store={{STORE_ID}}&lang={{LANG}}
+
 ### the product page, by slug — 404 CATALOG.PRODUCT.NOT_FOUND for an unknown slug
 GET {{LANDING_UI_URL}}/catalog/api/v2/product/name/demo-product?store={{STORE_ID}}&lang={{LANG}}
 

@@ -245,7 +245,7 @@ class ProductSearchApiIntegrationTest {
      * <p>
      * The case that plain {@code similarity} cannot answer: it scores the query against the whole name, so
      * "runing shoos" against "Nike Tempo Running Shorts (Women)" comes out at 0.25 and falls under any floor
-     * worth having. Scored against the best-matching run of words inside the name it is 0.60.
+     * worth having. Scored against the words inside the name it is 0.47.
      * </p>
      */
     @Test
@@ -254,6 +254,23 @@ class ProductSearchApiIntegrationTest {
 
         assertThat(result.get(DID_YOU_MEAN).isNull()).isFalse();
         assertThat(result.get(TOTAL_ELEMENTS).asLong()).isPositive();
+    }
+
+    /**
+     * The other side of the correction: a short term this shop simply does not carry.
+     *
+     * <p>
+     * "lego" is nobody's typo for "Nike One Leggings (Women)", but an unbounded extent scores it 0.60 on the
+     * shared opening of "leggings" alone — which was enough to answer a shopper looking for a toy with a pair
+     * of leggings. Bounded at word boundaries it is 0.27, under the floor, and the honest empty page stands.
+     * </p>
+     */
+    @Test
+    void aShortAbsentTermIsNotCorrectedIntoAnUnrelatedProduct() {
+        JsonNode result = search(STORE_A, EN, "lego", A_PAGE);
+
+        assertThat(result.get(TOTAL_ELEMENTS).asLong()).isZero();
+        assertThat(result.get(DID_YOU_MEAN) == null || result.get(DID_YOU_MEAN).isNull()).isTrue();
     }
 
     // ------------------------------------------------------------------------------------------------ tenancy

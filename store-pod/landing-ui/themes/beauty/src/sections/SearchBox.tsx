@@ -16,6 +16,9 @@ export function SearchBox({storeContext, capabilities, className, wide}: { store
     const provider = useSearchProvider(capabilities);
     const {query, setQuery, result, loading, clear} = useSearch(storeContext, provider);
     const [focused, setFocused] = useState(false);
+    // `focused` is the panel, not the DOM: submitting closes it while the input keeps focus, so onFocus
+    // will not fire again. Typing or clicking the field reopens it — otherwise a second search from the
+    // results page silently has no suggestions until focus leaves the input and comes back.
     const open = focused && query.trim().length > 0;
     // Enter goes to the results page. Only when the platform can actually answer a text query — with
     // suggestions alone there is nothing behind /search worth sending anyone to.
@@ -47,7 +50,7 @@ export function SearchBox({storeContext, capabilities, className, wide}: { store
                     <span className="sr-only">{t('LABEL')}</span>
                     <SearchIcon className="pointer-events-none absolute start-2 size-3.5 text-muted-foreground"/>
                     <input type="search" role="combobox" aria-expanded={open} aria-controls={combobox.listboxId} aria-autocomplete="list" {...combobox.inputProps} value={query}
-                           placeholder={t('LABEL')} title={capabilities.text ? undefined : t('PLACEHOLDER')} onChange={e => setQuery(e.target.value)} onFocus={() => setFocused(true)}
+                           placeholder={t('LABEL')} title={capabilities.text ? undefined : t('PLACEHOLDER')} onChange={e => { setQuery(e.target.value); setFocused(true); }} onFocus={() => setFocused(true)} onClick={() => setFocused(true)}
                            className={cn('h-full bg-transparent ps-7 pe-7 font-mono text-xs uppercase tracking-wide outline-none placeholder:text-muted-foreground', wide ? 'w-full' : 'w-48 xl:w-56')}/>
                     {query && <button type="button" aria-label={t('LABEL')} onClick={clear} className="absolute end-1 flex size-6 items-center justify-center hover:bg-foreground hover:text-background"><XIcon className="size-3.5"/></button>}
                 </label>
