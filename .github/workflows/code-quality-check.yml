@@ -13,8 +13,16 @@ on:
       - 'develop'
       - 'main'
   workflow_dispatch:
+
+# A new push supersedes the run still in flight for the same branch or PR: the older
+# commit's result is not the one the PR is judged on.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
+    name: Checkstyle
     runs-on: ubuntu-latest
 
     steps:
