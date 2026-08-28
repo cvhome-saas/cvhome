@@ -4,6 +4,7 @@ import {notFound} from 'next/navigation';
 import {getTranslations} from 'next-intl/server';
 import {CategoryService} from '@store-front/services/category-service';
 import {ProductCategory} from '@store-front/services/product-category';
+import {toListingProducts} from '@store-front/services/product-presenter';
 import {isApiError, type ListingQuery, type ProductListingPage} from '@store-front/types';
 import type {CategoryData} from '@store-front/theme';
 import {getStoreContext} from '@/shell/request/store-context';
@@ -32,5 +33,7 @@ export const loadCategory = cache(async (url: string, query: ListingQuery): Prom
         crumbs.push({id: String(category.parent.id), name: category.parent.description.name, href: `/category/${category.parent.description.friendlyUrl}`});
     }
     crumbs.push({id: String(category.id), name: category.description.name, href: `/category/${category.description.friendlyUrl}`});
-    return {category, breadcrumbs: crumbs, initial, query, facets};
+    // The first page is serialised into the HTML as client-component props; trim it to what a card reads.
+    // Later pages arrive over fetch from the listing hook and never touch the document.
+    return {category, breadcrumbs: crumbs, initial: {...initial, content: toListingProducts(initial.content)}, query, facets};
 });

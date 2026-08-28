@@ -36,6 +36,15 @@ state rendered; RTL + mobile first-class; merchant colour roles respected (the t
 default palette is the palette of its chosen visual world, seeded in the generator (never hand-written hex) so
 it passes the same contrast rules as the presets.
 
+**Fonts are a shared cost, not a private one.** Next collects every theme's `next/font` CSS into the *same*
+layout entry, so all twelve themes' `@font-face` rules are `<link>`ed on every storefront whatever theme is
+active — a face declared in `themes/<id>/src/fonts.ts` is bytes every other theme's merchants pay for. Hence
+two rules in `fonts.ts`: `preload: false` on every face (a preload would fire on all twelve storefronts), and
+prefer a family Google serves as named subsets. `subsets: [...]` does **not** shrink the CSS — it only picks
+what would be preloaded — so a family with CJK coverage ships ~120 numbered `unicode-range` slices per weight
+whatever you ask for. `storefront/scripts/prune-font-subsets.mjs` strips the CJK-only slices after every build
+as a backstop, but a Latin-native family costs nothing to begin with.
+
 Every page in the contract is required except **Search**. A theme without `pages/Search.tsx` gets the shell's
 fallback results page, which is built from tokens and so still wears the theme's type, colour and spacing;
 `basic` is the reference implementation to copy when a theme wants a designed one. What is *not* optional is

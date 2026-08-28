@@ -35,7 +35,7 @@ export async function Home({ctx, data}: PageProps<HomeData>) {
                     )}
                     {heroProducts.map(p => (
                         <div key={p.id} className={slides[0] ? 'col-span-1 lg:col-span-2 [--tilt:-1deg]' : 'col-span-2 sm:col-span-1 lg:col-span-3 [--tilt:-1deg]'}>
-                            <ProductCard product={p} storeContext={ctx.storeContext} priority className="h-full"/>
+                            <ProductCard product={p} storeContext={ctx.storeContext} priority heading="h2" className="h-full"/>
                         </div>
                     ))}
                     {!slides[0] && !heroProducts.length && data.hero.banner?.desktopUrl && (

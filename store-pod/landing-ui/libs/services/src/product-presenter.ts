@@ -49,3 +49,45 @@ export function secondaryImage(p: Product): { src: string; alt: string } | undef
 }
 
 export const productHref = (p: Product): string => p.description ? `/product/${p.description.friendlyUrl}` : '#';
+
+/** The images a listing cell can reach: `primaryImage` takes the first, `secondaryImage` the next distinct one. */
+const LISTING_IMAGE_COUNT = 2;
+
+/**
+ * A product as a *listing* cell needs it — for the home rails, category and search results, and related
+ * products. Everything a card cannot render is dropped before the object crosses the RSC boundary into a
+ * client `ProductCard`, where it would otherwise be serialised into the HTML in full.
+ *
+ * On a measured fashion home page the products were 225 KB of a 399 KB flight payload: 366 image records
+ * where the cards show at most two each, plus specifications, attributes and categories that only the
+ * product page reads. Every field dropped here is either already `| undefined` on `Product` (so the
+ * compiler already forces callers to cope) or unread anywhere in the storefront — `productSpecifications`,
+ * `properties`, `variants` and the four `Image` fields have no reader at all.
+ *
+ * Deliberately kept: `description` in full (hunger's card prints the copy), `options` (`hasVariants` reads
+ * it), and every price/stock field. The product page keeps the untouched record — never use this there.
+ */
+export function toListingProduct(p: Product): Product {
+    const {productSpecifications, attributes, properties, variants, categories, ...rest} = p;
+    const slim = (img: Image): Image => ({
+        id: img.id,
+        imageUrl: img.imageUrl,
+        altText: img.altText,
+        order: img.order,
+        defaultImage: img.defaultImage,
+    });
+    return {
+        ...rest,
+        productSpecifications: undefined,
+        attributes: undefined,
+        properties: undefined,
+        variants: undefined,
+        categories: undefined,
+        image: p.image ? slim(p.image) : undefined,
+        images: p.images ? sortedImages(p).slice(0, LISTING_IMAGE_COUNT).map(slim) : undefined,
+    };
+}
+
+/** `toListingProduct` over a list, tolerating the `undefined` every page container allows. */
+export const toListingProducts = (products: Product[] | undefined): Product[] | undefined =>
+    products?.map(toListingProduct);
