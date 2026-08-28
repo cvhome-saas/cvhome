@@ -22,8 +22,15 @@ spring:
           - "landing-ui"
     ecs:
       discovery:
-        namespace: "store-pod-507f1f77.cvhome.lcl"
-        namespace-id: "ns-je7qri6wn7fbsrpn"
+        # Supplied by the environment. Terraform injects both as
+        # SPRING_CLOUD_ECS_DISCOVERY_NAMESPACE and ..._NAMESPACE-ID, per service.
+        #
+        # These were previously hardcoded to a real namespace and a real namespace id
+        # (store-pod-507f1f77.cvhome.lcl / ns-je7qri6wn7fbsrpn) from one specific pod
+        # in one specific AWS account. Any other environment silently resolved
+        # discovery against a namespace that did not exist for it.
+        namespace: ${SPRING_CLOUD_ECS_DISCOVERY_NAMESPACE:}
+        namespace-id: ${SPRING_CLOUD_ECS_DISCOVERY_NAMESPACE_ID:}
         enabled: true
         default-port: 8080
         service-ports:

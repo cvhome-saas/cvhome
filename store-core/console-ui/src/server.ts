@@ -1,3 +1,4 @@
+import { AngularAppEngine } from '@angular/ssr';
 import {
   AngularNodeAppEngine,
   createNodeRequestHandler,
@@ -6,6 +7,25 @@ import {
 } from '@angular/ssr/node';
 import express from 'express';
 import { join } from 'node:path';
+
+/**
+ * Accept every `Host`. The console is never addressed directly — store-core-gateway is the only thing that
+ * reaches it, and that gateway already pins the host: its console route matches `<domain>`, `www.<domain>` and
+ * `console-ui.<domain>` and nothing else. So the SSRF allowlist this disables is a second copy of a decision
+ * already made one tier up, and the only copy that has to be told each environment's domain at *build* time.
+ *
+ * It was not merely redundant, it was wrong: Spring Cloud Gateway resolves `lb://console-ui` through Cloud Map,
+ * so on Fargate the `Host` it forwards is the task's private IP — `10.0.0.97:8011` — which no allowlist can name
+ * ahead of time. Every request was answered `Header "host" with value "10.0.0.97:8011" is not allowed.` with a
+ * 400. Locally discovery resolves to `localhost:8011`, which the allowlist did name, so it only broke deployed.
+ *
+ * `security.allowedHosts: ["*"]` in `angular.json` is the config that is *supposed* to express this. It does not:
+ * `@angular/ssr` 20.3.35 warns that `"*"` allows every host and then matches it with a rule that only understands
+ * the `*.suffix` form, so a bare `"*"` allows nothing. Verified against the built server. The flag below is what
+ * actually does it; keep the `"*"` so this reads correctly from `angular.json`, and drop the flag once a release
+ * honours it.
+ */
+AngularAppEngine.ɵdisableAllowedHostsCheck = true;
 
 const browserDistFolder = join(import.meta.dirname, '../browser');
 const SUPPORTED_LOCALES = ['en', 'ar'];

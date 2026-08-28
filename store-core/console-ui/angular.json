@@ -41,9 +41,7 @@
             "outputMode": "server",
             "security": {
               "allowedHosts": [
-                "localhost",
-                "127.0.0.1",
-                "console-ui.gateway.com"
+                "*"
               ]
             },
             "ssr": {
@@ -79,10 +77,7 @@
           "options": {
             "port": 8011,
             "host": "0.0.0.0",
-            "allowedHosts": [
-              "console-ui.gateway.com",
-              "localhost"
-            ]
+            "allowedHosts": true
           },
           "configurations": {
             "production": {

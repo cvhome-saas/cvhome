@@ -99,12 +99,18 @@ class GatewayRouteLocatorImplTest {
         }
     }
 
+    /**
+     * The filter is preserveHostHeader. console-ui's SSR server validates the Host header against the allowlist baked
+     * into its build, so a rewritten Host — the downstream instance address, which on Fargate is a private IP — is
+     * answered with a 400 rather than the console.
+     */
     @Test
-    void consoleCatchAllServesTheGatewayHostNames() {
+    void consoleCatchAllServesTheGatewayHostNamesWithTheHostPreserved() {
         for (String host : List.of(DOMAIN, "www.gateway.com", "console-ui.gateway.com")) {
             Route route = matching(request(host, DASHBOARD));
             assertThat(route).as(host).isNotNull();
             assertThat(route.getUri()).hasToString("lb://console-ui");
+            assertThat(route.getFilters()).as(host).hasSize(1);
         }
     }
 

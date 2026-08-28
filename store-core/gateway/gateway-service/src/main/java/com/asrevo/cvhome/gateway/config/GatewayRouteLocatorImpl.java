@@ -62,11 +62,19 @@ public class GatewayRouteLocatorImpl implements RouteLocator {
                 .route(r -> r.path("/uaa/**")
                         .filters(f -> f.stripPrefix(1).tokenRelay().preserveHostHeader())
                         .uri("lb://uaa"))
+                /*
+                 * preserveHostHeader, like every route above. Without it the Host forwarded to console-ui is the
+                 * address discovery resolved — localhost:8011 locally, but the task's private IP on Fargate, where
+                 * lb:// goes through Cloud Map. The console renders server-side, so that Host is what its SSR pass
+                 * sees as the request's own origin; leaving it as 10.0.0.97:8011 puts a private address where the
+                 * public one belongs. This route was the only one that had never asked for the real host.
+                 */
                 .route(r -> r.path(backendServicesPattern)
                         .negate()
                         .and()
                         .host(storeCoreGatewayDomain, String.format("www.%s", storeCoreGatewayDomain),
                                 String.format("console-ui.%s", storeCoreGatewayDomain))
+                        .filters(f -> f.preserveHostHeader())
                         .uri("lb://console-ui"))
                 .build()
                 .getRoutes();
