@@ -93,7 +93,6 @@ defaults:
         "com.asrevo.cvhome.services.spg.port": ${port.spg.80},
         "spring.datasource.url": "jdbc:postgresql://localhost:${port.postgres.5432}/cvhome",
         "com.asrevo.cvhome.cdn.storage.s3-url": "http://localhost:${port.minio.9000}",
-        "com.asrevo.cvhome.cdn.base-path": "http://localhost:${port.minio.9000}/d0dd4299-963a-4458-b31f-8efe31c35e8e",
         "com.asrevo.cvhome.pods[0].id": "507f1f77bcf86cd799439011",
         "com.asrevo.cvhome.pods[0].name": "pod-507f1f77",
         "com.asrevo.cvhome.pods[0].domain": "spg-507f1f77.gateway.com",

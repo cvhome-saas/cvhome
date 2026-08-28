@@ -1,3 +1,7 @@
+-- No urls here: storage_key is the object's key in the bucket, and the url a browser fetches is composed from
+-- it and the configured CDN base when the asset is read. The seed used to carry a second, absolute copy, which
+-- meant every environment came up serving the demo library from one developer's MinIO.
+
 -- The store's appearance, which merchant used to hold.
 --
 -- The logo and the slider live in the media library now; the slides became CAROUSEL banners, which is
@@ -6,15 +10,15 @@
 -- Negative ids are seed-only: real ids come from sequences that only grow upward.
 
 INSERT INTO content.media_asset (id, store_merchant_id, filename, original_filename, mime_type, kind,
-                                 bytes, checksum, storage_key, public_url, uploaded_at)
+                                 bytes, checksum, storage_key, uploaded_at)
 VALUES (-190001, '65f020632bc46470c104b76f', 'logo.jpeg', 'logo.jpeg', 'image/jpeg', 'IMAGE',
-        320000, 'seed-190001', 'files/65f020632bc46470c104b76f/LOGO/logo.jpeg', 'http://localhost:9000/d0dd4299-963a-4458-b31f-8efe31c35e8e/files/65f020632bc46470c104b76f/LOGO/logo.jpeg', now())
+        320000, 'seed-190001', 'files/65f020632bc46470c104b76f/LOGO/logo.jpeg', now())
 on conflict (id) do nothing;
 
 INSERT INTO content.media_asset (id, store_merchant_id, filename, original_filename, mime_type, kind,
-                                 bytes, checksum, storage_key, public_url, uploaded_at)
+                                 bytes, checksum, storage_key, uploaded_at)
 VALUES (-190002, '65f020632bc46470c104b76f', 'banner.jpeg', 'banner.jpeg', 'image/jpeg', 'IMAGE',
-        320000, 'seed-190002', 'files/65f020632bc46470c104b76f/BANNER/banner.jpeg', 'http://localhost:9000/d0dd4299-963a-4458-b31f-8efe31c35e8e/files/65f020632bc46470c104b76f/BANNER/banner.jpeg', now())
+        320000, 'seed-190002', 'files/65f020632bc46470c104b76f/BANNER/banner.jpeg', now())
 on conflict (id) do nothing;
 
 -- The site settings row is created by 01-store.sql; this fills in what merchant used to own.
@@ -22,9 +26,9 @@ UPDATE content.site_settings SET logo_media_id = -190001, social_links = '[{"pro
  WHERE store_merchant_id = '65f020632bc46470c104b76f';
 
 INSERT INTO content.media_asset (id, store_merchant_id, filename, original_filename, mime_type, kind,
-                                 bytes, checksum, storage_key, public_url, uploaded_at)
+                                 bytes, checksum, storage_key, uploaded_at)
 VALUES (-190003, '65f020632bc46470c104b76f', 'slide-1.jpeg', 'slide-1.jpeg', 'image/jpeg', 'IMAGE',
-        320000, 'seed-190003', 'files/65f020632bc46470c104b76f/SLIDER/slide-1.jpeg', 'http://localhost:9000/d0dd4299-963a-4458-b31f-8efe31c35e8e/files/65f020632bc46470c104b76f/SLIDER/slide-1.jpeg', now())
+        320000, 'seed-190003', 'files/65f020632bc46470c104b76f/SLIDER/slide-1.jpeg', now())
 on conflict (id) do nothing;
 
 INSERT INTO content.content (content_id, code, content_type, sort_order, visible, store_merchant_id,
@@ -40,9 +44,9 @@ VALUES (-1200, now(), now(), '', 'Slide 1', 'Slide 1',
 on conflict (description_id) do nothing;
 
 INSERT INTO content.media_asset (id, store_merchant_id, filename, original_filename, mime_type, kind,
-                                 bytes, checksum, storage_key, public_url, uploaded_at)
+                                 bytes, checksum, storage_key, uploaded_at)
 VALUES (-190004, '65f020632bc46470c104b76f', 'slide-2.jpeg', 'slide-2.jpeg', 'image/jpeg', 'IMAGE',
-        320000, 'seed-190004', 'files/65f020632bc46470c104b76f/SLIDER/slide-2.jpeg', 'http://localhost:9000/d0dd4299-963a-4458-b31f-8efe31c35e8e/files/65f020632bc46470c104b76f/SLIDER/slide-2.jpeg', now())
+        320000, 'seed-190004', 'files/65f020632bc46470c104b76f/SLIDER/slide-2.jpeg', now())
 on conflict (id) do nothing;
 
 INSERT INTO content.content (content_id, code, content_type, sort_order, visible, store_merchant_id,
@@ -58,9 +62,9 @@ VALUES (-1201, now(), now(), '', 'Slide 2', 'Slide 2',
 on conflict (description_id) do nothing;
 
 INSERT INTO content.media_asset (id, store_merchant_id, filename, original_filename, mime_type, kind,
-                                 bytes, checksum, storage_key, public_url, uploaded_at)
+                                 bytes, checksum, storage_key, uploaded_at)
 VALUES (-190005, '65f020632bc46470c104b76f', 'slide-3.jpeg', 'slide-3.jpeg', 'image/jpeg', 'IMAGE',
-        320000, 'seed-190005', 'files/65f020632bc46470c104b76f/SLIDER/slide-3.jpeg', 'http://localhost:9000/d0dd4299-963a-4458-b31f-8efe31c35e8e/files/65f020632bc46470c104b76f/SLIDER/slide-3.jpeg', now())
+        320000, 'seed-190005', 'files/65f020632bc46470c104b76f/SLIDER/slide-3.jpeg', now())
 on conflict (id) do nothing;
 
 INSERT INTO content.content (content_id, code, content_type, sort_order, visible, store_merchant_id,
@@ -76,9 +80,9 @@ VALUES (-1202, now(), now(), '', 'Slide 3', 'Slide 3',
 on conflict (description_id) do nothing;
 
 INSERT INTO content.media_asset (id, store_merchant_id, filename, original_filename, mime_type, kind,
-                                 bytes, checksum, storage_key, public_url, uploaded_at)
+                                 bytes, checksum, storage_key, uploaded_at)
 VALUES (-190006, '65f020632bc46470c104b76f', 'slide-4.jpeg', 'slide-4.jpeg', 'image/jpeg', 'IMAGE',
-        320000, 'seed-190006', 'files/65f020632bc46470c104b76f/SLIDER/slide-4.jpeg', 'http://localhost:9000/d0dd4299-963a-4458-b31f-8efe31c35e8e/files/65f020632bc46470c104b76f/SLIDER/slide-4.jpeg', now())
+        320000, 'seed-190006', 'files/65f020632bc46470c104b76f/SLIDER/slide-4.jpeg', now())
 on conflict (id) do nothing;
 
 INSERT INTO content.content (content_id, code, content_type, sort_order, visible, store_merchant_id,
@@ -94,9 +98,9 @@ VALUES (-1203, now(), now(), '', 'Slide 4', 'Slide 4',
 on conflict (description_id) do nothing;
 
 INSERT INTO content.media_asset (id, store_merchant_id, filename, original_filename, mime_type, kind,
-                                 bytes, checksum, storage_key, public_url, uploaded_at)
+                                 bytes, checksum, storage_key, uploaded_at)
 VALUES (-190007, '65f020632bc46470c104b76f', 'slide-5.jpeg', 'slide-5.jpeg', 'image/jpeg', 'IMAGE',
-        320000, 'seed-190007', 'files/65f020632bc46470c104b76f/SLIDER/slide-5.jpeg', 'http://localhost:9000/d0dd4299-963a-4458-b31f-8efe31c35e8e/files/65f020632bc46470c104b76f/SLIDER/slide-5.jpeg', now())
+        320000, 'seed-190007', 'files/65f020632bc46470c104b76f/SLIDER/slide-5.jpeg', now())
 on conflict (id) do nothing;
 
 INSERT INTO content.content (content_id, code, content_type, sort_order, visible, store_merchant_id,

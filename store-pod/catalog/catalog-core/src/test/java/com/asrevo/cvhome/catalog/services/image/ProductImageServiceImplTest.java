@@ -44,9 +44,14 @@ class ProductImageServiceImplTest {
 
     private static final long PRODUCT_ID = 7L;
 
-    private static final String URL_ONE = "https://cdn.example/media/1/a.png";
+    private static final String CDN = "https://cdn.example/bucket";
 
-    private static final String URL_TWO = "https://cdn.example/media/2/b.png";
+    /** How the mapper joins the two, so the expectations here are not a second copy of that rule. */
+    private static final String UNDER_CDN = "%s/%s";
+
+    private static final String PATH_ONE = "files/store/media/1/a.png";
+
+    private static final String PATH_TWO = "files/store/media/2/b.png";
 
     @Mock
     private ProductRepository productRepository;
@@ -63,7 +68,7 @@ class ProductImageServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        service = new ProductImageServiceImpl(productRepository, productImageRepository, media, new ImageMapper());
+        service = new ProductImageServiceImpl(productRepository, productImageRepository, media, new ImageMapper(CDN));
         product = new Product();
         product.setId(PRODUCT_ID);
         product.setSku(SKU);
@@ -75,11 +80,17 @@ class ProductImageServiceImplTest {
         when(productImageRepository.save(any())).thenAnswer(i -> i.getArgument(0));
     }
 
-    private void libraryHas(Long id, String url) {
+    private void libraryHas(Long id, String path) {
+        when(media.resolve(any(), anyList())).thenReturn(List.of(libraryAsset(id, path)));
+    }
+
+    /** Content answers with the path; the url it composes from it is for a browser, not for catalog to keep. */
+    private static ReadableMediaAsset libraryAsset(Long id, String path) {
         ReadableMediaAsset asset = new ReadableMediaAsset();
         asset.setId(id);
-        asset.setUrl(url);
-        when(media.resolve(any(), anyList())).thenReturn(List.of(asset));
+        asset.setPath(path);
+        asset.setUrl(String.format(UNDER_CDN, CDN, path));
+        return asset;
     }
 
     private static PersistableProductImage item(Long assetId, boolean isDefault) {
@@ -92,15 +103,16 @@ class ProductImageServiceImplTest {
     @Test
     void theFirstImageOfAnEmptyGalleryBecomesTheDefault() throws Exception {
         productExists();
-        libraryHas(1L, URL_ONE);
+        libraryHas(1L, PATH_ONE);
 
         List<ReadableImage> out = service.attach(STORE, PRODUCT_ID, List.of(item(1L, false)));
 
         assertThat(out).singleElement().satisfies(i -> {
             assertThat(i.isDefaultImage()).isTrue();
             assertThat(i.getMediaAssetId()).isEqualTo(1L);
-            // The url is cached at attach time, so reading a product needs no call into content.
-            assertThat(i.getImageUrl()).isEqualTo(URL_ONE);
+            // The path is cached at attach time, so reading a product needs no call into content; the url is
+            // that path under the CDN this environment is configured with.
+            assertThat(i.getImageUrl()).isEqualTo(String.format(UNDER_CDN, CDN, PATH_ONE));
         });
     }
 
@@ -121,15 +133,10 @@ class ProductImageServiceImplTest {
 
     @Test
     void replacingTheGalleryRenumbersAndHonoursTheChosenDefault() throws Exception {
-        product.getImages().add(new ProductImage(product, 1L, URL_ONE, null, 0, true));
+        product.getImages().add(new ProductImage(product, 1L, PATH_ONE, null, 0, true));
         productExists();
-        ReadableMediaAsset one = new ReadableMediaAsset();
-        one.setId(1L);
-        one.setUrl(URL_ONE);
-        ReadableMediaAsset two = new ReadableMediaAsset();
-        two.setId(2L);
-        two.setUrl(URL_TWO);
-        when(media.resolve(any(), anyList())).thenReturn(List.of(one, two));
+        when(media.resolve(any(), anyList()))
+                .thenReturn(List.of(libraryAsset(1L, PATH_ONE), libraryAsset(2L, PATH_TWO)));
 
         List<ReadableImage> out = service.replace(STORE, PRODUCT_ID,
                 List.of(item(2L, true), item(1L, false)));
@@ -145,7 +152,7 @@ class ProductImageServiceImplTest {
     @Test
     void aGalleryWithNoChosenDefaultDefaultsToTheFirst() throws Exception {
         productExists();
-        libraryHas(1L, URL_ONE);
+        libraryHas(1L, PATH_ONE);
 
         List<ReadableImage> out = service.replace(STORE, PRODUCT_ID, List.of(item(1L, false)));
 
@@ -155,7 +162,7 @@ class ProductImageServiceImplTest {
     @Test
     void contentIsToldTheCompleteSetAndWhichProductHoldsIt() throws Exception {
         productExists();
-        libraryHas(1L, URL_ONE);
+        libraryHas(1L, PATH_ONE);
 
         service.attach(STORE, PRODUCT_ID, List.of(item(1L, false)));
 
@@ -176,7 +183,7 @@ class ProductImageServiceImplTest {
      */
     @Test
     void detachingAnImageReleasesOnlyThatReference() throws Exception {
-        ProductImage image = new ProductImage(product, 1L, URL_ONE, null, 0, true);
+        ProductImage image = new ProductImage(product, 1L, PATH_ONE, null, 0, true);
         image.setId(11L);
         product.getImages().add(image);
         when(productImageRepository.findByStoreAndProductAndId(STORE, PRODUCT_ID, 11L))

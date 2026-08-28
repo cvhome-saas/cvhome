@@ -37,7 +37,9 @@ com:
           s3-access-key: "minioadmin"
           s3-secret-key: "minioadmin"
           region: "eu-central-1"
-        base-path: "http://localhost:9000/d0dd4299-963a-4458-b31f-8efe31c35e8e"
+        # Derived, so a stack that moves MinIO — `lcl --stack` shifts its port by 1000 — only has to say so
+        # once. Seed scripts interpolate this same key, so the demo images follow it.
+        base-path: "${com.asrevo.cvhome.cdn.storage.s3-url}/${com.asrevo.cvhome.cdn.storage.bucket}"
       pod-info:
         pod:
           id: 507f1f77bcf86cd799439011

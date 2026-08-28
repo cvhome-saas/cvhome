@@ -18,6 +18,7 @@ import com.asrevo.cvhome.content.model.site.ReadableSiteSettings;
 import com.asrevo.cvhome.content.model.site.SiteBranding;
 import com.asrevo.cvhome.content.repository.MediaAssetRepository;
 import com.asrevo.cvhome.content.repository.SiteSettingsRepository;
+import com.asrevo.cvhome.content.storage.MediaStorage;
 import com.asrevo.cvhome.content.support.JsonCodec;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -47,6 +48,8 @@ class SiteSettingsServiceTest {
 
     private static final String ACTOR = "org1-admin";
 
+    private static final String LOGO_KEY = "files/store-1/media/7/logo.png";
+
     private static final String LOGO_URL = "https://cdn.test/logo.png";
 
     private static final String META_TITLE = "metaTitle";
@@ -71,6 +74,8 @@ class SiteSettingsServiceTest {
 
     private MediaUsageTracker usageTracker;
 
+    private MediaStorage storage;
+
     private SiteSettingsService service;
 
     @BeforeEach
@@ -78,7 +83,9 @@ class SiteSettingsServiceTest {
         repository = mock(SiteSettingsRepository.class);
         assets = mock(MediaAssetRepository.class);
         usageTracker = mock(MediaUsageTracker.class);
-        service = new SiteSettingsService(repository, assets, usageTracker, ContentFixtures.clock());
+        storage = mock(MediaStorage.class);
+        when(storage.url(LOGO_KEY)).thenReturn(LOGO_URL);
+        service = new SiteSettingsService(repository, assets, usageTracker, storage, ContentFixtures.clock());
         when(repository.save(any(SiteSettings.class))).thenAnswer(i -> i.getArgument(0));
     }
 
@@ -92,11 +99,11 @@ class SiteSettingsServiceTest {
         when(repository.findById(STORE_ID)).thenReturn(Optional.of(s));
     }
 
-    private static MediaAsset asset(long id, String url, String altTexts) {
+    private static MediaAsset asset(long id, String storageKey, String altTexts) {
         MediaAsset a = new MediaAsset();
         a.setId(id);
         a.setStoreMerchantId(STORE_ID);
-        a.setPublicUrl(url);
+        a.setStorageKey(storageKey);
         a.setWidth(320);
         a.setHeight(120);
         a.setAltTexts(altTexts);
@@ -163,7 +170,7 @@ class SiteSettingsServiceTest {
         SiteSettings entity = settings();
         entity.setLogoMediaId(7L);
         stored(entity);
-        library(asset(7L, LOGO_URL, null));
+        library(asset(7L, LOGO_KEY, null));
 
         ReadableSiteSettings out = service.put(ContentFixtures.STORE, body(null), ContentFixtures.EN, ACTOR);
 
@@ -195,7 +202,7 @@ class SiteSettingsServiceTest {
     void theFilledSlotsAreStatedAsUsesAndTheEmptyOnesAreNot() throws ContentNotFoundException {
         SiteSettings entity = settings();
         stored(entity);
-        library(asset(7L, LOGO_URL, null));
+        library(asset(7L, LOGO_KEY, null));
 
         service.put(ContentFixtures.STORE, body(7L), ContentFixtures.EN, ACTOR);
 
@@ -208,7 +215,7 @@ class SiteSettingsServiceTest {
         SiteSettings entity = settings();
         entity.setLogoMediaId(7L);
         stored(entity);
-        library(asset(7L, LOGO_URL, null));
+        library(asset(7L, LOGO_KEY, null));
 
         SiteBranding branding = service.branding(ContentFixtures.STORE, ContentFixtures.EN);
 
@@ -230,7 +237,7 @@ class SiteSettingsServiceTest {
         SiteSettings entity = settings();
         entity.setLogoMediaId(7L);
         stored(entity);
-        library(asset(7L, LOGO_URL, JsonCodec.write(Map.of(EN, LOGO_ALT, AR, LOGO_ALT_AR))));
+        library(asset(7L, LOGO_KEY, JsonCodec.write(Map.of(EN, LOGO_ALT, AR, LOGO_ALT_AR))));
 
         assertThat(service.branding(ContentFixtures.STORE, ContentFixtures.AR).logo().alt()).isEqualTo(LOGO_ALT_AR);
     }
@@ -244,7 +251,7 @@ class SiteSettingsServiceTest {
         SiteSettings entity = settings();
         entity.setLogoMediaId(7L);
         stored(entity);
-        library(asset(7L, LOGO_URL, JsonCodec.write(Map.of(EN, LOGO_ALT))));
+        library(asset(7L, LOGO_KEY, JsonCodec.write(Map.of(EN, LOGO_ALT))));
 
         assertThat(service.branding(ContentFixtures.STORE, ContentFixtures.AR).logo().alt()).isEqualTo(LOGO_ALT);
     }

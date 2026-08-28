@@ -64,6 +64,8 @@ class MediaServiceTest {
 
     private static final String STORED_URL = "https://cdn.test/x";
 
+    private static final String ASSET_KEY = "files/s/media/1/logo.png";
+
     private static final String SVG = "image/svg+xml";
 
     private static final String ABOUT_TITLE = "About";
@@ -129,8 +131,7 @@ class MediaServiceTest {
         a.setKind(MediaKind.IMAGE);
         a.setBytes(100);
         a.setChecksum("abc");
-        a.setStorageKey("files/s/media/1/logo.png");
-        a.setPublicUrl("https://cdn.test/files/s/media/1/logo.png");
+        a.setStorageKey(ASSET_KEY);
         a.setUploadedAt(ContentFixtures.NOW);
         return a;
     }
@@ -306,6 +307,7 @@ class MediaServiceTest {
 
             verify(storage).put(eq(MediaStorage.key(STORE_ID, 11L, LOGO)), any(), eq(PNG));
             assertThat(out).singleElement().satisfies(r -> {
+                assertThat(r.getPath()).isEqualTo(MediaStorage.key(STORE_ID, 11L, LOGO));
                 assertThat(r.getUrl()).isEqualTo(STORED_URL);
                 assertThat(r.getKind()).isEqualTo(MediaKind.IMAGE);
                 assertThat(r.getUploadedBy()).isEqualTo(ACTOR);
@@ -371,9 +373,10 @@ class MediaServiceTest {
         void urlsSkipNullsDeduplicatesAndReturnsNothingForAnEmptyRequest() {
             when(assets.findByStoreMerchantIdAndIdIn(STORE_ID, List.of(5L)))
                     .thenReturn(List.of(asset(5L, LOGO)));
+            when(storage.url(ASSET_KEY)).thenReturn(STORED_URL);
 
             assertThat(service.urls(ContentFixtures.STORE, java.util.Arrays.asList(5L, null, 5L)))
-                    .containsExactly(Map.entry(5L, asset(5L, LOGO).getPublicUrl()));
+                    .containsExactly(Map.entry(5L, STORED_URL));
             assertThat(service.urls(ContentFixtures.STORE, java.util.Arrays.asList((Long) null))).isEmpty();
         }
 
