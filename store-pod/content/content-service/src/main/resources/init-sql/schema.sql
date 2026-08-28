@@ -257,7 +257,6 @@ create table if not exists content.media_asset
     height            integer,
     checksum          varchar(64)  not null,
     storage_key       varchar(255) not null,
-    public_url        varchar(500) not null,
     alt_texts         jsonb,
     title             varchar(200),
     tags              jsonb,
@@ -265,6 +264,10 @@ create table if not exists content.media_asset
     uploaded_at       timestamp(6) not null,
     constraint media_asset_store_checksum_unique unique (store_merchant_id, checksum)
 );
+-- The asset's url is composed from storage_key and the configured CDN base on the way out, so the stored
+-- copy was a second address for the same object — right on the machine that wrote it and wrong everywhere
+-- else, which is how the demo library ended up pointing at one developer's MinIO.
+alter table content.media_asset drop column if exists public_url;
 create index if not exists media_asset_store_folder_idx on content.media_asset (store_merchant_id, folder_id);
 create index if not exists media_asset_store_kind_idx on content.media_asset (store_merchant_id, kind);
 

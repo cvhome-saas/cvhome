@@ -23,13 +23,13 @@ import lombok.Setter;
  *
  * <p>
  * {@code imageType} 0 is an asset in the content service's media library, held as {@code mediaAssetId} with its
- * public URL cached alongside; {@code imageType} 1 is an external url (possibly a video). Catalog used to store
- * the file itself under the product's sku, which gave product images no alt text, no metadata and no way for
- * anything to know an image was still in use.
+ * path in the bucket cached alongside; {@code imageType} 1 is an external url (possibly a video). Catalog used to
+ * store the file itself under the product's sku, which gave product images no alt text, no metadata and no way
+ * for anything to know an image was still in use.
  * </p>
  *
  * <p>
- * The cached URL is safe to hold because an asset's bytes are never replaced in place: an upload either
+ * The cached path is safe to hold because an asset's bytes are never replaced in place: an upload either
  * deduplicates onto the existing asset or mints a new id. It can only go stale if the asset is deleted, which
  * the usage index refuses while a product still references it.
  * </p>
@@ -67,7 +67,9 @@ public class ProductImage extends SalesManagerEntity<Long, ProductImage> {
     private Long mediaAssetId;
 
     /**
-     * The asset's public URL, cached so reading a product needs no call into content.
+     * The asset's path in the bucket, cached so reading a product needs no call into content. The url a browser
+     * fetches is this under the configured CDN base, composed by {@code ImageMapper} on the way out; rows written
+     * before that carry a whole url instead and are served as they stand.
      */
     @Column(name = "IMAGE_URL", length = 500)
     private String imageUrl;
@@ -110,13 +112,6 @@ public class ProductImage extends SalesManagerEntity<Long, ProductImage> {
      */
     public boolean isExternal() {
         return getImageType() == TYPE_EXTERNAL_URL && productImageUrl != null;
-    }
-
-    /**
-     * Where a browser fetches this image: the external url for an external row, else the cached library URL.
-     */
-    public String resolvedUrl() {
-        return isExternal() ? productImageUrl : imageUrl;
     }
 
     public boolean isDefaultImage() {

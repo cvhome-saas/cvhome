@@ -172,12 +172,10 @@ public class MediaService implements SummaryService.MediaFigures {
             }
             // key needs the id, so save a placeholder key first
             a.setStorageKey(PENDING);
-            a.setPublicUrl(PENDING);
             MediaAsset saved = assets.saveAndFlush(a);
             String key = MediaStorage.key(store.getId(), saved.getId(), saved.getFilename());
             storage.put(key, bytes, mime);
             saved.setStorageKey(key);
-            saved.setPublicUrl(storage.url(key));
             saved = assets.saveAndFlush(saved);
             quota.setBytesUsed(quota.getBytesUsed() + bytes.length);
             quota.setFileCount(quota.getFileCount() + 1);
@@ -273,7 +271,7 @@ public class MediaService implements SummaryService.MediaFigures {
             return out;
         }
         for (MediaAsset a : assets.findByStoreMerchantIdAndIdIn(store.getId(), wanted)) {
-            out.put(a.getId(), a.getPublicUrl());
+            out.put(a.getId(), storage.url(a.getStorageKey()));
         }
         return out;
     }
@@ -282,7 +280,8 @@ public class MediaService implements SummaryService.MediaFigures {
         if (id == null) {
             return Optional.empty();
         }
-        return assets.findByIdAndStoreMerchantId(id, store.getId()).map(MediaAsset::getPublicUrl);
+        return assets.findByIdAndStoreMerchantId(id, store.getId())
+                .map(a -> storage.url(a.getStorageKey()));
     }
 
     // ------------------------------------------------------------------------------------------------- writes
@@ -466,8 +465,13 @@ public class MediaService implements SummaryService.MediaFigures {
         return out;
     }
 
+    /**
+     * The asset as a client reads it: {@code path} is what is stored, {@code url} is that path under the CDN this
+     * environment is configured with. Callers that cache a reference — catalog does, per product image — keep the
+     * path, so their copy follows the CDN instead of pinning the address it had on the day it was taken.
+     */
     @SuppressWarnings("unchecked")
-    static ReadableMediaAsset toReadable(MediaAsset a, int usageCount, List<MediaUsage> uses) {
+    ReadableMediaAsset toReadable(MediaAsset a, int usageCount, List<MediaUsage> uses) {
         ReadableMediaAsset r = new ReadableMediaAsset();
         r.setId(a.getId());
         r.setFilename(a.getFilename());
@@ -477,7 +481,8 @@ public class MediaService implements SummaryService.MediaFigures {
         r.setBytes(a.getBytes());
         r.setWidth(a.getWidth());
         r.setHeight(a.getHeight());
-        r.setUrl(a.getPublicUrl());
+        r.setPath(a.getStorageKey());
+        r.setUrl(storage.url(a.getStorageKey()));
         r.setFolderId(a.getFolderId());
         r.setAltTexts(a.getAltTexts() == null ? Map.of() : JsonCodec.read(a.getAltTexts(), LinkedHashMap.class));
         r.setTitle(a.getTitle());

@@ -82,7 +82,9 @@ public class ExternalClientsTestConfiguration {
             return ids == null ? List.of() : ids.stream().map(id -> {
                 ReadableMediaAsset asset = new ReadableMediaAsset();
                 asset.setId(id);
-                asset.setUrl(String.format("https://cdn.example/media/%d/asset.png", id));
+                // The path is what catalog caches; the url content composes from it is for a browser.
+                asset.setPath(String.format("files/store/media/%d/asset.png", id));
+                asset.setUrl(String.format("https://cdn.example/files/store/media/%d/asset.png", id));
                 return asset;
             }).toList();
         }).when(service).resolve(any(), any());

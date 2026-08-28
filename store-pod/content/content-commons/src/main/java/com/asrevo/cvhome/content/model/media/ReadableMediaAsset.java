@@ -34,6 +34,12 @@ public class ReadableMediaAsset implements Serializable {
 
     private Integer height;
 
+    /**
+     * Where the object lives, relative to the CDN base. What another service caches when it wants a reference
+     * that keeps working after the CDN moves; {@link #url} is this path already resolved, for a browser.
+     */
+    private String path;
+
     private String url;
 
     private Long folderId;

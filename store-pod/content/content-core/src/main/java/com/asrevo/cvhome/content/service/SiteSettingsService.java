@@ -22,6 +22,7 @@ import com.asrevo.cvhome.content.model.site.ReadableSiteSettings;
 import com.asrevo.cvhome.content.model.site.SiteBranding;
 import com.asrevo.cvhome.content.repository.MediaAssetRepository;
 import com.asrevo.cvhome.content.repository.SiteSettingsRepository;
+import com.asrevo.cvhome.content.storage.MediaStorage;
 import com.asrevo.cvhome.content.support.JsonCodec;
 
 import lombok.RequiredArgsConstructor;
@@ -54,6 +55,8 @@ public class SiteSettingsService {
     private final MediaAssetRepository assets;
 
     private final MediaUsageTracker usageTracker;
+
+    private final MediaStorage storage;
 
     private final Clock clock;
 
@@ -152,7 +155,7 @@ public class SiteSettingsService {
     }
 
     @SuppressWarnings("unchecked")
-    private static MediaRef ref(MediaAsset a, LanguageCode language) {
+    private MediaRef ref(MediaAsset a, LanguageCode language) {
         if (a == null) {
             return null;
         }
@@ -164,7 +167,7 @@ public class SiteSettingsService {
                 alt = alts.values().stream().filter(v -> v != null && !v.isBlank()).findFirst().orElse(null);
             }
         }
-        return new MediaRef(a.getId(), a.getPublicUrl(), alt, a.getWidth(), a.getHeight());
+        return new MediaRef(a.getId(), storage.url(a.getStorageKey()), alt, a.getWidth(), a.getHeight());
     }
 
     private ReadableSiteSettings toReadable(SiteSettings entity, LanguageCode language) {

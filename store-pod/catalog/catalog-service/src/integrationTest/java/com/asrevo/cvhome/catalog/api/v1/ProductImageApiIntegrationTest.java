@@ -3,6 +3,7 @@ package com.asrevo.cvhome.catalog.api.v1;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
@@ -38,7 +39,8 @@ import static org.mockito.ArgumentMatchers.any;
  * <p>
  * Catalog no longer stores files, so there is no MinIO in this story any more — the bytes are the media library's
  * problem. What is tested here is the reference: that an asset id which is not this store's is refused, that the
- * url is cached at attach time, and that the seller can finally choose which image is the default.
+ * asset's path is cached at attach time and served under this environment's CDN, and that the seller can finally
+ * choose which image is the default.
  * </p>
  */
 @StorageIntegrationTest
@@ -81,6 +83,9 @@ class ProductImageApiIntegrationTest {
 
     @Autowired
     private ExternalMediaService media;
+
+    @Value("${com.asrevo.cvhome.cdn.base-path}")
+    private String cdnBasePath;
 
     private CatalogApiSupport api;
 
@@ -128,9 +133,11 @@ class ProductImageApiIntegrationTest {
 
         assertThat(images.size()).isGreaterThanOrEqualTo(1);
         assertThat(images.get(0).get(ORDER).asInt()).isZero();
-        // The seeded photos are registered library assets, so they carry an id and a cached url.
+        // The seeded photos are registered library assets, so they carry an id and a cached path.
         assertThat(images.get(0).get(MEDIA_ASSET_ID).isNull()).isFalse();
-        assertThat(images.get(0).get(IMAGE_URL).asString()).isNotBlank();
+        // The seed stores a path and nothing about the host, so this is the CDN this environment configures —
+        // here the MinIO container, an address no script could have written down.
+        assertThat(images.get(0).get(IMAGE_URL).asString()).startsWith(cdnBasePath);
     }
 
     // ------------------------------------------------------------------------------------------------- writes
@@ -146,8 +153,11 @@ class ProductImageApiIntegrationTest {
         assertThat(after).hasSize(1);
         assertThat(after.get(0).get(MEDIA_ASSET_ID).asLong()).isEqualTo(11L);
         assertThat(after.get(0).get(ALT_TEXT).asString()).isEqualTo(ALT);
-        // Cached when it was attached, so reading a product never calls content.
-        assertThat(after.get(0).get(IMAGE_URL).asString()).contains("/media/11/");
+        // The path is cached when it is attached, so reading a product never calls content; the url is that
+        // path under this environment's CDN, composed on the way out.
+        assertThat(after.get(0).get(IMAGE_URL).asString())
+                .startsWith(cdnBasePath)
+                .endsWith("/media/11/asset.png");
         // The first image of an empty gallery is the default without being asked.
         assertThat(after.get(0).get(DEFAULT_IMAGE).asBoolean()).isTrue();
 

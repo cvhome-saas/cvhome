@@ -36,6 +36,7 @@ import com.asrevo.cvhome.catalog.repositories.ProductFacetRepository;
 import com.asrevo.cvhome.catalog.repositories.ProductRepository;
 import com.asrevo.cvhome.catalog.repositories.ProductSearchIndexRepository;
 import com.asrevo.cvhome.catalog.repositories.ProductTypeRepository;
+import com.asrevo.cvhome.catalog.services.image.ImageMapper;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 
@@ -135,7 +136,8 @@ class ProductSearchServiceImplTest {
     @BeforeEach
     void setUp() {
         service = new ProductSearchServiceImpl(productRepository, searchIndexRepository, facetRepository,
-                categoryRepository, manufacturerRepository, productTypeRepository, indexer, productMapper);
+                categoryRepository, manufacturerRepository, productTypeRepository, indexer, productMapper,
+                new ImageMapper("https://cdn.example/bucket"));
         when(productMapper.toReadable(any(), any())).thenAnswer(invocation -> {
             Product product = invocation.getArgument(0);
             ReadableProduct readable = new ReadableProduct();

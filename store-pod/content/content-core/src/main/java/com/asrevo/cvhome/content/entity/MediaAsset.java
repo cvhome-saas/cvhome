@@ -74,11 +74,13 @@ public class MediaAsset implements Serializable {
     @Column(name = "CHECKSUM", nullable = false, length = 64)
     private String checksum;
 
+    /**
+     * The object's key in the bucket, and the only record of where it lives. The url a browser fetches is this
+     * key under {@code com.asrevo.cvhome.cdn.base-path}, composed on the way out — a stored url was a copy of
+     * the CDN's address that went wrong the moment an environment served the same bucket from somewhere else.
+     */
     @Column(name = "STORAGE_KEY", nullable = false, length = 255)
     private String storageKey;
-
-    @Column(name = "PUBLIC_URL", nullable = false, length = 500)
-    private String publicUrl;
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "ALT_TEXTS")
