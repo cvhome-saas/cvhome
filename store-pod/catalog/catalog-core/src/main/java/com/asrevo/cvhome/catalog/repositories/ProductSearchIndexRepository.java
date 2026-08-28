@@ -79,10 +79,20 @@ public interface ProductSearchIndexRepository extends JpaRepository<ProductSearc
      * merchant wrote it, not the normalised form the comparison ran on.
      *
      * <p>
-     * {@code word_similarity}, not {@code similarity}: the latter compares the query against the whole name, so
-     * two mistyped words against a five-word product name score near zero however good the match is. This
-     * compares them against the best-matching run of words inside the name, which is the question actually
-     * being asked.
+     * Not {@code similarity}: it compares the query against the whole name, so two mistyped words against a
+     * five-word product name score near zero however good the match is. The comparison has to be against the
+     * words inside the name, which is the question actually being asked.
+     * </p>
+     *
+     * <p>
+     * {@code strict_word_similarity} rather than {@code word_similarity} because the latter is free to pick any
+     * continuous extent of the name, including a fragment of one word — so a short query scores on a shared
+     * opening and nothing else: "nike" against "YSL Pure Shots Night Reboot Serum" scores 0.40 on the "ni" the
+     * query shares with "Night" and nothing more, over any floor worth having, and a shopper whose brand the
+     * shop does not carry is told we meant a serum. The strict form bounds the extent at word boundaries, which
+     * scores that pair at 0.22 and rejects it, while the typos this exists for are unharmed: "runing" against
+     * "Nike Tempo Running Shorts (Women)" is still 0.67, "runing shoos" 0.47, "invincibl" against "Nike ZoomX
+     * Invincible Run 3" 0.75.
      * </p>
      */
     @Query(value = """
@@ -94,8 +104,8 @@ public interface ProductSearchIndexRepository extends JpaRepository<ProductSearc
             where i.store_merchant_id = :store
               and i.language_code = :language
               and p.available = true
-              and public.word_similarity(catalog.search_normalize(:q), i.name_normalized) > :floor
-            order by public.word_similarity(catalog.search_normalize(:q), i.name_normalized) desc
+              and public.strict_word_similarity(catalog.search_normalize(:q), i.name_normalized) > :floor
+            order by public.strict_word_similarity(catalog.search_normalize(:q), i.name_normalized) desc
             limit 1
             """, nativeQuery = true)
     Optional<String> bestNearMiss(@Param("store") String store, @Param("language") String language,
