@@ -1,6 +1,7 @@
 import 'server-only';
 import {cache} from 'react';
 import {ProductSearchService} from '@store-front/services/product-search-service';
+import {toListingProducts} from '@store-front/services/product-presenter';
 import {EMPTY_FACETS, emptySearchPage, type ProductSearchPage, type ProductSearchQuery} from '@store-front/types';
 import type {SearchData} from '@store-front/theme';
 import {getStoreContext} from '@/shell/request/store-context';
@@ -15,7 +16,8 @@ export const loadSearch = cache(async (query: ProductSearchQuery): Promise<Searc
     });
     return {
         query,
-        initial,
+        // Serialised into the HTML as client-component props — see loadCategory.
+        initial: {...initial, content: toListingProducts(initial.content) ?? []},
         facets: initial.facets ?? EMPTY_FACETS,
         didYouMean: initial.didYouMean,
         // Only worth telling a shopper about when it is not the language they are reading the shop in.

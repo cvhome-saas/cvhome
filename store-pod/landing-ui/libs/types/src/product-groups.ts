@@ -90,14 +90,18 @@ export interface ProductPrice {
 
 export interface Image {
     id: number
-    /** The content media asset behind this image; null for an external url or a video. */
-    mediaAssetId: number | null
+    /** The content media asset behind this image; null for an external url or a video.
+     *  Optional because nothing in the storefront reads it — `toListingProduct` drops it from list payloads. */
+    mediaAssetId?: number | null
     imageUrl: string
     /** Overrides the asset's own alt text for this product. */
     altText: string | null
-    externalUrl: any
-    videoUrl: any
-    imageType: number
+    /** Unread by the storefront; see `mediaAssetId`. */
+    externalUrl?: any
+    /** Unread by the storefront; see `mediaAssetId`. */
+    videoUrl?: any
+    /** Unread by the storefront; see `mediaAssetId`. */
+    imageType?: number
     order: number
     defaultImage: boolean
 }
