@@ -19,7 +19,7 @@ sophisticated online retail operations.
 
 ## History
 
-`cvhome` evolves the single-instance model of **[Shopizer](https://github.com/shopizer-ecommerce/shopizer)** into a
+`cvhome` evolves the single-instance model of **[Shopizer](https://github.com/cvhome-saas/shopizer)** into a
 scalable, multi-tenant SaaS platform. We've significantly refactored the architecture to introduce robust tenant
 isolation, cloud-native optimization, and a modernized technology stack.
 
