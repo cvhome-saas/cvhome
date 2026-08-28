@@ -86,11 +86,11 @@ To build all microservices and frontend applications:
 2. **Run the build command:**
    ### On Linux/macOS
     ```bash
-   ./gradlew clean build -x test
+   ./gradlew clean build -PskipAllTests
    ```
    ### On Windows
     ```bash
-   gradlew.bat clean build -x test
+   gradlew.bat clean build -PskipAllTests
    ``` 
 
 ## Running Locally
@@ -132,4 +132,4 @@ pull requests. This guide covers:
 * Development workflow (forking, branching)
 * Coding style guidelines
 * Commit message conventions
-* Pull request process    
+* Pull request process
