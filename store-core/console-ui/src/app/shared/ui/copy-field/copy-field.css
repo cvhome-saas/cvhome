@@ -1,0 +1,41 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+
+.copy-field {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-tight);
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--input);
+}
+
+code {
+  flex: 1;
+  overflow-x: auto;
+  min-inline-size: 0;
+  color: var(--secondary-foreground);
+  font-family: ui-monospace, monospace;
+  font-size: var(--text-2xs);
+  white-space: nowrap;
+}
+
+button {
+  display: grid;
+  place-items: center;
+  flex: none;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--primary);
+  cursor: pointer;
+  transition: color var(--default-transition-duration);
+  --icon-size: 0.8rem;
+}
+
+button:hover {
+  color: var(--primary-emphasis);
+}

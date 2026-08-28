@@ -1,0 +1,18 @@
+{
+  "name": "@store-front/theme",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "description": "The storefront theme contract: ThemeDefinition, design-token schema, merchant colour bridge.",
+  "peerDependencies": {
+    "react": "*"
+  },
+  "dependencies": {
+    "@store-front/types": "0.0.0"
+  },
+  "scripts": {
+    "test": "tsx --test test/*.test.ts"
+  }
+}

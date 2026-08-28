@@ -1,0 +1,45 @@
+<!-- The close/cancel events are the platform's dismissal signals: Escape and the backdrop. -->
+<dialog #dialog class="invite" (close)="dismissed.emit()" (cancel)="dismissed.emit()">
+  <form method="dialog" class="invite-body" (submit)="onSubmit($event)">
+    <h2 class="invite-title">{{ title() }}</h2>
+    <p class="invite-message">{{ message() }}</p>
+
+    <app-form-field [label]="emailLabel()" required wide>
+      <app-text-field
+        [(value)]="email"
+        type="email"
+        autocomplete="off"
+        latin
+        [invalid]="showError()"
+        [disabled]="busy()"
+        [ariaLabel]="emailLabel()"
+      />
+    </app-form-field>
+
+    <app-form-field [label]="roleLabel()" required wide>
+      <app-select
+        [value]="role()"
+        (valueChange)="role.set($event)"
+        [options]="roles()"
+        [disabled]="busy()"
+        [ariaLabel]="roleLabel()"
+      />
+    </app-form-field>
+
+    @if (showError()) {
+      <p class="invite-error" role="alert">{{ invalidMessage() }}</p>
+    }
+
+    <!-- Nothing on the platform sends email, so the operator delivers the link themselves. -->
+    <p class="invite-hint">{{ noMailHint() }}</p>
+
+    <div class="invite-actions">
+      <button class="secondary-action" type="button" [disabled]="busy()" (click)="close()">
+        {{ cancelLabel() }}
+      </button>
+      <button class="primary-action" type="submit" [disabled]="busy()">
+        {{ busy() ? busyLabel() : confirmLabel() }}
+      </button>
+    </div>
+  </form>
+</dialog>

@@ -1,14 +1,9 @@
 package com.asrevo.cvhome.merchant.api.v1;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
-import java.util.UUID;
 
 import jakarta.validation.Valid;
 
-import org.apache.commons.io.FilenameUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,23 +14,19 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
-import com.asrevo.cvhome.commons.domain.ReadableSliderImage;
-import com.asrevo.cvhome.commons.domain.SliderImage;
+import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.merchant.errors.DefaultStoreNotRemovableException;
+import com.asrevo.cvhome.merchant.errors.DuplicateMerchantStoreException;
+import com.asrevo.cvhome.merchant.errors.MerchantStoreContextMismatchException;
+import com.asrevo.cvhome.merchant.errors.MerchantStoreNotFoundException;
 import com.asrevo.cvhome.merchant.model.merchant.PersistableMerchantStore;
 import com.asrevo.cvhome.merchant.model.merchant.ReadableMerchantStore;
 import com.asrevo.cvhome.merchant.service.facade.merchant.StoreFacade;
-import com.asrevo.cvhome.store.controller.exception.RestApiException;
 import com.asrevo.cvhome.store.core.constants.Constants;
-import com.asrevo.cvhome.store.core.entity.content.FileContentType;
-import com.asrevo.cvhome.store.core.entity.content.InputContentFile;
-import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
-import com.asrevo.cvhome.store.utils.ImageFilePath;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -47,7 +38,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1_STR;
+import static com.asrevo.cvhome.commons.utils.DefaultStoresConstants.DEFAULT_ORG1_STORE1_STR;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -58,8 +49,6 @@ public class MerchantStoreApi {
 
     private final StoreFacade storeFacade;
 
-    private final ImageFilePath imageFilePath;
-
     @GetMapping(value = {"/store/{code}"}, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(method = "GET", description = "Get merchant store",
             responses = @ApiResponse(
@@ -67,9 +56,14 @@ public class MerchantStoreApi {
     @Parameter(name = "lang",
             schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
 
-    public ReadableMerchantStore store(@PathVariable String code,
-                                       @RequestParam(value = "lang", required = false) String lang) {
-        return storeFacade.getByMerchantStoreId(new StoreMerchantId(code), new LanguageCode(lang));
+    public ReadableMerchantStore store(@PathVariable String code, StoreMerchantId merchantStore,
+                                       LanguageCode language)
+            throws MerchantStoreNotFoundException, MerchantStoreContextMismatchException {
+        StoreMerchantId pathStore = new StoreMerchantId(code);
+        if (!pathStore.equals(merchantStore)) {
+            throw MerchantStoreContextMismatchException.of(pathStore, merchantStore);
+        }
+        return storeFacade.getByMerchantStoreId(merchantStore, language);
     }
 
     @GetMapping(value = {"/private/store"}, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -79,8 +73,9 @@ public class MerchantStoreApi {
     @Parameter(name = "lang",
             schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
 
-    @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.MERCHANT.*') or hasAnyAuthority('SCOPE_STORE_CORE')")
-    public ReadableMerchantStore storeFull(StoreMerchantId merchantStore, LanguageCode language) {
+    @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.MERCHANT.READ')")
+    public ReadableMerchantStore storeFull(StoreMerchantId merchantStore, LanguageCode language)
+            throws MerchantStoreNotFoundException {
         return storeFacade.getByMerchantStoreId(merchantStore, language);
     }
 
@@ -101,7 +96,7 @@ public class MerchantStoreApi {
                     content = @Content(schema = @Schema(implementation = ReadableMerchantStore.class))))
 
     @PreAuthorize("hasPermission(#store.org,'String','STORE-POD.MERCHANT.STORE-CREATE')")
-    public void create(@Valid @RequestBody PersistableMerchantStore store) {
+    public void create(@Valid @RequestBody PersistableMerchantStore store) throws DuplicateMerchantStoreException {
         storeFacade.create(store);
     }
 
@@ -113,95 +108,9 @@ public class MerchantStoreApi {
     @Parameter(name = "store",
             schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.MERCHANT.*')")
-    public void update(StoreMerchantId merchantStore, @Valid @RequestBody PersistableMerchantStore store) {
-        storeFacade.update(store);
-    }
-
-    @ResponseStatus(HttpStatus.OK)
-    @PutMapping(value = {"/private/store/social-links"}, produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(method = "PUT", description = "Updates store social links",
-            responses = @ApiResponse(
-                    content = @Content(schema = @Schema(implementation = ReadableMerchantStore.class))))
-    @Parameter(name = "store",
-            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
-    @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.MERCHANT.*')")
-    public void updateSocialLinks(StoreMerchantId merchantStore, @RequestBody PersistableMerchantStore store) {
-        storeFacade.updateSocialLinks(merchantStore, store.getSocialLinks());
-    }
-
-    @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping(value = {"/private/store/marketing/logo"})
-    @Operation(method = "POST", description = "Add store logo")
-    @Parameter(name = "store",
-            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
-
-    @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.MERCHANT.*')")
-    public void addLogo(StoreMerchantId merchantStore, @RequestParam("file") MultipartFile uploadfile) {
-
-        InputContentFile cmsContentImage = createInputContentFile(uploadfile, FileContentType.LOGO);
-        storeFacade.addStoreLogo(merchantStore, cmsContentImage);
-    }
-
-    @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping(value = {"/private/store/marketing/banner"})
-    @Operation(method = "POST", description = "Add store banner")
-    @Parameter(name = "store",
-            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
-
-    @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.MERCHANT.*')")
-    public void addBanner(StoreMerchantId merchantStore, @RequestParam("file") MultipartFile uploadfile) {
-
-        InputContentFile cmsContentImage = createInputContentFile(uploadfile, FileContentType.BANNER);
-        storeFacade.addStoreBanner(merchantStore, cmsContentImage);
-    }
-
-    @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping(value = {"/private/store/marketing/add-slider-image"})
-    @Operation(method = "POST", description = "Add image")
-    @Parameter(name = "store",
-            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
-
-    @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.MERCHANT.*')")
-    public ReadableSliderImage addSliderImage(StoreMerchantId merchantStore, @RequestParam("file") MultipartFile file) {
-
-        InputContentFile cmsContentImage = createInputContentFile(file, FileContentType.SLIDER);
-        String extension = FilenameUtils.getExtension(file.getOriginalFilename());
-        String newFileName = UUID.randomUUID() + "." + extension;
-        cmsContentImage.setFileName(newFileName);
-        SliderImage sliderImage = storeFacade.addStoreSliderImage(merchantStore, cmsContentImage);
-        return new ReadableSliderImage(sliderImage.priority(), sliderImage.name(),
-                imageFilePath.buildStoreSliderFilePath(merchantStore, newFileName));
-    }
-
-    @ResponseStatus(HttpStatus.CREATED)
-    @PutMapping(value = {"/private/store/marketing/slider-images"})
-    @Operation(method = "PUT", description = "Save slider images with its order")
-    @Parameter(name = "store",
-            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
-
-    @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.MERCHANT.*')")
-    public void sliderImages(StoreMerchantId merchantStore, @RequestBody PersistableMerchantStore store) {
-        storeFacade.updateSliderImages(merchantStore, store.getSliderImages());
-    }
-
-    private InputContentFile createInputContentFile(MultipartFile image, FileContentType contentType) {
-
-        InputContentFile cmsContentImage;
-
-        try {
-
-            InputStream input = new ByteArrayInputStream(image.getBytes());
-            cmsContentImage = new InputContentFile();
-            cmsContentImage.setFileName(image.getOriginalFilename());
-            cmsContentImage.setMimeType(image.getContentType());
-            cmsContentImage.setFileContentType(contentType);
-            cmsContentImage.setFile(input);
-
-        } catch (IOException ioe) {
-            throw new RestApiException(ioe);
-        }
-
-        return cmsContentImage;
+    public void update(StoreMerchantId merchantStore, @Valid @RequestBody PersistableMerchantStore store)
+            throws MerchantStoreNotFoundException {
+        storeFacade.update(merchantStore, store);
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -212,7 +121,8 @@ public class MerchantStoreApi {
             schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.MERCHANT.*')")
-    public void delete(StoreMerchantId merchantStore) {
+    public void delete(StoreMerchantId merchantStore)
+            throws DefaultStoreNotRemovableException, MerchantStoreNotFoundException {
         storeFacade.delete(merchantStore);
     }
 

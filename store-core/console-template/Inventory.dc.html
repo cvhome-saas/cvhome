@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/primeicons@7.0.0/primeicons.css">
+<style>
+html,body{margin:0;padding:0}
+body{background:#eff3f8;font-family:Inter,system-ui,sans-serif;color:#334155;-webkit-font-smoothing:antialiased}
+a{color:#059669;text-decoration:none}
+a:hover{color:#047857}
+*{box-sizing:border-box}
+::selection{background:#d1fae5}
+@keyframes sk-up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes sk-in{from{opacity:0}to{opacity:1}}
+@keyframes sk-grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes sk-pulse{0%,100%{opacity:1}50%{opacity:.35}}
+</style>
+</helmet>
+
+<div style="min-height:100vh;min-width:1280px;background:#eff3f8">
+  <div style="display:flex;align-items:center;gap:1rem;height:49px;padding:0 2rem;background:#ecfdf5;border-bottom:1px solid #a7f3d0;animation:sk-in .4s ease both">
+    <i class="pi pi-sparkles" style="color:#059669;font-size:1rem"></i>
+    <span style="font-size:.875rem;color:#065f46">You're on the Free plan — upgrade to add more stores, users and premium features.</span>
+    <div style="flex:1"></div>
+    <button style="display:flex;align-items:center;gap:.5rem;padding:.5rem .9rem;background:#10b981;color:#fff;border:1px solid #10b981;border-radius:6px;font:600 .8125rem Inter,sans-serif;cursor:pointer;transition:background-color .2s,box-shadow .2s" style-hover="background:#059669;border-color:#059669;box-shadow:0 4px 10px rgba(16,185,129,.35)">Upgrade plan<i class="pi pi-arrow-up-right" style="font-size:.7rem"></i></button>
+    <i class="pi pi-times" style="color:#64748b;font-size:.8rem;cursor:pointer;padding:.25rem"></i>
+  </div>
+
+  <div style="display:flex;align-items:flex-start;gap:1.5rem;padding:1.5rem 2rem 2.5rem">
+
+    <aside style="width:280px;flex:none;position:sticky;top:1.5rem;height:calc(100vh - 4rem - 49px);display:flex;flex-direction:column;background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:1.25rem 1rem;box-shadow:0 1px 2px rgba(18,18,23,.05);animation:sk-up .45s ease both">
+      <div style="display:flex;align-items:center;gap:.65rem;padding:.25rem .5rem 1rem">
+        <div style="width:34px;height:34px;border-radius:8px;background:#10b981;display:flex;align-items:center;justify-content:center;color:#fff;font:700 .9rem Inter,sans-serif">A</div>
+        <span style="font:700 1.05rem Inter,sans-serif;color:#0f172a;letter-spacing:-.01em">ACME</span>
+      </div>
+
+      <div style="flex:1;min-height:0;overflow-y:auto;margin:0 -.25rem;padding:0 .25rem">
+        <div style="padding:.5rem .55rem .35rem;font:700 .6875rem Inter,sans-serif;letter-spacing:.07em;text-transform:uppercase;color:#94a3b8">Seller</div>
+        <a href="Admin Dashboard.dc.html" style="display:flex;align-items:center;gap:.75rem;padding:.7rem;border-radius:8px;color:#334155;font:500 .875rem Inter,sans-serif;text-decoration:none;transition:background-color .2s,color .2s" style-hover="background:#f1f5f9;color:#059669"><i class="pi pi-home" style="font-size:.95rem"></i>Home</a>
+
+        <div style="padding:1.15rem .55rem .35rem;font:700 .6875rem Inter,sans-serif;letter-spacing:.07em;text-transform:uppercase;color:#94a3b8">Organization</div>
+        <a href="Store Management.dc.html" style="display:flex;align-items:center;gap:.75rem;padding:.7rem;border-radius:8px;color:#334155;font:500 .875rem Inter,sans-serif;text-decoration:none;transition:background-color .2s,color .2s" style-hover="background:#f1f5f9;color:#059669"><i class="pi pi-building-columns" style="font-size:.95rem"></i>Store management</a>
+        <a href="User Management.dc.html" style="display:flex;align-items:center;gap:.75rem;padding:.7rem;border-radius:8px;color:#334155;font:500 .875rem Inter,sans-serif;text-decoration:none;transition:background-color .2s,color .2s" style-hover="background:#f1f5f9;color:#059669"><i class="pi pi-users" style="font-size:.95rem"></i>User management</a>
+
+        <div style="padding:1.15rem .55rem .35rem;font:700 .6875rem Inter,sans-serif;letter-spacing:.07em;text-transform:uppercase;color:#94a3b8">Storefront</div>
+        <div style="display:flex;align-items:center;gap:.75rem;padding:.7rem;border-radius:8px;color:#334155;font:500 .875rem Inter,sans-serif;cursor:pointer;transition:background-color .2s,color .2s" style-hover="background:#f1f5f9;color:#059669"><i class="pi pi-user" style="font-size:.95rem"></i>Customers</div>
+        <a href="Content Management.dc.html" style="display:flex;align-items:center;gap:.75rem;padding:.7rem;border-radius:8px;color:#334155;font:500 .875rem Inter,sans-serif;text-decoration:none;transition:background-color .2s,color .2s" style-hover="background:#f1f5f9;color:#059669"><i class="pi pi-file-edit" style="font-size:.95rem"></i>Content management</a>
+
+        <div style="padding:1.15rem .55rem .35rem;font:700 .6875rem Inter,sans-serif;letter-spacing:.07em;text-transform:uppercase;color:#94a3b8">Commerce</div>
+        <div style="display:flex;align-items:center;gap:.75rem;padding:.7rem;border-radius:8px;background:#ecfdf5;color:#047857;font:600 .875rem Inter,sans-serif;cursor:pointer"><i class="pi pi-box" style="font-size:.95rem"></i>Inventory<span style="margin-left:auto;padding:.1rem .4rem;border-radius:999px;background:#fef3c7;color:#92400e;font:600 .6875rem Inter,sans-serif">12</span></div>
+        <a href="Orders.dc.html" style="display:flex;align-items:center;gap:.75rem;padding:.7rem;border-radius:8px;color:#334155;font:500 .875rem Inter,sans-serif;text-decoration:none;transition:background-color .2s,color .2s" style-hover="background:#f1f5f9;color:#059669"><i class="pi pi-shopping-cart" style="font-size:.95rem"></i>Orders<span style="margin-left:auto;padding:.1rem .4rem;border-radius:999px;background:#fee2e2;color:#991b1b;font:600 .6875rem Inter,sans-serif">5</span></a>
+        <a href="Payments.dc.html" style="display:flex;align-items:center;gap:.75rem;padding:.7rem;border-radius:8px;color:#334155;font:500 .875rem Inter,sans-serif;text-decoration:none;transition:background-color .2s,color .2s" style-hover="background:#f1f5f9;color:#059669"><i class="pi pi-credit-card" style="font-size:.95rem"></i>Payments<span style="margin-left:auto;padding:.1rem .4rem;border-radius:999px;background:#ecfdf5;color:#047857;font:600 .6875rem Inter,sans-serif">7</span></a>
+      </div>
+
+      <div style="flex:none;margin-top:.75rem;padding-top:1rem;border-top:1px solid #e2e8f0">
+        <div style="display:flex;align-items:center;padding:.25rem .55rem .5rem">
+          <span style="font:700 .6875rem Inter,sans-serif;letter-spacing:.07em;text-transform:uppercase;color:#94a3b8">Store</span>
+          <div style="flex:1"></div>
+          <div style="width:24px;height:24px;display:flex;align-items:center;justify-content:center;border-radius:6px;cursor:pointer;transition:background-color .2s" style-hover="background:#f1f5f9"><i class="pi pi-ellipsis-h" style="font-size:.8rem;color:#64748b"></i></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:.15rem">
+          <div style="display:flex;align-items:center;gap:.6rem;padding:.55rem .7rem;border-radius:8px;background:#ecfdf5;cursor:pointer">
+            <div style="width:24px;height:24px;flex:none;border-radius:6px;background:#10b981;display:flex;align-items:center;justify-content:center"><i class="pi pi-building" style="font-size:.7rem;color:#fff"></i></div>
+            <span style="flex:1;font:600 .8125rem Inter,sans-serif;color:#047857">Acme Supply Co.</span>
+            <i class="pi pi-thumbtack" style="font-size:.7rem;color:#10b981"></i>
+            <i class="pi pi-check" style="font-size:.7rem;color:#10b981"></i>
+          </div>
+          <div style="display:flex;align-items:center;gap:.6rem;padding:.55rem .7rem;border-radius:8px;cursor:pointer;transition:background-color .2s" style-hover="background:#f1f5f9">
+            <div style="width:24px;height:24px;flex:none;border-radius:6px;background:#f1f5f9;display:flex;align-items:center;justify-content:center"><i class="pi pi-building" style="font-size:.7rem;color:#64748b"></i></div>
+            <span style="flex:1;font:500 .8125rem Inter,sans-serif;color:#334155">Acme Outlet — West</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:.6rem;padding:.55rem .7rem;border-radius:8px;cursor:pointer;transition:background-color .2s" style-hover="background:#f1f5f9">
+            <div style="width:24px;height:24px;flex:none;border-radius:6px;background:#f1f5f9;display:flex;align-items:center;justify-content:center"><i class="pi pi-building" style="font-size:.7rem;color:#64748b"></i></div>
+            <span style="flex:1;font:500 .8125rem Inter,sans-serif;color:#334155">Acme Wholesale</span>
+          </div>
+        </div>
+        <a href="Create Store.dc.html" style="margin-top:.6rem;width:100%;display:flex;align-items:center;justify-content:center;gap:.5rem;padding:.6rem .75rem;background:#fff;color:#047857;border:1px dashed #a7f3d0;border-radius:8px;font:600 .8125rem Inter,sans-serif;text-decoration:none;cursor:pointer;transition:background-color .2s,border-color .2s,box-shadow .2s" style-hover="background:#ecfdf5;border-color:#10b981;box-shadow:0 0 0 3px rgba(16,185,129,.12)"><i class="pi pi-plus" style="font-size:.7rem"></i>Create store</a>
+      </div>
+    </aside>
+
+    <main style="flex:1;min-width:0;display:flex;flex-direction:column;gap:1.5rem">
+
+      <div style="position:relative;z-index:50;display:flex;flex-wrap:nowrap;overflow:hidden;align-items:center;gap:1rem;background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:.85rem 1.25rem;box-shadow:0 1px 2px rgba(18,18,23,.05);animation:sk-up .45s .05s ease both">
+        <div style="flex:none;white-space:nowrap;display:flex;align-items:center;gap:.5rem;font:500 .8125rem Inter,sans-serif;color:#64748b">
+          <i class="pi pi-home" style="font-size:.8rem"></i><span>Dashboard</span>
+          <i class="pi pi-angle-right" style="font-size:.7rem;color:#cbd5e1"></i><span style="color:#1e293b;font-weight:600">Inventory</span>
+        </div>
+        <div style="flex:1;min-width:.5rem"></div>
+        <div style="flex:none;white-space:nowrap;display:flex;align-items:center;gap:.5rem;padding:.45rem .75rem;border:1px solid #e2e8f0;border-radius:6px;width:230px;transition:border-color .2s,box-shadow .2s" style-hover="border-color:#10b981;box-shadow:0 0 0 3px rgba(16,185,129,.12)">
+          <i class="pi pi-search" style="font-size:.8rem;color:#94a3b8"></i>
+          <span style="font:400 .8125rem Inter,sans-serif;color:#94a3b8">Search SKU or product…</span>
+        </div>
+        <div style="flex:none;position:relative;width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background-color .2s" style-hover="background:#f1f5f9">
+          <i class="pi pi-bell" style="font-size:1rem;color:#475569"></i>
+          <span style="position:absolute;top:4px;right:4px;min-width:16px;height:16px;padding:0 .2rem;border-radius:999px;background:#ef4444;color:#fff;font:600 .625rem Inter,sans-serif;display:flex;align-items:center;justify-content:center;animation:sk-pulse 2.4s infinite">4</span>
+        </div>
+        <div style="flex:none;white-space:nowrap;display:flex;align-items:center;gap:.45rem;padding:.45rem .6rem;border-radius:8px;cursor:pointer;transition:background-color .2s" style-hover="background:#f1f5f9">
+          <i class="pi pi-globe" style="font-size:.95rem;color:#475569"></i>
+          <span style="font:600 .8125rem Inter,sans-serif;color:#1e293b">EN</span>
+          <i class="pi pi-chevron-down" style="font-size:.6rem;color:#94a3b8"></i>
+        </div>
+        <div style="flex:none;width:1px;height:24px;background:#e2e8f0"></div>
+        <div style="flex:none;white-space:nowrap;display:flex;align-items:center;gap:.6rem;cursor:pointer;padding:.25rem .35rem;border-radius:8px;transition:background-color .2s" style-hover="background:#f1f5f9">
+          <div style="width:32px;height:32px;border-radius:50%;background:#d1fae5;color:#047857;display:flex;align-items:center;justify-content:center;font:600 .75rem Inter,sans-serif">JD</div>
+          <span style="font:600 .8125rem Inter,sans-serif;color:#1e293b">Jordan Diaz</span>
+          <i class="pi pi-chevron-down" style="font-size:.6rem;color:#94a3b8"></i>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:flex-end;gap:1rem;animation:sk-up .45s .1s ease both">
+        <div>
+          <h1 style="margin:0;font:600 1.75rem Inter,sans-serif;color:#0f172a;letter-spacing:-.02em">Inventory</h1>
+          <p style="margin:.35rem 0 0;font:400 .875rem Inter,sans-serif;color:#64748b">Acme Supply Co. · 1,482 SKUs across 3 locations</p>
+        </div>
+        <div style="flex:1"></div>
+        <div style="display:flex;align-items:center;gap:.5rem;background:#fff;border:1px solid #e2e8f0;border-radius:6px;padding:.5rem .75rem;cursor:pointer;transition:border-color .2s,box-shadow .2s" style-hover="border-color:#10b981;box-shadow:0 0 0 3px rgba(16,185,129,.12)">
+          <i class="pi pi-map-marker" style="font-size:.85rem;color:#64748b"></i>
+          <span style="font:500 .8125rem Inter,sans-serif;color:#1e293b">All locations</span>
+          <i class="pi pi-chevron-down" style="font-size:.6rem;color:#94a3b8"></i>
+        </div>
+        <button style="display:flex;align-items:center;gap:.5rem;padding:.55rem .85rem;background:#fff;color:#334155;border:1px solid #e2e8f0;border-radius:6px;font:500 .8125rem Inter,sans-serif;cursor:pointer;transition:background-color .2s,border-color .2s" style-hover="background:#f1f5f9;border-color:#cbd5e1"><i class="pi pi-upload" style="font-size:.75rem"></i>Import CSV</button>
+        <button style="display:flex;align-items:center;gap:.5rem;padding:.55rem .85rem;background:#fff;color:#334155;border:1px solid #e2e8f0;border-radius:6px;font:500 .8125rem Inter,sans-serif;cursor:pointer;transition:background-color .2s,border-color .2s" style-hover="background:#f1f5f9;border-color:#cbd5e1"><i class="pi pi-sliders-h" style="font-size:.75rem"></i>Stock count</button>
+        <a href="Add Product.dc.html" style="display:flex;align-items:center;gap:.5rem;padding:.55rem .95rem;background:#10b981;color:#fff;border:1px solid #10b981;border-radius:6px;font:600 .8125rem Inter,sans-serif;transition:background-color .2s,box-shadow .2s" style-hover="background:#059669;border-color:#059669;box-shadow:0 4px 10px rgba(16,185,129,.35)"><i class="pi pi-plus" style="font-size:.75rem"></i>Add product</a>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1.25rem">
+        <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="4">
+          <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:1.15rem;box-shadow:0 1px 2px rgba(18,18,23,.05);transition:transform .2s,box-shadow .2s;animation:sk-up .5s .15s ease both" style-hover="transform:translateY(-3px);box-shadow:0 10px 24px rgba(18,18,23,.09)">
+            <div style="display:flex;align-items:flex-start;gap:1rem">
+              <div style="flex:1">
+                <div style="font:600 .6875rem Inter,sans-serif;letter-spacing:.07em;text-transform:uppercase;color:#94a3b8">{{ k.label }}</div>
+                <div style="margin-top:.45rem;font:600 1.625rem Inter,sans-serif;color:#0f172a;letter-spacing:-.02em">{{ k.value }}</div>
+              </div>
+              <div style="width:40px;height:40px;border-radius:8px;background:{{ k.iconBg }};display:flex;align-items:center;justify-content:center"><i class="{{ k.icon }}" style="color:{{ k.iconColor }};font-size:1rem"></i></div>
+            </div>
+            <div style="margin-top:.75rem;display:flex;align-items:center;gap:.4rem">
+              <sc-if value="{{ k.chip }}" hint-placeholder-val="{{ false }}"><span style="{{ k.chipStyle }}">{{ k.chip }}</span></sc-if>
+              <span style="font:400 .75rem Inter,sans-serif;color:#94a3b8">{{ k.meta }}</span>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.5rem">
+        <sc-for list="{{ locations }}" as="lo" hint-placeholder-count="3">
+          <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:1.15rem 1.25rem;box-shadow:0 1px 2px rgba(18,18,23,.05);animation:sk-up .5s .25s ease both">
+            <div style="display:flex;align-items:center;gap:.6rem">
+              <i class="pi pi-warehouse" style="font-size:.9rem;color:#64748b"></i>
+              <span style="flex:1;font:600 .875rem Inter,sans-serif;color:#1e293b">{{ lo.label }}</span>
+              <span style="{{ lo.statusStyle }}">{{ lo.status }}</span>
+            </div>
+            <div style="margin-top:.85rem;display:flex;align-items:flex-end;gap:1.25rem">
+              <div>
+                <div style="font:400 .6875rem Inter,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#94a3b8">On hand</div>
+                <div style="margin-top:.2rem;font:600 1.25rem Inter,sans-serif;color:#0f172a">{{ lo.onHand }}</div>
+              </div>
+              <div>
+                <div style="font:400 .6875rem Inter,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#94a3b8">Reserved</div>
+                <div style="margin-top:.2rem;font:600 1.25rem Inter,sans-serif;color:#475569">{{ lo.reserved }}</div>
+              </div>
+              <div>
+                <div style="font:400 .6875rem Inter,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#94a3b8">Capacity</div>
+                <div style="margin-top:.2rem;font:600 1.25rem Inter,sans-serif;color:#475569">{{ lo.fill }}</div>
+              </div>
+            </div>
+            <div style="margin-top:.85rem;height:6px;border-radius:3px;background:#f1f5f9;overflow:hidden"><div style="height:100%;width:{{ lo.fill }};background:{{ lo.barColor }};border-radius:3px;transform-origin:left;animation:sk-grow .8s .3s cubic-bezier(.22,1,.36,1) both"></div></div>
+            <div style="margin-top:.6rem;font:400 .75rem Inter,sans-serif;color:#94a3b8">{{ lo.meta }}</div>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;box-shadow:0 1px 2px rgba(18,18,23,.05);overflow:hidden;animation:sk-up .5s .35s ease both">
+        <div style="display:flex;flex-wrap:nowrap;overflow:hidden;align-items:center;gap:1rem;padding:1.1rem 1.25rem;border-bottom:1px solid #f1f5f9">
+          <div>
+            <h2 style="margin:0;font:600 1.0625rem Inter,sans-serif;color:#0f172a">Stock levels</h2>
+            <p style="margin:.25rem 0 0;font:400 .8125rem Inter,sans-serif;color:#64748b">{{ tableSub }}</p>
+          </div>
+          <div style="flex:1;min-width:.5rem"></div>
+          <div style="flex:none;display:flex;padding:.2rem;background:#f1f5f9;border-radius:8px;gap:.15rem">
+            <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="5">
+              <div onClick="{{ t.go }}" style="{{ t.style }}">{{ t.label }}<sc-if value="{{ t.badge }}" hint-placeholder-val="{{ false }}"><span style="{{ t.badgeStyle }}">{{ t.badge }}</span></sc-if></div>
+            </sc-for>
+          </div>
+          <div style="flex:none;white-space:nowrap;display:flex;align-items:center;gap:.5rem;padding:.45rem .7rem;border:1px solid #e2e8f0;border-radius:6px;cursor:pointer;transition:border-color .2s" style-hover="border-color:#10b981">
+            <i class="pi pi-filter" style="font-size:.75rem;color:#64748b"></i>
+            <span style="font:500 .8125rem Inter,sans-serif;color:#334155">All categories</span>
+            <i class="pi pi-chevron-down" style="font-size:.6rem;color:#94a3b8"></i>
+          </div>
+        </div>
+
+        <sc-if value="{{ showBulk }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;align-items:center;gap:1rem;padding:.7rem 1.25rem;background:#fffbeb;border-bottom:1px solid #fde68a">
+            <i class="pi pi-exclamation-circle" style="font-size:.85rem;color:#f59e0b"></i>
+            <span style="font:500 .8125rem Inter,sans-serif;color:#92400e">12 SKUs are at or below their reorder point.</span>
+            <div style="flex:1"></div>
+            <button style="display:flex;align-items:center;gap:.4rem;padding:.45rem .8rem;background:#10b981;color:#fff;border:1px solid #10b981;border-radius:6px;font:600 .75rem Inter,sans-serif;cursor:pointer;transition:background-color .2s" style-hover="background:#059669"><i class="pi pi-shopping-bag" style="font-size:.65rem"></i>Create purchase orders</button>
+            <button style="padding:.45rem .8rem;background:#fff;color:#334155;border:1px solid #fde68a;border-radius:6px;font:600 .75rem Inter,sans-serif;cursor:pointer;transition:background-color .2s" style-hover="background:#fffbeb">Export list</button>
+          </div>
+        </sc-if>
+
+        <div style="display:grid;grid-template-columns:28px minmax(220px,2.2fr) minmax(110px,1fr) 72px 60px 72px minmax(130px,1.2fr) 84px 92px;gap:.75rem;padding:.7rem 1.25rem;background:#f8fafc;border-bottom:1px solid #e2e8f0;font:600 .6875rem Inter,sans-serif;letter-spacing:.05em;text-transform:uppercase;color:#94a3b8">
+          <span><i class="pi pi-stop" style="font-size:.8rem;color:#cbd5e1"></i></span>
+          <span>Product</span><span>Category</span><span style="text-align:right">On hand</span><span style="text-align:right">Res.</span><span style="text-align:right">Available</span><span>Stock</span><span style="text-align:right">Value</span><span></span>
+        </div>
+
+        <sc-for list="{{ rows }}" as="r" hint-placeholder-count="10">
+          <div style="display:grid;grid-template-columns:28px minmax(220px,2.2fr) minmax(110px,1fr) 72px 60px 72px minmax(130px,1.2fr) 84px 92px;gap:.75rem;padding:.85rem 1.25rem;align-items:center;border-bottom:1px solid #f8fafc;cursor:pointer;transition:background-color .2s" style-hover="background:#f8fafc">
+            <i class="pi pi-stop" style="font-size:.8rem;color:#cbd5e1"></i>
+            <div style="min-width:0;display:flex;align-items:center;gap:.75rem">
+              <div style="width:34px;height:34px;flex:none;border-radius:6px;background:#f1f5f9;display:flex;align-items:center;justify-content:center"><i class="{{ r.icon }}" style="font-size:.8rem;color:#64748b"></i></div>
+              <div style="min-width:0">
+                <div style="font:600 .8125rem Inter,sans-serif;color:#1e293b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.name }}</div>
+                <div style="margin-top:.15rem;font:400 .6875rem ui-monospace,Menlo,monospace;color:#94a3b8">{{ r.sku }}</div>
+              </div>
+            </div>
+            <span style="font:500 .8125rem Inter,sans-serif;color:#475569;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.category }}</span>
+            <span style="text-align:right;font:600 .8125rem Inter,sans-serif;color:{{ r.onHandColor }}">{{ r.onHand }}</span>
+            <span style="text-align:right;font:400 .8125rem Inter,sans-serif;color:#94a3b8">{{ r.reserved }}</span>
+            <span style="text-align:right;font:600 .8125rem Inter,sans-serif;color:#0f172a">{{ r.available }}</span>
+            <div>
+              <span style="{{ r.statusStyle }};white-space:nowrap">{{ r.status }}</span>
+              <div style="margin-top:.35rem;height:4px;border-radius:2px;background:#f1f5f9;overflow:hidden"><div style="height:100%;width:{{ r.bar }};background:{{ r.barColor }};border-radius:2px"></div></div>
+              <div style="margin-top:.25rem;font:400 .6875rem Inter,sans-serif;color:#94a3b8">reorder at {{ r.reorder }}</div>
+            </div>
+            <span style="text-align:right;font:500 .8125rem Inter,sans-serif;color:#475569">{{ r.value }}</span>
+            <div style="display:flex;gap:.2rem;justify-content:flex-end">
+              <sc-if value="{{ r.needsPo }}" hint-placeholder-val="{{ false }}">
+                <div title="Create purchase order" style="width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background-color .2s" style-hover="background:#ecfdf5"><i class="pi pi-shopping-bag" style="font-size:.75rem;color:#059669"></i></div>
+              </sc-if>
+              <div title="Adjust stock" style="width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background-color .2s" style-hover="background:#f1f5f9"><i class="pi pi-pencil" style="font-size:.75rem;color:#475569"></i></div>
+              <div style="width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background-color .2s" style-hover="background:#f1f5f9"><i class="pi pi-ellipsis-v" style="font-size:.75rem;color:#94a3b8"></i></div>
+            </div>
+          </div>
+        </sc-for>
+
+        <div style="display:flex;align-items:center;gap:1rem;padding:.85rem 1.25rem;background:#f8fafc">
+          <span style="font:400 .8125rem Inter,sans-serif;color:#64748b">{{ pageInfo }}</span>
+          <div style="flex:1"></div>
+          <sc-if value="{{ showPager }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;gap:.25rem">
+              <div style="width:30px;height:30px;border:1px solid #e2e8f0;border-radius:6px;background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer"><i class="pi pi-angle-left" style="font-size:.75rem;color:#94a3b8"></i></div>
+              <div style="width:30px;height:30px;border:1px solid #10b981;border-radius:6px;background:#ecfdf5;display:flex;align-items:center;justify-content:center;font:600 .75rem Inter,sans-serif;color:#047857">1</div>
+              <div style="width:30px;height:30px;border:1px solid #e2e8f0;border-radius:6px;background:#fff;display:flex;align-items:center;justify-content:center;font:500 .75rem Inter,sans-serif;color:#475569;cursor:pointer">2</div>
+              <div style="width:30px;height:30px;border:1px solid #e2e8f0;border-radius:6px;background:#fff;display:flex;align-items:center;justify-content:center;font:500 .75rem Inter,sans-serif;color:#475569;cursor:pointer">3</div>
+              <div style="width:30px;height:30px;border:1px solid #e2e8f0;border-radius:6px;background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer"><i class="pi pi-angle-right" style="font-size:.75rem;color:#475569"></i></div>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem">
+        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;box-shadow:0 1px 2px rgba(18,18,23,.05);animation:sk-up .5s .4s ease both">
+          <div style="display:flex;align-items:center;padding:1.15rem 1.5rem;border-bottom:1px solid #f1f5f9">
+            <h2 style="margin:0;font:600 1.0625rem Inter,sans-serif;color:#0f172a">Incoming purchase orders</h2>
+            <div style="flex:1"></div>
+            <span style="font:500 .8125rem Inter,sans-serif;color:#059669;cursor:pointer">View all</span>
+          </div>
+          <div style="padding:.75rem 1rem 1.25rem;display:flex;flex-direction:column;gap:.35rem">
+            <sc-for list="{{ pos }}" as="po" hint-placeholder-count="4">
+              <div style="display:flex;align-items:center;gap:1rem;padding:.8rem .75rem;border-radius:8px;cursor:pointer;transition:background-color .2s" style-hover="background:#f8fafc">
+                <div style="width:34px;height:34px;flex:none;border-radius:8px;background:{{ po.iconBg }};display:flex;align-items:center;justify-content:center"><i class="{{ po.icon }}" style="font-size:.85rem;color:{{ po.iconColor }}"></i></div>
+                <div style="flex:1;min-width:0">
+                  <div style="font:600 .8125rem Inter,sans-serif;color:#1e293b">{{ po.label }}</div>
+                  <div style="margin-top:.15rem;font:400 .75rem Inter,sans-serif;color:#64748b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ po.meta }}</div>
+                </div>
+                <span style="{{ po.statusStyle }}">{{ po.status }}</span>
+                <span style="width:86px;text-align:right;font:600 .8125rem Inter,sans-serif;color:#0f172a">{{ po.amount }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;box-shadow:0 1px 2px rgba(18,18,23,.05);animation:sk-up .5s .45s ease both">
+          <div style="display:flex;align-items:center;padding:1.15rem 1.5rem;border-bottom:1px solid #f1f5f9">
+            <h2 style="margin:0;font:600 1.0625rem Inter,sans-serif;color:#0f172a">Recent stock movements</h2>
+            <div style="flex:1"></div>
+            <span style="font:400 .75rem Inter,sans-serif;color:#94a3b8">Last 48 hours</span>
+          </div>
+          <div style="padding:.75rem 1rem 1.25rem;display:flex;flex-direction:column;gap:.35rem">
+            <sc-for list="{{ moves }}" as="mv" hint-placeholder-count="6">
+              <div style="display:flex;align-items:center;gap:.85rem;padding:.7rem .75rem;border-radius:8px;transition:background-color .2s" style-hover="background:#f8fafc">
+                <div style="width:30px;height:30px;flex:none;border-radius:8px;background:{{ mv.iconBg }};display:flex;align-items:center;justify-content:center"><i class="{{ mv.icon }}" style="font-size:.75rem;color:{{ mv.iconColor }}"></i></div>
+                <div style="flex:1;min-width:0">
+                  <div style="font:500 .8125rem Inter,sans-serif;color:#1e293b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ mv.label }}</div>
+                  <div style="margin-top:.1rem;font:400 .6875rem Inter,sans-serif;color:#94a3b8">{{ mv.meta }}</div>
+                </div>
+                <span style="font:600 .8125rem Inter,sans-serif;color:{{ mv.deltaColor }}">{{ mv.delta }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1500,&quot;height&quot;:1250}}">
+const chip = (bg, color) => 'display:inline-flex;align-items:center;padding:.2rem .5rem;border-radius:4px;background:' + bg + ';color:' + color + ';font:600 .6875rem Inter,sans-serif;letter-spacing:.03em;text-transform:uppercase';
+const S = {
+  'In stock': chip('#ecfdf5', '#047857'),
+  Low: chip('#fef3c7', '#92400e'),
+  'Out of stock': chip('#fee2e2', '#991b1b'),
+  Overstock: chip('#eff6ff', '#1e40af'),
+  Discontinued: chip('#f1f5f9', '#475569'),
+  Active: chip('#ecfdf5', '#047857'),
+  'Near capacity': chip('#fef3c7', '#92400e'),
+  'In transit': chip('#ecfeff', '#155e75'),
+  Confirmed: chip('#eff6ff', '#1e40af'),
+  Draft: chip('#f1f5f9', '#475569'),
+  Delayed: chip('#fef3c7', '#92400e'),
+};
+
+const P = [
+  { name: 'Wireless Headphones ANC', sku: 'ACM-AUD-0142', category: 'Electronics', onHand: 0, reserved: 12, reorder: 40, cost: 78, icon: 'pi pi-headphones' },
+  { name: 'Copy Paper A4 · 80gsm pallet', sku: 'ACM-PPR-0011', category: 'Paper', onHand: 18, reserved: 6, reorder: 60, cost: 210, icon: 'pi pi-file' },
+  { name: 'Ergonomic Desk Chair · mesh', sku: 'ACM-FUR-0308', category: 'Furniture', onHand: 34, reserved: 9, reorder: 40, cost: 164, icon: 'pi pi-inbox' },
+  { name: 'USB-C Docking Station 11-in-1', sku: 'ACM-ELC-0577', category: 'Electronics', onHand: 96, reserved: 14, reorder: 50, cost: 92, icon: 'pi pi-desktop' },
+  { name: 'Mechanical Keyboard · tactile', sku: 'ACM-ELC-0421', category: 'Electronics', onHand: 142, reserved: 21, reorder: 60, cost: 58, icon: 'pi pi-table' },
+  { name: 'Nitrile Gloves · box of 200', sku: 'ACM-JAN-0090', category: 'Janitorial', onHand: 12, reserved: 4, reorder: 80, cost: 14, icon: 'pi pi-shield' },
+  { name: 'Industrial Floor Cleaner 20L', sku: 'ACM-JAN-0132', category: 'Janitorial', onHand: 61, reserved: 8, reorder: 30, cost: 46, icon: 'pi pi-inbox' },
+  { name: '4K Monitor 27" IPS', sku: 'ACM-ELC-0655', category: 'Electronics', onHand: 480, reserved: 18, reorder: 60, cost: 268, icon: 'pi pi-desktop' },
+  { name: 'Steel Shelving Unit · 5 tier', sku: 'ACM-FUR-0219', category: 'Furniture', onHand: 8, reserved: 3, reorder: 25, cost: 118, icon: 'pi pi-bars' },
+  { name: 'Whiteboard Markers · pack of 12', sku: 'ACM-STN-0044', category: 'Stationery', onHand: 220, reserved: 16, reorder: 100, cost: 9, icon: 'pi pi-pencil' },
+  { name: 'Recycled Notebooks A5 · 10 pack', sku: 'ACM-STN-0071', category: 'Stationery', onHand: 0, reserved: 0, reorder: 60, cost: 22, icon: 'pi pi-book' },
+  { name: 'Sticky Notes 76mm · 12 pack', sku: 'ACM-STN-0102', category: 'Stationery', onHand: 42, reserved: 8, reorder: 90, cost: 11, icon: 'pi pi-bookmark' },
+  { name: 'Toner Cartridge · black XL', sku: 'ACM-PRN-0233', category: 'Printing', onHand: 26, reserved: 5, reorder: 45, cost: 96, icon: 'pi pi-print' },
+  { name: 'Hand Sanitiser 5L refill', sku: 'ACM-JAN-0188', category: 'Janitorial', onHand: 31, reserved: 7, reorder: 55, cost: 27, icon: 'pi pi-shield' },
+  { name: 'Bubble Wrap Roll · 100m', sku: 'ACM-SHP-0062', category: 'Shipping', onHand: 19, reserved: 4, reorder: 35, cost: 38, icon: 'pi pi-box' },
+  { name: 'Monitor Arm · dual gas spring', sku: 'ACM-FUR-0410', category: 'Furniture', onHand: 22, reserved: 6, reorder: 40, cost: 74, icon: 'pi pi-sliders-v' },
+  { name: 'Standing Desk Mat', sku: 'ACM-FUR-0455', category: 'Furniture', onHand: 15, reserved: 3, reorder: 30, cost: 52, icon: 'pi pi-stop' },
+  { name: 'Label Printer Tape · 24mm', sku: 'ACM-PRN-0301', category: 'Printing', onHand: 38, reserved: 9, reorder: 70, cost: 17, icon: 'pi pi-tag' },
+  { name: 'Microfibre Cloths · 50 pack', sku: 'ACM-JAN-0210', category: 'Janitorial', onHand: 28, reserved: 6, reorder: 50, cost: 21, icon: 'pi pi-inbox' },
+  { name: 'Packing Tape · 48mm case', sku: 'ACM-SHP-0015', category: 'Shipping', onHand: 74, reserved: 11, reorder: 40, cost: 31, icon: 'pi pi-box' },
+];
+
+const TABS = [
+  { key: 'all', label: 'All' },
+  { key: 'Low', label: 'Low stock', badge: '12' },
+  { key: 'Out of stock', label: 'Out of stock', badge: '2' },
+  { key: 'In stock', label: 'In stock' },
+  { key: 'Overstock', label: 'Overstock' },
+];
+
+const SUBS = {
+  all: '1,482 SKUs · 12 at or below reorder point',
+  Low: 'At or below the reorder point — order soon',
+  'Out of stock': 'Zero available with open orders attached',
+  'In stock': 'Comfortably above the reorder point',
+  Overstock: 'More than 4× the reorder point on hand',
+};
+
+const money = n => '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+class Component extends DCLogic {
+  state = { tab: 'all' };
+
+  classify(p) {
+    const avail = p.onHand - p.reserved;
+    if (p.onHand === 0) return 'Out of stock';
+    if (avail <= p.reorder) return 'Low';
+    if (p.onHand > p.reorder * 4) return 'Overstock';
+    return 'In stock';
+  }
+
+  renderVals() {
+    const st = this.state;
+
+    const all = P.map(p => {
+      const status = this.classify(p);
+      const avail = p.onHand - p.reserved;
+      const pct = Math.min(100, Math.round(p.onHand / (p.reorder * 2) * 100));
+      const color = status === 'Out of stock' ? '#ef4444' : (status === 'Low' ? '#f59e0b' : (status === 'Overstock' ? '#3b82f6' : '#10b981'));
+      return { ...p, status, statusStyle: S[status],
+        available: avail < 0 ? 0 : avail,
+        bar: pct + '%', barColor: color,
+        onHandColor: p.onHand === 0 ? '#b91c1c' : '#0f172a',
+        value: money(p.onHand * p.cost),
+        needsPo: status === 'Low' || status === 'Out of stock',
+      };
+    });
+
+    const rows = all.filter(r => st.tab === 'all' || r.status === st.tab);
+
+    const tabs = TABS.map(t => {
+      const on = st.tab === t.key;
+      return { label: t.label, badge: t.badge,
+        go: () => this.setState({ tab: t.key }),
+        style: 'display:flex;align-items:center;gap:.35rem;padding:.35rem .7rem;border-radius:6px;font:600 .75rem Inter,sans-serif;cursor:pointer;transition:background-color .2s,color .2s;' +
+          (on ? 'background:#fff;color:#047857;box-shadow:0 1px 2px rgba(18,18,23,.08)' : 'color:#64748b'),
+        badgeStyle: 'padding:.05rem .3rem;border-radius:999px;font:600 .625rem Inter,sans-serif;background:' +
+          (on ? '#fef3c7' : '#e2e8f0') + ';color:' + (on ? '#92400e' : '#64748b'),
+      };
+    });
+
+    const kpis = [
+      { label: 'Stock on hand', value: '38,204', meta: 'units across 1,482 SKUs', icon: 'pi pi-box', iconBg: '#eff6ff', iconColor: '#3b82f6' },
+      { label: 'Inventory value', value: '$1.34M', meta: 'at landed cost', icon: 'pi pi-dollar', iconBg: '#ecfdf5', iconColor: '#10b981', chip: '+2.6%', chipStyle: chip('#ecfdf5', '#047857') },
+      { label: 'Low stock', value: '12', meta: 'below reorder point', icon: 'pi pi-exclamation-triangle', iconBg: '#fffbeb', iconColor: '#f59e0b', chip: 'Reorder', chipStyle: chip('#fef3c7', '#92400e') },
+      { label: 'Out of stock', value: '2', meta: '12 orders affected', icon: 'pi pi-times-circle', iconBg: '#fef2f2', iconColor: '#ef4444', chip: 'Urgent', chipStyle: chip('#fee2e2', '#991b1b') },
+    ];
+
+    const locations = [
+      { label: 'Harrison St · SF', onHand: '21,410', reserved: '1,204', fill: '72%', status: 'Active', meta: '8 low-stock SKUs · last count Jul 28', barColor: '#10b981' },
+      { label: 'West Outlet · Oakland', onHand: '9,882', reserved: '640', fill: '91%', status: 'Near capacity', meta: '3 low-stock SKUs · last count Aug 1', barColor: '#f59e0b' },
+      { label: 'Wholesale · Stockton', onHand: '6,912', reserved: '388', fill: '44%', status: 'Active', meta: '1 low-stock SKU · last count Jul 19', barColor: '#10b981' },
+    ].map(l => ({ ...l, statusStyle: S[l.status] }));
+
+    const pos = [
+      { label: 'PO-4471 · Vantone Audio', meta: '120 × Wireless Headphones ANC · ETA Aug 8', amount: '$9,360', status: 'In transit', icon: 'pi pi-truck', iconBg: '#ecfeff', iconColor: '#06b6d4' },
+      { label: 'PO-4468 · Northfield Paper', meta: '80 × Copy Paper pallet · ETA Aug 11', amount: '$16,800', status: 'Confirmed', icon: 'pi pi-check-circle', iconBg: '#eff6ff', iconColor: '#3b82f6' },
+      { label: 'PO-4465 · SafeGrip Supplies', meta: '200 × Nitrile Gloves · ETA Aug 9', amount: '$2,800', status: 'Delayed', icon: 'pi pi-exclamation-triangle', iconBg: '#fffbeb', iconColor: '#f59e0b' },
+      { label: 'PO-4462 · Ironline Fixtures', meta: '40 × Steel Shelving Unit · not sent', amount: '$4,720', status: 'Draft', icon: 'pi pi-pencil', iconBg: '#f1f5f9', iconColor: '#64748b' },
+    ].map(p => ({ ...p, statusStyle: S[p.status] }));
+
+    const moves = [
+      { label: 'Sale · #10482 Maya Chen', meta: 'Harrison St · 3 SKUs', delta: '−7', icon: 'pi pi-shopping-cart', iconBg: '#eff6ff', iconColor: '#3b82f6', deltaColor: '#b91c1c' },
+      { label: 'Received · PO-4459 Deskline', meta: 'Harrison St · Ergonomic Desk Chair', delta: '+48', icon: 'pi pi-download', iconBg: '#ecfdf5', iconColor: '#10b981', deltaColor: '#047857' },
+      { label: 'Transfer · SF → Oakland', meta: 'USB-C Docking Station', delta: '−25', icon: 'pi pi-arrow-right-arrow-left', iconBg: '#f5f3ff', iconColor: '#8b5cf6', deltaColor: '#475569' },
+      { label: 'Count adjustment · Aug 1', meta: 'Oakland · Whiteboard Markers', delta: '−4', icon: 'pi pi-sliders-h', iconBg: '#f1f5f9', iconColor: '#64748b', deltaColor: '#b91c1c' },
+      { label: 'Return restock · #10471', meta: 'Harrison St · Mechanical Keyboard', delta: '+2', icon: 'pi pi-undo', iconBg: '#ecfdf5', iconColor: '#10b981', deltaColor: '#047857' },
+      { label: 'Damage write-off', meta: 'Stockton · Floor Cleaner 20L', delta: '−3', icon: 'pi pi-trash', iconBg: '#fef2f2', iconColor: '#ef4444', deltaColor: '#b91c1c' },
+    ];
+
+    return {
+      kpis, locations, tabs, rows, pos, moves,
+      tableSub: SUBS[st.tab],
+      showBulk: st.tab === 'Low',
+      showPager: st.tab === 'all',
+      pageInfo: 'Showing ' + rows.length + ' of ' + (st.tab === 'all' ? '1,482' : rows.length),
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+:host {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-group);
+  padding: 0.85rem 1.25rem;
+  background: var(--input);
+}
+
+.page-info {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  color: var(--muted-foreground);
+  font-size: var(--text-xs);
+}
+
+.page-strip {
+  display: flex;
+  flex: none;
+  gap: var(--spacing-inline);
+}
+
+.page-number,
+.page-step {
+  display: grid;
+  place-items: center;
+  inline-size: 30px;
+  block-size: 30px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--muted);
+  color: var(--secondary-foreground);
+  font-size: var(--text-2xs);
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background-color var(--default-transition-duration),
+    border-color var(--default-transition-duration);
+  --icon-size: 0.75rem;
+}
+
+.page-number:hover:not(.current),
+.page-step:hover:not(:disabled) {
+  border-color: var(--edge);
+  background: var(--accent);
+}
+
+.page-number.current {
+  border-color: var(--primary);
+  background: var(--primary-muted);
+  color: var(--primary-emphasis);
+  font-weight: 600;
+  cursor: default;
+}
+
+.page-step:disabled {
+  color: var(--foreground-subtle);
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.page-gap {
+  display: grid;
+  place-items: center;
+  inline-size: 18px;
+  block-size: 30px;
+  color: var(--foreground-subtle);
+  font-size: var(--text-2xs);
+}

@@ -1,0 +1,7 @@
+# ExternalMerchantStoreApi — representative service-to-service contract request.
+
+### read merchant store through SPG
+GET {{SPG_URL}}/merchant/api/v1/store?store={{STORE_ID}}&lang={{LANG}}
+Accept: application/json
+
+###

@@ -1,0 +1,55 @@
+# ExternalEntitlementApi — com.asrevo.cvhome.billing.api.v1.ExternalEntitlementApi
+# (@RequestMapping "/api/v1/entitlement")
+#
+# A service-to-service API: the pods enforce these ceilings and the gateway polls the blocked list, so it is
+# gated on scope rather than on a seller's roles. A seller session reaches `snapshot` for its own store —
+# it carries nothing that store's own /subscription/current does not — but not the batch or the blocked
+# list, which span orgs.
+#
+# Requires a running stack: lcl start -d
+
+### one store's standing and ceilings
+GET {{SELLER_UI_URL}}/billing/api/v1/entitlement/private/snapshot?store={{STORE_ID}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+> {%
+    client.test("a snapshot answers the only question callers have", function () {
+        client.assert(response.status === 200 || response.status === 404, "status " + response.status);
+        if (response.status === 200) {
+            client.assert(typeof response.body.operable === "boolean", "no operable flag");
+            client.assert(response.body.entitlements !== undefined, "no entitlements map");
+        }
+    });
+    client.test("an unpaid store is not operable", function () {
+        if (response.status === 200 && (response.body.status === "PENDING"
+                || response.body.status === "SUSPENDED" || response.body.status === "CANCELED")) {
+            client.assert(response.body.operable === false, response.body.status + " should not be operable");
+        }
+    });
+%}
+
+### the blocked list is not a seller's to read — it spans every org on the platform
+GET {{SELLER_UI_URL}}/billing/api/v1/entitlement/private/blocked-stores
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+> {%
+    client.test("a human is refused a platform-wide list", function () {
+        client.assert(response.status === 403, "expected 403, got " + response.status);
+    });
+%}
+
+### the gateway gate, seen from outside
+# A store whose subscription has lapsed is refused at the edge with 402 and never reaches the pod. Compare a
+# paying store, which routes through and gets whatever the pod says.
+#
+# The `pod` parameter is required: the /spg/** route matches on it, and without it the gateway 404s before any
+# filter runs — which is why an early version of this block appeared to prove the gate did nothing.
+GET {{SELLER_UI_URL}}/spg/merchant/api/v1/private/store?store={{SUSPENDED_STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+> {%
+    client.test("a lapsed store is refused at the edge", function () {
+        client.assert(response.status === 402, "expected 402, got " + response.status);
+        client.assert(response.body.code === "BILLING.STORE.SUSPENDED", JSON.stringify(response.body));
+    });
+%}

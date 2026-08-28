@@ -3,7 +3,7 @@ package com.asrevo.cvhome.store.model.references;
 import java.io.Serial;
 import java.io.Serializable;
 
-import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
+import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.store.core.serializer.LanguageCodeDeSerializer;
 import com.asrevo.cvhome.store.core.serializer.LanguageCodeSerializer;
 

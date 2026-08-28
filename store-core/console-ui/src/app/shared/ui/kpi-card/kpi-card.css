@@ -1,0 +1,142 @@
+:host {
+  display: block;
+  padding: var(--spacing-section);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  background: var(--muted);
+  transition:
+    transform var(--default-transition-duration),
+    box-shadow var(--default-transition-duration);
+}
+
+:host(:hover) {
+  transform: translateY(-3px);
+  box-shadow: var(--lift);
+}
+
+.kpi-head {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-group);
+}
+
+.kpi-copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.kpi-label {
+  margin: 0;
+  color: var(--foreground-subtle);
+  font-size: var(--text-3xs);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.kpi-value {
+  display: block;
+  margin-top: var(--spacing-tight);
+  color: var(--foreground-strong);
+  font-size: var(--text-4xl);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: -0.02em;
+}
+
+.kpi-icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  inline-size: 42px;
+  block-size: 42px;
+  border-radius: var(--radius-lg);
+  background: var(--input);
+  color: var(--muted-foreground);
+  --icon-size: 1.05rem;
+}
+
+.kpi-icon.green {
+  background: var(--chart-1-wash);
+  color: var(--chart-1-foreground);
+}
+
+.kpi-icon.blue {
+  background: var(--chart-2-wash);
+  color: var(--chart-2-foreground);
+}
+
+.kpi-icon.cyan {
+  background: var(--chart-3-wash);
+  color: var(--chart-3-foreground);
+}
+
+.kpi-icon.amber {
+  background: var(--chart-4-wash);
+  color: var(--chart-4-foreground);
+}
+
+.kpi-icon.red {
+  background: var(--chart-5-wash);
+  color: var(--chart-5-foreground);
+}
+
+.kpi-icon.violet {
+  background: var(--chart-6-wash);
+  color: var(--chart-6-foreground);
+}
+
+.kpi-foot {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0.85rem 0 0;
+  min-block-size: 1.5rem;
+}
+
+.kpi-foot small {
+  color: var(--foreground-subtle);
+  font-size: var(--text-2xs);
+}
+
+.kpi-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.15rem 0.4rem;
+  border-radius: var(--radius-sm);
+  background: var(--input);
+  color: var(--secondary-foreground);
+  font-size: var(--text-2xs);
+  font-weight: 600;
+  --icon-size: 0.6rem;
+}
+
+.kpi-pill.green {
+  background: var(--chart-1-wash);
+  color: var(--chart-1-foreground);
+}
+
+.kpi-pill.blue {
+  background: var(--chart-2-wash);
+  color: var(--chart-2-foreground);
+}
+
+.kpi-pill.cyan {
+  background: var(--chart-3-wash);
+  color: var(--chart-3-foreground);
+}
+
+.kpi-pill.amber {
+  background: var(--chart-4-wash);
+  color: var(--chart-4-foreground);
+}
+
+.kpi-pill.red {
+  background: var(--chart-5-wash);
+  color: var(--chart-5-foreground);
+}
+
+.kpi-pill.violet {
+  background: var(--chart-6-wash);
+  color: var(--chart-6-foreground);
+}

@@ -85,7 +85,7 @@ public class SecurityUser implements UserDetails, OAuth2User, OidcUser, Serializ
         this.attributes.put("email", this.email);
         this.attributes.put("given_name", this.firstName);
         this.attributes.put("family_name", this.lastName);
-        this.attributes.put("name", this.firstName + " " + this.lastName);
+        this.attributes.put("name", String.format("%s %s", this.firstName, this.lastName));
         this.attributes.put("client_id", this.clientId);
 
         this.idToken = idToken;

@@ -6,20 +6,19 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import com.asrevo.cvhome.catalog.model.product.ProductDetails;
 import com.asrevo.cvhome.catalog.model.product.ReadableImage;
 import com.asrevo.cvhome.catalog.model.product.ReadableMinimalProduct;
-import com.asrevo.cvhome.catalog.services.product.ExternalProductService;
 import com.asrevo.cvhome.checkout.entity.order.orderproduct.OrderProduct;
 import com.asrevo.cvhome.checkout.entity.order.orderproduct.OrderProductAttribute;
+import com.asrevo.cvhome.checkout.errors.PriceNotFormattableException;
 import com.asrevo.cvhome.checkout.model.order.ReadableOrderProduct;
 import com.asrevo.cvhome.checkout.model.order.ReadableOrderProductAttribute;
+import com.asrevo.cvhome.checkout.model.product.ProductDetails;
+import com.asrevo.cvhome.checkout.service.facade.product.ProductDetailsComposer;
+import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
-import com.asrevo.cvhome.store.core.exception.ConversionException;
-import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import com.asrevo.cvhome.store.core.populator.AbstractDataPopulator;
-import com.asrevo.cvhome.store.utils.ImageFilePath;
 import com.asrevo.cvhome.store.utils.PriceUtils;
 
 import lombok.AllArgsConstructor;
@@ -36,15 +35,14 @@ import lombok.Getter;
 public class ReadableOrderProductPopulator
         extends AbstractDataPopulator<OrderProduct, StoreMerchantId, ReadableOrderProduct> {
 
-    private final ExternalProductService externalProductService;
+    private final ProductDetailsComposer productDetailsComposer;
 
-    private final ImageFilePath imageUtils;
 
     private final ExternalMerchantStoreService externalMerchantStoreService;
 
     @Override
     public ReadableOrderProduct populate(OrderProduct source, ReadableOrderProduct target, StoreMerchantId store,
-                                         LanguageCode language) throws ConversionException {
+                                         LanguageCode language) throws PriceNotFormattableException {
 
         target.setId(source.getId());
         target.setOrderedQuantity(source.getProductQuantity());
@@ -62,7 +60,7 @@ public class ReadableOrderProductPopulator
                     .getStoreFormatedAmountWithCurrency(externalMerchantStoreService.getStore(store), subTotal);
             target.setSubTotal(subTotalPrice);
         } catch (Exception e) {
-            throw new ConversionException("Cannot format price", e);
+            throw PriceNotFormattableException.of(subTotal, e);
         }
 
         if (source.getOrderAttributes() != null) {
@@ -80,7 +78,7 @@ public class ReadableOrderProductPopulator
             target.setAttributes(attributes);
         }
 
-        ProductDetails detailedProduct = externalProductService.getDetailedProduct(store, source.getSku(), language);
+        ProductDetails detailedProduct = productDetailsComposer.getDetailedProduct(store, source.getSku(), language);
         ReadableMinimalProduct read = detailedProduct.product();
         target.setProduct(read);
 

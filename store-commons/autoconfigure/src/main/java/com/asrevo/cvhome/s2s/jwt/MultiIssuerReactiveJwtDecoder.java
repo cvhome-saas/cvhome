@@ -1,117 +1,66 @@
 package com.asrevo.cvhome.s2s.jwt;
 
-import java.text.ParseException;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
 
-import com.asrevo.cvhome.s2s.utils.UrlNormalize;
-import com.nimbusds.jwt.JWTClaimsSet;
-import com.nimbusds.jwt.SignedJWT;
-
 import reactor.core.publisher.Mono;
 
 /**
- * A {@link ReactiveJwtDecoder} that supports multiple JWT issuers. It lazily initializes
- * and caches a specific {@link ReactiveJwtDecoder} for each issuer based on the 'iss'
- * claim in the JWT.
+ * The reactive twin of {@link MultiIssuerJwtDecoder}, for the gateway. Both delegate the trust decision to
+ * {@link IssuerRegistry} rather than repeating it, which is what let a normalization fix land on one of them and
+ * not the other.
  */
 public class MultiIssuerReactiveJwtDecoder implements ReactiveJwtDecoder {
 
-    private final Map<String, ReactiveJwtDecoder> issuerDecoders = new ConcurrentHashMap<>();
+    private static final String NULL_DECODER = """
+            Decoder factory returned null for realm '%s'. \
+            This indicates an issue with the factory configuration.""";
 
-    private final Set<String> supportedIssuerUris;
+    private final Map<String, ReactiveJwtDecoder> realmDecoders = new ConcurrentHashMap<>();
 
-    private final Function<String, ReactiveJwtDecoder> decoderFactory;
+    private final IssuerRegistry registry;
+
+    private final Function<IssuerRealm, ReactiveJwtDecoder> decoderFactory;
 
     /**
-     * Constructs a {@code MultiIssuerReactiveJwtDecoder}.
-     *
-     * @param supportedIssuerUris A set of trusted issuer URIs that this decoder will
-     *                            handle. An attempt to decode a token from an issuer not in this set will result in
-     *                            an error. Must not be null.
-     * @param decoderFactory      A function that takes an issuer URI (String) and returns a
-     *                            {@link ReactiveJwtDecoder} configured for that issuer. This factory is invoked
-     *                            lazily when a token from a new, supported issuer is encountered, and its result is
-     *                            cached. Must not be null. The factory should throw an exception if it cannot create
-     *                            a decoder for a given supported issuer URI.
+     * @param registry       the realms this decoder trusts. Must not be null.
+     * @param decoderFactory builds the delegate decoder for a realm, invoked lazily on first use and cached.
+     *                       Must not be null, and should throw rather than return null when it cannot build one.
      */
-    public MultiIssuerReactiveJwtDecoder(Set<String> supportedIssuerUris,
-                                         Function<String, ReactiveJwtDecoder> decoderFactory) {
-        Objects.requireNonNull(supportedIssuerUris, "supportedIssuerUris cannot be null");
-        Objects.requireNonNull(decoderFactory, "decoderFactory cannot be null");
-
-        this.supportedIssuerUris = supportedIssuerUris.stream()
-                .map(UrlNormalize::normalizeUri)
-                .collect(Collectors.toSet());
-        this.decoderFactory = decoderFactory;
+    public MultiIssuerReactiveJwtDecoder(IssuerRegistry registry,
+                                         Function<IssuerRealm, ReactiveJwtDecoder> decoderFactory) {
+        this.registry = Objects.requireNonNull(registry, "registry cannot be null");
+        this.decoderFactory = Objects.requireNonNull(decoderFactory, "decoderFactory cannot be null");
     }
 
     @Override
     public Mono<Jwt> decode(String token) throws JwtException {
         Objects.requireNonNull(token, "token cannot be null");
-        return Mono.fromCallable(() -> extractIssuer(token))
-                .flatMap(this::getDecoderForIssuer)
+        return Mono.fromCallable(() -> this.registry.resolve(token))
+                .map(this::decoderFor)
                 .flatMap(decoder -> decoder.decode(token))
                 .onErrorMap(ex -> {
                     if (ex instanceof JwtException) {
+                        // A BadJwtException must survive as itself, or the client's 401 becomes our 500.
                         return ex;
                     }
-                    return new JwtException("Failed to decode JWT: " + ex.getMessage(), ex);
+                    return new JwtException("Failed to decode JWT: %s".formatted(ex.getMessage()), ex);
                 });
     }
 
-    /**
-     * Retrieves or creates a {@link ReactiveJwtDecoder} for the given issuer.
-     *
-     * @param issuer The issuer URI.
-     * @return A {@link Mono} emitting the {@link ReactiveJwtDecoder} or an error if the
-     * issuer is unsupported or the factory fails.
-     */
-    private Mono<ReactiveJwtDecoder> getDecoderForIssuer(String issuer) {
-        if (!this.supportedIssuerUris.contains(issuer)) {
-            return Mono.error(new JwtException(String.format(
-                    "Unsupported issuer: '%s'. Issuer not in the configured list of" + " supported issuers: %s.",
-                    issuer, this.supportedIssuerUris)));
+    private ReactiveJwtDecoder decoderFor(IssuerRealm realm) {
+        ReactiveJwtDecoder delegate = this.realmDecoders.computeIfAbsent(realm.name(),
+                name -> this.decoderFactory.apply(realm));
+        if (delegate == null) {
+            throw new JwtException(NULL_DECODER.formatted(realm.name()));
         }
-
-        ReactiveJwtDecoder delegateDecoder = this.issuerDecoders.computeIfAbsent(issuer, this.decoderFactory);
-
-        if (delegateDecoder == null) {
-            return Mono
-                    .error(new JwtException(String.format("Decoder factory returned null for supported issuer: '%s'. This"
-                            + " indicates an issue with the factory configuration.", issuer)));
-        }
-        return Mono.just(delegateDecoder);
-    }
-
-    /**
-     * Extracts the 'iss' (issuer) claim from the JWT.
-     *
-     * @param token The JWT string.
-     * @return The issuer URI.
-     * @throws JwtException if the token cannot be parsed or the 'iss' claim is missing or
-     *                      empty.
-     */
-    private String extractIssuer(String token) throws JwtException {
-        try {
-            SignedJWT signedJWT = SignedJWT.parse(token);
-            JWTClaimsSet claimsSet = signedJWT.getJWTClaimsSet();
-            String issuer = claimsSet.getIssuer();
-            if (issuer == null || issuer.trim().isEmpty()) {
-                throw new JwtException("Missing or empty 'iss' (issuer) claim in token");
-            }
-            return issuer;
-        } catch (ParseException e) {
-            throw new JwtException("Failed to parse token to extract issuer: " + e.getMessage(), e);
-        }
+        return delegate;
     }
 
 }

@@ -1,0 +1,134 @@
+<ng-container *transloco="let t">
+  <app-page-header [title]="heading().title" [context]="facade.totalLabel() ?? heading().context">
+    <!--
+      The template's control says "Export CSV". Nothing on the platform produces one and the console
+      already renders PDFs from the DOM it is showing — see lessons.md, "Users — no export of any kind".
+    -->
+    <app-export-button
+      [target]="report()"
+      fileName="customers"
+      [title]="heading().title"
+      [subtitle]="heading().context"
+      [disabled]="isLoading() || isEmpty()"
+    />
+  </app-page-header>
+
+  @if (error(); as failure) {
+    <app-load-error [message]="failure.message" (retry)="facade.reload()" />
+  }
+
+  <app-busy-overlay reserve="page" [busy]="isLoading()" [label]="t('customers.loading')">
+    @if (!isEmpty()) {
+      <div class="customers-stack" #report>
+        <app-panel [title]="t('customers.allCustomers')" [subtitle]="facade.subtitle()">
+          <!--
+            In the panel's header, where the orders table keeps its own — a control that narrows the
+            whole list belongs to the thing it narrows, not stacked on top of the first row. It sat
+            in the body, left-aligned and flush against the table's header band, reading as a stray
+            field that happened to be there.
+
+            One box, one parameter. The server's `name` filter already spans the billing first name,
+            the billing last name and the email address, so there is nothing to route by shape the
+            way the orders page has to.
+          -->
+          <app-search-box
+            panelAction
+            [value]="facade.search()"
+            (valueChange)="onSearch($event)"
+            [label]="t('customers.search.label')"
+            [placeholder]="t('customers.search.placeholder')"
+            [clearLabel]="t('customers.search.clear')"
+          />
+
+          @if (rows().length) {
+            <app-data-table [columns]="columns()" [label]="t('customers.allCustomers')">
+              @for (row of rows(); track row.id) {
+                <app-table-row [interactive]="true">
+                  <div class="cell-customer" role="cell" [attr.data-label]="t('customers.column.customer')">
+                    <span class="avatar" aria-hidden="true">{{ row.initials }}</span>
+                    <!--
+                      The name is the affordance rather than the whole row: a row-wide click handler
+                      is invisible to a keyboard and to a screen reader.
+                    -->
+                    <button class="identity" type="button" (click)="open(row.id)">
+                      <!--
+                        A customer with no billing address has no name — shown as it is, because the
+                        populator has none to give and the email below carries the identity.
+                      -->
+                      @if (row.name) {
+                        <strong>{{ row.name }}</strong>
+                      } @else {
+                        <strong class="unnamed">{{ t('customers.unnamed') }}</strong>
+                      }
+                      <span class="email" dir="auto">{{ row.email }}</span>
+                    </button>
+                  </div>
+
+                  <span class="cell-location" role="cell" dir="auto" [attr.data-label]="t('customers.column.location')">
+                    {{ row.location || '—' }}
+                  </span>
+
+                  <span class="cell-id latin" role="cell" [attr.data-label]="t('customers.column.id')">
+                    {{ row.id }}
+                  </span>
+
+                  <div class="cell-actions" role="cell" [attr.data-label]="t('customers.column.actions')">
+                    <button
+                      class="icon-action"
+                      type="button"
+                      [title]="t('customers.action.openDetails')"
+                      [attr.aria-label]="t('customers.action.openDetailsFor', {name: row.name || row.email})"
+                      (click)="open(row.id)"
+                    >
+                      <app-icon name="chevronRight" />
+                    </button>
+                  </div>
+                </app-table-row>
+              }
+            </app-data-table>
+
+            <app-pagination
+              [page]="facade.pageIndex()"
+              [totalPages]="facade.totalPages()"
+              [totalElements]="facade.totalElements()"
+              [pageSize]="pageSize"
+              [unit]="t('customers.unit')"
+              [label]="t('customers.paginationLabel')"
+              (pageChange)="onPage($event)"
+            />
+          } @else if (facade.search()) {
+            <app-empty-state
+              icon="search"
+              [title]="t('customers.noMatches.title')"
+              [message]="t('customers.noMatches.message')"
+            />
+          } @else {
+            <app-empty-state
+              icon="user"
+              [title]="t('customers.empty.title')"
+              [message]="t('customers.empty.message')"
+            />
+          }
+        </app-panel>
+      </div>
+    }
+  </app-busy-overlay>
+
+  @if (facade.selected(); as selected) {
+    <app-customer-dialog
+      [open]="true"
+      [customer]="selected"
+      [orders]="facade.orderRows()"
+      [ordersLoading]="facade.ordersLoading()"
+      [ordersError]="facade.ordersError()"
+      [orderCount]="facade.orderCountLabel()"
+      [statusLabel]="statusLabel"
+      [statusTone]="statusTone"
+      [orderTotal]="orderTotal"
+      (openOrder)="openOrder($event)"
+      (viewAllOrders)="viewAllOrders()"
+      (retryOrders)="facade.reloadOrders()"
+        (dismissed)="closeDialog()"
+    />
+  }
+</ng-container>

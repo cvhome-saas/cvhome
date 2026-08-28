@@ -1,0 +1,238 @@
+:host {
+  display: contents;
+}
+
+.sidebar {
+  position: sticky;
+  top: 1.5rem;
+  flex: none;
+  inline-size: var(--rail-width);
+  overflow: hidden;
+  block-size: calc(100vh - 4rem - var(--banner-h, 0px));
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-section) var(--spacing-group);
+  background: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  animation: sidebar-in 0.45s ease both;
+  transition:
+    width 0.28s var(--ease-emphasis),
+    padding 0.28s var(--ease-emphasis);
+}
+
+:host-context(.nav-collapsed) .sidebar {
+  inline-size: var(--rail-collapsed);
+}
+
+:host-context(.nav-collapsed) {
+  .nav-label,
+  .org-mark { display: none; }
+  .sidebar-head,
+  .nav-item { justify-content: center; }
+}
+
+.sidebar-head {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: var(--spacing-inline) var(--spacing-tight) var(--spacing-group);
+}
+
+.org-mark {
+  flex: none;
+  display: grid;
+  place-items: center;
+  inline-size: 34px;
+  block-size: 34px;
+  border-radius: var(--radius-lg);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.sidebar-head strong {
+  flex: 1;
+  min-width: 0;
+  color: var(--foreground-strong);
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+.nav-toggle {
+  flex: none;
+  display: grid;
+  place-items: center;
+  inline-size: 26px;
+  block-size: 26px;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: none;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  transition:
+    background-color var(--default-transition-duration),
+    color var(--default-transition-duration);
+  --icon-size: 1rem;
+}
+
+.nav-toggle:hover {
+  background: var(--input);
+}
+
+.nav-label {
+  white-space: nowrap;
+}
+
+.sidebar-nav {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden auto;
+  margin: 0 -0.25rem;
+  padding: 0 var(--spacing-inline);
+}
+
+.nav-group {
+  padding: 1.15rem 0.55rem 0.35rem;
+  margin: 0;
+  color: var(--foreground-subtle);
+  font-size: var(--text-3xs);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.nav-group:first-child {
+  padding-top: var(--spacing-tight);
+}
+
+.nav-item {
+  inline-size: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-field);
+  padding: 0.7rem;
+  border: 0;
+  border-radius: var(--radius-lg);
+  background: none;
+  color: var(--secondary-foreground);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  text-align: start;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color var(--default-transition-duration),
+    color var(--default-transition-duration);
+  --icon-size: 0.95rem;
+}
+
+.nav-item app-icon {
+  flex: none;
+}
+
+.nav-item span {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.nav-item:hover {
+  background: var(--input);
+  color: var(--primary-emphasis);
+}
+
+.nav-item.active {
+  background: var(--accent);
+  color: var(--primary-soft);
+  font-weight: 600;
+}
+
+.nav-item.active:hover {
+  background: var(--chart-1-wash);
+}
+
+/*
+ * First run: no store exists, so every section is unreachable. The rail stays visible
+ * rather than disappearing — it is how the operator learns what is coming — but nothing in
+ * it responds, and each item's tooltip says why.
+ */
+.sidebar-nav.first-run .nav-group,
+.nav-item:disabled {
+  color: var(--foreground-quiet);
+}
+
+.nav-item:disabled {
+  cursor: not-allowed;
+}
+
+.nav-item:disabled:hover {
+  background: none;
+  color: var(--foreground-quiet);
+}
+
+.nav-item:disabled .badge {
+  opacity: 0.5;
+}
+
+.badge {
+  padding: 0.1rem 0.4rem;
+  border-radius: var(--radius-full);
+  background: var(--input);
+  color: var(--secondary-foreground);
+  font-size: var(--text-3xs);
+  font-weight: 600;
+}
+
+.badge.green { background: var(--chart-1-wash); color: var(--chart-1-foreground); }
+.badge.blue { background: var(--chart-2-wash); color: var(--chart-2-foreground); }
+.badge.cyan { background: var(--chart-3-wash); color: var(--chart-3-foreground); }
+.badge.amber { background: var(--chart-4-wash); color: var(--chart-4-foreground); }
+.badge.red { background: var(--chart-5-wash); color: var(--chart-5-foreground); }
+.badge.violet { background: var(--chart-6-wash); color: var(--chart-6-foreground); }
+
+/* Off-canvas drawer on small screens. */
+@media (max-width: 56.25rem) {
+  .sidebar {
+    position: fixed;
+    top: 0;
+    inset-inline-start: 0;
+    z-index: 80;
+    block-size: 100vh;
+    border-radius: 0;
+    /* Opaque as a drawer: the 2% card fill would let the page read through it. */
+    background: var(--card);
+    animation: none;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+  }
+
+  .sidebar:dir(rtl) {
+    transform: translateX(100%);
+  }
+
+  .sidebar.mobile-open {
+    transform: none;
+  }
+
+  :host-context(.nav-collapsed) .sidebar {
+    inline-size: var(--rail-width);
+  }
+
+  :host-context(.nav-collapsed) {
+    .nav-label { display: initial; }
+    .org-mark { display: grid; }
+    .sidebar-head,
+    .nav-item { justify-content: flex-start; }
+  }
+}
+
+@keyframes sidebar-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}

@@ -1,0 +1,32 @@
+### FAQ entries and groups
+
+### Groups (created on first read: general, ordering, shipping, returns)
+GET {{SELLER_UI_URL}}/spg/content/api/v1/private/content/faq/groups?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+
+###
+POST {{SELLER_UI_URL}}/spg/content/api/v1/private/content/faq/groups?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Content-Type: application/json
+Cookie: SESSION={{SESSION_ID}}
+
+{"key": "account-billing", "names": {"en": "Account & billing"}, "position": 4}
+
+### Create an entry
+POST {{SELLER_UI_URL}}/spg/content/api/v1/private/content/faq?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Content-Type: application/json
+Cookie: SESSION={{SESSION_ID}}
+
+{
+  "slug": "how-fast-is-next-day-delivery",
+  "groupId": 1,
+  "keywords": ["delivery time", "shipping", "dispatch"],
+  "showInCheckoutHelp": true,
+  "translations": [{"language": "en", "title": "How fast is next-day delivery?", "body": "<p>Order before 4pm…</p>"}]
+}
+
+### Reorder atomically
+PATCH {{SELLER_UI_URL}}/spg/content/api/v1/private/content/faq/reorder?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Content-Type: application/json
+Cookie: SESSION={{SESSION_ID}}
+
+[{"id": 1, "groupId": 1, "position": 0}, {"id": 2, "groupId": 1, "position": 1}]

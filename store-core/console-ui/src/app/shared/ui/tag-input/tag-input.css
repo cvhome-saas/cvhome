@@ -1,0 +1,82 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+
+.tag-field {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  padding: var(--spacing-tight);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--input);
+  transition: border-color var(--default-transition-duration);
+}
+
+.tag-field:focus-within {
+  border-color: var(--primary-emphasis);
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.35rem 0.25rem 0.55rem;
+  border-radius: var(--radius-md);
+  background: var(--chart-1-wash);
+  color: var(--chart-1-foreground);
+  font-size: var(--text-2xs);
+  font-weight: 500;
+}
+
+.tag button {
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-xs);
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  --icon-size: 0.6rem;
+}
+
+.tag button:hover {
+  color: var(--chart-5-foreground);
+}
+
+input {
+  flex: 1;
+  min-inline-size: 6rem;
+  padding: 0.25rem 0.35rem;
+  border: 0;
+  background: none;
+  color: var(--foreground-strong);
+  font-size: var(--text-2xs);
+}
+
+input:focus {
+  outline: none;
+}
+
+input::placeholder {
+  color: var(--foreground-subtle);
+}
+
+/*
+ * Read-only. The chips stay legible — the operator still needs to read what is there — and only
+ * the affordances go: no caret, no remove buttons, and the frame reads as a field that is not
+ * taking input rather than one that is broken.
+ */
+:host:has(input:disabled) .tag-field {
+  border-color: var(--border-soft);
+  background: var(--muted);
+  cursor: not-allowed;
+}
+
+input:disabled {
+  color: var(--muted-foreground);
+  cursor: not-allowed;
+}

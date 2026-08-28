@@ -1,0 +1,31 @@
+<!-- The close/cancel events are the platform's dismissal signals: Escape and the backdrop. -->
+<dialog #dialog class="suspend" (close)="dismissed.emit()" (cancel)="dismissed.emit()">
+  <form method="dialog" class="suspend-body" (submit)="onSubmit($event)">
+    <h2 class="suspend-title">{{ title() }}</h2>
+    <p class="suspend-message">{{ message() }}</p>
+
+    <!--
+      Said plainly, because it is the whole risk: `InternalStoreService.requireOperable` reads the
+      organization's status, so every store it owns stops being usable the moment this is confirmed.
+    -->
+    <p class="suspend-consequence" role="note">{{ consequence() }}</p>
+
+    <app-form-field [label]="reasonLabel()" [hint]="reasonHint()" wide>
+      <app-textarea
+        [(value)]="reason"
+        [rows]="3"
+        [disabled]="busy()"
+        [ariaLabel]="reasonLabel()"
+      />
+    </app-form-field>
+
+    <div class="suspend-actions">
+      <button class="secondary-action" type="button" [disabled]="busy()" (click)="close()">
+        {{ cancelLabel() }}
+      </button>
+      <button class="danger-action" type="submit" [disabled]="busy()">
+        {{ busy() ? busyLabel() : confirmLabel() }}
+      </button>
+    </div>
+  </form>
+</dialog>

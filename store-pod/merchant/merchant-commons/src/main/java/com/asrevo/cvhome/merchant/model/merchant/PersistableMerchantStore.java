@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.Set;
 
 import com.asrevo.cvhome.commons.domain.ManagerStoreDomain;
-import com.asrevo.cvhome.commons.domain.SliderImage;
-import com.asrevo.cvhome.commons.domain.SocialLink;
 import com.asrevo.cvhome.store.model.references.PersistableBaseAddress;
 
 import lombok.Getter;
@@ -14,7 +12,7 @@ import lombok.Setter;
 
 @Setter
 @Getter
-public class PersistableMerchantStore extends MerchantStoreEntity {
+public class PersistableMerchantStore extends MerchantStoreDetails {
 
     /**
      *
@@ -28,10 +26,6 @@ public class PersistableMerchantStore extends MerchantStoreEntity {
     private String retailerStore;
 
     private List<String> supportedLanguages;
-
-    private Set<SocialLink> socialLinks;
-
-    private List<SliderImage> sliderImages;
 
     private Set<ManagerStoreDomain> storeDomains;
 

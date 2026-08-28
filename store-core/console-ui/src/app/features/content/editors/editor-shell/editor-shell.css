@@ -1,0 +1,26 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-section);
+}
+
+.editor-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 20rem;
+  gap: var(--spacing-section);
+  align-items: start;
+}
+
+.editor-main,
+.editor-side {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-section);
+  min-width: 0;
+}
+
+@media (max-width: 64rem) {
+  .editor-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

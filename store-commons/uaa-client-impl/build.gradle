@@ -1,18 +1,22 @@
 plugins {
-	alias(libs.plugins.java.library.conventions)
+    alias(libs.plugins.java.library.conventions)
 }
 
 dependencies {
-	compileOnly project(":store-commons:commons")
-	implementation project(":store-commons:uaa-client")
-	implementation libs.jackson.databind
-	implementation libs.jackson.core
-	implementation libs.jackson.annotations
+    compileOnly project(":store-commons:commons")
+    implementation project(":store-commons:uaa-client")
+    implementation libs.jackson.databind
+    implementation libs.jackson.core
+    implementation libs.jackson.annotations
 
 
-	implementation libs.mapstruct
-	compileOnly libs.lombok
-	annotationProcessor libs.mapstruct.processor
-	annotationProcessor libs.lombok
-	annotationProcessor libs.lombok.mapstruct.binding
+    implementation libs.mapstruct
+    compileOnly libs.lombok
+    annotationProcessor libs.mapstruct.processor
+    annotationProcessor libs.lombok
+    annotationProcessor libs.lombok.mapstruct.binding
+
+    // ReadableUserList extends ReadableList from commons, which is compileOnly for consumers who bring their own.
+    // A test asserting what a listing returns has to see it.
+    testImplementation project(":store-commons:commons")
 }

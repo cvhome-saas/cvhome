@@ -1,0 +1,70 @@
+package com.asrevo.cvhome.payment.api.v1.payment;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.payment.errors.PaymentInitiateRejectedException;
+import com.asrevo.cvhome.payment.errors.PaymentProviderUnavailableException;
+import com.asrevo.cvhome.payment.model.payment.PaymentInitiateResult;
+import com.asrevo.cvhome.payment.model.payment.PaymentRequest;
+import com.asrevo.cvhome.payment.model.payment.PaymentResponse;
+import com.asrevo.cvhome.payment.service.PaymentGatewayService;
+import com.asrevo.cvhome.payment.services.payment.IPaymentGatewayService;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+import static com.asrevo.cvhome.commons.utils.DefaultStoresConstants.DEFAULT_ORG1_STORE1_STR;
+
+
+@RestController
+@RequestMapping("/api/v1")
+@Tag(name = "Payment Gateway")
+@Slf4j
+@AllArgsConstructor
+public class ExternalPaymentGatewayApi implements IPaymentGatewayService {
+
+    private final PaymentGatewayService paymentGatewayService;
+
+    @PostMapping("/private/payments/initiate")
+    @Operation(method = "POST", description = "Initiate Payment",
+            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = PaymentInitiateResult.class))))
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+
+    @Override
+    public PaymentInitiateResult initiatePayment(StoreMerchantId store, PaymentRequest paymentRequest)
+            throws PaymentInitiateRejectedException, PaymentProviderUnavailableException {
+        // Propagated, not caught: the shared advice renders each under its own code — PAYMENT.INITIATE.REJECTED for a
+        // refusal, PAYMENT.INITIATE.FAILED when nothing was decided — and that code is what the caller's client SDK
+        // rebuilds the exception from. The provider's own code rides along as an extension, never as ours.
+        return paymentGatewayService.initiatePayment(store, paymentRequest);
+    }
+
+    // The path must stay in step with ExternalPaymentGatewayService's @HttpExchange("/api/v1/private") +
+    // @GetExchange("/payments/{ref}/status") by hand: the client half is a separate interface, so nothing checks the
+    // two agree. This one had lost its /private segment, which no caller had noticed because status() has none yet.
+    @GetMapping("/private/payments/{requestRef}/status")
+    @Operation(method = "GET", description = "Payment Status",
+            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = PaymentResponse.class))))
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+
+    @Override
+    public PaymentResponse status(StoreMerchantId store, @PathVariable("requestRef") String requestRef) {
+        return paymentGatewayService.status(store, requestRef);
+    }
+
+
+}

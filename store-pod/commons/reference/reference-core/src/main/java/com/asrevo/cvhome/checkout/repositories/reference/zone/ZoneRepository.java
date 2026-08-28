@@ -6,9 +6,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import com.asrevo.cvhome.checkout.entity.reference.zone.Zone;
-import com.asrevo.cvhome.store.core.model.reference.CountryIsoCode;
-import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
-import com.asrevo.cvhome.store.core.model.reference.ZoneCode;
+import com.asrevo.cvhome.commons.domain.CountryIsoCode;
+import com.asrevo.cvhome.commons.domain.LanguageCode;
+import com.asrevo.cvhome.commons.domain.ZoneCode;
 
 public interface ZoneRepository extends JpaRepository<Zone, ZoneCode> {
 

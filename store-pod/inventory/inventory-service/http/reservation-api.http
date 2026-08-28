@@ -1,0 +1,52 @@
+# ExternalProductReservationApi — com.asrevo.cvhome.inventory.api.v1.ExternalProductReservationApi
+#
+# Reservation endpoints carry the STORE-POD.INVENTORY.RESERVE permission — normally called
+# service-to-service by checkout with an s2s token, so the seller session below only works because the
+# permission maps to same-pod access. See inventory-api.http for the env-var conventions.
+#
+# Requires a running stack: lcl start -d
+
+### reserve stock for a ref
+POST {{SELLER_UI_URL}}/spg/inventory/api/v1/private/reserve/http-demo-ref-1?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{
+  "entries": [
+    {
+      "sku": "SKU-YSL-MAKE-TEIPEN46",
+      "reserveQty": 1
+    }
+  ]
+}
+
+### reserve more than the stock — 422 INVENTORY.RESERVATION.INSUFFICIENT_INVENTORY
+POST {{SELLER_UI_URL}}/spg/inventory/api/v1/private/reserve/http-demo-ref-2?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{
+  "entries": [
+    {
+      "sku": "SKU-YSL-MAKE-TEIPEN46",
+      "reserveQty": 99999
+    }
+  ]
+}
+
+### reserve with no lines — 400 INVENTORY.RESERVATION.EMPTY
+POST {{SELLER_UI_URL}}/spg/inventory/api/v1/private/reserve/http-demo-ref-3?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{
+  "entries": []
+}
+
+### commit the reservation
+POST {{SELLER_UI_URL}}/spg/inventory/api/v1/private/commit/http-demo-ref-1?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+### release it (idempotent — already committed refs answer status=false)
+POST {{SELLER_UI_URL}}/spg/inventory/api/v1/private/release/http-demo-ref-1?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}

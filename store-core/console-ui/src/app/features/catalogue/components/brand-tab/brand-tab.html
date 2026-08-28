@@ -1,0 +1,147 @@
+<ng-container *transloco="let t">
+  @if (unavailable()) {
+    <app-notice-bar icon="alertCircle" tone="red" [message]="t('catalogue.brands.unavailable')" />
+  }
+
+  <div class="split">
+    <app-panel
+      class="list-panel"
+      [title]="t('catalogue.brands.title')"
+      [subtitle]="t('catalogue.brands.subtitle', {count: brands().length})"
+    >
+      <div class="brand-grid">
+        @for (brand of brands(); track brand.id) {
+          <button
+            class="brand-card"
+            type="button"
+            [class.current]="brand.id === facade.selectedBrandId()"
+            [attr.aria-pressed]="brand.id === facade.selectedBrandId()"
+            (click)="facade.select('brands', brand.id)"
+          >
+            <!--
+              Initials, not a logo. `ReadableManufacturer` has no image field and no upload
+              endpoint — see lessons.md. A mark that is obviously derived from the name reads as a
+              placeholder; an empty grey square reads as a broken image.
+            -->
+            <span class="brand-mark" aria-hidden="true">{{ brand.initials }}</span>
+            <span class="brand-copy">
+              <strong dir="auto">{{ brand.name }}</strong>
+              <small class="brand-code" dir="ltr">{{ brand.code }}</small>
+              @if (brand.description) {
+                <span class="brand-blurb" dir="auto">{{ brand.description }}</span>
+              }
+            </span>
+          </button>
+        } @empty {
+          <p class="list-empty">{{ t('catalogue.brands.none') }}</p>
+        }
+      </div>
+
+      <div class="list-foot">
+        <button class="secondary-action" type="button" (click)="facade.startCreate()">
+          <app-icon name="plus" />
+          {{ t('catalogue.add.brands') }}
+        </button>
+      </div>
+    </app-panel>
+
+    <app-panel
+      class="editor-panel"
+      [title]="creating() ? t('catalogue.brands.newTitle') : (selected()?.name ?? t('catalogue.brands.noneTitle'))"
+      [subtitle]="creating() ? t('catalogue.brands.newSubtitle') : (selected()?.code ?? null)"
+    >
+      @if (!creating() && !selected()) {
+        <app-empty-state icon="bookmark" [message]="t('catalogue.brands.empty')">
+          <button class="secondary-action" type="button" (click)="facade.startCreate()">
+            {{ t('catalogue.add.brands') }}
+          </button>
+        </app-empty-state>
+      } @else {
+        <form class="editor-body" [formGroup]="form" (ngSubmit)="facade.saveBrand()">
+          <div class="editor-head">
+            <app-locale-switcher
+              [languages]="facade.languages()"
+              [active]="facade.activeLanguage()"
+              [filled]="facade.translatedLanguages()"
+              [label]="t('catalogue.copy.languageLabel')"
+              (activeChange)="facade.setLanguage($event)"
+            />
+
+            @if (!creating() && selected(); as brand) {
+              <button
+                class="danger-action"
+                type="button"
+                [disabled]="facade.busy()"
+                (click)="facade.askDelete('brands', brand.id, brand.name)"
+              >
+                <app-icon name="trash" />
+                {{ t('catalogue.brands.delete') }}
+              </button>
+            }
+          </div>
+
+          <!--
+            No slug and no sort order. `manufacturer_description` has no `sef_url` column, and
+            `PersistableManufacturerPopulator` sets only the code and the per-language name and
+            description — a value sent for either field is read and dropped. Both were on this form
+            and both did nothing. See lessons.md.
+          -->
+          <app-notice-bar icon="info" tone="blue" [message]="t('catalogue.brands.nameAndDescriptionOnly')" />
+
+          <app-copy-fields
+            [form]="form.controls.copy"
+            scope="brand"
+            [languageName]="facade.activeLanguageName()"
+            [richDescription]="true"
+            [contentDir]="facade.activeLanguageDir()"
+            [showSlug]="false"
+            (nameChanged)="onNameInput($event)"
+          />
+
+          <hr class="divider" />
+
+          <div class="field-grid">
+            <!--
+              One uniqueness affordance for the whole console: checking, taken, free. The spinner is not
+              decoration — the check is debounced, so without it the field looks like it has already
+              passed. It used to be three hand-placed marks here, a fourth arrangement in create-store,
+              and a lone tick in the social links.
+            -->
+            <app-form-field
+              wide
+              [label]="t('catalogue.code')"
+              [control]="form.controls.code"
+              required
+              controlId="brand-code"
+              [hint]="creating() ? t('catalogue.codeHintNew') : t('catalogue.codeHintExisting')"
+              [fallback]="form.controls.code.hasError('codeTaken') ? t('catalogue.codeTaken') : ''"
+            >
+              <app-text-field
+                id="brand-code"
+                formControlName="code"
+                latin
+                [check]="codeCheck()"
+                [checkLabel]="t('catalogue.codeChecking')"
+                [invalid]="form.controls.code.hasError('codeTaken')"
+              />
+            </app-form-field>
+          </div>
+
+          <div class="editor-actions">
+            <button class="secondary-action" type="button" (click)="facade.cancelEdit()">
+              {{ t('shared.actions.cancel') }}
+            </button>
+            <button
+              class="primary-action"
+              type="submit"
+              [disabled]="facade.busy()"
+              [attr.aria-busy]="facade.busy()"
+            >
+              {{ creating() ? t('catalogue.brands.create') : t('catalogue.brands.save') }}
+            </button>
+          </div>
+        </form>
+      }
+    </app-panel>
+  </div>
+</ng-container>

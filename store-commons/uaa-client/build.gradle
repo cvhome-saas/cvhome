@@ -1,12 +1,15 @@
 plugins {
-	alias(libs.plugins.java.library.conventions)
+    alias(libs.plugins.java.library.conventions)
 }
 
 dependencies {
-	compileOnly project(":store-commons:commons")
-	implementation libs.mapstruct
-	compileOnly libs.lombok
-	annotationProcessor libs.mapstruct.processor
-	annotationProcessor libs.lombok
-	annotationProcessor libs.lombok.mapstruct.binding
+    // api, not compileOnly: the uaa API's exception types appear in UserAccountService's signature, so every consumer
+    // needs them on its runtime classpath to catch them.
+    api project(':store-commons:errors')
+    compileOnly project(":store-commons:commons")
+    implementation libs.mapstruct
+    compileOnly libs.lombok
+    annotationProcessor libs.mapstruct.processor
+    annotationProcessor libs.lombok
+    annotationProcessor libs.lombok.mapstruct.binding
 }

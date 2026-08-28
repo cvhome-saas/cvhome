@@ -1,7 +1,7 @@
 package com.asrevo.cvhome.checkout.service.populator.order;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.Instant;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -9,14 +9,15 @@ import org.springframework.stereotype.Component;
 import com.asrevo.cvhome.checkout.entity.order.Order;
 import com.asrevo.cvhome.checkout.entity.order.OrderChannel;
 import com.asrevo.cvhome.checkout.entity.order.orderstatus.OrderStatusHistory;
+import com.asrevo.cvhome.checkout.errors.OrderNotConvertibleException;
 import com.asrevo.cvhome.checkout.model.order.v1.PersistableOrder;
+import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
 import com.asrevo.cvhome.merchant.model.merchant.ReadableMerchantStore;
+import com.asrevo.cvhome.store.core.entity.common.InventoryStatus;
+import com.asrevo.cvhome.store.core.entity.common.PaymentStatus;
 import com.asrevo.cvhome.store.core.entity.order.orderstatus.OrderStatus;
-import com.asrevo.cvhome.store.core.entity.payments.PaymentType;
-import com.asrevo.cvhome.store.core.exception.ConversionException;
-import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import com.asrevo.cvhome.store.core.populator.AbstractDataPopulator;
 import com.asrevo.cvhome.store.utils.LocaleUtils;
 
@@ -31,7 +32,7 @@ public class PersistableOrderApiPopulator extends AbstractDataPopulator<Persista
 
     @Override
     public Order populate(PersistableOrder source, Order target, StoreMerchantId store, LanguageCode language)
-            throws ConversionException {
+            throws OrderNotConvertibleException {
 
         try {
 
@@ -42,15 +43,16 @@ public class PersistableOrderApiPopulator extends AbstractDataPopulator<Persista
             ReadableMerchantStore baseStore = externalMerchantStoreService.getStore(store);
             target.setLocale(LocaleUtils.getLocale(baseStore.getDefaultLanguage()));
 
-            target.setDatePurchased(LocalDate.now());
+            target.setDatePurchased(Instant.now());
             target.setCurrency(baseStore.getCurrency());
             target.setCurrencyValue(new BigDecimal(0));
             target.setStoreMerchantId(store);
             target.setChannel(OrderChannel.API);
             // need this
-            target.setStatus(OrderStatus.ORDERED);
-            target.setPaymentModuleCode(source.getPayment().getPaymentModule());
-            target.setPaymentType(PaymentType.valueOf(source.getPayment().getPaymentType()));
+            target.setPaymentType(source.getPaymentType());
+            target.setStatus(OrderStatus.CREATED);
+            target.setInventoryStatus(InventoryStatus.RESERVED);
+            target.setPaymentStatus(PaymentStatus.PENDING);
 
             target.setCustomerAgreement(source.isCustomerAgreement());
             target.setConfirmedAddress(true);
@@ -66,7 +68,7 @@ public class PersistableOrderApiPopulator extends AbstractDataPopulator<Persista
             return target;
 
         } catch (Exception e) {
-            throw new ConversionException(e);
+            throw OrderNotConvertibleException.of(store, e);
         }
     }
 

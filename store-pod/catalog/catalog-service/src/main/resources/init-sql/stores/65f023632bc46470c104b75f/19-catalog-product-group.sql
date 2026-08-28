@@ -134,3 +134,26 @@ VALUES (8, 136),
        (8, 169),
        (8, 172)
 ON CONFLICT DO NOTHING;
+-- French group names. The seed above carries English and Arabic only, so on the three storefronts that sell in
+-- French every product rail dropped out of the home page: the storefront skips a group whose description does
+-- not resolve in the requested locale. Ids are negative — description ids come from a sequence that only grows.
+-- HOME_PAGE
+INSERT INTO catalog.product_group_description (description_id, name, language_code, product_group_id,
+                                               date_created, date_modified)
+VALUES (-5, 'Page d''accueil', 'fr', 5, NOW(), NOW())
+on conflict do nothing;
+-- RECOMMENDED
+INSERT INTO catalog.product_group_description (description_id, name, language_code, product_group_id,
+                                               date_created, date_modified)
+VALUES (-6, 'Recommandé pour vous', 'fr', 6, NOW(), NOW())
+on conflict do nothing;
+-- NEWLY_ADDED
+INSERT INTO catalog.product_group_description (description_id, name, language_code, product_group_id,
+                                               date_created, date_modified)
+VALUES (-7, 'Nouveautés', 'fr', 7, NOW(), NOW())
+on conflict do nothing;
+-- FEATURED_ITEMS
+INSERT INTO catalog.product_group_description (description_id, name, language_code, product_group_id,
+                                               date_created, date_modified)
+VALUES (-8, 'Notre sélection', 'fr', 8, NOW(), NOW())
+on conflict do nothing;

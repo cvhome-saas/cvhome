@@ -1,4 +1,4 @@
 #!/bin/bash
-find dist -name "dist" -type d
-find libs -name "dist" -type d
-find templates -name ".next" -type d
+# List build outputs (handy before a clean).
+find libs -name dist -type d -maxdepth 2
+find storefront -name .next -type d -maxdepth 1

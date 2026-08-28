@@ -1,0 +1,138 @@
+<ng-container *transloco="let t">
+  <app-panel [title]="t('productForm.media.title')" [subtitle]="t('productForm.media.subtitle')">
+    <div class="editor-body">
+      @if (!saved()) {
+        <!--
+          Stated, not discovered. The rail already disables this step; this is what an operator who
+          got here by another route reads.
+        -->
+        <app-notice-bar icon="info" tone="blue" [message]="t('productForm.media.saveFirst')" />
+      } @else {
+        <!--
+          One grid, images and the drop target together — the layout `Add Product.dc.html` draws,
+          where the dashed cell is the **last tile** rather than a separate well underneath.
+
+          The well used to sit below a vertical list, at the asset's own square aspect, which in this
+          column made a 774px box: the thing you drop onto filled the screen and the photographs you
+          came to manage were pushed off it.
+        -->
+        <ul class="shot-grid">
+          @for (image of facade.images(); track image.id; let index = $index, count = $count) {
+            <li class="shot">
+              <span class="shot-frame">
+                @if (image.url && !broken().has(image.id)) {
+                  <img appImageBroken [src]="image.url" alt="" (broken)="markBroken(image.id)" />
+                } @else {
+                  <app-icon name="images" [size]="20" />
+                }
+
+                @if (image.isDefault) {
+                  <!--
+                    A statement, not a control — but the thing it states is now reachable: the
+                    thumbnail is the first image, so moving an image to the front is how it changes.
+                    That is one concept with one gesture rather than a second control that would
+                    express the same write.
+                  -->
+                  <span class="shot-main">{{ t('productForm.media.storefrontThumbnail') }}</span>
+                }
+
+                <span class="shot-overlay">
+                  @if (image.url && !broken().has(image.id)) {
+                    <button
+                      type="button"
+                      [attr.aria-label]="t('productForm.media.view', {position: index + 1})"
+                      (click)="viewing.set(image)"
+                    >
+                      <app-icon name="eye" [size]="13" />
+                    </button>
+                  }
+                  <!--
+                    Behind a confirmation, like every other destructive action in the console.
+                    Deleting an image is not undoable and there is no re-upload of the same file
+                    from here — the operator has to find it again.
+                  -->
+                  <button
+                    type="button"
+                    class="danger"
+                    [disabled]="facade.uploading()"
+                    [attr.aria-label]="t('productForm.media.remove', {position: index + 1})"
+                    (click)="pendingRemove.set(image.id)"
+                  >
+                    <app-icon name="trash" [size]="13" />
+                  </button>
+                </span>
+              </span>
+
+              <span class="shot-foot">
+                <!--
+                  Move rather than drag. The platform reorders by rewriting every image's order in
+                  one request; a drag gesture would be a second way to express the same write, and
+                  the only one that cannot be reached from a keyboard.
+                -->
+                <button
+                  type="button"
+                  [disabled]="index === 0 || facade.uploading()"
+                  [attr.aria-label]="t('productForm.media.moveUp', {position: index + 1})"
+                  (click)="facade.moveImage(index, -1)"
+                >
+                  <app-icon name="arrowUp" [size]="13" />
+                </button>
+                <!-- The position when the image has no name of its own; an id would identify it to the
+                     database and to nobody looking at the screen. -->
+                <span class="shot-name" dir="ltr">{{ image.name || index + 1 }}</span>
+                <button
+                  type="button"
+                  [disabled]="index === count - 1 || facade.uploading()"
+                  [attr.aria-label]="t('productForm.media.moveDown', {position: index + 1})"
+                  (click)="facade.moveImage(index, 1)"
+                >
+                  <app-icon name="arrowDown" [size]="13" />
+                </button>
+              </span>
+            </li>
+          }
+
+          <!--
+            The last cell, sized like the tiles beside it. It opens the store's media library rather
+            than a file input: the bytes belong there, and picking an image already in it is the
+            common case once a store has uploaded a few.
+          -->
+          <li class="shot-drop">
+            <button type="button" class="shot-drop-button" [disabled]="facade.uploading()" (click)="picking.set(true)">
+              <app-icon name="images" />
+              <span>{{ t('productForm.media.pick') }}</span>
+            </button>
+          </li>
+        </ul>
+
+        <p class="field-hint">{{ t('productForm.media.hint') }}</p>
+      }
+    </div>
+
+    <app-media-picker-dialog
+      [open]="picking()"
+      kind="IMAGE"
+      (picked)="onPicked($event)"
+      (closed)="picking.set(false)"
+    />
+
+    <app-image-preview
+      [open]="viewing() !== null"
+      (openChange)="onViewerToggled($event)"
+      [url]="viewing()?.url ?? null"
+      [heading]="t('productForm.media.image')"
+      [caption]="viewing()?.name ?? null"
+    />
+  </app-panel>
+</ng-container>
+
+<app-confirm-dialog
+  *transloco="let t"
+  [open]="pendingRemove() !== null"
+  [title]="t('productForm.media.removeTitle')"
+  [message]="t('productForm.media.removeConfirm')"
+  [confirmLabel]="t('productForm.media.removeAccept')"
+  [cancelLabel]="t('shared.actions.cancel')"
+  (confirmed)="confirmRemove()"
+  (dismissed)="pendingRemove.set(null)"
+/>

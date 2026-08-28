@@ -1,0 +1,120 @@
+# BillingStatisticApi — com.asrevo.cvhome.billing.api.v2.BillingStatisticApi (@RequestMapping "/api/v2")
+#
+# The platform's billing aggregates, and the first sums of money exposed to a human caller anywhere on
+# this platform. Super-admin only, matching tenancy's OrgStatisticApi.
+#
+# `subscription-statistic` is on the exact path seller-ui's admin home had been calling since it was
+# written — nothing served it, so that panel was a 404 for its entire life.
+#
+# Run with a super-admin session in SESSION_ID and an org1-admin session in ORG_ADMIN_SESSION_ID.
+# Requires a running stack: lcl start -d
+
+### money actually collected, per day and per currency
+POST {{SELLER_UI_URL}}/billing/api/v2/private/revenue-statistic
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SESSION_ID}}
+Content-Type: application/json
+
+{
+  "fromDate": "2020-01-01T00:00:00Z",
+  "toDate": "2030-01-01T00:00:00Z"
+}
+
+> {%
+    client.test("super admin gets the series", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        client.assert(response.body.entries !== undefined, "not a StatisticList");
+    });
+    // The currency is the grouping key and nothing converts it, so one day may carry several entries.
+    // A single merged figure would be a wrong number: nothing on this platform holds an exchange rate.
+    client.test("every entry names a currency and an amount in minor units", function () {
+        (response.body.entries || []).forEach(e => {
+            client.assert(e.name && e.name.length === 3, "entry with no ISO currency: " + e.name);
+            client.assert(Number.isInteger(e.value), "amount is not minor units: " + e.value);
+        });
+    });
+%}
+
+### subscriptions started per day, by plan code
+POST {{SELLER_UI_URL}}/billing/api/v2/private/subscription-statistic
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SESSION_ID}}
+Content-Type: application/json
+
+{
+  "fromDate": "2020-01-01T00:00:00Z",
+  "toDate": "2030-01-01T00:00:00Z"
+}
+
+> {%
+    client.test("super admin gets the series", function () {
+        client.assert(response.status === 200, "status " + response.status);
+    });
+    // Read from subscription_audit rather than store_subscription.created_date, and de-duplicated by
+    // store: ACTIVATED fires again when a suspended store pays, and counting raw rows would book a
+    // returning customer as a new one. So no store may appear more than once across the whole series.
+    client.test("a store is counted at most once", function () {
+        const total = (response.body.entries || []).reduce((sum, e) => sum + e.value, 0);
+        client.assert(total <= 1000, "implausible count — is distinct on (store_id) still there?");
+    });
+    client.test("every entry names a plan", function () {
+        (response.body.entries || []).forEach(e => {
+            client.assert(e.name, "entry with no plan code");
+        });
+    });
+%}
+
+### who is on what, and what that is contracted to bring in
+GET {{SELLER_UI_URL}}/billing/api/v2/private/plan-statistic
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SESSION_ID}}
+
+> {%
+    client.test("counts and recurring value come back together", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        client.assert(Array.isArray(response.body.counts), "no counts");
+        client.assert(Array.isArray(response.body.recurringValue), "no recurringValue");
+    });
+    // The left join is what keeps a plan-less PENDING store visible; an inner join would answer a
+    // smaller, tidier and wrong number.
+    client.test("a plan-less subscription is still counted", function () {
+        (response.body.counts || []).forEach(c => {
+            client.assert(c.status, "count with no status");
+        });
+    });
+    // Annualised in SQL, divided once in Java. Dividing a yearly price per row truncates every time.
+    client.test("monthly is exactly a twelfth of annual", function () {
+        (response.body.recurringValue || []).forEach(v => {
+            if (v.annual && v.monthly) {
+                client.assert(Math.floor(v.annual.minorUnits / 12) === v.monthly.minorUnits,
+                    "monthly is not annual/12 for " + v.planCode);
+            }
+        });
+    });
+%}
+
+### whether billing itself is working — two tables nothing else reads
+GET {{SELLER_UI_URL}}/billing/api/v2/private/billing-health
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SESSION_ID}}
+
+> {%
+    client.test("two counts and the window they cover", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        client.assert(Number.isInteger(response.body.failedEvents), "no failedEvents");
+        client.assert(Number.isInteger(response.body.stalledRequests), "no stalledRequests");
+        client.assert(response.body.staleAfterMinutes > 0, "no stale window");
+    });
+%}
+
+### an org admin must not see platform-wide money
+POST {{SELLER_UI_URL}}/billing/api/v2/private/revenue-statistic
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{
+  "fromDate": "2020-01-01T00:00:00Z",
+  "toDate": "2030-01-01T00:00:00Z"
+}
+
+> {%
+    client.test("403 for a merchant", function () {
+        client.assert(response.status === 403, "status " + response.status);
+    });
+%}

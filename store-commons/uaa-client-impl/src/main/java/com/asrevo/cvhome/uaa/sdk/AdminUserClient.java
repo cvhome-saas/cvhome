@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringJoiner;
 
+import com.asrevo.cvhome.uaa.api.errors.UaaApiException;
 import com.asrevo.cvhome.uaa.sdk.dto.CreateUserRequest;
 import com.asrevo.cvhome.uaa.sdk.dto.PageRequest;
 import com.asrevo.cvhome.uaa.sdk.dto.PageResponse;
@@ -25,27 +26,41 @@ public class AdminUserClient extends AbstractAdminClient {
 
     private static final String PATH_SEPARATOR = "/";
 
+    private static final String PATH_WITH_ID_TEMPLATE = "%s%s%s";
+
+    private static final String API_PATH = "%s/api/v1/admin/users";
+
     private final String usersApiUrl;
 
     public AdminUserClient(String baseUrl, String clientId, String clientSecret) {
         super(baseUrl, clientId, clientSecret);
-        this.usersApiUrl = baseUrl + "/api/v1/admin/users";
+        this.usersApiUrl = String.format(API_PATH, baseUrl);
     }
 
-    public PageResponse<UserDto> listUsers(Map<String, String> metadataFilters, PageRequest pageRequest) {
+    /**
+     * Overload taking the {@link java.net.http.HttpClient}, so a test can exercise the error paths without a uaa to
+     * talk to.
+     */
+    public AdminUserClient(String baseUrl, String clientId, String clientSecret, java.net.http.HttpClient httpClient) {
+        super(baseUrl, clientId, clientSecret, httpClient);
+        this.usersApiUrl = String.format(API_PATH, baseUrl);
+    }
+
+    public PageResponse<UserDto> listUsers(Map<String, String> metadataFilters, PageRequest pageRequest)
+            throws UaaApiException {
         String url = usersApiUrl;
         StringJoiner sj = new StringJoiner("&", "?", "");
         if (metadataFilters != null && !metadataFilters.isEmpty()) {
             for (Map.Entry<String, String> entry : metadataFilters.entrySet()) {
-                String key = URLEncoder.encode("metadata[" + entry.getKey() + "]", StandardCharsets.UTF_8);
+                String key = URLEncoder.encode(String.format("metadata[%s]", entry.getKey()), StandardCharsets.UTF_8);
                 String value = URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8);
-                sj.add(key + "=" + value);
+                sj.add(String.format("%s=%s", key, value));
             }
         }
 
         if (pageRequest != null) {
-            sj.add("page=" + pageRequest.page());
-            sj.add("size=" + pageRequest.size());
+            sj.add(String.format("page=%d", pageRequest.page()));
+            sj.add(String.format("size=%d", pageRequest.size()));
         }
 
         if (sj.length() > 1) {
@@ -58,12 +73,13 @@ public class AdminUserClient extends AbstractAdminClient {
         });
     }
 
-    public UserDto getUser(String id) {
-        HttpRequest request = authenticatedRequestBuilder(usersApiUrl + PATH_SEPARATOR + id).GET().build();
+    public UserDto getUser(String id) throws UaaApiException {
+        HttpRequest request = authenticatedRequestBuilder(
+                String.format(PATH_WITH_ID_TEMPLATE, usersApiUrl, PATH_SEPARATOR, id)).GET().build();
         return sendAndParse(request, UserDto.class);
     }
 
-    public UserDto createUser(CreateUserRequest req) {
+    public UserDto createUser(CreateUserRequest req) throws UaaApiException {
         HttpRequest request = authenticatedRequestBuilder(usersApiUrl)
                 .POST(HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(req)))
                 .header(CONTENT_TYPE_HEADER, CONTENT_TYPE_APPLICATION_JSON)
@@ -71,41 +87,42 @@ public class AdminUserClient extends AbstractAdminClient {
         return sendAndParse(request, UserDto.class);
     }
 
-    public UserDto updateUser(String id, UpdateUserRequest req) {
-        HttpRequest request = authenticatedRequestBuilder(usersApiUrl + PATH_SEPARATOR + id)
+    public UserDto updateUser(String id, UpdateUserRequest req) throws UaaApiException {
+        HttpRequest request = authenticatedRequestBuilder(String.format(PATH_WITH_ID_TEMPLATE, usersApiUrl, PATH_SEPARATOR, id))
                 .PUT(HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(req)))
                 .header(CONTENT_TYPE_HEADER, CONTENT_TYPE_APPLICATION_JSON)
                 .build();
         return sendAndParse(request, UserDto.class);
     }
 
-    public boolean usernameExist(String username) {
-        String url = usersApiUrl + "/exists?username=" + URLEncoder.encode(username, StandardCharsets.UTF_8);
+    public boolean usernameExist(String username) throws UaaApiException {
+        String url = String.format("%s/exists?username=%s", usersApiUrl, URLEncoder.encode(username, StandardCharsets.UTF_8));
         HttpRequest request = authenticatedRequestBuilder(url).GET().build();
         return sendAndParse(request, Boolean.class);
     }
 
-    public void enableUser(String id) {
-        HttpRequest request = authenticatedRequestBuilder(usersApiUrl + PATH_SEPARATOR + id + "/enable")
+    public void enableUser(String id) throws UaaApiException {
+        HttpRequest request = authenticatedRequestBuilder(String.format("%s%s%s/enable", usersApiUrl, PATH_SEPARATOR, id))
                 .POST(HttpRequest.BodyPublishers.noBody())
                 .build();
         sendAndVerify(request);
     }
 
-    public void disableUser(String id) {
-        HttpRequest request = authenticatedRequestBuilder(usersApiUrl + PATH_SEPARATOR + id + "/disable")
+    public void disableUser(String id) throws UaaApiException {
+        HttpRequest request = authenticatedRequestBuilder(String.format("%s%s%s/disable", usersApiUrl, PATH_SEPARATOR, id))
                 .POST(HttpRequest.BodyPublishers.noBody())
                 .build();
         sendAndVerify(request);
     }
 
-    public void deleteUser(String id) {
-        HttpRequest request = authenticatedRequestBuilder(usersApiUrl + PATH_SEPARATOR + id).DELETE().build();
+    public void deleteUser(String id) throws UaaApiException {
+        HttpRequest request = authenticatedRequestBuilder(
+                String.format(PATH_WITH_ID_TEMPLATE, usersApiUrl, PATH_SEPARATOR, id)).DELETE().build();
         sendAndVerify(request);
     }
 
-    public void resetPassword(String id, String newPassword) {
-        HttpRequest request = authenticatedRequestBuilder(usersApiUrl + PATH_SEPARATOR + id + "/reset-password")
+    public void resetPassword(String id, String newPassword) throws UaaApiException {
+        HttpRequest request = authenticatedRequestBuilder(String.format("%s%s%s/reset-password", usersApiUrl, PATH_SEPARATOR, id))
                 .PUT(HttpRequest.BodyPublishers
                         .ofString(objectMapper.writeValueAsString(new ResetUserPasswordRequest(newPassword))))
                 .header(CONTENT_TYPE_HEADER, CONTENT_TYPE_APPLICATION_JSON)
@@ -113,24 +130,24 @@ public class AdminUserClient extends AbstractAdminClient {
         sendAndVerify(request);
     }
 
-    public void assignRoles(String id, List<String> roles) {
-        HttpRequest request = authenticatedRequestBuilder(usersApiUrl + PATH_SEPARATOR + id + "/roles")
+    public void assignRoles(String id, List<String> roles) throws UaaApiException {
+        HttpRequest request = authenticatedRequestBuilder(String.format("%s%s%s/roles", usersApiUrl, PATH_SEPARATOR, id))
                 .POST(HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(roles)))
                 .header(CONTENT_TYPE_HEADER, CONTENT_TYPE_APPLICATION_JSON)
                 .build();
         sendAndVerify(request);
     }
 
-    public void removeRoles(String id, List<String> roles) {
-        HttpRequest request = authenticatedRequestBuilder(usersApiUrl + PATH_SEPARATOR + id + "/roles/remove")
+    public void removeRoles(String id, List<String> roles) throws UaaApiException {
+        HttpRequest request = authenticatedRequestBuilder(String.format("%s%s%s/roles/remove", usersApiUrl, PATH_SEPARATOR, id))
                 .POST(HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(roles)))
                 .header(CONTENT_TYPE_HEADER, CONTENT_TYPE_APPLICATION_JSON)
                 .build();
         sendAndVerify(request);
     }
 
-    public Set<String> getAssignableRoles() {
-        HttpRequest request = authenticatedRequestBuilder(usersApiUrl + "/assignable-roles").GET().build();
+    public Set<String> getAssignableRoles() throws UaaApiException {
+        HttpRequest request = authenticatedRequestBuilder(String.format("%s/assignable-roles", usersApiUrl)).GET().build();
         return sendAndParse(request, new TypeReference<>() {
         });
     }

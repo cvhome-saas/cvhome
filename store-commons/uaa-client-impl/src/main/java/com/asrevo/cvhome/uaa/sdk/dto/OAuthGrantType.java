@@ -22,7 +22,7 @@ public enum OAuthGrantType {
         try {
             return OAuthGrantType.valueOf(s.toUpperCase());
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Unknown grant type: " + s, e);
+            throw new IllegalArgumentException(String.format("Unknown grant type: %s", s), e);
         }
     }
 

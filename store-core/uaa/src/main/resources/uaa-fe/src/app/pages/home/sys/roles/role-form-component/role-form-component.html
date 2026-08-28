@@ -1,10 +1,10 @@
 <nb-card>
   <nb-card-header class="d-flex justify-content-between align-items-center">
     <span>Role</span>
-    <span>{{form.value.id}}</span>
+    <span>{{ form.value.id }}</span>
     <div style="display: flex;gap: 1rem;">
-      <button nbButton ghost status="basic" routerLink="/home/roles">Cancel</button>
-      <button nbButton status="primary" (click)="submit()">
+      <button ghost nbButton routerLink="/home/roles" status="basic">Cancel</button>
+      <button (click)="submit()" nbButton status="primary">
         <nb-icon icon="plus" style="margin-right: 0.5rem"></nb-icon>
         Save
       </button>
@@ -18,7 +18,7 @@
         <div class="row">
           <div class="col-md-6">
             <label>Name</label>
-            <input nbInput fullWidth formControlName="name" />
+            <input formControlName="name" fullWidth nbInput/>
           </div>
         </div>
       </nb-tab>

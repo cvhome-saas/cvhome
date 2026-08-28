@@ -1,0 +1,44 @@
+### Legal & policies
+
+### Compliance: which types are required, which exist
+GET {{SELLER_UI_URL}}/spg/content/api/v1/private/content/policies/compliance?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+
+### Create the head
+POST {{SELLER_UI_URL}}/spg/content/api/v1/private/content/policies?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Content-Type: application/json
+Cookie: SESSION={{SESSION_ID}}
+
+{
+  "slug": "returns",
+  "policyType": "RETURNS",
+  "jurisdiction": "NL",
+  "requiresAcceptance": true,
+  "notifyCustomers": false,
+  "showInFooter": true,
+  "showAtCheckout": true,
+  "translations": [{"language": "en", "title": "Returns & refunds", "body": "<h2>Return window</h2><p>30 days.</p>"}]
+}
+
+### Publish = cut version 1 (plain publish) …
+POST {{SELLER_UI_URL}}/spg/content/api/v1/private/content/policies/1/publish?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+
+### … or publish with an effective date and a note on the version
+POST {{SELLER_UI_URL}}/spg/content/api/v1/private/content/policies/1/publish-version?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Content-Type: application/json
+Cookie: SESSION={{SESSION_ID}}
+
+{"effectiveFrom": "2026-09-01T00:00:00Z", "note": "30-day window, buyer pays return shipping"}
+
+### Version history / one version's text / restore old text onto the head
+GET {{SELLER_UI_URL}}/spg/content/api/v1/private/content/policies/1/versions?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+
+###
+GET {{SELLER_UI_URL}}/spg/content/api/v1/private/content/policies/1/versions/1?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+
+###
+POST {{SELLER_UI_URL}}/spg/content/api/v1/private/content/policies/1/versions/1/restore-text?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}

@@ -1,0 +1,157 @@
+.visibility {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-field);
+}
+
+.switch-row {
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  transition:
+    border-color var(--default-transition-duration),
+    background-color var(--default-transition-duration);
+}
+
+/* A published store is the state worth marking — the row itself says which one is on. */
+.switch-row.on {
+  border-color: var(--edge);
+  background: var(--accent-veil);
+}
+
+.danger-zone {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.9rem;
+  padding: var(--spacing-group);
+  border: 1px solid var(--chart-5-wash);
+  border-radius: var(--radius-lg);
+  background: var(--chart-5-wash);
+  --icon-size: 1rem;
+}
+
+.danger-zone > app-icon {
+  flex: none;
+  margin-block-start: 0.1rem;
+  color: var(--chart-5-foreground);
+}
+
+.danger-copy {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+  gap: 0.2rem;
+}
+
+.danger-copy strong {
+  color: var(--chart-5-foreground);
+  font-size: var(--text-xs);
+  font-weight: 600;
+}
+
+.danger-copy span {
+  color: var(--secondary-foreground);
+  font-size: var(--text-xs);
+}
+
+.danger-zone .danger-action {
+  flex: none;
+  border-color: var(--chart-5-foreground);
+  background: var(--muted);
+}
+
+@container settings (max-width: 34rem) {
+  .danger-zone {
+    flex-wrap: wrap;
+  }
+}
+
+.storefront-flags,
+.unbacked {
+  display: grid;
+  gap: 0.85rem;
+}
+
+/*
+ * The designed-but-unrecorded block. Inset and tinted so it reads as a different kind of thing
+ * from the fields above it, rather than as a group that happens to be greyed out.
+ */
+.unbacked {
+  padding: var(--spacing-group);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--muted);
+}
+
+.unbacked-note {
+  margin: -0.4rem 0 0;
+  color: var(--muted-foreground);
+  font-size: var(--text-xs);
+  line-height: 1.6;
+}
+
+.unbacked .field-grid {
+  gap: 0.85rem 1rem;
+}
+
+/* ---- Supported languages ------------------------------------------------------------ */
+
+/*
+ * A checkbox per language rather than a multi-select: five options that are all visible at once
+ * read faster than a listbox, and ticking one does not require holding a modifier key.
+ */
+.check-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
+  gap: var(--spacing-tight);
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.5rem 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--input);
+  color: var(--foreground-strong);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition:
+    border-color var(--default-transition-duration),
+    background-color var(--default-transition-duration);
+}
+
+.check:hover {
+  border-color: var(--primary);
+}
+
+/* The ticked row is the state worth marking, so the box's own colour is not the only signal. */
+.check:has(:checked) {
+  border-color: var(--edge);
+  background: var(--accent-veil);
+}
+
+.check:has(:focus-visible) {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.check input {
+  flex: none;
+  accent-color: var(--primary);
+  inline-size: 0.95rem;
+  block-size: 0.95rem;
+  cursor: pointer;
+}
+
+/*
+ * A message about two fields at once. `app-field-error` binds to a single control and this one
+ * belongs to the group, so it is written out rather than borrowed — same voice, same colour.
+ */
+.cross-field-error {
+  margin: 0.35rem 0 0;
+  color: var(--chart-5-foreground);
+  font-size: var(--text-2xs);
+  font-weight: 500;
+}

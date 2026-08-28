@@ -1,0 +1,111 @@
+<ng-container *transloco="let t">
+  <app-page-header [title]="t('storeSettings.title')" [context]="context()">
+    <!--
+      No published/unpublished badge. Nothing on the platform records a store's publish state, so
+      the mockup's green pill was asserting something no service can answer — and a badge, unlike
+      a field, cannot be shown disabled with a reason. It is omitted instead.
+      TODO(lessons.md): see lessons.md, "Store management — a store has no published or
+      maintenance state".
+    -->
+    <button class="secondary-action" type="button" (click)="previewStorefront()">
+      <app-icon name="externalLink" />
+      {{ t('storeSettings.previewStorefront') }}
+    </button>
+
+    @if (isDirty()) {
+      <button class="secondary-action" type="button" (click)="facade.discard()">{{ t('storeSettings.discard') }}</button>
+    }
+
+    <button class="primary-action" type="button" [disabled]="!canSave()" (click)="facade.save()">
+      <app-icon name="check" />
+      {{ isSaving() ? t('storeSettings.saving') : t('storeSettings.saveChanges') }}
+    </button>
+  </app-page-header>
+
+  @if (error(); as failure) {
+    <app-load-error [message]="failure.message" (retry)="facade.retry()" />
+  }
+
+  <app-busy-overlay
+    reserve="page"
+    [busy]="isLoading()"
+    [label]="t('storeSettings.loading')"
+  >
+    @if (settings(); as store) {
+      <!--
+        The region owns the container; the grid inside it is what the container query restyles.
+        They cannot be the same element — a container query never matches its own container.
+      -->
+      <div class="settings-region">
+        <div class="settings-layout" [class.rail-collapsed]="railCollapsed()">
+          <app-section-nav
+            class="settings-rail"
+            basePath="/store-management"
+            [sections]="sections()"
+            [active]="section()"
+            [heading]="t('storeSettings.nav.heading')"
+            [label]="t('storeSettings.nav.ariaLabel')"
+            [(collapsed)]="railCollapsed"
+          >
+            <hr />
+            <!--
+              The storefront builder is a route of its own and not built yet. A disabled item with a
+              reason beats a link that goes nowhere.
+            -->
+            <span class="nav-item builder" [title]="t('storeSettings.nav.builderUnavailable')">
+              <app-icon name="layoutGrid" />
+              <span class="nav-copy">{{ t('storeSettings.nav.homePageBuilder') }}</span>
+              <app-icon name="arrowUpRight" [flip]="true" />
+            </span>
+          </app-section-nav>
+
+          <app-tab-switcher
+            class="settings-tabs"
+            [tabs]="tabs()"
+            [active]="section()"
+            (activeChange)="pickSection($event)"
+            [label]="t('storeSettings.sectionsLabel')"
+            panelId="settings-section"
+          />
+
+          <div class="settings-section" id="settings-section">
+            @switch (section()) {
+              @case ('domain') {
+                <app-domain-section
+                  [form]="forms.domain"
+                  [subdomain]="subdomain()"
+                  [customDomains]="customDomains()"
+                  [status]="domainStatus()"
+                  [checking]="facade.checkingDomain()"
+                  [checkUnavailable]="facade.dnsCheckUnavailable()"
+                  [record]="customDomainRecord()"
+                  [busy]="isSaving()"
+                  (verify)="facade.verifyDomain($event)"
+                  (removed)="facade.removeDomain($event)"
+                />
+              }
+              @case ('details') {
+                <app-details-section
+                  [form]="forms.details"
+                  [choices]="store.choices"
+                  [storeName]="store.storeName"
+                  [isDeleting]="facade.isDeleting()"
+                  (deleteRequested)="facade.deleteStore()"
+                />
+              }
+              @case ('social-login') {
+                <app-social-login-section
+                  [form]="forms['social-login']"
+                  [providers]="store.socialLogin"
+                />
+              }
+              @case ('payments') {
+                <app-payments-section [form]="forms.payments" [gateways]="store.payments" />
+              }
+            }
+          </div>
+        </div>
+      </div>
+    }
+  </app-busy-overlay>
+</ng-container>

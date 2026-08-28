@@ -1,0 +1,31 @@
+:host {
+  display: block;
+}
+
+.side-grid {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.side-grid + .side-grid {
+  margin-block-start: var(--spacing-group);
+}
+
+.schedule-sheet {
+  position: fixed;
+  inset-block-end: 1.25rem;
+  inset-inline-end: 1.25rem;
+  z-index: 30;
+  inline-size: min(30rem, calc(100vw - 2.5rem));
+  box-shadow: var(--lift);
+}
+
+.schedule-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-tight);
+}
+
+.schedule-row app-date-time-field {
+  flex: 1 1 12rem;
+}

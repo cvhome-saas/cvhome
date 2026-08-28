@@ -1,0 +1,201 @@
+/*
+ * beauty — "Industrial Quote Grammar", fused to a beauty + fashion boutique.
+ * Stockroom cotton ground and ink come from the merchant preset (background / foreground); the merchant's
+ * PRIMARY plays the zip-tie tag. Structure is drawn with 1px ink plates and 45° hazard stripes; state is a
+ * mark (tag on, stripe across), never a tint. Every label is set in straight quotes, display in condensed caps.
+ */
+[data-theme="beauty"] {
+    /* fonts — fonts.ts exports the variables */
+    --font-body: var(--font-beauty-mono), var(--font-beauty-arabic), ui-monospace, SFMono-Regular, Menlo, monospace;
+    --font-heading: var(--font-beauty-display), var(--font-beauty-arabic), "Arial Narrow", sans-serif;
+    --font-code: var(--font-beauty-mono), ui-monospace, monospace;
+
+    /* type scale — mono body stays small and exact, display jumps hard */
+    --type-xs: 0.6875rem;
+    --type-sm: 0.8125rem;
+    --type-base: 0.9375rem;
+    --type-lg: 1.0625rem;
+    --type-xl: 1.25rem;
+    --type-2xl: 1.625rem;
+    --type-3xl: 2.25rem;
+    --type-4xl: 3rem;
+    --type-5xl: 4.25rem;
+    --type-6xl: 6rem;
+    --line-tight: 0.92;
+    --line-snug: 1.15;
+    --line-normal: 1.5;
+    --line-relaxed: 1.65;
+    --track-tight: -0.02em;
+    --track-normal: 0.01em;
+    --track-wide: 0.08em;
+
+    /* spacing & density — plates sit tight; sections separate with rules, not air */
+    --density: 1;
+    --space-unit: calc(0.25rem * var(--density));
+    --section-y: 2.5rem;
+    --gutter: 1rem;
+
+    /* radius — square plates, a 2px ease on controls so the tag hole reads */
+    --r-control: 2px;
+    --r-card: 0px;
+    --r-image: 0px;
+    --r-badge: 2px;
+    --r-overlay: 0px;
+
+    /* borders & elevation — ink lines carry depth; no shadows except the overlay */
+    --border-width: 1px;
+    --elev-sm: 0 0 #0000;
+    --elev-md: 0 0 #0000;
+    --elev-lg: 0 0 #0000;
+    --elev-overlay: 0 24px 48px -16px rgb(0 0 0 / 0.35);
+
+    /* containers — the stockroom grid runs wide */
+    --width-narrow: 46rem;
+    --width-content: 84rem;
+    --width-wide: 100rem;
+
+    /* motion — one authored moment: the tag swing */
+    --motion-fast: 110ms;
+    --motion-base: 180ms;
+    --motion-slow: 420ms;
+    --easing-standard: cubic-bezier(0.2, 0, 0, 1);
+    --easing-emphasized: cubic-bezier(0.16, 1, 0.3, 1);
+
+    /* layout */
+    --header-h: 3.25rem;
+    --header-h-lg: 3.75rem;
+    --product-aspect: 1 / 1;
+
+    /* world materials */
+    --hazard: repeating-linear-gradient(-45deg, var(--foreground) 0 5px, transparent 5px 13px);
+    --hazard-on-primary: repeating-linear-gradient(-45deg, var(--primary-foreground) 0 5px, transparent 5px 13px);
+    --plate-line: 1px solid var(--foreground);
+
+    /* browser surfaces carry the world too */
+    caret-color: var(--primary);
+    scrollbar-color: var(--foreground) var(--background);
+    accent-color: var(--primary);
+}
+
+@media (min-width: 1024px) {
+    [data-theme="beauty"] {
+        --section-y: 3.5rem;
+        --gutter: 1.5rem;
+    }
+}
+
+[data-theme="beauty"] ::selection {
+    background: var(--primary);
+    color: var(--primary-foreground);
+}
+
+/* ---- world grammar as small utilities (scoped to the theme) ------------------------------------ */
+
+/* straight quotes around labels, the way the stockroom names things */
+[data-theme="beauty"] .q { unicode-bidi: isolate; }
+[data-theme="beauty"] .q::before { content: '"'; }
+[data-theme="beauty"] .q::after { content: '"'; }
+
+/* an ink plate */
+[data-theme="beauty"] .plate {
+    border: var(--plate-line);
+    background: var(--background);
+}
+
+/* hazard stripe band (set height with h-* / block size) */
+[data-theme="beauty"] .hazard { background-image: var(--hazard); }
+[data-theme="beauty"] .hazard-on-primary { background-image: var(--hazard-on-primary); }
+[data-theme="beauty"] .hazard-soft {
+    background-image: repeating-linear-gradient(-45deg, color-mix(in srgb, var(--foreground) 14%, transparent) 0 5px, transparent 5px 13px);
+}
+
+/* the zip-tie tag: primary plate with a punched hole at the reading-end side */
+[data-theme="beauty"] .tag {
+    position: relative;
+    background: var(--primary);
+    color: var(--primary-foreground);
+    border: 1px solid var(--primary);
+    padding-inline-end: 1.35rem;
+    transform-origin: 100% 0;
+}
+[data-theme="beauty"] .tag::after {
+    content: '';
+    position: absolute;
+    inset-inline-end: 0.45rem;
+    top: 50%;
+    width: 0.4rem;
+    height: 0.4rem;
+    margin-top: -0.2rem;
+    border-radius: 9999px;
+    background: var(--background);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--primary-foreground) 55%, transparent);
+}
+[dir="rtl"][data-theme="beauty"] .tag, [data-theme="beauty"] [dir="rtl"] .tag { transform-origin: 0 0; }
+
+/* the one authored motion: a tag swings once when it changes */
+@keyframes beauty-swing {
+    0% { transform: rotate(0deg); }
+    25% { transform: rotate(-6deg); }
+    55% { transform: rotate(4deg); }
+    80% { transform: rotate(-2deg); }
+    100% { transform: rotate(0deg); }
+}
+[data-theme="beauty"] .tag-swing { animation: beauty-swing var(--motion-slow) var(--easing-emphasized) 1; }
+
+/* a rivet dot in a plate corner */
+[data-theme="beauty"] .rivet { position: relative; }
+[data-theme="beauty"] .rivet::before {
+    content: '';
+    position: absolute;
+    inset-inline-start: 0.5rem;
+    top: 50%;
+    margin-top: -0.15rem;
+    width: 0.3rem;
+    height: 0.3rem;
+    border-radius: 9999px;
+    background: var(--foreground);
+}
+
+/* disabled / unavailable: the stripe runs across it */
+[data-theme="beauty"] .struck {
+    background-image: repeating-linear-gradient(-45deg, color-mix(in srgb, var(--foreground) 22%, transparent) 0 4px, transparent 4px 11px);
+    color: var(--muted-foreground);
+}
+
+/* swiper controls in the world's vocabulary */
+[data-theme="beauty"] .swiper-button-prev,
+[data-theme="beauty"] .swiper-button-next {
+    width: 2.25rem;
+    height: 2.25rem;
+    border: var(--plate-line);
+    background: var(--background);
+    color: var(--foreground);
+    border-radius: 0;
+}
+[data-theme="beauty"] .swiper-button-prev::after,
+[data-theme="beauty"] .swiper-button-next::after { font-size: 0.85rem; font-weight: 700; }
+[data-theme="beauty"] .swiper-pagination-bullet {
+    width: 1.25rem; height: 0.3rem; border-radius: 0; background: var(--foreground); opacity: 0.3;
+}
+[data-theme="beauty"] .swiper-pagination-bullet-active { opacity: 1; background: var(--primary); }
+
+@media (prefers-reduced-motion: reduce) {
+    [data-theme="beauty"] .tag-swing { animation: none; }
+}
+
+/* toasts: a stockroom notice plate — square, ink-ruled, mono caps, the progress line in primary */
+[data-theme="beauty"] .toast-nextjs {
+    border: 1px solid var(--foreground);
+    border-radius: 0;
+    box-shadow: none;
+}
+[data-theme="beauty"] .toast-nextjs .message .text {
+    font-family: var(--font-body);
+    font-size: var(--type-xs);
+    text-transform: uppercase;
+    letter-spacing: var(--track-wide);
+}
+[data-theme="beauty"] .toast-nextjs .check { border-radius: 0; animation: none; }
+[data-theme="beauty"] .toast-nextjs.success .check { background-color: var(--primary) !important; color: var(--primary-foreground) !important; }
+[data-theme="beauty"] .toast-nextjs.error .check { background-color: var(--foreground) !important; color: var(--background) !important; }
+[data-theme="beauty"] .toast-nextjs .progress::before { background-color: var(--primary) !important; }

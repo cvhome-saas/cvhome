@@ -9,7 +9,7 @@ import static com.asrevo.cvhome.commons.domain.SubscriptionPlanLimitKey.STORES;
 import static com.asrevo.cvhome.commons.domain.SubscriptionPlanLimitKey.VISITORS;
 import static com.asrevo.cvhome.commons.domain.SubscriptionPlanLimitValue.of;
 
-public class SubscriptionPlanLimitsConstants {
+public final class SubscriptionPlanLimitsConstants {
 
     private static final Integer K = 1000;
 

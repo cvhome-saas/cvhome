@@ -13,10 +13,11 @@ on:
       - 'develop'
       - 'main'
   workflow_dispatch:
-jobs:
-  build:
-    runs-on: ubuntu-latest
 
+jobs:
+  unit:
+    name: Unit tests
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Set up JDK 25
@@ -31,5 +32,120 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
 
-      - name: Run Test with Gradle
-        run: ./gradlew test
+      # src/test only: no Docker, no Spring context. Includes the *ArchitectureTest layering rules.
+      - name: Run unit tests
+        run: ./gradlew test verifyTestNaming --continue
+
+      - name: Publish unit test report
+        if: always()
+        uses: mikepenz/action-junit-report@v4
+        with:
+          report_paths: '**/build/test-results/test/TEST-*.xml'
+          check_name: Unit test results
+
+      - name: Upload unit coverage data
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-exec-unit
+          path: '**/build/jacoco/test.exec'
+          if-no-files-found: error
+          retention-days: 3
+
+  integration:
+    name: Integration tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 25
+        uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'corretto'
+
+      - name: Validate Gradle wrapper
+        uses: gradle/actions/wrapper-validation@v3
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      # src/integrationTest: full Spring context on Testcontainers (Postgres, MinIO). ubuntu-latest ships Docker.
+      - name: Run integration tests
+        run: ./gradlew integrationTest --continue
+
+      - name: Publish integration test report
+        if: always()
+        uses: mikepenz/action-junit-report@v4
+        with:
+          report_paths: '**/build/test-results/integrationTest/TEST-*.xml'
+          check_name: Integration test results
+
+      - name: Upload integration coverage data
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-exec-integration
+          path: '**/build/jacoco/integrationTest.exec'
+          if-no-files-found: error
+          retention-days: 3
+
+      # A container-backed failure is usually only explicable from the service log the test captured, so keep the
+      # raw results and the HTML report whenever the job goes red.
+      - name: Upload integration test results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: integration-test-results
+          path: |
+            **/build/test-results/integrationTest/**
+            **/build/reports/tests/integrationTest/**
+          if-no-files-found: warn
+          retention-days: 14
+
+  coverage:
+    name: Coverage reports
+    runs-on: ubuntu-latest
+    needs: [unit, integration]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 25
+        uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'corretto'
+
+      - name: Validate Gradle wrapper
+        uses: gradle/actions/wrapper-validation@v3
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      # The .exec files come from the two jobs above; the gates read them instead of re-running the tests.
+      - name: Download coverage data
+        uses: actions/download-artifact@v4
+        with:
+          pattern: jacoco-exec-*
+          merge-multiple: true
+
+      # One report per domain (unit / integration / merged), the whole-monorepo aggregate, and the three gates
+      # against domainCoverageMinimum in the root build.gradle.
+      - name: Generate coverage reports and verify floors
+        run: ./gradlew compileJava domainCoverage coverageReport printDomainCoverage domainCoverageVerification -x test -x integrationTest -PcoverageFromArtifacts --continue
+
+      - name: Upload per-domain coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-per-domain
+          path: build/reports/coverage/**
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Upload aggregated coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-aggregate
+          path: build/reports/jacoco/aggregate/**
+          if-no-files-found: error
+          retention-days: 14

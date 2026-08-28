@@ -1,0 +1,3536 @@
+{
+  "route": {
+    "home": {
+      "title": "cvhome | Commerce, unbordered"
+    },
+    "signIn": {
+      "title": "Sign in | cvhome"
+    },
+    "signUp": {
+      "title": "Create account | cvhome"
+    },
+    "dashboard": {
+      "title": "Dashboard | cvhome"
+    },
+    "orders": {
+      "title": "Orders | cvhome"
+    },
+    "storeManagement": {
+      "title": "Store management | cvhome"
+    },
+    "createStore": {
+      "title": "Create store | cvhome"
+    },
+    "firstRun": {
+      "title": "Getting started | cvhome"
+    },
+    "notFound": {
+      "title": "Page not found | cvhome"
+    },
+    "terms": {
+      "title": "Terms of service | cvhome"
+    },
+    "privacyPolicy": {
+      "title": "Privacy policy | cvhome"
+    },
+    "subscriptionSuccess": {
+      "title": "Subscription confirmed | cvhome"
+    },
+    "subscriptionFail": {
+      "title": "Subscription not completed | cvhome"
+    },
+    "signOut": {
+      "title": "Signing out | cvhome"
+    },
+    "orderDetails": {
+      "title": "Order | cvhome"
+    },
+    "billing": {
+      "title": "Billing"
+    },
+    "catalogue": {
+      "title": "Catalogue | cvhome"
+    },
+    "products": {
+      "title": "Products | cvhome"
+    },
+    "newProduct": {
+      "title": "New product | cvhome"
+    },
+    "productForm": {
+      "title": "Product | cvhome"
+    },
+    "payments": {
+      "title": "Payments | cvhome"
+    },
+    "users": {
+      "title": "Users"
+    },
+    "acceptInvitation": {
+      "title": "Join an organization"
+    },
+    "profile": {
+      "title": "Your account"
+    },
+    "customers": {
+      "title": "Customers"
+    },
+    "platform": {
+      "title": "Platform | cvhome"
+    },
+    "organizations": {
+      "title": "Organizations | cvhome"
+    },
+    "organization": {
+      "title": "Organization | cvhome"
+    },
+    "pods": {
+      "title": "Pods | cvhome"
+    },
+    "newPod": {
+      "title": "Register a pod | cvhome"
+    },
+    "pod": {
+      "title": "Pod | cvhome"
+    },
+    "platformUsers": {
+      "title": "Platform accounts | cvhome"
+    },
+    "platformBilling": {
+      "title": "Billing · Platform"
+    },
+    "plans": {
+      "title": "Plans | cvhome"
+    },
+    "content": {
+      "title": "Content management | cvhome",
+      "newPage": "New page | cvhome",
+      "page": "Page | cvhome",
+      "newPost": "New post | cvhome",
+      "post": "Post | cvhome",
+      "newBanner": "New banner | cvhome",
+      "banner": "Banner | cvhome",
+      "newFaq": "New FAQ entry | cvhome",
+      "faq": "FAQ entry | cvhome",
+      "newPolicy": "New policy | cvhome",
+      "policy": "Policy | cvhome"
+    }
+  },
+  "notFound": {
+    "heading": "Page not found",
+    "copy": "That console route does not exist yet.",
+    "back": "Return home"
+  },
+  "errors": {
+    "generic": "Something went wrong. Try again, or contact support if it continues.",
+    "trace": "Support reference:",
+    "category": {
+      "validation": "Check the highlighted fields and try again.",
+      "unauthenticated": "Your session has expired. Sign in again.",
+      "forbidden": "You do not have permission to do that.",
+      "notFound": "That record could not be found.",
+      "conflict": "This changed somewhere else. Refresh and try again.",
+      "remote": "The service did not answer in time. Try again.",
+      "internal": "We could not complete that request. Try again."
+    },
+    "code": {
+      "clientSessionMissing": "Sign in to continue.",
+      "CONTENT_NOT_FOUND": "That content no longer exists. It may have been deleted.",
+      "CONTENT_SLUG_DUPLICATE": "Another item already uses this URL. Pick a different slug.",
+      "CONTENT_CODE_DUPLICATE": "Another item already uses this code.",
+      "CONTENT_VERSION_CONFLICT": "Someone else saved this while you were editing. Reload to see their version.",
+      "CONTENT_STATUS_TRANSITION_NOT_ALLOWED": "That status change is not allowed from here.",
+      "CONTENT_PUBLISH_INCOMPLETE": "Write the title and body in the source language before publishing.",
+      "CONTENT_SCHEDULE_INVALID": "Pick a publish date in the future.",
+      "CONTENT_PAGE_REFERENCED": "This page is used in a navigation menu. Remove it from the menu first.",
+      "CONTENT_BANNER_CAPACITY_EXCEEDED": "That placement is full. Unpublish another banner first.",
+      "CONTENT_MENU_DEPTH_EXCEEDED": "Menus go two levels deep at most.",
+      "CONTENT_MENU_TARGET_INVALID": "That menu link points at something that no longer exists.",
+      "CONTENT_POLICY_VERSION_IMMUTABLE": "A published policy version cannot be changed. Publish a new version instead.",
+      "CONTENT_POLICY_TYPE_ACTIVE_EXISTS": "A live policy of this type already exists.",
+      "CONTENT_FAQ_GROUP_NOT_FOUND": "That FAQ group no longer exists.",
+      "CONTENT_BULK_TOO_LARGE": "Select fewer items and try again.",
+      "MEDIA_NOT_FOUND": "That file is no longer in the library.",
+      "MEDIA_TYPE_NOT_ALLOWED": "That file type is not accepted.",
+      "MEDIA_TOO_LARGE": "That file is too large.",
+      "MEDIA_QUOTA_EXCEEDED": "Your media storage is full. Delete some files first.",
+      "MEDIA_REFERENCED": "This file is used by published content. Remove it there first.",
+      "MEDIA_FOLDER_NOT_EMPTY": "Empty the folder before deleting it.",
+      "MEDIA_UNREADABLE": "That file could not be read.",
+      "MEDIA_STORAGE_FAILED": "The file could not be stored. Try again."
+    }
+  },
+  "auth": {
+    "accountAccess": "Account access",
+    "accountAction": "Account action",
+    "createAccount": "Create account",
+    "signIn": "Sign in",
+    "backToHome": "Back to cvhome home",
+    "freeTrialEyebrow": "14 days free",
+    "trustNote": "Trusted by 1,400 merchants across 26 markets.",
+    "signIn.heading": "Welcome back.",
+    "signIn.copy": "Continue through cvhome's authorization server and return to your default market.",
+    "signIn.point1": "Single sign-on available on Scale plans.",
+    "signIn.point2": "Session history and device list live in your profile.",
+    "signIn.point3": "Support answers in under four hours on weekdays.",
+    "signIn.oauthCopy": "Sign in through cvhome UAA. Your organization, stores and permissions are resolved by the authorization server after the handoff.",
+    "signIn.continueWithUaa": "Continue with cvhome UAA",
+    "signIn.twoFactorNote": "Two-factor authentication applies where your organization requires it.",
+    "signUp.heading": "Plant your flag.",
+    "signUp.copy": "Create the account, choose where you want to sell first, and your store is live before you finish reading this page.",
+    "signUp.point1": "One account, as many storefronts as your plan allows.",
+    "signUp.point2": "Regions, currencies and tax rules configured per store.",
+    "signUp.point3": "No card until the trial ends.",
+    "signUp.email": "Email",
+    "signUp.emailFallback": "Enter a valid email address.",
+    "signUp.password": "Password",
+    "signUp.passwordFallback": "Use at least 8 characters.",
+    "signUp.showPassword": "Show password",
+    "signUp.legalNote": "Free for 14 days. No card. Close the account and every store with it, whenever you like.",
+    "signUp.firstName": "First name",
+    "signUp.firstNameFallback": "Enter your first name.",
+    "signUp.lastName": "Last name",
+    "signUp.lastNameFallback": "Enter your last name.",
+    "signUp.repeatPassword": "Repeat password",
+    "signUp.repeatPasswordFallback": "Repeat your password.",
+    "signUp.passwordMismatch": "The two passwords do not match.",
+    "signUp.creating": "Creating account…",
+    "signUp.created": "Account created. Sign in to continue.",
+    "signingOut": "Signing you out…",
+    "signUp.emailTaken": "An account already uses this email address. Sign in instead, or use another address."
+  },
+  "dashboard": {
+    "heading": {
+      "title": "Home",
+      "context": "{store} · {date}"
+    },
+    "loadingMetrics": "Loading metrics…",
+    "storeMetrics": "Store metrics",
+    "needsAttention": "Needs your attention",
+    "viewAll": "View all",
+    "customerSplitTitle": "Orders by customer country",
+    "orderStatusBreakdown": "Order status breakdown",
+    "ordersUnit": "orders",
+    "topSellingProducts": "Most ordered products",
+    "productReportOptions": "Product report options",
+    "kpi": {
+      "revenue": "Revenue",
+      "orders": "Orders",
+      "pendingPayments": "Pending payments",
+      "lowStock": "Low stock items",
+      "needsReview": "Needs review",
+      "unavailable": "Not available yet"
+    },
+    "attention": {
+      "paymentApprovals": {
+        "label": "Payment approvals waiting",
+        "detail": "Manual bank-transfer transactions to confirm"
+      },
+      "awaitingFulfilment": {
+        "label": "Orders awaiting fulfilment",
+        "detail": "Placed but not yet shipped"
+      }
+    }
+  },
+  "shared": {
+    "actions": {
+      "cancel": "Cancel",
+      "retry": "Try again"
+    },
+    "autocomplete": {
+      "searching": "Searching…",
+      "noMatches": "No matches."
+    },
+    "copyField": {
+      "defaultLabel": "value",
+      "copy": "Copy {what}",
+      "failed": "{what} could not be copied. Select it and copy by hand."
+    },
+    "datePicker": {
+      "selectDate": "Select a date",
+      "dialogLabel": "Choose a date",
+      "previousMonth": "Previous month",
+      "nextMonth": "Next month",
+      "today": "Today",
+      "clear": "Clear",
+      "applied": "Date set to {date}",
+      "cleared": "Date cleared."
+    },
+    "dateRangePicker": {
+      "selectRange": "Select date range",
+      "rangeLabel": "{from} to {to}",
+      "rangeLabelOpen": "{from} to ...",
+      "dialogLabel": "Select date range",
+      "previousMonth": "Previous month",
+      "nextMonth": "Next month",
+      "pickEndDate": "pick an end date",
+      "pickStartDate": "Pick a start date",
+      "rangeApplied": "Range applied: {from} to {to}"
+    },
+    "export": {
+      "generatedAt": "Generated {date}",
+      "pageOfPages": "{page} / {pages}"
+    },
+    "exportButton": {
+      "export": "Export",
+      "preparing": "Preparing…",
+      "preparingAnnouncement": "Preparing the export.",
+      "readyAnnouncement": "Export ready. The download has started.",
+      "failedFallback": "The export failed.",
+      "canvasUnavailable": "Unable to prepare the export canvas.",
+      "failedAnnouncement": "Export failed. {message}"
+    },
+    "imagePicker": {
+      "choose": "Choose {field}",
+      "constraints": "{formats} · at least {width}×{height} · up to {size}",
+      "peek": "View {field} full size",
+      "replace": "Replace",
+      "saved": "Saved",
+      "stored": "Stored: {name}",
+      "tooHeavy": "That file is {actual}. The limit is {limit} — export it smaller and try again.",
+      "tooSmall": "That image is {actual}. It needs to be at least {width}×{height} to stay sharp.",
+      "unreadable": "That file could not be read as an image. Check it opens, then try again.",
+      "uploading": "Uploading…",
+      "wrongShape": "That image is {actual}, which is the wrong shape for this slot. Aim for {wanted} or the same proportions.",
+      "wrongType": "That is not a {formats} file."
+    },
+    "imagePreview": {
+      "close": "Close"
+    },
+    "kpiCard": {
+      "vsLastPeriod": "vs last period"
+    },
+    "localeSwitcher": {
+      "translatedIn": "Translated in {language}",
+      "notTranslatedIn": "Not translated in {language}"
+    },
+    "pagination": {
+      "previousPage": "Previous page",
+      "nextPage": "Next page",
+      "pageN": "Page {n}",
+      "label": "Pagination",
+      "records": "records",
+      "noRecords": "No {unit}",
+      "summary": "Showing {first}–{last} of {total} {unit}"
+    },
+    "richText": {
+      "defaultLabel": "Formatted text",
+      "toolbarLabel": "Text formatting",
+      "heading2": "Heading",
+      "heading3": "Subheading",
+      "bold": "Bold",
+      "italic": "Italic",
+      "bulletList": "Bulleted list",
+      "numberList": "Numbered list",
+      "link": "Link",
+      "clear": "Clear formatting",
+      "sourceLabel": "Edit HTML source",
+      "sourceFieldLabel": "HTML source of {field}",
+      "sourceOn": "HTML source shown. Undo history starts again from here.",
+      "sourceOff": "Formatted view shown. Undo history starts again from here.",
+      "linkUrl": "Link address",
+      "linkPlaceholder": "https://example.com",
+      "linkApply": "Add link",
+      "linkRefused": "That address cannot be used in a link.",
+      "keys": {
+        "heading2": "Ctrl+Alt+2",
+        "heading3": "Ctrl+Alt+3",
+        "bold": "Ctrl+B",
+        "italic": "Ctrl+I",
+        "bulletList": "Ctrl+Shift+8",
+        "numberList": "Ctrl+Shift+7",
+        "link": "Ctrl+K",
+        "clear": "Ctrl+\\"
+      }
+    },
+    "secretField": {
+      "copy": "Copy {field}",
+      "hide": "Hide {field}",
+      "notSet": "Not set",
+      "reveal": "Show {field}"
+    },
+    "sectionNav": {
+      "ariaLabel": "Sections",
+      "heading": "Sections",
+      "collapse": "Collapse sections",
+      "expand": "Expand sections",
+      "needsAttention": "Needs attention"
+    },
+    "stepper": {
+      "complete": "Complete"
+    },
+    "tagInput": {
+      "defaultLabel": "Tags",
+      "defaultPlaceholder": "Add tag…",
+      "removeTag": "Remove {tag}"
+    },
+    "toast": {
+      "regionLabel": "Notifications",
+      "dismiss": "Dismiss notification",
+      "tone": {
+        "success": "Success:",
+        "info": "Info:",
+        "warning": "Warning:",
+        "danger": "Error:"
+      }
+    },
+    "tree": {
+      "expand": "Expand {name}",
+      "collapse": "Collapse {name}",
+      "toggleVisibility": "Show or hide {name} in the storefront",
+      "visible": "Shown in the storefront",
+      "hidden": "Hidden from the storefront",
+      "nest": "Move {name} into the row above it",
+      "nestShort": "Move into the row above",
+      "unnest": "Move {name} out of its parent",
+      "unnestShort": "Move out",
+      "addChild": "Add a {noun} inside {name}",
+      "addChildShort": "Add {noun} inside",
+      "empty": "Nothing here yet.",
+      "actions": "Actions for {name}",
+      "keyboardHint": "Use Alt with the left and right arrows to move a {noun} in or out. Press Shift F10 for more actions.",
+      "visibilityShort": "Show in the storefront",
+      "keys": {
+        "nest": "Alt+→",
+        "unnest": "Alt+←",
+        "visibility": "Alt+V",
+        "addChild": "Alt+N",
+        "moveUp": "Alt+↑",
+        "moveDown": "Alt+↓"
+      },
+      "announce": {
+        "nesting": "Moving {name} in",
+        "unnesting": "Moving {name} out",
+        "hiding": "Hiding {name} from the storefront",
+        "showing": "Showing {name} in the storefront",
+        "settled": "{name}, level {level}, {position} of {size}",
+        "movingUp": "Moving {name} up",
+        "movingDown": "Moving {name} down"
+      },
+      "keyboardHintReorder": "Use Alt with the up and down arrows to reorder a {noun}, and with the left and right arrows to move it in or out. Press Shift F10 for more actions.",
+      "moveUp": "Move {name} up among its siblings",
+      "moveDown": "Move {name} down among its siblings",
+      "moveUpShort": "Move up",
+      "moveDownShort": "Move down"
+    },
+    "validation": {
+      "required": "This field is required.",
+      "email": "Enter a valid email address.",
+      "minLength": "Use at least {requiredLength} characters.",
+      "maxLength": "Use at most {requiredLength} characters.",
+      "min": "Enter {min} or more.",
+      "max": "Enter {max} or less.",
+      "pattern": "This is not a valid value.",
+      "url": "Enter a valid web address.",
+      "phone": "Enter a valid phone number.",
+      "taken": "This is already in use.",
+      "mismatch": "These two do not match."
+    },
+    "listSeparator": ", ",
+    "storeStatus": {
+      "ACTIVE": "Active",
+      "SUSPENDED": "Suspended",
+      "ARCHIVED": "Archived",
+      "DELETED": "Deleted"
+    },
+    "provisioningState": {
+      "NOT_STARTED_PROVISIONING": "Queued",
+      "IN_PROGRESS_PROVISIONING": "Building",
+      "SUCCESSFULLY_PROVISIONING": "Ready",
+      "FAILED_PROVISIONING": "Failed"
+    },
+    "subscriptionStatus": {
+      "PENDING": "Pending",
+      "TRIALING": "Trial",
+      "ACTIVE": "Active",
+      "PAST_DUE": "Payment failed",
+      "SUSPENDED": "Suspended",
+      "CANCELED": "Cancelled"
+    },
+    "allowance": {
+      "unlimited": "Unlimited",
+      "included": "Included",
+      "notIncluded": "Not included",
+      "megabytes": "{{size}} MB"
+    },
+    "entitlement": {
+      "MAX_PRODUCTS": {
+        "limit": "Up to {count} products",
+        "unlimited": "Unlimited products",
+        "granted": "Product catalog"
+      },
+      "MAX_ORDERS_MONTH": {
+        "limit": "Up to {count} orders a month",
+        "unlimited": "Unlimited orders",
+        "granted": "Order processing"
+      },
+      "MAX_ACCOUNTS": {
+        "limit": "Up to {count} staff accounts",
+        "unlimited": "Unlimited staff accounts",
+        "granted": "Staff accounts"
+      },
+      "MAX_STORAGE_MB": {
+        "limit": "{count} MB of media storage",
+        "unlimited": "Unlimited media storage",
+        "granted": "Media storage"
+      },
+      "CUSTOM_DOMAIN": {
+        "limit": "Custom domain",
+        "unlimited": "Custom domain",
+        "granted": "Custom domain"
+      },
+      "ANALYTICS": {
+        "limit": "Analytics dashboards",
+        "unlimited": "Analytics dashboards",
+        "granted": "Analytics dashboards"
+      },
+      "PRIORITY_SUPPORT": {
+        "limit": "Priority support",
+        "unlimited": "Priority support",
+        "granted": "Priority support"
+      }
+    }
+  },
+  "orders": {
+    "allOrders": "All orders",
+    "clearFilters": "Clear filters",
+    "clearSearch": "Clear the order search",
+    "column": {
+      "order": "Order",
+      "customer": "Customer",
+      "status": "Status",
+      "payment": "Payment",
+      "total": "Total",
+      "placed": "Placed",
+      "actions": "Actions",
+      "city": "City"
+    },
+    "createOrder": "Create order",
+    "filterByStatus": "Filter orders by status",
+    "heading": {
+      "title": "Orders",
+      "context": "{store} · Aug 4, 2026",
+      "contextWithCount": "{store} · {count, plural, one {# order} other {# orders}} in the selected period"
+    },
+    "kpi": {
+      "orders": "Orders",
+      "allClear": "All clear",
+      "averageOrderValue": "Average order value",
+      "returnsRate": "Returns rate",
+      "awaitingFulfilment": "Awaiting fulfilment",
+      "awaiting": "Needs picking",
+      "unavailable": "Not available yet"
+    },
+    "loading": "Loading orders…",
+    "metricsLabel": "Order metrics",
+    "noneInPeriod": "No orders were placed in this period.",
+    "noneMatch": "No orders match this filter.",
+    "notAvailable": {
+      "create": "Creating orders from the console is not available yet.",
+      "bulkFulfilment": "Bulk fulfilment is not available yet.",
+      "pickingLists": "Picking lists are not available yet."
+    },
+    "pagesLabel": "Order pages",
+    "searchLabel": "Search orders",
+    "searchPlaceholder": "Customer name, email or phone",
+    "subtitle": {
+      "range": "{count, plural, one {Showing {from}–{to} of {total} order} other {Showing {from}–{to} of {total} orders}}",
+      "rangeForStatus": "{status} · showing {from}–{to} of {total}",
+      "none": "No orders in this period.",
+      "noneForStatus": "No {status} orders in this period."
+    },
+    "tab": {
+      "all": "All"
+    },
+    "unit": "orders",
+    "viewOrder": "View order",
+    "viewOrderFor": "View order {id}",
+    "filteredByCustomer": "Showing only the orders of {{customer}}.",
+    "clearCustomerFilter": "Show all orders"
+  },
+  "storeSettings": {
+    "details": {
+      "address": "Business address",
+      "category": "Category",
+      "city": "City",
+      "colorTheme": "Colour theme",
+      "colorThemeDefault": "Theme default (the storefront theme’s own colours)",
+      "country": "Country",
+      "countryFallback": "Choose the country this store trades from.",
+      "currency": "Default currency",
+      "currencyFallback": "A default currency is required.",
+      "deleteStore": "Delete this store",
+      "deleteStoreAccept": "Delete this store",
+      "deleteStoreConfirm": "This removes the store, its settings and its storefront. It cannot be undone.",
+      "deleteStoreDone": "Store deleted.",
+      "deleteStoreType": "To confirm, type the store name:",
+      "deleteStoreWarning": "Removes products, orders and configuration. This cannot be undone.",
+      "dimensionUnit": "Dimension unit",
+      "inBusinessSince": "In business since",
+      "language": "Default language",
+      "languageFallback": "A default language is required.",
+      "languageNotSupported": "The default language must be one of the supported languages.",
+      "legalName": "Legal entity name",
+      "maintenanceMode": "Maintenance mode",
+      "maintenanceModeDescription": "Show a holding page instead of the storefront",
+      "notRecorded": "Not recorded by the platform",
+      "notRecordedNote": "These fields appear in the console design but nothing stores them yet, so they cannot be edited or saved.",
+      "postalCode": "Postal code",
+      "published": "Store is published",
+      "publishedDescription": "Visible to customers and indexable by search engines",
+      "requireLogin": "Require sign-in to check out",
+      "requireLoginDescription": "Shoppers must have an account before placing an order.",
+      "shortDescription": "Short description",
+      "slug": "Store slug",
+      "stateProvince": "State or province",
+      "storeName": "Store name",
+      "storeNameFallback": "A store name is required.",
+      "storefrontBehaviour": "Storefront behaviour",
+      "subtitle": "Identity, contact and locale settings for this store.",
+      "supportEmail": "Support email",
+      "supportEmailFallback": "Enter an address customers can reach you at.",
+      "supportPhone": "Support phone",
+      "supportPhoneFallback": "Enter a phone number customers can reach you on.",
+      "supportedLanguages": "Supported languages",
+      "supportedLanguagesFallback": "Choose at least one language for the storefront.",
+      "supportedLanguagesNote": "Adding a language applies on save. Removing one is not applied yet — the platform only ever adds to a store's languages.",
+      "taxNumber": "Tax / VAT number",
+      "theme": "Storefront theme",
+      "timezone": "Timezone",
+      "title": "Store details",
+      "upToCharacters": "Up to {max} characters",
+      "useCache": "Cache storefront responses",
+      "useCacheDescription": "Faster pages, at the cost of showing changes a little later.",
+      "weightUnit": "Weight unit",
+      "inBusinessSincePlaceholder": "No date set"
+    },
+    "discard": "Discard",
+    "domain": {
+      "addCustomDomain": "Add a custom domain",
+      "addHint": "Paste or type the domain — we keep just the host name. It has to already point at us with the record below before it can be added.",
+      "check": "Check DNS",
+      "checkAgain": "Check again",
+      "checkFailed": "Could not reach the DNS resolver, so the record could not be checked.",
+      "checkUnavailable": "We could not reach a DNS resolver, so this domain has not been checked. You can still add it.",
+      "checking": {
+        "title": "Checking DNS…",
+        "meta": "from your browser",
+        "body": "Looking up the CNAME for {domain} through a public resolver."
+      },
+      "checkingNow": "Checking…",
+      "customDomains": "Custom domains",
+      "defaultSubdomain": "Default subdomain · always active",
+      "dnsHint": "Add this at your DNS provider, then run the check. DNS changes can take up to 24 hours to reach every resolver.",
+      "dnsName": "Name",
+      "dnsType": "Type",
+      "dnsValue": "Value",
+      "enterBeforeChecking": "Enter a custom domain before checking DNS.",
+      "failed": {
+        "title": "Points somewhere else",
+        "meta": "record found",
+        "body": "A CNAME exists for {domain} but points elsewhere. Correct it to the value below and check again."
+      },
+      "fallback": "That does not look like a host name. Use something like shop.example.com.",
+      "noTarget": "The address to point your domain at is not available for this store, so the DNS record cannot be shown.",
+      "open": "Open",
+      "openNamed": "Open {domain} in a new tab",
+      "recordToAdd": "DNS record to add",
+      "removeNamed": "Remove {domain}",
+      "removed": "{domain} removed.",
+      "subdomainUnknown": "Address not available",
+      "subtitle": "Serve your storefront from your own domain.",
+      "system": "System",
+      "title": "Store domain",
+      "verified": {
+        "title": "Points at this store",
+        "meta": "one resolver agrees",
+        "body": "{domain} currently resolves to this store. This is a live DNS lookup from your browser, not a platform verification."
+      },
+      "waiting": {
+        "title": "No record yet",
+        "meta": "nothing found",
+        "body": "No CNAME record for {domain} yet. Add the record below — DNS changes can take up to 24 hours to reach every resolver."
+      },
+      "yourDomain": "your domain"
+    },
+    "loading": "Loading store settings…",
+    "loginProvider": {
+      "google": "Google",
+      "facebook": "Facebook",
+      "github": "GitHub"
+    },
+    "nav": {
+      "ariaLabel": "Store settings sections",
+      "builderUnavailable": "The home page builder is not available yet.",
+      "heading": "Settings",
+      "homePageBuilder": "Home page builder"
+    },
+    "paymentDescription": {
+      "cod": "Collected by the courier — nothing to configure",
+      "manualTransfer": "Orders wait until you confirm the transfer",
+      "stripe": "Cards, wallets and local methods",
+      "paypal": "PayPal balance and linked cards"
+    },
+    "paymentType": {
+      "cod": "Cash on delivery",
+      "manualTransfer": "Manual bank transfer",
+      "stripe": "Stripe",
+      "paypal": "PayPal"
+    },
+    "payments": {
+      "accept": "Accept {gateway}",
+      "apiKey": "API key",
+      "publishable": "(publishable)",
+      "secretKey": "Secret key",
+      "secretsNotice": "Secret keys and webhook secrets are encrypted at rest, but this screen is handed them decrypted — treat this page as you would the keys themselves.",
+      "subtitle": "Gateway credentials for this store only.",
+      "title": "Store payment configuration",
+      "unknownGateway": "Configured on the platform.",
+      "webhookSecret": "Webhook secret",
+      "webhookSecretHint": "The value the gateway signs its webhooks with.",
+      "webhookUrl": "Webhook URL",
+      "webhookUrlHint": "Paste this into {gateway} as the endpoint for its events."
+    },
+    "previewNotAvailable": "Previewing the storefront is not available yet.",
+    "previewStorefront": "Preview storefront",
+    "saveChanges": "Save changes",
+    "saving": "Saving…",
+    "section": {
+      "domain": "Store domain",
+      "details": "Store details",
+      "socialLogin": "Store social login",
+      "payments": "Store payment config"
+    },
+    "sectionSaved": "{section} saved.",
+    "sectionShort": {
+      "domain": "Domain",
+      "details": "Details",
+      "socialLogin": "Social login",
+      "payments": "Payment config"
+    },
+    "sectionsLabel": "Store settings sections",
+    "socialLogin": {
+      "appId": "App ID",
+      "appSecret": "App secret",
+      "appSecretHint": "Stored encrypted. It is shown here because the API returns it decrypted.",
+      "callbackHint": "Paste this into the provider's redirect URI allow-list",
+      "callbackUrl": "Callback URL",
+      "credentialsRequired": "An enabled provider needs both an app ID and an app secret.",
+      "notConfigured": "Not set up yet",
+      "signInWith": "Sign in with {provider}",
+      "subtitle": "Let customers sign in with an external provider.",
+      "title": "Store social login"
+    },
+    "state": {
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "live": "Live",
+      "off": "Off"
+    },
+    "title": "Store management",
+    "unit": {
+      "CM": "Centimetres (cm)",
+      "IN": "Inches (in)",
+      "KG": "Kilograms (kg)",
+      "LB": "Pounds (lb)"
+    }
+  },
+  "createStore": {
+    "artifact": {
+      "database": {
+        "label": "Dedicated tenant database",
+        "detail": "Encrypted at rest, isolated from other stores"
+      },
+      "node": {
+        "label": "Node assignment",
+        "detail": "A physical server, chosen by the pod registry"
+      },
+      "domain": {
+        "label": "Provisional subdomain + TLS",
+        "detail": "A storefront address with a managed certificate"
+      },
+      "locale": {
+        "label": "Locale and tax defaults",
+        "detail": "Seeded from the country of operation"
+      },
+      "owner": {
+        "label": "Admin access for you",
+        "detail": "Your account, added as store owner"
+      }
+    },
+    "artifactsPanel": {
+      "title": "What gets created"
+    },
+    "cancel": "Cancel",
+    "identity": {
+      "title": "Store identity",
+      "subtitle": "Branding, domains and content are configured after provisioning",
+      "storeName": "Store name",
+      "storeNamePlaceholder": "Acme Supply Co.",
+      "country": "Country of operation",
+      "currency": "Base currency",
+      "nameAvailable": "That name is available.",
+      "nameTaken": "That name is already in use. Store names are unique across the platform.",
+      "email": "Support email",
+      "emailFallback": "Enter an address customers can reach you at.",
+      "phone": "Support phone",
+      "phoneFallback": "Enter a phone number customers can reach you on.",
+      "choose": "Choose…",
+      "countryFallback": "Choose the country this store trades from.",
+      "currencyFallback": "A base currency is required.",
+      "supportedLanguages": "Storefront languages",
+      "supportedLanguagesFallback": "Choose at least one language for the storefront.",
+      "language": "Default language",
+      "languageNotSupported": "The default language has to be one of the storefront languages ticked above.",
+      "theme": "Storefront theme",
+      "themeFallback": "A theme is required.",
+      "colorTheme": "Colour palette",
+      "colorThemeDefault": "Theme default (the storefront theme’s own colours)",
+      "colorThemeFallback": "A colour palette is required.",
+      "address": "Street address",
+      "city": "City",
+      "stateProvince": "State or province",
+      "postalCode": "Postal code",
+      "inBusinessSince": "In business since",
+      "weightUnit": "Weight unit",
+      "dimensionUnit": "Dimension unit",
+      "requireLogin": "Shoppers must sign in before placing an order",
+      "requireLoginDescription": "Guests can browse either way. With this off, they can check out without an account.",
+      "inBusinessSincePlaceholder": "No date set",
+      "cityFallback": "A city is required.",
+      "postalCodeFallback": "A postal code is required."
+    },
+    "infra": {
+      "storeId": "Store id",
+      "status": "Status"
+    },
+    "infraPanel": {
+      "title": "Assigned infrastructure"
+    },
+    "nextStep": {
+      "logo": "Upload logo and banner",
+      "domain": "Attach a custom domain",
+      "payments": "Connect a payment gateway",
+      "product": "Add your first product"
+    },
+    "nextStepsPanel": {
+      "title": "Next steps"
+    },
+    "notAvailable": "{what} is not available yet.",
+    "progress": {
+      "runningTitle": "Provisioning store",
+      "doneTitle": "Store provisioned",
+      "assigning": "assigning…",
+      "pending": "pending",
+      "liveBanner": "{name} is live.",
+      "configureStore": "Configure store",
+      "doneNote": "Your store is provisioned and ready to configure.",
+      "runningNote": "This usually takes under a minute. You can leave this page — provisioning continues without it.",
+      "failedTitle": "Provisioning failed",
+      "failedNote": "The store record exists but was not built. It cannot be used until someone looks at it.",
+      "failedBanner": "{name} could not be provisioned. Contact support with the store id above — creating it again would leave a second, broken record.",
+      "timedOutNote": "Still building. We stopped checking, but the server has not.",
+      "timedOutBanner": "This is taking longer than expected. Provisioning has not failed — reopen the store from store management to see where it got to.",
+      "openConsole": "Open the console",
+      "viewStores": "View stores",
+      "failureReason": "The pod reported:"
+    },
+    "progressLabel": "Provisioning progress",
+    "region": {
+      "title": "Hosting region",
+      "subtitle": "Where the store is physically provisioned — this cannot be changed afterwards",
+      "permanent": "Permanent",
+      "automatic": "Assigned automatically",
+      "automaticMeta": "The registry picks the pod with room for your store.",
+      "preferenceNote": "A pod is a preference, not a guarantee — the registry honours it only if it has capacity."
+    },
+    "subtitle": {
+      "form": "Provision a new store on a server in the region you sell from",
+      "running": "Provisioning {name} — this takes about a minute",
+      "live": "{name} · live",
+      "runningInRegion": "Provisioning {name} in {region} — this takes about a minute",
+      "liveInRegion": "{name} · live in {region}"
+    },
+    "summary": {
+      "storeName": "Store name",
+      "pendingName": "—",
+      "region": "Region",
+      "countryCurrency": "Country · currency",
+      "regionAutomatic": "Assigned automatically",
+      "languages": "Storefront languages"
+    },
+    "summaryPanel": {
+      "title": "Provisioning summary",
+      "note": "Provisioning takes about a minute. You can leave this page — the store appears in the switcher as soon as it is live.",
+      "provision": "Provision store",
+      "billingNote": "Billing starts when the store goes live",
+      "provisioning": "Creating…"
+    },
+    "title": "Create store"
+  },
+  "firstRun": {
+    "feature": {
+      "title": "Watch: create a store in 2 minutes",
+      "copy": "A short walkthrough from an empty account to a live storefront — region, plan, first product and the home page.",
+      "duration": "2:14"
+    },
+    "guide": {
+      "meta": "{duration} · {section}",
+      "section": {
+        "products": "Products",
+        "storefront": "Storefront",
+        "payments": "Payments",
+        "content": "Content"
+      },
+      "csvImport": {
+        "title": "Import a catalogue from CSV",
+        "duration": "3:05"
+      },
+      "homePage": {
+        "title": "Build the home page",
+        "duration": "4:20"
+      },
+      "goLive": {
+        "title": "Connect Stripe and go live",
+        "duration": "2:48"
+      },
+      "secondLanguage": {
+        "title": "Sell in a second language",
+        "duration": "3:36"
+      }
+    },
+    "guides": {
+      "title": "More short guides"
+    },
+    "heading": {
+      "title": "Getting started",
+      "context": "No store yet · create one to open the console"
+    },
+    "help": {
+      "title": "Want us to set the first store up with you?",
+      "copy": "A 15-minute call covering regions, currency and catalogue import. Free on every plan.",
+      "bookCall": "Book a call"
+    },
+    "hero": {
+      "stepOf": "Step {step} of {total}",
+      "startTrial": "Start 14-day trial",
+      "createStore": "Create store",
+      "trialRequired": "Start your trial to unlock store provisioning.",
+      "pending": {
+        "title": "Start your trial, then create your store",
+        "copy": "Your 14-day trial unlocks store provisioning. Start it and you can name your first store and pick its region straight away — no card, cancel any time.",
+        "meta": "No card required · 14 days free"
+      },
+      "ready": {
+        "title": "Create your first store",
+        "copy": "Nothing else in cvhome works until a store exists — products, orders and payments all belong to one. Give it a name, a contact address and where it trades from; provisioning takes about a minute.",
+        "meta": "~1 minute · you can create more later"
+      }
+    },
+    "limit": {
+      "of": "of {cap}",
+      "growthAllows": "Growth allows {amount}",
+      "stores": "Stores",
+      "products": "Products",
+      "seats": "Team seats",
+      "storage": "Media storage"
+    },
+    "loading": "Loading your setup…",
+    "nextUp": {
+      "title": "What comes after that",
+      "subtitle": "Unlocks the moment your store is provisioned",
+      "catalogue": {
+        "title": "Fill the catalogue",
+        "copy": "Add products with images, pricing and stock per location — or import an existing catalogue as a CSV."
+      },
+      "storefront": {
+        "title": "Shape the storefront",
+        "copy": "Build the home page from hero, carousel, category and product blocks, in each language you sell in."
+      },
+      "payments": {
+        "title": "Take the first payment",
+        "copy": "Connect Stripe, PayPal or a regional gateway. Test mode first, then flip it live."
+      }
+    },
+    "notAvailable": "{what} is not available yet.",
+    "notice": {
+      "pending": "Start your 14-day trial to create your first store. No card required.",
+      "active": "Your 14-day trial is active — {days} days left, no card on file.",
+      "startTrial": "Start 14-day trial",
+      "viewPlans": "View plans"
+    },
+    "plan": {
+      "title": "Your plan",
+      "meta": "14 days left · no card on file",
+      "freeTrial": "Free trial",
+      "comparePlans": "Compare plans",
+      "footnote": "The free plan runs one store in one region with a cvhome subdomain. Custom domains, extra stores and team seats come with Growth."
+    },
+    "planAfterStore": "Pick a plan once your first store exists — a subscription belongs to a store, not to the account.",
+    "progress": {
+      "title": "Setup progress",
+      "locked": "Locked"
+    },
+    "progressLabel": "Setup progress",
+    "step": {
+      "createStore": {
+        "label": "Create your first store",
+        "meta": "Name, contact and locale · ~1 min"
+      },
+      "addProducts": {
+        "label": "Add your first products",
+        "meta": "One at a time or import a CSV"
+      },
+      "designHome": {
+        "label": "Design the home page",
+        "meta": "Hero, categories and promos"
+      },
+      "connectPayments": {
+        "label": "Connect a payment gateway",
+        "meta": "Required before you can take orders"
+      }
+    },
+    "video": {
+      "close": "Close video",
+      "unavailable": "This walkthrough has not been published yet.",
+      "unsupported": "Your browser cannot play this video."
+    }
+  },
+  "marketing": {
+    "brandHome": "cvhome home",
+    "toggleNavigation": "Toggle navigation",
+    "primaryNavigation": "Primary navigation",
+    "metricsAriaLabel": "Platform metrics",
+    "footerNavigation": "Footer navigation",
+    "nav": {
+      "why": "Why cvhome",
+      "merchants": "Merchants",
+      "reviews": "Reviews",
+      "contact": "Contact",
+      "pricing": "Pricing",
+      "openStore": "Open a store"
+    },
+    "hero": {
+      "status": "Commerce, unbordered",
+      "headline": "Sell anywhere.<br><strong>Rule everywhere.</strong>",
+      "copy": "cvhome is the operating table for merchants who outgrew one storefront. Many markets, many languages, many currencies. One command.",
+      "begin": "Begin",
+      "seeItLive": "See it live"
+    },
+    "metric": {
+      "timeToOpen": "To open a market",
+      "continents": "Continents",
+      "languages": "Languages",
+      "uptime": "Uptime"
+    },
+    "story": {
+      "heading": "Most platforms give you a store. We give you a <em>territory</em>."
+    },
+    "pillar": {
+      "openMarket": {
+        "title": "Open a market in a minute",
+        "copy": "A new store is a decision, not a project. Choose where you want to sell and it is standing before the coffee cools."
+      },
+      "localLanguage": {
+        "title": "Speak the local language",
+        "copy": "Every word your customers read, in their language and their currency, without running four teams to keep it true."
+      },
+      "oneSeat": {
+        "title": "One seat, every store",
+        "copy": "Switch markets the way you switch tabs. The numbers, the orders and the shelves all answer to the same login."
+      }
+    },
+    "stores": {
+      "heading": "Merchants already <em>on the map</em>.",
+      "subheading": "Four live storefronts, one account",
+      "live": "Live"
+    },
+    "store": {
+      "since": "Since {year}",
+      "acme": {
+        "trade": "Workplace supplies"
+      },
+      "northline": {
+        "trade": "Lab consumables"
+      },
+      "harborPoint": {
+        "trade": "Cafe wholesale"
+      },
+      "vantage": {
+        "trade": "Furniture trade"
+      }
+    },
+    "reviews": {
+      "heading": "What merchants say <em>after a year</em>.",
+      "ratedAriaLabel": "Rated {rating} out of 5",
+      "averageFrom": "4.8 average from {count} reviews",
+      "startTrial": "Start your own trial"
+    },
+    "review": {
+      "marta": {
+        "role": "Founder, Nordwerk Interiors",
+        "market": "Poland · 3 stores",
+        "quote": "We ran three storefronts on three different tools before this. Consolidating them took an afternoon, and I finally see one stock number instead of three that disagree."
+      },
+      "tobias": {
+        "role": "Head of Ecommerce, Fjord Supply",
+        "market": "Sweden · 5 stores",
+        "quote": "Opening a new market used to be a project with a budget. Now it is a form. The tax and currency rules come preconfigured per region, which is the part I dreaded."
+      },
+      "amina": {
+        "role": "Operations lead, Souk Modern",
+        "market": "UAE · 2 stores",
+        "quote": "Arabic and English side by side in the same product form is what sold us. Translators work in the admin directly instead of passing spreadsheets back and forth."
+      },
+      "daniel": {
+        "role": "Managing director, Ridgeline Tools",
+        "market": "UK · 4 stores",
+        "quote": "Support answered a payout question in under two hours on a Saturday. That mattered more than any feature on the pricing page."
+      },
+      "camille": {
+        "role": "Brand director, Atelier Vert",
+        "market": "France · 1 store",
+        "quote": "The storefront builder gave us something on brand without a developer. We hired one later for the checkout, not for the basics."
+      },
+      "priya": {
+        "role": "Merchandising manager, Acme Supply",
+        "market": "Netherlands · 6 stores",
+        "quote": "Banners, pages and FAQ entries all publish per store per language. Our seasonal campaigns went from a two-week scramble to a Monday morning."
+      }
+    },
+    "reviewStat": {
+      "averageRating": "Average rating across 312 reviews",
+      "wouldRecommend": "Would recommend to another merchant",
+      "medianTime": "Median time on the platform"
+    },
+    "quote": {
+      "text": "“We opened Germany on a Tuesday morning and took our first order before lunch.”",
+      "attribution": "Head of Commerce · Acme Supply Holdings"
+    },
+    "pricing": {
+      "heading": "One price. Per store.",
+      "billingCycle": "Billing cycle",
+      "monthly": "Monthly",
+      "yearly": "Yearly",
+      "perMonth": "/mo",
+      "billedYearly": "billed yearly",
+      "billedMonthly": "billed monthly",
+      "note": "Every plan is the whole platform. The account is free — you only pay for stores you open.",
+      "perYear": "/yr",
+      "startFree": "Start free",
+      "startTrial": "Start {days}-day trial",
+      "choosePlan": "Choose this plan",
+      "unavailable": "Prices are unavailable right now. Please try again shortly.",
+      "saving": "Save {percent}% against monthly"
+    },
+    "contact": {
+      "heading": "Talk to someone who <em>runs stores</em>.",
+      "intro": "Migration questions, tax setup in a new market, or a plan that does not fit the pricing page. Our team answers in under four hours on weekdays.",
+      "address": "Prinsengracht 263, Amsterdam · Mon–Fri, 09:00–18:00 CET",
+      "formHeading": "Send us a note",
+      "formIntro": "No sales sequence. One reply from the person who can answer.",
+      "name": "Name",
+      "company": "Company",
+      "workEmail": "Work email",
+      "whatDoYouNeed": "What do you need?",
+      "message": "Message",
+      "sendMessage": "Send message",
+      "notConnectedNote": "This form is not connected yet — please use one of the channels above and we will pick it up from there."
+    },
+    "channel": {
+      "email": {
+        "title": "Email us",
+        "detail": "For migrations, pricing and partnership questions."
+      },
+      "chat": {
+        "title": "Live chat",
+        "detail": "In the console, bottom right. Weekdays 09:00–18:00 CET."
+      },
+      "call": {
+        "title": "Call sales",
+        "detail": "For teams running more than five storefronts."
+      }
+    },
+    "contactTopic": {
+      "migratingStores": "Migrating stores",
+      "newMarketSetup": "New market setup",
+      "customPlan": "Custom plan",
+      "somethingElse": "Something else"
+    },
+    "contactHint": {
+      "migratingStores": "We run four storefronts on two other platforms and want to consolidate before the autumn season.",
+      "newMarketSetup": "We are opening in Germany and Poland next quarter and need help with tax and currency setup.",
+      "customPlan": "We expect around 20 stores across 6 markets. The published tiers do not cover that.",
+      "somethingElse": "Tell us what you are trying to do and who it is for."
+    },
+    "footer": {
+      "console": "Console",
+      "copyright": "© {year} cvhome"
+    }
+  },
+  "shell": {
+    "breadcrumb": {
+      "dashboard": "Dashboard",
+      "orders": "Orders",
+      "storeManagement": "Store management",
+      "createStore": "Create store",
+      "firstRun": "Getting started",
+      "orderDetails": "Order",
+      "billing": "Billing",
+      "catalogue": "Catalogue",
+      "products": "Products",
+      "newProduct": "New product",
+      "productForm": "Product",
+      "payments": "Payments",
+      "users": "Users",
+      "profile": "Account",
+      "customers": "Customers",
+      "platform": "Platform",
+      "organizations": "Organizations",
+      "organization": "Organization",
+      "pods": "Pods",
+      "newPod": "Register a pod",
+      "pod": "Pod",
+      "platformUsers": "Accounts",
+      "platformBilling": "Billing",
+      "plans": "Plans",
+      "content": "Content management"
+    },
+    "toolbar": {
+      "breadcrumbNav": "Breadcrumb",
+      "clearSearch": "Clear the search",
+      "languageAriaLabel": "Language, {name}",
+      "search": "Search orders and products",
+      "searchPlaceholder": "Search orders, products…",
+      "themeAriaLabel": "Theme, {name}"
+    },
+    "profile": {
+      "profile": "Profile",
+      "logOut": "Log out",
+      "loading": "Signing in…"
+    },
+    "theme": {
+      "forest": {
+        "label": "Forest",
+        "hint": "Emerald on deep green"
+      },
+      "midnight": {
+        "label": "Midnight",
+        "hint": "Indigo on slate"
+      },
+      "daylight": {
+        "label": "Daylight",
+        "hint": "Emerald on white"
+      }
+    },
+    "nav": {
+      "ariaLabel": "Console",
+      "openNavigation": "Open navigation",
+      "closeNavigation": "Close navigation",
+      "expandMenu": "Expand menu",
+      "collapseMenu": "Collapse menu",
+      "firstRunDisabled": "Create your first store to unlock this section.",
+      "group": {
+        "seller": "Seller",
+        "organization": "Organization",
+        "storefront": "Storefront",
+        "commerce": "Commerce",
+        "platform": "Platform"
+      },
+      "item": {
+        "home": "Home",
+        "storeManagement": "Store management",
+        "userManagement": "User management",
+        "customers": "Customers",
+        "contentManagement": "Content management",
+        "inventory": "Inventory",
+        "orders": "Orders",
+        "payments": "Payments",
+        "billing": "Billing",
+        "catalogue": "Catalogue",
+        "platformHome": "Platform overview",
+        "organizations": "Organizations",
+        "pods": "Pods",
+        "platformUsers": "Accounts",
+        "platformBilling": "Billing",
+        "plans": "Plans"
+      }
+    },
+    "planBanner": {
+      "ariaLabel": "Plan notice",
+      "upgrade": "Upgrade plan",
+      "dismiss": "Dismiss plan notice",
+      "manage": "Manage plan"
+    },
+    "store": {
+      "ariaLabel": "Stores",
+      "title": "Store",
+      "loading": "Loading stores…",
+      "noStoreYet": "No store yet",
+      "createStore": "Create store"
+    }
+  },
+  "legal": {
+    "backToHome": "← Back to home",
+    "pending": "This document has not been published yet. Until it is, the terms you are bound by are the ones agreed in your contract — write to us and we will send you the current text.",
+    "contactUs": "Contact us",
+    "terms": {
+      "title": "Terms of service",
+      "lede": "The agreement between you and cvhome for the use of the platform and the stores you open on it."
+    },
+    "privacy": {
+      "title": "Privacy policy",
+      "lede": "What we collect about you and the shoppers of your stores, why we hold it, and how long for."
+    }
+  },
+  "subscription": {
+    "toConsole": "Go to the console",
+    "success": {
+      "title": "Subscription confirmed",
+      "copy": "Your plan is active. It may take a moment to appear in the console while the payment settles."
+    },
+    "fail": {
+      "title": "Subscription not completed",
+      "copy": "Nothing was charged. You can try again from the pricing page, or use another card."
+    },
+    "toBilling": "Go to billing"
+  },
+  "orderDetails": {
+    "title": "Order {reference}",
+    "backToOrders": "All orders",
+    "loading": "Loading order…",
+    "invoice": "Invoice",
+    "items": "Items",
+    "itemsSubtitle": "{count} lines on this order",
+    "noItems": "This order has no lines.",
+    "column": {
+      "product": "Product",
+      "quantity": "Qty",
+      "unitPrice": "Unit price",
+      "lineTotal": "Total",
+      "description": "Description",
+      "amount": "Amount"
+    },
+    "history": "History",
+    "historySubtitle": "Every status this order has been through",
+    "noHistory": "No status changes recorded yet.",
+    "newStatus": "New status",
+    "comment": "Comment",
+    "commentPlaceholder": "Add a note about this order…",
+    "recordStatus": "Record status",
+    "recording": "Recording…",
+    "statusAdded": "Status recorded.",
+    "customer": "Customer",
+    "addresses": "Addresses",
+    "billing": "Billing",
+    "delivery": "Delivery",
+    "noAddress": "Not provided on this order.",
+    "status": "Status",
+    "yes": "Yes",
+    "no": "No",
+    "flag": {
+      "paymentStatus": "Payment",
+      "reservationStatus": "Stock reservation",
+      "customerAgreed": "Terms accepted",
+      "confirmedAddress": "Address confirmed"
+    },
+    "placedOn": "Placed {date}",
+    "fulfilment": "Fulfilment progress",
+    "stageAhead": "Not yet",
+    "offPath": "This order is {status}. It is no longer moving through fulfilment.",
+    "stage": {
+      "placed": "Placed",
+      "paid": "Paid",
+      "picked": "Picked",
+      "shipped": "Shipped",
+      "delivered": "Delivered"
+    },
+    "viewProfile": "View profile",
+    "invoiceWord": "INVOICE",
+    "order": "Order",
+    "issued": "Issued",
+    "billedTo": "Billed to",
+    "shippedTo": "Shipped to",
+    "download": "Download",
+    "preparing": "Preparing…",
+    "print": "Print",
+    "close": "Close",
+    "invoiceFailed": "The invoice could not be prepared.",
+    "customerStat": {
+      "orders": "Orders",
+      "spent": "Spent",
+      "returns": "Returns"
+    },
+    "customerStatsUnavailable": "Lifetime figures are not available yet.",
+    "emailInvoice": "Email",
+    "emailNotAvailable": "Emailing invoices is not available yet.",
+    "commentVisible": "Visible to the customer",
+    "badReference": "“{reference}” is not an order reference.",
+    "payments": "Payments",
+    "noPayments": "No payment has been recorded against this order.",
+    "profileNeedsEmail": "This order has no email address, so there is nothing to look the customer up by."
+  },
+  "status": {
+    "CREATED": "Created",
+    "PENDING_PAYMENT": "Pending payment",
+    "CONFIRMED": "Confirmed",
+    "PROCESSING": "Processing",
+    "SHIPPED": "Shipped",
+    "DELIVERING": "Delivering",
+    "DELIVERED": "Delivered",
+    "COMPLETED": "Completed",
+    "CANCELLED": "Cancelled",
+    "RETURNED": "Returned",
+    "PENDING": "Pending",
+    "PAID": "Paid",
+    "FAILED": "Failed",
+    "EXPIRED": "Expired",
+    "WAITING_VERIFICATION": "Awaiting verification",
+    "REJECTED": "Rejected",
+    "AUTHORIZED": "Authorized",
+    "REFUNDED": "Refunded",
+    "AVAILABLE": "Available",
+    "NOT_REQUESTED": "Not requested",
+    "RESERVED": "Reserved",
+    "COMMITTED": "Committed",
+    "RELEASED": "Released",
+    "RESERVATION_FAILED": "Reservation failed"
+  },
+  "orderTotal": {
+    "subtotal": "Subtotal",
+    "total": "Total",
+    "tax": "Tax",
+    "shipping": "Shipping",
+    "handling": "Handling",
+    "discount": "Discount",
+    "credit": "Credit",
+    "refund": "Refund",
+    "product": "Products"
+  },
+  "plans": {
+    "title": "Plans",
+    "subtitle": "Every plan is the whole platform. You pay per store, not per account.",
+    "close": "Close plans",
+    "billingCycle": "Billing cycle",
+    "monthly": "Monthly",
+    "yearly": "Yearly",
+    "perMonth": "/mo",
+    "perYear": "/yr",
+    "popular": "Popular",
+    "saving": "Save {percent}% against monthly",
+    "startFree": "Start free",
+    "startTrial": "Start {days}-day trial",
+    "choose": "Choose this plan",
+    "note": "Prices come straight from the billing catalogue — the same one you are charged from.",
+    "unavailable": "Plans could not be loaded.",
+    "retry": "Try again",
+    "noneAtInterval": "No plans are sold at this billing cycle."
+  },
+  "billing": {
+    "title": "Billing",
+    "loading": "Loading billing…",
+    "subtitle": {
+      "on": "This store is on {plan}",
+      "none": "No subscription on record for this store yet"
+    },
+    "plan": {
+      "title": "Current plan",
+      "subtitle": "What this store is on, and when it next renews",
+      "change": "Change plan",
+      "renewsOn": "Renews on",
+      "endsOn": "Ends on",
+      "trialEnds": "Trial ends",
+      "graceUntil": "Works until",
+      "pendingChange": "Moving to {plan} on {date}. Until then this store keeps what it is paying for.",
+      "resume": "Resume renewal",
+      "cancel": "Cancel renewal",
+      "noSubscription": "Billing has not caught up with this store yet. It is created moments after the store and usually appears within a minute.",
+      "noPlanYet": "No plan yet",
+      "choose": "Choose a plan",
+      "perPeriod": "per month"
+    },
+    "allowances": {
+      "title": "What this plan grants",
+      "subtitle": "The ceilings on this store",
+      "none": "No plan on this store yet, so there are no allowances to show.",
+      "note": "These are the plan's limits, not what the store has used — the platform does not publish usage counters yet."
+    },
+    "invoices": {
+      "title": "Invoices",
+      "subtitle": "Issued by the payment provider",
+      "none": "No invoices yet.",
+      "unnumbered": "Draft",
+      "view": "View",
+      "pdf": "PDF"
+    },
+    "invoiceStatus": {
+      "DRAFT": "Draft",
+      "OPEN": "Due",
+      "PAID": "Paid",
+      "UNCOLLECTIBLE": "Uncollectible",
+      "VOID": "Void"
+    },
+    "banner": {
+      "trial": "{days} days left on your {plan} trial.",
+      "pastDue": "Your last payment failed. Update your payment details to keep this store running.",
+      "pastDueGrace": "Your last payment failed — this store keeps working for {days} more days.",
+      "suspended": "This store is suspended for non-payment.",
+      "canceled": "This store's subscription has ended.",
+      "cancelling": "Renewal is off. This store stops on {date}.",
+      "noSubscription": "Billing has not caught up with this store yet."
+    },
+    "cancelDialog": {
+      "title": "Turn off renewal?",
+      "message": "This store keeps everything it is paying for until {date}, then stops. You can turn renewal back on before then.",
+      "confirm": "Turn off renewal",
+      "dismiss": "Keep it running"
+    },
+    "toast": {
+      "planChanged": "Now on {plan}.",
+      "downgradeScheduled": "Scheduled. This store moves to {plan} at the end of the period.",
+      "resumed": "Renewal is back on.",
+      "cancelled": "Renewal is off."
+    },
+    "planName": {
+      "FREE": "Free",
+      "BASIC": "Basic",
+      "PRO": "Pro"
+    },
+    "section": {
+      "plan": "Plan",
+      "invoices": "Invoices"
+    },
+    "nav": {
+      "heading": "Billing",
+      "ariaLabel": "Billing sections"
+    }
+  },
+  "catalogue": {
+    "loading": "Loading the catalogue…",
+    "tabsLabel": "Catalogue sections",
+    "code": "Code",
+    "codeHintNew": "Used in the API, in imports and in storefront URLs. Suggested from the name; edit it before saving if you want a different one.",
+    "codeHintExisting": "Fixed once the record exists — a different code is a different record, not a rename.",
+    "deleteConfirm": "Delete",
+    "heading": {
+      "title": "Catalogue",
+      "context": "{store} — the category tree is what your storefront navigation shows",
+      "contextWithCounts": "{store} · {categories, plural, one {# category} other {# categories}}, {brands, plural, one {# brand} other {# brands}}"
+    },
+    "tab": {
+      "categories": "Categories",
+      "types": "Product types",
+      "brands": "Brands",
+      "groups": "Groups"
+    },
+    "add": {
+      "categories": "New category",
+      "types": "New product type",
+      "brands": "New brand",
+      "groups": "New group"
+    },
+    "delete": {
+      "categories": "Delete {name}?",
+      "types": "Delete {name}?",
+      "brands": "Delete {name}?",
+      "groups": "Delete {name}?"
+    },
+    "deleteMessage": {
+      "categories": "This deletes the category and every category inside it. Products stay, but they lose this category.",
+      "types": "Products already using this type keep working, but you will not be able to set it on a new one.",
+      "brands": "Products already using this brand keep working, but they will no longer name it.",
+      "groups": "The products stay. Only the group and its membership go."
+    },
+    "saved": {
+      "category": "Category saved.",
+      "brand": "Brand saved.",
+      "type": "Product type saved.",
+      "group": "Group saved.",
+      "visibility": "Storefront navigation updated.",
+      "moved": "Category moved.",
+      "memberAdded": "Product added to the group.",
+      "memberRemoved": "Product removed from the group.",
+      "deleted": "Deleted."
+    },
+    "copy": {
+      "languageLabel": "Language being written",
+      "name": "Name",
+      "nameRequired": "A name is required in at least one language.",
+      "slug": "Slug",
+      "slugHint": "The storefront URL. Leave it empty and the storefront falls back to the code.",
+      "description": "Description",
+      "seoTitle": "SEO title",
+      "seoTitleHint": "What a search engine shows as the page title.",
+      "metaDescription": "Meta description",
+      "metaHint": "The snippet under the title in search results.",
+      "translated": "Written in {language}.",
+      "notTranslated": "Not written in {language} yet — the storefront falls back to another language.",
+      "translatedIn": "Written in {language}",
+      "notTranslatedIn": "Not written in {language}",
+      "descriptionPlaceholder": "Describe this for a shopper."
+    },
+    "categories": {
+      "title": "Category tree",
+      "subtitle": "{total, plural, one {# category} other {# categories}} · {roots} top level · {visible} in the storefront navigation",
+      "treeLabel": "Category tree",
+      "expandAll": "Expand all",
+      "collapseAll": "Collapse all",
+      "addTopLevel": "Add a top-level category",
+      "dragHint": "Drag a row onto another to nest it inside. Every move is also on the row’s own buttons, which work from the keyboard.",
+      "newTitle": "New category",
+      "newSubtitle": "Give it a name and a code. Everything else can wait.",
+      "noneTitle": "No category selected",
+      "empty": "This store has no categories yet.",
+      "sortOrder": "Sort order",
+      "sortOrderHint": "Lower numbers come first among siblings.",
+      "visible": "Show in storefront navigation",
+      "visibleOn": "Appears in the storefront navigation, in tree order.",
+      "visibleOff": "Reachable by URL and by search, hidden from the navigation.",
+      "hasChildren": "This category has {count, plural, one {# category} other {# categories}} inside it. Deleting it deletes them too.",
+      "create": "Create category",
+      "save": "Save category",
+      "delete": "Delete",
+      "noun": "category"
+    },
+    "brands": {
+      "title": "Brands",
+      "subtitle": "{count, plural, one {# brand} other {# brands}}",
+      "unavailable": "The brand list could not be loaded. Everything else on this page is up to date.",
+      "none": "This store has no brands yet.",
+      "newTitle": "New brand",
+      "newSubtitle": "A name and a code is all it takes.",
+      "noneTitle": "No brand selected",
+      "empty": "This store has no brands yet.",
+      "create": "Create brand",
+      "save": "Save brand",
+      "delete": "Delete",
+      "nameAndDescriptionOnly": "A brand on this platform is a name and a description. It has no storefront slug and no sort order — the server records neither."
+    },
+    "types": {
+      "title": "Product types",
+      "subtitle": "{count, plural, one {# type} other {# types}}",
+      "unavailable": "The product type list could not be loaded. Everything else on this page is up to date.",
+      "none": "This store has no product types yet.",
+      "newTitle": "New product type",
+      "newSubtitle": "A name and a code is all it takes.",
+      "noneTitle": "No product type selected",
+      "empty": "This store has no product types yet.",
+      "noAttributes": "A product type on this platform is a name, a code and the two settings below. It does not define which attributes a product must carry — nothing links a type to an attribute set.",
+      "visible": "Show on the storefront",
+      "visibleHint": "Whether shoppers can browse by this type.",
+      "allowAddToCart": "Can be added to a basket",
+      "allowAddToCartHint": "Turn this off for types that are shown but not sold directly.",
+      "create": "Create product type",
+      "save": "Save product type",
+      "delete": "Delete"
+    },
+    "groups": {
+      "title": "Product groups",
+      "subtitle": "{count, plural, one {# group} other {# groups}}",
+      "unavailable": "The product group list could not be loaded. Everything else on this page is up to date.",
+      "none": "This store has no product groups yet.",
+      "newTitle": "New product group",
+      "newSubtitle": "Name the group and give it a code. Add products once it exists.",
+      "noneTitle": "No group selected",
+      "empty": "This store has no product groups yet.",
+      "memberCount": "{count, plural, one {# product} other {# products}}",
+      "active": "Active",
+      "inactive": "Inactive",
+      "activeLabel": "Active",
+      "activeHint": "An inactive group stays here but the storefront ignores it.",
+      "members": "Products in this group",
+      "membersHint": "Adding and removing take effect immediately — they are not part of Save.",
+      "addMember": "Add a product to this group",
+      "searchProducts": "Search by name or SKU…",
+      "removeMember": "Remove {name} from this group",
+      "noMembers": "No products in this group yet.",
+      "saveFirst": "Save the group first. Products can be added once it exists.",
+      "create": "Create group",
+      "save": "Save group",
+      "delete": "Delete",
+      "searchPool": "Searches the products already loaded — the platform has no server-side search by name."
+    },
+    "codeChecking": "Checking…",
+    "codeTaken": "That code is already used by another record in this store.",
+    "missingLanguages": "Cannot save yet — no name written in {languages}."
+  },
+  "products": {
+    "loading": "Loading products…",
+    "allProducts": "Products",
+    "addProduct": "Add product",
+    "unit": "products",
+    "pagesLabel": "Product pages",
+    "filterByAvailability": "Filter products by availability",
+    "clearFilters": "Clear filters",
+    "uncategorised": "Uncategorised",
+    "available": "Available",
+    "unavailable": "Unavailable",
+    "none": "This store has no products yet.",
+    "noneMatch": "No products match these filters.",
+    "editRow": "Edit price and quantity",
+    "editRowFor": "Edit the price and quantity of {name}",
+    "saveRowFor": "Save the changes to {name}",
+    "cancelEditFor": "Cancel editing {name}",
+    "editPriceFor": "Price of {name}",
+    "editQuantityFor": "Quantity of {name}",
+    "toggleAvailableFor": "Show or hide {name} on the storefront",
+    "openProduct": "Open the product",
+    "openProductFor": "Open {name}",
+    "deleteProduct": "Delete the product",
+    "deleteProductFor": "Delete {name}",
+    "heading": {
+      "title": "Products",
+      "context": "{store}",
+      "contextWithCount": "{store} · {count, plural, one {# product} other {# products}}"
+    },
+    "tab": {
+      "all": "All",
+      "available": "Available",
+      "unavailable": "Unavailable"
+    },
+    "column": {
+      "product": "Product",
+      "category": "Category",
+      "brand": "Brand",
+      "price": "Price",
+      "quantity": "Quantity",
+      "available": "Storefront",
+      "actions": "Actions"
+    },
+    "filter": {
+      "allBrands": "All brands",
+      "allCategories": "All categories",
+      "brand": "Filter by brand",
+      "category": "Filter by category",
+      "clearBrand": "Clear the brand filter",
+      "clearCategory": "Clear the category filter",
+      "clearSku": "Clear the SKU search",
+      "sku": "Search by SKU",
+      "skuPlaceholder": "Search by SKU…"
+    },
+    "subtitle": {
+      "none": "Nothing to show.",
+      "range": "Showing {from}–{to} of {total} {count, plural, one {product} other {products}}"
+    },
+    "saved": {
+      "row": "Product updated.",
+      "deleted": "{name} deleted."
+    },
+    "delete": {
+      "title": "Delete {name}?",
+      "message": "This removes the product, its images and its category assignments. Orders that already include it are not affected.",
+      "confirm": "Delete product"
+    }
+  },
+  "productForm": {
+    "loading": "Loading the product…",
+    "title": "Product",
+    "newTitle": "New product",
+    "contextDraft": "Draft · SKU {sku} · {percent}% ready",
+    "contextLive": "On the storefront · SKU {sku} · {percent}% ready",
+    "stepsLabel": "Product setup steps",
+    "saveDraft": "Save draft",
+    "publish": "Publish product",
+    "cannotPublish": "Some required details are still missing. The checklist on the right says which.",
+    "step": {
+      "essentials": "Essentials",
+      "essentialsMeta": "SKU, name and description",
+      "media": "Media",
+      "mediaMeta": "Photographs and their order",
+      "mediaLocked": "Save the product first",
+      "pricing": "Pricing & stock",
+      "pricingMeta": "Price, quantity and the shipping box",
+      "organize": "Organize",
+      "organizeMeta": "Categories, brand and related products"
+    },
+    "saved": {
+      "created": "Product created. Images and related products are available now.",
+      "updated": "Product saved.",
+      "published": "Product published to the storefront.",
+      "createdWithoutCategories": "Product created, but its categories could not be applied. Check the Organize step.",
+      "categoriesFailed": "Product saved, but its categories could not be applied. The list below is what the server has."
+    },
+    "essentials": {
+      "identifiers": "Identifiers",
+      "identifiersSubtitle": "Shared across every language.",
+      "sku": "SKU",
+      "skuHint": "Your own code for this product. Fixed once the product exists.",
+      "skuInvalid": "Use letters, digits, dots, hyphens and underscores only.",
+      "dateAvailable": "Available from",
+      "dateAvailableHint": "Leave it empty to make it available immediately.",
+      "sortOrder": "Sort order",
+      "sortOrderHint": "Lower numbers come first in a category listing.",
+      "visible": "Show on the storefront",
+      "visibleOn": "Shoppers can find and buy this product.",
+      "visibleOff": "Hidden from the storefront. Publishing turns this on.",
+      "copy": "Names and descriptions",
+      "copySubtitle": "One version per language your store trades in.",
+      "languageLabel": "Language being written",
+      "perLanguage": "You are editing the {language} version. Only the fields below are per-language — the SKU, price, stock, categories and images are shared.",
+      "name": "Product name",
+      "nameHint": "What shoppers see in listings and search results.",
+      "slug": "URL slug",
+      "slugHint": "Leave it empty and the storefront falls back to the SKU.",
+      "highlights": "Short description",
+      "highlightsHint": "One or two lines, shown beside the product image.",
+      "description": "Full description",
+      "seoTitle": "SEO title",
+      "metaDescription": "Meta description",
+      "keywords": "Keywords",
+      "keywordsHint": "Comma-separated. Used by the storefront’s own search.",
+      "slugPrefix": "/p/",
+      "descriptionPlaceholder": "Describe the product for a shopper. Headings and lists are fine.",
+      "skuChecking": "Checking the SKU…",
+      "dateAvailablePlaceholder": "Available immediately",
+      "keywordsPlaceholder": "Add a keyword…"
+    },
+    "media": {
+      "hint": "The storefront thumbnail is the first image. Move another one to the front to change it.",
+      "image": "Product image",
+      "moveDown": "Move image {position} later",
+      "moveUp": "Move image {position} earlier",
+      "remove": "Remove image {position}",
+      "removeAccept": "Remove image",
+      "removeConfirm": "The image is deleted from the product. Uploading it again means finding the file.",
+      "removeTitle": "Remove this image?",
+      "saveFirst": "Save the product first. Images are attached to a product, so there has to be one to attach them to.",
+      "storefrontThumbnail": "Storefront thumbnail",
+      "subtitle": "The first image is the storefront thumbnail.",
+      "title": "Images",
+      "view": "View image {position} full size",
+      "pick": "Choose from media library"
+    },
+    "pricing": {
+      "title": "Price and stock",
+      "subtitle": "One price and one quantity — this platform does not model more than that.",
+      "price": "Price",
+      "priceInvalid": "Enter a price of zero or more.",
+      "quantity": "Quantity in stock",
+      "quantityHint": "A single figure. There are no per-location stock levels on this platform.",
+      "notModelled": "Compare-at price, unit cost and margin, quantity-break tiers, tax class, per-product currency, reorder points and backorders are not recorded anywhere on this platform, so they are not shown here.",
+      "canBePurchased": "Can be bought",
+      "canBePurchasedHint": "Turn this off to show the product without a buy button.",
+      "shipeable": "Needs shipping",
+      "shipeableHint": "Turn this off for a product that is collected or delivered digitally.",
+      "virtual": "Digital product",
+      "virtualHint": "No physical item ships.",
+      "shippingBox": "Shipping box",
+      "shippingBoxSubtitle": "What the courier is quoted on.",
+      "weight": "Weight",
+      "weightUnit": "Weight unit",
+      "length": "Length",
+      "width": "Width",
+      "height": "Height",
+      "dimensionUnit": "Dimension unit",
+      "unit": {
+        "g": "Grams",
+        "kg": "Kilograms",
+        "l": "Litres",
+        "lb": "Pounds",
+        "T": "Tonnes",
+        "cm": "Centimetres",
+        "cu": "Cubic",
+        "ft": "Feet",
+        "in": "Inches",
+        "m": "Metres"
+      },
+      "weightValue": "Weight",
+      "dimensions": "Dimensions"
+    },
+    "organize": {
+      "categories": "Categories",
+      "categoriesSubtitle": "Where shoppers find this product. A product can be in several.",
+      "selectedCount": "{count, plural, one {# category selected} other {# categories selected}}",
+      "noneSelected": "No categories selected. Shoppers will only find this product by search.",
+      "noCategories": "This store has no categories yet. Create some on the Catalogue page first.",
+      "classification": "Brand and type",
+      "classificationSubtitle": "How the product is classified.",
+      "brand": "Brand",
+      "noBrand": "No brand",
+      "brandHint": "Shown on the product page and filterable in listings.",
+      "type": "Product type",
+      "noType": "No product type",
+      "typeHint": "Manage the list on the Catalogue page.",
+      "related": "Related products",
+      "relatedSubtitle": "Shown as “you may also like” on the product page.",
+      "relatedSaveFirst": "Save the product first. Relationships are between two saved products.",
+      "addRelated": "Add a related product",
+      "searchProducts": "Search by name or SKU…",
+      "removeRelated": "Remove {name} from the related products",
+      "noRelated": "No related products yet.",
+      "searchPool": "Searches the products already loaded — the platform has no server-side search by name."
+    },
+    "readiness": {
+      "title": "Ready to publish",
+      "subtitle": "{percent}% complete",
+      "required": "REQ",
+      "done": "Done",
+      "todo": "Still to do",
+      "blocked": "Publishing needs every required item above.",
+      "item": {
+        "sku": "A SKU",
+        "name": "A name in every language",
+        "price": "A price",
+        "category": "At least one category",
+        "brand": "A brand",
+        "image": "At least one image",
+        "description": "A description"
+      }
+    },
+    "translations": {
+      "title": "Translations",
+      "subtitle": "Which languages this product is written in.",
+      "missing": "Not written",
+      "filled": "{filled} of {total}"
+    },
+    "missingLanguages": "Cannot save yet — no name written in {languages}."
+  },
+  "payments": {
+    "heading": {
+      "title": "Payments",
+      "context": "{{store}} · every payment the store has taken"
+    },
+    "loading": "Loading payments…",
+    "metricsLabel": "Payment metrics",
+    "allTransactions": "Transactions",
+    "gatewaySettings": "Gateway settings",
+    "filterByStatus": "Filter transactions by status",
+    "searchLabel": "Search by order number or transaction reference",
+    "searchPlaceholder": "Order number or reference",
+    "clearSearch": "Clear the transaction search",
+    "clearFilters": "Clear filters",
+    "noneMatch": "No transaction matches these filters.",
+    "noneInPeriod": "No payments were taken in this period.",
+    "unit": "transactions",
+    "pagesLabel": "Transaction pages",
+    "filter": {
+      "gateway": "Filter by gateway",
+      "allGateways": "All gateways",
+      "clearGateway": "Show every gateway"
+    },
+    "tab": {
+      "queue": "Awaiting approval",
+      "all": "All"
+    },
+    "column": {
+      "transaction": "Transaction",
+      "order": "Order",
+      "method": "Method",
+      "status": "Status",
+      "amount": "Amount",
+      "date": "Date",
+      "actions": "Actions"
+    },
+    "kpi": {
+      "awaitingApproval": "Awaiting approval",
+      "captured": "Captured",
+      "failed": "Failed",
+      "refunded": "Refunded",
+      "actionNeeded": "Action needed",
+      "allClear": "Nothing waiting",
+      "unavailable": "Not available"
+    },
+    "subtitle": {
+      "none": "Nothing to show",
+      "range": "Showing {{from}}–{{to}} of {{total}}",
+      "queue": "Showing {{from}}–{{to}} of {{total}} awaiting confirmation"
+    },
+    "action": {
+      "approve": "Approve",
+      "approveFor": "Approve transaction {{reference}}",
+      "reject": "Reject",
+      "rejectFor": "Reject transaction {{reference}}"
+    },
+    "approve": {
+      "title": "Confirm this payment",
+      "message": "Enter the reference from your bank or gateway to record that the money arrived.",
+      "messageFor": "Enter the reference from your bank or gateway to record that the money for order {{reference}} arrived.",
+      "transactionNo": "External transaction number",
+      "transactionNoHint": "The reference on your statement. It is stored with the payment.",
+      "transactionNoRequired": "Enter the external transaction number.",
+      "confirm": "Approve payment",
+      "approving": "Approving…"
+    },
+    "reject": {
+      "title": "Reject this payment?",
+      "message": "Payment {{reference}} will be marked rejected. The order does not change status and the customer is not notified — you will need to follow up separately.",
+      "confirm": "Reject payment"
+    },
+    "toast": {
+      "approved": "Payment {{reference}} approved.",
+      "rejected": "Payment {{reference}} rejected. The order was not changed."
+    },
+    "summary": {
+      "title": "Order",
+      "loading": "Loading the order…",
+      "failed": "This order could not be loaded.",
+      "customer": "Customer",
+      "placed": "Placed",
+      "noItems": "This order has no line items.",
+      "total": "Order total",
+      "quantity": "×",
+      "close": "Close the order summary",
+      "items": "Items",
+      "openOrder": "Open the full order"
+    },
+    "viewOrderFor": "Open a summary of order {{order}}",
+    "externalRef": "Ref",
+    "externalRefHint": "The reference this payment is known by outside the console — from the bank statement or the gateway."
+  },
+  "customers": {
+    "loading": "Loading customers…",
+    "allCustomers": "All customers",
+    "unit": "customers",
+    "paginationLabel": "Customer pages",
+    "unnamed": "No name on record",
+    "totalLabel": "{{total}} {count, plural, =1 {customer} other {customers}}",
+    "heading": {
+      "title": "Customers",
+      "context": "The people who have bought from {{store}}"
+    },
+    "subtitle": {
+      "none": "No one to show",
+      "range": "Showing {{from}}–{{to}} of {{total}} {count, plural, =1 {customer} other {customers}}"
+    },
+    "column": {
+      "customer": "Customer",
+      "location": "Location",
+      "id": "ID",
+      "actions": "Actions"
+    },
+    "search": {
+      "label": "Search customers",
+      "placeholder": "Name or email",
+      "clear": "Clear the search"
+    },
+    "empty": {
+      "title": "No customers yet",
+      "message": "Nobody has ordered from this store. Customers appear here after their first order."
+    },
+    "noMatches": {
+      "title": "No customers match",
+      "message": "Nothing matched that name or email. A customer who has never given a billing address can only be found by email."
+    },
+    "fact": {
+      "company": "Company",
+      "phone": "Phone",
+      "ordersPlaced": "Orders placed",
+      "customerId": "Customer ID"
+    },
+    "lifetime": {
+      "title": "Lifetime figures",
+      "value": "Lifetime value",
+      "returns": "Returns",
+      "since": "Customer since",
+      "unavailable": "Lifetime figures are not available yet."
+    },
+    "addresses": {
+      "title": "Addresses",
+      "billing": "Billing",
+      "delivery": "Delivery",
+      "none": "This customer has no address on record."
+    },
+    "orders": {
+      "title": "Orders",
+      "viewAll": "View all",
+      "loading": "Loading orders…",
+      "empty": "No orders yet."
+    },
+    "action": {
+      "openDetails": "Open",
+      "openDetailsFor": "Open {{name}}",
+      "closeDetails": "Close details"
+    }
+  },
+  "users": {
+    "loading": "Loading the team…",
+    "allUsers": "All users",
+    "unit": "users",
+    "paginationLabel": "Team pages",
+    "you": "You",
+    "heading": {
+      "title": "User management",
+      "context": "Everyone with access to {{store}}"
+    },
+    "subtitle": {
+      "none": "No one to show",
+      "range": "Showing {{from}}–{{to}} of {{total}} {count, plural, =1 {user} other {users}}"
+    },
+    "column": {
+      "user": "User",
+      "roles": "Roles",
+      "status": "Status",
+      "actions": "Actions",
+      "email": "Email",
+      "role": "Role",
+      "expires": "Expires",
+      "userName": "Username"
+    },
+    "status": {
+      "active": "Active",
+      "disabled": "Disabled"
+    },
+    "empty": {
+      "title": "No one here yet",
+      "message": "This store has no staff accounts. Add one to give a colleague access."
+    },
+    "rail": {
+      "newUser": "New user",
+      "editUser": "Edit user"
+    },
+    "fact": {
+      "roles": "Roles",
+      "userName": "Username",
+      "storeAccess": "Store access",
+      "organizationWide": "Organization-wide",
+      "signIn": "Sign-in",
+      "allowed": "Allowed",
+      "blocked": "Blocked"
+    },
+    "field": {
+      "userName": "Username",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "Email",
+      "password": "Password",
+      "newPassword": "New password",
+      "repeatPassword": "Repeat password",
+      "passwordHint": "At least 8 characters, with an uppercase letter, a lowercase letter and a digit.",
+      "roles": "Roles",
+      "rolesHint": "What this person may do. At least one is required.",
+      "rolesUnavailable": "The list of roles could not be loaded, so only the roles this account already has are shown.",
+      "active": "Allow sign-in",
+      "activeHint": "A disabled account keeps its history and cannot sign in.",
+      "role": "Role"
+    },
+    "action": {
+      "addUser": "Add user",
+      "save": "Save",
+      "delete": "Delete",
+      "edit": "Edit",
+      "enable": "Allow sign-in",
+      "disable": "Block sign-in",
+      "resetPassword": "Set password",
+      "closeDetails": "Close details",
+      "notOnYourself": "You cannot do this to your own account.",
+      "invite": "Invite user",
+      "resend": "Resend",
+      "resendFor": "Resend the invitation to {{email}}",
+      "revoke": "Revoke",
+      "revokeFor": "Revoke the invitation to {{email}}",
+      "openDetails": "Open",
+      "openDetailsFor": "Open {{name}}'s account"
+    },
+    "delete": {
+      "title": "Delete this account?",
+      "message": "{{name}} will be removed and will no longer be able to sign in. Their past activity is kept. This cannot be undone."
+    },
+    "reset": {
+      "title": "Set a new password",
+      "message": "Choose a new password for {{name}}. They will not be told — you will need to pass it on yourself.",
+      "confirm": "Set password",
+      "busy": "Setting…",
+      "handoverHint": "Nothing on this platform sends email, so hand the password over yourself and ask them to change it.",
+      "weak": "Use at least 8 characters, with an uppercase letter, a lowercase letter and a digit.",
+      "mismatch": "The two passwords do not match."
+    },
+    "toast": {
+      "created": "{{name}} was added.",
+      "updated": "{{name}} was updated.",
+      "deleted": "{{name}} was deleted.",
+      "enabled": "{{name}} can sign in again.",
+      "disabled": "{{name}} can no longer sign in.",
+      "passwordReset": "A new password was set for {{name}}.",
+      "revoked": "The invitation to {{email}} was revoked."
+    },
+    "tabsLabel": "Team and invitations",
+    "tab": {
+      "team": "Team",
+      "invitations": "Invitations"
+    },
+    "invitationStatus": {
+      "PENDING": "Pending",
+      "ACCEPTED": "Accepted",
+      "REVOKED": "Revoked",
+      "EXPIRED": "Expired"
+    },
+    "invitations": {
+      "title": "Invitations",
+      "subtitle": "Everyone who has been asked to join this organization.",
+      "empty": {
+        "title": "No invitations yet",
+        "message": "Invite someone to give them access to this organization's stores."
+      }
+    },
+    "invite": {
+      "title": "Invite someone to join",
+      "message": "They will join this organization with the role you choose. They need a cvhome account to accept.",
+      "invalid": "Enter a valid email address and choose a role.",
+      "noMailHint": "Nothing is emailed. You will be given a link to send them yourself.",
+      "confirm": "Create invitation",
+      "busy": "Creating…"
+    },
+    "issued": {
+      "title": "Send them this link",
+      "message": "The invitation for {{email}} is ready. Copy the link and send it to them however you normally would.",
+      "linkLabel": "Invitation link",
+      "warning": "This is the only time this link can be shown. Close this and it cannot be recovered — you would have to resend the invitation, which creates a different link.",
+      "done": "I have copied it"
+    },
+    "revoke": {
+      "title": "Revoke this invitation?",
+      "message": "The link sent to {{email}} will stop working. You can invite them again later."
+    }
+  },
+  "role": {
+    "SUPER_ADMIN": "Platform administrator",
+    "ORG_ADMIN": "Organization administrator",
+    "STORE_ADMIN": "Store administrator",
+    "STORE_MODERATOR": "Store moderator",
+    "STORE_RETAIL": "Retail",
+    "USER": "User"
+  },
+  "acceptInvitation": {
+    "title": "Join this organization",
+    "message": "You have been invited to join. Accepting adds your account to the organization and gives you access to its stores.",
+    "action": "Accept invitation",
+    "busy": "Accepting…",
+    "hint": "An invitation can only be accepted once.",
+    "joined": {
+      "title": "You are in",
+      "message": "Your account has been added to the organization. You can open the console now.",
+      "action": "Open the console"
+    },
+    "refused": {
+      "title": "This invitation cannot be used",
+      "noToken": "This link is missing its invitation token, so there is nothing to accept.",
+      "retry": "Try again",
+      "hint": "It may have already been used, been revoked, or expired. Ask whoever invited you to send a new one."
+    },
+    "story": {
+      "heading": "One console, every store",
+      "copy": "Joining an organization gives you access to the stores its administrators have put you on.",
+      "point1": "Your own sign-in — nothing is shared",
+      "point2": "The stores and permissions your administrator chose",
+      "point3": "An invitation can only be accepted once"
+    }
+  },
+  "profile": {
+    "heading": {
+      "title": "Your account",
+      "context": "How you are signed in, and how the console looks to you"
+    },
+    "account": {
+      "title": "Account",
+      "limited": "The console can only see your username and your roles. Your name and email address live in the sign-in service and are not sent to it yet, so there is nothing here to edit."
+    },
+    "preferences": {
+      "title": "Preferences",
+      "subtitle": "How the console looks and reads.",
+      "language": "Language",
+      "theme": "Theme",
+      "thisBrowserOnly": "These are remembered in this browser only. There is nowhere to keep them against your account yet, so they will not follow you to another device."
+    }
+  },
+  "platform": {
+    "orgStatus": {
+      "ACTIVE": "Active",
+      "SUSPENDED": "Suspended",
+      "CLOSED": "Closed"
+    },
+    "invoiceStatus": {
+      "DRAFT": "Draft",
+      "OPEN": "Open",
+      "PAID": "Paid",
+      "UNCOLLECTIBLE": "Uncollectible",
+      "VOID": "Void"
+    },
+    "auditEvent": {
+      "CREATED": "Created",
+      "TRIAL_STARTED": "Trial started",
+      "ACTIVATED": "Activated",
+      "RENEWED": "Renewed",
+      "PAYMENT_FAILED": "Payment failed",
+      "PAST_DUE": "Past due",
+      "SUSPENDED": "Suspended",
+      "RESUMED": "Resumed",
+      "PLAN_UPGRADED": "Plan upgraded",
+      "PLAN_DOWNGRADE_SCHEDULED": "Downgrade scheduled",
+      "PLAN_DOWNGRADE_APPLIED": "Downgrade applied",
+      "CANCEL_SCHEDULED": "Cancellation scheduled",
+      "CANCEL_REVOKED": "Cancellation revoked",
+      "CANCELED": "Cancelled",
+      "INVOICE_RECORDED": "Invoice recorded",
+      "QUOTA_REFUSED": "Quota refused"
+    },
+    "auditSource": {
+      "API": "Operator",
+      "WEBHOOK": "Stripe",
+      "JOB": "Scheduled job",
+      "SYSTEM": "Provisioning"
+    },
+    "podLifecycle": {
+      "PROVISIONING": "Provisioning",
+      "ACTIVE": "Active",
+      "DRAINING": "Draining",
+      "DECOMMISSIONED": "Decommissioned"
+    },
+    "podHealth": {
+      "GREEN": "Healthy",
+      "AMBER": "Degraded",
+      "RED": "Unhealthy"
+    },
+    "podVisibility": {
+      "PUBLIC": "Shared",
+      "PRIVATE": "Private"
+    },
+    "dashboard": {
+      "heading": {
+        "title": "Platform overview",
+        "context": "Organizations and stores created across the whole platform"
+      },
+      "loading": "Loading platform figures…",
+      "kpiLabel": "Platform metrics",
+      "kpi": {
+        "organizations": "New organizations in this period",
+        "stores": "New stores in this period",
+        "subscriptions": "Subscriptions started in this period",
+        "revenue": "Collected ({currency})"
+      },
+      "organizations": {
+        "title": "Organizations created per day",
+        "unit": "organizations"
+      },
+      "stores": {
+        "title": "Stores created per day",
+        "unit": "stores"
+      },
+      "subscriptions": {
+        "title": "Subscriptions started per day — {plan}",
+        "unit": "subscriptions"
+      },
+      "seeBilling": "See the full billing picture"
+    },
+    "organizations": {
+      "heading": {
+        "title": "Organizations",
+        "context": "Every tenant on the platform"
+      },
+      "loading": "Loading organizations…",
+      "totalLabel": "{{total}} {count, plural, =1 {organization} other {organizations}}",
+      "subtitle": {
+        "none": "No organizations to show",
+        "range": "Showing {{from}}–{{to}} of {{total}} {count, plural, =1 {organization} other {organizations}}"
+      },
+      "panel": {
+        "title": "All organizations"
+      },
+      "unnamed": "Unnamed organization",
+      "unit": "organizations",
+      "paginationLabel": "Organization pages",
+      "column": {
+        "organization": "Organization",
+        "status": "Status",
+        "created": "Created",
+        "id": "Identifier",
+        "actions": "Actions"
+      },
+      "action": {
+        "create": "New organization",
+        "open": "Open organization",
+        "openNamed": "Open {{name}}"
+      },
+      "empty": {
+        "title": "No organizations yet",
+        "message": "Every organization created on the platform will appear here."
+      },
+      "create": {
+        "title": "New organization",
+        "message": "Creates the organization and its first administrator together. If the address is already registered, neither is created.",
+        "firstName": "First name",
+        "lastName": "Last name",
+        "email": "Contact email",
+        "password": "Password",
+        "repeatPassword": "Repeat password",
+        "passwordHint": "6 to 12 characters, with an uppercase letter, a lowercase letter and a digit.",
+        "unnamedHint": "The organization will be listed under this email address until someone gives it a name.",
+        "emailInvalid": "Enter a valid email address.",
+        "passwordWeak": "The password does not meet the rule above.",
+        "passwordMismatch": "The two passwords do not match.",
+        "confirm": "Create organization",
+        "busy": "Creating…"
+      },
+      "toast": {
+        "created": "Organization created for {{email}}."
+      },
+      "search": {
+        "label": "Search organizations",
+        "placeholder": "Name or contact email",
+        "clear": "Clear the search"
+      },
+      "filter": {
+        "statusLabel": "Filter by status",
+        "allStatuses": "All statuses"
+      },
+      "noMatches": {
+        "title": "No organizations matched",
+        "message": "Nothing on the platform matches that name, address or status. Clear the filters to see every organization."
+      }
+    },
+    "organization": {
+      "heading": {
+        "fallback": "Organization",
+        "context": "Created {{created}}"
+      },
+      "loading": "Loading organization…",
+      "nav": {
+        "heading": "Organization",
+        "ariaLabel": "Organization sections"
+      },
+      "section": {
+        "overview": "Overview",
+        "stores": "Stores",
+        "users": "Users",
+        "activity": "Activity",
+        "billing": "Billing"
+      },
+      "action": {
+        "backToList": "All organizations",
+        "resume": "Resume",
+        "suspend": "Suspend",
+        "close": "Close organization"
+      },
+      "overview": {
+        "identity": "Identity",
+        "id": "Organization id",
+        "name": "Name",
+        "saveName": "Save name",
+        "rename": "Rename organization",
+        "unnamed": "Not named yet",
+        "email": "Contact email",
+        "created": "Created",
+        "status": "Status",
+        "owner": "Owner account",
+        "ownerLede": "The administrator this organization was created with. Setting a password here changes theirs.",
+        "resetOwnerPassword": "Set owner password",
+        "noOwnerReason": "No owner account is recorded for this organization, so there is nobody to set a password for."
+      },
+      "stores": {
+        "title": "Stores",
+        "readOnly": "Read-only: a store is administered by its own organization.",
+        "loading": "Loading stores…",
+        "unit": "stores",
+        "paginationLabel": "Store pages",
+        "column": {
+          "store": "Store",
+          "status": "Status",
+          "provisioning": "Provisioning",
+          "pod": "Pod",
+          "billing": "Billing"
+        },
+        "empty": {
+          "title": "No stores yet",
+          "message": "This organization has not created a store."
+        },
+        "billingUnknown": "Billing has no subscription recorded for this store, or could not be reached. Either way it does not mean the store has lapsed.",
+        "billingUnknownShort": "Unknown",
+        "openBilling": "Open this store in the billing register"
+      },
+      "users": {
+        "title": "Users",
+        "lede": "Every account uaa holds for this organization, including administrators who belong to no store.",
+        "loading": "Loading accounts…",
+        "paginationLabel": "Account pages",
+        "empty": {
+          "title": "No accounts",
+          "message": "uaa holds no account carrying this organization's identifier."
+        }
+      },
+      "billing": {
+        "loading": "Loading this organization's billing…",
+        "spend": "Spend",
+        "paidIn": "Paid ({currency})",
+        "billedIn": "Billed ({currency})",
+        "noSpend": "This organization has never been invoiced.",
+        "subscriptions": "Subscriptions",
+        "invoices": "Invoices",
+        "openRegister": "Open the register",
+        "openLedger": "Open the ledger",
+        "noSubscriptions": "None of this organization’s stores has a subscription.",
+        "noInvoices": "No invoices for this organization yet."
+      },
+      "activity": {
+        "title": "Activity",
+        "empty": {
+          "title": "Not available yet",
+          "message": "Every rename, suspension and closure is recorded, but no endpoint returns those records yet."
+        }
+      },
+      "suspend": {
+        "title": "Suspend {{name}}?",
+        "message": "The organization can be resumed afterwards; nothing is deleted.",
+        "consequence": "Every store this organization owns stops being usable immediately, including its storefronts' console.",
+        "reasonLabel": "Reason",
+        "reasonHint": "Optional. Recorded in the audit trail beside your name.",
+        "busy": "Suspending…"
+      },
+      "resume": {
+        "title": "Resume {{name}}?",
+        "message": "The organization and every store it owns become usable again."
+      },
+      "close": {
+        "title": "Close {{name}}?",
+        "message": "Closing is final: there is no transition out of it. Every store the organization owns stops being usable and cannot be brought back from here.",
+        "confirmationLabel": "Type the organization's name to confirm:"
+      },
+      "ownerReset": {
+        "title": "Set the owner's password",
+        "message": "Sets a new password for the account that owns {{name}}.",
+        "password": "New password",
+        "repeatPassword": "Repeat password",
+        "hint": "At least 8 characters, with an uppercase letter, a lowercase letter and a digit.",
+        "handoverHint": "Nothing on the platform sends email, so you will need to pass this on yourself.",
+        "weak": "The password does not meet the rule above.",
+        "mismatch": "The two passwords do not match.",
+        "confirm": "Set password",
+        "busy": "Setting…"
+      },
+      "toast": {
+        "renamed": "Organization renamed to {{name}}.",
+        "suspended": "{{name}} suspended.",
+        "resumed": "{{name}} resumed.",
+        "closed": "{{name}} closed.",
+        "ownerPasswordReset": "Password set for {{name}}'s owner."
+      }
+    },
+    "pods": {
+      "heading": {
+        "title": "Pods",
+        "context": "The deployments that host every store"
+      },
+      "loading": "Loading pods…",
+      "totalLabel": "{{total}} {count, plural, =1 {pod} other {pods}}",
+      "subtitle": {
+        "none": "No pods to show",
+        "range": "Showing {{from}}–{{to}} of {{total}} {count, plural, =1 {pod} other {pods}}"
+      },
+      "notice": {
+        "stateOnDetail": "Lifecycle, health and capacity are per pod — open one to see them."
+      },
+      "panel": {
+        "title": "The fleet"
+      },
+      "public": "Shared",
+      "unit": "pods",
+      "paginationLabel": "Pod pages",
+      "column": {
+        "pod": "Pod",
+        "endpoint": "Endpoint",
+        "owner": "Owner",
+        "shortId": "Identifier",
+        "actions": "Actions",
+        "stores": "Stores"
+      },
+      "action": {
+        "create": "Register a pod",
+        "open": "Open pod",
+        "openNamed": "Open {{name}}"
+      },
+      "empty": {
+        "title": "No pods registered",
+        "message": "A store cannot be provisioned until at least one pod exists."
+      },
+      "search": {
+        "label": "Search pods",
+        "placeholder": "Name or endpoint",
+        "clear": "Clear the search"
+      },
+      "noMatches": {
+        "title": "No pods matched",
+        "message": "No pod has that name or endpoint. Clear the search to see the whole fleet."
+      }
+    },
+    "pod": {
+      "heading": {
+        "new": "Register a pod",
+        "newContext": "Adds a deployment to the registry the gateway routes from",
+        "fallback": "Pod",
+        "context": "Identifier {{id}}"
+      },
+      "loading": "Loading pod…",
+      "neverProbed": "Never probed",
+      "action": {
+        "backToFleet": "The fleet",
+        "resume": "Resume",
+        "drain": "Drain",
+        "delete": "Delete pod"
+      },
+      "state": {
+        "title": "State",
+        "lifecycle": "Lifecycle",
+        "lifecycleNote": "Lifecycle decides placement only. A draining pod keeps its route and keeps serving the stores already on it.",
+        "health": "Health",
+        "lastProbed": "Last probed {{at}}",
+        "capacity": "Capacity",
+        "capacityDisagrees": "The registry counts {{registry}} here while tenancy has {{placed}}. Placement decisions use the registry's number."
+      },
+      "capacityUnlimited": "{{stores}} stores, no ceiling set",
+      "capacityOf": "{{stores}} of {{max}} stores",
+      "routing": {
+        "title": "Routing",
+        "endpoint": "Endpoint",
+        "endpointType": "Endpoint type",
+        "visibility": "Visibility",
+        "region": "Region",
+        "noRegion": "Not recorded",
+        "id": "Pod id"
+      },
+      "endpointType": {
+        "EXTERNAL": "External",
+        "INTERNAL": "Internal"
+      },
+      "form": {
+        "createTitle": "Pod details",
+        "editTitle": "Edit pod",
+        "edit": "Edit pod",
+        "editableFields": "Only the name and the endpoint can be changed after a pod is registered. Visibility, region and capacity are set by the registry.",
+        "name": "Name",
+        "nameHint": "Letters, digits and hyphens. Unique across the platform.",
+        "nameInvalid": "Use letters, digits and hyphens only.",
+        "endpoint": "Endpoint",
+        "endpointHint": "The absolute URL the gateway routes this pod's traffic to.",
+        "endpointInvalid": "Enter an absolute http or https URL.",
+        "endpointType": "Endpoint type",
+        "owner": "Owning organization",
+        "ownerHint": "Naming an organization makes the pod private to it. Leave it shared for a public pod.",
+        "ownerFixed": "The owner is set when a pod is registered and cannot be changed afterwards.",
+        "create": "Register pod",
+        "save": "Save changes",
+        "saving": "Saving…"
+      },
+      "drain": {
+        "title": "Drain {{name}}?",
+        "message": "No new store will be placed here. The stores already on it keep working and keep their route — this is the safe way to retire a pod."
+      },
+      "resume": {
+        "title": "Resume {{name}}?",
+        "message": "The pod becomes a candidate for new store placements again."
+      },
+      "delete": {
+        "title": "Delete {{name}}?",
+        "message": "Nothing checks whether stores are still on this pod, and there is no undo: every store placed here would be left pointing at a deployment the registry no longer knows. Drain is the safe operation.",
+        "confirmationLabel": "Type the pod's name to confirm:"
+      },
+      "toast": {
+        "created": "Pod {{name}} registered.",
+        "updated": "Pod {{name}} saved.",
+        "drained": "{{name}} is draining. No new stores will be placed on it.",
+        "resumed": "{{name}} is back in rotation.",
+        "deleted": "Pod {{name}} deleted."
+      },
+      "stores": {
+        "title": "Stores on this pod",
+        "subtitle": "From tenancy, which owns the placement. Read-only: a store is administered by its own organization.",
+        "loading": "Loading stores…",
+        "count": "{{stores}} {count, plural, =1 {store} other {stores}}",
+        "unit": "stores",
+        "paginationLabel": "Store pages",
+        "column": {
+          "store": "Store",
+          "organization": "Organization",
+          "status": "Status",
+          "provisioning": "Provisioning",
+          "billing": "Billing"
+        },
+        "empty": {
+          "title": "No stores here",
+          "message": "Nothing has been placed on this pod. Deleting it strands nobody."
+        },
+        "search": {
+          "label": "Search stores on this pod",
+          "placeholder": "Store name or id",
+          "clear": "Clear the search"
+        },
+        "noMatches": {
+          "title": "No stores matched",
+          "message": "No store on this pod has that name or id. Clear the search to see them all."
+        }
+      }
+    },
+    "users": {
+      "heading": {
+        "title": "Platform accounts",
+        "context": "Every account uaa holds"
+      },
+      "loading": "Loading accounts…",
+      "totalLabel": "{{total}} {count, plural, =1 {account} other {accounts}}",
+      "subtitle": {
+        "none": "No accounts to show",
+        "range": "Showing {{from}}–{{to}} of {{total}} {count, plural, =1 {account} other {accounts}}"
+      },
+      "notice": {
+        "noSearch": "Accounts can be narrowed by organization only — uaa's admin list has no search over names, usernames or addresses."
+      },
+      "panel": {
+        "title": "All accounts"
+      },
+      "unnamed": "No name recorded",
+      "noOrg": "No organization",
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "unit": "accounts",
+      "paginationLabel": "Account pages",
+      "column": {
+        "user": "Account",
+        "roles": "Roles",
+        "scope": "Organization",
+        "status": "Status",
+        "actions": "Actions"
+      },
+      "filter": {
+        "label": "Filter by organization",
+        "allOrgs": "All organizations"
+      },
+      "action": {
+        "enable": "Enable account",
+        "enableNamed": "Enable {{name}}",
+        "disable": "Disable account",
+        "disableNamed": "Disable {{name}}",
+        "resetPassword": "Set password",
+        "resetPasswordNamed": "Set a password for {{name}}",
+        "editRoles": "Edit roles",
+        "editRolesNamed": "Edit roles for {{name}}",
+        "impersonateUnavailable": "Signing in as another account is not built yet",
+        "delete": "Delete account",
+        "deleteNamed": "Delete {{name}}"
+      },
+      "empty": {
+        "title": "No accounts",
+        "message": "uaa holds no account to show."
+      },
+      "noMatches": {
+        "title": "No accounts in this organization",
+        "message": "No account carries this organization's identifier. Clear the filter to see every account."
+      },
+      "reset": {
+        "title": "Set a password",
+        "message": "Sets a new password for {{name}}.",
+        "password": "New password",
+        "repeatPassword": "Repeat password",
+        "hint": "At least 8 characters, with an uppercase letter, a lowercase letter and a digit.",
+        "handoverHint": "Nothing on the platform sends email, so you will need to pass this on yourself.",
+        "weak": "The password does not meet the rule above.",
+        "mismatch": "The two passwords do not match.",
+        "confirm": "Set password",
+        "busy": "Setting…"
+      },
+      "roles": {
+        "title": "Roles",
+        "message": "Which roles {{name}} holds. Changes take effect the next time they sign in.",
+        "empty": "uaa did not answer with a list of assignable roles, so there is nothing to choose from.",
+        "confirm": "Save roles",
+        "busy": "Saving…"
+      },
+      "delete": {
+        "title": "Delete this account?",
+        "message": "{{name}} will be removed from uaa. There is no undo, and anything that referenced them by id will no longer resolve.",
+        "confirmationLabel": "Type the username to confirm:"
+      },
+      "toast": {
+        "enabled": "{{name}} enabled.",
+        "disabled": "{{name}} disabled.",
+        "passwordReset": "Password set for {{name}}.",
+        "rolesChanged": "Roles saved for {{name}}.",
+        "deleted": "{{name}} deleted."
+      }
+    },
+    "billing": {
+      "heading": {
+        "title": "Billing",
+        "context": "Revenue, subscriptions, invoices and the subscription audit trail, across every tenant"
+      },
+      "nav": {
+        "heading": "Sections",
+        "ariaLabel": "Billing sections"
+      },
+      "section": {
+        "overview": "Overview",
+        "subscriptions": "Subscriptions",
+        "invoices": "Invoices",
+        "activity": "Activity"
+      },
+      "filter": {
+        "allStatuses": "Any status",
+        "allPlans": "Any plan",
+        "allEvents": "Any event",
+        "allSources": "Any source",
+        "status": "Filter by status",
+        "plan": "Filter by plan",
+        "event": "Filter by event",
+        "source": "Filter by source",
+        "blockedOnly": "Cut off only"
+      },
+      "kpi": {
+        "revenue": {
+          "inCurrency": "Collected ({currency})",
+          "none": "Collected in this period"
+        }
+      },
+      "overview": {
+        "loading": "Loading billing figures…",
+        "period": "Choose a period",
+        "revenueKpis": "Revenue in this period",
+        "revenueTrend": "Collected per day ({currency})",
+        "collected": "collected",
+        "planMix": "Who is on what",
+        "runRate": "Committed run rate, annualised",
+        "book": "The book",
+        "active": "Paying stores",
+        "trialing": "On trial",
+        "annualised": "Annualised ({currency})",
+        "monthly": "Monthly equivalent ({currency})",
+        "noPlan": "No plan",
+        "blocked": "Cut off for non-payment",
+        "blockedSubtitle": "Stores no enforcement layer is letting through",
+        "seeAll": "See all",
+        "noneBlocked": "Every store on the platform is being served.",
+        "health": "Billing health",
+        "healthOk": "No failed webhooks or stalled provider calls.",
+        "failedEvents": "Failed Stripe events (24h)",
+        "stalledRequests": "Stripe calls unfinished after {minutes} minutes"
+      },
+      "subscriptions": {
+        "title": "Subscriptions",
+        "loading": "Loading subscriptions…",
+        "search": "Search by store id",
+        "searchPlaceholder": "Part of a store id",
+        "unit": "subscriptions",
+        "column": {
+          "store": "Store",
+          "plan": "Plan",
+          "status": "Status",
+          "amount": "Amount",
+          "renews": "Renews / cut off"
+        },
+        "noMatch": {
+          "title": "Nothing matched",
+          "message": "No subscription matches these filters. Clear one to widen the search."
+        },
+        "empty": {
+          "title": "No subscriptions yet",
+          "message": "Billing has not recorded a subscription for any store on the platform."
+        }
+      },
+      "invoices": {
+        "title": "Invoices",
+        "loading": "Loading invoices…",
+        "search": "Search by store id",
+        "searchPlaceholder": "A store id",
+        "period": "Issued between",
+        "unit": "invoices",
+        "totalsLabel": "Totals for this filter",
+        "total": "Collected ({currency})",
+        "ofBilled": "of {billed} billed",
+        "openHosted": "Open the invoice at Stripe",
+        "openPdf": "Open the invoice PDF",
+        "column": {
+          "number": "Invoice",
+          "store": "Store",
+          "status": "Status",
+          "paid": "Paid",
+          "issued": "Issued"
+        },
+        "noMatch": {
+          "title": "Nothing matched",
+          "message": "No invoice matches these filters. Clear one to widen the search."
+        },
+        "empty": {
+          "title": "No invoices yet",
+          "message": "Stripe has not reported an invoice for any store on the platform."
+        }
+      },
+      "activity": {
+        "title": "Subscription activity",
+        "subtitle": "Every plan change, payment failure and cancellation, newest first",
+        "loading": "Loading activity…",
+        "search": "Search by store id",
+        "searchPlaceholder": "A store id",
+        "period": "Happened between",
+        "unit": "events",
+        "actorUnknown": "Not recorded",
+        "column": {
+          "event": "Event",
+          "store": "Store",
+          "change": "Change",
+          "actor": "Who",
+          "when": "When"
+        },
+        "noMatch": {
+          "title": "Nothing matched",
+          "message": "No event matches these filters. Clear one to widen the search."
+        },
+        "empty": {
+          "title": "Nothing has happened yet",
+          "message": "No subscription on the platform has changed state."
+        }
+      },
+      "store": {
+        "title": "Store billing",
+        "close": "Close store billing",
+        "loading": "Loading this store's billing…",
+        "plan": "Subscription",
+        "onPlan": "Plan",
+        "amount": "Amount",
+        "renews": "Renews",
+        "trialEnds": "Trial ends",
+        "graceUntil": "Grace until",
+        "pendingChange": "Moving to {plan} on {date}.",
+        "willNotRenew": "Renewal is off; access ends {date}.",
+        "noProvider": "This store has no payment provider subscription behind it, so its plan cannot be changed, cancelled or resumed here. It has to be bought through checkout first.",
+        "changePlan": "Change plan",
+        "pickPlan": "Choose a plan",
+        "applyPlan": "Apply",
+        "cancelPick": "Cancel",
+        "resume": "Resume renewal",
+        "cancelAtPeriodEnd": "Stop renewal",
+        "cancelNow": "End now",
+        "invoices": "Invoices",
+        "activity": "Activity",
+        "noInvoices": "No invoices for this store yet.",
+        "noActivity": "Nothing has happened to this subscription yet.",
+        "perMonth": "a month",
+        "perYear": "a year",
+        "priceOption": "{plan} — {amount} {interval}",
+        "noSubscription": {
+          "title": "No subscription",
+          "message": "Billing has never seen this store, or it could not be reached. A store created before billing existed, or one whose provisioning event never landed, looks the same from here."
+        },
+        "confirm": {
+          "cancelAtPeriodEnd": {
+            "title": "Stop renewal?",
+            "message": "The store keeps its plan until the paid period ends, and then stops. Renewal can be switched back on before then.",
+            "confirm": "Stop renewal"
+          },
+          "cancelNow": {
+            "title": "End this subscription now?",
+            "message": "This throws away time the customer has already paid for and cannot be undone. Only a platform operator can do it.",
+            "confirm": "End now",
+            "typeId": "Type the store id to confirm"
+          },
+          "resume": {
+            "title": "Resume renewal?",
+            "message": "Renewal is switched back on, and any scheduled downgrade is called off.",
+            "confirm": "Resume"
+          }
+        },
+        "toast": {
+          "planChanged": "The plan was changed.",
+          "downgradeScheduled": "The downgrade will apply on {date}.",
+          "cancelScheduled": "Renewal was switched off.",
+          "canceledNow": "The subscription was ended.",
+          "resumed": "Renewal was switched back on."
+        }
+      }
+    },
+    "plans": {
+      "heading": {
+        "title": "Plans",
+        "context": "What the platform sells, and what each plan grants"
+      },
+      "loading": "Loading the catalogue…",
+      "notice": {
+        "readOnly": "Read-only. The catalogue is mirrored from Stripe and no endpoint on the platform writes it."
+      },
+      "panel": {
+        "title": "Plan catalogue",
+        "subtitle": "Every plan, cheapest tier first."
+      },
+      "column": {
+        "plan": "Plan",
+        "monthly": "Monthly",
+        "yearly": "Yearly",
+        "subscribers": "Stores",
+        "recurring": "Annual value"
+      },
+      "trial": "{{days}}-day trial",
+      "empty": {
+        "title": "No plans",
+        "message": "Billing has no plan in its catalogue."
+      }
+    }
+  },
+  "content": {
+    "hub": {
+      "title": "Content management",
+      "context": "{store} · pages, posts, media and storefront navigation",
+      "railHeading": "Content",
+      "railLabel": "Content sections"
+    },
+    "tab": {
+      "pages": "Pages",
+      "posts": "Blog posts",
+      "banners": "Banners & promos",
+      "faq": "FAQ entries",
+      "media": "Media library",
+      "menus": "Navigation menus",
+      "policies": "Legal & policies",
+      "branding": "Store appearance"
+    },
+    "create": {
+      "pages": "New page",
+      "posts": "New post",
+      "banners": "New banner",
+      "faq": "New FAQ entry",
+      "policies": "New policy",
+      "media": "Upload files",
+      "menus": "Add link"
+    },
+    "kpi": {
+      "label": "Content overview",
+      "published": "Published items",
+      "publishedMeta": "across pages, posts, banners, FAQ and policies",
+      "drafts": "Drafts",
+      "draftsMeta": "{count} untouched for 30+ days",
+      "awaitingTranslation": "Awaiting translation",
+      "allTranslated": "Everything translated",
+      "media": "Media storage",
+      "mediaMeta": "{count} files · {percent}% of {quota}"
+    },
+    "bytes": {
+      "gb": "{value} GB",
+      "mb": "{value} MB",
+      "kb": "{value} KB"
+    },
+    "status": {
+      "DRAFT": "Draft",
+      "REVIEW": "Review",
+      "SCHEDULED": "Scheduled",
+      "PUBLISHED": "Published",
+      "ARCHIVED": "Archived"
+    },
+    "translationState": {
+      "MISSING": "{code}: not translated",
+      "DRAFT": "{code}: draft",
+      "TRANSLATED": "{code}: translated",
+      "STALE": "{code}: translated, source changed since"
+    },
+    "column": {
+      "pages": "Page",
+      "posts": "Post",
+      "banners": "Placement",
+      "faq": "Question",
+      "policies": "Policy",
+      "status": "Status",
+      "languages": "Languages",
+      "updated": "Updated",
+      "actions": "Actions"
+    },
+    "filter": {
+      "all": "All",
+      "search": "Search content",
+      "searchPlaceholder": "Search titles and slugs…",
+      "clearSearch": "Clear the search",
+      "language": "Filter by missing language",
+      "allLanguages": "All languages",
+      "missingLanguage": "Missing {language}",
+      "clearLanguage": "Show all languages",
+      "byStatus": "Filter by status",
+      "clear": "Clear filters"
+    },
+    "list": {
+      "loading": "Loading content…",
+      "none": "Nothing here yet",
+      "range": "Showing {from}–{to} of {total}",
+      "noneMatch": "Nothing matches these filters.",
+      "publishesOn": "Publishes {date}",
+      "pagesLabel": "Content pages",
+      "unit": {
+        "pages": "pages",
+        "posts": "posts",
+        "banners": "banners",
+        "faq": "entries",
+        "policies": "policies"
+      },
+      "empty": {
+        "pages": "No pages yet. The storefront shows only the pages you publish here.",
+        "posts": "No blog posts yet.",
+        "banners": "No banners yet. The storefront falls back to the store's slider images.",
+        "faq": "No FAQ entries yet.",
+        "policies": "No policies yet. Checkout links the terms and returns policies from here."
+      }
+    },
+    "action": {
+      "edit": "Edit",
+      "editFor": "Edit {title}",
+      "moreFor": "More actions for {title}",
+      "publish": "Publish",
+      "unpublish": "Unpublish",
+      "submit-review": "Submit for review",
+      "archive": "Archive",
+      "restore": "Restore to draft",
+      "delete": "Delete",
+      "schedule": "Schedule…",
+      "save": "Save",
+      "close": "Close"
+    },
+    "bulk": {
+      "label": "Bulk actions",
+      "selected": "{count} selected",
+      "selectAll": "Select every row on this page",
+      "selectRow": "Select {title}",
+      "clear": "Clear selection"
+    },
+    "toast": {
+      "publish": "{title} is now {status}.",
+      "unpublish": "{title} is back to {status}.",
+      "submit-review": "{title} was sent for review.",
+      "archive": "{title} was archived.",
+      "restore": "{title} was restored to draft.",
+      "deleted": "{title} was deleted.",
+      "bulkDone": "{count} item(s) updated.",
+      "bulkPartial": "{ok} updated, {failed} could not be."
+    },
+    "delete": {
+      "title": "Delete {title}?",
+      "message": "This removes it from the storefront and cannot be undone.",
+      "messagePage": "This removes the page from the storefront and cannot be undone. A page linked from a menu is removed from the menu too."
+    },
+    "editor": {
+      "back": "Back to content",
+      "saveDraft": "Save",
+      "saving": "Saving…",
+      "saved": "Saved.",
+      "checkFields": "Some fields still need attention — the first one is highlighted.",
+      "loading": "Loading…",
+      "moreActions": "More actions",
+      "versionConflict": "Someone else changed this item since you opened it. It has been reloaded — apply your edits again.",
+      "publishAt": "Publish date",
+      "publishAtHint": "Leave empty to publish immediately.",
+      "unpublishAt": "Unpublish date",
+      "unpublishAtHint": "Optional: the item is archived at this time.",
+      "schedule": "Schedule",
+      "scheduleTitle": "Schedule publishing",
+      "scheduleSubtitle": "The item publishes itself at this time.",
+      "slug": "URL slug"
+    },
+    "copy": {
+      "title": "Content",
+      "subtitle": "Written per language; other locales fall back to the source copy.",
+      "writeIn": "Write in",
+      "pageTitle": "Title",
+      "postTitle": "Title",
+      "body": "Body",
+      "excerpt": "Excerpt",
+      "excerptHint": "Shown on the blog index and in search results. Up to 300 characters.",
+      "altHint": "Describes the artwork for screen readers and search engines.",
+      "fallbackNotice": "{language} is the source copy. Other languages fall back to it when empty.",
+      "headline": "Headline",
+      "subtext": "Subtext",
+      "buttonLabel": "Button label",
+      "altText": "Alt text",
+      "question": "Question",
+      "answer": "Answer",
+      "heading": "Heading",
+      "policyBody": "Policy text",
+      "bannerLabel": "Label",
+      "bannerLabelHint": "Names the banner in your content list. Shoppers never see it.",
+      "message": "Message"
+    },
+    "seo": {
+      "title": "URL & search",
+      "subtitle": "Where the page lives and how it appears in search results.",
+      "slug": "URL slug",
+      "slugHint": "Lower-case letters, digits and dashes, after {prefix}",
+      "slugInvalid": "Use lower-case letters, digits and dashes only.",
+      "slugTaken": "Another item already uses this URL.",
+      "slugCheck": {
+        "pending": "Checking…",
+        "free": "Available",
+        "taken": "Already used"
+      },
+      "metaTitle": "Meta title",
+      "metaTitleHint": "Falls back to the title. Up to 70 characters is best.",
+      "metaDescription": "Meta description",
+      "metaDescriptionHint": "Aim for 50–160 characters.",
+      "keywords": "Search keywords",
+      "keywordsHint": "Comma-separated.",
+      "canonical": "Canonical URL",
+      "canonicalHint": "Only when this content lives elsewhere first.",
+      "noindex": "Hide from search engines",
+      "noindexHint": "Turn on for internal or campaign-only pages.",
+      "serpHost": "your-store",
+      "serpTitlePlaceholder": "Page title",
+      "serpDescriptionPlaceholder": "The meta description appears here."
+    },
+    "checklist": {
+      "title": "Before publishing",
+      "titleAndBody": "Title and body written",
+      "slug": "Slug set and available",
+      "metaLength": "Meta description under 160 characters",
+      "hero": "Hero image chosen",
+      "translationsDone": "All languages translated",
+      "translationsMissing": "Translations missing: {languages}",
+      "placement": "Placement selected",
+      "headlineAndTarget": "Headline and link target set",
+      "artwork": "Artwork uploaded",
+      "altText": "Alt text written",
+      "questionAndAnswer": "Question and answer written",
+      "group": "Group selected",
+      "keywords": "Search keywords added",
+      "policyType": "Type selected",
+      "headingAndBody": "Heading and body written",
+      "effectiveDate": "Effective date set",
+      "legalReview": "Legal review for {languages}",
+      "message": "Announcement message written"
+    },
+    "page": {
+      "newTitle": "New page",
+      "editTitle": "Page",
+      "context": "Content, URL and visibility for a storefront page",
+      "visibility": "Visibility",
+      "parent": "Parent page",
+      "noParent": "None — top level",
+      "showInFooter": "Add to the footer menu",
+      "showInFooterHint": "Appears under Company alongside About and Contact."
+    },
+    "post": {
+      "newTitle": "New post",
+      "editTitle": "Post",
+      "context": "Editorial content at /blog/<slug>",
+      "hero": "Hero image",
+      "heroHint": "Shown on the blog index and at the top of the post.",
+      "chooseHero": "Choose from library",
+      "removeHero": "Remove",
+      "organise": "Organise",
+      "categories": "Categories",
+      "noCategories": "No categories yet.",
+      "tags": "Tags",
+      "author": "Author",
+      "featured": "Featured",
+      "featuredHint": "Pinned to the top of the blog index."
+    },
+    "media": {
+      "folders": "Folders",
+      "allFiles": "All files",
+      "newFolder": "New folder",
+      "folderName": "Folder name",
+      "deleteFolder": "Delete folder {name}",
+      "library": "Library",
+      "shown": "{count} files",
+      "search": "Search files",
+      "searchPlaceholder": "Search by name, title or tag…",
+      "filterType": "Filter by type",
+      "allTypes": "All types",
+      "clearType": "Show all types",
+      "unusedOnly": "Unused only",
+      "view": "View",
+      "gridView": "Grid view",
+      "listView": "List view",
+      "loading": "Loading files…",
+      "dropTitle": "Drop files here to upload",
+      "dropHint": "JPG, PNG, WebP, SVG, MP4, PDF, ZIP · up to 50 MB per file",
+      "browse": "Browse files",
+      "tooLarge": "{name} is over 50 MB and was not uploaded.",
+      "uploaded": "{count} file(s) uploaded.",
+      "saved": "Saved.",
+      "deleted": "{name} was deleted.",
+      "urlCopied": "URL copied.",
+      "preview": "Preview",
+      "copyUrl": "Copy URL",
+      "details": "Details",
+      "openAsset": "Open {name}",
+      "openFile": "Open file",
+      "empty": "No files yet. Drop some above.",
+      "noneMatch": "No files match these filters.",
+      "unit": "files",
+      "pagesLabel": "Media pages",
+      "usedOn": "used on {count} item(s)",
+      "unused": "unused",
+      "usedIn": "Used in",
+      "titleField": "Title",
+      "altText": "Alt text",
+      "altLanguage": "Alt text language",
+      "altPlaceholder": "What the image shows",
+      "tags": "Tags",
+      "folder": "Folder",
+      "noFolder": "No folder",
+      "kind": {
+        "IMAGE": "Image",
+        "VIDEO": "Video",
+        "DOCUMENT": "Document",
+        "ARCHIVE": "Archive",
+        "VECTOR": "Vector"
+      },
+      "usageKind": {
+        "PAGE": "Page",
+        "POST": "Post",
+        "BANNER": "Banner",
+        "FAQ": "FAQ",
+        "POLICY": "Policy",
+        "SECTION": "Section",
+        "SITE_SETTINGS": "Store appearance",
+        "PRODUCT": "Product",
+        "CATEGORY": "Category",
+        "BRAND": "Brand",
+        "CONTENT": "Content"
+      },
+      "delete": {
+        "title": "Delete {name}?",
+        "message": "The file is removed from storage. This cannot be undone.",
+        "forceTitle": "{name} is still in use — delete anyway?",
+        "forceMessage": "It is referenced by: {uses}. Those places will show a missing image."
+      }
+    },
+    "mediaPicker": {
+      "title": "Choose from the media library",
+      "uploadTitle": "Or drop a new file",
+      "empty": "No files of this kind yet."
+    },
+    "menus": {
+      "subtitle": "{count, plural, one {1 link} other {# links}} · one level of nesting",
+      "loading": "Loading menus…",
+      "labelsIn": "Labels in",
+      "handle": {
+        "MAIN": "Main menu",
+        "FOOTER": "Footer menu"
+      },
+      "kind": {
+        "PAGE": "Page",
+        "CATEGORY": "Category",
+        "PRODUCT": "Product",
+        "POLICY": "Policy",
+        "BLOG_INDEX": "Blog",
+        "FAQ_INDEX": "Help / FAQ",
+        "URL": "URL"
+      },
+      "label": "Label",
+      "target": "Target kind",
+      "value": "Target",
+      "valuePlaceholder": {
+        "PAGE": "page slug",
+        "CATEGORY": "category handle",
+        "PRODUCT": "product handle",
+        "POLICY": "TERMS, PRIVACY…",
+        "URL": "/path or https://…",
+        "BLOG_INDEX": "",
+        "FAQ_INDEX": ""
+      },
+      "broken": "Broken link",
+      "empty": "Pick a link from the menu to edit it, or add one.",
+      "addLink": "Add link",
+      "save": "Save menu",
+      "discard": "Discard",
+      "saved": "{menu} saved.",
+      "menusLabel": "Which menu to edit",
+      "noun": "link",
+      "treeLabel": "Menu tree",
+      "dragHint": "Drag a link onto another to nest it, or onto the gap between two to reorder. Every move is on the row buttons too, and works from the keyboard.",
+      "expandAll": "Expand all",
+      "collapseAll": "Collapse all",
+      "untitled": "Untitled link",
+      "noneTitle": "No link selected",
+      "labelHint": "What the storefront shows, in {language}. Other languages keep their own labels.",
+      "valueHint": {
+        "PAGE": "Which published page this opens.",
+        "CATEGORY": "The category handle, as it appears in the catalogue.",
+        "PRODUCT": "The product handle, as it appears in the catalogue.",
+        "POLICY": "Which policy this opens.",
+        "URL": "A path on this store, or a full address elsewhere."
+      },
+      "brokenHint": "This target no longer resolves. Pick another, or the link will 404 on the storefront.",
+      "hasChildren": "Removing this link removes {count, plural, one {its one sub-link} other {its # sub-links}} with it.",
+      "visible": "Show in the storefront",
+      "visibleOn": "Shown in the storefront",
+      "visibleOff": "Hidden from the storefront",
+      "openInNewTab": "Open in a new tab",
+      "openInNewTabHint": "Usually only worth it for an address outside this store.",
+      "delete": "Remove link",
+      "unsaved": "This menu has unsaved changes."
+    },
+    "banner": {
+      "newTitle": "New banner",
+      "editTitle": "Banner",
+      "context": "Placement, artwork and copy for a storefront promotion",
+      "placementTitle": "Placement",
+      "placementSubtitle": "Where the banner renders. Each placement holds a limited number of live banners at a time.",
+      "placement": {
+        "HERO": {
+          "label": "Home hero",
+          "hint": "1920 × 900 · one live at a time"
+        },
+        "CAROUSEL": {
+          "label": "Home carousel",
+          "hint": "1600 × 640 · up to 8, shared with other promos"
+        },
+        "COLLECTION": {
+          "label": "Collection header",
+          "hint": "1600 × 420 · one per collection"
+        },
+        "STRIP": {
+          "label": "Announcement strip",
+          "hint": "Text only, site-wide · one at a time"
+        }
+      },
+      "artwork": "Artwork",
+      "artworkHint": "Recommended {size}. JPG, PNG or WebP.",
+      "desktop": "Desktop",
+      "mobile": "Mobile (optional)",
+      "chooseArtwork": "Choose from library",
+      "targetTitle": "Link target",
+      "targetKindLabel": "Links to",
+      "targetValue": "Target",
+      "targetValueHint": "A collection or product handle, a page slug, or a URL.",
+      "targetKind": {
+        "COLLECTION": "Collection",
+        "PRODUCT": "Product",
+        "PAGE": "Page",
+        "URL": "URL"
+      },
+      "schedule": "Schedule & audience",
+      "startsAt": "Starts",
+      "endsAt": "Ends",
+      "loggedInOnly": "Signed-in visitors only",
+      "audienceHint": "Segments and country targeting are not available on this platform yet.",
+      "preview": "Preview",
+      "previewHeadline": "Your headline",
+      "previewHint": "Artwork replaces the gradient once uploaded.",
+      "identityTitle": "Address",
+      "previewMessage": "Your announcement",
+      "previewStripHint": "The strip spans the top of every storefront page. Links in the message stay clickable."
+    },
+    "faq": {
+      "newTitle": "New FAQ entry",
+      "editTitle": "FAQ entry",
+      "context": "One question, its answer, and where it appears on the storefront",
+      "groupTitle": "Group",
+      "groupSubtitle": "Entries are shown grouped, in the order you set.",
+      "entriesInGroup": "{count} entries",
+      "newGroup": "New group",
+      "groupName": "Group name",
+      "placementTitle": "Placement & search",
+      "slugHint": "Appears under /help/",
+      "position": "Position in group",
+      "positionHint": "0 is first. Leave empty to append.",
+      "keywords": "Search keywords",
+      "keywordsHint": "Terms shoppers might type that do not appear in the question.",
+      "checkoutHelp": "Show in the checkout help widget",
+      "checkoutHelpHint": "Surfaces this answer to buyers mid-checkout.",
+      "preview": "Preview",
+      "previewGroup": "Group",
+      "previewQuestion": "Your question"
+    },
+    "policy": {
+      "newTitle": "New policy",
+      "editTitle": "Policy",
+      "context": "Legal text shown at checkout and in the storefront footer",
+      "typeTitle": "Policy type",
+      "typeSubtitle": "One policy of each type per store. The type cannot change once created.",
+      "type": {
+        "TERMS": {
+          "label": "Terms of service",
+          "hint": "What buyers agree to when they order."
+        },
+        "PRIVACY": {
+          "label": "Privacy policy",
+          "hint": "What data you collect and why."
+        },
+        "RETURNS": {
+          "label": "Returns & refunds",
+          "hint": "Return window, condition rules and who pays for shipping."
+        },
+        "SHIPPING": {
+          "label": "Shipping policy",
+          "hint": "Where you deliver, how fast, and what it costs."
+        },
+        "COOKIES": {
+          "label": "Cookie notice",
+          "hint": "Required in EU regions."
+        },
+        "CUSTOM": {
+          "label": "Custom",
+          "hint": "Any other legal text."
+        }
+      },
+      "appliesTitle": "Where it applies",
+      "jurisdiction": "Jurisdiction",
+      "jurisdictionHint": "e.g. NL — picks the compliance rules that apply.",
+      "effectiveFrom": "Effective date",
+      "effectiveFromHint": "Shown with the version; empty means on publish.",
+      "requiresAcceptance": "Require acceptance at checkout",
+      "requiresAcceptanceHint": "Buyers tick a box before payment. Acceptance is stored with the order.",
+      "notifyCustomers": "Email existing customers about the change",
+      "notifyCustomersHint": "Not sent by the platform yet — recorded for when it is.",
+      "showInFooter": "Link in the footer",
+      "showAtCheckout": "Show at checkout",
+      "showAtSignup": "Show at sign-up",
+      "versions": "Version history",
+      "versionsSubtitle": "Publishing cuts a new immutable version; older ones stay readable.",
+      "versionStatus": {
+        "LIVE": "Live",
+        "DRAFT": "Draft",
+        "ARCHIVED": "Archived"
+      },
+      "restoreText": "Restore text",
+      "versionBadge": "v{version}",
+      "versionRestored": "Version {version}'s text is now the draft. Publish to make it live.",
+      "checkoutPreview": "Checkout preview",
+      "acceptLabel": "I accept the {type}"
+    },
+    "policies": {
+      "title": "Compliance",
+      "subtitle": "Which legal texts the store has, and which its regions require.",
+      "requiredIn": "Required in {regions}",
+      "notRequired": "Optional",
+      "notWritten": "Not written",
+      "optional": "Optional"
+    },
+    "branding": {
+      "title": "Brand images",
+      "subtitle": "The logo, favicon and share image the storefront uses.",
+      "loading": "Loading store appearance…",
+      "imagesLabel": "Brand images",
+      "save": "Save changes",
+      "discard": "Discard",
+      "saved": "Store appearance saved.",
+      "choose": "Choose",
+      "replace": "Replace",
+      "clear": "Clear",
+      "slot": {
+        "logo": "Logo",
+        "logoDark": "Logo (dark)",
+        "favicon": "Favicon",
+        "og": "Share image"
+      },
+      "slotHint": {
+        "logo": "Shown in the storefront header.",
+        "logoDark": "Used against dark backgrounds, when it differs.",
+        "favicon": "The browser-tab icon. Square, and legible at 16px.",
+        "og": "The default picture when a page is shared."
+      },
+      "seoTitle": "Search engine listing",
+      "seoSubtitle": "What search results and browser tabs show for the store itself.",
+      "copyIn": "Copy in",
+      "seo": {
+        "metaTitle": "Store title",
+        "metaDescription": "Store description"
+      },
+      "seoHint": {
+        "metaTitle": "Also the browser tab title on pages that set none of their own.",
+        "metaDescription": "The sentence under the title in search results."
+      },
+      "socialTitle": "Social links",
+      "socialSubtitle": "Shown in the storefront footer. Leave one empty to remove it.",
+      "socialPlaceholder": "https://…",
+      "socialProvider": {
+        "facebook": "Facebook",
+        "x": "X",
+        "tiktok": "TikTok",
+        "instagram": "Instagram",
+        "github": "GitHub"
+      },
+      "socialHost": "Use a {{host}} link.",
+      "socialUrl": "Enter a valid web address.",
+      "socialProfile": "Link to the profile page, not just the site."
+    }
+  }
+}

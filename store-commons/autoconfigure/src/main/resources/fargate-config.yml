@@ -7,13 +7,18 @@ spring:
         clients:
           - "store-core-gateway"
           - "uaa"
-          - "control-plane"
-          - "seller-ui"
+          - "tenancy"
+          - "billing"
+          - "pod-registry"
+          - "console-ui"
           - "spg"
           - "merchant"
+          - "content"
           - "catalog"
           - "checkout"
           - "cua"
+          - "payment"
+          - "inventory"
           - "landing-ui"
     ecs:
       discovery:
@@ -24,10 +29,15 @@ spring:
         service-ports:
           "uaa": 8001
           "store-core-gateway": 8000
-          "seller-ui": 8010
-          "control-plane": 8020
+          "console-ui": 8011
+          "tenancy": 8020
+          "billing": 8021
+          "pod-registry": 8022
           "landing-ui": 8110
           "merchant": 8120
+          "content": 8121
           "catalog": 8122
           "checkout": 8123
           "cua": 8124
+          "payment": 8125
+          "inventory": 8126

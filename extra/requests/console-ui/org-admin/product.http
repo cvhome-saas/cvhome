@@ -1,0 +1,50 @@
+###
+
+# curl 'GET {{GATEWAY_URL}}/spg/catalog/api/v2/products?store=65f023632bc46470c104b76f&lang=en&count=20&origin=admin&page=0'
+GET {{GATEWAY_URL}}/spg/catalog/api/v2/products?store=65f023632bc46470c104b76f&lang=en&count=20&origin=admin&page=0
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
+
+###
+
+# curl 'GET {{GATEWAY_URL}}/spg/catalog/api/v2/private/product/1?store=65f023632bc46470c104b76f&lang=_all'
+GET {{GATEWAY_URL}}/spg/catalog/api/v2/private/product/1?store=65f023632bc46470c104b76f&lang=_all
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
+
+###
+
+# curl 'GET {{GATEWAY_URL}}/spg/catalog/api/v1/manufacturers?store=65f023632bc46470c104b76f'
+GET {{GATEWAY_URL}}/spg/catalog/api/v1/manufacturers?store=65f023632bc46470c104b76f
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
+
+###
+
+# curl 'GET {{GATEWAY_URL}}/spg/catalog/api/v1/private/product/types?store=65f023632bc46470c104b76f'
+GET {{GATEWAY_URL}}/spg/catalog/api/v1/private/product/types?store=65f023632bc46470c104b76f
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
+
+###
+
+# curl 'GET {{GATEWAY_URL}}/spg/catalog/api/v1/store/languages?store=65f023632bc46470c104b76f'
+GET {{GATEWAY_URL}}/spg/merchant/api/v1/store/languages?store=65f023632bc46470c104b76f
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
+
+###
+
+# curl 'GET {{GATEWAY_URL}}/spg/catalog/api/v1/product/1/images?store=65f023632bc46470c104b76f'
+GET {{GATEWAY_URL}}/spg/catalog/api/v1/product/1/images?store=65f023632bc46470c104b76f
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
+
+###
+
+# curl 'GET {{GATEWAY_URL}}/spg/catalog/api/v1/category/product/1?store=65f023632bc46470c104b76f&lang=en'
+GET {{GATEWAY_URL}}/spg/catalog/api/v1/category/product/1?store=65f023632bc46470c104b76f&lang=en
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
+
+###
+
+# curl 'GET {{GATEWAY_URL}}/spg/catalog/api/v1/private/category?store=65f023632bc46470c104b76f&count=50&page=0&lang=en'
+GET {{GATEWAY_URL}}/spg/catalog/api/v1/private/category?store=65f023632bc46470c104b76f&count=50&page=0&lang=en
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
+
+###
+

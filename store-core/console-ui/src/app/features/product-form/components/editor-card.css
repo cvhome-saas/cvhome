@@ -1,0 +1,92 @@
+/*
+ * The product wizard's field vocabulary: field, grid, counter, quiet row.
+ *
+ * The same pattern `features/store-management/components/settings-card.css` documents, for the same
+ * reason: style encapsulation means a parent cannot reach into a child's template, so a file pulled
+ * into each sibling's `styleUrls` is how the four steps agree what a field looks like. Kept
+ * page-local rather than hoisted into `styles.css` because it is a page's vocabulary, not the
+ * console's — unlike `.primary-action`, which is genuinely global and lives there.
+ */
+
+/*
+ * The step is a stack, and so is the `[formGroup]` wrapper three of the four steps put their panels
+ * inside.
+ *
+ * Both live here rather than in `product-form.css` because of encapsulation: the wrapper belongs to
+ * the step's own template and carries the step's content attribute, so a rule written on the page
+ * matches the step host and nothing within it. That is exactly what shipped — `gap: 16px` computing
+ * correctly on a container with a single child while the panels inside it sat flush.
+ */
+:host,
+.step-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-group);
+  min-inline-size: 0;
+}
+
+.editor-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  padding: var(--spacing-section);
+}
+
+/*
+ * What is left after the field vocabulary moved.
+ *
+ * This file and the catalogue's copy of it differed by 42 lines out of 238 — two hand-maintained
+ * copies of one thing, a few months apart. The control, its label, its hint, its counter and its
+ * uniqueness marks are `app-form-field` with `app-text-field` and friends now; `.field-grid`,
+ * `.field-wide` and `.split` are layout and come from `@shared/styles/field.css`.
+ */
+.field {
+  min-inline-size: 0;
+}
+
+.field-hint {
+  margin: .35rem 0 0;
+  color: var(--foreground-quiet);
+  font-size: var(--text-2xs);
+  line-height: 1.5;
+}
+
+.divider {
+  block-size: 1px;
+  margin: 0;
+  border: 0;
+  background: var(--border-soft);
+}
+
+/* The row of Save / Cancel at the foot of an editor. */
+.editor-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: .6rem;
+  padding-block-start: var(--spacing-inline);
+}
+
+/* The line that says whether the language on screen has been written yet. */
+.translation-state {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  margin: 0;
+  font-size: var(--text-2xs);
+  font-weight: 500;
+}
+
+.translation-state.missing {
+  color: var(--chart-4-foreground);
+}
+
+.translation-state.present {
+  color: var(--primary-emphasis);
+}
+
+
+@media (max-width: 900px) {
+  .field-grid {
+    grid-template-columns: 1fr;
+  }
+}

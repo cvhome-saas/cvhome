@@ -1,0 +1,117 @@
+.brand-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
+  gap: .6rem;
+  padding: .9rem;
+}
+
+.brand-card {
+  display: flex;
+  align-items: flex-start;
+  gap: .7rem;
+  padding: .8rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--muted);
+  color: var(--foreground);
+  text-align: start;
+  cursor: pointer;
+  transition:
+    border-color var(--default-transition-duration),
+    background-color var(--default-transition-duration);
+}
+
+.brand-card:hover {
+  border-color: var(--edge);
+}
+
+.brand-card.current {
+  border-color: var(--primary);
+  background: var(--accent);
+}
+
+.brand-card:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+/*
+ * The mark carries the brand's initials on a neutral tile. Not a per-brand hue: the design's
+ * coloured tiles came from a `hue` field the entity does not have, and picking one from the name
+ * would make an arbitrary colour look like a stored setting.
+ */
+.brand-mark {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  inline-size: 2.2rem;
+  block-size: 2.2rem;
+  border-radius: var(--radius-lg);
+  background: var(--input);
+  color: var(--foreground-subtle);
+  font-size: var(--text-2xs);
+  font-weight: 700;
+}
+
+.brand-card.current .brand-mark {
+  background: var(--accent-strong);
+  color: var(--primary-emphasis);
+}
+
+.brand-copy {
+  display: grid;
+  min-inline-size: 0;
+  gap: .15rem;
+}
+
+.brand-copy strong {
+  overflow: hidden;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.brand-code {
+  color: var(--foreground-quiet);
+  font-size: var(--text-3xs);
+  letter-spacing: .04em;
+}
+
+.brand-blurb {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--foreground-subtle);
+  font-size: var(--text-3xs);
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.list-empty {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 2rem 0;
+  color: var(--foreground-quiet);
+  font-size: var(--text-xs);
+  text-align: center;
+}
+
+.list-foot {
+  padding: 0 .9rem .9rem;
+}
+
+.editor-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-group);
+  flex-wrap: wrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brand-card {
+    transition: none;
+  }
+}

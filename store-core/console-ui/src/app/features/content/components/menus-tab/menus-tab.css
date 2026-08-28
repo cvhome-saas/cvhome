@@ -1,0 +1,129 @@
+/*
+ * One menu at a time: the switcher and the locale above, the tree-and-editor split below, and the
+ * save bar under both.
+ *
+ * `.split`, `.field-grid` and `.field-wide` come from `@shared/styles/field.css`, pulled in through
+ * `styleUrls` — the same arrangement the catalogue's tabs use, and the reason this file only holds
+ * what is genuinely local to the menus screen.
+ */
+
+:host {
+  display: block;
+  min-inline-size: 0;
+}
+
+.menus {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-group);
+}
+
+/*
+ * Which menu, and which language its labels are in — the two questions that apply to the whole
+ * screen rather than to the open link, so they sit above the split rather than inside a panel.
+ */
+.menus-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-group);
+  flex-wrap: wrap;
+}
+
+/* ---- the tree side ------------------------------------------------------------------------ */
+
+.panel-controls {
+  display: flex;
+  gap: .35rem;
+}
+
+.tree-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-field);
+  padding: var(--spacing-field);
+}
+
+.add-root {
+  align-self: flex-start;
+}
+
+.tree-hint {
+  margin: 0;
+  color: var(--foreground-quiet);
+  font-size: var(--text-2xs);
+  line-height: 1.5;
+}
+
+/* ---- the editor side ---------------------------------------------------------------------- */
+
+.editor-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  padding: var(--spacing-section);
+}
+
+.editor-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-group);
+  flex-wrap: wrap;
+}
+
+/* Restates the state the tree's eye toggle owns, because the panel is where the operator is. */
+.editor-kind {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-inline);
+  color: var(--foreground-quiet);
+  font-size: var(--text-2xs);
+}
+
+.field {
+  min-inline-size: 0;
+}
+
+.divider {
+  block-size: 1px;
+  margin: 0;
+  border: 0;
+  background: var(--border-soft);
+}
+
+/*
+ * A target that cannot be edited because the kind already decided it. Drawn like a disabled field
+ * rather than like body copy, so it reads as "this is the value" and not as a hint.
+ */
+.fixed-target {
+  margin: 0;
+  padding: .45rem .6rem;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  background: var(--input);
+  color: var(--foreground-quiet);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+}
+
+/* ---- the save bar -------------------------------------------------------------------------- */
+
+.menus-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-tight);
+  flex-wrap: wrap;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.unsaved {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-inline);
+  color: var(--foreground-quiet);
+  font-size: var(--text-2xs);
+}

@@ -2,9 +2,9 @@ package com.asrevo.cvhome.s2s.utils;
 
 import java.util.Objects;
 
-import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
+import com.asrevo.cvhome.commons.domain.LanguageCode;
 
-public class LanguageUtils {
+public final class LanguageUtils {
 
     public static final String LANG = "lang";
 

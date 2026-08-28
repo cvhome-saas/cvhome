@@ -1,0 +1,190 @@
+<ng-container *transloco="let t">
+  <!-- `step-stack` is what puts air between the panels; see product-form.css. -->
+  <div class="step-stack" [formGroup]="form()">
+    <app-panel [title]="t('productForm.pricing.title')" [subtitle]="t('productForm.pricing.subtitle')">
+      <div class="editor-body">
+        <div class="field-grid">
+          <app-form-field
+            required
+            [label]="t('productForm.pricing.price')"
+            [control]="form().controls.price"
+            [fallback]="t('productForm.pricing.priceInvalid')"
+            controlId="product-price"
+          >
+            <!--
+              The store's currency, as an ISO code, carried as the field's own prefix. There is no
+              per-product currency on this platform, and a code rather than a symbol for the reason
+              lessons.md records: `US$` and `UK£` strand Latin script inside a right-to-left line.
+            -->
+            <app-number-field
+              id="product-price"
+              formControlName="price"
+              [prefix]="currency()"
+              [decimals]="2"
+              [min]="0"
+              [ariaLabel]="t('productForm.pricing.price')"
+            />
+          </app-form-field>
+
+          <app-form-field
+            [label]="t('productForm.pricing.quantity')"
+            [hint]="t('productForm.pricing.quantityHint')"
+            controlId="product-quantity"
+          >
+            <app-number-field
+              id="product-quantity"
+              formControlName="quantity"
+              [decimals]="0"
+              [min]="0"
+              [ariaLabel]="t('productForm.pricing.quantity')"
+            />
+          </app-form-field>
+        </div>
+
+        <!--
+          Said once, rather than as eight disabled controls. Twelve dead fields would make the four
+          real ones hard to find, which is why this step departs from Module 5's "keep them, marked".
+        -->
+        <app-notice-bar icon="info" tone="blue" [message]="t('productForm.pricing.notModelled')" />
+
+        <hr class="divider" />
+
+        <div class="field-grid">
+          <div class="field field-wide">
+            <app-toggle
+              [checked]="form().controls.canBePurchased.value"
+              (checkedChange)="form().controls.canBePurchased.setValue($event)"
+              [label]="t('productForm.pricing.canBePurchased')"
+              [description]="t('productForm.pricing.canBePurchasedHint')"
+            />
+          </div>
+
+          <div class="field field-wide">
+            <app-toggle
+              [checked]="form().controls.shipeable.value"
+              (checkedChange)="form().controls.shipeable.setValue($event)"
+              [label]="t('productForm.pricing.shipeable')"
+              [description]="t('productForm.pricing.shipeableHint')"
+            />
+          </div>
+
+          <div class="field field-wide">
+            <app-toggle
+              [checked]="form().controls.virtual.value"
+              (checkedChange)="form().controls.virtual.setValue($event)"
+              [label]="t('productForm.pricing.virtual')"
+              [description]="t('productForm.pricing.virtualHint')"
+            />
+          </div>
+        </div>
+      </div>
+    </app-panel>
+
+    <app-panel
+      [title]="t('productForm.pricing.shippingBox')"
+      [subtitle]="t('productForm.pricing.shippingBoxSubtitle')"
+    >
+      <div class="editor-body measure-body">
+        <!--
+          Two groups, not six fields.
+          
+          These used to be one flat grid of six equal cells, so `Weight unit` and `Dimension unit`
+          sat in the run of numbers and read as measurements themselves. A courier quotes on a
+          weight and on a box; that is two facts, and the markup now says so. `fieldset`/`legend`
+          rather than a styled heading, so the grouping is real to a screen reader and not a visual
+          suggestion.
+        -->
+        <fieldset class="measure-group">
+          <legend class="measure-legend">{{ t('productForm.pricing.weight') }}</legend>
+
+          <div class="measure-pair">
+            <div class="field">
+              <label class="sr-only" for="product-weight">{{ t('productForm.pricing.weightValue') }}</label>
+              <app-number-field
+                id="product-weight"
+                formControlName="weight"
+                [decimals]="2"
+                [min]="0"
+                [ariaLabel]="t('productForm.pricing.weightValue')"
+              />
+            </div>
+
+            <div class="field measure-unit">
+              <label class="sr-only" for="product-weight-unit">{{ t('productForm.pricing.weightUnit') }}</label>
+              <!--
+                The server owns this enum, so the label is translated through a known-set guard —
+                see Module 4's rule. Anything outside the set would take the page down against the
+                strict missing-key handler.
+              -->
+              <app-select
+                id="product-weight-unit"
+                formControlName="weightUnit"
+                [options]="weightUnitOptions()"
+                [ariaLabel]="t('productForm.pricing.weightUnit')"
+              />
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset class="measure-group">
+          <legend class="measure-legend">{{ t('productForm.pricing.dimensions') }}</legend>
+
+          <div class="measure-dimensions">
+            <app-form-field
+              [label]="t('productForm.pricing.length')"
+              controlId="product-length"
+            >
+              <app-number-field
+                id="product-length"
+                formControlName="length"
+                [decimals]="1"
+                [min]="0"
+                [ariaLabel]="t('productForm.pricing.length')"
+              />
+            </app-form-field>
+
+            <span class="measure-times" aria-hidden="true">&times;</span>
+
+            <app-form-field
+              [label]="t('productForm.pricing.width')"
+              controlId="product-width"
+            >
+              <app-number-field
+                id="product-width"
+                formControlName="width"
+                [decimals]="1"
+                [min]="0"
+                [ariaLabel]="t('productForm.pricing.width')"
+              />
+            </app-form-field>
+
+            <span class="measure-times" aria-hidden="true">&times;</span>
+
+            <app-form-field
+              [label]="t('productForm.pricing.height')"
+              controlId="product-height"
+            >
+              <app-number-field
+                id="product-height"
+                formControlName="height"
+                [decimals]="1"
+                [min]="0"
+                [ariaLabel]="t('productForm.pricing.height')"
+              />
+            </app-form-field>
+
+            <div class="field measure-unit">
+              <label class="sr-only" for="product-dimension-unit">{{ t('productForm.pricing.dimensionUnit') }}</label>
+              <app-select
+                id="product-dimension-unit"
+                formControlName="dimensionUnit"
+                [options]="dimensionUnitOptions()"
+                [ariaLabel]="t('productForm.pricing.dimensionUnit')"
+              />
+            </div>
+          </div>
+        </fieldset>
+      </div>
+    </app-panel>
+  </div>
+</ng-container>

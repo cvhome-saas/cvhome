@@ -1,0 +1,49 @@
+:host {
+  /* Above the content below it, so a picker or menu opened here is never covered. */
+  position: relative;
+  z-index: 30;
+  display: block;
+  animation: page-head-in 0.45s 0.1s ease both;
+}
+
+.page-head {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--spacing-group);
+}
+
+.page-copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.page-copy h1 {
+  margin: 0;
+  color: var(--foreground-strong);
+  font-size: var(--text-3xl);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: -0.02em;
+}
+
+.page-copy p {
+  margin-top: 0.35rem;
+  color: var(--muted-foreground);
+  font-size: var(--text-sm);
+}
+
+@media (max-width: 56.25rem) {
+  .page-head {
+    flex-wrap: wrap;
+  }
+
+  .page-copy {
+    flex: 1 0 100%;
+  }
+}
+
+@keyframes page-head-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}

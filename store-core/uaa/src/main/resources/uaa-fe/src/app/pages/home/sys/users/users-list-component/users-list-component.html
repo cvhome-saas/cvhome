@@ -1,11 +1,12 @@
 <div class="page-body">
 
-  <nb-card status="basic" accent="info">
+  <nb-card accent="info" status="basic">
     <nb-card-header>
       <div class="d-flex justify-content-between align-items-center">
         <h1 class="page_title">{{ 'USER.USER_LIST' | translate }}</h1>
-        <button nbButton status="primary" routerLink="/home/users/create">
-          <nb-icon icon="plus" style="margin-right: 0.5rem"></nb-icon> Create User
+        <button nbButton routerLink="/home/users/create" status="primary">
+          <nb-icon icon="plus" style="margin-right: 0.5rem"></nb-icon>
+          Create User
         </button>
       </div>
     </nb-card-header>

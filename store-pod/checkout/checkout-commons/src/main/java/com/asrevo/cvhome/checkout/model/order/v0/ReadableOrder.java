@@ -11,6 +11,8 @@ import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.customer.model.customer.ReadableBilling;
 import com.asrevo.cvhome.customer.model.customer.ReadableCustomer;
 import com.asrevo.cvhome.customer.model.customer.ReadableDelivery;
+import com.asrevo.cvhome.store.core.entity.common.InventoryStatus;
+import com.asrevo.cvhome.store.core.entity.common.PaymentStatus;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -40,5 +42,11 @@ public class ReadableOrder extends OrderEntity implements Serializable {
     private OrderTotal tax;
 
     private OrderTotal shipping;
+
+    private PaymentStatus paymentStatus;
+
+    private InventoryStatus reservationStatus;
+
+    private String redirectUri;
 
 }

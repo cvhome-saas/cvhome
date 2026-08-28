@@ -1,0 +1,1192 @@
+/*
+ * The page's own stack.
+ *
+ * Everything the page renders sits inside a single `busy-overlay` slot, so the shell's own 1.5rem
+ * rhythm stops at that boundary and the blocks below were flush against one another. The gap is
+ * the same one the template's main column uses, and the orders list solves this the same way.
+ */
+.detail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-gutter);
+}
+
+/* ---- Identity line ---------------------------------------------------------------------- */
+
+.order-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+}
+
+.back {
+  display: grid;
+  flex: none;
+  place-items: center;
+  inline-size: 2rem;
+  block-size: 2rem;
+  margin-block-start: 0.15rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--card);
+  color: var(--foreground-subtle);
+  --icon-size: 0.8rem;
+  transition:
+    background-color var(--default-transition-duration),
+    border-color var(--default-transition-duration),
+    color var(--default-transition-duration);
+}
+
+.back:hover {
+  border-color: var(--edge);
+  background: var(--accent);
+  color: var(--primary-emphasis);
+}
+
+.identity {
+  flex: 1;
+  min-inline-size: 0;
+}
+
+.identity-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.identity-line h1 {
+  margin: 0;
+  color: var(--foreground-strong);
+  /*
+   * `--text-operations-title` is an @utility, not a custom property, so this var() never
+   * resolved and the line had been running on its fallback. Same size, named properly. The
+   * utility itself is not applied here: it carries weight 700, and this heading is 600.
+   */
+  font-size: var(--text-3xl);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+/* The pill reads as a state, so it carries a dot as well as a colour. */
+.status-dot {
+  inline-size: 0.375rem;
+  block-size: 0.375rem;
+  margin-inline-end: 0.35rem;
+  border-radius: var(--radius-full);
+  background: currentcolor;
+}
+
+.order-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.9rem;
+  margin: var(--spacing-tight) 0 0;
+  color: var(--muted-foreground);
+  font-size: var(--text-xs);
+}
+
+.order-meta > span + span::before {
+  content: '·';
+  margin-inline-end: 0.9rem;
+  color: var(--border);
+}
+
+.meta-total {
+  color: var(--foreground-strong);
+  font-variant-numeric: tabular-nums;
+}
+
+.icon-action,
+.panel-link {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--card);
+  color: var(--foreground);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  --icon-size: 0.75rem;
+  transition:
+    background-color var(--default-transition-duration),
+    border-color var(--default-transition-duration),
+    color var(--default-transition-duration);
+}
+
+.icon-action:hover,
+.panel-link:hover {
+  border-color: var(--edge);
+  background: var(--accent);
+  color: var(--primary-emphasis);
+}
+
+.panel-link {
+  padding: 0.3rem 0.55rem;
+  border-color: transparent;
+  background: none;
+  color: var(--primary-emphasis);
+  font-size: var(--text-2xs);
+}
+
+/* ---- Fulfilment tracker ------------------------------------------------------------------ */
+
+.off-path {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.85rem 1.1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  background: var(--muted);
+  color: var(--foreground-subtle);
+  font-size: var(--text-sm);
+  --icon-size: 0.9rem;
+}
+
+.off-path app-icon {
+  color: var(--destructive);
+}
+
+/*
+ * The tracker is a panel like every other block on this page, so it takes the shared card chrome
+ * rather than restating it: same surface, same header rhythm, same divider. It had its own, and a
+ * slightly different card sitting above matching ones is exactly the sort of thing you see without
+ * being able to name.
+ */
+
+.stages {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 1.1rem;
+  margin: 0;
+  /* Matches the panel header's inline padding, so the stages line up with the title above them. */
+  padding: var(--panel-interior);
+  list-style: none;
+}
+
+.stage-head {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-tight);
+  min-inline-size: 0;
+}
+
+.stage-dot {
+  display: grid;
+  flex: none;
+  place-items: center;
+  inline-size: 1.15rem;
+  block-size: 1.15rem;
+  border-radius: var(--radius-full);
+  background: var(--secondary);
+  color: var(--muted-foreground);
+  --icon-size: 0.55rem;
+}
+
+.stages .done .stage-dot {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+
+.stages .current .stage-dot {
+  background: var(--chart-4);
+  color: var(--primary-foreground);
+}
+
+.stage-label {
+  overflow: hidden;
+  color: var(--muted-foreground);
+  font-size: var(--text-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.stages .done .stage-label {
+  color: var(--foreground);
+}
+
+.stages .current .stage-label {
+  color: var(--foreground-strong);
+  font-weight: 500;
+}
+
+.stage-bar {
+  display: block;
+  overflow: hidden;
+  block-size: 3px;
+  margin-block-start: 0.6rem;
+  border-radius: var(--radius-full);
+  background: var(--track);
+}
+
+.stage-bar i {
+  display: block;
+  block-size: 100%;
+  border-radius: inherit;
+  background: var(--primary);
+  transform-origin: inline-start;
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.stages .current .stage-bar i {
+  background: var(--chart-4);
+}
+
+.stage-meta {
+  display: block;
+  margin-block-start: 0.45rem;
+  color: var(--muted-foreground);
+  font-size: var(--text-2xs);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stage-bar i {
+    transition: none;
+  }
+}
+
+:host {
+  display: contents;
+}
+
+/* The mockup's two columns; the side column drops under the main one when the shell narrows. */
+.order-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(18rem, 0.9fr);
+  gap: var(--spacing-section);
+  align-items: start;
+}
+
+.column-main,
+.column-side {
+  display: grid;
+  gap: var(--spacing-section);
+  align-content: start;
+}
+
+.panel-pad {
+  padding: var(--spacing-section);
+}
+
+.panel-stack {
+  display: grid;
+  gap: var(--spacing-group);
+}
+
+/* ---- Items ------------------------------------------------------------------------------ */
+
+.items {
+  inline-size: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+}
+
+.items th {
+  padding-block-end: 0.6rem;
+  border-block-end: 1px solid var(--border);
+  color: var(--muted-foreground);
+  font-size: var(--text-2xs);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-align: start;
+  text-transform: uppercase;
+}
+
+.items td {
+  padding-block: 0.7rem;
+  border-block-end: 1px solid var(--border);
+  vertical-align: top;
+}
+
+.items strong {
+  display: block;
+  color: var(--foreground-strong);
+  font-weight: 500;
+}
+
+.items small {
+  color: var(--muted-foreground);
+  font-size: var(--text-2xs);
+}
+
+.numeric {
+  text-align: end;
+  font-variant-numeric: tabular-nums;
+}
+
+/*
+ * A numeric heading sits over its own column, not off to the left of it.
+ *
+ * `.items th` and `.invoice-items th` set `text-align: start` for the description column and
+ * outrank `.numeric` on specificity, so the three right-aligned columns had left-aligned headings —
+ * quantities and amounts flush right under labels flush left.
+ */
+.items th.numeric,
+.invoice-items th.numeric {
+  text-align: end;
+}
+
+/*
+ * Column widths, so the numbers occupy a predictable band instead of being sized by the longest
+ * amount in the response. The description takes what is left.
+ */
+.items th.numeric:first-of-type,
+.invoice-items th.numeric:first-of-type {
+  inline-size: 5rem;
+}
+
+.items th.numeric:not(:first-of-type),
+.invoice-items th.numeric:not(:first-of-type) {
+  inline-size: 8rem;
+}
+
+.mono {
+  font-family: ui-monospace, monospace;
+}
+
+.empty {
+  padding-block: var(--spacing-gutter);
+  color: var(--muted-foreground);
+  text-align: center;
+}
+
+.totals {
+  display: grid;
+  gap: 0.4rem;
+  margin: 1.1rem 0 0;
+  margin-inline-start: auto;
+  max-inline-size: 20rem;
+  font-size: var(--text-sm);
+}
+
+.totals > div {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--spacing-group);
+}
+
+.totals dt {
+  color: var(--muted-foreground);
+}
+
+.totals dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.totals .grand {
+  padding-block-start: var(--spacing-tight);
+  border-block-start: 1px solid var(--border);
+  color: var(--foreground-strong);
+  font-weight: 600;
+}
+
+/* ---- History ---------------------------------------------------------------------------- */
+
+.timeline {
+  display: grid;
+  gap: var(--spacing-field);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.timeline li {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+}
+
+/* A hairline joining the entries, so the column reads as one sequence rather than five chips. */
+.timeline-rail {
+  position: absolute;
+  inset-block: 1.35rem -0.75rem;
+  inset-inline-start: 0.55rem;
+  inline-size: 1px;
+  background: var(--border);
+}
+
+.timeline li:last-child .timeline-rail {
+  display: none;
+}
+
+.timeline-copy {
+  display: grid;
+  gap: 0.15rem;
+  min-inline-size: 0;
+}
+
+.timeline-copy strong {
+  color: var(--foreground-strong);
+  font-size: var(--text-sm);
+  font-weight: 400;
+}
+
+.timeline-copy small,
+.timeline .empty {
+  color: var(--muted-foreground);
+  font-size: var(--text-2xs);
+}
+
+/* ---- Status composer --------------------------------------------------------------------- */
+
+.composer {
+  display: flex;
+  gap: 0.85rem;
+  padding-block-start: var(--spacing-group);
+  border-block-start: 1px solid var(--border);
+}
+
+.composer-avatar,
+.customer-avatar {
+  display: grid;
+  flex: none;
+  place-items: center;
+  inline-size: 2rem;
+  block-size: 2rem;
+  border-radius: var(--radius-full);
+  background: var(--accent-strong);
+  color: var(--primary-emphasis);
+  font-size: var(--text-2xs);
+  font-weight: 600;
+}
+
+.composer-body {
+  display: grid;
+  flex: 1;
+  gap: 0.6rem;
+  min-inline-size: 0;
+}
+
+/*
+ * The note field used to be styled from here — forty lines of border, radius, padding and a
+ * `field-sizing` grow — and not one of them ever applied. A rule written in a page's stylesheet
+ * stops at a child component's host, so it never reached the textarea inside `app-textarea`; the
+ * field has always been drawn by the shared control, which is where the look belongs. See
+ * lessons.md, "The design pass — encapsulation, and three more things a native control hid".
+ */
+
+.composer-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.6rem;
+}
+
+/* Takes the free space so the status and the action stay grouped at the end. */
+.composer-hint {
+  flex: 1;
+  min-inline-size: 8rem;
+  margin: 0;
+  color: var(--muted-foreground);
+  font-size: var(--text-2xs);
+}
+
+/*
+ * The status sits with the action it applies, not stranded at the far end of a row.
+ *
+ * The label is text beside the control, not a frame around it. This used to carry a border, a
+ * radius and the field background of its own, with `app-select` — which draws all three — nested
+ * inside it, so the row showed a field inside a field. The rules under it styled a native
+ * `<select>` that has not been in this template since the control was themed.
+ */
+.status-picker {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-tight);
+  color: var(--muted-foreground);
+  font-size: var(--text-2xs);
+}
+
+.status-picker app-select {
+  inline-size: 9.5rem;
+  /* Matches the button beside it. The one hook the component offers — see select.css. */
+  --select-height: 2.25rem;
+}
+
+/* ---- Side panels ------------------------------------------------------------------------ */
+
+.customer-head {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-field);
+}
+
+.customer-avatar {
+  inline-size: 2.35rem;
+  block-size: 2.35rem;
+  font-size: var(--text-xs);
+}
+
+.customer-name {
+  display: grid;
+  min-inline-size: 0;
+}
+
+.customer-name strong {
+  color: var(--foreground-strong);
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.customer-name small {
+  color: var(--muted-foreground);
+  font-size: var(--text-2xs);
+}
+
+/*
+ * The lifetime figures. They are drawn at the weight the mockup gives them because that is the
+ * shape of the answer; the value is an em dash because no service can produce one yet, and a
+ * fabricated number under a real label is worse than an honest blank.
+ */
+.customer-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--spacing-field);
+  margin: 0;
+  padding: 0.85rem 0;
+  border-block: 1px solid var(--border-soft);
+}
+
+.customer-stats div {
+  min-inline-size: 0;
+}
+
+.customer-stats dt {
+  color: var(--muted-foreground);
+  font-size: var(--text-2xs);
+}
+
+.customer-stats dd {
+  margin: 0.2rem 0 0;
+  color: var(--foreground-subtle);
+  font-size: var(--text-base);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.stats-note {
+  margin: -0.35rem 0 0;
+  color: var(--muted-foreground);
+  font-size: var(--text-2xs);
+}
+
+.contact {
+  display: grid;
+  gap: 0.55rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--text-sm);
+}
+
+.contact li {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-inline-size: 0;
+  --icon-size: 0.75rem;
+}
+
+.contact app-icon {
+  flex: none;
+  color: var(--muted-foreground);
+}
+
+.contact a,
+.contact span {
+  overflow: hidden;
+  color: var(--foreground);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.contact a:hover {
+  color: var(--primary-emphasis);
+}
+
+.address-grid {
+  display: grid;
+  gap: var(--spacing-section);
+}
+
+.address-grid h3 {
+  margin: 0 0 0.4rem;
+  color: var(--muted-foreground);
+  font-size: var(--text-2xs);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.address-name {
+  margin: 0;
+  color: var(--foreground-strong);
+  font-size: var(--text-sm);
+}
+
+.address-line {
+  margin: 0;
+  color: var(--foreground-subtle);
+  font-size: var(--text-sm);
+}
+
+.address-line.muted {
+  color: var(--muted-foreground);
+}
+
+.flags {
+  display: grid;
+  gap: 0.6rem;
+  margin: 0;
+  font-size: var(--text-sm);
+}
+
+.flags > div {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--spacing-group);
+}
+
+.flags dt {
+  color: var(--muted-foreground);
+}
+
+.flags dd {
+  margin: 0;
+  color: var(--foreground-strong);
+}
+
+@media (max-width: 1100px) {
+  .order-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---- Invoice document -------------------------------------------------------------------- */
+
+.invoice-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: var(--scrim);
+  backdrop-filter: blur(2px);
+}
+
+.invoice-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 61;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+.invoice-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.75rem 1.1rem;
+  border-block-end: 1px solid var(--border);
+  background: var(--header-veil);
+  backdrop-filter: blur(12px);
+  color: var(--foreground);
+}
+
+.invoice-bar > strong {
+  flex: 1;
+  min-inline-size: 0;
+  overflow: hidden;
+  color: var(--foreground-strong);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.invoice-bar button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  block-size: 2.15rem;
+  padding-inline: 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--card);
+  color: var(--foreground);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  --icon-size: 0.75rem;
+  transition:
+    background-color var(--default-transition-duration),
+    border-color var(--default-transition-duration),
+    color var(--default-transition-duration);
+}
+
+.invoice-bar button:hover:not(:disabled) {
+  border-color: var(--edge);
+  background: var(--accent);
+  color: var(--primary-emphasis);
+}
+
+.invoice-bar button:disabled {
+  opacity: 0.6;
+}
+
+.invoice-close {
+  inline-size: 2.15rem;
+  padding-inline: 0 !important;
+  justify-content: center;
+}
+
+.invoice-scroll {
+  overflow: auto;
+  padding: 1.75rem 1rem 3rem;
+  display: flex;
+  justify-content: center;
+}
+
+/*
+ * A sheet, not a panel: page proportions and paper colours, so what is on screen is what comes out
+ * of the printer. It keeps its own light palette in every theme for the same reason.
+ */
+.invoice-sheet {
+  flex: none;
+  inline-size: min(51rem, 100%);
+  min-block-size: 66rem;
+  padding: clamp(1.75rem, 4vw, 3.5rem);
+  border-radius: var(--radius-sm);
+  background: var(--paper);
+  color: var(--paper-ink);
+  box-shadow: 0 18px 48px rgb(4 18 13 / 45%);
+  font-size: 0.8125rem;
+  line-height: 1.7;
+}
+
+.invoice-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 2rem;
+  padding-block-end: var(--spacing-gutter);
+  border-block-end: 2px solid var(--paper-ink);
+}
+
+/*
+ * The letterhead reads as a block — mark or logo, trading name, then the address and contact lines
+ * in a quieter grey, the way a printed invoice stacks them.
+ */
+.seller {
+  min-inline-size: 0;
+}
+
+.seller-mark {
+  display: grid;
+  place-items: center;
+  inline-size: 2.4rem;
+  block-size: 2.4rem;
+  margin-block-end: 0.6rem;
+  border-radius: var(--radius-lg);
+  background: var(--primary);
+  color: var(--paper);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+/* Capped rather than stretched: store logos arrive at whatever size the merchant uploaded. */
+.seller-logo {
+  display: block;
+  max-inline-size: 11rem;
+  max-block-size: 3.25rem;
+  margin-block-end: 0.6rem;
+  object-fit: contain;
+}
+
+.seller strong {
+  display: block;
+  color: var(--paper-ink);
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.seller p {
+  margin: 0;
+  color: var(--paper-ink-muted);
+  font-size: 0.8125rem;
+  line-height: 1.55;
+}
+
+.seller-contact {
+  color: var(--paper-line);
+}
+
+.seller p:first-of-type {
+  margin-block-start: 0.35rem;
+}
+
+.invoice-id {
+  flex: none;
+  text-align: end;
+}
+
+.invoice-word {
+  margin: 0;
+  color: var(--paper-ink);
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.invoice-id dl {
+  display: grid;
+  gap: 0.15rem;
+  margin: var(--spacing-tight) 0 0;
+}
+
+.invoice-id dl > div {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+}
+
+.invoice-id dt {
+  color: var(--paper-ink-faint);
+}
+
+.invoice-id dd {
+  margin: 0;
+  color: var(--paper-ink-strong);
+  font-variant-numeric: tabular-nums;
+}
+
+.invoice-parties {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2.5rem;
+  padding-block: var(--spacing-gutter);
+  border-block-end: 1px solid var(--paper-rule);
+}
+
+.invoice-parties h3 {
+  margin: 0 0 var(--spacing-tight);
+  color: var(--paper-ink-faint);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.invoice-parties p {
+  margin: 0;
+  color: var(--paper-ink-strong);
+}
+
+.invoice-parties .party-name {
+  font-weight: 600;
+}
+
+.invoice-parties .muted {
+  color: var(--paper-ink-faint);
+}
+
+.invoice-items {
+  inline-size: 100%;
+  margin-block-start: var(--spacing-gutter);
+  border-collapse: collapse;
+}
+
+.invoice-items th {
+  padding-block-end: 0.6rem;
+  border-block-end: 1px solid var(--paper-ink);
+  color: var(--paper-ink);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-align: start;
+  text-transform: uppercase;
+}
+
+.invoice-items td {
+  padding-block: 0.8rem;
+  border-block-end: 1px solid var(--paper-wash);
+  color: var(--paper-line);
+  vertical-align: top;
+}
+
+.invoice-items strong {
+  display: block;
+  color: var(--paper-ink-strong);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.invoice-items small {
+  color: var(--paper-ink-faint);
+  font-size: 0.75rem;
+}
+
+.invoice-items .strong {
+  color: var(--paper-ink);
+  font-weight: 600;
+}
+
+.invoice-totals {
+  display: grid;
+  gap: var(--spacing-tight);
+  margin: var(--spacing-section) 0 0;
+  margin-inline-start: auto;
+  max-inline-size: 19rem;
+}
+
+.invoice-totals > div {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--spacing-group);
+}
+
+.invoice-totals dt {
+  color: var(--paper-ink-quiet);
+}
+
+.invoice-totals dd {
+  margin: 0;
+  color: var(--paper-ink-strong);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.invoice-totals .grand {
+  margin-block-start: 0.35rem;
+  padding-block-start: 0.6rem;
+  border-block-start: 2px solid var(--paper-ink);
+}
+
+.invoice-totals .grand dt,
+.invoice-totals .grand dd {
+  color: var(--paper-ink);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+/* Printing sends the sheet alone; the console around it is not part of the document. */
+@media print {
+  .invoice-scrim,
+  .invoice-bar {
+    display: none;
+  }
+
+  /* Nothing animates onto paper. */
+  .invoice-sheet,
+  .stage-bar i {
+    animation: none;
+  }
+
+  .invoice-layer {
+    position: static;
+  }
+
+  .invoice-scroll {
+    padding: 0;
+    overflow: visible;
+  }
+
+  .invoice-sheet {
+    inline-size: 100%;
+    min-block-size: 0;
+    box-shadow: none;
+  }
+}
+
+@media (max-width: 1100px) {
+  .order-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Five abreast stops being readable long before the shell does. */
+  .stages {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .stages {
+    grid-template-columns: 1fr;
+  }
+
+  .invoice-parties {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-section);
+  }
+
+  .order-head {
+    flex-wrap: wrap;
+  }
+}
+
+/* ---- Motion ------------------------------------------------------------------------------ */
+
+/*
+ * The page arrives rather than appearing: the identity line first, then the tracker, then the two
+ * columns, a beat apart. Short and small — 12px and 320ms — because this is a screen an operator
+ * opens dozens of times a day, and anything longer would be in the way by the third visit.
+ */
+.order-head,
+.fulfilment,
+.off-path,
+.order-grid {
+  --rise-from: 0.75rem;
+  animation: rise 320ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+.fulfilment,
+.off-path {
+  animation-delay: 60ms;
+}
+
+.order-grid {
+  animation-delay: 120ms;
+}
+
+/*
+ * The bars fill after the card has landed, so the progress reads as progress rather than as a
+ * picture of it. One keyframe: it runs from empty to whatever the stage's own transform says.
+ */
+@keyframes stage-fill {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+.stage-bar i {
+  animation: stage-fill 620ms cubic-bezier(0.22, 1, 0.36, 1) 220ms backwards;
+}
+
+/* The invoice is a document being placed in front of you, so it comes forward, not sideways. */
+@keyframes invoice-in {
+  from {
+    opacity: 0;
+    transform: translateY(1.25rem) scale(0.99);
+  }
+}
+
+@keyframes veil-in {
+  from {
+    opacity: 0;
+  }
+}
+
+.invoice-scrim,
+.invoice-bar {
+  animation: veil-in 200ms ease-out backwards;
+}
+
+.invoice-sheet {
+  animation: invoice-in 340ms cubic-bezier(0.22, 1, 0.36, 1) 40ms backwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .order-head,
+  .fulfilment,
+  .off-path,
+  .order-grid {
+    animation: none;
+  }
+
+  .stage-bar i,
+  .invoice-scrim,
+  .invoice-bar,
+  .invoice-sheet {
+    animation: none;
+  }
+}
+
+/* ---- Bidi ---------------------------------------------------------------------------------- */
+
+/*
+ * Data the seller and the buyer typed, laid out by its own direction.
+ *
+ * In an Arabic console the page direction is RTL, and a Latin line that starts with digits gets
+ * reordered by it: "123 Olaya Street" printed as "Olaya Street 123", and "+966 50 123 4567" as
+ * "4567 123 50 966+". `plaintext` resolves each line from its own first strong character — the same
+ * rule `dir="auto"` applies — so Latin addresses stay Latin-ordered inside an Arabic page, and an
+ * Arabic address in an English page keeps its own order too.
+ */
+.seller p,
+.party-name,
+.invoice-parties p,
+.address-grid p,
+.contact a,
+.contact span,
+.customer-name strong,
+.customer-name small,
+.items strong,
+.items small,
+.invoice-items strong,
+.invoice-items small {
+  unicode-bidi: plaintext;
+}
+
+/* ---- Payments panel ---------------------------------------------------------------- */
+
+/*
+ * The payments taken against this order. Four columns rather than a table: there is rarely more
+ * than one row, and a `data-table` for a single line reads as an empty grid.
+ */
+.payment-list {
+  display: grid;
+  gap: var(--spacing-field);
+  margin: 0;
+  padding-inline-start: 0;
+  list-style: none;
+}
+
+.payment-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.35rem 0.75rem;
+  align-items: center;
+}
+
+.payment-copy {
+  display: grid;
+  min-width: 0;
+}
+
+.payment-copy strong {
+  overflow: hidden;
+  color: var(--foreground-strong);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* The gateway's own reference: Latin data that must not reorder inside an Arabic page. */
+.payment-ref {
+  overflow: hidden;
+  color: var(--foreground-subtle);
+  font-size: var(--text-3xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  unicode-bidi: plaintext;
+}
+
+.payment-amount {
+  color: var(--foreground-strong);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  text-align: end;
+}
+
+.payment-date {
+  color: var(--foreground-subtle);
+  font-size: var(--text-3xs);
+  text-align: end;
+}

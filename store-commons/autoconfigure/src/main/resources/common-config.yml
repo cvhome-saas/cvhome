@@ -3,6 +3,13 @@ com:
     cvhome:
       app:
         domain: gateway.com
+        sub:
+          - www
+          - console-ui
+          - uaa
+        handlers:
+          - schema: http
+            port: 8000
       pod:
         domain: spg-507f1f77.gateway.com
       services:
@@ -20,17 +27,31 @@ com:
           schema: http
           namespace: store-core.cvhome.lcl
           gateway-service-name: store-core-gateway
-        control-plane:
-          name: control-plane
+        tenancy:
+          name: tenancy
           domain: ${com.asrevo.cvhome.app.domain}
           port: 8020
           schema: http
           namespace: store-core.cvhome.lcl
           gateway-service-name: store-core-gateway
-        seller-ui:
-          name: seller-ui
-          domain: seller-ui.${com.asrevo.cvhome.app.domain}
-          port: 8010
+        billing:
+          name: billing
+          domain: ${com.asrevo.cvhome.app.domain}
+          port: 8021
+          schema: http
+          namespace: store-core.cvhome.lcl
+          gateway-service-name: store-core-gateway
+        pod-registry:
+          name: pod-registry
+          domain: ${com.asrevo.cvhome.app.domain}
+          port: 8022
+          schema: http
+          namespace: store-core.cvhome.lcl
+          gateway-service-name: store-core-gateway
+        console-ui:
+          name: console-ui
+          domain: console-ui.${com.asrevo.cvhome.app.domain}
+          port: 8011
           schema: http
           namespace: store-core.cvhome.lcl
           gateway-service-name: store-core-gateway
@@ -45,6 +66,13 @@ com:
           name: merchant
           domain: ${com.asrevo.cvhome.pod.domain}
           port: 8120
+          schema: http
+          namespace: store-pod-507f1f77.cvhome.lcl
+          gateway-service-name: spg
+        content:
+          name: content
+          domain: ${com.asrevo.cvhome.pod.domain}
+          port: 8121
           schema: http
           namespace: store-pod-507f1f77.cvhome.lcl
           gateway-service-name: spg
@@ -69,6 +97,20 @@ com:
           schema: http
           namespace: store-pod-507f1f77.cvhome.lcl
           gateway-service-name: spg
+        payment:
+          name: payment
+          domain: ${com.asrevo.cvhome.pod.domain}
+          port: 8125
+          schema: http
+          namespace: store-pod-507f1f77.cvhome.lcl
+          gateway-service-name: spg
+        inventory:
+          name: inventory
+          domain: ${com.asrevo.cvhome.pod.domain}
+          port: 8126
+          schema: http
+          namespace: store-pod-507f1f77.cvhome.lcl
+          gateway-service-name: spg
         landing-ui:
           name: landing-ui
           domain: ${com.asrevo.cvhome.pod.domain}
@@ -76,6 +118,8 @@ com:
           schema: http
           namespace: store-pod-507f1f77.cvhome.lcl
           gateway-service-name: spg
+      crypto:
+        type: LOCAL
 spring:
   docker:
     compose:
@@ -139,9 +183,14 @@ spring:
             user-name-attribute: sub
       resourceserver:
         jwt:
-          issuer-uri-set:
-            - ${com.asrevo.cvhome.services.uaa.schema}://${com.asrevo.cvhome.services.uaa.domain}
-            - ${com.asrevo.cvhome.services.uaa.schema}://${com.asrevo.cvhome.services.uaa.domain}:${com.asrevo.cvhome.services.uaa.port}
+          issuers:
+            # Staff and service principals. No `grants`: uaa's clients carry arbitrary scopes, and capping them
+            # here would lock out callers this realm is meant to admit.
+            uaa:
+              uris:
+                - ${com.asrevo.cvhome.services.uaa.schema}://${com.asrevo.cvhome.services.uaa.domain}
+                - ${com.asrevo.cvhome.services.uaa.schema}://${com.asrevo.cvhome.services.uaa.domain}:${com.asrevo.cvhome.services.uaa.port}
+              jwk-set-uri: ${com.asrevo.cvhome.services.uaa.schema}://${com.asrevo.cvhome.services.uaa.domain}:${com.asrevo.cvhome.services.uaa.port}/oauth2/jwks
 server:
   forward-headers-strategy: NATIVE
   port: ${com.asrevo.cvhome.services.${spring.application.name}.port}
@@ -151,9 +200,21 @@ springdoc:
   api-docs:
     path: /api-docs
 management:
+  metrics:
+    tags:
+      application: ${spring.application.name}
+      service.version: ${version}
+    enable:
+      jvm: false
   observations:
     key-values:
       application: ${spring.application.name}
+      service.version: ${version}
+    enable:
+      spring.security.filterchains: false
+      spring.security.authorizations: false
+      spring.security.authentications: false
+      spring.security.http: false
   info:
     env:
       enabled: true
@@ -176,15 +237,17 @@ otel:
     disabled: true
   resource:
     attributes:
-      service:
-        name: ${spring.application.name}
+      service.name: ${spring.application.name}
+      service.version: ${version}
+    disabled:
+      keys: process.command,process.command_args,process.command_line,process.executable.name,process.executable.path,process.owner,process.parent_pid,process.pid,process.runtime.description,process.runtime.name,process.runtime.version,telemetry.distro.name,telemetry.distro.version,telemetry.sdk.language,telemetry.sdk.name,telemetry.sdk.version,os.version,os.description,os.type
   instrumentation:
-    spring-webmvc:
-      experimental-span-attributes: true
-    spring-cloud-gateway:
-      experimental-span-attributes: true
-    spring-webflux:
-      experimental-span-attributes: true
+    runtime-metrics:
+      enabled: false
+    jvm-metrics:
+      enabled: false
+    micrometer:
+      enabled: true
 logging:
   level:
     com.asrevo: DEBUG

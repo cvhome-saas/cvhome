@@ -1,0 +1,40 @@
+.badges {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-inline);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.1rem 0.35rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  font-size: var(--text-3xs);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  line-height: 1.4;
+  background: var(--input);
+  color: var(--foreground-quiet);
+}
+
+.chip.translated {
+  background: var(--chart-1-wash);
+  color: var(--chart-1-foreground);
+}
+
+.chip.stale {
+  background: var(--chart-4-wash);
+  color: var(--chart-4-foreground);
+}
+
+.chip.draft {
+  background: var(--input);
+  color: var(--muted-foreground);
+}
+
+.chip.missing {
+  background: transparent;
+  border-color: var(--border);
+  color: var(--foreground-quiet);
+}

@@ -1,0 +1,184 @@
+/*
+ * Follows `features/customers/components/customer-dialog/customer-dialog.css` — same surface, same
+ * backdrop, same top-layer entry — so a record opened from a table reads the same wherever it is
+ * opened from. Wider than that one, because this panel carries three stacked sections rather than
+ * one record.
+ */
+.store-billing {
+  /* The reset zeroes margins, which is what centres a native dialog — put it back explicitly. */
+  margin: auto;
+  inline-size: min(44rem, calc(100vw - 2rem));
+  max-block-size: min(48rem, calc(100vh - 3rem));
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  background: var(--background);
+  color: var(--foreground);
+  box-shadow: var(--lift);
+}
+
+.store-billing-body {
+  display: flex;
+  flex-direction: column;
+  max-block-size: inherit;
+}
+
+/* ---------------------------------------------------------------------------- head ---- */
+
+.store-billing-head {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 1.15rem 1.35rem;
+  border-block-end: 1px solid var(--border-soft);
+}
+
+.store-billing-head .who {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-inline-size: 0;
+  /* Takes the slack so the badge and the close button sit at the far edge. */
+  flex: 1;
+}
+
+.store-billing-head h2 {
+  margin: 0;
+  color: var(--foreground-strong);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-bold);
+}
+
+.store-id {
+  color: var(--muted-foreground);
+  font-family: var(--font-mono, monospace);
+  font-size: var(--text-xs);
+  /* A store id is Latin data that may sit in a right-to-left line. */
+  unicode-bidi: plaintext;
+  overflow-wrap: anywhere;
+}
+
+/* --------------------------------------------------------------------------- body ---- */
+
+.store-billing-scroll {
+  display: flex;
+  flex-direction: column;
+  gap: 1.35rem;
+  padding: 1.25rem 1.35rem 1.5rem;
+  overflow-y: auto;
+}
+
+.store-section h3 {
+  margin: 0 0 0.65rem;
+  color: var(--foreground-strong);
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* --------------------------------------------------------------------------- facts ---- */
+
+.facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: 0.85rem 1.25rem;
+  margin: 0 0 0.9rem;
+}
+
+.facts div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-inline-size: 0;
+}
+
+.facts dt {
+  color: var(--muted-foreground);
+  font-size: var(--text-xs);
+}
+
+.facts dd {
+  margin: 0;
+  color: var(--foreground-strong);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.pending {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0 0 var(--spacing-field);
+  color: var(--muted-foreground);
+  font-size: var(--text-xs);
+}
+
+/* -------------------------------------------------------------------------- levers ---- */
+
+.levers {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-tight);
+  padding-block-start: 0.35rem;
+}
+
+.plan-picker {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-tight);
+  inline-size: 100%;
+}
+
+.plan-picker app-select {
+  /* The select takes the row's slack; the two buttons keep their intrinsic width. */
+  flex: 1 1 16rem;
+  min-inline-size: 0;
+}
+
+/* ---------------------------------------------------------------------------- rows ---- */
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rows li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--spacing-inline) var(--spacing-field);
+  padding: 0.5rem 0.55rem;
+  border-radius: var(--radius-md);
+  font-size: var(--text-xs);
+}
+
+.rows li:nth-child(odd) {
+  background: var(--muted);
+}
+
+.row-lead {
+  color: var(--foreground-strong);
+  font-weight: var(--font-weight-medium);
+  /* Leads the row and takes the slack, so the value column lines up down the list. */
+  flex: 1 1 8rem;
+  min-inline-size: 0;
+  unicode-bidi: plaintext;
+}
+
+.row-meta {
+  color: var(--muted-foreground);
+  unicode-bidi: plaintext;
+}
+
+.row-value {
+  color: var(--foreground-strong);
+  font-variant-numeric: tabular-nums;
+  margin-inline-start: auto;
+}

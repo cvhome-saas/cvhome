@@ -1,6 +1,0 @@
-### update category
-POST http://seller-ui.gateway.com:8120/api/v1/private/product/5/category/6?store=65f020632bc46470c104b76f
-Authorization: Bearer {{access_token}}
-Content-Type: application/json
-
-{}

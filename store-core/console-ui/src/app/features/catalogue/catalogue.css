@@ -1,0 +1,43 @@
+/*
+ * Page-level layout only. The console frame belongs to ConsoleShell and the card chrome to Panel.
+ *
+ * `display: contents` so the page's blocks become children of the shell's `.workspace`, which owns
+ * the 1.5rem rhythm every other console page sits on. The six pages that predate this one all do
+ * the same; this one used `display: block` and re-invented the spacing.
+ */
+:host {
+  display: contents;
+}
+
+/*
+ * The tab strip and the panel it controls are one block inside the busy overlay, where the shell's
+ * rhythm stops — so this stack owns its gap.
+ */
+.catalogue-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-group);
+}
+
+.tab-panel {
+  min-inline-size: 0;
+}
+
+/*
+ * A tab change is a change of screen, so it enters rather than appearing. One keyframe, the
+ * console's usual 8px rise — see `toast-host.css` and `date-picker.css` for the same idiom.
+ *
+ * No leave: the outgoing tab is replaced immediately, and animating it out would hold two panels on
+ * screen at once for no gain.
+ */
+.tab-panel-in {
+  --rise-from: 0.5rem;
+  animation: rise .22s var(--ease-emphasis) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tab-panel-in {
+    animation-duration: .01ms;
+  }
+}
+

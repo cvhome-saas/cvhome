@@ -1,9 +1,13 @@
 plugins {
-	alias(libs.plugins.java.library.conventions)
+    alias(libs.plugins.java.library.conventions)
 }
 
 dependencies {
-	compileOnly libs.jackson.databind
-	compileOnly libs.lombok
-	annotationProcessor libs.lombok
+    compileOnly libs.jackson.databind
+    compileOnly libs.lombok
+    annotationProcessor libs.lombok
+
+    // Jackson is compileOnly for consumers, who all bring their own. The DTOs here exist only to be deserialized,
+    // so a test that does not have it cannot assert anything about them.
+    testImplementation libs.jackson.databind
 }

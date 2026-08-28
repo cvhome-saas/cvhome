@@ -1,0 +1,49 @@
+# SignUpApi — com.asrevo.cvhome.tenancy.manager.controller.SignUpApi (@RequestMapping "api/v1/signup")
+#
+# The one endpoint on this service anyone may call without a session. It moved off api/v1/user-account, which
+# it used to share with UserAccountApi — every endpoint on that one needs a session and a store-scoped
+# permission, so the shared prefix implied an audience it did not have.
+#
+# Creating the organization and the uaa user is one transaction: a duplicate email can no longer leave an
+# organization behind that nobody can log into.
+#
+# Requires a running stack: lcl start -d
+
+### sign up
+POST {{SELLER_UI_URL}}/tenancy/api/v1/signup/public/create?lang={{LANG}}
+Content-Type: application/json
+
+{
+  "user": {
+    "emailAddress": "founder+{{$timestamp}}@example.com",
+    "firstName": "New",
+    "lastName": "Founder",
+    "password": "Passw0rd!"
+  }
+}
+
+> {%
+    client.test("an organization and its administrator are created together", function () {
+        client.assert(response.status === 200, "status " + response.status);
+    });
+%}
+
+### the same address twice — uaa refuses, and the organization must roll back with it
+POST {{SELLER_UI_URL}}/tenancy/api/v1/signup/public/create?lang={{LANG}}
+Content-Type: application/json
+
+{
+  "user": {
+    "emailAddress": "org1-admin@mail.com",
+    "firstName": "Dup",
+    "lastName": "Founder",
+    "password": "Passw0rd!"
+  }
+}
+
+> {%
+    client.test("refused", function () {
+        client.assert(response.status >= 400, "status " + response.status);
+    });
+    // Then check by hand that tenancy.manager_org gained no row: that orphan is what the transaction prevents.
+%}

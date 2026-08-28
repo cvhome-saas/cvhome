@@ -1,0 +1,86 @@
+<ng-container *transloco="let t">
+  <app-page-header [title]="t('content.hub.title')" [context]="facade.context()">
+    @if (createAvailable()) {
+      <button class="primary-action" type="button" (click)="create()">
+        <app-icon name="plus" />
+        {{ createLabel() }}
+      </button>
+    }
+
+    <!-- The branding tab's save spans all three of its panels, so it belongs to the page. -->
+    @if (brandingActions()) {
+      @if (branding.dirty()) {
+        <button class="secondary-action" type="button" (click)="branding.discard()">
+          {{ t('content.branding.discard') }}
+        </button>
+      }
+      <button
+        class="primary-action"
+        type="button"
+        [disabled]="!branding.dirty() || branding.busy() || !branding.linksValid()"
+        (click)="branding.save()"
+      >
+        <app-icon name="check" />
+        {{ t('content.branding.save') }}
+      </button>
+    }
+  </app-page-header>
+
+  @if (facade.summaryError(); as failure) {
+    <app-load-error [message]="failure.message" (retry)="facade.retry()" />
+  }
+
+  @if (facade.kpis().length) {
+    <app-kpi-grid [data]="facade.kpis()" [label]="t('content.kpi.label')" />
+  }
+
+  <div class="hub-region">
+    <div class="hub-layout" [class.rail-collapsed]="railCollapsed()">
+      <app-section-nav
+        class="hub-rail"
+        basePath="/content"
+        [sections]="facade.sections()"
+        [active]="activeTab()"
+        [heading]="t('content.hub.railHeading')"
+        [label]="t('content.hub.railLabel')"
+        [(collapsed)]="railCollapsed"
+      />
+
+      <app-tab-switcher
+        class="hub-tabs"
+        [tabs]="tabs()"
+        [active]="activeTab()"
+        (activeChange)="pickTab($event)"
+        [label]="t('content.hub.railLabel')"
+        panelId="content-section"
+      />
+
+      <div class="hub-section" id="content-section">
+        @if (listType(); as type) {
+          @if (type === 'policies') {
+            <app-policies-tab [canManage]="canManage()" (open)="openPolicy($event)" />
+          }
+          <app-content-list
+            [type]="type"
+            [locales]="facade.localeOptions()"
+            [canManage]="canManage()"
+            (open)="openRow($event)"
+            (create)="create()"
+          />
+        } @else {
+          @switch (activeTab()) {
+            @case ('media') {
+              <app-media-tab [locales]="facade.localeOptions()" [canManage]="canManage()" [totalFiles]="facade.counts()['media'] ?? 0" />
+            }
+            @case ('menus') {
+              <app-menus-tab [locales]="facade.localeOptions()" [defaultLocale]="facade.locales().defaultCode" [canManage]="canManage()" />
+            }
+            @case ('branding') {
+              <app-branding-tab [locales]="facade.localeOptions()" [defaultLocale]="facade.locales().defaultCode" [canManage]="canManage()" />
+            }
+          }
+        }
+      </div>
+    </div>
+  </div>
+</ng-container>

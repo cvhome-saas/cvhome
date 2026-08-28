@@ -1,0 +1,17 @@
+plugins {
+    alias(libs.plugins.java.library.conventions)
+}
+
+dependencies {
+    implementation project(":store-commons:secret-crypto:secret-crypto-core")
+    
+    compileOnly libs.lombok
+    annotationProcessor libs.lombok
+}
+
+// EnvironmentVariableKeyProvider calls System.getenv directly and Mockito will not mock java.lang.System, so the
+// only way to exercise the path a real deployment takes is to set the variable for the test JVM. The value is the
+// base64 of the throwaway key the tests already use; it protects nothing.
+tasks.named('test') {
+    environment 'COM_ASREVO_CVHOME_CRYPTO_KEY', 'MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY='
+}

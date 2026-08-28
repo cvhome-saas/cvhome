@@ -1,0 +1,57 @@
+# OrgStatisticApi / StoreStatisticApi — com.asrevo.cvhome.tenancy.manager.controller.statistic.*
+#   (@RequestMapping "/api/v2")
+#
+# Platform-wide counts across every tenant, so super-admin only. Both were completely unguarded until phase 3,
+# and both queries still named the pre-rename `manager.` schema until phase 10 — they would have failed the
+# first time either screen was opened.
+#
+# Requires a running stack: lcl start -d
+
+### organizations created per day
+POST {{SELLER_UI_URL}}/tenancy/api/v2/private/org-statistic?lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+Content-Type: application/json
+
+{
+  "fromDate": "2020-01-01T00:00:00Z",
+  "toDate": "2030-01-01T00:00:00Z"
+}
+
+> {%
+    client.test("super admin gets the series", function () {
+        client.assert(response.status === 200, "status " + response.status);
+    });
+%}
+
+### stores created per day
+POST {{SELLER_UI_URL}}/tenancy/api/v2/private/store-statistic?lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+Content-Type: application/json
+
+{
+  "fromDate": "2020-01-01T00:00:00Z",
+  "toDate": "2030-01-01T00:00:00Z"
+}
+
+> {%
+    client.test("super admin gets the series", function () {
+        client.assert(response.status === 200, "status " + response.status);
+    });
+%}
+
+### an org admin must not see platform-wide numbers
+# Run with an org1-admin session in ORG_ADMIN_SESSION_ID.
+POST {{SELLER_UI_URL}}/tenancy/api/v2/private/store-statistic?lang={{LANG}}
+Cookie: SESSION={{ORG_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{
+  "fromDate": "2020-01-01T00:00:00Z",
+  "toDate": "2030-01-01T00:00:00Z"
+}
+
+> {%
+    client.test("refused", function () {
+        client.assert(response.status === 403, "status " + response.status);
+    });
+%}

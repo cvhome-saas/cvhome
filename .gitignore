@@ -40,5 +40,18 @@ bin/
 /extra/test-data/generated/
 *.d.ts
 *.tsbuildinfo
-/store-core/uaa/src/main/resources/static/*
-/store-core/uaa/src/main/resources/uaa-fe/.angular/
+**/resources/static/*
+**/.DS_Store
+/.junie/*
+### IntelliJ HTTP Client ###
+# Session ids are per-developer and expire; copy http-client.private.env.json.example to
+# http-client.private.env.json and paste your own. Never commit it.
+http-client.private.env.json
+/.codex/config.toml
+/.codex/hooks.json
+**/.angular/
+/store-pod/landing-ui/.impeccable/*
+
+# lcl stack runner state (.lcl/<stack>/) and its per-stack Next build dirs (.next-<stack>/)
+.lcl/
+**/.next-*/

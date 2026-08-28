@@ -1,0 +1,199 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+
+.settings-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  background: var(--muted);
+}
+
+/*
+ * The heading and the fold control share a row, so collapsing does not cost the rail a line and
+ * the control sits where the labels are about to disappear from.
+ */
+.nav-head {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-inline);
+  padding-inline-end: 0.15rem;
+}
+
+.nav-heading {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  padding: 0.6rem 0.65rem 0.4rem;
+  overflow: hidden;
+  color: var(--foreground-subtle);
+  font-size: var(--text-3xs);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.nav-toggle {
+  display: grid;
+  place-items: center;
+  flex: none;
+  inline-size: 1.75rem;
+  block-size: 1.75rem;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: none;
+  color: var(--foreground-subtle);
+  cursor: pointer;
+  transition:
+    background-color var(--default-transition-duration),
+    color var(--default-transition-duration);
+  --icon-size: 0.85rem;
+}
+
+.nav-toggle:hover {
+  background: var(--input);
+  color: var(--primary-emphasis);
+}
+
+/*
+ * Folded, the rail is icons only.
+ *
+ * The labels are collapsed by width rather than removed: `grid-template-columns` on the page
+ * animates the column, and a label that is still in the DOM has something to widen back into
+ * instead of popping in at the end. `visibility` takes them out of the tab order and off the
+ * screen reader's path while they are zero-width.
+ */
+.settings-nav.collapsed .nav-heading {
+  flex: 0;
+  padding-inline: 0;
+  opacity: 0;
+}
+
+.nav-copy {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  transition:
+    opacity var(--default-transition-duration),
+    max-inline-size var(--default-transition-duration);
+  max-inline-size: 14rem;
+}
+
+.settings-nav.collapsed .nav-copy {
+  max-inline-size: 0;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.settings-nav.collapsed .nav-item {
+  justify-content: center;
+  gap: 0;
+  padding-inline: 0.7rem;
+}
+
+/* The dot has no label beside it to qualify it, so it moves onto the icon as a corner marker. */
+.settings-nav.collapsed .nav-item {
+  position: relative;
+}
+
+.settings-nav.collapsed .nav-dot {
+  position: absolute;
+  inset-block-start: 0.45rem;
+  inset-inline-end: 0.45rem;
+}
+
+/* The hover nudge reads as a stutter when there is no label for it to reveal. */
+.settings-nav.collapsed a.nav-item:hover {
+  padding-inline-start: 0.7rem;
+}
+
+.settings-nav.collapsed .builder app-icon:last-child {
+  display: none;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  overflow: hidden;
+  padding: 0.65rem 0.7rem;
+  border-radius: var(--radius-lg);
+  color: var(--foreground);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  transition:
+    background-color var(--default-transition-duration),
+    color var(--default-transition-duration),
+    padding-inline-start var(--default-transition-duration);
+  --icon-size: 0.9rem;
+}
+
+a.nav-item:hover {
+  padding-inline-start: var(--spacing-group);
+  background: var(--input);
+  color: var(--primary-emphasis);
+}
+
+.nav-item.active {
+  background: var(--accent-strong);
+  color: var(--primary-emphasis);
+  font-weight: 600;
+}
+
+.nav-dot {
+  flex: none;
+  inline-size: 6px;
+  block-size: 6px;
+  border-radius: var(--radius-full);
+  background: var(--chart-4);
+}
+
+hr {
+  block-size: 1px;
+  margin: 0.4rem 0.35rem;
+  border: 0;
+  background: var(--border-soft);
+}
+
+/* Not yet a destination, so it reads as unavailable rather than as a link. */
+.builder {
+  color: var(--foreground-subtle);
+  cursor: not-allowed;
+}
+
+.builder app-icon:last-child {
+  --icon-size: 0.6rem;
+}
+
+/*
+ * Below the swap width the page renders a tab track instead (see store-management.css), so
+ * the rail's sticky behaviour only applies while it is a rail.
+ */
+@container settings (min-width: 44rem) {
+  .settings-nav {
+    position: sticky;
+    top: 1.5rem;
+  }
+}
+
+.nav-count {
+  margin-inline-start: auto;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--foreground-quiet);
+}
+
+.nav-item.active .nav-count {
+  color: var(--primary-emphasis);
+}
+
+.settings-nav.collapsed .nav-count {
+  display: none;
+}

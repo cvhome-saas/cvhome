@@ -1,0 +1,38 @@
+# RouterApi — com.asrevo.cvhome.tenancy.manager.controller.RouterApi (@RequestMapping "api/v1/router")
+#
+# Which pod hosts a store. Tenancy owns the store-to-pod binding; the pod registry owns what that pod is, and
+# the lookup degrades to a cached directory when the registry is unreachable.
+#
+# The file this replaces called two endpoints that no longer existed and pointed at localhost:8020.
+#
+# Requires a running stack: lcl start -d
+
+### the pod a store lives on
+GET {{SELLER_UI_URL}}/tenancy/api/v1/router/store-pod-by-store-id?store={{STORE_ID}}&lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+
+> {%
+    client.test("resolved through the registry", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        client.assert(response.body.endpoint.endpoint.length > 0, "no endpoint, so nothing could be routed");
+    });
+%}
+
+### another org's store — 404, the same answer a missing store gets
+GET {{SELLER_UI_URL}}/tenancy/api/v1/router/store-pod-by-store-id?store=65f020632bc46470c104b76f&lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+
+> {%
+    client.test("cross-tenant lookup refused", function () {
+        client.assert(response.status === 404, "status " + response.status);
+    });
+%}
+
+### unauthenticated — this endpoint had no guard at all until phase 3
+GET {{SELLER_UI_URL}}/tenancy/api/v1/router/store-pod-by-store-id?store={{STORE_ID}}&lang={{LANG}}
+
+> {%
+    client.test("a session is required", function () {
+        client.assert(response.status === 401, "status " + response.status);
+    });
+%}

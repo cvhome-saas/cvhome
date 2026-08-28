@@ -1,0 +1,209 @@
+/*
+ * Layer 1 — primitives and scales.
+ *
+ * Every key in this file is a standard Tailwind theme key. Where a value differs from
+ * Tailwind's default it is an intentional override, which is exactly how a Tailwind theme
+ * is meant to work: themes replace values, they never invent key names.
+ *
+ * Tailwind's stock palette (emerald, blue, cyan, amber, red, violet, teal, slate, white)
+ * is already available and is used as-is — only the two genuinely custom ramps are
+ * authored here.
+ *
+ * The identity built on top of these lives in theme-forest.css.
+ */
+
+/*
+ * `static` so every token is emitted to :root whether or not a utility uses it — the
+ * component stylesheets read these through var() and Tailwind cannot see those uses.
+ */
+@theme static {
+  /* ---------------------------------------------------------------- palette ---- */
+
+  /*
+   * forest — the near-black greens the dark world is built from. 800/900/950 are the
+   * brand values; the lighter steps complete the ramp so a foreign ramp can replace it.
+   */
+  --color-forest-50: oklch(96.5% 0.018 168);
+  --color-forest-100: oklch(93% 0.035 168);
+  --color-forest-200: oklch(86% 0.062 168);
+  --color-forest-300: oklch(77% 0.088 167);
+  --color-forest-400: oklch(66% 0.098 167);
+  --color-forest-500: oklch(54% 0.088 167);
+  --color-forest-600: oklch(44% 0.072 167);
+  --color-forest-700: oklch(33% 0.055 167);
+  --color-forest-800: oklch(19.9% 0.029 167.22); /* #071a13 */
+  --color-forest-900: oklch(17.5% 0.024 170.63); /* #05140f */
+  --color-forest-950: oklch(16.7% 0.024 169.85); /* #04120d */
+
+  /* sage — the green-tinted neutral. Carries all body and supporting text. */
+  --color-sage-50: oklch(97.5% 0.005 168);
+  --color-sage-100: oklch(94.4% 0.011 167.79); /* #e6efeb */
+  --color-sage-200: oklch(87.5% 0.015 167);
+  --color-sage-300: oklch(79.7% 0.019 166.24); /* #b2c1ba */
+  --color-sage-400: oklch(72.6% 0.026 166.8); /* #98aca3 */
+  --color-sage-500: oklch(69.7% 0.026 166.74); /* #8fa39a */
+  --color-sage-600: oklch(65.7% 0.027 167.78); /* #82978e */
+  --color-sage-700: oklch(54% 0.026 167);
+  --color-sage-800: oklch(42% 0.024 167);
+  --color-sage-900: oklch(31% 0.021 167);
+  --color-sage-950: oklch(21% 0.018 167);
+
+  /*
+   * Tailwind v4 re-derived its default palette in OKLCH for wider-gamut displays, which
+   * moved every hue slightly — its emerald-500 resolves to #00bc7d, not the #10b981 this
+   * brand is built on. These are the steps the identity actually uses, pinned back to the
+   * brand values. Same rule as the scales below: standard key, this system's value.
+   *
+   * Every other step of every other ramp is Tailwind's, untouched.
+   */
+  --color-emerald-200: #a7f3d0;
+  --color-emerald-300: #6ee7b7;
+  --color-emerald-400: #34d399;
+  --color-emerald-500: #10b981;
+  --color-emerald-600: #059669;
+  --color-emerald-700: #047857;
+  --color-emerald-800: #065f46;
+  --color-blue-300: #93c5fd;
+  --color-blue-500: #3b82f6;
+  --color-blue-700: #1d4ed8;
+  --color-cyan-300: #67e8f9;
+  --color-cyan-500: #06b6d4;
+  --color-cyan-700: #0e7490;
+  --color-amber-300: #fcd34d;
+  --color-amber-500: #f59e0b;
+  --color-amber-700: #b45309;
+  --color-red-300: #fca5a5;
+  --color-red-500: #ef4444;
+  --color-red-600: #dc2626;
+  --color-red-700: #b91c1c;
+  --color-violet-300: #c4b5fd;
+  --color-violet-500: #8b5cf6;
+  --color-violet-700: #6d28d9;
+  --color-teal-900: #134e4a;
+  --color-slate-200: #e2e8f0;
+  --color-slate-800: #1e293b;
+
+  /*
+   * The 600/700 steps carry emerald and the categorical hues as *text* on a light
+   * background, where the 300s used on dark drop below 3:1. Midnight's slate and indigo
+   * are not brand colours and deliberately use Tailwind's stock ramps untouched.
+   */
+
+  /* ----------------------------------------------------------------- typography ---- */
+
+  --font-sans:
+    'Inter Variable', 'Noto Sans Arabic Variable', Inter, ui-sans-serif, system-ui,
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  /*
+   * The size ladder. `sm` and `base` sit on Tailwind's own values; the rest are
+   * overridden to this system's steps. 4xs/3xs/2xs are extensions — Tailwind has no slot
+   * below `xs`, and these are the conventional names for the ones below it.
+   *
+   * Weight, leading and tracking are NOT attached here: several roles share a size and
+   * differ only in weight, so the roles are composed as utilities in theme-bridge.css.
+   */
+  --text-4xs: 0.625rem;
+  --text-3xs: 0.6875rem;
+  --text-2xs: 0.75rem;
+  --text-xs: 0.8125rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.0625rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.375rem;
+  --text-3xl: 1.75rem;
+  --text-4xl: 1.875rem;
+  --text-5xl: 2rem;
+  --text-6xl: 2.5rem;
+  --text-7xl: 2.75rem;
+  --text-8xl: 5.25rem;
+
+  /* Inter Variable renders 350 distinctly from 400; the rest are Tailwind's defaults. */
+  --font-weight-book: 350;
+
+  /* ------------------------------------------------------------------- shape ---- */
+
+  /*
+   * Marketing uses the generous end, the console the compact end — same scale, different
+   * density. xs through 2xl are Tailwind's own values; only 3xl is overridden (24px ->
+   * 20px) to match this system's largest card radius. Restated in full so the whole scale
+   * reaches :root, since the component stylesheets read it through var().
+   */
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-2xl: 16px;
+  --radius-3xl: 20px;
+  --radius-full: calc(infinity * 1px);
+
+  /* ------------------------------------------------------------------- space ---- */
+
+  /*
+   * Derived from what the console already measures rather than invented: these are the six
+   * steps the existing stylesheets land on, named for the job each one does. The names are
+   * roles, not sizes, because the failure this closes was a developer with no `var()` to
+   * type picking whatever the component beside them used.
+   *
+   * Anything coarser than `gutter` — 1.75rem and up — is a page measure rather than a
+   * component rhythm and stays a literal; there are 23 of those and they share no job.
+   */
+  --spacing-inline: 0.25rem; /* a glyph and its word */
+  --spacing-tight: 0.5rem; /* inside one control: icon and label, chips in a row */
+  --spacing-field: 0.75rem; /* a label and its control */
+  --spacing-group: 1rem; /* one field and the next */
+  --spacing-section: 1.25rem; /* one panel and the next; a card's block interior */
+  --spacing-gutter: 1.5rem; /* a card's inline interior */
+
+  /* ------------------------------------------------------------------ motion ---- */
+
+  /* Hover, focus and colour changes. Tailwind's default is 150ms. */
+  --default-transition-duration: 200ms;
+  --ease-emphasis: cubic-bezier(0.2, 0, 0, 1);
+
+  /* -------------------------------------------------------------- breakpoints ---- */
+
+  --breakpoint-sm: 600px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 900px;
+  --breakpoint-xl: 1100px;
+  --breakpoint-2xl: 1180px;
+
+  /*
+   * Paper.
+   *
+   * The one place in the console that does not follow the active theme, and deliberately: the
+   * invoice is a document that gets printed and read as paper, so it is light in Forest, Midnight
+   * and Daylight alike. DESIGN.md's Token Rule says a literal hex in a stylesheet is a defect —
+   * this is the sanctioned exception, and it is an exception precisely because the values are
+   * *here*, named, rather than scattered through a feature stylesheet where the next person cannot
+   * tell them from an oversight. Slate, so the sheet reads as printed rather than as a light theme.
+   */
+  --paper: #ffffff;
+  --paper-ink: #0f172a;
+  --paper-ink-strong: #1e293b;
+  --paper-ink-muted: #475569;
+  --paper-ink-quiet: #64748b;
+  --paper-ink-faint: #94a3b8;
+  --paper-rule: #e2e8f0;
+  --paper-wash: #f1f5f9;
+  --paper-line: #334155;
+}
+
+/*
+ * The panel interior, as one value, so the measurement that defines the console's card
+ * rhythm exists once. Deliberately not a `--spacing-*` key: that namespace also generates
+ * the single-axis utilities, and `pt-panel` would emit an invalid two-value
+ * `padding-top`. Sits beside the scale rather than in a theme file because it is the same
+ * measurement in Forest, Midnight and Daylight alike.
+ *
+ * `interior`, not `pad`: order-details and create-store each still carry a `.panel-pad`
+ * *class*, at 1.25rem and 1.5rem respectively — neither of them this value. Those are the
+ * drift `Panel.padded` was meant to end and they are still owed; a token sharing their
+ * name would read as their definition.
+ */
+:root {
+  --panel-interior: var(--spacing-section) var(--spacing-gutter);
+}

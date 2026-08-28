@@ -1,0 +1,230 @@
+/*
+ * Billing across every tenant: a section rail and a work area, the shape store management, the
+ * merchant billing page and the organization detail all use — so a console page with sections looks
+ * like a console page with sections, whichever one it is.
+ */
+:host {
+  display: contents;
+}
+
+.billing-layout {
+  container: platform-billing / inline-size;
+  display: grid;
+  grid-template-columns: 250px minmax(0, 1fr);
+  gap: var(--spacing-gutter);
+  align-items: start;
+  transition: grid-template-columns 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.billing-layout.rail-collapsed {
+  grid-template-columns: 3.4rem minmax(0, 1fr);
+}
+
+/* Below the rail's useful width the sections become a tab strip; without it the page loses its
+   navigation entirely on a narrow viewport. */
+.billing-tabs {
+  display: none;
+}
+
+@container platform-billing (max-width: 46rem) {
+  .billing-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .billing-rail {
+    display: none;
+  }
+
+  .billing-tabs {
+    display: block;
+    overflow-x: auto;
+  }
+}
+
+.billing-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-section);
+  min-inline-size: 0;
+}
+
+/* ------------------------------------------------------------------------- filters ---- */
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+/* The search box leads and takes the row's slack; the selects keep their intrinsic width. */
+.filters app-search-box {
+  flex: 1 1 16rem;
+  min-inline-size: 0;
+}
+
+.filters app-select {
+  flex: 0 1 11rem;
+  min-inline-size: 0;
+}
+
+/* ------------------------------------------------------------------------ overview ---- */
+
+.overview {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-section);
+}
+
+/*
+ * The plan mix and the run rate read as one statement — who is on what, and what that is worth — so
+ * they share a row wherever there is room for two readable plots.
+ */
+.overview-pair {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(19rem, 1fr));
+  gap: var(--spacing-section);
+}
+
+.book {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: 0.9rem 1.25rem;
+  margin: 0;
+}
+
+.book div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-inline-size: 0;
+}
+
+.book dt {
+  color: var(--muted-foreground);
+  font-size: var(--text-xs);
+}
+
+.book dd {
+  margin: 0;
+  color: var(--foreground-strong);
+  font-size: var(--text-base);
+  font-variant-numeric: tabular-nums;
+}
+
+.health-ok {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0;
+  color: var(--muted-foreground);
+  font-size: var(--text-sm);
+}
+
+/* ------------------------------------------------------------------------- blocked ---- */
+
+.blocked-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  margin: 0;
+  padding: 0.35rem 0.75rem 0.85rem;
+  list-style: none;
+}
+
+.blocked-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-field);
+  inline-size: 100%;
+  padding: 0.5rem 0.55rem;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+  transition: background var(--default-transition-duration);
+}
+
+.blocked-row:hover,
+.blocked-row:focus-visible {
+  background: var(--muted);
+}
+
+.blocked-store {
+  /* Leads and takes the slack, so the badges line up down the list. */
+  flex: 1;
+  min-inline-size: 0;
+  color: var(--foreground-strong);
+  font-size: var(--text-xs);
+  /* A store id is Latin data in a line that may be right-to-left. */
+  unicode-bidi: plaintext;
+  overflow-wrap: anywhere;
+}
+
+.blocked-since {
+  color: var(--muted-foreground);
+  font-size: var(--text-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+/* --------------------------------------------------------------------------- cells ---- */
+
+.cell-store {
+  /* Store ids and invoice numbers are Latin data that may sit in a right-to-left row. */
+  unicode-bidi: plaintext;
+  overflow-wrap: anywhere;
+}
+
+.cell-number {
+  font-variant-numeric: tabular-nums;
+}
+
+/*
+ * The invoice ledger's rows are not themselves interactive — a row carries two external links — so
+ * the store id is the affordance that opens the panel.
+ */
+.cell-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent-foreground);
+  font: inherit;
+  text-align: start;
+  unicode-bidi: plaintext;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+}
+
+.cell-link:hover,
+.cell-link:focus-visible {
+  text-decoration: underline;
+}
+
+.cell-links {
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.cell-change {
+  color: var(--muted-foreground);
+  unicode-bidi: plaintext;
+}
+
+/* The actor over its source: who did it, and through what. */
+.cell-actor {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-inline-size: 0;
+  unicode-bidi: plaintext;
+  overflow-wrap: anywhere;
+}
+
+.cell-actor small {
+  color: var(--muted-foreground);
+  font-size: var(--text-2xs);
+}

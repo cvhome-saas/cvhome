@@ -1,0 +1,19 @@
+:host {
+  display: contents;
+}
+
+/* The page owns its own rhythm, as `customers.css` and `users.css` do. */
+.users-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-gutter);
+}
+
+/*
+ * The filter sits in the panel header. It is capped rather than left to the header's flex sizing:
+ * an organization list can hold a very long name, and a select that grows to fit it pushes the
+ * panel's title off the row.
+ */
+.org-filter {
+  inline-size: min(18rem, 60vw);
+}

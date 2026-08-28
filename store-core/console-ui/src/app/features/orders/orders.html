@@ -1,0 +1,169 @@
+<ng-container *transloco="let t">
+  <app-page-header [title]="heading().title" [context]="context()">
+    <app-date-range-picker [value]="dateRange()" (valueChange)="dateRange.set($event)" />
+    <app-export-button
+      [target]="report()"
+      fileName="orders"
+      [title]="heading().title"
+      [subtitle]="exportSubtitle()"
+      [disabled]="isLoading() || isEmpty()"
+    />
+    <button class="primary-action" type="button" (click)="createOrder()">
+      <app-icon name="plus" />
+      {{ t('orders.createOrder') }}
+    </button>
+  </app-page-header>
+
+  @if (error(); as failure) {
+    <app-load-error [message]="failure.message" (retry)="facade.retry()" />
+  }
+
+  <app-busy-overlay
+    reserve="page"
+    [busy]="isLoading()"
+    [label]="t('orders.loading')"
+  >
+    @if (!isEmpty()) {
+      <div class="report" #report>
+        <app-kpi-grid [label]="t('orders.metricsLabel')" [data]="kpis()" />
+
+        <app-panel class="orders-panel" [title]="t('orders.allOrders')" [subtitle]="subtitle()">
+          <div panelAction class="panel-controls">
+            <!--
+              Ten statuses plus "All", from the server's own enum — more tabs than the mockup
+              shows, because the endpoint filters on one status at a time and grouping them would
+              mean inventing groups it cannot express. The strip scrolls.
+            -->
+            <app-tab-switcher
+              [tabs]="tabs()"
+              [(active)]="activeTab"
+              [label]="t('orders.filterByStatus')"
+              panelId="orders-table"
+            />
+
+            <!--
+              One box, three server fields. The list endpoint filters on name, email and phone
+              separately, so the term is routed to whichever its shape implies — see `toOrderQuery`.
+              A channel filter used to sit here; orders carry no channel.
+            -->
+            <app-search-box
+              [value]="search()"
+              (valueChange)="onSearch($event)"
+              [label]="t('orders.searchLabel')"
+              [placeholder]="t('orders.searchPlaceholder')"
+              [clearLabel]="t('orders.clearSearch')"
+            />
+          </div>
+
+          <!--
+            TODO(lessons.md): an overdue notice sat here, counting orders "past 24 hours without a
+            status update". Nothing records when a status last changed — see lessons.md,
+            "Orders — no stale-order signal".
+          -->
+
+          <!--
+            The customer narrowing is the one filter with nothing on screen to show for it: the tab
+            strip shows the status and the box shows the term, but this arrives in a URL a link set.
+            Without this an operator following "View all" from a customer would read a store with one
+            order — and have no way back to the rest.
+          -->
+          @if (customerFilter(); as narrowing) {
+            <div class="customer-filter">
+              <app-notice-bar
+                icon="user"
+                tone="blue"
+                [message]="t('orders.filteredByCustomer', {customer: narrowing})"
+              />
+              <button class="secondary-action" type="button" (click)="clearCustomerFilter()">
+                {{ t('orders.clearCustomerFilter') }}
+              </button>
+            </div>
+          }
+
+          @if (orders().length) {
+            <app-data-table id="orders-table" [columns]="columns()" [label]="t('orders.allOrders')">
+              @for (order of orders(); track order.id) {
+                <app-table-row [interactive]="true" (click)="openOrder(order)">
+                  <div class="cell-order" role="cell" [attr.data-label]="t('orders.column.order')">
+                    <!--
+                      The whole row is a click target for pointers, but only this is focusable —
+                      one tab stop per row rather than one per cell.
+                    -->
+                    <button class="order-ref" type="button" (click)="$event.stopPropagation(); openOrder(order)">
+                      {{ order.reference }}
+                    </button>
+                  </div>
+
+                  <div class="cell-customer" role="cell" [attr.data-label]="t('orders.column.customer')">
+                    <span class="customer-mark" aria-hidden="true">{{ initialsOf(order) }}</span>
+                    <span class="customer-copy">
+                      <strong>{{ order.customer }}</strong>
+                      <small>{{ order.email }}</small>
+                    </span>
+                  </div>
+
+                  <span class="cell-city" role="cell" [attr.data-label]="t('orders.column.city')">{{ order.city }}</span>
+
+                  <div class="cell-status" role="cell" [attr.data-label]="t('orders.column.status')">
+                    <app-badge [tone]="toneOf(order)" shape="square">{{ statusLabel(order) }}</app-badge>
+                  </div>
+
+                  <div class="cell-payment" role="cell" [attr.data-label]="t('orders.column.payment')">
+                    <span class="payment-copy"><strong>{{ paymentLabel(order) }}</strong></span>
+                  </div>
+
+                  <span class="cell-total" role="cell" [attr.data-label]="t('orders.column.total')">{{ totalLabel(order) }}</span>
+
+                  <div class="cell-placed" role="cell" [attr.data-label]="t('orders.column.placed')">
+                    <strong>{{ order.placedOn ? (order.placedOn | translocoDate: {dateStyle: 'medium'}) : '—' }}</strong>
+                  </div>
+
+                  <div class="cell-actions" role="cell" [attr.data-label]="t('orders.column.actions')">
+                    <!--
+                      One row action, not three. Create-shipment had no endpoint, and the invoice
+                      moved to the detail page where it is rendered from the order itself.
+                    -->
+                    <button
+                      class="icon-action"
+                      type="button"
+                      [title]="t('orders.viewOrder')"
+                      [attr.aria-label]="t('orders.viewOrderFor', {id: order.id})"
+                      (click)="$event.stopPropagation(); openOrder(order)"
+                    >
+                      <app-icon name="chevronRight" [flip]="true" />
+                    </button>
+                  </div>
+                </app-table-row>
+              }
+            </app-data-table>
+          } @else {
+            <!--
+              Empty because of a filter, or empty because the period holds no orders — the two are
+              different situations and only one of them has a way out.
+            -->
+            <app-empty-state
+              icon="shoppingCart"
+              [message]="filtered() ? t('orders.noneMatch') : t('orders.noneInPeriod')"
+            >
+              @if (filtered()) {
+                <button class="secondary-action" type="button" (click)="clearFilters()">
+                  {{ t('orders.clearFilters') }}
+                </button>
+              }
+            </app-empty-state>
+          }
+
+          <app-pagination
+            [page]="page().pageNumber"
+            [totalPages]="page().totalPages"
+            [totalElements]="page().totalElements"
+            [pageSize]="pageSize"
+            [unit]="t('orders.unit')"
+            [label]="t('orders.pagesLabel')"
+            (pageChange)="onPage($event)"
+          />
+        </app-panel>
+      </div>
+    }
+  </app-busy-overlay>
+</ng-container>

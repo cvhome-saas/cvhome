@@ -1,0 +1,75 @@
+/*
+ * starter — design tokens. Scoped to the theme so several themes can coexist in one CSS build.
+ * Every name here is listed in THEME_OWNED_TOKENS (libs/theme/src/tokens.ts); the mapping to Tailwind
+ * utilities lives once in storefront/src/app/globals.css. Colour roles are NOT set here — they come from
+ * the merchant's ColorTheme preset through the bridge (inline style on <html>).
+ */
+[data-theme="sports"] {
+    /* fonts (next/font variables from fonts.ts) */
+    --font-body: var(--font-sports-sans), ui-sans-serif, system-ui, sans-serif;
+    --font-heading: var(--font-body);
+    --font-code: ui-monospace, SFMono-Regular, Menlo, monospace;
+
+    /* type scale — a restrained 1.2 ratio */
+    --type-xs: 0.75rem;
+    --type-sm: 0.875rem;
+    --type-base: 1rem;
+    --type-lg: 1.125rem;
+    --type-xl: 1.25rem;
+    --type-2xl: 1.5rem;
+    --type-3xl: 1.875rem;
+    --type-4xl: 2.25rem;
+    --type-5xl: 3rem;
+    --type-6xl: 3.75rem;
+    --line-tight: 1.2;
+    --line-snug: 1.35;
+    --line-normal: 1.5;
+    --line-relaxed: 1.65;
+    --track-tight: -0.015em;
+    --track-normal: 0;
+    --track-wide: 0.06em;
+
+    /* spacing & density */
+    --density: 1;
+    --space-unit: calc(0.25rem * var(--density));
+    --section-y: 3rem;
+    --gutter: 1rem;
+
+    /* radius */
+    --r-control: 0.375rem;
+    --r-card: 0.5rem;
+    --r-image: 0.5rem;
+    --r-badge: 9999px;
+    --r-overlay: 0.75rem;
+
+    /* borders & elevation */
+    --border-width: 1px;
+    --elev-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --elev-md: 0 4px 6px -1px rgb(0 0 0 / 0.08), 0 2px 4px -2px rgb(0 0 0 / 0.08);
+    --elev-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --elev-overlay: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+
+    /* containers */
+    --width-narrow: 42rem;
+    --width-content: 80rem;
+    --width-wide: 96rem;
+
+    /* motion */
+    --motion-fast: 120ms;
+    --motion-base: 200ms;
+    --motion-slow: 400ms;
+    --easing-standard: cubic-bezier(0.2, 0, 0, 1);
+    --easing-emphasized: cubic-bezier(0.3, 0, 0, 1);
+
+    /* layout */
+    --header-h: 3.5rem;
+    --header-h-lg: 4rem;
+    --product-aspect: 1 / 1;
+}
+
+@media (min-width: 1024px) {
+    [data-theme="sports"] {
+        --section-y: 4rem;
+        --gutter: 2rem;
+    }
+}

@@ -1,20 +1,31 @@
 plugins {
-	alias(libs.plugins.java.library.conventions)
+    alias(libs.plugins.java.library.conventions)
 }
 
 dependencies {
-	api project(':store-pod:commons:store-commons')
-	api project(':store-pod:catalog:catalog-commons')
-	api project(':store-pod:merchant:merchant-external-api')
-	implementation project(':store-pod:commons:store-modules:store-cms-commons')
-	compileOnly libs.spring.data.jpa
-	compileOnly libs.jakarta.validation.api
-	compileOnly libs.jackson.annotations
-	compileOnly libs.lombok
-	compileOnly libs.apache.commons.lang3
-	compileOnly libs.commons.io
-	compileOnly libs.hibernate.core
-	implementation libs.commons.validator
-	compileOnly libs.hibernate.core
-	annotationProcessor libs.lombok
+    testImplementation libs.spring.data.commons
+    // The unit tests mock the repositories and hand the image service a MockMultipartFile, so the interfaces the
+    // production code only compiles against have to be on the test runtime classpath too.
+    testImplementation libs.spring.data.jpa
+    testImplementation libs.spring.web
+    testImplementation libs.jakarta.persistence.api
+    // TsVectorType implements a Hibernate UserType, so the interface has to resolve to test it.
+    testImplementation libs.hibernate.core
+    // StoreEntitlements is exercised for real rather than mocked: its cache is the behaviour under test.
+    testImplementation libs.caffeine
+    api project(':store-pod:commons:store-commons')
+    api project(':store-pod:catalog:catalog-commons')
+    api project(':store-pod:merchant:merchant-external-api')
+    api project(':store-core:billing:billing-external-api')
+    implementation project(':store-pod:content:content-external-api')
+    compileOnly libs.spring.data.jpa
+    compileOnly libs.spring.web
+    compileOnly libs.jakarta.validation.api
+    compileOnly libs.jackson.annotations
+    compileOnly libs.lombok
+    compileOnly libs.apache.commons.lang3
+    compileOnly libs.commons.io
+    compileOnly libs.hibernate.core
+    implementation libs.commons.validator
+    annotationProcessor libs.lombok
 }

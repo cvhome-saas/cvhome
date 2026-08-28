@@ -1,0 +1,122 @@
+:host {
+  display: block;
+}
+
+.placement-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: var(--spacing-field);
+}
+
+.placement-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--background);
+  text-align: start;
+  cursor: pointer;
+}
+
+.placement-card strong {
+  font-size: var(--text-xs);
+  color: var(--foreground-strong);
+}
+
+.placement-card small {
+  font-size: var(--text-2xs);
+  color: var(--muted-foreground);
+}
+
+.placement-card.active {
+  border-color: var(--primary);
+  background: var(--chart-1-wash);
+}
+
+.artwork-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: var(--spacing-group);
+}
+
+.artwork-slot img {
+  inline-size: 100%;
+  max-block-size: 11rem;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+}
+
+.artwork-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  block-size: 7rem;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-md);
+  background: var(--muted);
+  color: var(--foreground-quiet);
+}
+
+.artwork-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-tight);
+  margin-block-start: var(--spacing-tight);
+}
+
+.side-grid {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.banner-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-block-size: 8rem;
+  padding: var(--spacing-group);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, var(--chart-2-wash), var(--chart-1-wash));
+  background-size: cover;
+  background-position: center;
+  color: var(--foreground-strong);
+}
+
+.banner-preview.strip {
+  min-block-size: 0;
+  align-items: center;
+  padding: var(--spacing-tight) var(--spacing-group);
+}
+
+.banner-preview strong {
+  font-size: var(--text-sm);
+}
+
+.banner-preview em {
+  align-self: flex-start;
+  padding: 0.25rem 0.6rem;
+  border-radius: var(--radius-md);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-style: normal;
+  font-size: var(--text-2xs);
+  font-weight: 600;
+}
+
+/* The strip preview mirrors the storefront's announcement bar: one centred line, links underlined. */
+.banner-preview .strip-message {
+  font-size: var(--text-sm);
+  text-align: center;
+}
+
+.banner-preview .strip-message :is(p, h1, h2, h3) {
+  margin: 0;
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+.banner-preview .strip-message a {
+  text-decoration: underline;
+}

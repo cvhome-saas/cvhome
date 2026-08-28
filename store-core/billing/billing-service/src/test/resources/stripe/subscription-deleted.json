@@ -1,0 +1,19 @@
+{
+  "id": "evt_subscription_deleted",
+  "object": "event",
+  "api_version": "2025-03-31.basil",
+  "created": 1767225600,
+  "type": "customer.subscription.deleted",
+  "data": {
+    "object": {
+      "id": "sub_test_1",
+      "object": "subscription",
+      "customer": "cus_test_1",
+      "status": "canceled",
+      "cancel_at_period_end": false,
+      "metadata": {
+        "storeId": "65f023632bc46470c104b76f"
+      }
+    }
+  }
+}

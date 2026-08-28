@@ -1,0 +1,113 @@
+:host {
+  display: contents;
+}
+
+/* The page owns its own rhythm, as `customers.css` and `users.css` do. */
+.pods-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-gutter);
+}
+
+.cell-pod {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-field);
+  min-inline-size: 0;
+}
+
+.pod-mark {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  inline-size: 2.25rem;
+  block-size: 2.25rem;
+  border-radius: var(--radius-full);
+  background: var(--accent-strong);
+  color: var(--accent-foreground);
+}
+
+/* A button that reads as text: the affordance is the hover and the row's own interactive state. */
+.identity {
+  display: grid;
+  min-inline-size: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.identity strong {
+  overflow: hidden;
+  color: var(--foreground-strong);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.identity:hover strong {
+  color: var(--primary-emphasis);
+}
+
+.identity:focus-visible {
+  border-radius: var(--radius-sm);
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+.cell-endpoint {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-tight);
+  min-inline-size: 0;
+}
+
+/* A URL is latin data, so it takes its own direction under RTL. */
+.endpoint {
+  overflow: hidden;
+  color: var(--secondary-foreground);
+  font-size: var(--text-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  unicode-bidi: plaintext;
+}
+
+.latin {
+  unicode-bidi: plaintext;
+}
+
+.cell-owner {
+  overflow: hidden;
+  color: var(--secondary-foreground);
+  font-size: var(--text-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  unicode-bidi: plaintext;
+}
+
+/* A count is a figure: tabular, so the column reads as a column. */
+.cell-stores {
+  color: var(--foreground-strong);
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.cell-short {
+  min-inline-size: 0;
+}
+
+.cell-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-inline);
+}
+
+/* The chevron points the way the page reads, so it mirrors under RTL. */
+:host-context([dir='rtl']) .cell-actions app-icon {
+  transform: scaleX(-1);
+}

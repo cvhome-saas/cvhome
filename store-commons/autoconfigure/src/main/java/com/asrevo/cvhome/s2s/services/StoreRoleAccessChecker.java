@@ -6,9 +6,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.commons.domain.Pod;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.commons.domain.UserOrgStoreIdentity;
+import com.asrevo.cvhome.s2s.utils.SecurityUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -25,28 +26,53 @@ import static com.asrevo.cvhome.s2s.utils.SecurityUtils.hasSuperAdminRole;
 @Slf4j
 public class StoreRoleAccessChecker {
 
+    /**
+     * Whether this principal came from the wrong identity server for the check being made.
+     *
+     * <p>
+     * The role checks below are claim-based, and both authorization servers write their roles into the same
+     * {@code roles} claim — so a shopper token and a staff token were told apart only by what they happened to
+     * claim. The realm cap in the authorities converter is the primary guard; this is the second one, and it
+     * makes the intent legible at the point of the check rather than implicit in configuration.
+     * </p>
+     */
+    private static boolean wrongRealm(Authentication authentication, String realm) {
+        if (SecurityUtils.isForeignRealm(authentication, realm)) {
+            log.warn("Principal {} was issued by a realm other than '{}'; refusing the check.",
+                    authentication.getName(), realm);
+            return true;
+        }
+        return false;
+    }
+
     private static String getResource(JwtAuthenticationToken authentication) {
         return authentication.getTokenAttributes().getOrDefault("resource", "").toString();
     }
 
     public boolean isSuperAdmin(Authentication authentication) {
+        if (wrongRealm(authentication, SecurityUtils.REALM_UAA)) {
+            return false;
+        }
         return hasSuperAdminRole(authentication);
     }
 
-    public boolean isOrgAdmin(Authentication authentication, ManagerStoreId requestedStoreId) {
+    public boolean isOrgAdmin(Authentication authentication, StoreMerchantId requestedStoreId) {
         return isOrgAdmin(authentication, requestedStoreId, null);
     }
 
-    public boolean isStoreAdmin(Authentication authentication, ManagerStoreId requestedStoreId) {
+    public boolean isStoreAdmin(Authentication authentication, StoreMerchantId requestedStoreId) {
         return isStoreAdmin(authentication, requestedStoreId, null);
     }
 
-    public boolean isStoreModerator(Authentication authentication, ManagerStoreId requestedStoreId) {
+    public boolean isStoreModerator(Authentication authentication, StoreMerchantId requestedStoreId) {
         return isStoreModerator(authentication, requestedStoreId, null);
     }
 
     @SuppressWarnings("java:S1172")
-    public boolean isOrgAdmin(Authentication authentication, ManagerStoreId requestedStoreId, Pod pod) {
+    public boolean isOrgAdmin(Authentication authentication, StoreMerchantId requestedStoreId, Pod pod) {
+        if (wrongRealm(authentication, SecurityUtils.REALM_UAA)) {
+            return false;
+        }
         if (!hasOrgAdminRole(authentication)) {
             return false;
         }
@@ -60,7 +86,10 @@ public class StoreRoleAccessChecker {
         return true;
     }
 
-    public boolean isStoreAdmin(Authentication authentication, ManagerStoreId requestedStoreId, Pod pod) {
+    public boolean isStoreAdmin(Authentication authentication, StoreMerchantId requestedStoreId, Pod pod) {
+        if (wrongRealm(authentication, SecurityUtils.REALM_UAA)) {
+            return false;
+        }
         if (!hasStoreAdminRole(authentication)) {
             log.debug("User {} does not have store admin role with roles {}", authentication.getName(),
                     getRoles(authentication));
@@ -72,7 +101,7 @@ public class StoreRoleAccessChecker {
                     authentication.getName(), getRoles(authentication), pod.name(), identity.org().id().toString());
             return false;
         }
-        if (!requestedStoreId.getId().toString().equals(identity.store())) {
+        if (!requestedStoreId.equals(identity.store())) {
             log.debug(
                     "User {} does not have store admin role with roles {} because request store {} not match identity store {}",
                     authentication.getName(), getRoles(authentication), requestedStoreId, identity.store());
@@ -81,7 +110,10 @@ public class StoreRoleAccessChecker {
         return true;
     }
 
-    public boolean isStoreModerator(Authentication authentication, ManagerStoreId requestedStoreId, Pod pod) {
+    public boolean isStoreModerator(Authentication authentication, StoreMerchantId requestedStoreId, Pod pod) {
+        if (wrongRealm(authentication, SecurityUtils.REALM_UAA)) {
+            return false;
+        }
         if (!hasStoreModeratorRole(authentication)) {
             log.debug("User {} does not have store moderator role with roles {}", authentication.getName(),
                     getRoles(authentication));
@@ -93,7 +125,7 @@ public class StoreRoleAccessChecker {
                     authentication.getName(), getRoles(authentication), pod.name(), identity.org().id().toString());
             return false;
         }
-        if (!requestedStoreId.getId().toString().equals(identity.store())) {
+        if (!requestedStoreId.equals(identity.store())) {
             log.debug(
                     "User {} does not have store moderator role with roles {} because request store {} not match identity store {}",
                     authentication.getName(), getRoles(authentication), requestedStoreId, identity.store());
@@ -118,7 +150,10 @@ public class StoreRoleAccessChecker {
 
     }
 
-    public boolean isStoreCustomer(Authentication authentication, ManagerStoreId requestedStoreId) {
+    public boolean isStoreCustomer(Authentication authentication, StoreMerchantId requestedStoreId) {
+        if (wrongRealm(authentication, SecurityUtils.REALM_CUA)) {
+            return false;
+        }
         if (!hasStoreCustomerRole(authentication)) {
             log.debug("User {} does not have store customer role with roles {}", authentication.getName(),
                     getRoles(authentication));
@@ -128,7 +163,7 @@ public class StoreRoleAccessChecker {
             return false;
         }
         String storeId = getStoreId(auth);
-        if (!storeId.equals(requestedStoreId.getId().toString())) {
+        if (!storeId.equals(requestedStoreId.getId())) {
             log.debug(
                     "User {} does not have store customer role with roles {} because requested store {} not match identity store {}",
                     authentication.getName(), getRoles(authentication), requestedStoreId, storeId);
@@ -138,6 +173,9 @@ public class StoreRoleAccessChecker {
     }
 
     public boolean isScopeStoreCore(Authentication authentication) {
+        if (wrongRealm(authentication, SecurityUtils.REALM_UAA)) {
+            return false;
+        }
         if (!hasScopeStoreCore(authentication)) {
             log.debug("User {} does not have store core scope with roles {}", authentication.getName(),
                     getRoles(authentication));
@@ -147,6 +185,9 @@ public class StoreRoleAccessChecker {
     }
 
     public boolean isScopeStorePod(Authentication authentication, Pod pod) {
+        if (wrongRealm(authentication, SecurityUtils.REALM_UAA)) {
+            return false;
+        }
         if (Objects.isNull(pod)) {
             log.debug("pod is null, cannot check internal scope");
             return false;

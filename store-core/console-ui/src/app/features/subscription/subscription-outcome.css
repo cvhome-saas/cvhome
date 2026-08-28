@@ -1,0 +1,54 @@
+:host {
+  display: block;
+  min-block-size: 100vh;
+  background: var(--background);
+  color: var(--foreground);
+}
+
+.outcome {
+  display: grid;
+  gap: var(--spacing-group);
+  justify-items: center;
+  align-content: center;
+  min-block-size: 100vh;
+  max-inline-size: 34rem;
+  margin-inline: auto;
+  padding: 2rem 1.5rem;
+  text-align: center;
+}
+
+app-icon {
+  color: var(--primary);
+  font-size: 3rem;
+}
+
+.outcome.failed app-icon {
+  color: var(--destructive);
+}
+
+h1 {
+  margin: 0;
+  color: var(--foreground-strong);
+  font-size: clamp(1.8rem, 5vw, 2.6rem);
+  font-weight: 300;
+  letter-spacing: -0.03em;
+}
+
+p {
+  margin: 0;
+  color: var(--muted-foreground);
+}
+
+.action {
+  min-block-size: 3rem;
+  padding: 0.8rem 1.5rem;
+  border-radius: var(--radius-full);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-weight: 700;
+}
+
+.secondary {
+  color: var(--primary);
+  font-weight: 600;
+}

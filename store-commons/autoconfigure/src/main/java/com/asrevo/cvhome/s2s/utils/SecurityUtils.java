@@ -11,15 +11,28 @@ import org.springframework.security.oauth2.jwt.Jwt;
 
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
 import com.asrevo.cvhome.commons.domain.Roles;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.commons.domain.UserOrgStoreIdentity;
+import com.asrevo.cvhome.s2s.jwt.RealmAwareJwtGrantedAuthoritiesConverter;
 
-public class SecurityUtils {
+public final class SecurityUtils {
 
     public static final String CLAIMS_ORG_KEY = "org";
 
     public static final String CLAIMS_STORE_KEY = "store";
 
-    private static final String WILD_CARD_STORE_ACCESS = "*";
+    /** The realm that mints staff and service tokens. */
+    public static final String REALM_UAA = "uaa";
+
+    /** The realm that mints shopper tokens. */
+    public static final String REALM_CUA = "cua";
+
+    /**
+     * Stands for "every store", for a principal that is not confined to one. Deliberately not a valid store id — a
+     * sentinel that can never collide with a real one — and deliberately kept here rather than on
+     * {@link StoreMerchantId}, which is a tenant identifier and has no business knowing about authorization.
+     */
+    private static final StoreMerchantId WILD_CARD_STORE_ACCESS = new StoreMerchantId("*");
 
     private SecurityUtils() {
     }
@@ -52,6 +65,23 @@ public class SecurityUtils {
         return hasRole(authentication, Roles.SCOPE_STORE_POD);
     }
 
+    /**
+     * Whether this principal is known to come from an identity server <em>other</em> than {@code realm}.
+     *
+     * <p>
+     * Deliberately not "is from realm X". A principal carries a {@code REALM_} authority only where realms are
+     * configured, so asking the positive question would refuse every token on a service running under Boot's
+     * own single-issuer support. Asking the negative one refuses a shopper token presented for a staff check
+     * where the realm is known, and stays out of the way where it is not.
+     * </p>
+     */
+    public static boolean isForeignRealm(Authentication authentication, String realm) {
+        String expected = RealmAwareJwtGrantedAuthoritiesConverter.REALM_AUTHORITY_PREFIX + realm;
+        Set<String> roles = getRoles(authentication);
+        return roles.stream().anyMatch(it -> it.startsWith(RealmAwareJwtGrantedAuthoritiesConverter
+                .REALM_AUTHORITY_PREFIX)) && !roles.contains(expected);
+    }
+
     public static boolean hasRole(Authentication authentication, Roles role) {
         return getRoles(authentication).contains(role.name());
     }
@@ -73,13 +103,14 @@ public class SecurityUtils {
             return new UserOrgStoreIdentity(null, WILD_CARD_STORE_ACCESS, roles);
         } else if (hasOrgAdminRole(authentication)) {
             Map<String, Object> claims = ((Jwt) authentication.getPrincipal()).getClaims();
-            String adminOrg = ((String) claims.get(CLAIMS_ORG_KEY));
+            String adminOrg = (String) claims.get(CLAIMS_ORG_KEY);
             return new UserOrgStoreIdentity(new ManagerOrgId(adminOrg), WILD_CARD_STORE_ACCESS, roles);
         } else {
             Map<String, Object> claims = ((Jwt) authentication.getPrincipal()).getClaims();
-            String adminOrg = ((String) claims.get(CLAIMS_ORG_KEY));
-            String adminStore = ((String) claims.get(CLAIMS_STORE_KEY));
-            return new UserOrgStoreIdentity(new ManagerOrgId(adminOrg), adminStore, roles);
+            String adminOrg = (String) claims.get(CLAIMS_ORG_KEY);
+            String adminStore = (String) claims.get(CLAIMS_STORE_KEY);
+            return new UserOrgStoreIdentity(new ManagerOrgId(adminOrg),
+                    adminStore == null ? null : new StoreMerchantId(adminStore), roles);
         }
     }
 

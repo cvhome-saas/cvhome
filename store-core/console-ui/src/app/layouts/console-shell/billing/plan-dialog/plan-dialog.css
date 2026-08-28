@@ -1,0 +1,368 @@
+/*
+ * Plan comparison, as a modal.
+ *
+ * The card treatment deliberately echoes the marketing page's pricing section — it is the same
+ * catalog and the same decision, and an operator who saw the public page should recognise it —
+ * but sized for a dialog rather than a landing viewport.
+ */
+
+.pd {
+  /* The reset zeroes margins, which is what centres a native dialog — put it back explicitly. */
+  margin: auto;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  background: var(--card);
+  color: var(--foreground);
+  box-shadow: var(--lift);
+  inline-size: min(62rem, calc(100vw - 2rem));
+  max-block-size: calc(100vh - 4rem);
+  overflow: hidden auto;
+}
+
+.pd::backdrop {
+  background: rgb(0 0 0 / 55%);
+  backdrop-filter: blur(2px);
+}
+
+.pd-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-group);
+  padding: var(--spacing-section);
+}
+
+.pd-head {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-group);
+}
+
+.pd-heading {
+  flex: 1;
+  min-inline-size: 0;
+}
+
+.pd-title {
+  margin: 0;
+  color: var(--foreground-strong);
+  font-size: var(--text-lg);
+  font-weight: 600;
+}
+
+.pd-subtitle {
+  margin: var(--spacing-inline) 0 0;
+  color: var(--muted-foreground);
+  font-size: var(--text-sm);
+}
+
+.pd-close {
+  flex: none;
+  display: grid;
+  place-items: center;
+  inline-size: 2rem;
+  block-size: 2rem;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: none;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  transition:
+    background-color var(--default-transition-duration),
+    color var(--default-transition-duration);
+}
+
+.pd-close:hover {
+  background: var(--input);
+  color: var(--foreground-strong);
+}
+
+.pd-close:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+
+.pd-close svg {
+  inline-size: 1rem;
+  block-size: 1rem;
+}
+
+/* Cycle toggle ------------------------------------------------------------ */
+
+.pd-cycle {
+  display: inline-flex;
+  align-self: center;
+  gap: var(--spacing-inline);
+  padding: var(--spacing-inline);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  background: var(--muted);
+}
+
+.pd-cycle button {
+  padding: 0.4rem 1rem;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: none;
+  color: var(--muted-foreground);
+  font-size: var(--text-xs);
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background-color var(--default-transition-duration),
+    color var(--default-transition-duration);
+}
+
+.pd-cycle button.active {
+  background: var(--card);
+  color: var(--foreground-strong);
+  box-shadow: var(--lift);
+}
+
+.pd-cycle button:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+
+/* Cards ------------------------------------------------------------------- */
+
+.pd-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 0.85rem;
+}
+
+.pd-plan {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-tight);
+  padding: 1.1rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--muted);
+}
+
+/* The middle tier, by the rule in `pricing.mapper` — billing publishes no recommended flag. */
+.pd-plan.featured {
+  border-color: var(--edge);
+  background: var(--accent-veil);
+}
+
+.pd-placeholder {
+  min-block-size: 17rem;
+  animation: pd-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes pd-pulse {
+  50% {
+    opacity: 0.45;
+  }
+}
+
+.pd-flag {
+  position: absolute;
+  inset-block-start: -0.6rem;
+  inset-inline-end: 0.9rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-full);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-size: var(--text-3xs);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.pd-plan-name {
+  margin: 0;
+  color: var(--foreground-strong);
+  font-size: var(--text-base);
+  font-weight: 600;
+}
+
+.pd-plan-copy {
+  margin: 0;
+  color: var(--muted-foreground);
+  font-size: var(--text-xs);
+  line-height: 1.5;
+}
+
+.pd-price {
+  display: flex;
+  align-items: baseline;
+  gap: 0.3rem;
+  margin: 0.35rem 0 0;
+}
+
+.pd-price strong {
+  color: var(--foreground-strong);
+  font-size: var(--text-2xl);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.pd-price span {
+  color: var(--muted-foreground);
+  font-size: var(--text-xs);
+}
+
+.pd-saving {
+  color: var(--chart-1-foreground);
+  font-size: var(--text-2xs);
+  font-weight: 500;
+}
+
+.pd-features {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin: 0.35rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pd-features li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.45rem;
+  color: var(--secondary-foreground);
+  font-size: var(--text-xs);
+  line-height: 1.5;
+}
+
+.pd-features svg {
+  flex: none;
+  margin-block-start: 0.15rem;
+  inline-size: 0.8rem;
+  block-size: 0.8rem;
+  color: var(--primary);
+}
+
+.pd-choose {
+  margin-block-start: 0.65rem;
+  padding: 0.55rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--card);
+  color: var(--foreground-strong);
+  font-size: var(--text-xs);
+  font-family: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color var(--default-transition-duration),
+    border-color var(--default-transition-duration);
+}
+
+.pd-plan.featured .pd-choose {
+  border-color: transparent;
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+
+.pd-choose:hover {
+  border-color: var(--edge);
+}
+
+.pd-choose:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Notes ------------------------------------------------------------------- */
+
+.pd-note {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-tight);
+  margin: 0;
+  padding: 2rem 1rem;
+  color: var(--muted-foreground);
+  font-size: var(--text-sm);
+  text-align: center;
+}
+
+.pd-retry {
+  padding: 0.3rem 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--muted);
+  color: var(--foreground-strong);
+  font-size: var(--text-xs);
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.pd-retry:hover {
+  border-color: var(--edge);
+}
+
+.pd-foot {
+  margin: 0;
+  color: var(--muted-foreground);
+  font-size: var(--text-xs);
+  text-align: center;
+}
+
+@media (max-width: 37.5rem) {
+  .pd-body {
+    padding: 0.9rem;
+  }
+
+  .pd-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/*
+ * Open and close both animate. See `VideoDialog` for why `allow-discrete` is required: a dialog
+ * lives in the top layer, and without it `display` flips discretely and the close is a hard cut.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  @starting-style {
+    .pd[open] {
+      opacity: 0;
+      transform: translateY(0.75rem) scale(0.98);
+    }
+  }
+
+  .pd[open] {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  .pd {
+    opacity: 0;
+    transform: translateY(0.75rem) scale(0.98);
+    transition:
+      opacity 0.18s ease,
+      transform 0.18s ease,
+      overlay 0.18s ease allow-discrete,
+      display 0.18s ease allow-discrete;
+  }
+
+  .pd::backdrop {
+    opacity: 0;
+    transition:
+      opacity 0.18s ease,
+      overlay 0.18s ease allow-discrete,
+      display 0.18s ease allow-discrete;
+  }
+
+  .pd[open]::backdrop {
+    opacity: 1;
+  }
+
+  @starting-style {
+    .pd[open]::backdrop {
+      opacity: 0;
+    }
+  }
+}

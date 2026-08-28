@@ -1,0 +1,38 @@
+### Public storefront read API — no auth, cacheable, locale fallback (servedLocale names the locale used)
+
+### Everything the layout needs in one read
+GET {{SELLER_UI_URL}}/spg/content/api/v1/storefront/site?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+
+### A page (or a draft with ?preview=<token> from POST …/pages/{id}/preview-token)
+GET {{SELLER_UI_URL}}/spg/content/api/v1/storefront/pages/about-us?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+
+### Blog
+GET {{SELLER_UI_URL}}/spg/content/api/v1/storefront/posts?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}&page=0&count=12
+###
+GET {{SELLER_UI_URL}}/spg/content/api/v1/storefront/posts?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}&category=guides
+###
+GET {{SELLER_UI_URL}}/spg/content/api/v1/storefront/posts/quarterly-supply-budget?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+###
+GET {{SELLER_UI_URL}}/spg/content/api/v1/storefront/post-categories?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+
+### Home-page sections, in order (public, 60s cache + ETag)
+GET {{SELLER_UI_URL}}/spg/content/api/v1/storefront/home-sections?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+
+### Banners that win each placement
+GET {{SELLER_UI_URL}}/spg/content/api/v1/storefront/banners?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}&placement=HERO
+
+### FAQ (+ FAQPage JSON-LD)
+GET {{SELLER_UI_URL}}/spg/content/api/v1/storefront/faq?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+
+### Menus resolved (labels in lang, hrefs, broken links dropped)
+GET {{SELLER_UI_URL}}/spg/content/api/v1/storefront/menus/MAIN?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+
+### Live policy, or an older version
+GET {{SELLER_UI_URL}}/spg/content/api/v1/storefront/policies/RETURNS?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+###
+GET {{SELLER_UI_URL}}/spg/content/api/v1/storefront/policies/RETURNS?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}&v=1
+
+### Sitemap entries and redirects
+GET {{SELLER_UI_URL}}/spg/content/api/v1/storefront/sitemap?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+###
+GET {{SELLER_UI_URL}}/spg/content/api/v1/storefront/redirects?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}&path=/content/old-slug

@@ -1,0 +1,56 @@
+:host {
+  display: block;
+}
+
+.chips {
+  display: inline-flex;
+  gap: .15rem;
+  padding: .15rem;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  background: var(--muted);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: .3rem;
+  padding: var(--spacing-inline) var(--spacing-tight);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--foreground-quiet);
+  font-size: var(--text-3xs);
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    background-color var(--default-transition-duration),
+    color var(--default-transition-duration);
+}
+
+.chip:hover {
+  color: var(--foreground);
+}
+
+.chip.current {
+  background: var(--card);
+  color: var(--foreground);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 8%);
+}
+
+.chip:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 1px;
+}
+
+.chip app-icon {
+  color: var(--primary-emphasis);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chip {
+    transition: none;
+  }
+}

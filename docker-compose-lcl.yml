@@ -1,4 +1,3 @@
-version: '3'
 services:
   postgres:
     image: postgres:15-alpine
@@ -8,6 +7,15 @@ services:
       POSTGRES_DB: cvhome
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
+  minio:
+    image: minio/minio:RELEASE.2025-09-07T16-13-09Z-cpuv1
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
   spg:
     image: ashraf1abdelrasool/saas-gateway:sha-4a6d381
     ports:
@@ -19,33 +27,85 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
       - "merchant.gateway.com:host-gateway"
+      - "content.gateway.com:host-gateway"
       - "catalog.gateway.com:host-gateway"
       - "checkout.gateway.com:host-gateway"
       - "cua.gateway.com:host-gateway"
+      - "payment.gateway.com:host-gateway"
+      - "inventory.gateway.com:host-gateway"
       - "landing-ui.gateway.com:host-gateway"
       - "spg-507f1f77.gateway.com:host-gateway"
     environment:
       NAMESPACE: gateway.com
-      ASK_TLS_URL: http://spg-507f1f77.gateway.com:80/merchant/api/v1/router/public/ask-for-tls
-      DOMAIN_LOOKUP_URL: http://spg-507f1f77.gateway.com:80/merchant/api/v1/router/public/lookup-by-domain
+      # Upstream ports for the Caddyfile and the two self-addressed lookup URLs. Defaults keep a plain
+      # `docker compose up` on the canonical ports; lcl passes the assigned values (see lcl.yml compose.environment).
+      LCL_PORT_MERCHANT: ${LCL_PORT_MERCHANT:-8120}
+      LCL_PORT_CONTENT: ${LCL_PORT_CONTENT:-8121}
+      LCL_PORT_CATALOG: ${LCL_PORT_CATALOG:-8122}
+      LCL_PORT_CHECKOUT: ${LCL_PORT_CHECKOUT:-8123}
+      LCL_PORT_CUA: ${LCL_PORT_CUA:-8124}
+      LCL_PORT_PAYMENT: ${LCL_PORT_PAYMENT:-8125}
+      LCL_PORT_INVENTORY: ${LCL_PORT_INVENTORY:-8126}
+      LCL_PORT_LANDING_UI: ${LCL_PORT_LANDING_UI:-8110}
+      # spg's own public ports — the two lookup URLs below, and the X-Forwarded-Port the Caddyfile sets so
+      # services behind it can rebuild the URL the browser actually used.
+      LCL_PORT_SPG: ${LCL_PORT_SPG:-80}
+      LCL_PORT_SPG_TLS: ${LCL_PORT_SPG_TLS:-443}
+      ASK_TLS_URL: http://spg-507f1f77.gateway.com:${LCL_PORT_SPG:-80}/merchant/api/v1/router/public/ask-for-tls
+      DOMAIN_LOOKUP_URL: http://spg-507f1f77.gateway.com:${LCL_PORT_SPG:-80}/merchant/api/v1/router/public/lookup-by-domain
       CERT_BUCKET: random-bucket
       CERT_BUCKET_REGION: eu-central-1
-      OTEL_EXPORTER_OTLP_ENDPOINT: http://host.docker.internal:4317
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://host.docker.internal:${LCL_PORT_OTEL_GRPC:-4317}
       OTEL_EXPORTER_OTLP_PROTOCOL: grpc
       OTEL_SERVICE_NAME: spg
   otel-collector:
-    image: otel/opentelemetry-collector-contrib:0.139.0
-    command: ["--config=/etc/logging-otel-collector-config.yml"]
+    image: otel/opentelemetry-collector-contrib:0.150.1
+    command: [ "--config=/etc/logging-otel-collector-config.yml" ]
     volumes:
       - ./extra/monitoring/logging-otel-collector-config.yml:/etc/logging-otel-collector-config.yml
     ports:
       - "4317:4317"
       - "4318:4318"
+      - "8889:8889"
+      - "13133:13133"
+    depends_on:
+      - loki
+      - tempo
     extra_hosts:
       - "host.docker.internal:host-gateway"
-  zipkin:
-    image: openzipkin/zipkin:3
+  loki:
+    image: grafana/loki:3.6.10
+    command: [ "-config.file=/etc/loki/loki.yml" ]
+    volumes:
+      - ./extra/monitoring/loki.yml:/etc/loki/loki.yml
     ports:
-      - "9411:9411"
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - "3100:3100"
+  tempo:
+    image: grafana/tempo:2.10.5
+    command: [ "-config.file=/etc/tempo/tempo.yml" ]
+    volumes:
+      - ./extra/monitoring/tempo.yml:/etc/tempo/tempo.yml
+    ports:
+      - "3200:3200"
+  prometheus:
+    image: prom/prometheus:v3.11.2
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--web.enable-remote-write-receiver"
+    volumes:
+      - ./extra/monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+  grafana:
+    image: grafana/grafana:12.4
+    environment:
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
+    volumes:
+      - ./extra/monitoring/grafana-datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+      - loki
+      - tempo

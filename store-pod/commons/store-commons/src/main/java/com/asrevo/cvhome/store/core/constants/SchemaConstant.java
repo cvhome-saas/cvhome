@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-public class SchemaConstant {
+public final class SchemaConstant {
 
 
     public static final int DESCRIPTION_ID_ALLOCATION_SIZE = 0;

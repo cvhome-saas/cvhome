@@ -1,0 +1,78 @@
+:host {
+  display: block;
+}
+
+.zone {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-group);
+  padding: 1.1rem 1.25rem;
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--muted);
+  transition:
+    border-color var(--default-transition-duration),
+    background-color var(--default-transition-duration);
+}
+
+.zone.dragging {
+  border-color: var(--primary);
+  background: var(--chart-1-wash);
+}
+
+.zone.busy {
+  cursor: progress;
+}
+
+.zone-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  inline-size: 2.75rem;
+  block-size: 2.75rem;
+  border-radius: var(--radius-md);
+  background: var(--chart-1-wash);
+  color: var(--chart-1-foreground);
+}
+
+.zone-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.zone-copy strong {
+  font-size: var(--text-sm);
+  color: var(--foreground-strong);
+}
+
+.zone-copy small {
+  font-size: var(--text-xs);
+  color: var(--muted-foreground);
+}
+
+.zone-copy .rejected {
+  color: var(--chart-5-foreground);
+}
+
+.zone-spacer {
+  flex: 1;
+}
+
+.progress {
+  inline-size: 10rem;
+  block-size: 0.5rem;
+  border-radius: var(--radius-full);
+  background: var(--input);
+  overflow: hidden;
+}
+
+.bar {
+  display: block;
+  block-size: 100%;
+  background: var(--primary);
+  border-radius: var(--radius-full);
+  transition: inline-size var(--default-transition-duration);
+}

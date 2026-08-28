@@ -1,0 +1,80 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+
+.toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  inline-size: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.toggle:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.track {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: flex-start;
+  inline-size: 38px;
+  block-size: 22px;
+  padding: 3px;
+  border-radius: var(--radius-full);
+  background: var(--track);
+  transition:
+    background-color var(--default-transition-duration),
+    justify-content var(--default-transition-duration);
+}
+
+.knob {
+  display: block;
+  inline-size: 16px;
+  block-size: 16px;
+  border-radius: var(--radius-full);
+  background: var(--primary-foreground);
+  transition: transform 0.2s var(--ease-emphasis);
+}
+
+[aria-checked='true'] .track {
+  background: var(--primary);
+}
+
+/*
+ * Moved rather than re-justified, so the knob slides. `justify-content` is not animatable,
+ * and the mockup's flex-end swap jumped.
+ */
+[aria-checked='true'] .knob {
+  transform: translateX(16px);
+}
+
+:host-context([dir='rtl']) [aria-checked='true'] .knob {
+  transform: translateX(-16px);
+}
+
+.copy {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+}
+
+.copy strong {
+  color: var(--foreground-strong);
+  font-size: var(--text-xs);
+  font-weight: 600;
+}
+
+.copy small {
+  margin-block-start: 0.1rem;
+  color: var(--muted-foreground);
+  font-size: var(--text-2xs);
+}

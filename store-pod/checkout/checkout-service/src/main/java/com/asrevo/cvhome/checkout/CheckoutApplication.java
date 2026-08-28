@@ -2,13 +2,9 @@ package com.asrevo.cvhome.checkout;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Import;
-
-import com.asrevo.cvhome.s2s.config.CvhomeSharedConfig;
 
 @SpringBootApplication
-@Import(CvhomeSharedConfig.class)
-public class CheckoutApplication {
+public final class CheckoutApplication {
 
     private CheckoutApplication() {
 

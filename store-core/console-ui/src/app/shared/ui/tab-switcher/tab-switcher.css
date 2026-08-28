@@ -1,0 +1,81 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+
+.tab-track {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.15rem;
+  padding: 0.2rem;
+  border-radius: var(--radius-lg);
+  background: var(--input);
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.7rem;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: none;
+  color: var(--muted-foreground);
+  font-size: var(--text-2xs);
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color var(--default-transition-duration),
+    color var(--default-transition-duration);
+}
+
+.tab:hover {
+  color: var(--foreground-strong);
+}
+
+/* The selected tab lifts off the track — the only raised element in the group. */
+.tab.selected {
+  background: var(--muted);
+  box-shadow: var(--lift);
+  color: var(--primary-emphasis);
+}
+
+.tab-badge {
+  padding: 0.05rem 0.3rem;
+  border-radius: var(--radius-full);
+  background: var(--track);
+  color: var(--muted-foreground);
+  font-size: var(--text-4xs);
+  font-weight: 600;
+}
+
+.tab-badge.green {
+  background: var(--chart-1-wash);
+  color: var(--chart-1-foreground);
+}
+
+.tab-badge.blue {
+  background: var(--chart-2-wash);
+  color: var(--chart-2-foreground);
+}
+
+.tab-badge.cyan {
+  background: var(--chart-3-wash);
+  color: var(--chart-3-foreground);
+}
+
+.tab-badge.amber {
+  background: var(--chart-4-wash);
+  color: var(--chart-4-foreground);
+}
+
+.tab-badge.red {
+  background: var(--chart-5-wash);
+  color: var(--chart-5-foreground);
+}
+
+.tab-badge.violet {
+  background: var(--chart-6-wash);
+  color: var(--chart-6-foreground);
+}

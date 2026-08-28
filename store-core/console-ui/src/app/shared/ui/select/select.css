@@ -1,0 +1,273 @@
+/*
+ * The dropdown.
+ *
+ * The trigger deliberately matches `.control` — the class every text input in this console wears —
+ * because a select and a text field sit side by side in almost every form here and any difference
+ * in height, radius or border reads as a mistake. That match is the whole reason this component
+ * exists, and it is the first thing to check if either changes.
+ */
+
+:host {
+  position: relative;
+  display: block;
+}
+
+.select-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-tight);
+  inline-size: 100%;
+  /*
+   * The height is a custom property because a consumer cannot reach this element any other way:
+   * `.select-trigger` lives in this component's template and carries this component's encapsulation
+   * attribute, so a rule written on `app-select` from a feature stylesheet matches nothing. The
+   * products filter row needs 2.25rem to line up with the search box beside it.
+   */
+  block-size: var(--select-height, 2.375rem);
+  padding: 0 .7rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--input);
+  color: var(--foreground-strong);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  text-align: start;
+  cursor: pointer;
+  transition:
+    border-color var(--default-transition-duration),
+    background-color var(--default-transition-duration);
+}
+
+.select-trigger:hover:not(:disabled) {
+  border-color: var(--edge);
+}
+
+.select-trigger:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 1px;
+}
+
+.select-trigger.is-open {
+  border-color: var(--primary);
+}
+
+.select-trigger.is-invalid {
+  border-color: var(--chart-5-foreground);
+}
+
+.select-trigger:disabled {
+  background: var(--muted);
+  color: var(--foreground-quiet);
+  cursor: not-allowed;
+}
+
+/* The placeholder is not a value, and must not read as one. */
+.select-trigger.is-placeholder .select-value {
+  color: var(--foreground-quiet);
+  font-weight: 400;
+}
+
+.select-value {
+  /*
+   * Shrinks and truncates rather than pushing. `overflow: hidden` alone is not enough: a flex item
+   * is at least its content wide unless `min-inline-size` says otherwise, so a long option pushed
+   * the caret out and ran under the clear button instead of ending in an ellipsis.
+   */
+  flex: 1;
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.select-caret {
+  flex: none;
+  color: var(--foreground-subtle);
+  transition: transform var(--default-transition-duration) var(--ease-emphasis);
+}
+
+.select-trigger.is-open .select-caret {
+  transform: rotate(180deg);
+}
+
+/* ---- The list --------------------------------------------------------------------------- */
+
+/*
+ * Overrides to the global `.popover`, which is sized for a menu anchored to the end of a toolbar.
+ * This one belongs to the field it opens from, so it takes the field's width and edge.
+ */
+.select-list {
+  inline-size: 100%;
+  min-inline-size: 0;
+  inset-inline: 0;
+  max-block-size: 15rem;
+  overflow-y: auto;
+}
+
+/*
+ * Above the trigger, when below would run off the page. `top` is what `.popover` sets, so it has to
+ * be unset explicitly rather than merely overridden — `inset-block-end` alone would leave both
+ * edges pinned and stretch the list.
+ */
+.select-list.drop-up {
+  top: auto;
+  inset-block-end: calc(100% + .35rem);
+}
+
+.select-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .6rem;
+  inline-size: 100%;
+  padding: .5rem .6rem;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: none;
+  color: var(--secondary-foreground);
+  font-size: var(--text-xs);
+  text-align: start;
+  cursor: pointer;
+  transition: background-color var(--default-transition-duration);
+}
+
+.select-option:hover {
+  background: var(--input);
+  color: var(--primary-emphasis);
+}
+
+.select-option:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: -2px;
+}
+
+.select-option.is-selected {
+  color: var(--primary-emphasis);
+  font-weight: 600;
+}
+
+/*
+ * `aria-disabled`, not `disabled`: a disabled button is skipped by screen-reader item counts, so an
+ * unavailable option would silently vanish from a list of five and the operator could not tell
+ * whether it was unavailable or never there. The tree's row menu made the same choice.
+ */
+.select-option[aria-disabled='true'] {
+  opacity: .4;
+  cursor: not-allowed;
+}
+
+.select-option[aria-disabled='true']:hover {
+  background: none;
+  color: var(--secondary-foreground);
+}
+
+.option-copy {
+  display: flex;
+  flex-direction: column;
+  gap: .1rem;
+  min-inline-size: 0;
+}
+
+.option-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.option-detail {
+  color: var(--foreground-quiet);
+  font-size: var(--text-2xs);
+}
+
+.option-tick {
+  flex: none;
+  color: var(--primary);
+}
+
+/* Only the leave: `.popover` owns the entry. */
+.select-list-out {
+  animation: popover-in .12s ease-in reverse both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .select-list-out {
+    animation-duration: .01ms;
+  }
+
+  .select-trigger,
+  .select-caret,
+  .select-option {
+    transition: none;
+  }
+}
+
+/*
+ * The clear button, for a select that is a filter.
+ *
+ * Absolutely positioned over the trigger rather than inside it: a button inside a button is
+ * invalid HTML, and nesting them meant clearing also opened the list. The trigger reserves room
+ * for it with padding so the two never overlap the value.
+ */
+:host {
+  position: relative;
+}
+
+:host(.has-clear) .select-trigger {
+  padding-inline-end: 3.4rem;
+}
+
+/*
+ * With a clear button in play the caret comes out of the flow.
+ *
+ * The button cannot be a child of the trigger, so it is drawn over it — and anything drawn over the
+ * trigger sits nearer the edge than the trigger's own last flex child, which put the cross outside
+ * the caret and the two of them touching. Pinning the caret to the edge instead lets the cross take
+ * the place before it, which is the order every field with both affordances uses.
+ */
+:host(.has-clear) .select-caret {
+  position: absolute;
+  inset-inline-end: .7rem;
+  inset-block-start: 50%;
+  transform: translateY(-50%);
+}
+
+:host(.has-clear) .select-trigger.is-open .select-caret {
+  transform: translateY(-50%) rotate(180deg);
+}
+
+.select-clear {
+  position: absolute;
+  inset-inline-end: 1.95rem;
+  inset-block-start: 50%;
+  display: grid;
+  place-items: center;
+  inline-size: 1.25rem;
+  block-size: 1.25rem;
+  padding: 0;
+  transform: translateY(-50%);
+  border: 0;
+  border-radius: var(--radius-full);
+  background: none;
+  color: var(--foreground-quiet);
+  cursor: pointer;
+  transition:
+    background-color var(--default-transition-duration),
+    color var(--default-transition-duration);
+}
+
+.select-clear:hover {
+  background: var(--input);
+  color: var(--foreground-strong);
+}
+
+.select-clear:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 1px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .select-clear {
+    transition: none;
+  }
+}

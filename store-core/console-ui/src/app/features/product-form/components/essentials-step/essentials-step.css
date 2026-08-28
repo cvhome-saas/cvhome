@@ -1,0 +1,14 @@
+/*
+ * What is left after the language strip moved.
+ *
+ * The strip was its own radiogroup here, keyed by *index* rather than language code, with no
+ * arrow keys and no mark for a language that already holds copy — three differences from the
+ * identical control in the catalogue. Both are `app-locale-switcher` now.
+ */
+
+.field-hint.warn {
+  display: flex;
+  align-items: center;
+  gap: .3rem;
+  color: var(--chart-4-foreground);
+}

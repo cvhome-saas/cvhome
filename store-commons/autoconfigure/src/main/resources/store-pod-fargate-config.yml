@@ -3,8 +3,25 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri-set:
-            - ${com.asrevo.cvhome.services.uaa.schema}://${com.asrevo.cvhome.services.uaa.domain}
-            - ${com.asrevo.cvhome.services.uaa.schema}://${com.asrevo.cvhome.services.uaa.domain}:${com.asrevo.cvhome.services.uaa.port}
-            - ${com.asrevo.cvhome.services.spg.schema}://${com.asrevo.cvhome.services.spg.domain}/cua
-            - ${com.asrevo.cvhome.services.spg.schema}://${com.asrevo.cvhome.services.spg.domain}:${com.asrevo.cvhome.services.spg.port}/cua
+          issuers:
+            # Staff and service principals. No `grants`: uaa's clients carry arbitrary scopes, and capping them
+            # here would lock out callers this realm is meant to admit.
+            uaa:
+              uris:
+                - ${com.asrevo.cvhome.services.uaa.schema}://${com.asrevo.cvhome.services.uaa.domain}
+                - ${com.asrevo.cvhome.services.uaa.schema}://${com.asrevo.cvhome.services.uaa.domain}:${com.asrevo.cvhome.services.uaa.port}
+              jwk-set-uri: ${com.asrevo.cvhome.services.uaa.schema}://${com.asrevo.cvhome.services.uaa.domain}:${com.asrevo.cvhome.services.uaa.port}/oauth2/jwks
+            # Shoppers. `grants` is the ceiling: whatever a cua token claims, it can confer nothing but
+            # ROLE_CUSTOMER. Before this, the only thing keeping a shopper out of the merchant APIs was that
+            # cua's own token customizer happens to hard-code CUSTOMER.
+            cua:
+              uris:
+                - ${com.asrevo.cvhome.services.spg.schema}://${com.asrevo.cvhome.services.spg.domain}/cua
+                - ${com.asrevo.cvhome.services.spg.schema}://${com.asrevo.cvhome.services.spg.domain}:${com.asrevo.cvhome.services.spg.port}/cua
+              jwk-set-uri: ${com.asrevo.cvhome.services.spg.schema}://${com.asrevo.cvhome.services.spg.domain}:${com.asrevo.cvhome.services.spg.port}/cua/oauth2/jwks
+              grants:
+                - ROLE_CUSTOMER
+                # cua registers one OAuth2 client per store and grants it `openid` only, so this is every
+                # scope a shopper token legitimately carries. Listed so the cap stays silent in normal
+                # operation — a dropped-authority warning should mean something is actually wrong.
+                - SCOPE_OPENID

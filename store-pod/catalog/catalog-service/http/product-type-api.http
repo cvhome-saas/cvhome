@@ -1,0 +1,47 @@
+# ProductTypeApi — com.asrevo.cvhome.catalog.api.v1.ProductTypeApi (@RequestMapping "/api/v1/private/product")
+# See product-api.http for the env-var conventions. Requires a running stack: lcl start -d
+
+### create — 201 {"id": n}
+# @name createType
+POST {{SELLER_UI_URL}}/spg/catalog/api/v1/private/product/type?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{"code": "http-type", "visible": true, "allowAddToCart": true, "descriptions": [{"language": "en", "name": "HTTP type"}]}
+
+> {%
+    client.test("created", function () {
+        client.assert(response.status === 201, "status " + response.status);
+        client.global.set("TYPE_ID", response.body.id);
+    });
+%}
+
+### same code again — 409 CATALOG.PRODUCT_TYPE.DUPLICATE
+POST {{SELLER_UI_URL}}/spg/catalog/api/v1/private/product/type?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{"code": "http-type", "descriptions": [{"language": "en", "name": "dup"}]}
+
+### list, one, taken?
+GET {{SELLER_UI_URL}}/spg/catalog/api/v1/private/product/types?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+###
+GET {{SELLER_UI_URL}}/spg/catalog/api/v1/private/product/type/{{TYPE_ID}}?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+###
+GET {{SELLER_UI_URL}}/spg/catalog/api/v1/private/product/type/unique?store={{STORE_ID}}&lang={{LANG}}&code=http-type
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+### update (the code cannot change)
+PUT {{SELLER_UI_URL}}/spg/catalog/api/v1/private/product/type/{{TYPE_ID}}?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{"code": "http-type", "visible": false, "descriptions": [{"language": "en", "name": "HTTP type, hidden"}]}
+
+### delete — 404 CATALOG.PRODUCT_TYPE.NOT_FOUND on a second run
+DELETE {{SELLER_UI_URL}}/spg/catalog/api/v1/private/product/type/{{TYPE_ID}}?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}

@@ -72,82 +72,6 @@ create table if not exists catalog.manufacturer_description
         constraint fk2cpxn0kaionj660yaqdln4sfi references catalog.manufacturer,
     constraint UKebgisqk3yxc370rlqxn8o621f unique (manufacturer_id, language_code)
 );
-create table if not exists catalog.product_option
-(
-    product_option_id       bigint      not null primary key,
-    product_option_code     varchar(255),
-    product_option_sort_ord integer,
-    product_option_type     varchar(10),
-    product_option_read     boolean,
-    store_merchant_id       varchar(50) not null,
-    constraint UK1rc0c2a63kcaogxrh7yuufbkc unique (
-                                                   store_merchant_id, product_option_code
-        )
-);
-create index if not exists prd_option_code_idx on catalog.product_option (product_option_code);
-create table if not exists catalog.product_option_desc
-(
-    description_id         bigint       not null primary key,
-    date_created           timestamp(6),
-    date_modified          timestamp(6),
-    updt_id                varchar(60),
-    description            text,
-    name                   varchar(120) not null,
-    title                  varchar(100),
-    product_option_comment varchar(4000),
-    language_code          varchar(6)   not null,
-    product_option_id      bigint       not null
-        constraint fktrmohor3afrj5vhs5rawi8vu0 references catalog.product_option,
-    constraint UKds6ej49dgqk9rrujqx7dgs91b unique (product_option_id, language_code)
-);
-create table if not exists catalog.product_option_set
-(
-    product_option_set_id   bigint      not null primary key,
-    product_option_set_code varchar(255),
-    product_option_set_disp boolean,
-    product_option_id       bigint      not null
-        constraint fka602atlw6q67lrmw7tp5i071q references catalog.product_option,
-    store_merchant_id       varchar(50) not null,
-    constraint UK8oo79x4cvypweal0u20ct1j25 unique (
-                                                   store_merchant_id, product_option_set_code
-        )
-);
-create table if not exists catalog.product_option_value
-(
-    product_option_value_id  bigint      not null primary key,
-    product_option_val_code  varchar(255),
-    product_opt_for_disp     boolean,
-    product_opt_val_image    varchar(255),
-    product_opt_val_sort_ord integer,
-    store_merchant_id        varchar(50) not null,
-    constraint UKh49jqh4s5e0b7eqsqrk4okudc unique (
-                                                   store_merchant_id, product_option_val_code
-        )
-);
-create table if not exists catalog.product_opt_set_opt_value
-(
-    product_option_set_product_option_set_id bigint not null
-        constraint fkdueqvdjymkdkcjynggnmmahv9 references catalog.product_option_set,
-    values_product_option_value_id           bigint not null
-        constraint fk2fdwprg8xh06io1alw7v4lkq6 references catalog.product_option_value
-);
-create index if not exists prd_option_val_code_idx on catalog.product_option_value (product_option_val_code);
-create table if not exists catalog.product_option_value_description
-(
-    description_id          bigint       not null primary key,
-    date_created            timestamp(6),
-    date_modified           timestamp(6),
-    updt_id                 varchar(60),
-    description             text,
-    name                    varchar(120) not null,
-    title                   varchar(100),
-    language_code           varchar(6)   not null,
-    product_option_value_id bigint
-        constraint fknl1ctkjjk7dn2g94n3w2lf6ro references catalog.product_option_value,
-    constraint UKmogtqqkc4e5h3g4mgph7hqkr7 unique (
-                                                   product_option_value_id, language_code
-        )
-);
 create table if not exists catalog.product_type
 (
     product_type_id      bigint not null primary key,
@@ -158,17 +82,6 @@ create table if not exists catalog.product_type
     prd_type_code        varchar(255),
     prd_type_visible     boolean,
     store_merchant_id    varchar(50)
-);
-create table if not exists catalog.product_opt_set_prd_type
-(
-    product_option_set_product_option_set_id bigint not null
-        constraint fkcglxrfpokkw8ovxjlhcewbgpp references catalog.product_option_set,
-    product_types_product_type_id            bigint not null
-        constraint fkfik3p80lpd24it8slpqlcfe3q references catalog.product_type,
-    primary key (
-                 product_option_set_product_option_set_id,
-                 product_types_product_type_id
-        )
 );
 create table if not exists catalog.product_type_description
 (
@@ -183,37 +96,6 @@ create table if not exists catalog.product_type_description
     product_type_id bigint       not null
         constraint fk5yingh0egjkus0xfkl1hhmwy references catalog.product_type,
     constraint UKedftn4kxppmgot0f38hvk83sm unique (product_type_id, language_code)
-);
-create table if not exists catalog.product_variant_group
-(
-    product_variant_group_id bigint      not null primary key,
-    store_merchant_id        varchar(50) not null
-);
-create table if not exists catalog.product_var_image
-(
-    product_var_image_id     bigint not null primary key,
-    default_image            boolean,
-    product_image            varchar(255),
-    product_variant_group_id bigint not null
-        constraint fkdw60r3ujcjs86ljprqecoueu references catalog.product_variant_group
-);
-create table if not exists catalog.product_variation
-(
-    product_variation_id bigint       not null primary key,
-    date_created         timestamp(6),
-    date_modified        timestamp(6),
-    updt_id              varchar(60),
-    code                 varchar(100) not null,
-    sort_order           integer,
-    variant_default      boolean,
-    store_merchant_id    varchar(50)  not null,
-    product_option_id    bigint       not null
-        constraint fkqsuew0y7i60q5x056w7qymhtq references catalog.product_option,
-    option_value_id      bigint       not null
-        constraint fkmdirohj7ym0mj2l1dl21yr8ur references catalog.product_option_value,
-    constraint UK7q6j9dlg19t0ea6gfasnskeo3 unique (
-                                                   store_merchant_id, product_option_id, option_value_id
-        )
 );
 create table if not exists catalog.product
 (
@@ -256,28 +138,6 @@ create table if not exists catalog.product
         constraint fklabq3c2e90ybbxk58rc48byqo references catalog.product_type,
     constraint UK8y3h56fhn50m59svlocxwqnn0 unique (store_merchant_id, sku)
 );
-create table if not exists catalog.product_attribute
-(
-    product_attribute_id         bigint not null primary key,
-    product_attribute_default    boolean,
-    product_attribute_discounted boolean,
-    product_attribute_for_disp   boolean,
-    product_attribute_required   boolean,
-    product_attribute_free       boolean,
-    product_atribute_price       numeric(38, 2),
-    product_attribute_weight     numeric(38, 2),
-    product_attribute_sort_ord   integer,
-    product_id                   bigint not null
-        constraint fklefs59y5kmsbu017n1wp10gf2 references catalog.product,
-    option_id                    bigint not null
-        constraint fk9bv3sx347ljlhjp2vtghkd9om references catalog.product_option,
-    option_value_id              bigint not null
-        constraint fk136df306o3xt00l44t3708t23 references catalog.product_option_value,
-    constraint ukd10bjk5oofj1a7e3xbct88mj9 unique (
-                                                   option_id, option_value_id, product_id
-        )
-);
-create index if not exists idxdnt1duep1jr86pow6xsujmx84 on catalog.product_attribute (product_id);
 create table if not exists catalog.product_category
 (
     product_id  bigint not null
@@ -307,154 +167,29 @@ create table if not exists catalog.product_description
     constraint UKlw13d26xneb2dsyd1q2rbwqqc unique (product_id, language_code)
 );
 create index if not exists product_description_sef_url on catalog.product_description (sef_url);
-create table if not exists catalog.product_digital
-(
-    product_digital_id bigint       not null primary key,
-    file_name          varchar(255) not null,
-    product_id         bigint       not null
-        constraint fkr5um4hejfu56oysveb3e5xs8j references catalog.product,
-    constraint ukg6qeecrifgaebprc185e880lq unique (product_id, file_name)
-);
+-- A product image is a reference into the content service's media library, not a file catalog owns. media_asset_id
+-- is the source of truth; image_url caches the asset's public URL so reading a product needs no cross-service
+-- call. That cache is safe because an asset's bytes are never replaced in place — an upload either deduplicates
+-- onto the existing asset or mints a new id — and content refuses to delete one a product still references.
 create table if not exists catalog.product_image
 (
-    product_image_id  bigint not null primary key,
+    product_image_id  bigint  not null primary key,
     default_image     boolean,
-    image_crop        boolean,
     image_type        integer,
-    product_image     varchar(255),
-    product_image_url varchar(255),
+    media_asset_id    bigint,
+    image_url         varchar(500),
+    alt_text          varchar(255),
+    product_image_url varchar(500),
     sort_order        integer,
-    product_id        bigint not null
+    product_id        bigint  not null
         constraint fk6oo0cvcdtb6qmwsga468uuukk references catalog.product
 );
-create table if not exists catalog.product_image_description
-(
-    description_id   bigint       not null primary key,
-    date_created     timestamp(6),
-    date_modified    timestamp(6),
-    updt_id          varchar(60),
-    description      text,
-    name             varchar(120) not null,
-    title            varchar(100),
-    alt_tag          varchar(100),
-    language_code    varchar(6)   not null,
-    product_image_id bigint       not null
-        constraint fk9k3u9pf3teymlxchgu9p4jd9e references catalog.product_image,
-    constraint UKthpdsawwymj1tnjnsmk84umlp unique (product_image_id, language_code)
-);
-create table if not exists catalog.product_var_image_description
-(
-    description_id       bigint       not null primary key,
-    date_created         timestamp(6),
-    date_modified        timestamp(6),
-    updt_id              varchar(60),
-    description          text,
-    name                 varchar(120) not null,
-    title                varchar(100),
-    alt_tag              varchar(100),
-    language_code        varchar(6)   not null,
-    product_id           bigint       not null
-        constraint fkhn2mq2b7cqn7rg7h4k9py71k6 references catalog.product,
-    product_var_image_id bigint       not null
-        constraint fkdafb5lwa8xuw5knggb5opunqw references catalog.product_var_image,
-    constraint UKnqb3wtfkfird2cjp6eyfhgbmu unique (
-                                                   product_var_image_id, language_code
-        )
-);
-create table if not exists catalog.product_variant
-(
-    product_variant_id         bigint not null primary key,
-    date_created               timestamp(6),
-    date_modified              timestamp(6),
-    updt_id                    varchar(60),
-    available                  boolean,
-    code                       varchar(255),
-    date_available             timestamp(6),
-    default_selection          boolean,
-    sku                        varchar(255),
-    sort_order                 integer,
-    product_id                 bigint not null
-        constraint fkgrbbs9t374m9gg43l6tq1xwdj references catalog.product,
-    product_variant_group_id   bigint
-        constraint fk8xtj3bi1s75coa9f84tgof611 references catalog.product_variant_group,
-    product_variation_id       bigint
-        constraint fkrsayulwa4xtlt8mc3sddl1spt references catalog.product_variation,
-    product_variation_value_id bigint
-        constraint fkrt8wxodoxdqx5t4a1ey66xnyd references catalog.product_variation,
-    constraint ukg69sutihl26shxl3w47s0vch unique (product_id, sku)
-);
-create table if not exists catalog.product_availability
-(
-    product_avail_id  bigint  not null primary key,
-    date_created      timestamp(6),
-    date_modified     timestamp(6),
-    updt_id           varchar(60),
-    available         boolean,
-    height            numeric(38, 2),
-    length            numeric(38, 2),
-    weight            numeric(38, 2),
-    width             numeric(38, 2),
-    owner             varchar(255),
-    date_available    date,
-    free_shipping     boolean,
-    quantity          integer not null,
-    quantity_ord_max  integer,
-    quantity_ord_min  integer,
-    status            boolean,
-    region            varchar(255),
-    region_variant    varchar(255),
-    sku               varchar(255),
-    store_merchant_id varchar(50),
-    product_id        bigint  not null
-        constraint fk3sgpu0mqt3cncaw0k1x3okkq8 references catalog.product,
-    product_variant   bigint
-        constraint fkg460g5177h3t14atnsynm8ikc references catalog.product_variant,
-    constraint UK3cq0pcvlrorbgahh1r1o6fao5 unique (
-                                                   store_merchant_id, product_id, product_variant,
-                                                   region_variant
-        )
-);
-create index if not exists prd_avail_store_prd_idx on catalog.product_availability (product_id, store_merchant_id);
-create index if not exists prd_avail_prd_idx on catalog.product_availability (product_id);
-create table if not exists catalog.product_price
-(
-    product_price_id               bigint       not null primary key,
-    product_price_code             varchar(255) not null,
-    default_price                  boolean,
-    product_identifier_id          bigint,
-    product_price_amount           numeric(38, 2),
-    product_price_special_amount   numeric(38, 2),
-    product_price_special_end_date date,
-    product_price_special_st_date  date,
-    product_price_type             varchar(20)
-        constraint product_price_product_price_type_check check (
-            (product_price_type):: text = ANY (
-                (
-                    ARRAY [ 'ONE_TIME' :: character varying,
-                        'MONTHLY' :: character varying]
-                    ):: text[]
-                )
-            ),
-    product_avail_id               bigint       not null
-        constraint fkth2oyk1000w7vut9aro9a8mhi references catalog.product_availability
-);
-create table if not exists catalog.product_price_description
-(
-    description_id   bigint       not null primary key,
-    date_created     timestamp(6),
-    date_modified    timestamp(6),
-    updt_id          varchar(60),
-    description      text,
-    name             varchar(120) not null,
-    title            varchar(100),
-    price_appender   varchar(255),
-    language_code    varchar(6)   not null,
-    product_price_id bigint       not null
-        constraint fkghwl7kccj71r4u0qdwegbles6 references catalog.product_price,
-    constraint UKc84xdnuwluljfaeor1cax423p unique (product_price_id, language_code)
-);
-create index if not exists idxv61l549h1wdlqi4chir5muwl on catalog.product_variant (product_id);
-
+alter table catalog.product_image add column if not exists media_asset_id bigint;
+alter table catalog.product_image add column if not exists image_url      varchar(500);
+alter table catalog.product_image add column if not exists alt_text       varchar(255);
+alter table catalog.product_image drop column if exists product_image;
+alter table catalog.product_image drop column if exists image_crop;
+create index if not exists product_image_media_idx on catalog.product_image (media_asset_id);
 create table if not exists catalog.product_group
 (
     product_group_id  bigint       not null primary key,
@@ -496,3 +231,267 @@ create table if not exists catalog.product_group_product
         constraint fk_pgp_product references catalog.product,
     primary key (product_group_id, product_id)
 );
+
+-- ---------------------------------------------------------------------------------------------------------------
+-- Product search
+--
+-- Full-text search over the catalogue, per store and per language. The searchable document is materialised into
+-- catalog.product_search_index rather than derived at query time: the document spans product, product_description
+-- and manufacturer_description, and a query has to reach it through one index scan, not three joins.
+--
+-- The table is not mapped for writing by JPA. It is refreshed by catalog.refresh_product_search_index, which the
+-- outbox handler calls when a ProductSearchIndexStaleEvent is processed. Keeping the document shape here — and not
+-- in Java — is what guarantees the index side and the query side normalise text the same way; a mismatch there
+-- does not fail loudly, it just silently stops matching.
+-- ---------------------------------------------------------------------------------------------------------------
+
+create extension if not exists unaccent with schema public;
+create extension if not exists pg_trgm with schema public;
+create extension if not exists btree_gin with schema public;
+
+-- The snowball configuration for a store language. Postgres ships stemmers for all five storefront locales.
+-- Immutable so it folds into a constant when the planner sees a literal language.
+create or replace function catalog.search_config(p_language varchar) returns regconfig
+    language sql immutable parallel safe as
+$$
+select case lower(left(coalesce(p_language, 'en'), 2))
+           when 'ar' then 'arabic'::regconfig
+           when 'en' then 'english'::regconfig
+           when 'fr' then 'french'::regconfig
+           when 'es' then 'spanish'::regconfig
+           when 'ru' then 'russian'::regconfig
+           else 'simple'::regconfig
+           end
+$$;
+
+-- unaccent() is STABLE, because it resolves its dictionary by name at call time. Pinning the dictionary makes the
+-- wrapper immutable, which is what lets it be used in index expressions and folded by the planner.
+create or replace function catalog.search_unaccent(p_text text) returns text
+    language sql immutable parallel safe as
+$$
+select public.unaccent('public.unaccent'::regdictionary, coalesce(p_text, ''))
+$$;
+
+-- Fold away the differences a shopper does not type.
+--
+-- The snowball arabic stemmer handles suffixes but not orthography, so on its own "احذيه" never finds "أَحْذِيَة".
+-- This strips the tashkeel block (U+064B..U+0652) and tatweel (U+0640), then folds the alef forms
+-- (U+0623 U+0625 U+0622 U+0671 -> U+0627), teh marbuta (U+0629 -> U+0647) and alef maksura (U+0649 -> U+064A).
+-- search_unaccent covers the Latin scripts in the same pass.
+--
+-- This function is the ONLY normalisation implementation. The query side calls it too, in SQL — Java must never
+-- re-implement it.
+create or replace function catalog.search_normalize(p_text text) returns text
+    language sql immutable parallel safe as
+$$
+select catalog.search_unaccent(
+               translate(
+                       regexp_replace(lower(coalesce(p_text, '')), '[ً-ْـ]', '', 'g'),
+                       'أإآٱىة',
+                       'اااايه'))
+$$;
+
+-- The autocomplete query: the shopper is still typing, so the last word — and every word, since we do not know
+-- which one they are on — matches as a prefix. Lexing the query through to_tsvector first means the prefixes are
+-- attached to stemmed lexemes ("running" -> "run:*") and stopwords drop out, which a naive split on spaces would
+-- get wrong in both directions.
+create or replace function catalog.search_prefix_tsquery(p_text text, p_language varchar) returns tsquery
+    language sql immutable parallel safe as
+$$
+select to_tsquery(catalog.search_config(p_language),
+                  array_to_string(
+                          (select array_agg(lexeme || ':*')
+                           from unnest(tsvector_to_array(
+                                   to_tsvector(catalog.search_config(p_language),
+                                               catalog.search_normalize(p_text)))) as lexeme),
+                          ' & '))
+$$;
+
+create table if not exists catalog.product_search_index
+(
+    product_id        bigint       not null,
+    language_code     varchar(6)   not null,
+    store_merchant_id varchar(50)  not null,
+    name_normalized   text,
+    search_document   tsvector,
+    indexed_at        timestamp(6) not null default now(),
+    primary key (product_id, language_code)
+);
+
+-- store_merchant_id sits in the index, not just the table: without it a search for a common word scans every
+-- matching row across every tenant in the pod and only then filters, so cost would grow with the number of
+-- stores rather than with the store's own catalogue. btree_gin is what lets the scalar columns share the GIN.
+create index if not exists product_search_doc_idx on catalog.product_search_index
+    using gin (store_merchant_id, language_code, search_document);
+
+-- Only read on the fallback path, when the tsquery found nothing and we are looking for a near miss.
+create index if not exists product_search_trgm_idx on catalog.product_search_index
+    using gin (store_merchant_id, name_normalized public.gin_trgm_ops);
+
+-- Missing until now, and both sit directly on the facet path.
+create index if not exists product_store_idx on catalog.product (store_merchant_id);
+create index if not exists product_category_category_idx on catalog.product_category (category_id);
+
+-- The searchable form of every product, as a query. Kept as a view so the document is defined exactly once and
+-- both the per-product refresh and the whole-store rebuild are the same expression with a different filter.
+--
+-- Weighted so a hit on the name outranks a hit in the body:
+--   A name · B meta_title, title, keywords, sku, ref_sku, brand · C highlight · D description
+-- Category names are deliberately absent: a category match reaches the shopper as its own suggestion, and
+-- including them here would mean every category rename invalidated the products underneath it.
+create or replace view catalog.product_search_source as
+select pd.product_id,
+       pd.language_code,
+       p.store_merchant_id,
+       catalog.search_normalize(pd.name) as name_normalized,
+       setweight(to_tsvector(catalog.search_config(pd.language_code),
+                             catalog.search_normalize(pd.name)), 'A') ||
+       setweight(to_tsvector(catalog.search_config(pd.language_code),
+                             catalog.search_normalize(
+                                     concat_ws(' ', pd.meta_title, pd.title, pd.meta_keywords,
+                                               p.sku, p.ref_sku, md.name))), 'B') ||
+       setweight(to_tsvector(catalog.search_config(pd.language_code),
+                             catalog.search_normalize(pd.product_highlight)), 'C') ||
+       setweight(to_tsvector(catalog.search_config(pd.language_code),
+           -- the description is merchant-authored HTML; tags are not words
+                             catalog.search_normalize(
+                                     regexp_replace(coalesce(pd.description, ''), '<[^>]*>', ' ', 'g'))), 'D')
+           as search_document
+from catalog.product_description pd
+         join catalog.product p on p.product_id = pd.product_id
+         left join catalog.manufacturer_description md
+                   on md.manufacturer_id = p.manufacturer_id and md.language_code = pd.language_code;
+
+-- Rebuild every language of one product.
+--
+-- One statement, and plain SQL rather than plpgsql, because Spring's script runner splits init scripts on the
+-- semicolon and does not understand dollar quoting — a procedural body with statements in it would be cut in
+-- half at startup. It also has to be an upsert rather than a delete-then-insert: a data-modifying CTE that
+-- deleted and reinserted the same key would race itself. So the delete only prunes languages the product no
+-- longer has, and the insert takes care of the rest.
+create or replace function catalog.refresh_product_search_index(p_product_id bigint) returns integer
+    language sql as
+$$
+with wanted as (select * from catalog.product_search_source where product_id = p_product_id),
+     pruned as (
+         delete from catalog.product_search_index i
+             where i.product_id = p_product_id
+                 and not exists (select 1 from wanted w where w.language_code = i.language_code)
+             returning 1),
+     upserted as (
+         insert into catalog.product_search_index
+             (product_id, language_code, store_merchant_id, name_normalized, search_document, indexed_at)
+             select product_id, language_code, store_merchant_id, name_normalized, search_document, now()
+             from wanted
+             on conflict (product_id, language_code)
+                 do update set store_merchant_id = excluded.store_merchant_id,
+                               name_normalized   = excluded.name_normalized,
+                               search_document   = excluded.search_document,
+                               indexed_at        = excluded.indexed_at
+             returning 1)
+select count(*)::int from upserted
+$$;
+
+create or replace function catalog.purge_product_search_index(p_product_id bigint) returns integer
+    language sql as
+$$
+with removed as (delete from catalog.product_search_index where product_id = p_product_id returning 1)
+select count(*)::int from removed
+$$;
+
+-- Whole-store rebuild: behind the private rebuild endpoint, and what to run after the document's shape changes
+-- above. Set-based rather than a loop over products, so a large catalogue is one pass.
+create or replace function catalog.rebuild_product_search_index(p_store varchar) returns integer
+    language sql as
+$$
+with wanted as (select * from catalog.product_search_source where store_merchant_id = p_store),
+     pruned as (
+         delete from catalog.product_search_index i
+             where i.store_merchant_id = p_store
+                 and not exists (select 1
+                                 from wanted w
+                                 where w.product_id = i.product_id and w.language_code = i.language_code)
+             returning 1),
+     upserted as (
+         insert into catalog.product_search_index
+             (product_id, language_code, store_merchant_id, name_normalized, search_document, indexed_at)
+             select product_id, language_code, store_merchant_id, name_normalized, search_document, now()
+             from wanted
+             on conflict (product_id, language_code)
+                 do update set store_merchant_id = excluded.store_merchant_id,
+                               name_normalized   = excluded.name_normalized,
+                               search_document   = excluded.search_document,
+                               indexed_at        = excluded.indexed_at
+             returning 1)
+select count(*)::int from upserted
+$$;
+
+-- ---------------------------------------------------------------------------------------------------------------
+-- Outbox
+--
+-- The search index is refreshed from domain events, not from a database trigger: the event row commits in the same
+-- transaction as the product change, and the poller picks it up a moment later. That buys retries, ordered
+-- per-product processing and a batched brand rename, at the cost of the index being eventually consistent — a
+-- merchant who saves a product does not find it by search for a second or two.
+--
+-- The library's own schema initialisation is off (namastack.outbox.jpa.schema-initialization.enabled: false), the
+-- same as payment-service, so the tables are declared here. Index names are schema-scoped, so these do not collide
+-- with payment's.
+-- ---------------------------------------------------------------------------------------------------------------
+
+create table if not exists catalog.outbox_record
+(
+    id             varchar(255)             not null,
+    status         varchar(20)              not null,
+    record_key     varchar(255)             not null,
+    record_type    varchar(255)             not null,
+    payload        text                     not null,
+    context        text,
+    created_at     timestamp with time zone not null,
+    completed_at   timestamp with time zone,
+    failure_count  int                      not null,
+    failure_reason varchar(1000),
+    next_retry_at  timestamp with time zone not null,
+    partition_no   integer                  not null,
+    handler_id     varchar(1000)            not null,
+    primary key (id)
+);
+
+create table if not exists catalog.outbox_instance
+(
+    instance_id    varchar(255) primary key,
+    hostname       varchar(255)             not null,
+    port           integer                  not null,
+    status         varchar(50)              not null,
+    started_at     timestamp with time zone not null,
+    last_heartbeat timestamp with time zone not null,
+    created_at     timestamp with time zone not null,
+    updated_at     timestamp with time zone not null
+);
+
+create table if not exists catalog.outbox_partition
+(
+    partition_number integer primary key,
+    instance_id      varchar(255),
+    version          bigint                   not null default 0,
+    updated_at       timestamp with time zone not null
+);
+
+create index if not exists idx_outbox_record_record_key_created
+    on catalog.outbox_record (record_key, created_at);
+create index if not exists idx_outbox_record_partition_status_retry
+    on catalog.outbox_record (partition_no, status, next_retry_at);
+create index if not exists idx_outbox_record_status_retry
+    on catalog.outbox_record (status, next_retry_at);
+create index if not exists idx_outbox_record_status
+    on catalog.outbox_record (status);
+create index if not exists idx_outbox_record_record_key_completed_created
+    on catalog.outbox_record (record_key, completed_at, created_at);
+create index if not exists idx_outbox_instance_status_heartbeat
+    on catalog.outbox_instance (status, last_heartbeat);
+create index if not exists idx_outbox_instance_last_heartbeat
+    on catalog.outbox_instance (last_heartbeat);
+create index if not exists idx_outbox_instance_status
+    on catalog.outbox_instance (status);
+create index if not exists idx_outbox_partition_instance_id
+    on catalog.outbox_partition (instance_id);

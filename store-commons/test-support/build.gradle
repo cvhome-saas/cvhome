@@ -1,0 +1,29 @@
+/*
+ * Shared test infrastructure for src/integrationTest of every service. Consumed only from the integration-test
+ * classpath (java-integration-test-conventions adds it), never from main or src/test.
+ */
+plugins {
+    alias(libs.plugins.java.library.conventions)
+}
+
+// This module's src/main is test infrastructure, not production code: it runs from every other domain's
+// integrationTest, and that execution is recorded against those domains, never against `shared`. Counting it would
+// mean gating the coverage of test helpers.
+ext.coverageExempt = true
+
+dependencies {
+    api platform("org.springframework.boot:spring-boot-dependencies:${libs.versions.springBoot.get()}")
+    api project(":store-commons:commons")
+    api libs.bundles.test.integration
+    api libs.testcontainers.minio
+    api libs.junit.platform.launcher
+    api libs.archunit.junit5
+
+    compileOnly libs.spring.boot.starter.security.oauth2.resource.server
+    compileOnly libs.spring.webmvc
+    compileOnly libs.spring.webflux
+    compileOnly libs.jackson.databind
+    // @RepositoryIntegrationTest only: a consumer adds `integrationTestImplementation libs.spring.boot.starter.data.jpa.test`.
+    // Exporting it here would auto-configure a DataSource in services that have none (the gateway).
+    compileOnly libs.spring.boot.starter.data.jpa.test
+}

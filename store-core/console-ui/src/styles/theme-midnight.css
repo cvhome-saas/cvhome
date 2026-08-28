@@ -1,0 +1,102 @@
+/*
+ * Midnight — indigo on slate. Dark, like Forest, so every structural decision carries
+ * over unchanged: the same white-alpha borders and fills, the same contrast ladder, the
+ * same flat-at-rest treatment. Only the hue family moves.
+ *
+ * Slate and indigo are not brand colours, so unlike Forest's pinned emerald they use
+ * Tailwind's stock ramps exactly as shipped.
+ *
+ * The categorical scale (--chart-N) is deliberately NOT re-hued. Those six colours are a
+ * data vocabulary, not brand: a reader who learns "amber means pending" should not have to
+ * relearn it because the chrome changed. Only their on-dark inks would move, and here the
+ * background is dark in both themes, so they stay too.
+ */
+
+[data-theme='midnight'] {
+  color-scheme: dark;
+
+  --background: var(--color-slate-950);
+  --foreground: var(--color-slate-100);
+  --foreground-strong: var(--color-white);
+  --foreground-subtle: var(--color-slate-400);
+  --foreground-quiet: var(--color-slate-500);
+
+  --card: var(--color-slate-900);
+  --card-foreground: var(--foreground-strong);
+
+  --popover: var(--color-slate-900);
+  --popover-foreground: var(--color-slate-100);
+
+  --primary: var(--color-indigo-500);
+  /* Indigo is too dark for near-black ink; this pairing carries the button labels. */
+  --primary-foreground: var(--color-white);
+
+  --secondary: --alpha(var(--color-white) / 6%);
+  --secondary-foreground: var(--color-slate-300);
+
+  --muted: --alpha(var(--color-white) / 2%);
+  --muted-foreground: var(--color-slate-400);
+
+  --accent: --alpha(var(--color-indigo-500) / 10%);
+  --accent-foreground: var(--color-indigo-300);
+
+  --destructive: var(--color-red-300);
+  --destructive-foreground: var(--color-slate-950);
+
+  --border: --alpha(var(--color-white) / 10%);
+  --input: --alpha(var(--color-white) / 6%);
+  --ring: var(--color-indigo-400);
+
+  /* Unchanged from Forest — see the note above. */
+  --chart-1: var(--color-emerald-500);
+  --chart-1-foreground: var(--color-emerald-300);
+  --chart-1-wash: --alpha(var(--color-emerald-500) / 16%);
+
+  --chart-2: var(--color-blue-500);
+  --chart-2-foreground: var(--color-blue-300);
+  --chart-2-wash: --alpha(var(--color-blue-500) / 16%);
+
+  --chart-3: var(--color-cyan-500);
+  --chart-3-foreground: var(--color-cyan-300);
+  --chart-3-wash: --alpha(var(--color-cyan-500) / 16%);
+
+  --chart-4: var(--color-amber-500);
+  --chart-4-foreground: var(--color-amber-300);
+  --chart-4-wash: --alpha(var(--color-amber-500) / 16%);
+
+  --chart-5: var(--color-red-500);
+  --chart-5-foreground: var(--color-red-300);
+  --chart-5-wash: --alpha(var(--color-red-500) / 16%);
+
+  --chart-6: var(--color-violet-500);
+  --chart-6-foreground: var(--color-violet-300);
+  --chart-6-wash: --alpha(var(--color-violet-500) / 16%);
+
+  --primary-emphasis: var(--color-indigo-400);
+  --primary-soft: var(--color-indigo-300);
+  --primary-muted: var(--color-indigo-200);
+
+  --border-soft: --alpha(var(--color-white) / 7%);
+  --edge: --alpha(var(--color-indigo-400) / 42%);
+  --edge-strong: --alpha(var(--color-indigo-400) / 55%);
+
+  --seat-1: var(--color-indigo-900);
+  --seat-2: var(--color-slate-700);
+  --seat-3: var(--color-slate-800);
+  --seat-3-foreground: var(--color-slate-200);
+
+  --accent-strong: --alpha(var(--color-indigo-500) / 20%);
+  --accent-veil: --alpha(var(--color-indigo-500) / 8%);
+
+  --track: --alpha(var(--color-white) / 18%);
+
+  --panel: --alpha(var(--color-slate-950) / 60%);
+  --header-veil: --alpha(var(--color-slate-950) / 82%);
+  --scrim: --alpha(var(--color-slate-950) / 72%);
+
+  --lift: 0 20px 45px rgb(0 0 0 / 20%);
+  --lift-primary: 0 12px 30px --alpha(var(--color-indigo-500) / 30%);
+  --lift-subtle: 0 1px 2px rgb(0 0 0 / 24%);
+
+  --glow-color: --alpha(var(--color-indigo-500) / 27%);
+}

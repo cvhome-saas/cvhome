@@ -2,16 +2,14 @@ package com.asrevo.cvhome.checkout.model.order;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.asrevo.cvhome.checkout.model.order.total.OrderTotal;
 import com.asrevo.cvhome.checkout.model.order.v0.Order;
+import com.asrevo.cvhome.commons.domain.CurrencyCode;
 import com.asrevo.cvhome.store.core.entity.order.orderstatus.OrderStatus;
-import com.asrevo.cvhome.store.core.entity.order.payment.CreditCard;
-import com.asrevo.cvhome.store.core.entity.payments.PaymentType;
-import com.asrevo.cvhome.store.core.model.reference.CurrencyCode;
 import com.asrevo.cvhome.store.core.serializer.CurrencyCodeDeSerializer;
 import com.asrevo.cvhome.store.core.serializer.CurrencyCodeSerializer;
 
@@ -35,19 +33,13 @@ public class OrderEntity extends Order implements Serializable {
 
     private List<OrderAttribute> attributes = new ArrayList<>();
 
-    private PaymentType paymentType;
-
-    private String paymentModule;
-
     private String shippingModule;
 
     private List<OrderStatus> previousOrderStatus;
 
     private OrderStatus orderStatus;
 
-    private CreditCard creditCard;
-
-    private LocalDate datePurchased;
+    private Instant datePurchased;
 
     @JsonSerialize(using = CurrencyCodeSerializer.class)
     @JsonDeserialize(using = CurrencyCodeDeSerializer.class)

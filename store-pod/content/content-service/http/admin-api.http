@@ -1,0 +1,9 @@
+### Cross-type private endpoints (ContentAdminApi)
+
+### Hub summary — KPIs + rail counts
+GET {{SELLER_UI_URL}}/spg/content/api/v1/private/content/summary?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+
+### Redirects written by slug changes of published pages
+GET {{SELLER_UI_URL}}/spg/content/api/v1/private/content/redirects?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}

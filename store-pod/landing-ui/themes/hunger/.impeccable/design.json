@@ -1,0 +1,152 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-08-26T00:00:00Z",
+  "title": "Design System: Hunger",
+  "extensions": {
+    "colorMeta": {
+      "primary": {"role": "primary", "displayName": "Menu Red", "canonical": "oklch(0.47 0.215 27)", "note": "Generated from THEME_DEFAULTS.hunger in libs/types/scripts/build-color-schemas.mjs; regenerate with `npm run gen:colors` in libs/types. Runtime value comes from the merchant ColorTheme preset via the shell bridge.", "tonalRamp": ["oklch(0.15 0.09 27)", "oklch(0.25 0.14 27)", "oklch(0.35 0.19 27)", "oklch(0.47 0.215 27)", "oklch(0.58 0.19 27)", "oklch(0.70 0.14 27)", "oklch(0.83 0.08 27)", "oklch(0.95 0.03 27)"]},
+      "secondary": {"role": "secondary", "displayName": "Blotting Pink", "canonical": "oklch(0.905 0.05 30)", "tonalRamp": ["oklch(0.15 0.02 30)", "oklch(0.26 0.03 30)", "oklch(0.38 0.04 30)", "oklch(0.50 0.05 30)", "oklch(0.62 0.05 30)", "oklch(0.74 0.05 30)", "oklch(0.85 0.05 30)", "oklch(0.95 0.03 30)"]},
+      "accent": {"role": "tertiary", "displayName": "Spot Green", "canonical": "oklch(0.45 0.125 158)", "note": "Only on .mark-offer.", "tonalRamp": ["oklch(0.15 0.05 158)", "oklch(0.25 0.08 158)", "oklch(0.35 0.11 158)", "oklch(0.45 0.125 158)", "oklch(0.57 0.11 158)", "oklch(0.70 0.08 158)", "oklch(0.83 0.05 158)", "oklch(0.95 0.02 158)"]},
+      "background": {"role": "neutral", "displayName": "Menu Stock", "canonical": "oklch(0.99 0.005 70)", "tonalRamp": ["oklch(0.15 0.005 70)", "oklch(0.26 0.005 70)", "oklch(0.38 0.005 70)", "oklch(0.50 0.005 70)", "oklch(0.62 0.005 70)", "oklch(0.74 0.005 70)", "oklch(0.87 0.005 70)", "oklch(0.99 0.005 70)"]},
+      "foreground": {"role": "neutral", "displayName": "Press Ink", "canonical": "oklch(0.18 0.012 45)", "tonalRamp": ["oklch(0.15 0.012 45)", "oklch(0.18 0.012 45)", "oklch(0.30 0.012 45)", "oklch(0.42 0.012 45)", "oklch(0.55 0.012 45)", "oklch(0.68 0.012 45)", "oklch(0.82 0.012 45)", "oklch(0.95 0.006 45)"]},
+      "border": {"role": "neutral", "displayName": "Cut Rule", "canonical": "color-mix(in srgb, var(--foreground) 26%, var(--background))", "tonalRamp": ["oklch(0.20 0.010 55)", "oklch(0.32 0.010 55)", "oklch(0.44 0.010 55)", "oklch(0.56 0.010 55)", "oklch(0.68 0.010 55)", "oklch(0.79 0.010 55)", "oklch(0.89 0.008 55)", "oklch(0.97 0.005 55)"]}
+    },
+    "typographyMeta": {
+      "display": {"displayName": "Masthead", "purpose": "The store name only, up to 5.25rem."},
+      "dish-name": {"displayName": "Dish Name", "purpose": "The menu line's name; ~30px in the board variant, ~17px in the dense list."},
+      "price": {"displayName": "Price Column", "purpose": "Tabular lining numerals; one column down the whole sheet."},
+      "label": {"displayName": "Printed Mark", "purpose": "Outline state marks, fold tabs, breadcrumbs, small print."},
+      "body": {"displayName": "Reading Voice", "purpose": "Geologica for anything that must be read: descriptions, forms, CMS copy."}
+    },
+    "shadows": [
+      {"name": "elev-sm", "value": "0 1px 0 0 color-mix(in srgb, var(--foreground) 12%, transparent)", "purpose": "Not a lift — the paper crease under the fold strip (.crease)."},
+      {"name": "elev-md", "value": "0 2px 6px -2px color-mix(in srgb, var(--foreground) 22%, transparent)", "purpose": "Available to libs/ui primitives; the theme's own surfaces do not use it."},
+      {"name": "elev-lg", "value": "0 6px 18px -8px color-mix(in srgb, var(--foreground) 28%, transparent)", "purpose": "Available to libs/ui primitives; unused by the theme."},
+      {"name": "elev-overlay", "value": "0 20px 48px -16px color-mix(in srgb, var(--foreground) 40%, transparent)", "purpose": "Drawers, dropdowns, the search suggestion panel — the only surfaces truly off the sheet. Always paired with a 2px ink border."}
+    ],
+    "motion": [
+      {"name": "motion-fast", "value": "90ms", "purpose": "Colour transitions on .dish, .fold, .dish-no and crop-mark opacity."},
+      {"name": "motion-base", "value": "150ms", "purpose": "Default state transitions."},
+      {"name": "motion-slow", "value": "480ms", "purpose": "The .impression wipe — the theme's only authored animation."},
+      {"name": "easing-standard", "value": "cubic-bezier(0.2, 0, 0, 1)", "purpose": "Every colour and opacity transition."},
+      {"name": "easing-emphasized", "value": "cubic-bezier(0.9, 0, 0.1, 1)", "purpose": "The press stroke: .impression only."}
+    ],
+    "breakpoints": [
+      {"name": "sm", "value": "640px"},
+      {"name": "md", "value": "768px"},
+      {"name": "lg", "value": "1024px"},
+      {"name": "xl", "value": "1280px"}
+    ]
+  },
+  "components": [
+    {
+      "name": "ADD Plate",
+      "kind": "button",
+      "refersTo": "add-button",
+      "description": "The dish line's action: a fold tab filled with the second ink plate.",
+      "html": "<button class=\"ds-add\" type=\"button\">ADD TO ORDER</button>",
+      "css": ".ds-add { display: inline-flex; align-items: center; justify-content: center; min-width: 6rem; height: 2.25rem; padding-inline: 0.85rem; border: 1px solid var(--primary, #AD0010); border-radius: 0; background: var(--primary, #AD0010); color: var(--primary-foreground, #fff); font-family: 'Alumni Sans', 'Arial Narrow', sans-serif; font-weight: 700; font-size: 0.75rem; letter-spacing: 0.045em; text-transform: uppercase; white-space: nowrap; transition: background-color 90ms cubic-bezier(0.2,0,0,1), color 90ms cubic-bezier(0.2,0,0,1); } .ds-add:hover { background: var(--hover-primary, #8B000A); border-color: var(--hover-primary, #8B000A); } .ds-add:focus-visible { outline: none; box-shadow: none; position: relative; } .ds-add:focus-visible::after { content: ''; position: absolute; inset: -5px; pointer-events: none; background-image: linear-gradient(var(--primary,#AD0010),var(--primary,#AD0010)),linear-gradient(var(--primary,#AD0010),var(--primary,#AD0010)),linear-gradient(var(--primary,#AD0010),var(--primary,#AD0010)),linear-gradient(var(--primary,#AD0010),var(--primary,#AD0010)),linear-gradient(var(--primary,#AD0010),var(--primary,#AD0010)),linear-gradient(var(--primary,#AD0010),var(--primary,#AD0010)),linear-gradient(var(--primary,#AD0010),var(--primary,#AD0010)),linear-gradient(var(--primary,#AD0010),var(--primary,#AD0010)); background-repeat: no-repeat; background-size: 11px 2px, 2px 11px, 11px 2px, 2px 11px, 11px 2px, 2px 11px, 11px 2px, 2px 11px; background-position: left top, left top, right top, right top, left bottom, left bottom, right bottom, right bottom; }"
+    },
+    {
+      "name": "Fold Tab",
+      "kind": "nav",
+      "refersTo": "fold-tab",
+      "description": "The category index tab under the masthead; the active one lights across its whole width.",
+      "html": "<nav class=\"ds-fold-strip\"><a class=\"ds-fold\" href=\"#\">MEZZE <span class=\"ds-fold-count\">12</span></a><a class=\"ds-fold\" href=\"#\" aria-current=\"page\">GRILLS <span class=\"ds-fold-count\">18</span></a><a class=\"ds-fold\" href=\"#\">SWEETS <span class=\"ds-fold-count\">7</span></a></nav>",
+      "css": ".ds-fold-strip { display: flex; align-items: stretch; } .ds-fold { display: inline-flex; align-items: center; gap: 0.4rem; min-height: 2.75rem; padding-inline: 0.85rem; margin-inline-start: -1px; border: 1px solid var(--foreground, #16100D); border-radius: 0; color: var(--foreground, #16100D); background: var(--background, #FEFBF8); text-decoration: none; font-family: 'Alumni Sans', 'Arial Narrow', sans-serif; font-weight: 700; font-size: 0.9375rem; letter-spacing: 0.045em; text-transform: uppercase; white-space: nowrap; transition: background-color 90ms cubic-bezier(0.2,0,0,1), color 90ms cubic-bezier(0.2,0,0,1); } .ds-fold-strip > .ds-fold:first-child { margin-inline-start: 0; } .ds-fold:hover { background: color-mix(in srgb, var(--primary, #AD0010) 8%, var(--background, #FEFBF8)); } .ds-fold[aria-current='page'] { background: var(--primary, #AD0010); color: var(--primary-foreground, #fff); border-color: var(--primary, #AD0010); } .ds-fold-count { font-family: Geologica, ui-sans-serif, system-ui, sans-serif; font-weight: 500; font-size: 0.6875rem; letter-spacing: 0; opacity: 0.7; font-variant-numeric: tabular-nums; }"
+    },
+    {
+      "name": "Dish Line",
+      "kind": "custom",
+      "refersTo": "dish-no",
+      "description": "The signature component: a product printed as a menu line — number box, name, dotted leader, tabular price.",
+      "html": "<article class=\"ds-dish\"><span class=\"ds-dish-no\">04-118</span><div class=\"ds-dish-body\"><div class=\"ds-dish-head\"><h3 class=\"ds-dish-name\">Charcoal Lamb Kofta</h3><span class=\"ds-leader\"></span></div><p class=\"ds-dish-desc\">Hand-minced lamb, parsley, sumac onion, flatbread.</p><span class=\"ds-mark ds-mark-sale\">SAVE 15%</span></div><span class=\"ds-price\">EGP 185.00</span></article>",
+      "css": ".ds-dish { position: relative; display: grid; grid-template-columns: auto minmax(0,1fr) auto; align-items: start; column-gap: 1rem; padding-block: 0.875rem; border-bottom: 1px solid color-mix(in srgb, var(--foreground,#16100D) 26%, var(--background,#FEFBF8)); transition: background-color 90ms cubic-bezier(0.2,0,0,1); } .ds-dish:hover { background: color-mix(in srgb, var(--primary,#AD0010) 8%, var(--background,#FEFBF8)); } .ds-dish-no { min-width: 2.5rem; min-height: 1.65rem; padding-inline: 0.3rem; text-align: center; border: 1px solid var(--foreground,#16100D); border-radius: 0; font-family: 'Alumni Sans','Arial Narrow',sans-serif; font-weight: 800; font-size: 0.8125rem; line-height: 1.6rem; letter-spacing: 0.04em; font-variant-numeric: tabular-nums lining-nums; } .ds-dish-body { display: flex; flex-direction: column; gap: 0.25rem; min-width: 0; } .ds-dish-head { display: flex; align-items: baseline; gap: 0.5rem; } .ds-dish-name { margin: 0; font-family: 'Alumni Sans','Arial Narrow',sans-serif; font-weight: 700; font-size: 1.0625rem; line-height: 1.02; letter-spacing: 0.005em; color: var(--foreground,#16100D); } .ds-leader { flex: 1 1 auto; min-width: 1.5rem; align-self: end; margin-bottom: 0.32em; border-bottom: 1px dotted color-mix(in srgb, var(--foreground,#16100D) 42%, var(--background,#FEFBF8)); } .ds-dish-desc { margin: 0; font-family: Geologica, ui-sans-serif, system-ui, sans-serif; font-size: 0.75rem; line-height: 1.35; color: color-mix(in srgb, var(--foreground,#16100D) 62%, var(--background,#FEFBF8)); } .ds-price { font-family: 'Alumni Sans','Arial Narrow',sans-serif; font-weight: 800; font-size: 1.0625rem; line-height: 1; white-space: nowrap; font-variant-numeric: tabular-nums lining-nums; color: var(--foreground,#16100D); } .ds-mark { align-self: flex-start; display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.1rem 0.35rem; border: 1px solid currentColor; border-radius: 0; font-family: 'Alumni Sans','Arial Narrow',sans-serif; font-weight: 700; font-size: 0.6875rem; line-height: 1.35; letter-spacing: 0.08em; text-transform: uppercase; } .ds-mark-sale { background: var(--primary,#AD0010); color: var(--primary-foreground,#fff); border-color: var(--primary,#AD0010); }"
+    },
+    {
+      "name": "Section Band",
+      "kind": "custom",
+      "refersTo": "section-band",
+      "description": "The running head naming a stretch of the menu, printed on the second ink plate.",
+      "html": "<div class=\"ds-band\"><h2 class=\"ds-band-title\">FROM THE GRILL</h2><a class=\"ds-band-action\" href=\"#\">SEE ALL</a></div>",
+      "css": ".ds-band { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.25rem 1rem; padding: 0.375rem 0.75rem; border-radius: 0; background: var(--primary,#AD0010); color: var(--primary-foreground,#fff); } .ds-band-title { margin: 0; font-family: 'Alumni Sans','Arial Narrow',sans-serif; font-weight: 800; font-size: 1.5rem; line-height: 1; letter-spacing: 0.005em; text-transform: uppercase; font-variant-numeric: tabular-nums lining-nums; } .ds-band-action { color: inherit; font-family: 'Alumni Sans','Arial Narrow',sans-serif; font-weight: 700; font-size: 0.6875rem; letter-spacing: 0.08em; text-transform: uppercase; text-decoration: none; } .ds-band-action:hover { text-decoration: underline; text-underline-offset: 0.18em; }"
+    },
+    {
+      "name": "Printed Mark",
+      "kind": "chip",
+      "refersTo": "mark",
+      "description": "Outline state printed in the line: sale, sold out, last few. In stock prints nothing.",
+      "html": "<span class=\"ds-mark2\">ONLY 3 LEFT</span> <span class=\"ds-mark2 ds-mark2-out\">SOLD OUT</span> <span class=\"ds-mark2 ds-mark2-offer\">IN STOCK</span>",
+      "css": ".ds-mark2 { display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.1rem 0.35rem; border: 1px solid currentColor; border-radius: 0; color: var(--foreground,#16100D); font-family: 'Alumni Sans','Arial Narrow',sans-serif; font-weight: 700; font-size: 0.6875rem; line-height: 1.35; letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap; font-variant-numeric: tabular-nums; } .ds-mark2-out { color: color-mix(in srgb, var(--foreground,#16100D) 62%, var(--background,#FEFBF8)); } .ds-mark2-offer { background: var(--accent,#00663E); color: var(--accent-foreground,#fff); border-color: var(--accent,#00663E); }"
+    },
+    {
+      "name": "Search Field",
+      "kind": "input",
+      "refersTo": null,
+      "description": "Suggestions-only search: zero radius, ink border, 2px primary focus outline (form controls cannot carry crop marks).",
+      "html": "<input class=\"ds-input\" type=\"search\" placeholder=\"Find a section or page\">",
+      "css": ".ds-input { width: 14rem; height: 2.25rem; padding-inline: 0.6rem; border: 1px solid var(--foreground,#16100D); border-radius: 0; background: var(--background,#FEFBF8); color: var(--foreground,#16100D); font-family: Geologica, ui-sans-serif, system-ui, sans-serif; font-size: 0.9375rem; caret-color: var(--primary,#AD0010); } .ds-input::placeholder { color: color-mix(in srgb, var(--foreground,#16100D) 62%, var(--background,#FEFBF8)); } .ds-input:focus-visible { outline: 2px solid var(--primary,#AD0010); outline-offset: 2px; }"
+    },
+    {
+      "name": "Order Tally",
+      "kind": "button",
+      "refersTo": "fold-tab",
+      "description": "The header's running count printed as a fold tab, not a bag icon; lights once the order has lines.",
+      "html": "<button class=\"ds-tally\" type=\"button\" data-active=\"true\">ITEMS <span class=\"ds-tally-n\">3</span></button>",
+      "css": ".ds-tally { display: inline-flex; align-items: center; gap: 0.5rem; height: 2.5rem; padding-inline: 0.75rem 0.5rem; border: 1px solid var(--foreground,#16100D); border-radius: 0; background: var(--background,#FEFBF8); color: var(--foreground,#16100D); font-family: 'Alumni Sans','Arial Narrow',sans-serif; font-weight: 700; font-size: 0.8125rem; letter-spacing: 0.045em; text-transform: uppercase; transition: background-color 90ms cubic-bezier(0.2,0,0,1), color 90ms cubic-bezier(0.2,0,0,1); } .ds-tally:hover { background: color-mix(in srgb, var(--primary,#AD0010) 8%, var(--background,#FEFBF8)); } .ds-tally[data-active='true'] { background: var(--primary,#AD0010); color: var(--primary-foreground,#fff); border-color: var(--primary,#AD0010); } .ds-tally-n { min-width: 1.5rem; padding-inline: 0.25rem; border: 1px solid currentColor; text-align: center; line-height: 1.25rem; font-variant-numeric: tabular-nums lining-nums; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Letterbox Menu",
+    "overview": "The storefront is the folded takeaway menu that came through the door. Every dish is a printed line — order number, name, dotted leader, price in one tabular column, ADD at the end. Sections are bands of the second ink plate. State is printed in outline (SALE / SOLD OUT / ONLY N LEFT), never toasted. The world refuses the full-bleed dark dish photo over rounded cards with a coloured add button that every food storefront ships, and it refuses the cream-and-serif fine-dining page just as hard.\n\nThe sheet is white menu stock carrying exactly two ink plates: ink (foreground) and the merchant's PRIMARY. Nothing else prints. Every radius token is 0; hairline rules replace cards; the primary appears only as flat fields — the masthead phone block, the section band, the active fold tab, every ADD, the ordered dish's number box. Density is deliberately high: a menu earns trust by fitting a lot of dishes on one sheet, and the shopper is meant to read down, not to browse a gallery.\n\nAttention is a registration crop mark, not a browser ring. Motion is a press clock: one authored moment (the second plate wiping across the line you just ordered) and nothing else — no entrance animations, all content visible by default.",
+    "keyCharacteristics": [
+      "Two ink plates on white stock: ink and the merchant PRIMARY. No third colour, no gradients.",
+      "Zero radius on every surface, control, image and overlay.",
+      "Hairline rules instead of cards; the sheet is flat, only floating surfaces cast shadow.",
+      "One price column down the whole sheet at every width — productGrid is 1 at every breakpoint.",
+      "Dishes are lines, never cards; pictures are small printed thumbs beside the line, never the subject.",
+      "Attention = crop marks; state = printed outline marks; motion = one wipe."
+    ],
+    "rules": [
+      {"name": "The Two Plates Rule", "body": "The sheet prints in ink and the merchant primary. A third colour appears only as --wash (8% primary), the spot-green offer mark, and the semantic error/warning/success roles the shell supplies for forms. Nothing else earns an ink.", "section": "colors"},
+      {"name": "The Flat Field Rule", "body": "The primary is only ever a flat, fully-saturated field with primary-foreground on it (.plate). Never a gradient, never at partial opacity as decoration, never a shadow tint.", "section": "colors"},
+      {"name": "The Bridge Rule", "body": "Never write --primary, --background or --foreground in tokens.css. The merchant's preset owns colour roles; the theme owns everything else.", "section": "colors"},
+      {"name": "The Printed Voice Rule", "body": ".press (Alumni Sans 800, uppercase, tabular numerals, text-wrap: balance) is the voice for anything that names or counts: masthead, bands, numbers, prices, marks, nav, small print. Everything a shopper has to read — dish descriptions, forms, policies — is Geologica. Do not mix.", "section": "typography"},
+      {"name": "The Tabular Numeral Rule", "body": "Every number that can align with another number (.price, .dish-no, .fold > .count, the order tally, pagination) is font-variant-numeric: tabular-nums lining-nums.", "section": "typography"},
+      {"name": "The Arabic Lead Rule", "body": "Never reorder the :lang(ar) font stacks to put a Latin face first. next/font's metric fallback for the Latin faces carries Arabic glyphs and will eat the Arabic text.", "section": "typography"},
+      {"name": "The One Column Rule", "body": "productGrid stays 1 at every breakpoint. If a surface needs more density, shorten the line — never add a column.", "section": "layout"},
+      {"name": "The Shared Rule Rule", "body": "Adjacent bordered items overlap by one pixel (-ms-px, -mt-px, -mx-px) so two 1px borders read as one printed rule, never as a 2px seam.", "section": "layout"},
+      {"name": "The Paper Rule", "body": "A surface that is part of the sheet gets a rule, never a shadow. A surface that floats over the sheet gets --elev-overlay and a 2px ink border. There is nothing in between.", "section": "elevation"},
+      {"name": "The Zero Radius Rule", "body": "No radius token, utility or inline value above 0 anywhere in this theme, including images, avatars and overlays.", "section": "shapes"},
+      {"name": "The Printed State Rule", "body": "State is printed where the thing is — an outline mark in the line, a filled number box, a lit tab. Never a toast, never a floating badge over a photo.", "section": "components"},
+      {"name": "The Crop Mark Rule", "body": "Attention in this theme is the registration crop mark. Never introduce a browser ring, a glow, or a coloured outline on anything that can carry ::after. Form controls are the deliberate exception: they keep a 2px primary outline because they cannot carry a pseudo-element.", "section": "components"},
+      {"name": "The One Impression Rule", "body": ".impression is the only authored animation in the theme. Nothing enters, nothing fades in on scroll, nothing bounces; all content is visible by default.", "section": "components"}
+    ],
+    "dos": [
+      "Do print a product as a line: number, thumb, name, dotted leader, price, action.",
+      "Do keep productGrid at {base:1, sm:1, lg:1, xl:1} and every price in one tabular column.",
+      "Do use .press for anything that names or counts and Geologica for anything that must be read.",
+      "Do reach for .fold, .plate, .mark, .dish-no, .crease, .crop, .press and .price before writing new CSS; the world grammar already exists.",
+      "Do keep new world-grammar CSS inside @layer components so Tailwind utilities on the same element still win.",
+      "Do overlap adjacent bordered items by one pixel so two borders read as one rule.",
+      "Do render .leader as hidden sm:block. It only makes sense where the price shares the row; on phones the price/action row's dotted top rule carries that function. Do not \"fix\" it back to always-on.",
+      "Do change colour by editing the THEME_DEFAULTS.hunger OKLCH seed in libs/types/scripts/build-color-schemas.mjs and running `npm run gen:colors` in libs/types.",
+      "Do keep the masthead short — the first section band and its dish lines must be reachable without scrolling, and the masthead must look finished with one slider image and with none.",
+      "Do put every string through t(); this theme adds no literal UI text and added no new locale keys."
+    ],
+    "donts": [
+      "Don't give anything a radius, a gradient, or a shadow that belongs to the sheet.",
+      "Don't turn dishes into photo cards, or make an image the subject of a line.",
+      "Don't author colour roles in tokens.css or hand-edit src/colors.ts; both are owned elsewhere.",
+      "Don't introduce a third ink beyond --wash, the spot-green offer mark, and the shell's semantic form roles.",
+      "Don't add entrance animations, scroll reveals, carousels between sections, or a second authored motion moment.",
+      "Don't use a toast, a floating badge, or an icon-in-a-circle for any state.",
+      "Don't put a Latin face first in the :lang(ar) stacks, or apply text-transform: uppercase / letter-spacing to Arabic text.",
+      "Don't remove the 2px primary outline on form controls; they cannot carry crop marks.",
+      "Don't repeat categories in the standing nav — the fold strip is the category index.",
+      "Don't reformat prices; they arrive pre-formatted from the API.",
+      "Don't build UI for text search, reviews or ratings, wishlists, promotions or coupons, or table reservations. The platform has none of them; this theme never pretends to book a table. Search is suggestions-only over categories and pages, and says so in its panel.",
+      "Don't edit storefront/**, fork libs/ui, or re-implement behaviour from libs/hooks. Restyle through tokens, variants and className only, and compose the shared hooks for cart, listing, purchase, search and user."
+    ]
+  }
+}

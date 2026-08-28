@@ -1,0 +1,93 @@
+:host {
+  display: block;
+  flex: none;
+  inline-size: var(--search-width, 15rem);
+  max-inline-size: 100%;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-tight);
+  inline-size: 100%;
+  min-inline-size: 0;
+  padding: .4rem .7rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--input);
+  color: var(--foreground-quiet);
+  transition: border-color var(--default-transition-duration);
+  --icon-size: .9rem;
+}
+
+.search-box:hover,
+.search-box:focus-within {
+  border-color: var(--primary);
+}
+
+.search-input {
+  flex: 1;
+  inline-size: 100%;
+  min-inline-size: 0;
+  border: 0;
+  background: none;
+  color: var(--foreground-strong);
+  font: inherit;
+  font-size: var(--text-xs);
+  outline: none;
+  /*
+   * A search term is data, not chrome: a SKU or an email typed into an Arabic page must not flip.
+   * `plaintext` still lets a genuinely Arabic term read correctly.
+   */
+  unicode-bidi: plaintext;
+}
+
+.search-input::placeholder {
+  color: var(--foreground-quiet);
+}
+
+/*
+ * WebKit draws its own cancel button, at a size and colour from a different design language than
+ * everything beside it. `type="search"` is kept for Escape-to-clear, which is the part worth having.
+ */
+.search-input::-webkit-search-cancel-button {
+  appearance: none;
+}
+
+/* Sized and toned like the one on `app-select`, because they sit in the same filter row. */
+.search-clear {
+  display: grid;
+  flex: none;
+  place-items: center;
+  inline-size: 1.25rem;
+  block-size: 1.25rem;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: none;
+  color: var(--foreground-quiet);
+  cursor: pointer;
+  transition:
+    background-color var(--default-transition-duration),
+    color var(--default-transition-duration);
+}
+
+.search-clear:hover {
+  background: var(--muted);
+  color: var(--foreground-strong);
+}
+
+.search-clear:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 1px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .search-clear {
+    transition: none;
+  }
+
+  .search-box {
+    transition: none;
+  }
+}

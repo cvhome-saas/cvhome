@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
 import {SharedModule} from '../../shared/shared.module';
 import {RouterOutlet} from '@angular/router';
 
@@ -8,12 +8,12 @@ import {RouterOutlet} from '@angular/router';
     SharedModule,
     RouterOutlet,
   ],
-  template:`
+  template: `
     <div class="page-content">
       <router-outlet/>
     </div>
   `,
 })
-export class ClientsComponent  {
+export class ClientsComponent {
 
 }

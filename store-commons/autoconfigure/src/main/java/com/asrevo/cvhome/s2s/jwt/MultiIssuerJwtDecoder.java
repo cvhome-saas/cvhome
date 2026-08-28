@@ -1,112 +1,68 @@
 package com.asrevo.cvhome.s2s.jwt;
 
-import java.text.ParseException;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtException;
 
-import com.asrevo.cvhome.s2s.utils.UrlNormalize;
-import com.nimbusds.jwt.JWTClaimsSet;
-import com.nimbusds.jwt.SignedJWT;
-
 /**
- * A {@link JwtDecoder} that supports multiple JWT issuers for synchronous environments.
- * It lazily initializes and caches a specific {@link JwtDecoder} for each issuer based on
- * the 'iss' claim in the JWT.
+ * A {@link JwtDecoder} that accepts tokens from more than one identity server for synchronous environments.
+ * The {@code iss} claim selects a realm through {@link IssuerRegistry}, and one delegate decoder is built and
+ * cached per realm.
+ *
+ * <p>
+ * The cache is keyed by realm rather than by issuer string: a realm answers on several URIs (an explicit
+ * default port or not, a shifted port, a path prefix) and they all share one signing key set, so keying by URI
+ * built the same decoder several times over.
+ * </p>
  */
 public class MultiIssuerJwtDecoder implements JwtDecoder {
 
-    private final Map<String, JwtDecoder> issuerDecoders = new ConcurrentHashMap<>();
+    private static final String NULL_DECODER = """
+            Decoder factory returned null for realm '%s'. \
+            This indicates an issue with the factory configuration.""";
 
-    private final Set<String> supportedIssuerUris;
+    private final Map<String, JwtDecoder> realmDecoders = new ConcurrentHashMap<>();
 
-    private final Function<String, JwtDecoder> decoderFactory;
+    private final IssuerRegistry registry;
+
+    private final Function<IssuerRealm, JwtDecoder> decoderFactory;
 
     /**
-     * Constructs a {@code MultiIssuerJwtDecoder}.
-     *
-     * @param supportedIssuerUris A set of trusted issuer URIs that this decoder will
-     *                            handle. An attempt to decode a token from an issuer not in this set will result in
-     *                            an error. Must not be null.
-     * @param decoderFactory      A function that takes an issuer URI (String) and returns a
-     *                            {@link JwtDecoder} configured for that issuer. This factory is invoked lazily when
-     *                            a token from a new, supported issuer is encountered, and its result is cached. Must
-     *                            not be null. The factory should throw an exception if it cannot create a decoder
-     *                            for a given supported issuer URI.
+     * @param registry       the realms this decoder trusts. Must not be null.
+     * @param decoderFactory builds the delegate decoder for a realm, invoked lazily on first use and cached.
+     *                       Must not be null, and should throw rather than return null when it cannot build one.
      */
-    public MultiIssuerJwtDecoder(Set<String> supportedIssuerUris, Function<String, JwtDecoder> decoderFactory) {
-        Objects.requireNonNull(supportedIssuerUris, "supportedIssuerUris cannot be null");
-        Objects.requireNonNull(decoderFactory, "decoderFactory cannot be null");
-
-        this.supportedIssuerUris = supportedIssuerUris.stream()
-                .map(UrlNormalize::normalizeUri)
-                .collect(Collectors.toSet());
-        this.decoderFactory = decoderFactory;
+    public MultiIssuerJwtDecoder(IssuerRegistry registry, Function<IssuerRealm, JwtDecoder> decoderFactory) {
+        this.registry = Objects.requireNonNull(registry, "registry cannot be null");
+        this.decoderFactory = Objects.requireNonNull(decoderFactory, "decoderFactory cannot be null");
     }
 
     @Override
     public Jwt decode(String token) throws JwtException {
         Objects.requireNonNull(token, "token cannot be null");
         try {
-            String issuer = extractIssuer(token);
-            JwtDecoder delegateDecoder = getDecoderForIssuer(issuer);
-            return delegateDecoder.decode(token);
+            IssuerRealm realm = this.registry.resolve(token);
+            return decoderFor(realm).decode(token);
         } catch (JwtException e) {
+            // Passes a BadJwtException through unchanged, which is what keeps a client's bad token a 401.
             throw e;
         } catch (Exception e) {
-            throw new JwtException("Failed to decode JWT: " + e.getMessage(), e);
+            // Building the delegate failed — JWKS or discovery unreachable. Ours to fix, so it stays a 500.
+            throw new JwtException("Failed to decode JWT: %s".formatted(e.getMessage()), e);
         }
     }
 
-    /**
-     * Retrieves or creates a {@link JwtDecoder} for the given issuer.
-     *
-     * @param issuer The issuer URI.
-     * @return The {@link JwtDecoder} for the issuer.
-     * @throws JwtException if the issuer is unsupported or the factory fails to create a
-     *                      decoder.
-     */
-    private JwtDecoder getDecoderForIssuer(String issuer) throws JwtException {
-        if (!this.supportedIssuerUris.contains(issuer)) {
-            throw new JwtException(String.format(
-                    "Unsupported issuer: '%s'. Issuer not in the configured list of" + " supported issuers: %s.",
-                    issuer, this.supportedIssuerUris));
+    private JwtDecoder decoderFor(IssuerRealm realm) {
+        JwtDecoder delegate = this.realmDecoders.computeIfAbsent(realm.name(), name -> this.decoderFactory.apply(realm));
+        if (delegate == null) {
+            throw new JwtException(NULL_DECODER.formatted(realm.name()));
         }
-        JwtDecoder delegateDecoder = this.issuerDecoders.computeIfAbsent(issuer, this.decoderFactory);
-        if (delegateDecoder == null) {
-            throw new JwtException(String.format("Decoder factory returned null for supported issuer: '%s'. This"
-                    + " indicates an issue with the factory configuration.", issuer));
-        }
-        return delegateDecoder;
-    }
-
-    /**
-     * Extracts the 'iss' (issuer) claim from the JWT.
-     *
-     * @param token The JWT string.
-     * @return The issuer URI.
-     * @throws JwtException if the token cannot be parsed or the 'iss' claim is missing or
-     *                      empty.
-     */
-    private String extractIssuer(String token) throws JwtException {
-        try {
-            SignedJWT signedJWT = SignedJWT.parse(token);
-            JWTClaimsSet claimsSet = signedJWT.getJWTClaimsSet();
-            String issuer = claimsSet.getIssuer();
-            if (issuer == null || issuer.trim().isEmpty()) {
-                throw new JwtException("Missing or empty 'iss' (issuer) claim in token");
-            }
-            return issuer;
-        } catch (ParseException e) {
-            throw new JwtException("Failed to parse token to extract issuer: " + e.getMessage(), e);
-        }
+        return delegate;
     }
 
 }

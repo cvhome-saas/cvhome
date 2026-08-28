@@ -1,0 +1,83 @@
+<!-- close/cancel are the platform's own dismissal signals: the backdrop and Escape. -->
+<dialog #dialog class="summary" (close)="dismissed.emit()" (cancel)="dismissed.emit()">
+  <div class="summary-body">
+    <header class="summary-head">
+      <div class="summary-heading">
+        <h2 class="summary-title">{{ title() }}</h2>
+        <span class="summary-ref" dir="auto">{{ reference() }}</span>
+      </div>
+      @if (summary(); as order) {
+        <app-badge [tone]="order.tone" shape="square">{{ order.status }}</app-badge>
+      }
+      <!--
+        The way out of the summary. Only offered once the order has actually loaded — a link to a
+        page that could not be read is worse than no link.
+      -->
+      @if (summary()) {
+        <button
+          class="icon-action summary-open"
+          type="button"
+          [attr.aria-label]="openOrderLabel()"
+          [title]="openOrderLabel()"
+          (click)="opened.emit()"
+        >
+          <app-icon name="externalLink" />
+        </button>
+      }
+      <button class="icon-action summary-close" type="button" [attr.aria-label]="closeLabel()" (click)="close()">
+        <app-icon name="x" />
+      </button>
+    </header>
+
+    @if (error()) {
+      <p class="summary-note" role="alert">{{ errorLabel() }}</p>
+    } @else if (loading() && !summary()) {
+      <p class="summary-note">{{ loadingLabel() }}</p>
+    } @else if (summary(); as order) {
+      <dl class="summary-facts">
+        <div>
+          <dt>{{ customerLabel() }}</dt>
+          <dd>
+            <strong>{{ order.customer }}</strong>
+            @if (order.email) {
+              <small class="summary-email">{{ order.email }}</small>
+            }
+          </dd>
+        </div>
+        <div>
+          <dt>{{ placedLabel() }}</dt>
+          <dd>{{ order.placedOn ? (order.placedOn | translocoDate: {dateStyle: 'medium', timeStyle: 'short'}) : '—' }}</dd>
+        </div>
+      </dl>
+
+      @if (order.lines.length) {
+        <p class="summary-items-head">
+          {{ itemsHeading() }} <span class="summary-items-count">{{ order.lines.length }}</span>
+        </p>
+        <!--
+          The fade belongs to the wrapper, not the list: a pseudo-element inside the scroller would
+          scroll away with the content. It is harmless on a short order, where it overlays the
+          dialog's own background and cannot be seen.
+        -->
+        <div class="summary-lines-wrap">
+          <ul class="summary-lines">
+            @for (line of order.lines; track line.id) {
+              <li class="summary-line">
+                <span class="summary-line-name">{{ line.name }}</span>
+                <span class="summary-line-qty">{{ quantityLabel() }} {{ line.quantity }}</span>
+                <span class="summary-line-total">{{ line.lineTotal }}</span>
+              </li>
+            }
+          </ul>
+        </div>
+      } @else {
+        <p class="summary-note">{{ itemsLabel() }}</p>
+      }
+
+      <footer class="summary-total">
+        <span>{{ totalLabel() }}</span>
+        <strong>{{ order.total }}</strong>
+      </footer>
+    }
+  </div>
+</dialog>

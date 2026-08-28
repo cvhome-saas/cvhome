@@ -1,0 +1,444 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-08-26T00:00:00Z",
+  "title": "Design System: Pink — Tokyo Girls Issue",
+  "extensions": {
+    "colorMeta": {
+      "primary": {
+        "role": "primary",
+        "displayName": "The Flood",
+        "canonical": "var(--primary)",
+        "note": "Injected per request from the merchant's ColorTheme preset via libs/theme/src/merchant-bridge.ts; the theme owns no hex and declares no mapMerchantColors hook. Aliased --flood. Owns whole regions: the cover, category and blog openers, the announcement, drawer heads, the open contents entry, the basket tab, the active account tab, the selected option, the ADDED flag, the state-block icon square, plus the ring, caret, accent-color, scrollbar thumb and ::selection. Default palette #E52995 (OKLCH seed oklch(0.62 0.235 352)).",
+        "tonalRamp": [
+          "color-mix(in oklch, var(--primary), black 75%)",
+          "color-mix(in oklch, var(--primary), black 55%)",
+          "color-mix(in oklch, var(--primary), black 35%)",
+          "color-mix(in oklch, var(--primary), black 15%)",
+          "var(--primary)",
+          "color-mix(in oklch, var(--primary), white 25%)",
+          "color-mix(in oklch, var(--primary), white 50%)",
+          "color-mix(in oklch, var(--primary), white 80%)"
+        ]
+      },
+      "primary-foreground": {
+        "role": "primary",
+        "displayName": "Flood Print",
+        "canonical": "var(--primary-foreground)",
+        "note": "Aliased --flood-ink; chosen white/near-black by contrast in the bridge. On the default palette it resolves to #111111 and clears the flood by only 4.57:1 — the measured reason nothing may be dimmed on a flooded field (.flood .dim resets to inherit)."
+      },
+      "accent": {
+        "role": "tertiary",
+        "displayName": "The Flag",
+        "canonical": "var(--accent)",
+        "note": "Aliased --flag. The notched pennant and nothing else: every price, every callout the issue prints beside a picture. Never a field, a rule or a text colour. Default palette #FCD521 (oklch(0.88 0.175 95)), 13.2:1 against its chosen print.",
+        "tonalRamp": [
+          "color-mix(in oklch, var(--accent), black 75%)",
+          "color-mix(in oklch, var(--accent), black 55%)",
+          "color-mix(in oklch, var(--accent), black 35%)",
+          "color-mix(in oklch, var(--accent), black 15%)",
+          "var(--accent)",
+          "color-mix(in oklch, var(--accent), white 25%)",
+          "color-mix(in oklch, var(--accent), white 50%)",
+          "color-mix(in oklch, var(--accent), white 80%)"
+        ]
+      },
+      "accent-foreground": {
+        "role": "tertiary",
+        "displayName": "Flag Print",
+        "canonical": "var(--accent-foreground)",
+        "note": "Aliased --flag-ink; the price printed on the pennant."
+      },
+      "secondary": {
+        "role": "secondary",
+        "displayName": "The Wash",
+        "canonical": "var(--secondary)",
+        "note": "Aliased --wash. The petal support field: alternating home feature bands, image beds behind die-cuts and cart thumbnails, table header rows, the mobile nav's expanded children, the search panel's scope note; a .cell hovers to 45% of it over paper. Default palette #FCD0E3.",
+        "tonalRamp": [
+          "color-mix(in oklch, var(--secondary), black 75%)",
+          "color-mix(in oklch, var(--secondary), black 55%)",
+          "color-mix(in oklch, var(--secondary), black 35%)",
+          "color-mix(in oklch, var(--secondary), black 15%)",
+          "var(--secondary)",
+          "color-mix(in oklch, var(--secondary), white 25%)",
+          "color-mix(in oklch, var(--secondary), white 50%)",
+          "color-mix(in oklch, var(--secondary), white 80%)"
+        ]
+      },
+      "background": {
+        "role": "neutral",
+        "displayName": "Paper",
+        "canonical": "var(--background)",
+        "note": "Aliased --paper: the page, the masthead, every .cell, every input, and the print inside an ink field. Default palette #FEF8FB.",
+        "tonalRamp": [
+          "color-mix(in oklch, var(--background), var(--foreground) 85%)",
+          "color-mix(in oklch, var(--background), var(--foreground) 70%)",
+          "color-mix(in oklch, var(--background), var(--foreground) 55%)",
+          "color-mix(in oklch, var(--background), var(--foreground) 40%)",
+          "color-mix(in oklch, var(--background), var(--foreground) 25%)",
+          "color-mix(in oklch, var(--background), var(--foreground) 14%)",
+          "color-mix(in oklch, var(--background), var(--foreground) 6%)",
+          "var(--background)"
+        ]
+      },
+      "foreground": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "var(--foreground)",
+        "note": "Aliased --ink and --hair: all text, every hairline, the .pagemark field, .flag-ink, the SHOP NOW pill, the colophon (.ink-field), the page-turn chips and the swiper bullets. Default palette #1F111A, 17.4:1 on paper.",
+        "tonalRamp": [
+          "var(--foreground)",
+          "color-mix(in oklch, var(--foreground), var(--background) 14%)",
+          "color-mix(in oklch, var(--foreground), var(--background) 28%)",
+          "color-mix(in oklch, var(--foreground), var(--background) 42%)",
+          "color-mix(in oklch, var(--foreground), var(--background) 56%)",
+          "color-mix(in oklch, var(--foreground), var(--background) 70%)",
+          "color-mix(in oklch, var(--foreground), var(--background) 84%)",
+          "color-mix(in oklch, var(--foreground), var(--background) 94%)"
+        ]
+      },
+      "hair-soft": {
+        "role": "neutral",
+        "displayName": "Soft Hair",
+        "canonical": "color-mix(in srgb, var(--foreground) 22%, transparent)",
+        "note": "The only quieter line in the issue: input and textarea borders, and the ruled lines of the order slip's blank stock (.ruled-stock, 2.75rem pitch)."
+      },
+      "ink-dim": {
+        "role": "neutral",
+        "displayName": "Quiet Ink",
+        "canonical": "color-mix(in srgb, var(--foreground) 65%, transparent)",
+        "note": "The .dim register — contents-row section numbers, child counts, the item count beside a section opener, the search suggestion's kind label. Composited over its own ground: 5.6:1 on paper, 5.0:1 on the wash. Reset to `inherit` on .flood and .ink-field, where nothing may be dimmed."
+      },
+      "tone-ink": {
+        "role": "neutral",
+        "displayName": "Screentone (ink)",
+        "canonical": "color-mix(in srgb, var(--foreground) 30%, transparent)",
+        "note": "Feeds .tone, the 7px halftone dot over an ink ground. Declared and unused in the build — not canonized."
+      },
+      "tone-light": {
+        "role": "neutral",
+        "displayName": "Screentone (light)",
+        "canonical": "color-mix(in srgb, var(--primary-foreground) 34%, transparent)",
+        "note": "The 7px halftone laid under every flooded field: the cover, the announcement, the category and blog openers, the cart drawer head."
+      },
+      "muted-foreground": {
+        "role": "neutral",
+        "displayName": "Print Grey",
+        "canonical": "var(--muted-foreground)",
+        "note": "Facts on paper: the manufacturer line, struck originals, timestamps, addresses, helper copy. AA-guarded by the bridge against the page background only (4.7:1 there, 3.6:1 on the wash) — keep it on paper."
+      },
+      "border": {
+        "role": "neutral",
+        "displayName": "Preset Border",
+        "canonical": "var(--border)",
+        "note": "Reaches the theme only through the shared primitives; the theme draws its own lines in --hair (ink) or --hair-soft."
+      },
+      "sale": {
+        "role": "tertiary",
+        "displayName": "Sale",
+        "canonical": "var(--sale)",
+        "note": "The preset's error role via the bridge. The SAVE N% / SALE flag, and the marker's own ink — the ring around a discounted price, the arrow at a low-stock count.",
+        "tonalRamp": [
+          "color-mix(in oklch, var(--sale), black 75%)",
+          "color-mix(in oklch, var(--sale), black 55%)",
+          "color-mix(in oklch, var(--sale), black 35%)",
+          "color-mix(in oklch, var(--sale), black 15%)",
+          "var(--sale)",
+          "color-mix(in oklch, var(--sale), white 25%)",
+          "color-mix(in oklch, var(--sale), white 50%)",
+          "color-mix(in oklch, var(--sale), white 80%)"
+        ]
+      },
+      "sale-foreground": {
+        "role": "tertiary",
+        "displayName": "Sale Print",
+        "canonical": "var(--sale-foreground)",
+        "note": "Text on the sale pennant; 6.6:1 on the default palette."
+      },
+      "success": {
+        "role": "tertiary",
+        "displayName": "In Stock",
+        "canonical": "var(--success)",
+        "note": "One line of cover-line text in the buy box. Never a field — the theme has no success surface."
+      },
+      "destructive": {
+        "role": "tertiary",
+        "displayName": "Fault",
+        "canonical": "var(--destructive)",
+        "note": "Field errors and the failed-order mark through the shared primitives; never a surface."
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Dela Gothic One 400, line-height 0.88, -0.03em: the cover title (3rem → 4rem sm → 5.5rem lg), the colophon store name, section openers (1.625 → 2.25rem), page titles (2.25–3rem), drawer titles (1.625rem), cover-line entries (1.25–1.625rem)."
+      },
+      "cover-line": {
+        "displayName": "Cover Line",
+        "purpose": "The tracked caps set over a photograph: 0.8125rem, +0.12em, uppercase — contents entries, breadcrumbs, imprint links, filter legends, table heads, tab labels, the subtotal label, result counts, SHOP NOW."
+      },
+      "figure": {
+        "displayName": "Figure",
+        "purpose": "Every printed number not on a flag: display face, tabular lining, -0.01em — contents numbers, counts, quantities, order ids, dates, phone numbers."
+      },
+      "price": {
+        "displayName": "Price",
+        "purpose": "The final figure riding the pennant: 1.0625rem on a die-cut, 2.25rem in the buy box; the struck original beside it in the display face at 0.8125 / 1.0625rem print grey."
+      },
+      "flag": {
+        "displayName": "Flag",
+        "purpose": "The pennant's own voice: 0.8125rem (0.9375rem on a die-cut, 1.25rem for subtotals and totals), line-height 1.1, tabular lining."
+      },
+      "pagemark": {
+        "displayName": "Page Mark",
+        "purpose": "The address system: 0.6875rem, +0.1em, tabular — section numbers, page x of y, order numbers and statuses, SKUs (as .pagemark-open)."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Every form label: display face 0.6875rem, +0.1em, uppercase; tracking and case dropped in Arabic."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "M PLUS Rounded 1c 400, 0.9375rem / 1.55 (prose 1.7): page copy, facts, inputs, messages."
+      },
+      "entry-name": {
+        "displayName": "Product Name",
+        "purpose": "The die-cut's and cart line's name slot: M PLUS Rounded 1c 700, 0.8125rem, leading 1.2, 2-line clamp. The buy-box name is .display at 2.25–3rem."
+      },
+      "marker": {
+        "displayName": "Marker",
+        "purpose": "The reader's pen: M PLUS Rounded 1c 800, 0.6875rem, sale-coloured, rotated -4deg, beside a drawn-on stroke mark."
+      }
+    },
+    "shadows": [
+      {
+        "name": "elev-sm",
+        "value": "0 1px 2px rgb(31 17 26 / 0.10)",
+        "purpose": "Declared for the shared primitives; referenced by no theme element (not canonized). Inputs and select triggers explicitly reset box-shadow to none."
+      },
+      {
+        "name": "elev-md",
+        "value": "0 2px 4px rgb(31 17 26 / 0.10), 0 10px 24px -12px rgb(31 17 26 / 0.28)",
+        "purpose": "The rail's prev / next ink chips — the only floating control in the world."
+      },
+      {
+        "name": "elev-lg",
+        "value": "0 4px 8px rgb(31 17 26 / 0.12), 0 22px 44px -18px rgb(31 17 26 / 0.34)",
+        "purpose": "Lifted paper: the dev toast."
+      },
+      {
+        "name": "elev-overlay",
+        "value": "0 28px 56px -20px rgb(31 17 26 / 0.45)",
+        "purpose": "The search suggestion panel, menus and drawers via the shell's shadow-overlay."
+      }
+    ],
+    "motion": [
+      {
+        "name": "motion-fast",
+        "value": "110ms",
+        "purpose": "Colour, border and brightness transitions: cell hover wash, contents entry flood, basket tab, thumbnails, option chips, the SHOP NOW 2px lift, the FAQ plus rotation."
+      },
+      {
+        "name": "motion-base",
+        "value": "190ms",
+        "purpose": "The die-cut's second-image cross-fade on hover."
+      },
+      {
+        "name": "motion-slow",
+        "value": "460ms",
+        "purpose": "Both keyframes: pink-snap (the ADDED flag) and pink-draw (the marker stroke, 120ms delay)."
+      },
+      {
+        "name": "easing-standard",
+        "value": "cubic-bezier(0.2, 0, 0, 1)",
+        "purpose": "Default easing for state transitions and the marker draw-on."
+      },
+      {
+        "name": "easing-emphasized",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "The one authored moment: pink-snap — scale 1.6 / rotate -12deg / opacity 0, overshooting to 0.95 / +2deg at 58%, settling at 1 / 0deg. Fired by the basket's real quantity rising (inCart > seenInCart), never by the click; disabled entirely under prefers-reduced-motion."
+      }
+    ],
+    "breakpoints": [
+      {"name": "sm", "value": "640px"},
+      {"name": "md", "value": "768px"},
+      {"name": "lg", "value": "1024px"},
+      {"name": "xl", "value": "1280px"}
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The one primary action per view (ADD TO CART, CHECKOUT, PLACE ORDER): the merchant primary as a flooded pill, label in the cover face.",
+      "html": "<button class=\"ds-btn-primary\">Add to cart</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; height: 2.5rem; padding: 0 1.5rem; background: var(--primary); color: var(--primary-foreground); border: 0; border-radius: 9999px; box-shadow: none; font-family: var(--font-pink-display), var(--font-pink-arabic), var(--font-pink-sans), sans-serif; font-weight: 400; font-size: 0.8125rem; letter-spacing: 0.03em; line-height: 1; cursor: pointer; transition: opacity 110ms cubic-bezier(0.2, 0, 0, 1); } .ds-btn-primary:hover:not(:disabled) { opacity: 0.9; } .ds-btn-primary:focus-visible { outline: none; box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 32%, transparent); } .ds-btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }"
+    },
+    {
+      "name": "Price Flag",
+      "kind": "chip",
+      "refersTo": "flag-price",
+      "description": "The signature: every price rides a notched pennant of flat accent, with the struck original beside it — never on it. Sale and sold out are the same pennant in other liveries.",
+      "html": "<div class=\"ds-flags\"><p class=\"ds-price-flag\"><del>SAR 440.00</del><span class=\"ds-price-final\">SAR 350.00</span></p><span class=\"ds-flag ds-flag-sale\">Save 20%</span><span class=\"ds-flag ds-flag-ink\">Out of stock</span></div>",
+      "css": ".ds-flags { display: flex; flex-direction: column; align-items: flex-start; gap: 0.75rem; } .ds-price-flag { display: flex; align-items: center; gap: 0.5rem; margin: 0; } .ds-price-flag del { font-family: var(--font-pink-display), var(--font-pink-arabic), var(--font-pink-sans), sans-serif; font-size: 0.8125rem; color: var(--muted-foreground); font-variant-numeric: tabular-nums lining-nums; } .ds-price-final { display: inline-flex; align-items: center; padding: 0.3em 0.85em 0.26em 0.6em; background: var(--accent); color: var(--accent-foreground); font-family: var(--font-pink-display), var(--font-pink-arabic), var(--font-pink-sans), sans-serif; font-weight: 400; font-size: 1.0625rem; line-height: 1.1; font-variant-numeric: tabular-nums lining-nums; clip-path: polygon(0 0, 100% 0, calc(100% - 0.55em) 50%, 100% 100%, 0 100%); } .ds-flag { display: inline-flex; align-items: center; gap: 0.35em; padding: 0.3em 0.85em 0.26em 0.6em; background: var(--accent); color: var(--accent-foreground); font-family: var(--font-pink-display), var(--font-pink-arabic), var(--font-pink-sans), sans-serif; font-weight: 400; font-size: 0.8125rem; line-height: 1.1; white-space: nowrap; font-variant-numeric: tabular-nums lining-nums; clip-path: polygon(0 0, 100% 0, calc(100% - 0.55em) 50%, 100% 100%, 0 100%); } .ds-flag-sale { background: var(--sale); color: var(--sale-foreground); } .ds-flag-ink { background: var(--foreground); color: var(--background); }"
+    },
+    {
+      "name": "Page Mark",
+      "kind": "custom",
+      "refersTo": "pagemark",
+      "description": "The issue's address system: a solid ink tab in the cover face for section numbers, page x of y and order numbers; the open variant is the same tab drawn as a hairline outline for SKUs and table statuses.",
+      "html": "<div class=\"ds-marks\"><span class=\"ds-pagemark\">01</span><span class=\"ds-pagemark\">Page 2 of 7</span><span class=\"ds-pagemark ds-pagemark-open\">SKU <span dir=\"ltr\">ZR-CL-DRS02</span></span></div>",
+      "css": ".ds-marks { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; } .ds-pagemark { display: inline-flex; align-items: center; gap: 0.35em; padding: 0.3em 0.6em 0.26em; background: var(--foreground); color: var(--background); font-family: var(--font-pink-display), var(--font-pink-arabic), var(--font-pink-sans), sans-serif; font-weight: 400; font-size: 0.6875rem; letter-spacing: 0.1em; line-height: 1; font-variant-numeric: tabular-nums; white-space: nowrap; } .ds-pagemark-open { background: transparent; color: var(--foreground); border: 1px solid var(--foreground); }"
+    },
+    {
+      "name": "Die-cut (cell on a plate)",
+      "kind": "card",
+      "refersTo": "cell",
+      "description": "Two entries on a ruled plate: the plate's 1px gaps are the rules and every child is paper. Picture 4:5 on the wash, the annotation row across the top, the price on its flag, one full-width action; hover washes the cell.",
+      "html": "<ul class=\"ds-plate\"><li class=\"ds-cell\"><a class=\"ds-cut\" href=\"#\" aria-label=\"Satin midi dress\"><span class=\"ds-annot\"><span class=\"ds-flag ds-flag-sale\">Save 20%</span></span></a><div class=\"ds-foot\"><h3 class=\"ds-name\"><a href=\"#\">Satin Effect Midi Dress</a></h3><p class=\"ds-price-flag\"><del>SAR 440.00</del><span class=\"ds-price-final\">SAR 350.00</span></p><button class=\"ds-btn-primary\">Add to cart</button></div></li><li class=\"ds-cell\"><a class=\"ds-cut\" href=\"#\" aria-label=\"Card holder\"><span class=\"ds-added ds-flag\">Added</span></a><div class=\"ds-foot\"><h3 class=\"ds-name\"><a href=\"#\">Heart Charm Card Holder</a></h3><p class=\"ds-price-flag\"><span class=\"ds-price-final\">SAR 89.00</span></p><button class=\"ds-btn-primary\">In basket (1)</button></div></li></ul>",
+      "css": ".ds-plate { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: var(--foreground); border: 1px solid var(--foreground); list-style: none; margin: 0; padding: 0; max-width: 30rem; } .ds-cell { position: relative; display: flex; flex-direction: column; background: var(--background); min-width: 0; transition: background-color 110ms cubic-bezier(0.2, 0, 0, 1); } .ds-cell:hover { background: color-mix(in srgb, var(--secondary) 45%, var(--background)); } .ds-cut { position: relative; display: block; aspect-ratio: 4 / 5; background: var(--secondary); } .ds-annot { position: absolute; inset-inline: 0.5rem; top: 0.5rem; display: flex; flex-direction: column; align-items: flex-start; gap: 0.375rem; } .ds-added { position: absolute; inset-inline-end: 0.5rem; bottom: 0.5rem; background: var(--primary); color: var(--primary-foreground); font-size: 0.9375rem; animation: ds-pink-snap 460ms cubic-bezier(0.16, 1, 0.3, 1) both; } @keyframes ds-pink-snap { 0% { scale: 1.6; rotate: -12deg; opacity: 0; } 58% { scale: 0.95; rotate: 2deg; opacity: 1; } 100% { scale: 1; rotate: 0deg; opacity: 1; } } @media (prefers-reduced-motion: reduce) { .ds-added { animation: none; } } .ds-foot { display: flex; flex: 1; flex-direction: column; gap: 0.5rem; border-top: 1px solid var(--foreground); padding: 0.75rem; } .ds-name { margin: 0; font-family: var(--font-pink-sans), var(--font-pink-arabic), ui-sans-serif, system-ui, sans-serif; font-size: 0.8125rem; font-weight: 700; line-height: 1.2; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; } .ds-name a { color: inherit; text-decoration: none; } .ds-name a:hover { text-decoration: underline; } .ds-price-flag { display: flex; align-items: center; gap: 0.5rem; margin: 0 0 auto; } .ds-price-flag del { font-family: var(--font-pink-display), var(--font-pink-arabic), var(--font-pink-sans), sans-serif; font-size: 0.8125rem; color: var(--muted-foreground); font-variant-numeric: tabular-nums lining-nums; } .ds-price-final, .ds-flag { display: inline-flex; align-items: center; padding: 0.3em 0.85em 0.26em 0.6em; background: var(--accent); color: var(--accent-foreground); font-family: var(--font-pink-display), var(--font-pink-arabic), var(--font-pink-sans), sans-serif; font-weight: 400; font-size: 1.0625rem; line-height: 1.1; white-space: nowrap; font-variant-numeric: tabular-nums lining-nums; clip-path: polygon(0 0, 100% 0, calc(100% - 0.55em) 50%, 100% 100%, 0 100%); } .ds-flag { font-size: 0.9375rem; } .ds-flag-sale { background: var(--sale); color: var(--sale-foreground); } .ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; width: 100%; height: 2rem; padding: 0 0.75rem; background: var(--primary); color: var(--primary-foreground); border: 0; border-radius: 9999px; font-family: var(--font-pink-display), var(--font-pink-arabic), var(--font-pink-sans), sans-serif; font-weight: 400; font-size: 0.8125rem; letter-spacing: 0.03em; cursor: pointer; transition: opacity 110ms cubic-bezier(0.2, 0, 0, 1); } .ds-btn-primary:hover { opacity: 0.9; }"
+    },
+    {
+      "name": "Marker Annotation",
+      "kind": "custom",
+      "refersTo": "marker",
+      "description": "The reader's own pen: one stroke language (2.2px, round caps, drawn on over 460ms) pointing at a fact the shop actually knows — a last-few-units count, a discounted price. Never decoration.",
+      "html": "<div class=\"ds-annots\"><span class=\"ds-marker\"><svg viewBox=\"0 0 34 20\" aria-hidden class=\"ds-arrow\"><path class=\"ds-stroke\" style=\"--len:60\" d=\"M2 4c9 12 20 13 29 12\"/><path class=\"ds-stroke\" style=\"--len:30\" d=\"M24 11.5l7 4.5-6.5 3\"/></svg>Only 3 left</span><span class=\"ds-ringed\"><span class=\"ds-price-final\">SAR 350.00</span><svg viewBox=\"0 0 64 30\" aria-hidden preserveAspectRatio=\"none\" class=\"ds-ring\"><path class=\"ds-stroke\" style=\"--len:200\" d=\"M50 5.5C41 1.5 22 1 11 6.5 2.5 10.8 1.5 19 9 23.5c9 5.4 30 6 41 1 8.4-3.8 9.8-11.4 3.2-16\"/></svg></span></div>",
+      "css": ".ds-annots { display: flex; flex-direction: column; align-items: flex-start; gap: 1.5rem; padding: 0.5rem 1.25rem; } .ds-marker { display: inline-flex; align-items: center; gap: 0.3em; font-family: var(--font-pink-sans), var(--font-pink-arabic), ui-sans-serif, system-ui, sans-serif; font-weight: 800; font-size: 0.6875rem; line-height: 1; color: var(--sale); rotate: -4deg; } .ds-marker svg { overflow: visible; } .ds-arrow { height: 1rem; width: 1.75rem; flex-shrink: 0; } .ds-stroke { stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; fill: none; stroke-dasharray: var(--len, 200); stroke-dashoffset: var(--len, 200); animation: ds-pink-draw 460ms cubic-bezier(0.2, 0, 0, 1) 120ms forwards; } @keyframes ds-pink-draw { to { stroke-dashoffset: 0; } } @media (prefers-reduced-motion: reduce) { .ds-stroke { animation: none; stroke-dashoffset: 0; } } .ds-ringed { position: relative; display: inline-flex; } .ds-ring { position: absolute; inset: -0.625rem -1rem; width: auto; height: auto; color: var(--sale); pointer-events: none; } .ds-price-final { display: inline-flex; align-items: center; padding: 0.24em 0.9em 0.2em 0.55em; background: var(--accent); color: var(--accent-foreground); font-family: var(--font-pink-display), var(--font-pink-arabic), var(--font-pink-sans), sans-serif; font-weight: 400; font-size: 1.625rem; line-height: 1.1; font-variant-numeric: tabular-nums lining-nums; clip-path: polygon(0 0, 100% 0, calc(100% - 0.55em) 50%, 100% 100%, 0 100%); }"
+    },
+    {
+      "name": "Contents Row",
+      "kind": "nav",
+      "refersTo": "nav-entry",
+      "description": "The masthead's second rule: the issue's sections as numbered cover lines, the number in the quiet-ink register, the entry flooding on hover or open. Wraps rather than clipping; from lg only, with the contents drawer below that.",
+      "html": "<nav class=\"ds-contents\"><a class=\"ds-entry\" href=\"#\"><span class=\"ds-num\">01</span>Dresses</a><a class=\"ds-entry ds-entry-open\" href=\"#\"><span class=\"ds-num\">02</span>Accessories</a><a class=\"ds-entry\" href=\"#\"><span class=\"ds-num\">03</span>Beauty</a><a class=\"ds-entry\" href=\"#\"><span class=\"ds-num\">04</span>Stationery</a></nav>",
+      "css": ".ds-contents { display: flex; flex-wrap: wrap; align-items: center; border-top: 1px solid var(--foreground); border-bottom: 2px solid var(--foreground); background: var(--background); min-height: 2.25rem; } .ds-entry { display: inline-flex; flex-direction: row; align-items: center; white-space: nowrap; padding: 0.375rem 0.75rem; min-height: 2.25rem; font-family: var(--font-pink-display), var(--font-pink-arabic), var(--font-pink-sans), sans-serif; font-weight: 400; font-size: 0.8125rem; letter-spacing: 0.12em; text-transform: uppercase; line-height: 1; color: var(--foreground); text-decoration: none; transition: background-color 110ms cubic-bezier(0.2, 0, 0, 1), color 110ms cubic-bezier(0.2, 0, 0, 1); } .ds-entry .ds-num { margin-inline-end: 0.5rem; color: color-mix(in srgb, var(--foreground) 65%, transparent); } .ds-entry:hover, .ds-entry-open { background: var(--primary); color: var(--primary-foreground); } .ds-entry:hover .ds-num, .ds-entry-open .ds-num { color: inherit; } .ds-entry:focus-visible { outline: 2px solid var(--primary); outline-offset: -2px; }"
+    },
+    {
+      "name": "Basket Tab",
+      "kind": "button",
+      "refersTo": "cart-tab",
+      "description": "The basket rides the masthead as a flooded square-cornered tab with its count in tabular figures; it brightens 5% on hover and opens the cart drawer.",
+      "html": "<button class=\"ds-basket\" aria-label=\"Cart, 3 items\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\" class=\"ds-ico\"><path d=\"M16 10a4 4 0 0 1-8 0\"/><path d=\"M3.103 6.034h17.794\"/><path d=\"M3.4 5.467a2 2 0 0 0-.4 1.2V20a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6.667a2 2 0 0 0-.4-1.2l-2-2.667A2 2 0 0 0 17 2H7a2 2 0 0 0-1.6.8z\"/></svg><span class=\"ds-count\">3</span></button>",
+      "css": ".ds-basket { display: inline-flex; align-items: center; gap: 0.5rem; height: 2.25rem; padding: 0 0.75rem; border: 0; border-radius: 0; background: var(--primary); color: var(--primary-foreground); font-family: var(--font-pink-display), var(--font-pink-arabic), var(--font-pink-sans), sans-serif; font-weight: 400; font-size: 0.8125rem; letter-spacing: 0.12em; text-transform: uppercase; line-height: 1; cursor: pointer; transition: filter 110ms cubic-bezier(0.2, 0, 0, 1); } .ds-basket:hover { filter: brightness(1.05); } .ds-basket .ds-ico { width: 1rem; height: 1rem; } .ds-basket .ds-count { font-size: 0.8125rem; font-variant-numeric: tabular-nums lining-nums; letter-spacing: -0.01em; } .ds-basket:focus-visible { outline: 2px solid var(--foreground); outline-offset: 2px; }"
+    },
+    {
+      "name": "Section Opener",
+      "kind": "custom",
+      "refersTo": "pagemark",
+      "description": "How the issue starts a feature: the numbered page mark and the title in the cover face on a 2px ink rule, the item count ranged at the end in the quiet-ink figure voice.",
+      "html": "<div class=\"ds-opener\"><div class=\"ds-opener-start\"><span class=\"ds-pagemark\">01</span><h2 class=\"ds-opener-title\">New this issue</h2></div><span class=\"ds-opener-count\">12 items</span></div>",
+      "css": ".ds-opener { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 0.5rem 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--foreground); } .ds-opener-start { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.75rem; min-width: 0; } .ds-pagemark { align-self: center; display: inline-flex; padding: 0.3em 0.6em 0.26em; background: var(--foreground); color: var(--background); font-family: var(--font-pink-display), var(--font-pink-arabic), var(--font-pink-sans), sans-serif; font-weight: 400; font-size: 0.6875rem; letter-spacing: 0.1em; line-height: 1; font-variant-numeric: tabular-nums; } .ds-opener-title { margin: 0; font-family: var(--font-pink-display), var(--font-pink-arabic), var(--font-pink-sans), sans-serif; font-weight: 400; font-size: 2.25rem; line-height: 0.88; letter-spacing: -0.03em; } .ds-opener-count { font-family: var(--font-pink-display), var(--font-pink-arabic), var(--font-pink-sans), sans-serif; font-size: 0.8125rem; letter-spacing: -0.01em; font-variant-numeric: tabular-nums lining-nums; color: color-mix(in srgb, var(--foreground) 65%, transparent); }"
+    },
+    {
+      "name": "Search Field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "The masthead search: a pill on paper with a soft hairline, icon at the start, no shadow; focus takes the border to the flood and draws a 32% flood ring. Suggestions drop into a square 2px-ruled panel whose rows flood on hover.",
+      "html": "<label class=\"ds-search\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\" class=\"ds-ico\"><circle cx=\"11\" cy=\"11\" r=\"8\"/><path d=\"m21 21-4.3-4.3\"/></svg><input class=\"ds-search-input\" type=\"search\" placeholder=\"Search\"></label>",
+      "css": ".ds-search { position: relative; display: block; width: 14rem; } .ds-search .ds-ico { position: absolute; inset-inline-start: 0.625rem; top: 50%; width: 1rem; height: 1rem; transform: translateY(-50%); color: var(--muted-foreground); pointer-events: none; } .ds-search-input { width: 100%; height: 2.25rem; padding: 0 2rem; border: 1px solid color-mix(in srgb, var(--foreground) 22%, transparent); border-radius: 9999px; background: var(--background); color: var(--foreground); font-family: var(--font-pink-sans), var(--font-pink-arabic), ui-sans-serif, system-ui, sans-serif; font-size: 0.8125rem; box-shadow: none; outline: none; transition: border-color 110ms cubic-bezier(0.2, 0, 0, 1), box-shadow 110ms cubic-bezier(0.2, 0, 0, 1); } .ds-search-input::placeholder { color: var(--muted-foreground); } .ds-search-input:focus-visible { border-color: var(--primary); box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 32%, transparent); }"
+    },
+    {
+      "name": "Option Chips",
+      "kind": "chip",
+      "refersTo": "option-chip",
+      "description": "Option values in the buy box: square hairline chips in the body face at 700; selected floods with a primary border; an unavailable combination goes dashed, print grey and struck through, and its price delta stays at full strength.",
+      "html": "<div class=\"ds-chips\" role=\"radiogroup\" aria-label=\"Size\"><button class=\"ds-chip\" role=\"radio\" aria-checked=\"true\">S</button><button class=\"ds-chip\" role=\"radio\" aria-checked=\"false\">M <span class=\"ds-delta\">+SAR 20</span></button><button class=\"ds-chip ds-chip-off\" role=\"radio\" aria-checked=\"false\">L</button></div>",
+      "css": ".ds-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; } .ds-chip { display: inline-flex; align-items: center; justify-content: center; gap: 0.375rem; min-width: 2.75rem; padding: 0.5rem 0.875rem; border: 1px solid var(--foreground); border-radius: 0; background: var(--background); color: var(--foreground); font-family: var(--font-pink-sans), var(--font-pink-arabic), ui-sans-serif, system-ui, sans-serif; font-size: 0.8125rem; font-weight: 700; cursor: pointer; transition: background-color 110ms cubic-bezier(0.2, 0, 0, 1), color 110ms cubic-bezier(0.2, 0, 0, 1); } .ds-chip:hover { background: var(--secondary); color: var(--secondary-foreground); } .ds-chip[aria-checked=\"true\"] { background: var(--primary); color: var(--primary-foreground); border-color: var(--primary); } .ds-chip:focus-visible { outline: none; box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 32%, transparent); } .ds-chip-off { border-style: dashed; color: var(--muted-foreground); text-decoration: line-through; } .ds-chip .ds-delta { font-family: var(--font-pink-display), var(--font-pink-arabic), var(--font-pink-sans), sans-serif; font-size: 0.6875rem; font-variant-numeric: tabular-nums lining-nums; }"
+    },
+    {
+      "name": "Cart Line (on ruled stock)",
+      "kind": "custom",
+      "refersTo": "cell",
+      "description": "One line of the order slip: a die-cut on the wash, the name at 700, the quantity stepper and the line total on its flag. The line carries its own opaque paper ground so the blank ruled stock behind it only shows where there is no line; the 24px remove square keeps a 44px hit area through a -inset-2.5 pseudo-element.",
+      "html": "<ul class=\"ds-slip\"><li class=\"ds-line\"><a class=\"ds-thumb\" href=\"#\" aria-label=\"Satin midi dress\"></a><div class=\"ds-line-body\"><div class=\"ds-line-top\"><h3 class=\"ds-line-name\"><a href=\"#\">Satin Effect Midi Dress</a></h3><button class=\"ds-remove\" aria-label=\"Remove\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" aria-hidden=\"true\"><path d=\"M18 6 6 18\"/><path d=\"m6 6 12 12\"/></svg></button></div><div class=\"ds-line-foot\"><span class=\"ds-qty\">1</span><span class=\"ds-flag\">SAR 350.00</span></div></div></li></ul>",
+      "css": ".ds-slip { list-style: none; margin: 0; padding: 0 1rem; max-width: 26rem; background-image: repeating-linear-gradient(to bottom, transparent 0 2.75rem, color-mix(in srgb, var(--foreground) 22%, transparent) 2.75rem calc(2.75rem + 1px)); } .ds-line { display: flex; gap: 0.75rem; padding: 0.75rem 0; border-bottom: 1px solid var(--foreground); background: var(--background); } .ds-line:last-child { border-bottom: 0; } .ds-thumb { width: 5rem; height: 5rem; flex-shrink: 0; border: 1px solid var(--foreground); background: var(--secondary); } .ds-line-body { display: flex; flex: 1; min-width: 0; flex-direction: column; gap: 0.5rem; } .ds-line-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.5rem; } .ds-line-name { margin: 0; font-family: var(--font-pink-sans), var(--font-pink-arabic), ui-sans-serif, system-ui, sans-serif; font-size: 0.8125rem; font-weight: 700; line-height: 1.2; } .ds-line-name a { color: inherit; text-decoration: none; } .ds-line-name a:hover { text-decoration: underline; } .ds-remove { position: relative; display: inline-flex; align-items: center; justify-content: center; width: 1.5rem; height: 1.5rem; flex-shrink: 0; margin-top: -0.125rem; border: 1px solid var(--foreground); border-radius: 0; background: transparent; color: var(--foreground); cursor: pointer; transition: background-color 110ms cubic-bezier(0.2, 0, 0, 1), color 110ms cubic-bezier(0.2, 0, 0, 1); } .ds-remove::before { content: ''; position: absolute; inset: -0.625rem; } .ds-remove svg { width: 0.875rem; height: 0.875rem; } .ds-remove:hover { background: var(--primary); color: var(--primary-foreground); } .ds-line-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; } .ds-qty { display: inline-flex; align-items: center; justify-content: center; min-width: 2rem; height: 2rem; padding: 0 0.75rem; border: 1px solid var(--foreground); border-radius: 9999px; font-family: var(--font-pink-display), var(--font-pink-arabic), var(--font-pink-sans), sans-serif; font-size: 0.8125rem; font-variant-numeric: tabular-nums lining-nums; } .ds-flag { display: inline-flex; align-items: center; padding: 0.3em 0.85em 0.26em 0.6em; background: var(--accent); color: var(--accent-foreground); font-family: var(--font-pink-display), var(--font-pink-arabic), var(--font-pink-sans), sans-serif; font-size: 0.8125rem; line-height: 1.1; font-variant-numeric: tabular-nums lining-nums; clip-path: polygon(0 0, 100% 0, calc(100% - 0.55em) 50%, 100% 100%, 0 100%); }"
+    },
+    {
+      "name": "Announcement Band",
+      "kind": "custom",
+      "refersTo": "announcement",
+      "description": "The merchant's header message as a flooded, screentoned band above the masthead. Plain 700 body at 13px on a phone (tracked cover caps from sm), links underlined, a ghost dismiss that hides itself under a drawer's scrim. Dismissal persists per session.",
+      "html": "<div class=\"ds-band\"><p class=\"ds-band-copy\">New issue in store — <a href=\"#\">free shipping</a> over SAR 350.</p><button class=\"ds-band-close\" aria-label=\"Dismiss\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" aria-hidden=\"true\"><path d=\"M18 6 6 18\"/><path d=\"m6 6 12 12\"/></svg></button></div>",
+      "css": ".ds-band { display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 1rem; background: var(--primary); color: var(--primary-foreground); background-image: radial-gradient(color-mix(in srgb, var(--primary-foreground) 34%, transparent) 1.1px, transparent 1.2px); background-size: 7px 7px; } .ds-band-copy { flex: 1; min-width: 0; margin: 0; text-align: center; font-family: var(--font-pink-sans), var(--font-pink-arabic), ui-sans-serif, system-ui, sans-serif; font-size: 0.8125rem; font-weight: 700; line-height: 1.35; } @media (min-width: 640px) { .ds-band-copy { font-family: var(--font-pink-display), var(--font-pink-arabic), var(--font-pink-sans), sans-serif; font-weight: 400; letter-spacing: 0.12em; text-transform: uppercase; line-height: 1; } } .ds-band-copy a { color: inherit; text-decoration: underline; text-underline-offset: 2px; } .ds-band-close { display: inline-flex; align-items: center; justify-content: center; width: 2rem; height: 2rem; flex-shrink: 0; border: 0; border-radius: 9999px; background: transparent; color: var(--primary-foreground); cursor: pointer; transition: background-color 110ms cubic-bezier(0.2, 0, 0, 1); } .ds-band-close svg { width: 1rem; height: 1rem; } .ds-band-close:hover { background: color-mix(in srgb, var(--primary-foreground) 20%, transparent); } .ds-band-close:focus-visible { outline: 2px solid var(--primary-foreground); outline-offset: -2px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "This Month's Issue",
+    "overview": "**Creative North Star: \"This Month's Issue\"**\n\nThe shop is this month's issue of a Japanese girls' fashion magazine, printed for a mixed girly-lifestyle merchant — apparel, accessories, beauty and stationery in one catalogue — and read by teenage girls and young women. The stock is paper (`--paper`) and plum-black ink (`--ink`); whole regions flood with the merchant's primary the way a cover floods with ink; every product is a die-cut ranged in a ruled cell with its price printed on a notched flag in the merchant's accent; and every spread carries a printed page address, so the reader always knows where in the issue she is. The direction was assigned by impeccable's `new-work` roll (seed `f844e405`, candidate 3 of the grounded list) and chosen by the user over the pick card and one competitive challenger; the build was code-led, with no comp round. Its stated anti-goals were the soft millennial-pink boutique of rounded, shadowed cards that every pink storefront ships, its stark monochrome opposite, and — the user's own words — anything \"too loud / hard to shop\".\n\nThe pink world always wins. The theme ships a committed pink default palette (generated, never hand-written), and a merchant preset re-maps the roles without dissolving the grammar: the flood is whatever `--primary` is that day, the flag whatever `--accent` is, and every rule below is written against the role, not the hue. There is exactly one authored moment of motion — a flag snapping onto a die-cut when the basket's real quantity for that sku goes up — and everything else is a 110–190ms colour or opacity transition. Density is a magazine's: running text small and tight (0.9375rem/1.55), cover lines jumping straight to cover scale (up to 5.5rem), five die-cuts across the widest plate.\n\nThree devices carry the issue and nothing may dilute them: **the page-address system** (`.pagemark` tabs, numbered contents entries, numbered section openers), **the notched accent price flag**, and **the single basket-truth snap**.",
+    "keyCharacteristics": [
+      "Flooded regions, not accents: `.flood` owns the cover, category and blog openers, drawer heads, the open nav entry, the basket tab, the active account tab, the selected option, the state-block icon square and every primary button.",
+      "Every price rides a notched pennant of flat accent (`.flag` / `.price-flag`, `clip-path` chevron, mirrored in RTL); sale is the same pennant in `--sale`, sold out the same pennant in ink.",
+      "A printed page address everywhere: `.pagemark` ink tabs for section numbers, listing pages, order numbers and statuses; `.pagemark-open` (hairline, no field) for SKUs and order statuses in tables.",
+      "Ruled plates: `.plate` is a 1px `--hair` grid whose 1px gaps *are* the rules, `.cell` is one entry on paper; no card radius, no card shadow, pill controls only.",
+      "Facts the shopper needs are marker annotations in the reader's own pen (`.marker`, 2.2px round-cap strokes drawn on over 460ms) — a circled sale price, an arrow at a last-few-units count. Never decoration.",
+      "One authored motion: `.snap` / `@keyframes pink-snap` (460ms on `--easing-emphasized`), fired by `inCart > seenInCart`, not by the click.",
+      "Dela Gothic One names, prices and flags; M PLUS Rounded 1c explains; Cairo is the Arabic companion in both stacks, reached by fallthrough rather than by a stack swap."
+    ],
+    "rules": [
+      {
+        "name": "The Flood Rule",
+        "body": "The merchant primary owns whole regions or nothing. It is a field (`.flood`), the ADDED flag, the focus ring, the caret and the selection — never a hairline, never a tint under text, never a second primary button in one view.",
+        "section": "colors"
+      },
+      {
+        "name": "The Flag Rule",
+        "body": "Every printed figure that is a price rides the notched accent pennant; the pennant's only other liveries are `.flag-sale` (`--sale`), `.flag-ink` for sold out, and `.flag-flood` for the one ADDED moment. The accent never appears as a field, a rule or a text colour.",
+        "section": "colors"
+      },
+      {
+        "name": "The Measured Quiet Rule",
+        "body": "Contrast is measured, not assumed. `--primary-foreground` clears the flood by only **4.57:1** on the default palette, so **nothing may be dimmed on a flooded field**: `.flood .dim` and `.ink-field .dim` reset to `color: inherit`, and the quiet register there is carried by size and weight at full colour strength. On paper and on the wash the quiet register is `--ink-dim` (**5.6:1** on paper, **5.0:1** on the wash) and never `opacity`. `muted-foreground` is guarded against the page background only (4.7:1 there, **3.6:1** on the wash) — keep it on paper. On the ink colophon, printed opacity stays at or above 0.6 (6.8:1); below roughly 0.5 it falls under the floor.",
+        "section": "colors"
+      },
+      {
+        "name": "The Two Voices Rule",
+        "body": "If it names, prices or flags, it is Dela Gothic One; if it explains, it is M PLUS Rounded 1c. There is no third face and no other weight of the display face — a price is never set in the body face, and a product name, fact or paragraph is never set in the display face.",
+        "section": "typography"
+      },
+      {
+        "name": "The Fallthrough Rule",
+        "body": "Arabic is reached by falling through the Latin stacks to Cairo, never by swapping the stack on `:lang(ar)`; `adjustFontFallback` stays `false` on both Latin cuts, and `:lang(ar)` adjusts weight (900), tracking (0) and case (none) only.",
+        "section": "typography"
+      },
+      {
+        "name": "The Printed Fact Rule",
+        "body": "Prices arrive pre-formatted from the API and are never re-formatted; counts, SKUs, order ids, dates and phone numbers carry `tabular-nums`; SKUs and phone numbers are forced `dir=\"ltr\"`, and a SKU already beginning with \"SKU\" is not labelled twice.",
+        "section": "typography"
+      },
+      {
+        "name": "The Ruled-Not-Lifted Rule",
+        "body": "Separation is a 1px `--hair` (2px where a section or a panel begins). A shadow means the surface is floating over the page. Never a shadow on a cell, a plate, a flag, a page mark or a button; never a glow, never a coloured shadow, never a hover lift on a die-cut.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Layering Rule",
+        "body": "The world's grammar (`.display`, `.cover-line`, `.figure`, `.dim`, `.band-copy`, `.pagemark`, `.flood`, `.wash`, `.ink-field`, `.tone*`, `.hair*`, `.cell`, `.plate`, `.cover-grid`, `.flag*`, `.price-flag*`, `.marker*`, `.prose-issue`, `.snap`, `.greyed`) lives in `@layer components`, so a Tailwind utility on the same element (`text-2xl`, `p-3`, `lg:sticky`) always wins. The control and form block (`.crumbs-flood`, the nav row fix, `.ruled-stock`, `.issue-block`, button / input / label / checkbox rules, the Swiper and toast overrides) sits deliberately **outside** the layer, because it has to outrank the shared primitives' own defaults.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** flood whole regions with the primary (`.flood` on the cover, section openers, drawer heads, the open contents entry, the basket tab, the active tab, the selected option, the state-block icon square) and keep exactly one primary button per view.",
+      "**Do** print every price on the notched accent pennant (`.price-flag`, `.flag`), and use the pennant's ink and sale liveries for sold out and for SAVE N%.",
+      "**Do** give every spread its printed address: a numbered `.pagemark` on a section opener, \"page x of y\" on a listing's page turn, the order number and status as page marks, the SKU as `.pagemark-open`.",
+      "**Do** range entries on a `.plate` (2 / 3 / 4 / 5, 1px ink gaps, children on paper) with the die-cut's slots fixed — 4:5 picture, annotation row on top, name at 700 (2 lines), price flag, one full-width action.",
+      "**Do** carry the quiet register with `--ink-dim` (`.dim`) on paper and the wash, and with size and weight alone on any flooded or ink field, where `.dim` deliberately resets to `inherit`.",
+      "**Do** set names, prices, flags, page marks, buttons, labels, prose subheads and pull quotes in Dela Gothic One, and everything that explains in M PLUS Rounded 1c; let Arabic fall through to Cairo and ask it for weight 900 on the printed roles.",
+      "**Do** draw a marker annotation only for a fact the shop actually knows (a discount, a last-few count, a sold-out die-cut), in the one stroke language (2.2px, round caps, drawn on over 460ms).",
+      "**Do** keep radii to the two-value scale: 0 on every plane, `9999px` on every control (the 1rem textarea is the single exception).",
+      "**Do** mirror for RTL with logical properties, the flag's mirrored `clip-path`, `rtl:rotate-180` on directional icons and `rtl:-scale-x-100` on the marker arrows, and hand Swiper an explicit `dir`."
+    ],
+    "donts": [
+      "**Don't** hard-code hex. Every colour is a role variable from the merchant bridge or one of the theme's declared `color-mix` materials (`--hair-soft`, `--ink-dim`, `--tone-ink`, `--tone-light`); the theme deliberately keeps no `mapMerchantColors` hook.",
+      "**Don't** dim anything on a flooded or ink field — `--primary-foreground` clears the flood by only 4.57:1, so opacity, `--ink-dim` or `muted-foreground` there falls under the floor. Don't put `muted-foreground` on the wash either (3.6:1).",
+      "**Don't** use opacity as the quiet register anywhere it can be a colour: `.dim` is a composited token precisely so it can be measured.",
+      "**Don't** let the accent be anything but the pennant — no accent fields, no accent rules, no accent text — and don't let the primary become a hairline, a tint or a text colour.",
+      "**Don't** float a cell, a plate, a flag, a page mark or a button: no card shadows, no hover lift on a die-cut, no glows, no coloured shadows.",
+      "**Don't** add a second authored motion. `pink-snap` (460ms, emphasized, basket-driven) is the issue's one moment, and the marker's `pink-draw` is its only other keyframe; everything else is a 110–190ms transition, and both keyframes stop under `prefers-reduced-motion`.",
+      "**Don't** round a plane or square a control; don't introduce a third radius beyond the textarea's 1rem.",
+      "**Don't** print a second contents strip — the cover lines *are* the contents, each the numbered address of a feature further down the page.",
+      "**Don't** put category navigation in the masthead's title row: that row is the imprint (CMS pages and the merchant's non-page menu entries); categories are the ruled contents row under it, and its drawer below `lg`.",
+      "**Don't** move the world's grammar out of `@layer components`, or move the control / form / Swiper / toast overrides into it — the first must lose to Tailwind utilities, the second must beat the shared primitives."
+    ]
+  }
+}

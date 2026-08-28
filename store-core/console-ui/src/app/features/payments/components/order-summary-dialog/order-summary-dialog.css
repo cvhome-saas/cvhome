@@ -1,0 +1,230 @@
+/*
+ * The order behind a transaction, as a modal summary.
+ *
+ * Shares `confirm-dialog`'s surface and backdrop so the three dialogs on this page read as one
+ * family, and differs where it should: wider, because it holds a list rather than a sentence, and
+ * it *pops* rather than rising — the user asked for a popup, and a modal opened from a table row
+ * reads better scaling out of the page than sliding up it.
+ */
+.summary {
+  /* The reset zeroes margins, which is what centres a native dialog — put it back explicitly. */
+  margin: auto;
+  inline-size: min(34rem, calc(100vw - 2rem));
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  background: var(--background);
+  color: var(--foreground);
+  box-shadow: var(--lift);
+}
+
+.summary-body {
+  display: grid;
+  gap: var(--spacing-group);
+  padding: 1.35rem;
+}
+
+.summary-head {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-field);
+}
+
+.summary-heading {
+  display: flex;
+  flex: 1;
+  align-items: baseline;
+  gap: var(--spacing-tight);
+  min-width: 0;
+}
+
+.summary-title {
+  margin: 0;
+  color: var(--foreground-strong);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-bold);
+}
+
+/* An order number is Latin data that must not reorder inside an Arabic page. */
+.summary-ref {
+  color: var(--foreground-subtle);
+  font-size: var(--text-xs);
+  unicode-bidi: plaintext;
+}
+
+.summary-open,
+.summary-close {
+  flex: none;
+}
+
+/* The escalation is quieter than the close: leaving is a choice, closing is the default. */
+.summary-open {
+  color: var(--foreground-subtle);
+}
+
+.summary-open:hover,
+.summary-open:focus-visible {
+  color: var(--primary-emphasis);
+}
+
+.summary-note {
+  margin: 0;
+  color: var(--secondary-foreground);
+  font-size: var(--text-xs);
+}
+
+.summary-facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem;
+  margin: 0;
+  padding-block: 0.85rem;
+  border-block: 1px solid var(--border);
+}
+
+.summary-facts div {
+  display: grid;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.summary-facts dt {
+  color: var(--foreground-subtle);
+  font-size: var(--text-3xs);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.summary-facts dd {
+  display: grid;
+  gap: 0.1rem;
+  margin: 0;
+  min-width: 0;
+  color: var(--foreground-strong);
+  font-size: var(--text-xs);
+}
+
+.summary-facts strong {
+  overflow: hidden;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* A buyer's own address, laid out by its own direction inside a page that may be RTL. */
+.summary-email {
+  overflow: hidden;
+  color: var(--foreground-subtle);
+  font-size: var(--text-3xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  unicode-bidi: plaintext;
+}
+
+.summary-items-head {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  margin: 0;
+  color: var(--foreground-subtle);
+  font-size: var(--text-3xs);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* The figure is data, not a label, so it does not take the label's letter-spacing. */
+.summary-items-count {
+  color: var(--secondary-foreground);
+  letter-spacing: normal;
+}
+
+/*
+ * Holds the fade over the scroller's bottom edge.
+ *
+ * Without it a capped list ends on a half-cut row that reads as a rendering fault rather than as
+ * "there is more". The gradient runs to the dialog's own background, so on a short order it covers
+ * empty space and is invisible — no need to detect whether the list actually overflows.
+ */
+.summary-lines-wrap {
+  position: relative;
+  min-block-size: 0;
+}
+
+.summary-lines-wrap::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 0;
+  block-size: 1.75rem;
+  background: linear-gradient(to bottom, transparent, var(--background));
+  pointer-events: none;
+}
+
+.summary-lines {
+  display: grid;
+  gap: 0.55rem;
+  /* Long orders scroll inside the box rather than growing the dialog past the viewport. */
+  max-block-size: 15rem;
+  margin: 0;
+  padding-inline-start: 0;
+  /* Room under the last row so the fade never sits on top of a figure. */
+  padding-block-end: var(--spacing-field);
+  overflow-y: auto;
+  list-style: none;
+  scrollbar-width: thin;
+}
+
+/*
+ * Fixed tracks for the two right-hand columns, not `auto`.
+ *
+ * Each row is its own grid — `display: contents` would share one, but it costs the `<li>` its list
+ * semantics in some browsers — so `auto` columns size to *their own row's* content and the quantity
+ * column lands at a different x on every line. With one item that is invisible; with seven the
+ * column is visibly ragged. Naming the widths lines them up, and both cells align to their end so
+ * the figures read as columns rather than as runs of text.
+ */
+.summary-line {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 2.75rem minmax(7rem, auto);
+  gap: var(--spacing-field);
+  align-items: baseline;
+  font-size: var(--text-xs);
+}
+
+.summary-line-name {
+  overflow: hidden;
+  color: var(--foreground);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.summary-line-qty {
+  color: var(--foreground-subtle);
+  font-size: var(--text-3xs);
+  text-align: end;
+}
+
+.summary-line-total {
+  color: var(--foreground-strong);
+  font-weight: 600;
+  text-align: end;
+}
+
+.summary-total {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--spacing-field);
+  padding-block-start: 0.85rem;
+  border-block-start: 1px solid var(--border);
+  color: var(--secondary-foreground);
+  font-size: var(--text-xs);
+}
+
+.summary-total strong {
+  color: var(--foreground-strong);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-bold);
+}

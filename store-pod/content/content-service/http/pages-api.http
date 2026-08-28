@@ -1,0 +1,100 @@
+### Pages — the private console API (WorkflowContentApi via PageApi). Same shape for posts, banners, faq, policies.
+### Vars: SELLER_UI_URL, STORE_ID, POD_ID, LANG, SESSION_ID from extra/requests/http-client.env.json
+
+### List pages (status/locale/state/q filters, count = page size)
+GET {{SELLER_UI_URL}}/spg/content/api/v1/private/content/pages?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}&page=0&count=25&sort=updatedAt,desc
+Cookie: SESSION={{SESSION_ID}}
+
+### List only drafts with Arabic missing
+GET {{SELLER_UI_URL}}/spg/content/api/v1/private/content/pages?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}&status=DRAFT&locale=ar&state=MISSING
+Cookie: SESSION={{SESSION_ID}}
+
+### Is a slug free?
+GET {{SELLER_UI_URL}}/spg/content/api/v1/private/content/pages/slug-available?slug=careers&store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+
+### Create a page (DRAFT)
+POST {{SELLER_UI_URL}}/spg/content/api/v1/private/content/pages?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Content-Type: application/json
+Cookie: SESSION={{SESSION_ID}}
+
+{
+  "slug": "careers",
+  "showInFooter": true,
+  "linkToMenu": false,
+  "noindex": false,
+  "translations": [
+    {"language": "en", "title": "Careers at Acme", "body": "<h2>Join us</h2><p>We are hiring.</p>", "metaDescription": "Open roles at Acme", "keywords": "jobs, careers"},
+    {"language": "ar", "title": "الوظائف", "body": "<p>انضم إلينا</p>"}
+  ]
+}
+
+### Read one page (all languages, version, locales, audit)
+GET {{SELLER_UI_URL}}/spg/content/api/v1/private/content/pages/1?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+
+### Update (send the version you read — a stale one is 409 CONTENT.VERSION.CONFLICT)
+PUT {{SELLER_UI_URL}}/spg/content/api/v1/private/content/pages/1?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Content-Type: application/json
+Cookie: SESSION={{SESSION_ID}}
+
+{
+  "version": 1,
+  "slug": "careers",
+  "translations": [
+    {"language": "en", "title": "Careers at Acme", "body": "<p>Updated.</p>"}
+  ]
+}
+
+### Publish now
+POST {{SELLER_UI_URL}}/spg/content/api/v1/private/content/pages/1/publish?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+
+### Schedule (publishAt in the future → SCHEDULED; the job publishes it)
+POST {{SELLER_UI_URL}}/spg/content/api/v1/private/content/pages/1/publish?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Content-Type: application/json
+Cookie: SESSION={{SESSION_ID}}
+
+{"publishAt": "2026-12-01T09:00:00Z", "unpublishAt": "2027-01-01T00:00:00Z"}
+
+### Submit for review / unpublish / archive / restore
+POST {{SELLER_UI_URL}}/spg/content/api/v1/private/content/pages/1/submit-review?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+
+###
+POST {{SELLER_UI_URL}}/spg/content/api/v1/private/content/pages/1/unpublish?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+
+###
+POST {{SELLER_UI_URL}}/spg/content/api/v1/private/content/pages/1/archive?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+
+###
+POST {{SELLER_UI_URL}}/spg/content/api/v1/private/content/pages/1/restore?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+
+### Edit one locale only (translator path)
+PUT {{SELLER_UI_URL}}/spg/content/api/v1/private/content/pages/1/translations/ar?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Content-Type: application/json
+Cookie: SESSION={{SESSION_ID}}
+
+{"title": "الوظائف في أكمي", "body": "<p>نحن نوظّف.</p>"}
+
+### Revisions, and restore one as a new version
+GET {{SELLER_UI_URL}}/spg/content/api/v1/private/content/pages/1/revisions?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+
+###
+POST {{SELLER_UI_URL}}/spg/content/api/v1/private/content/pages/1/revisions/0/restore?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+
+### Bulk (207 with a per-id result)
+POST {{SELLER_UI_URL}}/spg/content/api/v1/private/content/pages/bulk?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Content-Type: application/json
+Cookie: SESSION={{SESSION_ID}}
+
+{"ids": [1, 2, 3], "action": "PUBLISH"}
+
+### Delete (409 CONTENT.PAGE.REFERENCED when a menu links it, unless force=true)
+DELETE {{SELLER_UI_URL}}/spg/content/api/v1/private/content/pages/1?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}&force=false
+Cookie: SESSION={{SESSION_ID}}

@@ -1,0 +1,36 @@
+# InvoiceApi — com.asrevo.cvhome.billing.api.v1.InvoiceApi (@RequestMapping "/api/v1/invoice")
+#
+# Addressed through the gateway on :8000, which strips the /billing prefix and relays the session.
+# Rows appear only after Stripe reports a payment, so a store that has never paid lists empty rather
+# than 404 — an empty history is a fact, not a missing resource.
+#
+# Requires a running stack: lcl start -d
+
+### a store's billing history, newest first
+GET {{SELLER_UI_URL}}/billing/api/v1/invoice/list?store={{STORE_ID}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+> {%
+    client.test("200 with a page", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        client.assert(response.body.content !== undefined, "not a page");
+    });
+    client.test("a paid invoice carries Stripe's own documents", function () {
+        (response.body.content || []).filter(i => i.status === "PAID").forEach(i => {
+            client.assert(i.hostedInvoiceUrl, "paid invoice with no hosted url");
+            client.assert(i.invoicePdfUrl, "paid invoice with no pdf url");
+            client.assert(i.amountPaid.minorUnits > 0, "paid invoice with nothing paid");
+        });
+    });
+%}
+
+### another ORG's store must disclose nothing — scoped in the query, not just by @PreAuthorize
+GET {{SELLER_UI_URL}}/billing/api/v1/invoice/list?store=65f020632bc46470c104b76f
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+> {%
+    client.test("no rows from another org", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        client.assert((response.body.content || []).length === 0, "leaked another org's invoices");
+    });
+%}

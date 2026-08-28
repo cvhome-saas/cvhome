@@ -32,4 +32,13 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
 
       - name: Run Check with Gradle
-        run: ./gradlew checkstyleMain
+        run: ./gradlew checkstyleMain checkstyleTest checkstyleIntegrationTest
+
+      - name: Upload Checkstyle reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: checkstyle-reports
+          path: build/reports/checkstyle/*
+          if-no-files-found: error
+          retention-days: 14

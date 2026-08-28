@@ -1,0 +1,63 @@
+/*
+ * Page-level layout only. The console frame (banner, rail, toolbar) belongs to
+ * ConsoleShell, and each widget carries its own card chrome.
+ */
+
+:host {
+  display: contents;
+}
+
+/* Sits below the page header so the date picker popover is never covered. */
+app-kpi-grid {
+  position: relative;
+  z-index: 1;
+}
+
+.panel-row {
+  display: grid;
+  grid-template-columns: 1.55fr 1fr;
+  gap: var(--spacing-gutter);
+}
+
+.panel-row > * {
+  --rise-from: 0.75rem;
+  animation: rise 0.5s 0.42s ease both;
+}
+
+.panel-row > *:nth-child(2) {
+  animation-delay: 0.48s;
+}
+
+/* Projected into a widget's panel header. */
+.link {
+  border: 0;
+  background: none;
+  color: var(--primary-emphasis);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.link:hover {
+  color: var(--primary-soft);
+}
+
+@media (max-width: 73.75rem) {
+  .panel-row {
+    grid-template-columns: 1fr;
+  }
+
+  .panel-row > *:nth-child(2) {
+    animation-delay: 0.42s;
+  }
+}
+
+/*
+ * The page owns the widgets' rhythm. It cannot be set on the overlay's inner wrapper —
+ * that element belongs to BusyOverlay's template and is out of this stylesheet's reach.
+ */
+.widgets {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-gutter);
+}

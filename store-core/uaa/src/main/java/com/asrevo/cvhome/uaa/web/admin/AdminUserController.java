@@ -23,6 +23,8 @@ import com.asrevo.cvhome.uaa.dto.CreateUserRequest;
 import com.asrevo.cvhome.uaa.dto.ResetUserPasswordRequest;
 import com.asrevo.cvhome.uaa.dto.UpdateUserRequest;
 import com.asrevo.cvhome.uaa.dto.UserDto;
+import com.asrevo.cvhome.uaa.errors.SuperAdminImmutableException;
+import com.asrevo.cvhome.uaa.errors.UserNotFoundException;
 import com.asrevo.cvhome.uaa.service.AdminService;
 
 import lombok.RequiredArgsConstructor;
@@ -57,7 +59,7 @@ public class AdminUserController {
 
     @PreAuthorize("hasAuthority('SCOPE_super_admin') or hasRole('SUPER_ADMIN')")
     @GetMapping("/{id}")
-    public UserDto user(@PathVariable UUID id) {
+    public UserDto user(@PathVariable UUID id) throws UserNotFoundException {
         return adminService.getUser(id);
     }
 
@@ -69,49 +71,53 @@ public class AdminUserController {
 
     @PreAuthorize("hasAuthority('SCOPE_super_admin') or hasRole('SUPER_ADMIN')")
     @PostMapping("/{id}/enable")
-    public void enable(@PathVariable UUID id) {
+    public void enable(@PathVariable UUID id) throws UserNotFoundException, SuperAdminImmutableException {
         adminService.enableUser(id);
     }
 
     @PreAuthorize("hasAuthority('SCOPE_super_admin') or hasRole('SUPER_ADMIN')")
     @PostMapping("/{id}/disable")
-    public void disable(@PathVariable UUID id) {
+    public void disable(@PathVariable UUID id) throws UserNotFoundException, SuperAdminImmutableException {
         adminService.disableUser(id);
     }
 
     @PreAuthorize("hasAuthority('SCOPE_super_admin') or hasRole('SUPER_ADMIN')")
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable UUID id) {
+    public void delete(@PathVariable UUID id) throws UserNotFoundException, SuperAdminImmutableException {
         adminService.delete(id);
     }
 
     @PreAuthorize("hasAuthority('SCOPE_super_admin') or hasRole('SUPER_ADMIN')")
     @PostMapping
-    public UserDto create(@RequestBody CreateUserRequest req) {
+    public UserDto create(@RequestBody CreateUserRequest req) throws UserNotFoundException, SuperAdminImmutableException {
         return adminService.createUser(req);
     }
 
     @PreAuthorize("hasAuthority('SCOPE_super_admin') or hasRole('SUPER_ADMIN')")
     @PutMapping("/{id}")
-    public UserDto update(@PathVariable UUID id, @RequestBody UpdateUserRequest req) {
+    public UserDto update(@PathVariable UUID id, @RequestBody UpdateUserRequest req)
+            throws UserNotFoundException, SuperAdminImmutableException {
         return adminService.updateUser(id, req);
     }
 
     @PreAuthorize("hasAuthority('SCOPE_super_admin') or hasRole('SUPER_ADMIN')")
     @PutMapping("/{id}/reset-password")
-    public void resetPassword(@PathVariable UUID id, @RequestBody ResetUserPasswordRequest req) {
+    public void resetPassword(@PathVariable UUID id, @RequestBody ResetUserPasswordRequest req)
+            throws UserNotFoundException {
         adminService.resetPassword(id, req);
     }
 
     @PreAuthorize("hasAuthority('SCOPE_super_admin') or hasRole('SUPER_ADMIN')")
     @PostMapping("/{id}/roles")
-    public void assign(@PathVariable UUID id, @RequestBody Set<String> roles) {
+    public void assign(@PathVariable UUID id, @RequestBody Set<String> roles)
+            throws UserNotFoundException, SuperAdminImmutableException {
         adminService.assignRoles(id, roles);
     }
 
     @PreAuthorize("hasAuthority('SCOPE_super_admin') or hasRole('SUPER_ADMIN')")
     @PostMapping("/{id}/roles/remove")
-    public void removeRoles(@PathVariable UUID id, @RequestBody Set<String> roles) {
+    public void removeRoles(@PathVariable UUID id, @RequestBody Set<String> roles)
+            throws UserNotFoundException, SuperAdminImmutableException {
         adminService.removeRoles(id, roles);
     }
 

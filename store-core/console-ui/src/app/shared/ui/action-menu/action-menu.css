@@ -1,0 +1,53 @@
+:host {
+  display: inline-block;
+}
+
+.menu-root {
+  position: relative;
+  display: inline-flex;
+}
+
+.trigger.labelled {
+  gap: 0.35rem;
+  padding-inline: var(--spacing-field);
+}
+
+.menu {
+  min-width: 11rem;
+  width: max-content;
+  max-width: 16rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-tight);
+  width: 100%;
+  padding: 0.5rem 0.65rem;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: none;
+  color: var(--foreground);
+  font-size: var(--text-xs);
+  text-align: start;
+  cursor: pointer;
+}
+
+.menu-item:hover:not(:disabled),
+.menu-item:focus-visible {
+  background: var(--input);
+  color: var(--foreground-strong);
+  outline: none;
+}
+
+.menu-item:disabled {
+  color: var(--foreground-quiet);
+  cursor: not-allowed;
+}
+
+.menu-item.danger {
+  color: var(--chart-5-foreground);
+}

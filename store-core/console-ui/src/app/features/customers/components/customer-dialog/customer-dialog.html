@@ -1,0 +1,163 @@
+<dialog #dialog class="customer-dialog" (close)="dismissed.emit()" (cancel)="dismissed.emit()">
+  <ng-container *transloco="let t">
+    @if (customer(); as selected) {
+      <div class="customer-dialog-body">
+        <header class="customer-dialog-head">
+          <div class="who">
+            <span class="avatar" aria-hidden="true">{{ selected.initials }}</span>
+            <div class="who-text">
+              <!--
+                A customer with no billing address has no name at all: the populator copies one off
+                the billing record and never maps the customer's own columns. The email carries the
+                identity in that case rather than a name invented from it — see lessons.md,
+                "Customers — a customer's name comes from the billing address".
+              -->
+              @if (selected.name) {
+                <h2>{{ selected.name }}</h2>
+              } @else {
+                <h2 class="unnamed">{{ t('customers.unnamed') }}</h2>
+              }
+              <span class="email" dir="auto">{{ selected.email }}</span>
+            </div>
+          </div>
+          <button
+            class="icon-action"
+            type="button"
+            [attr.aria-label]="t('customers.action.closeDetails')"
+            (click)="close()"
+          >
+            <app-icon name="x" />
+          </button>
+        </header>
+
+        <div class="customer-dialog-scroll">
+          <!--
+            Four facts, where the design draws company, "buys from", phone and order history. "Buys
+            from" is gone: the list is already scoped to the open store, so the answer is the store
+            the operator has open. Orders placed takes its slot, and it is the one lifetime figure
+            here that is exact.
+          -->
+          <dl class="facts">
+            <div>
+              <dt>{{ t('customers.fact.company') }}</dt>
+              <dd>{{ selected.company || '—' }}</dd>
+            </div>
+            <div>
+              <dt>{{ t('customers.fact.phone') }}</dt>
+              <dd dir="auto">{{ selected.phone || '—' }}</dd>
+            </div>
+            <div>
+              <dt>{{ t('customers.fact.ordersPlaced') }}</dt>
+              <dd>{{ orderCount() }}</dd>
+            </div>
+            <div>
+              <dt>{{ t('customers.fact.customerId') }}</dt>
+              <dd class="latin">{{ selected.id }}</dd>
+            </div>
+          </dl>
+
+          <!--
+            TODO(lessons.md): customer lifetime figures — no backend endpoint. See lessons.md,
+            "Customers — no lifetime or per-customer aggregate". Drawn at the weight the design gives
+            them, each reading an em dash under a note that says why: computing them from the five
+            orders below would be a different number under the same label.
+          -->
+          <section class="lifetime" [attr.aria-label]="t('customers.lifetime.title')">
+            <dl class="lifetime-figures">
+              <div>
+                <dt>{{ t('customers.lifetime.value') }}</dt>
+                <dd>—</dd>
+              </div>
+              <div>
+                <dt>{{ t('customers.lifetime.returns') }}</dt>
+                <dd>—</dd>
+              </div>
+              <div>
+                <dt>{{ t('customers.lifetime.since') }}</dt>
+                <dd>—</dd>
+              </div>
+            </dl>
+            <p class="figures-note">{{ t('customers.lifetime.unavailable') }}</p>
+          </section>
+
+          <section class="block">
+            <h3>{{ t('customers.addresses.title') }}</h3>
+            @if (selected.addresses.length) {
+              <div class="addresses">
+                @for (address of selected.addresses; track address.kind) {
+                  <article class="address">
+                    <h4>
+                      {{
+                        address.kind === 'billing'
+                          ? t('customers.addresses.billing')
+                          : t('customers.addresses.delivery')
+                      }}
+                    </h4>
+                    @if (address.name) {
+                      <p class="address-name">{{ address.name }}</p>
+                    }
+                    @if (address.company) {
+                      <p>{{ address.company }}</p>
+                    }
+                    @for (line of address.lines; track $index) {
+                      <p>{{ line }}</p>
+                    }
+                    @if (address.phone) {
+                      <p class="latin" dir="auto">{{ address.phone }}</p>
+                    }
+                  </article>
+                }
+              </div>
+            } @else {
+              <p class="dialog-hint">{{ t('customers.addresses.none') }}</p>
+            }
+          </section>
+
+          <section class="block">
+            <div class="block-head">
+              <h3>{{ t('customers.orders.title') }}</h3>
+              @if (orders().length) {
+                <button class="ghost-action" type="button" (click)="viewAllOrders.emit()">
+                  {{ t('customers.orders.viewAll') }}
+                </button>
+              }
+            </div>
+
+            @if (ordersError(); as failure) {
+              <app-load-error [message]="failure.message" (retry)="retryOrders.emit()" />
+            } @else if (ordersLoading()) {
+              <p class="dialog-hint">{{ t('customers.orders.loading') }}</p>
+            } @else if (orders().length) {
+              <ul class="orders">
+                @for (order of orders(); track order.id) {
+                  <li>
+                    <button class="order" type="button" (click)="openOrder.emit(order.id)">
+                      <span class="order-id latin">#{{ order.id }}</span>
+                      <span class="order-date">
+                        @if (order.datePurchased) {
+                          {{ order.datePurchased | translocoDate: {dateStyle: 'medium'} }}
+                        } @else {
+                          —
+                        }
+                      </span>
+                      <app-badge [tone]="statusTone()(order.status)" shape="square">
+                        {{ statusLabel()(order.status) }}
+                      </app-badge>
+                      <span class="order-total">{{ orderTotal()(order) }}</span>
+                    </button>
+                  </li>
+                }
+              </ul>
+            } @else {
+              <app-empty-state
+                icon="shoppingCart"
+                compact
+                [message]="t('customers.orders.empty')"
+              />
+            }
+          </section>
+        </div>
+      </div>
+    }
+  </ng-container>
+</dialog>
