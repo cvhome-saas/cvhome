@@ -46,6 +46,7 @@ Gradle wrapper (9.2.0) drives Java *and* the npm apps. All commands from the rep
 
 ```bash
 ./gradlew build -x test -x check                 # full build, what CI's build job runs
+./gradlew build -PskipAllTests                   # normal build with every test and coverage task disabled
 ./gradlew :store-pod:catalog:catalog-service:build
 ./gradlew test                # src/test: unit + architecture tests, no Docker
 ./gradlew integrationTest     # src/integrationTest: Testcontainers, Docker required

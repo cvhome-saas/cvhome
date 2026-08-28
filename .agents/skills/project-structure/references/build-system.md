@@ -124,7 +124,7 @@ is in `configuration.md`.
 ## Common commands
 
 ```bash
-./gradlew clean build -x test          # build everything, skip tests
+./gradlew clean build -PskipAllTests   # normal build with every test and coverage task disabled
 ./gradlew :store-pod:catalog:catalog-service:bootRun    # run one service
 ./gradlew :store-core:console-ui:bootRun                 # npm run dev, via ui-conventions
 ./gradlew :store-core:uaa:build                         # also builds + embeds uaa-fe

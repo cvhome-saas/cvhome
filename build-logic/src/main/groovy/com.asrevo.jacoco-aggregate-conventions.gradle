@@ -30,6 +30,16 @@ def javaProjects = subprojects.findAll {
 }
 def hasIntegration = { Project p -> p.plugins.hasPlugin('com.asrevo.java-integration-test-conventions') }
 
+// Gradle's -x excludes task names, not task categories. This flag keeps the normal build graph while disabling
+// every unit/integration test and every coverage report/gate, including tasks registered later in configuration.
+if (providers.gradleProperty('skipAllTests').isPresent()) {
+    ([rootProject] + subprojects).each { p ->
+        p.tasks.withType(Test).configureEach { enabled = false }
+        p.tasks.withType(JacocoReport).configureEach { enabled = false }
+        p.tasks.withType(JacocoCoverageVerification).configureEach { enabled = false }
+    }
+}
+
 // Classes that are wiring, not logic. Filtered by name rather than by whole package: `CustomPermissionEvaluator` is
 // 140 lines of real permission logic and lives in s2s/config/internal, so `**/config/**` wholesale would drop it.
 // The `**` before the file name matters — `*` does not cross a `/`, so `**/config/*Config.class` silently missed
