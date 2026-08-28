@@ -6,10 +6,14 @@ import type {ThemeFonts} from '@store-front/theme';
  * a compact heavy kufi-grotesk that keeps the poster voice in RTL locales. Body: Rubik (Latin, Cyrillic,
  * Arabic in one family) for everything that explains. Display elements are set at weight 400 so Anton
  * is never faux-bolded; Changa ships only its 800 face, so the same weight request resolves to it.
+ *
+ * `preload: false` on every face: all themes' font CSS lands in the SAME layout entry, so a preload
+ * here fires on every storefront whatever theme is active. @font-face still fetches the faces the page
+ * actually uses; `display: swap` covers the extra hop.
  */
-const display = Anton({subsets: ['latin', 'latin-ext'], weight: '400', display: 'swap', variable: '--font-fashion-display'});
-const arabic = Changa({subsets: ['arabic', 'latin'], weight: ['800'], display: 'swap', variable: '--font-fashion-arabic'});
-const sans = Rubik({subsets: ['latin', 'latin-ext', 'cyrillic', 'arabic'], weight: ['400', '500', '700'], display: 'swap', variable: '--font-fashion-sans'});
+const display = Anton({subsets: ['latin', 'latin-ext'], weight: '400', display: 'swap', preload: false, variable: '--font-fashion-display'});
+const arabic = Changa({subsets: ['arabic', 'latin'], weight: ['800'], display: 'swap', preload: false, variable: '--font-fashion-arabic'});
+const sans = Rubik({subsets: ['latin', 'latin-ext', 'cyrillic', 'arabic'], weight: ['400', '500', '700'], display: 'swap', preload: false, variable: '--font-fashion-sans'});
 
 export const fonts: ThemeFonts = {
     variables: [display.variable, arabic.variable, sans.variable].join(' '),

@@ -2,8 +2,9 @@ import '../../globals.css';
 import type {Metadata} from 'next';
 import type {ReactNode} from 'react';
 import {headers} from 'next/headers';
-import {redirect} from 'next/navigation';
+import {notFound, redirect} from 'next/navigation';
 import {NextIntlClientProvider} from 'next-intl';
+import {routing} from '@store-front/i18n/routing';
 import {getDirection} from '@store-front/i18n/direction';
 import {localSupported, redirectToSupportedLang} from '@store-front/services/locale-utils';
 import {isApiError} from '@store-front/types';
@@ -20,6 +21,14 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function StorefrontLayout({children, params}: { children: ReactNode; params: Promise<{ locale: string }> }) {
     const {locale} = await params;
+
+    // `[locale]` matches any single segment, and proxy.ts deliberately lets paths with a file extension
+    // past next-intl, so /llms.txt, /ads.txt and every scanner probe land here as a "locale". Reject
+    // anything that is not one of the app's locales up front: without this a bogus path costs a store
+    // fetch and a full storefront render before redirectToSupportedLang() sends it to the default
+    // language — Lighthouse measured 383 KB for one such probe.
+    if (!(routing.locales as readonly string[]).includes(locale)) notFound();
+
     const [theme, storeContext] = await Promise.all([getTheme(), getStoreContext()]);
 
     let store;

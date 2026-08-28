@@ -9,10 +9,14 @@ import type {ThemeFonts} from '@store-front/theme';
  * are variable, so weights are free and nothing is faux-bolded. The two Sofia cuts ship without next/font's
  * metric-adjusted local fallback: that fallback (Arial-based) carries Arabic glyphs and would catch them before
  * Cairo does, so Arabic would render in Arial instead of Cairo.
+ *
+ * `preload: false` on every face: all themes' font CSS lands in the SAME layout entry, so a preload
+ * here fires on every storefront whatever theme is active. @font-face still fetches the faces the page
+ * actually uses; `display: swap` covers the extra hop.
  */
-const sans = Sofia_Sans({subsets: ['latin', 'latin-ext', 'cyrillic'], display: 'swap', variable: '--font-basic-sans', adjustFontFallback: false});
-const display = Sofia_Sans_Extra_Condensed({subsets: ['latin', 'latin-ext', 'cyrillic'], display: 'swap', variable: '--font-basic-display', adjustFontFallback: false});
-const arabic = Cairo({subsets: ['arabic', 'latin'], display: 'swap', variable: '--font-basic-arabic'});
+const sans = Sofia_Sans({subsets: ['latin', 'latin-ext', 'cyrillic'], display: 'swap', preload: false, variable: '--font-basic-sans', adjustFontFallback: false});
+const display = Sofia_Sans_Extra_Condensed({subsets: ['latin', 'latin-ext', 'cyrillic'], display: 'swap', preload: false, variable: '--font-basic-display', adjustFontFallback: false});
+const arabic = Cairo({subsets: ['arabic', 'latin'], display: 'swap', preload: false, variable: '--font-basic-arabic'});
 
 export const fonts: ThemeFonts = {
     variables: [sans.variable, display.variable, arabic.variable].join(' '),

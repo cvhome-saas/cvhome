@@ -23,6 +23,12 @@
 
 (routes) {
 
+    # Spring Boot leaves server.compression off, so every JSON body from merchant/catalog/checkout/
+    # inventory/content/payment/cua used to reach the shopper uncompressed (a category hierarchy is
+    # ~6 KB that gzips to 1.5 KB). Caddy skips anything that already carries Content-Encoding, so
+    # landing-ui's HTML — Next gzips it itself — passes through untouched.
+    encode zstd gzip
+
     # Caddy sends X-Forwarded-Proto and X-Forwarded-Host but never X-Forwarded-Port, and Tomcat's RemoteIpValve
     # (forward-headers-strategy: NATIVE) strips the port out of X-Forwarded-Host and then falls back to 80/443.
     # Anything building an absolute URL from the request — cua's DynamicRegisteredClientRepository derives the

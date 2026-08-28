@@ -9,16 +9,20 @@ import type {ThemeFonts} from '@store-front/theme';
  * Cairo is the Arabic companion on both roles: neither Latin cut carries Arabic, so Arabic falls through
  * to Cairo per glyph while Latin inside an Arabic page keeps its own voice. Both Latin cuts ship without
  * next/font's Arial-based metric fallback, which carries Arabic glyphs and would catch them before Cairo.
+ *
+ * `preload: false` on every face: all themes' font CSS lands in the SAME layout entry, so a preload
+ * here fires on every storefront whatever theme is active. @font-face still fetches the faces the page
+ * actually uses; `display: swap` covers the extra hop.
  */
 const display = Dela_Gothic_One({
-    weight: '400', subsets: ['latin', 'latin-ext'], display: 'swap',
+    weight: '400', subsets: ['latin', 'latin-ext'], display: 'swap', preload: false,
     variable: '--font-pink-display', adjustFontFallback: false,
 });
 const sans = M_PLUS_Rounded_1c({
-    weight: ['400', '500', '700', '800'], subsets: ['latin', 'latin-ext', 'cyrillic'], display: 'swap',
+    weight: ['400', '500', '700', '800'], subsets: ['latin', 'latin-ext', 'cyrillic'], display: 'swap', preload: false,
     variable: '--font-pink-sans', adjustFontFallback: false,
 });
-const arabic = Cairo({subsets: ['arabic', 'latin'], display: 'swap', variable: '--font-pink-arabic'});
+const arabic = Cairo({subsets: ['arabic', 'latin'], display: 'swap', preload: false, variable: '--font-pink-arabic'});
 
 export const fonts: ThemeFonts = {
     variables: [display.variable, sans.variable, arabic.variable].join(' '),

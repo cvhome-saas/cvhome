@@ -2,6 +2,7 @@ import 'server-only';
 import {cache} from 'react';
 import {ContentService} from '@store-front/services/content-service';
 import {ProductService} from '@store-front/services/product-service';
+import {toListingProducts} from '@store-front/services/product-presenter';
 import type {HomeSection, ProductGroup, ProductGroupCode} from '@store-front/types';
 import type {HomeData} from '@store-front/theme';
 import {getStoreContext} from '@/shell/request/store-context';
@@ -47,7 +48,8 @@ export const loadHome = cache(async (): Promise<HomeData> => {
         },
         sections,
         groups: groups.flatMap((g, i) => renderable(g)
-            ? [{code: codes[i], title: g!.description!.name, products: g!.products!}]
+            // Rails render cards, so the products cross into client components — send only what a card reads.
+            ? [{code: codes[i], title: g!.description!.name, products: toListingProducts(g!.products)!}]
             : []),
     };
 });

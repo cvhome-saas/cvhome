@@ -8,25 +8,29 @@ import type {ThemeFonts} from '@store-front/theme';
  * Alumni Sans is the printed voice — a tall collegiate gothic for the masthead, the section bands, the
  * dish numbers and every price. Geologica sets what has to be read: dish names, descriptions, forms.
  * Alexandria leads both roles in Arabic (see the :lang(ar) block in tokens.css).
+ *
+ * `preload: false` on every face: all themes' font CSS lands in the SAME layout entry, so a preload
+ * here fires on every storefront whatever theme is active. @font-face still fetches the faces the page
+ * actually uses; `display: swap` covers the extra hop.
  */
 const display = Alumni_Sans({
     subsets: ['latin', 'latin-ext', 'cyrillic'],
     weight: ['600', '700', '800', '900'],
-    display: 'swap',
+    display: 'swap', preload: false,
     variable: '--font-hunger-display',
 });
 
 const sans = Geologica({
     subsets: ['latin', 'latin-ext', 'cyrillic'],
     weight: ['300', '400', '500', '600', '700'],
-    display: 'swap',
+    display: 'swap', preload: false,
     variable: '--font-hunger-sans',
 });
 
 const arabic = Alexandria({
     subsets: ['arabic', 'latin'],
     weight: ['300', '400', '600', '700', '800'],
-    display: 'swap',
+    display: 'swap', preload: false,
     variable: '--font-hunger-arabic',
 });
 

@@ -3,6 +3,7 @@ import {cache} from 'react';
 import {notFound} from 'next/navigation';
 import {getTranslations} from 'next-intl/server';
 import {ProductService} from '@store-front/services/product-service';
+import {toListingProducts} from '@store-front/services/product-presenter';
 import {isApiError} from '@store-front/types';
 import type {ProductData} from '@store-front/theme';
 import {getStoreContext} from '@/shell/request/store-context';
@@ -28,6 +29,8 @@ export const loadProduct = cache(async (url: string): Promise<ProductData> => {
     return {
         product,
         breadcrumbs: crumbs,
-        related: related?.active && related.products ? related.products : [],
+        // `product` stays whole — the buy box needs the gallery, options and attributes. The related rail
+        // is cards, so it gets the listing projection.
+        related: related?.active && related.products ? toListingProducts(related.products)! : [],
     };
 });

@@ -13,9 +13,8 @@ create table if not exists merchant.merchant_store
     lineage                           varchar(255),
     org                               varchar(255) not null,
     theme                             varchar(25)  not null
-        check (theme in ('DEFAULT','BASIC','BEAUTY','COSMETICS','FASHION','FURNITURE','GLASSES','GROCERY','HUNGER',
-                         'JEWELLERY','PINK','SPORTS','BASIS','MODERN','JEWELERY','ELECTRONICS','FOOD','WATCHES',
-                         'BABY','TOOLS')),
+        check (theme in ('BASIS','MODERN','JEWELERY','BEAUTY','FURNITURE','SPORTS','ELECTRONICS','FOOD','GLASSES',
+                         'COSMETICS','WATCHES','BABY','TOOLS')),
     color_theme                       varchar(25)  not null
         check (color_theme in ('DEFAULT','LIGHT','DARK','NATURE','OCEAN','MIDNIGHT','FOREST_WHISPER','DESERT_MIRAGE',
                                'MIDNIGHT_DUSK','ROSE','LAVENDER','AURORA_LIGHTS','CYBERPUNK','AUTUMN_HARVEST',
@@ -62,15 +61,3 @@ create table if not exists merchant.store_domains
     domain_type       varchar(15) not null check (domain_type in ('SUB_DOMAIN','CUSTOM_DOMAIN')),
     constraint FKpw0mfwlhf9uay27vw3sbal8ao foreign key (store_merchant_id) references merchant.merchant_store
 );
-
--- The theme list grew: landing-ui ships a package per implemented `Theme` value, and the seven values it
--- already knew about (DEFAULT, FASHION, BASIC, GROCERY, PINK, HUNGER, JEWELLERY) were unwritable here
--- because the check above predates them. `create table if not exists` leaves an existing database on the
--- constraint it was created with, so replace it by name — a no-op once it already matches. The name is the
--- one Postgres gives the inline check above, so a fresh database and an old one end up on the same rule.
-alter table merchant.merchant_store drop constraint if exists merchant_store_theme_check;
-alter table merchant.merchant_store
-    add constraint merchant_store_theme_check
-        check (theme in ('DEFAULT','BASIC','BEAUTY','COSMETICS','FASHION','FURNITURE','GLASSES','GROCERY','HUNGER',
-                         'JEWELLERY','PINK','SPORTS','BASIS','MODERN','JEWELERY','ELECTRONICS','FOOD','WATCHES',
-                         'BABY','TOOLS'));

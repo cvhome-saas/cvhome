@@ -376,9 +376,6 @@ Expected. Do not report these.
   derivative sizes.
 - **Theme and colour scheme are still merchant's.** Deliberately out of scope — content is meant to own views
   config, and this is the next step. Store management still edits them.
-- **The seeded asset URLs are local.** The demo seeds hard-code `http://localhost:9000/<bucket>/…`, so on a
-  `+1000` shifted stack the demo images 404 until they are re-uploaded. Real uploads resolve against the
-  configured CDN base and are unaffected.
 - **Demo media assets report 0 bytes.** The seed registers pre-existing objects without weighing them, so the
   quota bar ignores them.
 - **There is no Sections tab in the console yet.** `SectionApi` and `SectionsService` exist and `.http` blocks

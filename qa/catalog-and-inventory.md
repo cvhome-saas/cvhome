@@ -133,8 +133,9 @@ the console reads its own catalogue through it on purpose (see [99](#99--known-g
 
 - **Steps** — `GET /catalog/api/v2/products?store=<org1-store1>&lang=en&count=3` on the pod path.
 - **Expect** — 200, `totalElements: 45`, each row with `sku`, `description.name` in English,
-  `description.friendlyUrl`, `image.imageUrl` (a `localhost:9000` MinIO path), `images[]`, `manufacturer.code`,
-  `type.code`, `categories[]` (two per seeded product), `productSpecifications` with `cm`/`kg` units — and
+  `description.friendlyUrl`, `image.imageUrl` (under the configured `com.asrevo.cvhome.cdn.base-path`),
+  `images[]`, `manufacturer.code`, `type.code`, `categories[]` (two per seeded product),
+  `productSpecifications` with `cm`/`kg` units — and
   **no** `price`, `quantity`, `finalPrice`, `canBePurchased` or `attributes` fields at all.
 
 ### LST-02 — A single category filter widens to its subtree · critical · [verified]

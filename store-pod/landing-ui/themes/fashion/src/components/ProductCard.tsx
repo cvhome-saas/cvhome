@@ -15,8 +15,13 @@ import {ProductBadges} from './ProductBadges';
  * A product poster: picture on paper (second picture on hover), stamps over the picture, the name in poster
  * caps, the price printed on the foot beside a day-glo add square. Adding slaps an ADDED stamp on the poster.
  * Products with variants go to their page instead (the square becomes an arrow).
+ *
+ * `heading` is the level the name is set at. h3 suits a card sitting under a section's h2; the hero wall
+ * pastes a poster straight under the store's h1, where h3 would skip a level.
  */
-export function ProductCard({product, storeContext, priority, className}: { product: Product; storeContext: StoreContext; priority?: boolean; className?: string }) {
+export function ProductCard({product, storeContext, priority, className, heading: Heading = 'h3'}: {
+    product: Product; storeContext: StoreContext; priority?: boolean; className?: string; heading?: 'h2' | 'h3'
+}) {
     const t = useTranslations('COMPONENTS.PRODUCT');
     const {addToCart, status, count} = useCart(storeContext);
     const [stampKey, setStampKey] = useState(0);
@@ -65,9 +70,9 @@ export function ProductCard({product, storeContext, priority, className}: { prod
                 )}
             </Link>
             <div className="flex flex-1 flex-col px-3 pb-3 pt-2.5">
-                <h3 className="line-clamp-2 font-display text-lg uppercase leading-[0.95]" dir="auto">
+                <Heading className="line-clamp-2 font-display text-lg uppercase leading-[0.95]" dir="auto">
                     <Link prefetch={false} href={href} className="hover:underline hover:decoration-primary hover:decoration-[3px] hover:underline-offset-4"><bdi>{name}</bdi></Link>
-                </h3>
+                </Heading>
                 {brand && <p className="mt-1 truncate text-xs uppercase tracking-wide text-muted-foreground">{brand}</p>}
                 <div className="mt-auto flex items-end justify-between gap-2 pt-3">
                     <p className="flex flex-col leading-none tabular-nums">
