@@ -12,7 +12,7 @@ import lombok.AllArgsConstructor;
  * {@code implemented} is narrower than "landing-ui can render it": it means a designed theme stands
  * behind the value, and only these are offered for selection ({@link #getImplementedThemes()}). The
  * rest still resolve — through the registry or landing-ui's {@code LEGACY_THEME_MAP} — so a store
- * already set to one keeps loading, and `?theme=<id>` still previews them wherever the storefront
+ * already set to one keeps loading, and {@code ?theme=<id>} still previews them wherever the storefront
  * allows previews. See {@code store-pod/landing-ui/themes/README.md} for what each one is.
  *
  * Promoting a theme to selectable is three edits, all needed: {@code implemented=true} here, the value
