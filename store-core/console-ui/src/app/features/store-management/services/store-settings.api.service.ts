@@ -40,6 +40,20 @@ import {
 export type SectionPatch = Readonly<Record<string, unknown>>;
 
 /**
+ * A reference list that is guaranteed to contain what the store is already set to.
+ *
+ * A server list is what may be *chosen*, which is not the same as what has been chosen: values get
+ * retired, and a lookup can fail outright. Either way a select whose options omit its own value shows
+ * nothing, so the current value is appended when the list does not already carry it.
+ */
+function withPresent(options: readonly string[], current: string | undefined): readonly string[] {
+  if (!current || options.includes(current)) {
+    return options;
+  }
+  return [...options, current];
+}
+
+/**
  * What a CNAME lookup means for the panel.
  *
  * `no-record` and `no-such-domain` are both "not there yet" rather than wrong: a record that has been
@@ -161,8 +175,14 @@ export class StoreSettingsApi {
         const domains = this.domains(allocations, store);
         const storefront = domains.find((entry) => entry.type === 'SUB_DOMAIN')?.hostname ?? null;
         const choices: SettingsChoices = {
-          themes,
-          colorThemes,
+          /*
+           * The server offers only `Theme.getImplementedThemes()`, which deliberately omits the legacy
+           * values (BASIS, MODERN, ELECTRONICS…) that all render the same storefront as DEFAULT. A store
+           * already set to one of those must still show what it is on, so its current theme joins the
+           * list — the same reason `languages` falls back below.
+           */
+          themes: withPresent(themes, store.theme),
+          colorThemes: withPresent(colorThemes, store.colorTheme),
           socialLinkProviders,
           /*
            * The store's own supported languages, falling back to whatever it is already set to —
