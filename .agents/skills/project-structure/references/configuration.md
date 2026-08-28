@@ -196,6 +196,13 @@ plain `schema.sql` for tenancy (which owns three schemas: `tenancy`, `org`, `ten
 
 Full detail — the JDBC vs JPA split, conventions in the DDL, and the outbox tables: `database-schemas.md`.
 
+**No script writes a host.** Seeds and uploads store where an object lives, never its address:
+`content.media_asset.storage_key` is the object's key in the bucket, and `catalog.product_image.image_url` is the
+same key, cached so reading a product needs no call into content. The url a browser fetches is composed on the
+way out — `MediaStorage.url` in content, `ImageMapper.url` in catalog — from
+`com.asrevo.cvhome.cdn.base-path`. That is what lets one seed serve local MinIO, a `--stack` run on a shifted
+port, and a real CDN, and what makes moving the CDN a config change rather than a backfill.
+
 ## Where to change what
 
 | Change | File |
@@ -205,5 +212,6 @@ Full detail — the JDBC vs JPA split, conventions in the DDL, and the outbox ta
 | AWS Cloud Map namespace, per-service ports in ECS | `fargate-config.yml` |
 | Which token issuers pod services trust | `store-pod-{lcl,fargate}-config.yml` |
 | Local object storage (MinIO) or pod identity | `store-pod-lcl-config.yml` |
+| Where uploaded and seeded media is served from | `com.asrevo.cvhome.cdn.base-path` (seeds store keys, not urls) |
 | Which pods store-core can reach locally | `store-core-lcl-config.yml` |
 | One service's own settings (timeouts, business rules, outbox) | that service's `application.yml` |
