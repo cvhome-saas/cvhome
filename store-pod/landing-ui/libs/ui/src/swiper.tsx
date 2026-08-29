@@ -79,9 +79,20 @@ export function Swiper({
     const t = useTranslations('COMMON');
     const viewportRef = useRef<HTMLDivElement>(null);
     const interactedRef = useRef(false);
+    const activeIndexRef = useRef(0);
     const [activeIndex, setActiveIndex] = useState(0);
     const slides = Children.toArray(children);
     const count = slides.length;
+
+    // Themes pass `autoplay` as an inline literal, so the object identity changes on every render: only the
+    // primitives it carries may be depended on, or every callback below is rebuilt and every effect re-runs.
+    const autoplayDelay = autoplay ? Math.max(5000, autoplay.delay ?? 5000) : 0;
+    const autoplayStopsOnInteraction = autoplay ? autoplay.disableOnInteraction !== false : false;
+
+    const setActive = useCallback((index: number) => {
+        activeIndexRef.current = index;
+        setActiveIndex(index);
+    }, []);
 
     const configAt = useCallback((point: number): Required<SlideConfig> => {
         const entries = Object.entries(breakpoints ?? {})
@@ -116,21 +127,34 @@ export function Swiper({
     }, [configAt, slidesPerView, spaceBetween]);
 
     const goTo = useCallback((index: number, manual = true) => {
-        if (count === 0) return;
+        const viewport = viewportRef.current;
+        if (!viewport || count === 0) return;
         const next = loop ? (index + count) % count : Math.min(Math.max(index, 0), count - 1);
-        const element = viewportRef.current?.children.item(next);
+        const element = viewport.children.item(next);
         if (!(element instanceof HTMLElement)) return;
-        if (manual && autoplay && autoplay.disableOnInteraction !== false) interactedRef.current = true;
-        element.scrollIntoView({behavior: 'smooth', block: 'nearest', inline: 'start'});
-    }, [autoplay, count, loop]);
+        if (manual && autoplayStopsOnInteraction) interactedRef.current = true;
+        // Scrolling the track itself, rather than scrollIntoView, so autoplay never drags the page to the carousel.
+        const offset = element.getBoundingClientRect().left - viewport.getBoundingClientRect().left;
+        viewport.scrollTo({left: viewport.scrollLeft + offset, behavior: 'smooth'});
+    }, [autoplayStopsOnInteraction, count, loop]);
 
+    // Stable for the lifetime of the carousel, so `onSwiper` reports the instance once as Swiper's own does.
     const api = useMemo<SwiperApi>(() => ({
-        slideNext: () => goTo(activeIndex + 1),
-        slidePrev: () => goTo(activeIndex - 1),
-    }), [activeIndex, goTo]);
+        slideNext: () => goTo(activeIndexRef.current + 1),
+        slidePrev: () => goTo(activeIndexRef.current - 1),
+    }), [goTo]);
 
-    useEffect(() => onSwiper?.(api), [api, onSwiper]);
-    useEffect(() => onSlideChange?.({realIndex: activeIndex}), [activeIndex, onSlideChange]);
+    // Themes also pass these as inline literals; reading them from a ref keeps a new identity from re-firing them.
+    const callbacksRef = useRef({onSwiper, onSlideChange});
+    useEffect(() => {
+        callbacksRef.current = {onSwiper, onSlideChange};
+    });
+    useEffect(() => {
+        callbacksRef.current.onSwiper?.(api);
+    }, [api]);
+    useEffect(() => {
+        callbacksRef.current.onSlideChange?.({realIndex: activeIndex});
+    }, [activeIndex]);
 
     useEffect(() => {
         const viewport = viewportRef.current;
@@ -141,21 +165,20 @@ export function Swiper({
                 .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
             if (!(visible?.target instanceof HTMLElement)) return;
             const index = Number(visible.target.dataset.carouselIndex);
-            if (Number.isInteger(index)) setActiveIndex(index);
+            if (Number.isInteger(index)) setActive(index);
         }, {root: viewport, threshold: [0.51, 0.75, 0.99]});
         for (const slide of viewport.children) observer.observe(slide);
         return () => observer.disconnect();
-    }, [count]);
+    }, [count, setActive]);
 
     useEffect(() => {
-        if (!autoplay || count < 2 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-        const delay = Math.max(5000, autoplay.delay ?? 5000);
+        if (autoplayDelay === 0 || count < 2 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
         const timer = window.setInterval(() => {
             if (document.hidden || interactedRef.current) return;
-            goTo(activeIndex + 1, false);
-        }, delay);
+            goTo(activeIndexRef.current + 1, false);
+        }, autoplayDelay);
         return () => window.clearInterval(timer);
-    }, [activeIndex, autoplay, count, goTo]);
+    }, [autoplayDelay, count, goTo]);
 
     const numbered = typeof pagination === 'object' && typeof pagination.renderBullet === 'function';
     const previousDisabled = !loop && activeIndex === 0;

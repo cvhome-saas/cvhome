@@ -351,7 +351,7 @@ class ProductSearchApiIntegrationTest {
      */
     @Test
     void aCategoryFilterCombinesWithARelevanceSortedQuery() {
-        JsonNode matched = search(STORE_A, EN, SEEDED_NAME_FRAGMENT, "facets=true&" + A_PAGE);
+        JsonNode matched = search(STORE_A, EN, SEEDED_NAME_FRAGMENT, "facets=true&%s".formatted(A_PAGE));
         long categoryId = matched.get(FACETS).get(CATEGORIES).get(0).get(ID).asLong();
 
         JsonNode narrowed = search(STORE_A, EN, SEEDED_NAME_FRAGMENT,
