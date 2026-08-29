@@ -1,4 +1,3 @@
-import {showToast} from "nextjs-toast-notify";
 import {toastDirection} from "@store-front/services/direction-utils";
 
 /** One toast vocabulary for every hook and theme. */
@@ -10,7 +9,9 @@ export function notify(kind: 'success' | 'error' | 'info', message: string, loca
         transition: "bounceIn",
         sound: false,
     } as const;
-    if (kind === 'success') showToast.success(message, options);
-    else if (kind === 'error') showToast.error(message, options);
-    else showToast.info(message, options);
+    void import('nextjs-toast-notify').then(({showToast}) => {
+        if (kind === 'success') showToast.success(message, options);
+        else if (kind === 'error') showToast.error(message, options);
+        else showToast.info(message, options);
+    });
 }

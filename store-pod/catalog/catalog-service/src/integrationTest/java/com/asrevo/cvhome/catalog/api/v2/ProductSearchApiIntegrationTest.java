@@ -345,6 +345,41 @@ class ProductSearchApiIntegrationTest {
         assertThat(narrowed.get(TOTAL_ELEMENTS).asLong()).isLessThanOrEqualTo(all.get(TOTAL_ELEMENTS).asLong());
     }
 
+    /**
+     * A term and a category together, ordered by relevance — the combination that a join plus {@code distinct}
+     * cannot express, because the rank is a subquery rather than one of the selected columns.
+     */
+    @Test
+    void aCategoryFilterCombinesWithARelevanceSortedQuery() {
+        JsonNode matched = search(STORE_A, EN, SEEDED_NAME_FRAGMENT, "facets=true&" + A_PAGE);
+        long categoryId = matched.get(FACETS).get(CATEGORIES).get(0).get(ID).asLong();
+
+        JsonNode narrowed = search(STORE_A, EN, SEEDED_NAME_FRAGMENT,
+                "categoryIds=%d&sort=RELEVANCE&%s".formatted(categoryId, A_PAGE));
+
+        assertThat(narrowed.get(TOTAL_ELEMENTS).asLong()).isPositive();
+        assertThat(skus(narrowed)).contains(SEEDED_SKU);
+    }
+
+    /**
+     * The same shape without a text match: relevance degrades to the merchant's ordering, and a product filed
+     * under several of the selected categories must still appear once.
+     */
+    @Test
+    void aProductInSeveralSelectedCategoriesIsListedOnce() {
+        JsonNode all = search(STORE_A, EN, EVERYTHING_WITH_FACETS);
+        JsonNode categories = all.get(FACETS).get(CATEGORIES);
+        StringBuilder ids = new StringBuilder();
+        for (JsonNode bucket : categories) {
+            ids.append(ids.isEmpty() ? "" : ",").append(bucket.get(ID).asLong());
+        }
+
+        JsonNode narrowed = search(STORE_A, EN, "q=&facets=false&categoryIds=%s&%s".formatted(ids, EVERY_RESULT));
+
+        assertThat(skus(narrowed)).doesNotHaveDuplicates();
+        assertThat(narrowed.get(TOTAL_ELEMENTS).asLong()).isEqualTo(skus(narrowed).size());
+    }
+
     // ---------------------------------------------------------------------------------------------- pagination
 
     @Test

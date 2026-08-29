@@ -1,13 +1,10 @@
 'use client'
 import Image from 'next/image';
 import {useTranslations} from 'next-intl';
-import {Swiper, SwiperSlide} from 'swiper/react';
-import {A11y, Autoplay, Pagination} from 'swiper/modules';
-import 'swiper/css';
-import 'swiper/css/pagination';
 import {useDir} from '@store-front/i18n/use-dir';
 import type {Banner} from '@store-front/types';
 import {cn} from '@store-front/ui/lib/utils';
+import {Swiper, SwiperSlide} from '@store-front/ui/swiper';
 import {StarMark} from '../components/Marks';
 
 export type CoverLine = { id: string; title: string; count: number; href: string };
@@ -53,7 +50,7 @@ export function Hero({slides, storeName, lines, actionHref}: {
                 </div>
                 {hasSlides && (
                     <div className="hair -mx-gutter min-w-0 overflow-hidden border-t-2 lg:col-start-3 lg:mx-0 lg:border-s-2 lg:border-t-0">
-                        <Swiper key={dir} dir={dir} modules={[Pagination, Autoplay, A11y]} loop={slides.length > 1}
+                        <Swiper key={dir} dir={dir} loop={slides.length > 1}
                                 pagination={{clickable: true}}
                                 autoplay={slides.length > 1 ? {delay: 5000, disableOnInteraction: true} : false}
                                 a11y={{enabled: true}} className="!h-full !w-full">
