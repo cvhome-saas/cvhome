@@ -34,6 +34,19 @@ export class InventoryService {
   }
 
   /**
+   * Every sku of the given products, in one call.
+   *
+   * The list needs this rather than `bySkus`: a product's stock is the sum of its variants', and the page only
+   * knows each product's **default** sku — reporting that one row's quantity as the product's understates a
+   * variant product's stock by everything the other combinations hold.
+   */
+  byProducts(productIds: readonly number[]): Observable<readonly SkuInventory[]> {
+    return this.crudService.get(`${INVENTORY_V1}/private/inventory/by-products`, {
+      productIds: productIds.join(','),
+    });
+  }
+
+  /**
    * Create or update the SKU's single inventory record — quantity, availability and default price
    * in one write. This is the console's whole write path for stock and price.
    */

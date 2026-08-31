@@ -24,6 +24,8 @@ import jakarta.persistence.Table;
 import jakarta.persistence.TableGenerator;
 import jakarta.persistence.UniqueConstraint;
 
+import org.hibernate.annotations.BatchSize;
+
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.constants.SchemaConstant;
 import com.asrevo.cvhome.store.core.entity.common.audit.AuditListener;
@@ -97,7 +99,12 @@ public class ProductVariant extends SalesManagerEntity<Long, ProductVariant> imp
     @Column(name = "OPTION_SIGNATURE", nullable = false)
     private String optionSignature = DEFAULT_SIGNATURE;
 
+    /*
+     * Batched: the PDP and the console matrix fetch-join these, but anything else iterating a product's
+     * variants would otherwise pay one query per variant.
+     */
     @OneToMany(mappedBy = "variant", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @BatchSize(size = 100)
     private Set<ProductVariantOptionValue> optionValues = new HashSet<>();
 
     public ProductVariant() {

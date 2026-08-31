@@ -16,6 +16,12 @@ public interface InventoryService {
 
     List<SkuInventory> getBySkus(StoreMerchantId store, Collection<String> skus);
 
+    /**
+     * Every sku of the given products, in one query. The console's list totals a product's variants from this
+     * rather than reporting the default variant's stock as though it were the product's.
+     */
+    List<SkuInventory> getByProductIds(StoreMerchantId store, Collection<Long> productIds);
+
     SkuInventory upsert(StoreMerchantId store, String sku, PersistableInventory inventory);
 
     /**

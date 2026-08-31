@@ -6,10 +6,12 @@ import jakarta.validation.Valid;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
@@ -27,8 +29,9 @@ import lombok.RequiredArgsConstructor;
 import static com.asrevo.cvhome.commons.utils.DefaultStoresConstants.DEFAULT_ORG1_STORE1_STR;
 
 /**
- * The merchant's write side: one upsert per sku, plus cleanup after a catalog product delete. Reads go through the
- * public bulk endpoint in {@link ExternalInventoryApi}.
+ * The merchant's write side: one upsert per sku, plus cleanup after a catalog product delete. Sku-addressed reads
+ * go through the public bulk endpoint in {@link ExternalInventoryApi}; the one read that lives here is
+ * product-addressed, because only the console asks "what does this product hold across all its variants".
  */
 @RestController
 @RequestMapping("/api/v1/private/inventory")
@@ -37,6 +40,18 @@ import static com.asrevo.cvhome.commons.utils.DefaultStoresConstants.DEFAULT_ORG
 public class InventoryApi {
 
     private final InventoryService inventoryService;
+
+    /**
+     * Every sku of the given products — the console list's stock column, which must total a product's variants
+     * rather than report the default variant's quantity as though it were the product's. One query for the whole
+     * page, served by the {@code (product_id, store_merchant_id)} index.
+     */
+    @GetMapping("/by-products")
+    @Parameter(name = "store", schema = @Schema(type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.INVENTORY.*')")
+    public List<SkuInventory> getByProducts(@RequestParam List<Long> productIds, StoreMerchantId merchantStore) {
+        return inventoryService.getByProductIds(merchantStore, productIds);
+    }
 
     @PutMapping("/bulk")
     @Parameter(name = "store", schema = @Schema(type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))

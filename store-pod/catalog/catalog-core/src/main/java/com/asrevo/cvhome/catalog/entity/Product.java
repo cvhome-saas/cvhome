@@ -122,12 +122,21 @@ public class Product extends SalesManagerEntity<Long, Product> implements Audita
     @JoinColumn(name = "PRODUCT_TYPE_ID")
     private ProductType type;
 
+    /*
+     * These three are batched for the same reason {@link #variants} is, and it is not a micro-optimisation.
+     * `findAllHydrated` fetch-joins them for the by-sku and search paths, but the LISTING pages ids through
+     * `search(...)` and maps the entities directly — so without a batch size every card's categories,
+     * descriptions and images were a query of their own: a 20-product page issued 100 statements, 60 of them
+     * one-per-product. Measured against the running stack; with the batch size the same page issues ~20.
+     */
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "PRODUCT_CATEGORY", joinColumns = @JoinColumn(name = "PRODUCT_ID"),
             inverseJoinColumns = @JoinColumn(name = "CATEGORY_ID"))
+    @BatchSize(size = 100)
     private Set<Category> categories = new HashSet<>();
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @BatchSize(size = 100)
     private Set<ProductDescription> descriptions = new HashSet<>();
 
     /**
@@ -135,6 +144,7 @@ public class Product extends SalesManagerEntity<Long, Product> implements Audita
      * Removed with the product.
      */
     @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
+    @BatchSize(size = 100)
     private Set<ProductImage> images = new HashSet<>();
 
     /**

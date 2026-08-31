@@ -44,4 +44,16 @@ public interface InventoryRepository extends JpaRepository<Inventory, Long> {
     Optional<Inventory> lockBySku(StoreMerchantId store, String sku);
 
     List<Inventory> findByStoreMerchantIdAndProductId(StoreMerchantId store, Long productId);
+
+    /**
+     * Every sku belonging to a page of products — the console's stock column, which totals a product's variants
+     * rather than reporting whichever one happens to be the default. Served by
+     * {@code prd_avail_store_prd_idx (product_id, store_merchant_id)}, so one query covers the whole page.
+     */
+    @Query("""
+            select distinct i from Inventory i
+            left join fetch i.prices
+            where i.storeMerchantId = ?1 and i.productId in ?2
+            order by i.id""")
+    List<Inventory> findByProductIds(StoreMerchantId store, Collection<Long> productIds);
 }

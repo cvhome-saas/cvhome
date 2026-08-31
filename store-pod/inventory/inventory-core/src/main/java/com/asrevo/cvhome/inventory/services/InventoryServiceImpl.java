@@ -42,6 +42,21 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<SkuInventory> getByProductIds(StoreMerchantId store, Collection<Long> productIds) {
+        if (productIds.isEmpty()) {
+            return List.of();
+        }
+        LocalDate today = LocalDate.now();
+        // Same first-row-per-sku rule as getBySkus: legacy data may hold duplicates and every reader must agree.
+        Map<String, SkuInventory> bySku = new LinkedHashMap<>();
+        for (Inventory inventory : inventoryRepository.findByProductIds(store, productIds)) {
+            bySku.putIfAbsent(inventory.getSku(), SkuInventoryMapper.toSkuInventory(inventory, today));
+        }
+        return List.copyOf(bySku.values());
+    }
+
+    @Override
     @Transactional
     public SkuInventory upsert(StoreMerchantId store, String sku, PersistableInventory source) {
         Inventory inventory = inventoryRepository.findBySku(store, sku).orElseGet(() -> new Inventory(store, sku));

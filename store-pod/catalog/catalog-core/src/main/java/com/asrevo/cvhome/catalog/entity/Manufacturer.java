@@ -22,6 +22,8 @@ import jakarta.persistence.Table;
 import jakarta.persistence.TableGenerator;
 import jakarta.persistence.UniqueConstraint;
 
+import org.hibernate.annotations.BatchSize;
+
 import com.asrevo.cvhome.catalog.model.product.event.BrandRenamedEvent;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
@@ -42,6 +44,13 @@ import lombok.Setter;
 @Table(name = "MANUFACTURER", uniqueConstraints = @UniqueConstraint(columnNames = {"STORE_MERCHANT_ID", "CODE"}))
 @Getter
 @Setter
+/*
+ * Batched at the class level so a listing page initialises every distinct brand proxy in one
+ * query instead of one apiece — a page showing six brands issued six selects and six more for their
+ * descriptions. Bounded by distinct entities rather than by rows, so it was never the worst offender,
+ * but it is the same fix and the same one line.
+ */
+@BatchSize(size = 100)
 public class Manufacturer extends SalesManagerEntity<Long, Manufacturer> implements Auditable {
 
     @Serial
@@ -71,6 +80,8 @@ public class Manufacturer extends SalesManagerEntity<Long, Manufacturer> impleme
     private Integer order;
 
     @OneToMany(mappedBy = "manufacturer", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    // Batched: the brand column of a listing page.
+    @BatchSize(size = 100)
     private Set<ManufacturerDescription> descriptions = new HashSet<>();
 
     public Optional<ManufacturerDescription> description(LanguageCode language) {

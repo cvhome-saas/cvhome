@@ -44,8 +44,16 @@ class FakeInventoryService {
   readonly upserts: {sku: string; body: unknown}[] = [];
   readonly deletes: number[] = [];
   inventories: SkuInventory[] = [
-    {sku: 'ACM-1', available: true, canBePurchased: true, quantity: 12, price: {originalPrice: 129, finalPrice: 129, discounted: false, discountPercent: 0}},
+    {sku: 'ACM-1', productId: 1, available: true, canBePurchased: true, quantity: 12, price: {originalPrice: 129, finalPrice: 129, discounted: false, discountPercent: 0}},
   ];
+
+  /** What the list actually calls: product-addressed, so a row can total its variants. */
+  readonly askedFor: number[][] = [];
+
+  byProducts(productIds: readonly number[]): Observable<readonly SkuInventory[]> {
+    this.askedFor.push([...productIds]);
+    return of(this.inventories);
+  }
 
   bySkus(): Observable<readonly SkuInventory[]> {
     return of(this.inventories);
@@ -182,6 +190,33 @@ describe('ProductsApi', () => {
       expect(first.brand).toBe('Northwind');
       expect(first.price).toBe(129);
       expect(snapshot.currency).toBe('SAR');
+      done();
+    });
+  });
+
+  it('totals a product’s stock across its variants, and prices it from the default one', (done) => {
+    /*
+     * The bug this pins: the row read the DEFAULT variant's quantity and reported it as the
+     * product's, so a product with 12 + 8 + 4 across three combinations showed "12 in stock".
+     * Price stays the default variant's — that is the merchant's own choice of the card price,
+     * deliberately not a range and not the cheapest combination.
+     */
+    inventory.inventories = [
+      {sku: 'ACM-1', productId: 1, available: true, canBePurchased: true, quantity: 12,
+        price: {originalPrice: 129, finalPrice: 129, discounted: false, discountPercent: 0}},
+      {sku: 'ACM-1-L', productId: 1, available: true, canBePurchased: true, quantity: 8,
+        price: {originalPrice: 139, finalPrice: 139, discounted: false, discountPercent: 0}},
+      {sku: 'ACM-1-XL', productId: 1, available: true, canBePurchased: true, quantity: 4,
+        price: {originalPrice: 149, finalPrice: 149, discounted: false, discountPercent: 0}},
+    ];
+
+    api.loadSnapshot(QUERY).subscribe((snapshot) => {
+      const [first] = snapshot.page.content;
+      expect(first.quantity).toBe(24);
+      expect(first.price).toBe(129);
+      // One product-addressed call for the whole page — never one per product, never per sku.
+      expect(inventory.askedFor.length).toBe(1);
+      expect(inventory.askedFor[0]).toContain(1);
       done();
     });
   });

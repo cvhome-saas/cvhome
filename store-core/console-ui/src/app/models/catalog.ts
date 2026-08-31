@@ -527,6 +527,11 @@ export interface PersistableInventoryBatch {
  */
 export interface SkuInventory {
   readonly sku: string;
+  /**
+   * The catalog product this sku belongs to. Informational on the row, and the key the console's
+   * list groups by to total a product's variants — absent only on rows written before it was set.
+   */
+  readonly productId?: number | null;
   readonly available: boolean;
   readonly canBePurchased: boolean;
   readonly quantity: number;
