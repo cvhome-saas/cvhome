@@ -1,0 +1,128 @@
+### The store's option vocabulary, exactly as console-ui calls it (api/catalog/product-option.service.ts).
+###
+### Store 65f023632bc46470c104b76f (fashion demo) is seeded with color (id 1: red=1, blue=2) and
+### size (id 2: m=3, l=4) by the test-stores profile.
+###
+### Note the path asymmetry, which is the controller's shape and not a slip here: the list is
+### plural (/product/options), every single-record operation singular (/product/option/{id}).
+
+###
+
+# curl 'GET {{GATEWAY_URL}}/spg/catalog/api/v1/private/product/options?store=65f023632bc46470c104b76f&lang=en&count=500&page=0'
+GET {{GATEWAY_URL}}/spg/catalog/api/v1/private/product/options?store=65f023632bc46470c104b76f&lang=en&count=500&page=0
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
+
+###
+
+# One option with its values. The Options tab reads the whole vocabulary from the list above; this is
+# the by-id read behind a deep link.
+GET {{GATEWAY_URL}}/spg/catalog/api/v1/private/product/option/1?store=65f023632bc46470c104b76f&lang=en
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
+
+###
+
+# The editor's uniqueness check, debounced behind the code field while creating.
+GET {{GATEWAY_URL}}/spg/catalog/api/v1/private/product/option/unique?code=material&store=65f023632bc46470c104b76f
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
+
+###
+
+# Create — a whole document: the option and every value travel together, each named in every
+# language the store trades in (the console refuses to save until they are).
+POST {{GATEWAY_URL}}/spg/catalog/api/v1/private/product/option?store=65f023632bc46470c104b76f&lang=en
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
+Content-Type: application/json
+
+{
+  "code": "material",
+  "sortOrder": 2,
+  "descriptions": [
+    { "language": "en", "name": "Material" },
+    { "language": "ar", "name": "الخامة" }
+  ],
+  "values": [
+    {
+      "code": "cotton",
+      "sortOrder": 0,
+      "descriptions": [
+        { "language": "en", "name": "Cotton" },
+        { "language": "ar", "name": "قطن" }
+      ]
+    },
+    {
+      "code": "linen",
+      "sortOrder": 1,
+      "descriptions": [
+        { "language": "en", "name": "Linen" },
+        { "language": "ar", "name": "كتان" }
+      ]
+    }
+  ]
+}
+
+###
+
+# Update — also a whole document. A value carrying its `id` keeps its row, and therefore keeps the
+# store-wide value id every variant and facet references: this renames Red to Crimson, it does not
+# retire value 1 and mint a new one. A value omitted here is deleted.
+PUT {{GATEWAY_URL}}/spg/catalog/api/v1/private/product/option/1?store=65f023632bc46470c104b76f&lang=en
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
+Content-Type: application/json
+
+{
+  "id": 1,
+  "code": "color",
+  "sortOrder": 0,
+  "descriptions": [
+    { "language": "en", "name": "Colour" },
+    { "language": "ar", "name": "اللون" }
+  ],
+  "values": [
+    {
+      "id": 1,
+      "code": "red",
+      "sortOrder": 0,
+      "descriptions": [
+        { "language": "en", "name": "Crimson" },
+        { "language": "ar", "name": "أحمر" }
+      ]
+    },
+    {
+      "id": 2,
+      "code": "blue",
+      "sortOrder": 1,
+      "descriptions": [
+        { "language": "en", "name": "Blue" },
+        { "language": "ar", "name": "أزرق" }
+      ]
+    }
+  ]
+}
+
+###
+
+# Delete guard: 409 CATALOG.PRODUCT_OPTION.IN_USE while any product assigns the option or a variant
+# uses one of its values. Colour is assigned to product 2 in the seed, so this refuses — which is
+# the case the Options tab surfaces as a named toast rather than a generic conflict.
+DELETE {{GATEWAY_URL}}/spg/catalog/api/v1/private/product/option/1?store=65f023632bc46470c104b76f
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
+
+###
+
+# Delete an unused option — succeeds. Use the id the create above answered with.
+DELETE {{GATEWAY_URL}}/spg/catalog/api/v1/private/product/option/3?store=65f023632bc46470c104b76f
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
+
+###
+
+# Tenant isolation: the same option id read as the OTHER demo store answers 404, never the record.
+GET {{GATEWAY_URL}}/spg/catalog/api/v1/private/product/option/1?store=65f023632bc46470c104b75f&lang=en
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b75f
+
+###
+
+# No session at all — 401, not 403. (A session held against another store gets 403; a record that
+# is not in the scoped store gets 404. Three refusals, three answers.)
+GET {{GATEWAY_URL}}/spg/catalog/api/v1/private/product/options?store=65f023632bc46470c104b76f&lang=en
+
+###

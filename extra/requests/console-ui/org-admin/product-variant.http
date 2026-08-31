@@ -1,0 +1,196 @@
+### A product's variant set, exactly as console-ui's variants step calls it
+### (api/catalog/product-variant.service.ts, then api/inventory/inventory.service.ts for the prices).
+###
+### Store 65f023632bc46470c104b76f (fashion demo), seeded by the test-stores profile:
+###   options  color = 1 (red = 1, blue = 2), size = 2 (m = 3, l = 4)
+###   product 1  Nike running shoes  — varies by size only
+###   product 2  Zara dress          — varies by colour x size, red/L deliberately missing
+###
+### The catalog write is ONE atomic PUT carrying the axes and the combinations together, so they can
+### never desync. Price and stock are NOT here — they are the inventory service's, one row per
+### variant sku, written by the bulk upsert at the bottom of this file. That two-step is exactly what
+### the variants step does, in that order.
+
+###
+
+# The console matrix: every combination with its resolved option/value labels in the asked language.
+GET {{GATEWAY_URL}}/spg/catalog/api/v2/private/product/2/variants?store=65f023632bc46470c104b76f&lang=en
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
+
+###
+
+# The same matrix in Arabic — the labels are resolved per request, nothing is cached per language.
+GET {{GATEWAY_URL}}/spg/catalog/api/v2/private/product/2/variants?store=65f023632bc46470c104b76f&lang=ar
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
+
+###
+
+# Whole-set replace. A combination carrying its `id` keeps its row (and its sku history); one absent
+# from this list stops being sold. Exactly one `defaultVariant` — it supplies the card/list price and
+# the PDP preselection, and the DB enforces it.
+#
+# This adds the missing red/L to the seeded product 2.
+PUT {{GATEWAY_URL}}/spg/catalog/api/v2/private/product/2/variants?store=65f023632bc46470c104b76f&lang=en
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
+Content-Type: application/json
+
+{
+  "options": ["color", "size"],
+  "variants": [
+    { "sku": "SKU-ZR-CL-DRS02", "sortOrder": 0, "defaultVariant": true, "optionValueIds": [1, 3] },
+    { "sku": "SKU-ZR-CL-DRS02-RD-L", "sortOrder": 1, "defaultVariant": false, "optionValueIds": [1, 4] },
+    { "sku": "SKU-ZR-CL-DRS02-BL-M", "sortOrder": 2, "defaultVariant": false, "optionValueIds": [2, 3] },
+    { "sku": "SKU-ZR-CL-DRS02-BL-L", "sortOrder": 3, "defaultVariant": false, "optionValueIds": [2, 4] }
+  ]
+}
+
+###
+
+# Empty options + variants restores the single default variant: the product sells by one sku again.
+# The service keeps the sku of the retiring first combination, which is why the console diffs retired
+# skus against the set AFTER this write rather than against the request — see ProductFormApi.
+PUT {{GATEWAY_URL}}/spg/catalog/api/v2/private/product/2/variants?store=65f023632bc46470c104b76f&lang=en
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
+Content-Type: application/json
+
+{ "options": [], "variants": [] }
+
+###
+
+# Two variants describing the same combination — 409 CATALOG.PRODUCT_VARIANT.DUPLICATE_COMBINATION.
+PUT {{GATEWAY_URL}}/spg/catalog/api/v2/private/product/2/variants?store=65f023632bc46470c104b76f&lang=en
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
+Content-Type: application/json
+
+{
+  "options": ["color", "size"],
+  "variants": [
+    { "sku": "SKU-DUP-A", "sortOrder": 0, "defaultVariant": true, "optionValueIds": [1, 3] },
+    { "sku": "SKU-DUP-B", "sortOrder": 1, "defaultVariant": false, "optionValueIds": [3, 1] }
+  ]
+}
+
+###
+
+# A variant missing one of the declared axes — 400 CATALOG.PRODUCT_VARIANT.OPTIONS_INVALID. Every
+# combination must carry exactly one value of every option the set declares.
+PUT {{GATEWAY_URL}}/spg/catalog/api/v2/private/product/2/variants?store=65f023632bc46470c104b76f&lang=en
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
+Content-Type: application/json
+
+{
+  "options": ["color", "size"],
+  "variants": [
+    { "sku": "SKU-HALF", "sortOrder": 0, "defaultVariant": true, "optionValueIds": [1] }
+  ]
+}
+
+###
+
+# A sku another product already sells — 409 CATALOG.PRODUCT_VARIANT.DUPLICATE_SKU.
+# `unique (store_merchant_id, sku)` lives on product_variant: skus are unique per store, not per product.
+PUT {{GATEWAY_URL}}/spg/catalog/api/v2/private/product/2/variants?store=65f023632bc46470c104b76f&lang=en
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
+Content-Type: application/json
+
+{
+  "options": ["size"],
+  "variants": [
+    { "sku": "SKU-NK-RUN-001", "sortOrder": 0, "defaultVariant": true, "optionValueIds": [3] }
+  ]
+}
+
+###
+
+# An option code the store's vocabulary does not hold — 404 CATALOG.PRODUCT_OPTION.NOT_FOUND. Worth
+# knowing before the limit case below: the axes are resolved BEFORE they are counted, so a set naming
+# five invented codes answers this, not the limit error.
+PUT {{GATEWAY_URL}}/spg/catalog/api/v2/private/product/2/variants?store=65f023632bc46470c104b76f&lang=en
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
+Content-Type: application/json
+
+{
+  "options": ["material"],
+  "variants": [
+    { "sku": "SKU-MAT", "sortOrder": 0, "defaultVariant": true, "optionValueIds": [1] }
+  ]
+}
+
+###
+
+# The guardrails: at most 4 assigned options and 100 variants per product, refused as
+# 400 CATALOG.PRODUCT_VARIANT.LIMIT_EXCEEDED (the category is VALIDATION, so 400 — the plan's
+# "422" was never what shipped). The console caps its picker at 4 and its generator at 100, so this
+# is reachable only through the API.
+#
+# To try the option limit you need five options actually defined in the store — create three more in
+# product-option.http first, or the unknown-code 404 above fires instead. The variant limit needs no
+# setup: 101 combinations of any declared axis.
+PUT {{GATEWAY_URL}}/spg/catalog/api/v2/private/product/2/variants?store=65f023632bc46470c104b76f&lang=en
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
+Content-Type: application/json
+
+{
+  "options": ["color", "size", "material", "fit", "finish"],
+  "variants": []
+}
+
+###
+
+# Step two of the console's save: one bulk upsert for the whole matrix's prices and stock, keyed by
+# variant sku. Wrapped in `entries` — a naked list body turns Spring 6.1's validation into a 500.
+PUT {{GATEWAY_URL}}/spg/inventory/api/v1/private/inventory/bulk?store=65f023632bc46470c104b76f&lang=en
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
+Content-Type: application/json
+
+{
+  "entries": [
+    { "sku": "SKU-ZR-CL-DRS02",       "inventory": { "productId": 2, "quantity": 8, "available": true,  "price": { "amount": 120.00 } } },
+    { "sku": "SKU-ZR-CL-DRS02-RD-L",  "inventory": { "productId": 2, "quantity": 3, "available": true,  "price": { "amount": 130.00 } } },
+    { "sku": "SKU-ZR-CL-DRS02-BL-M",  "inventory": { "productId": 2, "quantity": 5, "available": true,  "price": { "amount": 120.00 } } },
+    { "sku": "SKU-ZR-CL-DRS02-BL-L",  "inventory": { "productId": 2, "quantity": 0, "available": true,  "price": { "amount": 130.00 } } }
+  ]
+}
+
+###
+
+# Step three: retire the inventory rows of skus the replace removed. Idempotent — deleting a row that
+# is already gone is a no-op, which is what makes the console's failed-inventory retry safe.
+DELETE {{GATEWAY_URL}}/spg/inventory/api/v1/private/inventory/SKU-ZR-CL-DRS02-BL-L?store=65f023632bc46470c104b76f
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
+
+###
+
+# What the storefront's PDP does in one call: availability for the whole matrix, by sku.
+GET {{GATEWAY_URL}}/spg/inventory/api/v1/availability?skus=SKU-ZR-CL-DRS02,SKU-ZR-CL-DRS02-RD-L,SKU-ZR-CL-DRS02-BL-M,SKU-ZR-CL-DRS02-BL-L&store=65f023632bc46470c104b76f&lang=en
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
+
+###
+
+# The body form of the same read, which the storefront switches to above ~40 skus.
+POST {{GATEWAY_URL}}/spg/inventory/api/v1/availability/query?store=65f023632bc46470c104b76f&lang=en
+Content-Type: application/json
+
+{ "skus": ["SKU-ZR-CL-DRS02", "SKU-ZR-CL-DRS02-RD-L", "SKU-ZR-CL-DRS02-BL-M"] }
+
+###
+
+# Tenant isolation, and the three refusals are three different answers — the integration test pins
+# all of them. Scoped to the store the caller may act in, the product is not there: 404, never
+# another tenant's variants.
+GET {{GATEWAY_URL}}/spg/catalog/api/v2/private/product/2/variants?store=65f023632bc46470c104b75f&lang=en
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b75f
+
+###
+
+# Signed in, but reaching into a store this session may not act in — 403.
+# (Run with a session held against the OTHER demo store to see it.)
+GET {{GATEWAY_URL}}/spg/catalog/api/v2/private/product/2/variants?store=65f023632bc46470c104b76f&lang=en
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b75f
+
+###
+
+# No session at all — 401, not 403.
+GET {{GATEWAY_URL}}/spg/catalog/api/v2/private/product/2/variants?store=65f023632bc46470c104b76f&lang=en
+
+###
