@@ -12,23 +12,22 @@ import type {ThemeManifest} from '@models/layout';
  * Where the current store's storefront lives, as an origin the builder can iframe and fetch from.
  *
  * The console has never needed the storefront's address before (the gap `page-editor` noted); the
- * builder does, twice — the canvas iframe and `/api/theme-manifest`. The hostname is the subdomain
- * rule the domain section renders (`{label}.{alis}-{pod}.{apex}`); the scheme is the console's own.
+ * builder does, twice — the canvas iframe and `/api/theme-manifest`.
  *
- * The port is the local-stack wrinkle: in production the storefront answers on the default port, but
- * an `lcl` stack maps spg to `80 + offset` while serving the console through the gateway at
- * `8000 + offset` — so when the console's own location carries a port, the offset is read off it and
- * the derived `:80+offset` origin is probed first, with the bare origin as the fallback. The probe is
- * the manifest fetch itself, so whichever origin actually answers is the one the canvas iframes.
+ * The authority is the pod's EXTERNAL endpoint: tenancy answers the pod, and its endpoint carries
+ * scheme, host and — the local-stack wrinkle — the right port (`lcl` maps spg to a per-stack port
+ * production never has). The store's subdomain label is prefixed onto that host, because the
+ * storefront must be addressed per store by *hostname*: links inside the canvas iframe are
+ * path-based, so a `?store=` query would silently fall back to the default store on the first
+ * navigation. When the endpoint is missing or unusable, the hostname rule the domain section renders
+ * (`{label}.{alis}-{pod}.{apex}`, console's own scheme) is the fallback; the manifest fetch itself is
+ * the probe, so whichever origin actually answers is the one the canvas iframes.
  */
 @Injectable({providedIn: 'root'})
 export class StorefrontOriginService {
   private readonly http = inject(HttpClient);
   private readonly router = inject(MerchantRouterService);
   private readonly saas = inject(SaasService);
-
-  /** Gateway's default port locally; the spg sits at 80 with the same stack offset. */
-  private static readonly GATEWAY_BASE_PORT = 8000;
 
   private candidates(): Observable<string[]> {
     return forkJoin({
@@ -38,17 +37,24 @@ export class StorefrontOriginService {
     }).pipe(
       map(({allocations, saas, pod}) => {
         const sub = allocations.find((record) => record.domainType === 'SUB_DOMAIN');
-        const target = podHostname(saas, pod);
-        if (!sub || !target) {
+        if (!sub) {
           return [];
         }
-        const bare = `${location.protocol}//${sub.domain}.${target}`;
-        const consolePort = Number(location.port);
-        const offset = consolePort - StorefrontOriginService.GATEWAY_BASE_PORT;
-        if (Number.isFinite(consolePort) && offset > 0) {
-          return [`${bare}:${80 + offset}`, bare];
+        const origins: string[] = [];
+        if (pod?.endpoint?.type === 'EXTERNAL' && pod.endpoint.endpoint) {
+          try {
+            const endpoint = new URL(pod.endpoint.endpoint);
+            // host keeps the port; the store's label in front of it is the storefront's own hostname
+            origins.push(`${endpoint.protocol}//${sub.domain}.${endpoint.host}`);
+          } catch {
+            // an unparsable endpoint just loses the primary candidate
+          }
         }
-        return [bare];
+        const target = podHostname(saas, pod);
+        if (target) {
+          origins.push(`${location.protocol}//${sub.domain}.${target}`);
+        }
+        return [...new Set(origins)];
       }),
     );
   }
