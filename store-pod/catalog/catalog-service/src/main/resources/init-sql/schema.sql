@@ -97,6 +97,61 @@ create table if not exists catalog.product_type_description
         constraint fk5yingh0egjkus0xfkl1hhmwy references catalog.product_type,
     constraint UKedftn4kxppmgot0f38hvk83sm unique (product_type_id, language_code)
 );
+
+-- The store's option vocabulary (Color, Size, ...): defined once per store, translated once, reused by any
+-- product that assigns it. Value ids are store-wide, which is what makes id-based option faceting possible.
+create table if not exists catalog.product_option
+(
+    product_option_id bigint       not null primary key,
+    date_created      timestamp(6),
+    date_modified     timestamp(6),
+    updt_id           varchar(60),
+    code              varchar(100) not null,
+    sort_order        integer,
+    store_merchant_id varchar(50)  not null,
+    constraint uk_product_option_code unique (store_merchant_id, code)
+);
+create table if not exists catalog.product_option_description
+(
+    description_id    bigint       not null primary key,
+    date_created      timestamp(6),
+    date_modified     timestamp(6),
+    updt_id           varchar(60),
+    description       text,
+    name              varchar(120) not null,
+    title             varchar(100),
+    language_code     varchar(6)   not null,
+    product_option_id bigint       not null
+        constraint fk_prd_opt_desc_option references catalog.product_option,
+    constraint uk_product_option_desc unique (product_option_id, language_code)
+);
+create table if not exists catalog.product_option_value
+(
+    product_option_value_id bigint       not null primary key,
+    date_created            timestamp(6),
+    date_modified           timestamp(6),
+    updt_id                 varchar(60),
+    code                    varchar(100) not null,
+    sort_order              integer,
+    product_option_id       bigint       not null
+        constraint fk_prd_opt_value_option references catalog.product_option,
+    constraint uk_product_option_value_code unique (product_option_id, code)
+);
+create table if not exists catalog.product_option_value_description
+(
+    description_id          bigint       not null primary key,
+    date_created            timestamp(6),
+    date_modified           timestamp(6),
+    updt_id                 varchar(60),
+    description             text,
+    name                    varchar(120) not null,
+    title                   varchar(100),
+    language_code           varchar(6)   not null,
+    product_option_value_id bigint       not null
+        constraint fk_prd_opt_value_desc_value references catalog.product_option_value,
+    constraint uk_product_option_value_desc unique (product_option_value_id, language_code)
+);
+
 create table if not exists catalog.product
 (
     product_id        bigint      not null primary key,
