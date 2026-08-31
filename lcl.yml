@@ -118,13 +118,19 @@ services:
     ports: { http: 8001 }
     depends-on: [postgres]
     # A JVM that has logged "Started …Application" is up even if the actuator body is briefly not what we expect.
+    #
+    # 600s, not 300: `--project-cache-dir` is per stack, so a stack started in a fresh worktree compiles the
+    # whole project before its FIRST service can bind a port — and uaa is that service. At 300 it timed out
+    # mid-build, the supervisor gave up on the dependency gate, and every other service sat at
+    # "blocked by dependency: uaa" while uaa itself came up healthy seconds later. Warm stacks are unaffected:
+    # this is a ceiling, not a wait.
     health: &spring-health
       type: http
       port: http
       path: /actuator/health
       expect: '"status":"UP"'
       ready-log: 'Started \S+ in [\d.]+ seconds'
-      timeout: 300
+      timeout: 600
 
   store-core-gateway:
     description: platform edge — routes gateway.com and console-ui.gateway.com, terminates the console's OAuth2 login
@@ -157,6 +163,11 @@ services:
   console-ui:
     description: seller/admin console (Angular); reached through store-core-gateway, not directly
     cwd: store-core/console-ui
+    # A fresh worktree has no node_modules, and `npm run start` there fails as a bare "exited with 127"
+    # that says nothing about why. Install once, only when they are missing, so an existing checkout pays
+    # nothing. `npm install`, not `npm ci`: no package-lock.json is committed for this app.
+    prepare:
+      - { cwd: store-core/console-ui, command: [sh, -c, "[ -d node_modules ] || npm install --no-audit --no-fund"] }
     command: [npm, run, start, --, --port, "${port.console-ui.http}"]
     ports: { http: 8011 }
     depends-on: [store-core-gateway]
@@ -218,6 +229,9 @@ services:
     # "Can't resolve '@store-front/hooks/...'" until they exist — and they are what goes stale first. `tsc -b` is
     # incremental, so rebuilding every start is cheap. Themes need no prebuild; Next compiles them on demand.
     prepare:
+      # Same fresh-worktree gap as the console: without node_modules the build:libs steps below fail
+      # first, and the error names the build rather than the missing install.
+      - { cwd: store-pod/landing-ui, command: [sh, -c, "[ -d node_modules ] || npm install --no-audit --no-fund"] }
       - { cwd: store-pod/landing-ui, command: [npm, run, build:libs-types] }
       - { cwd: store-pod/landing-ui, command: [npm, run, build:libs-services] }
       - { cwd: store-pod/landing-ui, command: [npm, run, build:libs-hooks] }
