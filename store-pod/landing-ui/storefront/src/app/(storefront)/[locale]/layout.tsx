@@ -1,6 +1,7 @@
 import '../../globals.css';
 import type {Metadata} from 'next';
 import type {ReactNode} from 'react';
+import {preconnect} from 'react-dom';
 import {headers} from 'next/headers';
 import {notFound, redirect} from 'next/navigation';
 import {NextIntlClientProvider} from 'next-intl';
@@ -52,6 +53,15 @@ export default async function StorefrontLayout({children, params}: { children: R
 
     if (!localSupported(locale, store)) {
         redirectToSupportedLang(store, await headers(), locale);
+    }
+
+    // CDN mode (see start.mjs): fonts and scripts load from the static-assets host — open its
+    // connections while the HTML streams instead of paying DNS+TLS when the first asset is found.
+    // Fonts fetch with `crossorigin`, scripts without; each needs its own warmed connection.
+    const staticAssetsBase = process.env.STATIC_ASSETS_BASE_URL;
+    if (staticAssetsBase) {
+        preconnect(staticAssetsBase);
+        preconnect(staticAssetsBase, {crossOrigin: 'anonymous'});
     }
 
     const [data, colorThemeRequest] = await Promise.all([layoutDataPromise, getColorThemeRequest(store)]);

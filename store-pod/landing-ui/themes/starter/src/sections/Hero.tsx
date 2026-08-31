@@ -1,8 +1,8 @@
 'use client'
-import Image from 'next/image';
 import {useTranslations} from 'next-intl';
 import {useDir} from '@store-front/i18n/use-dir';
 import type {Banner} from '@store-front/types';
+import {BannerImage} from '@store-front/ui/banner-image';
 import {Swiper, SwiperSlide} from '@store-front/ui/swiper';
 
 /**
@@ -21,7 +21,7 @@ export function Hero({slides}: { slides: Banner[] }) {
                     a11y={{enabled: true}} className="aspect-[16/7] w-full bg-muted sm:aspect-[21/8]">
                 {shown.map((s, i) => (
                     <SwiperSlide key={s.id} aria-label={t('HERO_SLIDE', {index: i + 1, total: shown.length})}>
-                        <Image src={s.desktopUrl ?? ''} alt={s.altText ?? ''} fill priority={i === 0} sizes="100vw" className="object-cover"/>
+                        <BannerImage banner={s} priority={i === 0} sizes="100vw" className="object-cover"/>
                     </SwiperSlide>
                 ))}
             </Swiper>

@@ -1,10 +1,10 @@
 'use client'
 import {useState} from 'react';
-import Image from 'next/image';
 import {useTranslations} from 'next-intl';
 import {ChevronLeftIcon, ChevronRightIcon} from 'lucide-react';
 import {useDir} from '@store-front/i18n/use-dir';
 import type {Banner} from '@store-front/types';
+import {BannerImage} from '@store-front/ui/banner-image';
 import {Swiper, SwiperSlide, type SwiperApi} from '@store-front/ui/swiper';
 
 /**
@@ -24,7 +24,7 @@ export function HeroFrame({slides}: { slides: Banner[] }) {
                     autoplay={slides.length > 1 ? {delay: 6000, disableOnInteraction: true} : false} a11y={{enabled: true}} className="aspect-[4/3] w-full bg-muted lg:aspect-[16/9]">
                 {slides.map((s, i) => (
                     <SwiperSlide key={s.id} aria-label={t('HERO_SLIDE', {index: i + 1, total: slides.length})}>
-                        <Image src={s.desktopUrl ?? ''} alt={s.altText ?? ''} fill priority={i === 0} sizes="(max-width: 1024px) 100vw, 55vw" className="object-cover"/>
+                        <BannerImage banner={s} priority={i === 0} sizes="(max-width: 1024px) 100vw, 55vw" className="object-cover"/>
                     </SwiperSlide>
                 ))}
             </Swiper>

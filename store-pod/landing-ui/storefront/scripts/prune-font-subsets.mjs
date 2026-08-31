@@ -63,11 +63,33 @@ for (const file of walkFiles(staticDir)) {
     fs.writeFileSync(file, pruned);
 }
 
+// With `experimental.inlineCss` the build embeds each route's CSS — the @font-face rules included —
+// into the client-reference manifests at build time (`entryCSSFiles[*].content`, rendered by
+// next/dist/server/app-render/render-css-resource.js), and the standalone output carries its own
+// copy of those manifests. Prune the embedded copies with the same predicate, or every HTML
+// response would inline the very rules the stylesheets above just dropped — and the reference
+// sweep below would keep their font files alive.
+let removedInlineFaces = 0;
+for (const file of walkFiles(distDir)) {
+    if (!file.endsWith('_client-reference-manifest.js') || file.startsWith(path.join(distDir, 'cache'))) continue;
+    const js = fs.readFileSync(file, 'utf8');
+    if (!js.includes('@font-face')) continue;
+    let removedHere = 0;
+    const pruned = js.replace(/@font-face\s*\{[^}]*\}/g, block => {
+        if (!isUnsupportedCjkShard(block)) return block;
+        removedHere++;
+        return '';
+    });
+    if (!removedHere) continue;
+    removedInlineFaces += removedHere;
+    fs.writeFileSync(file, pruned);
+}
+
 // Sweep orphaned font files. The reference set is built from every text asset the build emitted —
 // stylesheets, JS chunks, manifests, prerendered HTML — so a file referenced from anywhere survives.
 let removedFiles = 0;
 let removedBytes = 0;
-if (removedFaces && fs.existsSync(mediaDir)) {
+if ((removedFaces || removedInlineFaces) && fs.existsSync(mediaDir)) {
     const referenced = new Set();
     for (const file of [...walkFiles(staticDir), ...walkFiles(path.join(distDir, 'server'))]) {
         if (file.startsWith(mediaDir)) continue;
@@ -86,9 +108,10 @@ if (removedFaces && fs.existsSync(mediaDir)) {
 }
 
 const kb = bytes => `${(bytes / 1024).toFixed(0)} KB`;
-if (removedFaces) {
+if (removedFaces || removedInlineFaces) {
     console.log(
         `[fonts] pruned ${removedFaces} unsupported CJK @font-face rules — stylesheets ${kb(cssBefore)} → ${kb(cssAfter)}; ` +
+        `pruned ${removedInlineFaces} embedded rules from client-reference manifests; ` +
         `deleted ${removedFiles} unreferenced font files (${kb(removedBytes)})`,
     );
 } else {

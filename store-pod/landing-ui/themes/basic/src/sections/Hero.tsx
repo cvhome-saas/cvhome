@@ -1,10 +1,10 @@
 'use client'
-import Image from 'next/image';
 import {useTranslations} from 'next-intl';
 import {ArrowDownIcon} from 'lucide-react';
 import {useDir} from '@store-front/i18n/use-dir';
 import type {Banner} from '@store-front/types';
 import {cn} from '@store-front/ui/lib/utils';
+import {BannerImage} from '@store-front/ui/banner-image';
 import {Swiper, SwiperSlide} from '@store-front/ui/swiper';
 
 /**
@@ -33,14 +33,14 @@ export function Hero({slides, banner, storeName, facts, anchor}: {
                             a11y={{enabled: true}} className={stage}>
                         {slides.map((s, i) => (
                             <SwiperSlide key={s.id} aria-label={t('HERO_SLIDE', {index: i + 1, total: slides.length})}>
-                                <Image src={s.desktopUrl ?? ''} alt={s.altText ?? ''} fill priority={i === 0} sizes="(max-width: 1344px) 100vw, 1344px" className="object-cover"/>
+                                <BannerImage banner={s} priority={i === 0} sizes="(max-width: 1344px) 100vw, 1344px" className="object-cover"/>
                             </SwiperSlide>
                         ))}
                     </Swiper>
                 </div>
             ) : banner?.desktopUrl ? (
                 <div className={cn('relative border', stage)}>
-                    <Image src={banner.desktopUrl} alt={banner.altText ?? ''} fill priority sizes="(max-width: 1344px) 100vw, 1344px" className="object-cover"/>
+                    <BannerImage banner={banner} priority sizes="(max-width: 1344px) 100vw, 1344px" className="object-cover"/>
                 </div>
             ) : null}
 

@@ -1,25 +1,40 @@
 'use client'
 import {useState} from 'react';
-import Image from 'next/image';
+import Image, {getImageProps} from 'next/image';
 import {cn} from '@store-front/ui/lib/utils';
+
+/** Below Tailwind's `sm` breakpoint the mobile rendition is served, when the merchant provided one. */
+const MOBILE_MEDIA = '(max-width: 639px)';
 
 /**
  * A picture pasted on a sheet. When the merchant gave no picture, or the file does not load, the sheet
  * becomes a typographic poster: the title in poster caps, the meta line printed under it — a wall never
  * shows a broken image or a grey box.
  */
-export function PosterImage({src, alt, title, meta, sizes, priority, className, imgClassName, fit = 'cover', tone = 'ink', align = 'end'}: {
-    src: string | undefined; alt: string; title: string; meta?: string; sizes: string; priority?: boolean;
+export function PosterImage({src, mobileSrc, alt, title, meta, sizes, priority, className, imgClassName, fit = 'cover', tone = 'ink', align = 'end'}: {
+    src: string | undefined; mobileSrc?: string; alt: string; title: string; meta?: string; sizes: string; priority?: boolean;
     className?: string; imgClassName?: string; fit?: 'cover' | 'contain'; tone?: 'ink' | 'faint'; align?: 'start' | 'end';
 }) {
     const [failed, setFailed] = useState(false);
     const showImage = !!src && !src.endsWith('/placeholder.png') && !failed;
+    const imageClassName = cn(fit === 'cover' ? 'object-cover' : 'object-contain', imgClassName);
+    // failed before hydration: onError never fires
+    const detectPreHydrationFailure = (node: HTMLImageElement | null) => { if (node && node.complete && node.naturalWidth === 0) setFailed(true); };
     return (
         <div className={cn('@container absolute inset-0', className)}>
             {showImage ? (
-                <Image src={src} alt={alt} fill sizes={sizes} priority={priority} onError={() => setFailed(true)}
-                       ref={node => { if (node && node.complete && node.naturalWidth === 0) setFailed(true); }}  // failed before hydration: onError never fires
-                       className={cn(fit === 'cover' ? 'object-cover' : 'object-contain', imgClassName)}/>
+                mobileSrc && mobileSrc !== src ? (
+                    // Images are unoptimized (no srcset), so a distinct mobile rendition needs <picture> art direction.
+                    <picture>
+                        <source media={MOBILE_MEDIA} srcSet={mobileSrc}/>
+                        {/* eslint-disable-next-line @next/next/no-img-element -- next/image cannot art-direct; props come from getImageProps */}
+                        <img {...getImageProps({src, alt, fill: true, sizes, priority, className: imageClassName}).props}
+                             onError={() => setFailed(true)} ref={detectPreHydrationFailure}/>
+                    </picture>
+                ) : (
+                    <Image src={src} alt={alt} fill sizes={sizes} priority={priority} onError={() => setFailed(true)}
+                           ref={detectPreHydrationFailure} className={imageClassName}/>
+                )
             ) : (
                 <div className={cn('typo-poster absolute inset-0 p-[8%]', align === 'start' && 'justify-start')} aria-hidden>
                     <p className={cn('font-display text-[clamp(0.75rem,13cqi,5.5rem)] uppercase leading-[0.86] [overflow-wrap:anywhere]', tone === 'faint' ? 'typo-faint line-clamp-3' : 'line-clamp-4')} dir="auto"><bdi>{title}</bdi></p>

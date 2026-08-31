@@ -1,9 +1,9 @@
 'use client'
-import Image from 'next/image';
 import {useTranslations} from 'next-intl';
 import {useDir} from '@store-front/i18n/use-dir';
 import type {Banner} from '@store-front/types';
 import {cn} from '@store-front/ui/lib/utils';
+import {BannerImage} from '@store-front/ui/banner-image';
 import {Swiper, SwiperSlide} from '@store-front/ui/swiper';
 import {StarMark} from '../components/Marks';
 
@@ -57,7 +57,7 @@ export function Hero({slides, storeName, lines, actionHref}: {
                             {slides.map((s, i) => (
                                 <SwiperSlide key={s.id} aria-label={t('HERO_SLIDE', {index: i + 1, total: slides.length})}
                                              className="relative !h-auto min-h-64 self-stretch lg:min-h-[30rem]">
-                                    <Image src={s.desktopUrl ?? ''} alt={s.altText ?? ''} fill priority={i === 0} sizes="(max-width: 1024px) 100vw, 40vw" className="object-cover"/>
+                                    <BannerImage banner={s} priority={i === 0} sizes="(max-width: 1024px) 100vw, 40vw" className="object-cover"/>
                                 </SwiperSlide>
                             ))}
                         </Swiper>
