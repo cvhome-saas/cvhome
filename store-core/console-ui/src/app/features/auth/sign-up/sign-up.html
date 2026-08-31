@@ -8,31 +8,24 @@
         <a routerLink="/sign-in">{{ t('auth.signIn') }}</a>
       </div>
 
+      <!--
+        None of these five fields carries a `fallback` any more. Each can now fail in more than one way — empty,
+        too long, and for the password too common as well — and a `fallback` wins over `shared.validation.*`, so
+        whichever sentence it held would be the only sentence the field could ever show. The email's said "Enter
+        a valid email address.", which for an address that is 51 characters and perfectly well formed sends
+        someone to hunt for a typo in the @ sign. The shared map names the rule that failed, and says how long
+        is too long.
+      -->
       <div class="auth-fields" formGroupName="user">
-        <app-form-field
-          [label]="t('auth.signUp.firstName')"
-          [control]="user.controls.firstName"
-          required
-          [fallback]="t('auth.signUp.firstNameFallback')"
-        >
+        <app-form-field [label]="t('auth.signUp.firstName')" [control]="user.controls.firstName" required>
           <app-text-field formControlName="firstName" autocomplete="given-name" />
         </app-form-field>
 
-        <app-form-field
-          [label]="t('auth.signUp.lastName')"
-          [control]="user.controls.lastName"
-          required
-          [fallback]="t('auth.signUp.lastNameFallback')"
-        >
+        <app-form-field [label]="t('auth.signUp.lastName')" [control]="user.controls.lastName" required>
           <app-text-field formControlName="lastName" autocomplete="family-name" />
         </app-form-field>
 
-        <app-form-field
-          [label]="t('auth.signUp.email')"
-          [control]="user.controls.emailAddress"
-          required
-          [fallback]="t('auth.signUp.emailFallback')"
-        >
+        <app-form-field [label]="t('auth.signUp.email')" [control]="user.controls.emailAddress" required>
           <app-text-field type="email" formControlName="emailAddress" latin autocomplete="email" />
         </app-form-field>
 
@@ -45,7 +38,7 @@
           [label]="t('auth.signUp.password')"
           [control]="user.controls.password"
           required
-          [fallback]="t('auth.signUp.passwordFallback')"
+          [hint]="t('auth.signUp.passwordHint')"
         >
           <app-text-field
             type="password"
@@ -59,7 +52,6 @@
           [label]="t('auth.signUp.repeatPassword')"
           [control]="user.controls.repeatPassword"
           required
-          [fallback]="t('auth.signUp.repeatPasswordFallback')"
         >
           <app-text-field
             type="password"
@@ -68,8 +60,16 @@
             [revealLabel]="t('auth.signUp.showPassword')"
           />
         </app-form-field>
+        <!--
+          Both messages belong to the group, not to a control: one compares the two passwords, the other
+          compares the password against the name and address typed above it. Each waits for the field it is
+          about to have been visited, so neither greets someone who has typed nothing.
+        -->
         @if (user.errors?.['passwordMismatch'] && user.controls.repeatPassword.touched) {
           <p class="cross-field-error" role="alert">{{ t('auth.signUp.passwordMismatch') }}</p>
+        }
+        @if (user.errors?.['passwordPersonal'] && user.controls.password.touched) {
+          <p class="cross-field-error" role="alert">{{ t('auth.signUp.passwordPersonal') }}</p>
         }
 
         <button class="auth-submit" type="submit" [disabled]="facade.busy() || facade.submitted()">

@@ -36,10 +36,27 @@ export class AuthFacade {
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
 
-  readonly passwordVisible = signal(false);
   /** True only while the request is in flight, so the button can say so and cannot be pressed twice. */
   readonly busy = signal(false);
+  /**
+   * Latched on success, so the button stays disabled across the tick between the account existing and the
+   * router leaving the page. `SignUp` clears it on the way in — see `resetSubmission`.
+   */
   readonly submitted = signal(false);
+
+  /**
+   * Forgets the last signup, so the page is submittable again.
+   *
+   * This facade is root-provided and `submitted` never falls back to false on its own, so without this a
+   * visitor who creates an account, arrives at sign-in and then follows "Create account" — to sign a colleague
+   * up, or because they mistyped the address — meets a permanently disabled button with no message.
+   *
+   * `busy` is deliberately not touched: it is cleared on both the success and the failure path, so it cannot
+   * latch, and resetting it would re-enable the button underneath a request that is still in flight.
+   */
+  resetSubmission(): void {
+    this.submitted.set(false);
+  }
 
   /**
    * `computed()` rather than a static object: `AuthStory` renders once per page load, but

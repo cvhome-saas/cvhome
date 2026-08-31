@@ -167,12 +167,47 @@ now being built per [`../../.agents/plans/console-ui-content.md`](../../.agents/
   It does not.
 - **What the console does meanwhile:** `SignUpFormService` is now the only validation there is, and says so.
   An earlier revision of it deliberately dropped the password minimum "because uaa owns the policy" — that
-  assumption was wrong and the minimum is back.
+  assumption was wrong and the minimum is back. It now also caps every field at the column that will store it
+  (see the next entry), screens the password against the passwords an attacker tries first, and refuses a
+  password containing the name or address typed above it. `SignUp.submit` trims the three text fields before
+  checking validity, because `Validators.required` accepts `"   "` and no `@NotBlank` will catch it either.
+  Composition rules ("one upper, one digit") were deliberately **not** added: they produce `Password1!`, which
+  is on the screen list, and NIST has advised against them since SP 800-63B.
 - **Expected contract:** `@Valid` on the request, `@NotBlank` on `firstName`/`lastName`, `@Email` on
   `emailAddress`, a password policy (length and character classes) applied in uaa, and an `@AssertTrue` for
   the password match. Failures should come back as RFC-7807 with `fieldErrors[]` paths like
   `user.emailAddress`, which the console's form is already shaped to receive.
 - **Note:** the probe left a junk organization and user (`not-an-email`) in the local development database.
+
+## Auth — signup's field limits are the database's, and only the console knows them
+
+- **Screen:** `/sign-up`.
+- **What is missing:** any length constraint on the request. With no `@Size` anywhere, the first thing that
+  objects to an over-long value is the column, and by then a tenant is half-created.
+- **The limits, each read off the schema rather than guessed:**
+
+  | Field | Column | Limit |
+  | --- | --- | --- |
+  | `firstName`, `lastName` | `uaa.users.first_name` / `last_name` | `varchar(50)` |
+  | `emailAddress` | `tenancy.manager_org.email` | **`varchar(50)`** |
+  | `emailAddress` (again) | `uaa.users.username` / `email` | `varchar(190)` / `varchar(254)` |
+  | `password` | bcrypt input, via `PasswordEncoderFactories.createDelegatingPasswordEncoder()` | 72 **bytes** |
+
+- **Why the email limit is 50 and not 254:** `SignupServiceImpl.createOrgUser` inserts the organization
+  *first*, and `manager_org.email` is `varchar(50)`. uaa's roomier columns never get a chance to matter. An
+  address of 51 characters — an ordinary corporate address — therefore cannot sign up at all.
+- **What it looks like when it happens:** the insert throws `DataIntegrityViolationException`, which
+  `DataIntegrityErrorHandler` answers as `409 COMMON.DATA_INTEGRITY_VIOLATION` with no `fieldErrors[]` — the
+  same shape a duplicate address produces. `AuthFacade.bindTakenEmail` cannot tell them apart and tells the
+  visitor the address is already registered. **The message is not merely unhelpful, it is false**, and it sends
+  someone to a sign-in page for an account that does not exist. This is the second failure to hide behind that
+  bare 409; see the next entry.
+- **What the console does meanwhile:** `SignUpFormService` caps each field at the limit above, so the request
+  that cannot succeed is never sent. The password cap is stated as a truncation, not a rule — bcrypt ignores
+  everything past 72 bytes whether or not the form mentions it, so the limit is honest rather than arbitrary.
+- **Expected contract:** widen `manager_org.email` to `varchar(254)` — an organization's email is a real
+  address and 50 is below the standard maximum — and put `@Size` beside the `@NotBlank` and `@Email` the
+  previous entry asks for, so a length failure arrives as a field error rather than as a conflict.
 
 ## Auth — a taken email is indistinguishable from any other conflict
 
