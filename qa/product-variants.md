@@ -117,11 +117,18 @@ Tags: `[verified]` run end to end against the local stack · `[tests]` covered b
 - **Result** — `toListingProduct` strips `options` and `variants`; the listing enrichment is one availability
   call for the page's default skus.
 
-### SF-05 — Facet rail and search UX · [not run]
+### SF-05 — The facet rail filters by option value · high · [verified]
 
-- The rail maps `facets.options` into counted checkbox groups ("Red (12)") wired to the already-sent
-  `optionValueIds`; a suggestion carrying `matchedVariantSku` deep-links the PDP with `?sku=`. Wired and
-  type-checked, but not exercised against the running stack.
+- **Steps** — the seeded Dresses category, whose two products give the rail something to count.
+- **Expect** — counted groups per option, a click narrowing the listing and putting the value in the URL, and
+  the AND across options anchored to a **single variant**.
+- **Result** — the rail renders `FILTER BY COLOR` (Red (1), Blue (1)) and `FILTER BY SIZE` (M (1), L (1))
+  beside the pre-existing manufacturer facet. Red alone narrows 2 → 1 with `?options=1`. **Red + L
+  (`?options=1,4`) answers "No products" while L alone answers 1** — so the empty result is the anchoring
+  and not an empty catalogue, matching the integration test exactly.
+- Also confirmed on those cards: the variant product offers *view details* while the simple one offers
+  quick-add, which is the card contract deriving `hasVariants` from `variantCount`.
+- Still not run: a suggestion carrying `matchedVariantSku` deep-linking the PDP with `?sku=`.
 
 ---
 
@@ -142,6 +149,19 @@ Tags: `[verified]` run end to end against the local stack · `[tests]` covered b
   default; the step saves itself (atomic catalog PUT, then the inventory bulk upsert and retired-sku cleanup).
 - **Result** — matrix rows carry the right per-row price and stock merged from inventory, exactly one default,
   and every control is labelled with the combination it belongs to ("Price for Red / M").
+- **The save round-trip, both directions, driven from the UI on the seeded simple product 3:**
+  - *Adding an axis* — picking Colour generated the two combinations, **seeding row 1 from the product's own
+    sku, price and stock** (SKU-AD-CL-TPT03 / 320 / 35) and suggesting `…-BLUE` for the second. The readiness
+    item swapped to "Every variant has a price", went unmet, dropped the product to 86% and blocked publish
+    until the second row was priced — then returned to 100% the moment it was.
+  - *Saving* — "Variants saved." Catalog got both variants with the right signatures, exactly one default and
+    the assignment row; inventory got both skus priced (320/35 and 345/12). The storefront PDP picked it up
+    with no further action: `variantCount: 2`, Colour chips, Red and Blue.
+  - *Removing the axis* — "Remove variants — sell as one SKU again" restored a single `DEFAULT` variant
+    **keeping the original sku**, cleared the assignment, and **deleted only the retired sku's inventory row
+    while the surviving default kept its price and stock**. That is the specific hazard the post-write diff
+    exists for (diffing against the request instead would have deleted the restored default's row), confirmed
+    live rather than reasoned about.
 - **Fixed during QA** — the SKU column was 11rem, which clipped every row to `SKU-ZR-CL-DRS02`; the suffix is
   the only thing distinguishing rows, so the column was showing nothing useful. Now 15rem.
 
@@ -207,10 +227,14 @@ Tags: `[verified]` run end to end against the local stack · `[tests]` covered b
 ## Known gaps
 
 - **SF-05** (facet rail, `matchedVariantSku` deep link) is wired and type-checked but never run end to end.
-- **A full purchase** through to the order's `order_product_option` snapshot was not run: the seeded stock made
-  it awkward to drive without mutating demo data. The placement path is covered by checkout's integration tests.
-- **The variant-set save round-trip** was not driven from the console UI; it is covered by
-  `ProductVariantApiIntegrationTest` and the console facade specs.
+- **A full purchase** through to the order's `order_product_option` snapshot is **still not run**, and not for
+  want of trying: the cart and the checkout summary both render the line correctly — the checkout page shows
+  **"Color: Blue / Size: M"** against SAR 365 on the variant line and nothing on the simple line beside it —
+  but placing the order needs a shopper sign-in, and entering a password is not something this assistant does.
+  Someone signed in as the demo shopper can finish it in a minute; what remains unproven is only the last hop,
+  the `order_product_option` rows written at placement and their rendering on the two order views. The
+  placement path itself is covered by checkout's integration tests.
+- **A suggestion's `matchedVariantSku` deep link** — see SF-05.
 - **`ProductAttribute*`** remains in landing-ui's types, documented as dead on the wire: every theme's product
   page renders a specifications block from it that degrades to nothing. Descriptive attributes are a stated
   future feature — delete the shape together with those blocks, or revive it when the feature lands.
