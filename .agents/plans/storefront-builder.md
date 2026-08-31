@@ -114,6 +114,20 @@ One JSONB doc per (store, page), draft + published copies:
 - New route `storefront/src/app/api/theme-manifest/route.ts`: resolves active theme via existing `get-theme.ts`, merges theme registry over the catalogue, returns `{themeId, kinds:[{kind, variants:[{id, source, fields, itemFields?}], presets:[…]}]}`. Public, `max-age=60`.
 - Rationale: the manifest reads the very registry the renderer uses — zero drift; console already needs the storefront origin for the iframe anyway.
 
+
+## Status (2026-09-01)
+
+Phases 0–5 are implemented and committed on `feat/storefront-builder` (worktree stack
+`storefront-builder`), live-QA'd against the running stack: backend + seeds, shell-composed home with
+theme registries (starter/basic/beauty designed, beauty's exclusive `hero.editorial`), the console
+builder, SECTION-flow retirement, plus post-QA fixes (newsletter client-reference bug, storefront origin
+now taken from the pod's EXTERNAL endpoint). Remaining from those phases: PR via /go, and the deferrals
+recorded in Phase 5 (banner HERO/CAROUSEL retirement, 5 remaining theme registries, manual product
+source, newsletter wiring).
+
+Phase 6 below is the continuation: full parity with `Storefront Builder.dc.html` — canvas drag-and-drop,
+on-canvas toolbar, guides, lock, page links, revisions drawer, and the stability pass.
+
 ## Phase 0 — Worktree setup (per AGENTS.md worktree-per-feature rules)
 
 The current checkout sits on `feat/product-variants` with uncommitted work — none of this feature touches it. All work happens in a fresh worktree cut from up-to-date `main`:
@@ -239,3 +253,204 @@ All QA runs against the worktree's own stack (`lcl start -d --stack storefront-b
 - **Phase 2:** demo store home renders seeded layout on starter AND an untouched scaffold theme (pure fallbacks), inline hero slides included; `?preview=` shows draft; `?theme=` cookie switch keeps rendering; ar/RTL sane; `curl /api/theme-manifest` with Store-Id header returns merged manifest with presets.
 - **Phase 3:** browser QA on demo store: add-from-preset/duplicate/reorder/edit/delete sections; item add/reorder inside hero and USP; save-as-preset then re-insert it; debounced PUT visible in network tab; iframe reflects saves; canvas↔layer selection both ways; publish then verify live storefront (no preview param); read-only content user blocked from route.
 - **Phase 4:** beauty-store manifest lists exclusive variant + preset, builder shows them only there; theme switch → graceful fallback, no crash.
+
+
+## Phase 6 — canvas parity: the complete drag-and-drop builder
+
+### Why
+
+Phases 1–5 delivered a working builder; the `Storefront Builder.dc.html` design promises more: the
+canvas itself as the editing surface — drag sections onto it and around it, edit-in-place chrome
+(name tags, floating toolbar, add-here zones, guides), locks, and page-level links. This phase closes
+every remaining gap with the design and hardens the editor.
+
+The constraint shaping everything: the canvas is the real storefront in a **cross-origin iframe**.
+No console DOM, no cdk drag, no shared event loop can reach into it. Every canvas affordance is
+therefore split in two: **the bridge draws and reports; the console decides and writes.**
+`builder-bridge.tsx` (landing-ui, mounted only in preview) owns all in-iframe overlays and pointer
+tracking; `preview-frame.ts` (console) owns the protocol; `builder.facade.ts` stays the single writer
+of the document. The bridge never mutates anything — it emits intents.
+
+### 6.0 Feature inventory (design → mechanism)
+
+| Design feature | Where it lives | Mechanism |
+|---|---|---|
+| Drag a library tile onto the canvas | console + bridge | native HTML5 drag in console; pointer forwarded over the bridge (§6.2a) |
+| Insertion line following the pointer | bridge overlay | boundary math on section rects (§6.2c) |
+| Reorder sections by dragging on the canvas | bridge only | in-iframe pointer drag from the toolbar grip (§6.2e) |
+| Floating toolbar on the selected block (↑ ↓ ⧉ 🗑 + grip) | bridge overlay → intents | `toolbar` messages → facade ops (§6.3) |
+| Per-block name tag on hover/selection | bridge overlay | `sectionHovered` mirror + guides mode (§6.4) |
+| “Add section here” dashed zones | bridge overlay → intents | `addHere {beforeId}` → targeted insert (§6.5) |
+| Guides toggle (outline everything) | top bar → bridge | `guides {on}` (§6.4) |
+| Hover sync layer list ⇄ canvas | both | `hover` in, `sectionHovered` out (§6.4) |
+| Reorder in the layer list | console (exists) | cdk drag — unchanged |
+| Move up/down from the layer row keyboard | console | Alt+ArrowUp/Down on the focused row |
+| Delete key removes the selected section | console | window keydown, guarded like undo (not in inputs, not locked) |
+| Section lock (🔒, everything disabled) | schema + console + bridge | additive `locked` flag (§6.6) |
+| Page group: “Theme & colors”, “SEO & metadata” | console | nav rows → `/store-management/details`, `/content/branding` |
+| Publish-problem badge on the offending row | console | `publishWarnings` keyed by section id (§6.7) |
+| Revisions / history | console | drawer over existing revisions API (§6.7) |
+| Draft-conflict recovery, canvas resilience | console | §6.8 |
+
+### 6.1 Bridge protocol v2
+
+Every message carries `{v: 2, type, ...}`; both sides drop messages whose origin fails the allowlist
+(console: the origin the manifest answered from; storefront: `NEXT_PUBLIC_BUILDER_ORIGINS`) or whose
+`v` is unknown. **Step 0:** add `NEXT_PUBLIC_BUILDER_ORIGINS` to landing-ui's env in `lcl.yml`
+(`http://gateway.com:${port.store-core-gateway.8000}`) — without it the bridge stays deliberately
+silent, which is why canvas click-select does nothing locally today.
+
+Console → iframe: `select {sectionId|null}`, `hover {sectionId|null}`, `scrollTo {sectionId}`,
+`guides {on}`, `dragState {active, label}`, `dragOver {y}` (pointer Y in iframe viewport coords:
+`clientY − iframeRect.top`; bridge adds its own scrollY), `locks {ids}`.
+
+Iframe → console: `ready` (console replays select/guides/locks/dragState — every reload re-handshakes),
+`height {px}`, `sectionClicked {sectionId}`, `sectionHovered {sectionId|null}`,
+`toolbar {action: moveUp|moveDown|duplicate|remove, sectionId}`, `dropTarget {beforeId|null}`
+(throttled answer to dragOver; null = end), `reorder {sectionId, beforeId|null}`,
+`addHere {beforeId|null}`.
+
+### 6.2 Drag-and-drop, end to end
+
+**(a) Source — library tiles.** `draggable="true"` (native HTML5 — cdk cannot cross documents).
+`dragstart`: custom drag image (the tile), `{presetId|savedId}` into dataTransfer,
+`facade.startDrag(kind,label)` → `dragState {active:true,label}`. `dragend` (drop, Esc and
+drop-outside alike) always sends `dragState {active:false}` — the single cancel path.
+
+**(b) Target — the canvas wrapper.** The iframe never receives cross-origin native drags, so the
+console's `.canvas` wrapper is the drop target: `dragover` (preventDefault, dropEffect copy) forwards
+`clientY − iframeRect.top` via `dragOver`, one message per animation frame. `drop` calls
+`facade.insertAt(preset, facade.dropBeforeId())` — the console's copy of the last `dropTarget`, so a
+lost final message costs one section of precision, never a crash. The layer list is a parallel native
+drop target (row-midpoint math locally, no bridge).
+
+**(c) Insertion math — in the bridge.** On `dragState {active}` snapshot every `[data-section-id]`
+rect (re-snapshot on height change and scroll). Per `dragOver {y}`: `docY = y + scrollY`; insertion
+point = before the first section whose `top + height/2 > docY`, else null (end). Move a 2px accent
+insertion line there; answer `dropTarget` only when the target *changed*. Locked sections are valid
+boundaries, never replacements.
+
+**(d) Auto-scroll.** `dragOver.y` within 48px of the viewport edge → the bridge scrolls its own
+document ±12px/frame (the console cannot scroll the iframe).
+
+**(e) In-canvas reorder.** Entirely inside the iframe (single-document): pointerdown on the toolbar
+grip → `setPointerCapture`, ghost outline follows, boundary math from (c) drives the line, pointerup
+emits one `reorder {sectionId, beforeId}` → `facade.moveById`; Esc cancels. The bridge moves nothing
+itself — the canvas reorders on the post-save reload.
+
+**(f) The honest latency.** The canvas is server-rendered truth: intent → facade → debounced save →
+iframe reloads at the new `savedRevision`. The layer list is the instant view; the bridge shows a thin
+“updating…” shimmer from accepted drop until the next `ready`. No optimistic DOM surgery in the iframe.
+
+### 6.3 Floating toolbar
+
+Bridge-rendered, pinned to the selected section's top-end corner (logical properties, RTL-correct),
+mockup's dark pill from theme tokens: grip, ↑, ↓, duplicate, remove → `toolbar` intents →
+`facade.moveById(id, ∓1)` / `duplicate` / `remove`. First/last disables ↑/↓; locked sections get no
+toolbar. Real `<button>`s with aria-labels.
+
+### 6.4 Hover, tags and guides
+
+Layer-row mouseenter/leave → `hover`; bridge mouseover (delegated, throttled) → `sectionHovered` →
+row highlight. Name tag chip at each section's top-start corner (kind off `data-section-kind`,
+humanized) on hover/selection/guides. Guides toggle in the top bar → `guides {on}`: dashed outline +
+tag on every section, add-here zones visible. Signal only, not persisted.
+
+### 6.5 “Add section here”
+
+Bridge renders a dashed zone between each pair of sections and after the last (guides/drag mode).
+Click → `addHere {beforeId}` → console opens the library with `facade.insertTarget = beforeId`, a
+banner “inserting here” with ✕; next click/drop inserts there, then clears. `insertAt(section,
+beforeId|null)` generalizes today's after-the-selection insert.
+
+### 6.6 Locks
+
+`locked?: boolean` on `LayoutSection` (console model + landing-ui type + content-commons record —
+codecs ignore unknown fields, additive, no migration). Layer row: lock glyph, no drag handle/eye;
+Delete/duplicate/toolbar/canvas-drag refused; inspector header swaps Remove/Duplicate for Unlock (any
+manager may unlock in v1 — parity + future plan-gating). `locks {ids}` syncs the canvas.
+
+### 6.7 Chrome completeness
+
+Page group under the layer list (“Theme & colors” → `/store-management/details`, “SEO & metadata” →
+`/content/branding`). Publish-problem badges: `publishWarnings` keyed by section id (backend sets
+`FieldError.field` to it) → warning dot on the row, message as tooltip. Revisions drawer: history icon
+→ side sheet over `layouts.revisions('HOME')` with restore-to-draft (confirm via app-confirm-dialog).
+
+### 6.8 Stability
+
+409 → `app-notice-bar` “Someone else saved this page” + Reload (`facade.load()`), mutations disabled
+until reloaded. Save error → same bar with Retry; Publish disabled while saveState ∈ {saving,
+conflict, error}. Canvas: iframe error or 15s without `ready` → re-mint token once, reload; still dead
+→ placeholder + Retry; timer re-mints at 25min (TTL 30). Every `ready` replays
+select/guides/locks/dragState. All overlay positioning logical-properties; insertion math Y-only, so
+RTL and device widths never affect it.
+
+### Files
+
+landing-ui — `storefront/src/shell/sections/builder-bridge.tsx` (protocol v2, overlay layer, insertion
+math, in-canvas reorder, auto-scroll); `lcl.yml` (builder-origins env). No theme changes.
+console-ui — `components/preview-frame.ts`, `components/section-library.ts`,
+`components/layer-list.ts`, `components/inspector.ts/html`, `storefront-builder.ts/html/css`,
+`facades/builder.facade.ts` (`insertAt`, `moveById`, drag/insert-target/lock signals, conflict
+gating), `models/layout.ts` (`locked`), i18n `builder.*` en + ar.
+content-commons — `LayoutSection` gains `locked` (additive).
+
+### Sequencing
+
+1. lcl env + protocol v2 skeleton + replay-on-ready (hover sync, toolbar) — canvas interactive locally.
+2. Library drag → canvas drop (a–d) + insertAt/add-here targeting.
+3. In-canvas reorder (e) + keyboard moves + Delete.
+4. Locks, page group, badges, revisions drawer, guides.
+5. Stability pass + full QA; console build/lint/test:ci and landing build/lint gate every commit.
+
+### Phase 6 verification
+
+Browser QA on the running `storefront-builder` stack: drag a preset into mid-page (line tracks
+pointer, auto-scroll near edges, drop lands at the line; Esc disarms); reorder via canvas grip, layer
+list and Alt+Arrow; toolbar ↑/↓/duplicate/remove respect first/last; hover sync both ways; guides show
+tags + zones; add-here targets the insert (banner + ✕); locked seeded section → glyph, no
+handle/toolbar/Delete, Unlock restores; publish with a sourceless products section → badge on that
+row; two tabs → conflict bar + Reload recovers; content-service restart → token re-mint recovers;
+beauty + an RTL store render toolbar/tags/lines sanely; builds/lint/tests green in both apps.
+
+
+## Phase 7 — theme design pass: every theme well designed, aligned (impeccable)
+
+**Load the `impeccable` skill before touching any visual file in this phase** and keep its guidance
+active through all of it — this phase is a design review with fixes, not a feature.
+
+### Scope
+
+1. **Registries for the five remaining designed themes** — fashion, grocery, pink, hunger, furniture
+   each get `src/sections/LayoutSections.tsx` wired to their own components (each already owns a
+   designed Hero/ProductRail/ProductGrid/SectionHeading), following the starter reference. After this,
+   every real theme renders builder sections in its own voice; only the four untouched scaffolds stay
+   on fallbacks (they inherit starter's registry when regenerated). fashion's interleaved-slider home
+   identity returns as its hero variant; furniture/hunger reuse their signature pieces (PlateKey,
+   Masthead) where a section kind naturally maps to one.
+2. **Shell fallback audit** — the 13 fallback renderers reviewed as one system: hierarchy, spacing
+   rhythm, type scale, empty-state quality, focus states, motion restraint, contrast in every
+   `tone` (default/muted/inverse), hover affordances. They must read as "the theme's neutral voice",
+   never as unstyled placeholders.
+3. **Per-theme alignment audit** — for each designed theme, its section renderers against its own
+   DESIGN.md/tokens: aspect ratios, radius, display font usage, RTL (logical properties, re-keyed
+   sliders), badge/price conventions matching that theme's product cards.
+4. **Builder chrome audit** — the console builder's three panes and the bridge overlays (toolbar,
+   tags, insertion line) against console DESIGN.md: tokens only, both console themes, ar RTL.
+5. **Consistency contract** — write the outcome down: a short "section design rules" block in
+   `themes/README.md` (what every kind's renderer must honor: heading scale, spacing tokens,
+   tone handling, empty behaviour) so the next theme starts aligned instead of drifting.
+
+### Method
+
+Per theme: render the demo store's full 13-kind layout with the `?theme=` QA cookie, screenshot
+desktop/mobile and en/ar via the browser tools, review against impeccable + the theme's DESIGN.md, fix,
+re-shoot. The design hook stays on for every write; findings triaged, not suppressed. Accessibility
+sweep (landmarks, alt text, focus order, contrast) rides the same pass.
+
+### Verification
+
+Every real theme renders the 13-kind demo layout with no fallback-styled section standing out as
+foreign; ar/RTL correct on all of them; `npm run build && lint` green; before/after screenshots
+attached to the PR for each theme.
