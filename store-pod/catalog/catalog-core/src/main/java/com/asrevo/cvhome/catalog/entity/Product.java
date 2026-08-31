@@ -29,8 +29,8 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.TableGenerator;
 import jakarta.persistence.Transient;
-import jakarta.persistence.UniqueConstraint;
 
+import org.hibernate.annotations.BatchSize;
 import org.springframework.data.domain.AfterDomainEventPublication;
 
 import com.asrevo.cvhome.catalog.model.product.event.ProductSearchIndexPurgedEvent;
@@ -48,17 +48,18 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * A sellable item's catalog data: sku, copy per language, images, brand, type, categories and the shipping box.
- * Price and stock live in the inventory service, keyed by {@code sku}.
+ * A product's pure definition: copy per language, images, brand, type, categories and the shipping box. The
+ * sellable unit is always a {@link ProductVariant} — every product owns at least one — and price and stock live
+ * in the inventory service, keyed by the variant's sku.
  *
  * <p>
- * The {@code product} table keeps columns of features that are not modelled here (condition, rental, reviews,
- * attributes); they stay unmapped until those features return.
+ * The {@code product} table keeps columns of features that are not modelled here (condition, rental, reviews);
+ * they stay unmapped until those features return.
  * </p>
  */
 @Entity
 @EntityListeners(AuditListener.class)
-@Table(name = "PRODUCT", uniqueConstraints = @UniqueConstraint(columnNames = {"STORE_MERCHANT_ID", "SKU"}))
+@Table(name = "PRODUCT")
 @Getter
 @Setter
 public class Product extends SalesManagerEntity<Long, Product> implements Auditable {
@@ -82,9 +83,6 @@ public class Product extends SalesManagerEntity<Long, Product> implements Audita
     @AttributeOverride(name = "storeMerchantId",
             column = @Column(name = "STORE_MERCHANT_ID", nullable = false, length = 50))
     private StoreMerchantId store;
-
-    @Column(name = "SKU")
-    private String sku;
 
     /**
      * The merchandising switch: whether the storefront shows the product at all.
@@ -140,6 +138,22 @@ public class Product extends SalesManagerEntity<Long, Product> implements Audita
     private Set<ProductImage> images = new HashSet<>();
 
     /**
+     * The sellable units — never empty on a persisted product. Managed by the variant service (the whole set is
+     * replaced atomically together with {@link #optionAssignments}); batched so a listing page loads every row's
+     * variants in one IN query instead of one per product.
+     */
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @BatchSize(size = 100)
+    private Set<ProductVariant> variants = new HashSet<>();
+
+    /**
+     * The ordered axes this product varies by — empty for a simple product.
+     */
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @BatchSize(size = 100)
+    private Set<ProductOptionAssignment> optionAssignments = new HashSet<>();
+
+    /**
      * Whether this product owes the search index an update. Not persisted, and not part of the product's shape:
      * it lives only for as long as it takes the repository to publish the event.
      */
@@ -163,6 +177,17 @@ public class Product extends SalesManagerEntity<Long, Product> implements Audita
     public Optional<ProductImage> defaultImage() {
         return images.stream().filter(ProductImage::isDefaultImage).findFirst()
                 .or(() -> images.stream().min(Comparator.comparingInt(ProductImage::getSortOrder)));
+    }
+
+    /**
+     * The variant flagged default — a partial unique index guarantees at most one — else the first by sort
+     * order then id, so the answer is deterministic even on unflagged legacy data.
+     */
+    public Optional<ProductVariant> defaultVariant() {
+        return variants.stream().filter(ProductVariant::isDefaultVariant).findFirst()
+                .or(() -> variants.stream().min(Comparator.comparingInt(ProductVariant::getSortOrder)
+                        .thenComparing(ProductVariant::getId,
+                                Comparator.nullsLast(Comparator.naturalOrder()))));
     }
 
     public boolean isAvailable() {

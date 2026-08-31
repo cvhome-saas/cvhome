@@ -315,3 +315,26 @@ on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
 VALUES (45, '65f023632bc46470c104b76f', 45, 'base', true, 150.00)
 on conflict (product_price_id) do nothing;
+
+-- Combination-variant skus of the demo multi-variant products (catalog seed 18-catalog-options-variants.sql).
+-- Different prices per combination so ranges and facets are visible in QA.
+INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
+VALUES (501, '65f023632bc46470c104b76f', 1, 'SKU-NK-RUN-001-L', 12, true, 1, 0)
+on conflict (product_avail_id) do nothing;
+INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
+VALUES (501, '65f023632bc46470c104b76f', 501, 'base', true, 780.00)
+on conflict (product_price_id) do nothing;
+
+INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
+VALUES (502, '65f023632bc46470c104b76f', 2, 'SKU-ZR-CL-DRS02-BL-M', 8, true, 1, 0)
+on conflict (product_avail_id) do nothing;
+INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
+VALUES (502, '65f023632bc46470c104b76f', 502, 'base', true, 365.00)
+on conflict (product_price_id) do nothing;
+
+INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
+VALUES (503, '65f023632bc46470c104b76f', 2, 'SKU-ZR-CL-DRS02-BL-L', 0, true, 1, 0)
+on conflict (product_avail_id) do nothing;
+INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
+VALUES (503, '65f023632bc46470c104b76f', 503, 'base', true, 380.00)
+on conflict (product_price_id) do nothing;

@@ -66,8 +66,10 @@ public class ProductMapper {
     public ReadableProductDefinition toDefinition(Product product, LanguageCode language) {
         ReadableProductDefinition definition = new ReadableProductDefinition();
         definition.setId(product.getId());
-        definition.setSku(product.getSku());
-        definition.setIdentifier(product.getSku());
+        product.defaultVariant().ifPresent(variant -> {
+            definition.setSku(variant.getSku());
+            definition.setIdentifier(variant.getSku());
+        });
         definition.setVisible(product.isAvailable());
         definition.setShipeable(product.isProductShipeable());
         definition.setVirtual(product.isProductVirtual());
@@ -93,7 +95,6 @@ public class ProductMapper {
      * the service; descriptions are merged by language so ids survive an edit.
      */
     public static void apply(PersistableProductDefinition source, Product target) {
-        target.setSku(source.getSku());
         target.setAvailable(source.isVisible());
         target.setProductShipeable(source.isShipeable());
         target.setProductVirtual(source.isVirtual());
@@ -128,7 +129,10 @@ public class ProductMapper {
 
     private <T extends ReadableMinimalProduct> T fill(T readable, Product product, LanguageCode language) {
         readable.setId(product.getId());
-        readable.setSku(product.getSku());
+        // The default variant's sku and the variant count come off the batched variants collection: a page of
+        // products loads them in one IN query (@BatchSize), a single product in one small query.
+        product.defaultVariant().ifPresent(variant -> readable.setSku(variant.getSku()));
+        readable.setVariantCount(product.getVariants().size());
         readable.setAvailable(product.isAvailable());
         readable.setProductShipeable(product.isProductShipeable());
         readable.setProductVirtual(product.isProductVirtual());

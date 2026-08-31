@@ -21,4 +21,14 @@ public interface ProductOptionRepository extends JpaRepository<ProductOption, Lo
     boolean existsByStoreMerchantIdAndCode(StoreMerchantId store, String code);
 
     Page<ProductOption> findByStoreMerchantId(StoreMerchantId store, Pageable pageable);
+
+    /**
+     * The delete guards: an option still assigned to a product, or with a value chosen by any variant, must not
+     * disappear from under them.
+     */
+    @Query("select count(a) > 0 from ProductOptionAssignment a where a.option.id = ?1")
+    boolean isAssignedToProducts(Long optionId);
+
+    @Query("select count(x) > 0 from ProductVariantOptionValue x where x.optionValue.option.id = ?1")
+    boolean isUsedByVariants(Long optionId);
 }

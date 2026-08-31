@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.checkout.config;
 
+import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -32,10 +33,11 @@ public class ClientsConfig {
     }
 
     @Bean
-    public ExternalProductService externalProductService(RestClientBuilder restClientBuilder) {
+    public ExternalProductService externalProductService(RestClientBuilder restClientBuilder,
+                                                         CacheManager cacheManager) {
         ExternalProductService externalProductService = restClientBuilder.buildClient(CATALOG_SERVICE_NAME,
                 ExternalProductService.class, RemoteErrorCatalog.none());
-        return new CachedExternalProductService(externalProductService);
+        return new CachedExternalProductService(externalProductService, cacheManager);
     }
 
     /**

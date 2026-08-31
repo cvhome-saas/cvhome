@@ -1,0 +1,168 @@
+package com.asrevo.cvhome.catalog.api.v2;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+
+import com.asrevo.cvhome.catalog.api.CatalogApiSupport;
+import com.asrevo.cvhome.catalog.config.ExternalClientsTestConfiguration;
+import com.asrevo.cvhome.testsupport.annotations.ServiceIntegrationTest;
+import com.asrevo.cvhome.testsupport.security.TestJwtSigner;
+
+import tools.jackson.databind.JsonNode;
+
+import static com.asrevo.cvhome.catalog.api.CatalogApiSupport.ADMIN;
+import static com.asrevo.cvhome.catalog.api.CatalogApiSupport.ID;
+import static com.asrevo.cvhome.catalog.api.CatalogApiSupport.MODERATOR;
+import static com.asrevo.cvhome.catalog.api.CatalogApiSupport.SKU;
+import static com.asrevo.cvhome.catalog.api.CatalogApiSupport.STORE_A;
+import static com.asrevo.cvhome.catalog.api.CatalogApiSupport.STORE_B;
+import static com.asrevo.cvhome.catalog.api.CatalogApiSupport.V2_PRIVATE;
+import static com.asrevo.cvhome.catalog.api.CatalogApiSupport.expect;
+import static com.asrevo.cvhome.catalog.api.CatalogApiSupport.json;
+import static com.asrevo.cvhome.catalog.api.CatalogApiSupport.path;
+import static com.asrevo.cvhome.catalog.api.CatalogApiSupport.scoped;
+import static org.assertj.core.api.Assertions.assertThat;
+
+/**
+ * The atomic axes+set replace over HTTP, against the seeded fashion store (color/size vocabulary; product 3 is
+ * a seeded simple product this test turns into a multi-variant one and back).
+ */
+@ServiceIntegrationTest
+@Import(ExternalClientsTestConfiguration.class)
+class ProductVariantApiIntegrationTest {
+
+    /** A seeded simple product of store A (Adidas track pants). */
+    private static final long PRODUCT = 3L;
+
+    private static final String ORIGINAL_SKU = "SKU-AD-CL-TPT03";
+
+    private static final String PRODUCT_SEGMENT = "product";
+
+    private static final String VARIANTS = "variants";
+
+    private static final String OPTION_VALUES = "optionValues";
+
+    private static final String COMBINATIONS = """
+            {"options":["color","size"],
+             "variants":[
+               {"sku":"%s","sortOrder":0,"defaultVariant":true,"optionValueIds":[1,3]},
+               {"sku":"SKU-AD-CL-TPT03-BL-L","sortOrder":1,"defaultVariant":false,"optionValueIds":[2,4]}]}"""
+            .formatted(ORIGINAL_SKU);
+
+    private static final String BACK_TO_SIMPLE = """
+            {"options":[],"variants":[{"sku":"%s"}]}""".formatted(ORIGINAL_SKU);
+
+    @LocalServerPort
+    private int port;
+
+    @Autowired
+    private TestJwtSigner signer;
+
+    private CatalogApiSupport api;
+
+    private String admin;
+
+    @BeforeEach
+    void setUp() {
+        api = new CatalogApiSupport(port, signer);
+        admin = api.token(ADMIN, STORE_A);
+    }
+
+    private ResponseEntity<String> replace(String store, String token, long productId, String body) {
+        return api.send(HttpMethod.PUT,
+                scoped(path(V2_PRIVATE, PRODUCT_SEGMENT, productId, VARIANTS), store), token, body);
+    }
+
+    private JsonNode list(long productId) {
+        var response = api.get(scoped(path(V2_PRIVATE, PRODUCT_SEGMENT, productId, VARIANTS), STORE_A), admin);
+        expect(response, HttpStatus.OK);
+        return json(response);
+    }
+
+    @Test
+    void replaceReadAndRestoreRoundTrip() {
+        try {
+            expect(replace(STORE_A, admin, PRODUCT, COMBINATIONS), HttpStatus.OK);
+
+            JsonNode variants = list(PRODUCT);
+            assertThat(variants).hasSize(2);
+            assertThat(variants.get(0).get(SKU).asString()).isEqualTo(ORIGINAL_SKU);
+            assertThat(variants.get(0).get("defaultVariant").asBoolean()).isTrue();
+            assertThat(variants.get(0).get(OPTION_VALUES)).hasSize(2);
+            assertThat(variants.get(0).get(OPTION_VALUES).get(0).get("optionCode").asString())
+                    .isEqualTo("color");
+            assertThat(variants.get(0).get(OPTION_VALUES).get(0).get("valueName").asString())
+                    .isEqualTo("Red");
+            long keptId = variants.get(0).get(ID).asLong();
+
+            // the product page carries the axes and the combinations
+            var page = api.get(scoped("/api/v2/product/name/adidas-tiro-track-pants", STORE_A, "en"), null);
+            if (page.getStatusCode() == HttpStatus.OK) {
+                JsonNode product = json(page);
+                assertThat(product.get("options")).hasSize(2);
+                assertThat(product.get(VARIANTS)).hasSize(2);
+                assertThat(product.get("variantCount").asInt()).isEqualTo(2);
+            }
+
+            // an id-addressed edit keeps the row
+            String edited = """
+                    {"options":["color","size"],
+                     "variants":[
+                       {"id":%d,"sku":"%s","sortOrder":0,"defaultVariant":true,"optionValueIds":[1,3]},
+                       {"sku":"SKU-AD-CL-TPT03-BL-M","sortOrder":1,"defaultVariant":false,"optionValueIds":[2,3]}]}"""
+                    .formatted(keptId, ORIGINAL_SKU);
+            expect(replace(STORE_A, admin, PRODUCT, edited), HttpStatus.OK);
+            JsonNode after = list(PRODUCT);
+            assertThat(after).hasSize(2);
+            assertThat(after.get(0).get(ID).asLong()).isEqualTo(keptId);
+        } finally {
+            expect(replace(STORE_A, admin, PRODUCT, BACK_TO_SIMPLE), HttpStatus.OK);
+        }
+        JsonNode restored = list(PRODUCT);
+        assertThat(restored).hasSize(1);
+        assertThat(restored.get(0).get(SKU).asString()).isEqualTo(ORIGINAL_SKU);
+        assertThat(restored.get(0).get(OPTION_VALUES)).isEmpty();
+    }
+
+    @Test
+    void invalidSetsAreRefusedWithTypedErrors() {
+        // a variant missing an axis
+        expect(replace(STORE_A, admin, PRODUCT,
+                        "{\"options\":[\"color\",\"size\"],\"variants\":[{\"sku\":\"HALF\",\"optionValueIds\":[1]}]}"),
+                HttpStatus.BAD_REQUEST);
+        // duplicate combination
+        expect(replace(STORE_A, admin, PRODUCT, """
+                {"options":["color"],"variants":[
+                  {"sku":"DUP-A","optionValueIds":[1]},{"sku":"DUP-B","optionValueIds":[1]}]}"""),
+                HttpStatus.CONFLICT);
+        // a sku owned by another product
+        expect(replace(STORE_A, admin, PRODUCT, """
+                {"options":["color"],"variants":[{"sku":"SKU-NK-RUN-001","optionValueIds":[1]}]}"""),
+                HttpStatus.CONFLICT);
+        // an unknown option code
+        expect(replace(STORE_A, admin, PRODUCT, """
+                {"options":["material"],"variants":[{"sku":"MAT","optionValueIds":[1]}]}"""),
+                HttpStatus.NOT_FOUND);
+        // the seeded product is untouched by all of it
+        assertThat(list(PRODUCT)).hasSize(1);
+    }
+
+    @Test
+    void anotherStoreAndLesserRolesAreRejected() {
+        String otherAdmin = api.token(ADMIN, STORE_B);
+        expect(api.get(scoped(path(V2_PRIVATE, PRODUCT_SEGMENT, PRODUCT, VARIANTS), STORE_B), otherAdmin),
+                HttpStatus.NOT_FOUND);
+        expect(api.get(scoped(path(V2_PRIVATE, PRODUCT_SEGMENT, PRODUCT, VARIANTS), STORE_A), otherAdmin),
+                HttpStatus.FORBIDDEN);
+        expect(api.get(scoped(path(V2_PRIVATE, PRODUCT_SEGMENT, PRODUCT, VARIANTS), STORE_A),
+                api.token(MODERATOR, STORE_A)), HttpStatus.FORBIDDEN);
+        expect(api.get(scoped(path(V2_PRIVATE, PRODUCT_SEGMENT, PRODUCT, VARIANTS), STORE_A), null),
+                HttpStatus.UNAUTHORIZED);
+    }
+}

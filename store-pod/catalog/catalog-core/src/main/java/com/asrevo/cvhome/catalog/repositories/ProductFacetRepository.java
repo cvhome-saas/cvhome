@@ -49,6 +49,15 @@ public class ProductFacetRepository {
     }
 
     /**
+     * Bucket by option value across the results' variants. {@code countDistinct} keeps a product with several
+     * matching variants (two Red combinations, say) a single count.
+     */
+    public Map<Long, Long> countByOptionValue(Specification<Product> spec) {
+        return countGroupedBy(spec, root -> root.join("variants").join("optionValues")
+                .join("optionValue").get(ID));
+    }
+
+    /**
      * @param group picks the column to bucket by; an inner join, so products without a brand or a type simply do
      *              not appear in that dimension rather than forming a null bucket nobody can click.
      */

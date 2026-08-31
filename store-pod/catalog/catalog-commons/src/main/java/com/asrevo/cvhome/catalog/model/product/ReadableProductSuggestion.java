@@ -31,7 +31,16 @@ public class ReadableProductSuggestion implements Serializable {
      */
     private String friendlyUrl;
 
+    /**
+     * The default variant's sku.
+     */
     private String sku;
+
+    /**
+     * Set when the typed query matched one concrete variant sku — the storefront deep-links the product page
+     * with it ({@code ?sku=}) so the shopper lands preselected. Null otherwise.
+     */
+    private String matchedVariantSku;
 
     private String imageUrl;
 

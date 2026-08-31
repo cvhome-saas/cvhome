@@ -2,6 +2,7 @@ package com.asrevo.cvhome.catalog.repositories;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -31,15 +32,6 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
             left join fetch p.type t left join fetch t.descriptions
             where p.store = ?1 and p.id = ?2""")
     Optional<Product> findByStoreAndId(StoreMerchantId store, Long id);
-
-    @Query("""
-            select distinct p from Product p
-            left join fetch p.descriptions
-            left join fetch p.images
-            where p.store = ?1 and p.sku = ?2""")
-    Optional<Product> findByStoreAndSku(StoreMerchantId store, String sku);
-
-    boolean existsByStoreAndSku(StoreMerchantId store, String sku);
 
     int countByStore(StoreMerchantId store);
 
@@ -79,15 +71,18 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
 
     /**
      * The listing behind the console's product table and the storefront's category page. Sorting comes from the
-     * caller's {@code Pageable} and must name direct columns of {@code Product}.
+     * caller's {@code Pageable} and must name direct columns of {@code Product}; {@code valuesByOption} is the
+     * filter's {@code optionValueIds} already grouped by owning option (the service resolves that once).
      */
-    default Page<Product> search(StoreMerchantId store, ProductFilter filter, Pageable pageable) {
+    default Page<Product> search(StoreMerchantId store, ProductFilter filter,
+                                 Map<Long, List<Long>> valuesByOption, Pageable pageable) {
         return findAll(Specification.allOf(
                 ProductSpecifications.inStore(store),
                 ProductSpecifications.available(filter.getAvailable()),
                 ProductSpecifications.skuLike(filter.getSku()),
                 ProductSpecifications.byManufacturers(
                         filter.getManufacturerId() == null ? null : List.of(filter.getManufacturerId())),
-                ProductSpecifications.inCategories(filter.getCategoryIds())), pageable);
+                ProductSpecifications.inCategories(filter.getCategoryIds()),
+                ProductSpecifications.hasOptionValues(valuesByOption)), pageable);
     }
 }

@@ -25,6 +25,7 @@ import com.asrevo.cvhome.catalog.entity.ProductType;
 import com.asrevo.cvhome.catalog.model.product.ProductSearchCriteria;
 import com.asrevo.cvhome.catalog.model.product.ProductSearchSort;
 import com.asrevo.cvhome.catalog.model.product.ReadableFacetBucket;
+import com.asrevo.cvhome.catalog.model.product.ReadableOptionFacet;
 import com.asrevo.cvhome.catalog.model.product.ReadableProduct;
 import com.asrevo.cvhome.catalog.model.product.ReadableProductSearchResult;
 import com.asrevo.cvhome.catalog.model.product.ReadableProductSuggestion;
@@ -32,6 +33,7 @@ import com.asrevo.cvhome.catalog.model.product.ReadableSearchFacets;
 import com.asrevo.cvhome.catalog.repositories.CategoryRepository;
 import com.asrevo.cvhome.catalog.repositories.ManufacturerRepository;
 import com.asrevo.cvhome.catalog.repositories.ProductFacetRepository;
+import com.asrevo.cvhome.catalog.repositories.ProductOptionValueRepository;
 import com.asrevo.cvhome.catalog.repositories.ProductRepository;
 import com.asrevo.cvhome.catalog.repositories.ProductSearchIndexRepository;
 import com.asrevo.cvhome.catalog.repositories.ProductSpecifications;
@@ -78,6 +80,8 @@ public class ProductSearchServiceImpl implements ProductSearchService {
 
     private final ProductTypeRepository productTypeRepository;
 
+    private final ProductOptionValueRepository optionValueRepository;
+
     private final ProductSearchIndexer indexer;
 
     private final ProductMapper productMapper;
@@ -121,6 +125,7 @@ public class ProductSearchServiceImpl implements ProductSearchService {
     private ReadableProductSearchResult runSearch(StoreMerchantId store, ProductSearchCriteria criteria,
                                                   LanguageCode language, Pageable pageable, String queryText) {
         Specification<Product> spec = filters(store, criteria)
+                .and(ProductSpecifications.hasOptionValues(valuesByOption(store, criteria.getOptionValueIds())))
                 .and(ProductSpecifications.matchesText(queryText, store, language));
 
         ProductSearchSort sort = ProductSearchSort.orDefault(criteria.getSort());
@@ -138,7 +143,7 @@ public class ProductSearchServiceImpl implements ProductSearchService {
         result.setPageNumber(page.getNumber());
         result.setLanguage(language.code());
         if (criteria.isFacets()) {
-            result.setFacets(facets(spec, criteria, language));
+            result.setFacets(facets(spec, criteria, language, store));
         }
         return result;
     }
@@ -208,7 +213,7 @@ public class ProductSearchServiceImpl implements ProductSearchService {
     }
 
     private ReadableSearchFacets facets(Specification<Product> spec, ProductSearchCriteria criteria,
-                                        LanguageCode language) {
+                                        LanguageCode language, StoreMerchantId store) {
         ReadableSearchFacets facets = new ReadableSearchFacets();
         facets.setCategories(buckets(facetRepository.countByCategory(spec), criteria.getCategoryIds(),
                 ids -> categoryRepository.findAllById(ids).stream()
@@ -219,7 +224,56 @@ public class ProductSearchServiceImpl implements ProductSearchService {
         facets.setTypes(buckets(facetRepository.countByType(spec), criteria.getProductTypeIds(),
                 ids -> productTypeRepository.findAllById(ids).stream()
                         .collect(Collectors.toMap(ProductType::getId, t -> name(t, language)))));
+        facets.setOptions(optionFacets(spec, criteria, language, store));
         return facets;
+    }
+
+    /**
+     * One group per option whose values appear in the current results. The counts come from one grouped query
+     * over the same predicate as the page; the labels from one load of the counted value ids.
+     */
+    private List<ReadableOptionFacet> optionFacets(Specification<Product> spec, ProductSearchCriteria criteria,
+                                                   LanguageCode language, StoreMerchantId store) {
+        Map<Long, Long> counts = facetRepository.countByOptionValue(spec);
+        if (counts.isEmpty()) {
+            return List.of();
+        }
+        List<Long> selected = criteria.getOptionValueIds() == null ? List.of() : criteria.getOptionValueIds();
+        Map<Long, ReadableOptionFacet> byOption = new LinkedHashMap<>();
+        optionValueRepository.findByIdsInStore(counts.keySet(), store).stream()
+                .sorted(Comparator
+                        .comparing((com.asrevo.cvhome.catalog.entity.ProductOptionValue value) ->
+                                        value.getOption().getSortOrder(),
+                                Comparator.nullsLast(Comparator.naturalOrder()))
+                        .thenComparing(value -> value.getSortOrder(),
+                                Comparator.nullsLast(Comparator.naturalOrder()))
+                        .thenComparing(com.asrevo.cvhome.catalog.entity.ProductOptionValue::getId))
+                .forEach(value -> {
+                    var option = value.getOption();
+                    ReadableOptionFacet group = byOption.computeIfAbsent(option.getId(), id -> {
+                        ReadableOptionFacet facet = new ReadableOptionFacet();
+                        facet.setOptionId(option.getId());
+                        facet.setCode(option.getCode());
+                        facet.setName(option.description(language).map(d -> d.getName())
+                                .orElse(option.getCode()));
+                        facet.setSortOrder(option.getSortOrder());
+                        return facet;
+                    });
+                    group.getValues().add(new ReadableFacetBucket(value.getId(),
+                            value.description(language).map(d -> d.getName()).orElse(value.getCode()),
+                            counts.getOrDefault(value.getId(), 0L), selected.contains(value.getId())));
+                });
+        return List.copyOf(byOption.values());
+    }
+
+    private Map<Long, List<Long>> valuesByOption(StoreMerchantId store, List<Long> optionValueIds) {
+        if (optionValueIds == null || optionValueIds.isEmpty()) {
+            return Map.of();
+        }
+        return optionValueRepository.findByIdsInStore(optionValueIds, store).stream()
+                .collect(Collectors.groupingBy(value -> value.getOption().getId(), LinkedHashMap::new,
+                        Collectors.mapping(com.asrevo.cvhome.catalog.entity.ProductOptionValue::getId,
+                                Collectors.toList())));
     }
 
     private List<ReadableFacetBucket> buckets(Map<Long, Long> counts, List<Long> selected,
@@ -272,7 +326,7 @@ public class ProductSearchServiceImpl implements ProductSearchService {
         for (Long id : ids) {
             Product product = loaded.get(id);
             if (product != null) {
-                ordered.put(id, toSuggestion(product, language));
+                ordered.put(id, toSuggestion(product, language, query.trim()));
             }
         }
         return List.copyOf(ordered.values());
@@ -282,10 +336,15 @@ public class ProductSearchServiceImpl implements ProductSearchService {
      * Built by hand rather than through {@link ProductMapper}, which would drag the dimensions, the unit lookup
      * and every image along for a row that renders a thumbnail and a name. This runs on every keystroke.
      */
-    private ReadableProductSuggestion toSuggestion(Product product, LanguageCode language) {
+    private ReadableProductSuggestion toSuggestion(Product product, LanguageCode language, String query) {
         ReadableProductSuggestion suggestion = new ReadableProductSuggestion();
         suggestion.setId(product.getId());
-        suggestion.setSku(product.getSku());
+        product.defaultVariant().ifPresent(variant -> suggestion.setSku(variant.getSku()));
+        // The shopper typed a concrete combination sku: let the storefront deep-link it (?sku=).
+        product.getVariants().stream()
+                .filter(variant -> variant.getSku().equalsIgnoreCase(query))
+                .findFirst()
+                .ifPresent(variant -> suggestion.setMatchedVariantSku(variant.getSku()));
         product.description(language).ifPresent(d -> {
             suggestion.setName(d.getName());
             suggestion.setFriendlyUrl(d.getSeUrl());

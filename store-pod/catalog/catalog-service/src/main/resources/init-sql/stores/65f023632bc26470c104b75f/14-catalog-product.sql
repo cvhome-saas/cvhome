@@ -14,10 +14,10 @@ HTML format used for description.
 -- Product 91: Toyota Camry (Sedan)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (91, '2024-04-02 14:00:00.000000', '2024-04-02 14:00:00.000000', true, '2024-04-02 00:00:00.000000', false, null,
-        false, null, true, false, null, null, 'CAR-REF-91', 'CAR-SKU-91', 0, 13,
+        false, null, true, false, null, null, 'CAR-REF-91', 0, 13,
         '65f023632bc26470c104b75f', 9)
 on conflict (product_id) do nothing;
 
@@ -46,10 +46,10 @@ on conflict (description_id) do nothing;
 -- Product 92: BMW X5 (SUV)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (92, '2024-04-02 14:00:00.000000', '2024-04-02 14:00:00.000000', true, '2024-04-02 00:00:00.000000', false, null,
-        false, null, true, false, null, null, 'CAR-REF-92', 'CAR-SKU-92', 1, 14,
+        false, null, true, false, null, null, 'CAR-REF-92', 1, 14,
         '65f023632bc26470c104b75f', 10)
 on conflict (product_id) do nothing;
 
@@ -78,10 +78,10 @@ on conflict (description_id) do nothing;
 -- Product 93: Mercedes EQS (Electric)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (93, '2024-04-02 14:00:00.000000', '2024-04-02 14:00:00.000000', true, '2024-04-02 00:00:00.000000', false, null,
-        false, null, true, false, null, null, 'CAR-REF-93', 'CAR-SKU-93', 2, 15,
+        false, null, true, false, null, null, 'CAR-REF-93', 2, 15,
         '65f023632bc26470c104b75f', 11)
 on conflict (product_id) do nothing;
 
@@ -110,10 +110,10 @@ on conflict (description_id) do nothing;
 -- Product 94: Hyundai Tucson (Used SUV)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (94, '2024-04-02 14:00:00.000000', '2024-04-02 14:00:00.000000', true, '2024-04-02 00:00:00.000000', false, null,
-        false, null, true, false, null, null, 'CAR-REF-94', 'CAR-SKU-94', 3, 16,
+        false, null, true, false, null, null, 'CAR-REF-94', 3, 16,
         '65f023632bc26470c104b75f', 12) -- Product Type 12 (USED_CARS), but it's an SUV model
 on conflict (product_id) do nothing;
 
@@ -142,10 +142,10 @@ on conflict (description_id) do nothing;
 -- Product 95: Kia Sportage (Sedan - Error in logic, should be SUV, using Type 9 Sedan for demo)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (95, '2024-04-02 14:00:00.000000', '2024-04-02 14:00:00.000000', true, '2024-04-02 00:00:00.000000', false, null,
-        false, null, true, false, null, null, 'CAR-REF-95', 'CAR-SKU-95', 4, 17,
+        false, null, true, false, null, null, 'CAR-REF-95', 4, 17,
         '65f023632bc26470c104b75f', 9) -- Type 9 (SEDAN) assigned based on cycle
 on conflict (product_id) do nothing;
 
@@ -174,10 +174,10 @@ on conflict (description_id) do nothing;
 -- Product 96: Ford Mustang (SUV - Error in logic, should be Coupe/Convertible, using Type 10 SUV for demo)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (96, '2024-04-02 14:00:00.000000', '2024-04-02 14:00:00.000000', true, '2024-04-02 00:00:00.000000', false, null,
-        false, null, true, false, null, null, 'CAR-REF-96', 'CAR-SKU-96', 5, 18,
+        false, null, true, false, null, null, 'CAR-REF-96', 5, 18,
         '65f023632bc26470c104b75f', 10) -- Type 10 (SUV) assigned based on cycle
 on conflict (product_id) do nothing;
 
@@ -205,10 +205,10 @@ on conflict (description_id) do nothing;
 -- Product 97: Toyota RAV4 (Electric - Error in logic, should be SUV/Hybrid, using Type 11 Electric for demo)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (97, '2024-04-02 14:00:00.000000', '2024-04-02 14:00:00.000000', true, '2024-04-02 00:00:00.000000', false, null,
-        false, null, true, false, null, null, 'CAR-REF-97', 'CAR-SKU-97', 6, 13,
+        false, null, true, false, null, null, 'CAR-REF-97', 6, 13,
         '65f023632bc26470c104b75f', 11) -- Type 11 (ELECTRIC) assigned based on cycle
 on conflict (product_id) do nothing;
 
@@ -236,10 +236,10 @@ on conflict (description_id) do nothing;
 -- Product 98: BMW 3 Series (Used Sedan)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (98, '2024-04-02 14:00:00.000000', '2024-04-02 14:00:00.000000', true, '2024-04-02 00:00:00.000000', false, null,
-        false, null, true, false, null, null, 'CAR-REF-98', 'CAR-SKU-98', 7, 14,
+        false, null, true, false, null, null, 'CAR-REF-98', 7, 14,
         '65f023632bc26470c104b75f', 12) -- Type 12 (USED_CARS)
 on conflict (product_id) do nothing;
 
@@ -268,10 +268,10 @@ on conflict (description_id) do nothing;
 -- Product 99: Mercedes C-Class (Sedan)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (99, '2024-04-02 14:00:00.000000', '2024-04-02 14:00:00.000000', true, '2024-04-02 00:00:00.000000', false, null,
-        false, null, true, false, null, null, 'CAR-REF-99', 'CAR-SKU-99', 8, 15,
+        false, null, true, false, null, null, 'CAR-REF-99', 8, 15,
         '65f023632bc26470c104b75f', 9) -- Type 9 (SEDAN)
 on conflict (product_id) do nothing;
 
@@ -299,11 +299,11 @@ on conflict (description_id) do nothing;
 -- Product 100: Hyundai Elantra (SUV - Error in logic, should be Sedan, using Type 10 SUV for demo)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (100, '2024-04-02 14:00:00.000000', '2024-04-02 14:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
         null,
-        false, null, true, false, null, null, 'CAR-REF-100', 'CAR-SKU-100', 9, 16,
+        false, null, true, false, null, null, 'CAR-REF-100', 9, 16,
         '65f023632bc26470c104b75f', 10) -- Type 10 (SUV) assigned based on cycle
 on conflict (product_id) do nothing;
 
@@ -331,11 +331,11 @@ on conflict (description_id) do nothing;
 -- Product 101: Kia Seltos (Electric - Error in logic, should be SUV, using Type 11 Electric for demo)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (101, '2024-04-02 14:00:00.000000', '2024-04-02 14:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
         null,
-        false, null, true, false, null, null, 'CAR-REF-101', 'CAR-SKU-101', 10, 17,
+        false, null, true, false, null, null, 'CAR-REF-101', 10, 17,
         '65f023632bc26470c104b75f', 11) -- Type 11 (ELECTRIC) assigned based on cycle
 on conflict (product_id) do nothing;
 
@@ -362,11 +362,11 @@ on conflict (description_id) do nothing;
 -- Product 102: Ford F-150 (Used Truck)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (102, '2024-04-02 14:00:00.000000', '2024-04-02 14:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
         null,
-        false, null, true, false, null, null, 'CAR-REF-102', 'CAR-SKU-102', 11, 18,
+        false, null, true, false, null, null, 'CAR-REF-102', 11, 18,
         '65f023632bc26470c104b75f', 12) -- Type 12 (USED_CARS)
 on conflict (product_id) do nothing;
 
@@ -395,11 +395,11 @@ on conflict (description_id) do nothing;
 -- Product 103: Toyota Corolla (Sedan)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (103, '2024-04-02 14:00:00.000000', '2024-04-02 14:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
         null,
-        false, null, true, false, null, null, 'CAR-REF-103', 'CAR-SKU-103', 12, 13,
+        false, null, true, false, null, null, 'CAR-REF-103', 12, 13,
         '65f023632bc26470c104b75f', 9) -- Type 9 (SEDAN)
 on conflict (product_id) do nothing;
 
@@ -428,11 +428,11 @@ on conflict (description_id) do nothing;
 -- Product 104: BMW i4 (SUV - Error in logic, should be Electric Sedan, using Type 10 SUV for demo)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (104, '2024-04-02 14:00:00.000000', '2024-04-02 14:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
         null,
-        false, null, true, false, null, null, 'CAR-REF-104', 'CAR-SKU-104', 13, 14,
+        false, null, true, false, null, null, 'CAR-REF-104', 13, 14,
         '65f023632bc26470c104b75f', 10) -- Type 10 (SUV) assigned based on cycle
 on conflict (product_id) do nothing;
 
@@ -461,11 +461,11 @@ on conflict (description_id) do nothing;
 -- Product 105: Mercedes E-Class (Electric - Error in logic, should be Sedan, using Type 11 Electric for demo)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (105, '2024-04-02 14:00:00.000000', '2024-04-02 14:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
         null,
-        false, null, true, false, null, null, 'CAR-REF-105', 'CAR-SKU-105', 14, 15,
+        false, null, true, false, null, null, 'CAR-REF-105', 14, 15,
         '65f023632bc26470c104b75f', 11) -- Type 11 (ELECTRIC) assigned based on cycle
 on conflict (product_id) do nothing;
 
@@ -493,11 +493,11 @@ on conflict (description_id) do nothing;
 -- Product 106: Hyundai Sonata (Used Sedan)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (106, '2024-04-02 14:00:00.000000', '2024-04-02 14:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
         null,
-        false, null, true, false, null, null, 'CAR-REF-106', 'CAR-SKU-106', 15, 16,
+        false, null, true, false, null, null, 'CAR-REF-106', 15, 16,
         '65f023632bc26470c104b75f', 12) -- Type 12 (USED_CARS) assigned based on cycle
 on conflict (product_id) do nothing;
 
@@ -527,11 +527,11 @@ on conflict (description_id) do nothing;
 -- Product 107: Kia EV6 (Sedan - Error in logic, should be Electric SUV, using Type 9 Sedan for demo)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (107, '2024-04-02 14:00:00.000000', '2024-04-02 14:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
         null,
-        false, null, true, false, null, null, 'CAR-REF-107', 'CAR-SKU-107', 16, 17,
+        false, null, true, false, null, null, 'CAR-REF-107', 16, 17,
         '65f023632bc26470c104b75f', 9) -- Type 9 (SEDAN) assigned based on cycle
 on conflict (product_id) do nothing;
 
@@ -560,11 +560,11 @@ on conflict (description_id) do nothing;
 -- Product 108: Ford Explorer (SUV)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (108, '2024-04-02 14:00:00.000000', '2024-04-02 14:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
         null,
-        false, null, true, false, null, null, 'CAR-REF-108', 'CAR-SKU-108', 17, 18,
+        false, null, true, false, null, null, 'CAR-REF-108', 17, 18,
         '65f023632bc26470c104b75f', 10) -- Type 10 (SUV) assigned based on cycle
 on conflict (product_id) do nothing;
 
@@ -594,11 +594,11 @@ on conflict (description_id) do nothing;
 -- Product 109: Toyota Highlander (Electric - Error in logic, should be SUV/Hybrid, using Type 11 Electric for demo)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (109, '2024-04-02 14:00:00.000000', '2024-04-02 14:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
         null,
-        false, null, true, false, null, null, 'CAR-REF-109', 'CAR-SKU-109', 18, 13,
+        false, null, true, false, null, null, 'CAR-REF-109', 18, 13,
         '65f023632bc26470c104b75f', 11) -- Type 11 (ELECTRIC) assigned based on cycle
 on conflict (product_id) do nothing;
 
@@ -629,11 +629,11 @@ on conflict (description_id) do nothing;
 -- Product 110: BMW X3 (Used SUV)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (110, '2024-04-02 14:00:00.000000', '2024-04-02 14:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
         null,
-        false, null, true, false, null, null, 'CAR-REF-110', 'CAR-SKU-110', 19, 14,
+        false, null, true, false, null, null, 'CAR-REF-110', 19, 14,
         '65f023632bc26470c104b75f', 12) -- Type 12 (USED_CARS) assigned based on cycle
 on conflict (product_id) do nothing;
 
@@ -663,11 +663,11 @@ on conflict (description_id) do nothing;
 -- Product 111: Mercedes GLC (Sedan - Error in logic, should be SUV, using Type 9 Sedan for demo)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (111, '2024-04-02 14:00:00.000000', '2024-04-02 14:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
         null,
-        false, null, true, false, null, null, 'CAR-REF-111', 'CAR-SKU-111', 20, 15,
+        false, null, true, false, null, null, 'CAR-REF-111', 20, 15,
         '65f023632bc26470c104b75f', 9) -- Type 9 (SEDAN) assigned based on cycle
 on conflict (product_id) do nothing;
 
@@ -695,11 +695,11 @@ on conflict (description_id) do nothing;
 -- Product 112: Hyundai Santa Fe (SUV)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (112, '2024-04-02 14:00:00.000000', '2024-04-02 14:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
         null,
-        false, null, true, false, null, null, 'CAR-REF-112', 'CAR-SKU-112', 21, 16,
+        false, null, true, false, null, null, 'CAR-REF-112', 21, 16,
         '65f023632bc26470c104b75f', 10) -- Type 10 (SUV) assigned based on cycle
 on conflict (product_id) do nothing;
 
@@ -730,11 +730,11 @@ on conflict (description_id) do nothing;
 -- Product 113: Kia Telluride (Electric - Error in logic, should be SUV, using Type 11 Electric for demo)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (113, '2024-04-02 14:00:00.000000', '2024-04-02 14:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
         null,
-        false, null, true, false, null, null, 'CAR-REF-113', 'CAR-SKU-113', 22, 17,
+        false, null, true, false, null, null, 'CAR-REF-113', 22, 17,
         '65f023632bc26470c104b75f', 11) -- Type 11 (ELECTRIC) assigned based on cycle
 on conflict (product_id) do nothing;
 
@@ -764,11 +764,11 @@ on conflict (description_id) do nothing;
 -- Product 114: Ford Bronco (Used SUV)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (114, '2024-04-02 14:00:00.000000', '2024-04-02 14:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
         null,
-        false, null, true, false, null, null, 'CAR-REF-114', 'CAR-SKU-114', 23, 18,
+        false, null, true, false, null, null, 'CAR-REF-114', 23, 18,
         '65f023632bc26470c104b75f', 12) -- Type 12 (USED_CARS) assigned based on cycle
 on conflict (product_id) do nothing;
 
@@ -798,11 +798,11 @@ on conflict (description_id) do nothing;
 -- Product 115: Toyota Sienna (Sedan - Error in logic, should be Minivan/Hybrid, using Type 9 Sedan for demo)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (115, '2024-04-02 14:00:00.000000', '2024-04-02 14:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
         null,
-        false, null, true, false, null, null, 'CAR-REF-115', 'CAR-SKU-115', 24, 13,
+        false, null, true, false, null, null, 'CAR-REF-115', 24, 13,
         '65f023632bc26470c104b75f', 9) -- Type 9 (SEDAN) assigned based on cycle
 on conflict (product_id) do nothing;
 
@@ -831,11 +831,11 @@ on conflict (description_id) do nothing;
 -- Product 116: BMW 5 Series (SUV - Error in logic, should be Sedan, using Type 10 SUV for demo)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (116, '2024-04-02 14:00:00.000000', '2024-04-02 14:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
         null,
-        false, null, true, false, null, null, 'CAR-REF-116', 'CAR-SKU-116', 25, 14,
+        false, null, true, false, null, null, 'CAR-REF-116', 25, 14,
         '65f023632bc26470c104b75f', 10) -- Type 10 (SUV) assigned based on cycle
 on conflict (product_id) do nothing;
 
@@ -865,11 +865,11 @@ on conflict (description_id) do nothing;
 -- Product 117: Mercedes S-Class (Electric - Error in logic, should be Sedan, using Type 11 Electric for demo)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (117, '2024-04-02 14:00:00.000000', '2024-04-02 14:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
         null,
-        false, null, true, false, null, null, 'CAR-REF-117', 'CAR-SKU-117', 26, 15,
+        false, null, true, false, null, null, 'CAR-REF-117', 26, 15,
         '65f023632bc26470c104b75f', 11) -- Type 11 (ELECTRIC) assigned based on cycle
 on conflict (product_id) do nothing;
 
@@ -898,11 +898,11 @@ on conflict (description_id) do nothing;
 -- Product 118: Hyundai Kona Electric (Used Electric)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (118, '2024-04-02 14:00:00.000000', '2024-04-02 14:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
         null,
-        false, null, true, false, null, null, 'CAR-REF-118', 'CAR-SKU-118', 27, 16,
+        false, null, true, false, null, null, 'CAR-REF-118', 27, 16,
         '65f023632bc26470c104b75f', 12) -- Type 12 (USED_CARS) assigned based on cycle
 on conflict (product_id) do nothing;
 
@@ -933,11 +933,11 @@ on conflict (description_id) do nothing;
 -- Product 119: Kia Niro EV (Sedan - Error in logic, should be Electric SUV, using Type 9 Sedan for demo)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (119, '2024-04-02 14:00:00.000000', '2024-04-02 14:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
         null,
-        false, null, true, false, null, null, 'CAR-REF-119', 'CAR-SKU-119', 28, 17,
+        false, null, true, false, null, null, 'CAR-REF-119', 28, 17,
         '65f023632bc26470c104b75f', 9) -- Type 9 (SEDAN) assigned based on cycle
 on conflict (product_id) do nothing;
 
@@ -966,11 +966,11 @@ on conflict (description_id) do nothing;
 -- Product 120: Ford Mustang Mach-E (SUV)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (120, '2024-04-02 14:00:00.000000', '2024-04-02 14:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
         null,
-        false, null, true, false, null, null, 'CAR-REF-120', 'CAR-SKU-120', 29, 18,
+        false, null, true, false, null, null, 'CAR-REF-120', 29, 18,
         '65f023632bc26470c104b75f', 10) -- Type 10 (SUV) assigned based on cycle
 on conflict (product_id) do nothing;
 
@@ -1000,11 +1000,11 @@ on conflict (description_id) do nothing;
 -- Product 121: Toyota Avalon (Sedan)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (121, '2024-04-02 14:00:00.000000', '2024-04-02 14:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
         null,
-        false, null, true, false, null, null, 'CAR-REF-121', 'CAR-SKU-121', 30, 13,
+        false, null, true, false, null, null, 'CAR-REF-121', 30, 13,
         '65f023632bc26470c104b75f', 9) -- Type 9 (SEDAN) assigned based on cycle
 on conflict (product_id) do nothing;
 
@@ -1033,11 +1033,11 @@ on conflict (description_id) do nothing;
 -- Product 122: BMW X1 (SUV)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (122, '2024-04-02 14:00:00.000000', '2024-04-02 14:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
         null,
-        false, null, true, false, null, null, 'CAR-REF-122', 'CAR-SKU-122', 31, 14,
+        false, null, true, false, null, null, 'CAR-REF-122', 31, 14,
         '65f023632bc26470c104b75f', 10) -- Type 10 (SUV) assigned based on cycle
 on conflict (product_id) do nothing;
 
@@ -1064,11 +1064,11 @@ on conflict (description_id) do nothing;
 -- Product 123: Mercedes EQB (Electric SUV)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (123, '2024-04-02 14:00:00.000000', '2024-04-02 14:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
         null,
-        false, null, true, false, null, null, 'CAR-REF-123', 'CAR-SKU-123', 32, 15,
+        false, null, true, false, null, null, 'CAR-REF-123', 32, 15,
         '65f023632bc26470c104b75f', 11) -- Type 11 (ELECTRIC) assigned based on cycle
 on conflict (product_id) do nothing;
 
@@ -1098,11 +1098,11 @@ on conflict (description_id) do nothing;
 -- Product 124: Hyundai Accent 2020 (Used Sedan)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (124, '2024-04-02 14:00:00.000000', '2024-04-02 14:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
         null,
-        false, null, true, false, null, null, 'CAR-REF-124', 'CAR-SKU-124', 33, 16,
+        false, null, true, false, null, null, 'CAR-REF-124', 33, 16,
         '65f023632bc26470c104b75f', 12) -- Type 12 (USED_CARS) assigned based on cycle
 on conflict (product_id) do nothing;
 
@@ -1132,11 +1132,11 @@ on conflict (description_id) do nothing;
 -- Product 125: Kia K5 (Sedan)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (125, '2024-04-02 14:00:00.000000', '2024-04-02 14:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
         null,
-        false, null, true, false, null, null, 'CAR-REF-125', 'CAR-SKU-125', 34, 17,
+        false, null, true, false, null, null, 'CAR-REF-125', 34, 17,
         '65f023632bc26470c104b75f', 9) -- Type 9 (SEDAN) assigned based on cycle
 on conflict (product_id) do nothing;
 
@@ -1163,11 +1163,11 @@ on conflict (description_id) do nothing;
 -- Product 126: Ford Escape (SUV)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (126, '2024-04-02 14:00:00.000000', '2024-04-02 14:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
         null,
-        false, null, true, false, null, null, 'CAR-REF-126', 'CAR-SKU-126', 35, 18,
+        false, null, true, false, null, null, 'CAR-REF-126', 35, 18,
         '65f023632bc26470c104b75f', 10) -- Type 10 (SUV) assigned based on cycle
 on conflict (product_id) do nothing;
 
@@ -1195,11 +1195,11 @@ on conflict (description_id) do nothing;
 -- Product 127: Toyota bZ4X (Electric SUV)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (127, '2024-04-02 14:00:00.000000', '2024-04-02 14:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
         null,
-        false, null, true, false, null, null, 'CAR-REF-127', 'CAR-SKU-127', 36, 13,
+        false, null, true, false, null, null, 'CAR-REF-127', 36, 13,
         '65f023632bc26470c104b75f', 11) -- Type 11 (ELECTRIC) assigned based on cycle
 on conflict (product_id) do nothing;
 
@@ -1229,11 +1229,11 @@ on conflict (description_id) do nothing;
 -- Product 128: BMW X7 2021 (Used SUV)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (128, '2024-04-02 14:00:00.000000', '2024-04-02 14:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
         null,
-        false, null, true, false, null, null, 'CAR-REF-128', 'CAR-SKU-128', 37, 14,
+        false, null, true, false, null, null, 'CAR-REF-128', 37, 14,
         '65f023632bc26470c104b75f', 12) -- Type 12 (USED_CARS) assigned based on cycle
 on conflict (product_id) do nothing;
 
@@ -1264,11 +1264,11 @@ on conflict (description_id) do nothing;
 -- Product 129: Mercedes A-Class Sedan
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (129, '2024-04-02 14:00:00.000000', '2024-04-02 14:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
         null,
-        false, null, true, false, null, null, 'CAR-REF-129', 'CAR-SKU-129', 38, 15,
+        false, null, true, false, null, null, 'CAR-REF-129', 38, 15,
         '65f023632bc26470c104b75f', 9) -- Type 9 (SEDAN) assigned based on cycle
 on conflict (product_id) do nothing;
 
@@ -1298,11 +1298,11 @@ on conflict (description_id) do nothing;
 -- Product 130: Hyundai Palisade (SUV)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (130, '2024-04-02 14:00:00.000000', '2024-04-02 14:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
         null,
-        false, null, true, false, null, null, 'CAR-REF-130', 'CAR-SKU-130', 39, 16,
+        false, null, true, false, null, null, 'CAR-REF-130', 39, 16,
         '65f023632bc26470c104b75f', 10) -- Type 10 (SUV) assigned based on cycle
 on conflict (product_id) do nothing;
 
@@ -1333,11 +1333,11 @@ on conflict (description_id) do nothing;
 -- Product 131: Kia Soul EV (Electric)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (131, '2024-04-02 14:00:00.000000', '2024-04-02 14:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
         null,
-        false, null, true, false, null, null, 'CAR-REF-131', 'CAR-SKU-131', 40, 17,
+        false, null, true, false, null, null, 'CAR-REF-131', 40, 17,
         '65f023632bc26470c104b75f', 11) -- Type 11 (ELECTRIC) assigned based on cycle
 on conflict (product_id) do nothing;
 
@@ -1366,11 +1366,11 @@ on conflict (description_id) do nothing;
 -- Product 132: Ford Focus 2019 (Used Sedan)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (132, '2024-04-02 14:00:00.000000', '2024-04-02 14:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
         null,
-        false, null, true, false, null, null, 'CAR-REF-132', 'CAR-SKU-132', 41, 18,
+        false, null, true, false, null, null, 'CAR-REF-132', 41, 18,
         '65f023632bc26470c104b75f', 12) -- Type 12 (USED_CARS) assigned based on cycle
 on conflict (product_id) do nothing;
 
@@ -1399,11 +1399,11 @@ on conflict (description_id) do nothing;
 -- Product 133: Toyota Crown (Sedan/Hybrid)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (133, '2024-04-02 14:00:00.000000', '2024-04-02 14:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
         null,
-        false, null, true, false, null, null, 'CAR-REF-133', 'CAR-SKU-133', 42, 13,
+        false, null, true, false, null, null, 'CAR-REF-133', 42, 13,
         '65f023632bc26470c104b75f', 9) -- Type 9 (SEDAN) assigned based on cycle
 on conflict (product_id) do nothing;
 
@@ -1433,11 +1433,11 @@ on conflict (description_id) do nothing;
 -- Product 134: BMW X6 (SUV Coupe)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (134, '2024-04-02 14:00:00.000000', '2024-04-02 14:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
         null,
-        false, null, true, false, null, null, 'CAR-REF-134', 'CAR-SKU-134', 43, 14,
+        false, null, true, false, null, null, 'CAR-REF-134', 43, 14,
         '65f023632bc26470c104b75f', 10) -- Type 10 (SUV) assigned based on cycle
 on conflict (product_id) do nothing;
 
@@ -1467,11 +1467,11 @@ on conflict (description_id) do nothing;
 -- Product 135: Mercedes EQC (Electric SUV)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (135, '2024-04-02 14:00:00.000000', '2024-04-02 14:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
         null,
-        false, null, true, false, null, null, 'CAR-REF-135', 'CAR-SKU-135', 44, 15,
+        false, null, true, false, null, null, 'CAR-REF-135', 44, 15,
         '65f023632bc26470c104b75f', 11) -- Type 11 (ELECTRIC) assigned based on cycle
 on conflict (product_id) do nothing;
 

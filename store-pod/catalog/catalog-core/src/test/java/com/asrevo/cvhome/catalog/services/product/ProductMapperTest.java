@@ -103,7 +103,10 @@ class ProductMapperTest {
         Product product = new Product();
         product.setId(7L);
         product.setStore(STORE);
-        product.setSku(SKU);
+        com.asrevo.cvhome.catalog.entity.ProductVariant defaultVariant =
+                new com.asrevo.cvhome.catalog.entity.ProductVariant(product, SKU);
+        defaultVariant.setDefaultVariant(true);
+        product.getVariants().add(defaultVariant);
         product.setHeight(BigDecimal.ONE);
         product.setWidth(BigDecimal.TWO);
         product.setLength(BigDecimal.TEN);
@@ -317,7 +320,8 @@ class ProductMapperTest {
 
             assertThat(product.getDateAvailable()).isEqualTo(original);
             assertThat(product.getHeight()).isEqualTo(BigDecimal.ONE);
-            assertThat(product.getSku()).isEqualTo(NEW_SKU);
+            // the sku belongs to the variant, not the definition body — apply leaves it alone
+            assertThat(product.defaultVariant().orElseThrow().getSku()).isEqualTo(SKU);
             assertThat(product.isAvailable()).isFalse();
             assertThat(product.isProductVirtual()).isTrue();
         }

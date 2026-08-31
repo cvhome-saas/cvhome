@@ -1,5 +1,7 @@
 package com.asrevo.cvhome.catalog.api.v1;
 
+import java.util.List;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -43,5 +45,13 @@ public class ExternalProductApi implements ExternalProductService {
             // The s2s contract declares nothing checked; the carrier keeps the 404 and its code on the way out.
             throw new UncheckedBaseException(e);
         }
+    }
+
+    @Override
+    @GetMapping("/detailed-products")
+    @Parameter(name = "store", schema = @Schema(type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    public List<ReadableMinimalProduct> getDetailedProducts(StoreMerchantId store,
+                                                            @RequestParam List<String> skus, LanguageCode lang) {
+        return productService.getBySkus(store, skus, lang);
     }
 }

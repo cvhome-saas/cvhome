@@ -17,10 +17,10 @@ Generated SQL inserts based on the provided template and instructions:
 -- Product 1: Nike Running Shoes (Manuf: 1, Type: 2)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (1, NOW(), NOW(), true, NOW(), false, 12.0,
-        false, 30.0, true, false, 0.8, 10.0, 'REF-NK-RUN-001', 'SKU-NK-RUN-001', 1, 1,
+        false, 30.0, true, false, 0.8, 10.0, 'REF-NK-RUN-001', 1, 1,
         '65f023632bc46470c104b76f', 2)
 on conflict (product_id) do nothing;
 
@@ -85,10 +85,10 @@ on conflict (description_id) do nothing;
 -- Product 2: Zara Women's Midi Dress (Manuf: 2, Type: 1)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (2, NOW(), NOW(), true, NOW(), false, null,
-        false, null, true, false, 0.5, null, 'REF-ZR-CL-DRS02', 'SKU-ZR-CL-DRS02', 2, 2,
+        false, null, true, false, 0.5, null, 'REF-ZR-CL-DRS02', 2, 2,
         '65f023632bc46470c104b76f', 1)
 on conflict (product_id) do nothing;
 
@@ -155,10 +155,10 @@ on conflict (description_id) do nothing;
 -- Product 3: Adidas Men's Track Pants (Manuf: 3, Type: 1)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (3, NOW(), NOW(), true, NOW(), false, null,
-        false, null, true, false, 0.5, null, 'REF-AD-CL-TPT03', 'SKU-AD-CL-TPT03', 3, 3,
+        false, null, true, false, 0.5, null, 'REF-AD-CL-TPT03', 3, 3,
         '65f023632bc46470c104b76f', 1)
 on conflict (product_id) do nothing;
 
@@ -223,10 +223,10 @@ on conflict (description_id) do nothing;
 -- Product 4: H&M Women's Knit Sweater (Manuf: 4, Type: 1)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (4, NOW(), NOW(), true, NOW(), false, null,
-        false, null, true, false, 0.6, null, 'REF-HM-CL-SWT04', 'SKU-HM-CL-SWT04', 4, 4,
+        false, null, true, false, 0.6, null, 'REF-HM-CL-SWT04', 4, 4,
         '65f023632bc46470c104b76f', 1)
 on conflict (product_id) do nothing;
 
@@ -290,10 +290,10 @@ on conflict (description_id) do nothing;
 -- Product 5: Gucci Marmont Shoulder Bag (Manuf: 5, Type: 4)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (5, NOW(), NOW(), true, NOW(), false, 15.0,
-        false, 26.0, true, false, 0.7, 7.0, 'REF-GU-BG-MAR05', 'SKU-GU-BG-MAR05', 5, 5,
+        false, 26.0, true, false, 0.7, 7.0, 'REF-GU-BG-MAR05', 5, 5,
         '65f023632bc46470c104b76f', 4)
 on conflict (product_id) do nothing;
 
@@ -360,10 +360,10 @@ on conflict (description_id) do nothing;
 -- Product 6: Chanel Sunglasses (Manuf: 6, Type: 3)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (6, NOW(), NOW(), true, NOW(), false, null,
-        false, null, true, false, 0.1, null, 'REF-CH-AC-SUN06', 'SKU-CH-AC-SUN06', 6, 6,
+        false, null, true, false, 0.1, null, 'REF-CH-AC-SUN06', 6, 6,
         '65f023632bc46470c104b76f', 3)
 on conflict (product_id) do nothing;
 
@@ -429,10 +429,10 @@ on conflict (description_id) do nothing;
 -- Product 7: Nike Kids' Hoodie (Manuf: 1, Type: 1)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (7, NOW(), NOW(), true, NOW(), false, null,
-        false, null, true, false, 0.4, null, 'REF-NK-CL-KHD07', 'SKU-NK-CL-KHD07', 7, 1,
+        false, null, true, false, 0.4, null, 'REF-NK-CL-KHD07', 7, 1,
         '65f023632bc46470c104b76f', 1)
 on conflict (product_id) do nothing;
 
@@ -495,10 +495,10 @@ on conflict (description_id) do nothing;
 -- Product 8: Zara Men's Sneakers (Manuf: 2, Type: 2)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (8, NOW(), NOW(), true, NOW(), false, null,
-        false, null, true, false, 0.9, null, 'REF-ZR-SH-SNK08', 'SKU-ZR-SH-SNK08', 8, 2,
+        false, null, true, false, 0.9, null, 'REF-ZR-SH-SNK08', 8, 2,
         '65f023632bc46470c104b76f', 2)
 on conflict (product_id) do nothing;
 
@@ -562,10 +562,10 @@ on conflict (description_id) do nothing;
 -- Product 9: Adidas Women's Backpack (Manuf: 3, Type: 4)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (9, NOW(), NOW(), true, NOW(), false, 45.0,
-        false, 30.0, true, false, 0.5, 15.0, 'REF-AD-BG-BPK09', 'SKU-AD-BG-BPK09', 9, 3,
+        false, 30.0, true, false, 0.5, 15.0, 'REF-AD-BG-BPK09', 9, 3,
         '65f023632bc46470c104b76f', 4)
 on conflict (product_id) do nothing;
 
@@ -628,10 +628,10 @@ on conflict (description_id) do nothing;
 -- Product 10: H&M Men's Belt (Manuf: 4, Type: 3)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (10, NOW(), NOW(), true, NOW(), false, null,
-        false, null, true, false, 0.2, 3.5, 'REF-HM-AC-BLT10', 'SKU-HM-AC-BLT10', 10, 4,
+        false, null, true, false, 0.2, 3.5, 'REF-HM-AC-BLT10', 10, 4,
         '65f023632bc46470c104b76f', 3)
 on conflict (product_id) do nothing;
 
@@ -692,10 +692,10 @@ on conflict (description_id) do nothing;
 -- Product 11: Gucci Women's Loafers (Manuf: 5, Type: 2)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (11, NOW(), NOW(), true, NOW(), false, null,
-        false, null, true, false, 0.7, null, 'REF-GU-SH-LOF11', 'SKU-GU-SH-LOF11', 11, 5,
+        false, null, true, false, 0.7, null, 'REF-GU-SH-LOF11', 11, 5,
         '65f023632bc46470c104b76f', 2)
 on conflict (product_id) do nothing;
 
@@ -761,10 +761,10 @@ on conflict (description_id) do nothing;
 -- Product 12: Chanel Card Holder (Manuf: 6, Type: 3)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (12, NOW(), NOW(), true, NOW(), false, 7.5,
-        false, 11.2, true, false, 0.1, 0.5, 'REF-CH-AC-CRD12', 'SKU-CH-AC-CRD12', 12, 6,
+        false, 11.2, true, false, 0.1, 0.5, 'REF-CH-AC-CRD12', 12, 6,
         '65f023632bc46470c104b76f', 3)
 on conflict (product_id) do nothing;
 
@@ -829,10 +829,10 @@ on conflict (description_id) do nothing;
 -- Product 13: Nike Women's Leggings (Manuf: 1, Type: 1)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (13, NOW(), NOW(), true, NOW(), false, null,
-        false, null, true, false, 0.3, null, 'REF-NK-CL-LEG13', 'SKU-NK-CL-LEG13', 13, 1,
+        false, null, true, false, 0.3, null, 'REF-NK-CL-LEG13', 13, 1,
         '65f023632bc46470c104b76f', 1)
 on conflict (product_id) do nothing;
 
@@ -897,10 +897,10 @@ on conflict (description_id) do nothing;
 -- Product 14: Zara Men's Polo Shirt (Manuf: 2, Type: 1)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (14, NOW(), NOW(), true, NOW(), false, null,
-        false, null, true, false, 0.3, null, 'REF-ZR-CL-POL14', 'SKU-ZR-CL-POL14', 14, 2,
+        false, null, true, false, 0.3, null, 'REF-ZR-CL-POL14', 14, 2,
         '65f023632bc46470c104b76f', 1)
 on conflict (product_id) do nothing;
 
@@ -963,10 +963,10 @@ on conflict (description_id) do nothing;
 -- Product 15: Adidas Kids' Sandals (Manuf: 3, Type: 2)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (15, NOW(), NOW(), true, NOW(), false, null,
-        false, null, true, false, 0.3, null, 'REF-AD-SH-SND15', 'SKU-AD-SH-SND15', 15, 3,
+        false, null, true, false, 0.3, null, 'REF-AD-SH-SND15', 15, 3,
         '65f023632bc46470c104b76f', 2)
 on conflict (product_id) do nothing;
 
@@ -1046,10 +1046,10 @@ Generated SQL inserts for products 16-30 based on the provided template and inst
 -- Product 16: H&M Women's Dress (Manuf: 4, Type: 1)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (16, NOW(), NOW(), true, NOW(), false, null,
-        false, null, true, false, 0.4, null, 'REF-HM-CL-DRS16', 'SKU-HM-CL-DRS16', 16, 4,
+        false, null, true, false, 0.4, null, 'REF-HM-CL-DRS16', 16, 4,
         '65f023632bc46470c104b76f', 1)
 on conflict (product_id) do nothing;
 
@@ -1116,10 +1116,10 @@ on conflict (description_id) do nothing;
 -- Product 17: Gucci Men's Wallet (Manuf: 5, Type: 3)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (17, NOW(), NOW(), true, NOW(), false, 9.0,
-        false, 11.0, true, false, 0.1, 1.5, 'REF-GU-AC-WAL17', 'SKU-GU-AC-WAL17', 17, 5,
+        false, 11.0, true, false, 0.1, 1.5, 'REF-GU-AC-WAL17', 17, 5,
         '65f023632bc46470c104b76f', 3)
 on conflict (product_id) do nothing;
 
@@ -1186,10 +1186,10 @@ on conflict (description_id) do nothing;
 -- Product 18: Chanel Brooch (Manuf: 6, Type: 3)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (18, NOW(), NOW(), true, NOW(), false, null,
-        false, null, true, false, 0.05, null, 'REF-CH-AC-BRH18', 'SKU-CH-AC-BRH18', 18, 6,
+        false, null, true, false, 0.05, null, 'REF-CH-AC-BRH18', 18, 6,
         '65f023632bc46470c104b76f', 3)
 on conflict (product_id) do nothing;
 
@@ -1252,10 +1252,10 @@ on conflict (description_id) do nothing;
 -- Product 19: Nike Men's Basketball Shorts (Manuf: 1, Type: 1)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (19, NOW(), NOW(), true, NOW(), false, null,
-        false, null, true, false, 0.3, null, 'REF-NK-CL-BBS19', 'SKU-NK-CL-BBS19', 19, 1,
+        false, null, true, false, 0.3, null, 'REF-NK-CL-BBS19', 19, 1,
         '65f023632bc46470c104b76f', 1)
 on conflict (product_id) do nothing;
 
@@ -1320,10 +1320,10 @@ on conflict (description_id) do nothing;
 -- Product 20: Zara Women's Sandals (Manuf: 2, Type: 2)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (20, NOW(), NOW(), true, NOW(), false, null,
-        false, null, true, false, 0.5, null, 'REF-ZR-SH-SND20', 'SKU-ZR-SH-SND20', 20, 2,
+        false, null, true, false, 0.5, null, 'REF-ZR-SH-SND20', 20, 2,
         '65f023632bc46470c104b76f', 2)
 on conflict (product_id) do nothing;
 
@@ -1387,10 +1387,10 @@ on conflict (description_id) do nothing;
 -- Product 21: Adidas Men's Hoodie (Manuf: 3, Type: 1)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (21, NOW(), NOW(), true, NOW(), false, null,
-        false, null, true, false, 0.7, null, 'REF-AD-CL-HOD21', 'SKU-AD-CL-HOD21', 21, 3,
+        false, null, true, false, 0.7, null, 'REF-AD-CL-HOD21', 21, 3,
         '65f023632bc46470c104b76f', 1)
 on conflict (product_id) do nothing;
 
@@ -1455,10 +1455,10 @@ on conflict (description_id) do nothing;
 -- Product 22: H&M Kids' T-Shirt Pack (Manuf: 4, Type: 1)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (22, NOW(), NOW(), true, NOW(), false, null,
-        false, null, true, false, 0.4, null, 'REF-HM-CL-KTP22', 'SKU-HM-CL-KTP22', 22, 4,
+        false, null, true, false, 0.4, null, 'REF-HM-CL-KTP22', 22, 4,
         '65f023632bc46470c104b76f', 1)
 on conflict (product_id) do nothing;
 
@@ -1522,10 +1522,10 @@ on conflict (description_id) do nothing;
 -- Product 23: Gucci Men's Sneakers (Manuf: 5, Type: 2)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (23, NOW(), NOW(), true, NOW(), false, null,
-        false, null, true, false, 1.0, null, 'REF-GU-SH-SNK23', 'SKU-GU-SH-SNK23', 23, 5,
+        false, null, true, false, 1.0, null, 'REF-GU-SH-SNK23', 23, 5,
         '65f023632bc46470c104b76f', 2)
 on conflict (product_id) do nothing;
 
@@ -1590,10 +1590,10 @@ on conflict (description_id) do nothing;
 -- Product 24: Chanel Ballet Flats (Manuf: 6, Type: 2)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (24, NOW(), NOW(), true, NOW(), false, null,
-        false, null, true, false, 0.5, null, 'REF-CH-SH-BAL24', 'SKU-CH-SH-BAL24', 24, 6,
+        false, null, true, false, 0.5, null, 'REF-CH-SH-BAL24', 24, 6,
         '65f023632bc46470c104b76f', 2)
 on conflict (product_id) do nothing;
 
@@ -1656,10 +1656,10 @@ on conflict (description_id) do nothing;
 -- Product 25: Nike Women's Tank Top (Manuf: 1, Type: 1)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (25, NOW(), NOW(), true, NOW(), false, null,
-        false, null, true, false, 0.2, null, 'REF-NK-CL-TNK25', 'SKU-NK-CL-TNK25', 25, 1,
+        false, null, true, false, 0.2, null, 'REF-NK-CL-TNK25', 25, 1,
         '65f023632bc46470c104b76f', 1)
 on conflict (product_id) do nothing;
 
@@ -1722,10 +1722,10 @@ on conflict (description_id) do nothing;
 -- Product 26: Zara Men's Trousers (Manuf: 2, Type: 1)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (26, NOW(), NOW(), true, NOW(), false, null,
-        false, null, true, false, 0.5, null, 'REF-ZR-CL-TRS26', 'SKU-ZR-CL-TRS26', 26, 2,
+        false, null, true, false, 0.5, null, 'REF-ZR-CL-TRS26', 26, 2,
         '65f023632bc46470c104b76f', 1)
 on conflict (product_id) do nothing;
 
@@ -1787,10 +1787,10 @@ on conflict (description_id) do nothing;
 -- Product 27: Adidas Kids' Tracksuit (Manuf: 3, Type: 1)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (27, NOW(), NOW(), true, NOW(), false, null,
-        false, null, true, false, 0.6, null, 'REF-AD-CL-KTS27', 'SKU-AD-CL-KTS27', 27, 3,
+        false, null, true, false, 0.6, null, 'REF-AD-CL-KTS27', 27, 3,
         '65f023632bc46470c104b76f', 1)
 on conflict (product_id) do nothing;
 
@@ -1855,10 +1855,10 @@ on conflict (description_id) do nothing;
 -- Product 28: H&M Scarf (Manuf: 4, Type: 3)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (28, NOW(), NOW(), true, NOW(), false, null,
-        false, 180.0, true, false, 0.2, 70.0, 'REF-HM-AC-SCF28', 'SKU-HM-AC-SCF28', 28, 4,
+        false, 180.0, true, false, 0.2, 70.0, 'REF-HM-AC-SCF28', 28, 4,
         '65f023632bc46470c104b76f', 3)
 on conflict (product_id) do nothing;
 
@@ -1919,10 +1919,10 @@ on conflict (description_id) do nothing;
 -- Product 29: Gucci Belt Bag (Manuf: 5, Type: 4)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (29, NOW(), NOW(), true, NOW(), false, 14.0,
-        false, 24.0, true, false, 0.5, 5.5, 'REF-GU-BG-BBG29', 'SKU-GU-BG-BBG29', 29, 5,
+        false, 24.0, true, false, 0.5, 5.5, 'REF-GU-BG-BBG29', 29, 5,
         '65f023632bc46470c104b76f', 4)
 on conflict (product_id) do nothing;
 
@@ -1988,10 +1988,10 @@ on conflict (description_id) do nothing;
 -- Product 30: Chanel Sneakers (Manuf: 6, Type: 2)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (30, NOW(), NOW(), true, NOW(), false, null,
-        false, null, true, false, 0.9, null, 'REF-CH-SH-SNK30', 'SKU-CH-SH-SNK30', 30, 6,
+        false, null, true, false, 0.9, null, 'REF-CH-SH-SNK30', 30, 6,
         '65f023632bc46470c104b76f', 2)
 on conflict (product_id) do nothing;
 
@@ -2069,10 +2069,10 @@ Generated SQL inserts for products 31-45 based on the provided template and inst
 -- Product 31: Nike Men's Windrunner Jacket (Manuf: 1, Type: 1)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (31, NOW(), NOW(), true, NOW(), false, null,
-        false, null, true, false, 0.5, null, 'REF-NK-CL-JKT31', 'SKU-NK-CL-JKT31', 31, 1,
+        false, null, true, false, 0.5, null, 'REF-NK-CL-JKT31', 31, 1,
         '65f023632bc46470c104b76f', 1)
 on conflict (product_id) do nothing;
 
@@ -2137,10 +2137,10 @@ on conflict (description_id) do nothing;
 -- Product 32: Zara Women's Jeans (Manuf: 2, Type: 1)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (32, NOW(), NOW(), true, NOW(), false, null,
-        false, null, true, false, 0.6, null, 'REF-ZR-CL-JNS32', 'SKU-ZR-CL-JNS32', 32, 2,
+        false, null, true, false, 0.6, null, 'REF-ZR-CL-JNS32', 32, 2,
         '65f023632bc46470c104b76f', 1)
 on conflict (product_id) do nothing;
 
@@ -2204,10 +2204,10 @@ on conflict (description_id) do nothing;
 -- Product 33: Adidas Cap (Manuf: 3, Type: 3)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (33, NOW(), NOW(), true, NOW(), false, null,
-        false, null, true, false, 0.1, null, 'REF-AD-AC-CAP33', 'SKU-AD-AC-CAP33', 33, 3,
+        false, null, true, false, 0.1, null, 'REF-AD-AC-CAP33', 33, 3,
         '65f023632bc46470c104b76f', 3)
 on conflict (product_id) do nothing;
 
@@ -2270,10 +2270,10 @@ on conflict (description_id) do nothing;
 -- Product 34: H&M Kids' Rain Jacket (Manuf: 4, Type: 1)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (34, NOW(), NOW(), true, NOW(), false, null,
-        false, null, true, false, 0.4, null, 'REF-HM-CL-KRJ34', 'SKU-HM-CL-KRJ34', 34, 4,
+        false, null, true, false, 0.4, null, 'REF-HM-CL-KRJ34', 34, 4,
         '65f023632bc46470c104b76f', 1)
 on conflict (product_id) do nothing;
 
@@ -2337,10 +2337,10 @@ on conflict (description_id) do nothing;
 -- Product 35: Gucci Scarf (Manuf: 5, Type: 3)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (35, NOW(), NOW(), true, NOW(), false, null,
-        false, 140.0, true, false, 0.2, 140.0, 'REF-GU-AC-SCF35', 'SKU-GU-AC-SCF35', 35, 5,
+        false, 140.0, true, false, 0.2, 140.0, 'REF-GU-AC-SCF35', 35, 5,
         '65f023632bc46470c104b76f', 3)
 on conflict (product_id) do nothing;
 
@@ -2407,10 +2407,10 @@ on conflict (description_id) do nothing;
 -- Product 36: Chanel Wallet on Chain (WOC) (Manuf: 6, Type: 4)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (36, NOW(), NOW(), true, NOW(), false, 12.3,
-        false, 19.2, true, false, 0.4, 3.5, 'REF-CH-BG-WOC36', 'SKU-CH-BG-WOC36', 36, 6,
+        false, 19.2, true, false, 0.4, 3.5, 'REF-CH-BG-WOC36', 36, 6,
         '65f023632bc46470c104b76f', 4)
 on conflict (product_id) do nothing;
 
@@ -2475,10 +2475,10 @@ on conflict (description_id) do nothing;
 -- Product 37: Nike Women's Running Shorts (Manuf: 1, Type: 1)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (37, NOW(), NOW(), true, NOW(), false, null,
-        false, null, true, false, 0.2, null, 'REF-NK-CL-WRS37', 'SKU-NK-CL-WRS37', 37, 1,
+        false, null, true, false, 0.2, null, 'REF-NK-CL-WRS37', 37, 1,
         '65f023632bc46470c104b76f', 1)
 on conflict (product_id) do nothing;
 
@@ -2544,10 +2544,10 @@ on conflict (description_id) do nothing;
 -- Product 38: Zara Kids' Sweater (Manuf: 2, Type: 1)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (38, NOW(), NOW(), true, NOW(), false, null,
-        false, null, true, false, 0.3, null, 'REF-ZR-CL-KSW38', 'SKU-ZR-CL-KSW38', 38, 2,
+        false, null, true, false, 0.3, null, 'REF-ZR-CL-KSW38', 38, 2,
         '65f023632bc46470c104b76f', 1)
 on conflict (product_id) do nothing;
 
@@ -2610,10 +2610,10 @@ on conflict (description_id) do nothing;
 -- Product 39: Adidas Socks (3-Pack) (Manuf: 3, Type: 3)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (39, NOW(), NOW(), true, NOW(), false, null,
-        false, null, true, false, 0.15, null, 'REF-AD-AC-SCK39', 'SKU-AD-AC-SCK39', 39, 3,
+        false, null, true, false, 0.15, null, 'REF-AD-AC-SCK39', 39, 3,
         '65f023632bc46470c104b76f', 3)
 on conflict (product_id) do nothing;
 
@@ -2677,10 +2677,10 @@ on conflict (description_id) do nothing;
 -- Product 40: H&M Men's Swim Shorts (Manuf: 4, Type: 1)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (40, NOW(), NOW(), true, NOW(), false, null,
-        false, null, true, false, 0.2, null, 'REF-HM-CL-SWM40', 'SKU-HM-CL-SWM40', 40, 4,
+        false, null, true, false, 0.2, null, 'REF-HM-CL-SWM40', 40, 4,
         '65f023632bc46470c104b76f', 1)
 on conflict (product_id) do nothing;
 
@@ -2743,10 +2743,10 @@ on conflict (description_id) do nothing;
 -- Product 41: Gucci Horsebit Loafers (Manuf: 5, Type: 2)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (41, NOW(), NOW(), true, NOW(), false, null,
-        false, null, true, false, 0.8, null, 'REF-GU-SH-HBL41', 'SKU-GU-SH-HBL41', 41, 5,
+        false, null, true, false, 0.8, null, 'REF-GU-SH-HBL41', 41, 5,
         '65f023632bc46470c104b76f', 2)
 on conflict (product_id) do nothing;
 
@@ -2813,10 +2813,10 @@ on conflict (description_id) do nothing;
 -- Product 42: Chanel Earrings (Manuf: 6, Type: 3)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (42, NOW(), NOW(), true, NOW(), false, null,
-        false, null, true, false, 0.05, null, 'REF-CH-AC-EAR42', 'SKU-CH-AC-EAR42', 42, 6,
+        false, null, true, false, 0.05, null, 'REF-CH-AC-EAR42', 42, 6,
         '65f023632bc46470c104b76f', 3)
 on conflict (product_id) do nothing;
 
@@ -2877,10 +2877,10 @@ on conflict (description_id) do nothing;
 -- Product 43: Nike Duffel Bag (Manuf: 1, Type: 4)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (43, NOW(), NOW(), true, NOW(), false, 28.0,
-        false, 55.0, true, false, 0.6, 25.0, 'REF-NK-BG-DUF43', 'SKU-NK-BG-DUF43', 43, 1,
+        false, 55.0, true, false, 0.6, 25.0, 'REF-NK-BG-DUF43', 43, 1,
         '65f023632bc46470c104b76f', 4)
 on conflict (product_id) do nothing;
 
@@ -2948,10 +2948,10 @@ on conflict (description_id) do nothing;
 -- Product 44: Zara Women's Blouse (Manuf: 2, Type: 1)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (44, NOW(), NOW(), true, NOW(), false, null,
-        false, null, true, false, 0.3, null, 'REF-ZR-CL-BLS44', 'SKU-ZR-CL-BLS44', 44, 2,
+        false, null, true, false, 0.3, null, 'REF-ZR-CL-BLS44', 44, 2,
         '65f023632bc46470c104b76f', 1)
 on conflict (product_id) do nothing;
 
@@ -3014,10 +3014,10 @@ on conflict (description_id) do nothing;
 -- Product 45: Adidas Slides (Manuf: 3, Type: 2)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (45, NOW(), NOW(), true, NOW(), false, null,
-        false, null, true, false, 0.4, null, 'REF-AD-SH-SLD45', 'SKU-AD-SH-SLD45', 45, 3,
+        false, null, true, false, 0.4, null, 'REF-AD-SH-SLD45', 45, 3,
         '65f023632bc46470c104b76f', 2)
 on conflict (product_id) do nothing;
 

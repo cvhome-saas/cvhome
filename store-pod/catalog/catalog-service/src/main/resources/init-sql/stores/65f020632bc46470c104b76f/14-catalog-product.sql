@@ -14,11 +14,11 @@ Timestamps replaced with NOW()
 -- Product 46: YSL Touche Éclat Illuminating Pen (Manuf: 7, Type: 6)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (46, NOW(), NOW(), true, NOW(), false, 12.5, -- Approx height in cm
         false, null, true, false, 0.03, 1.5, -- Approx weight in kg, width in cm
-        'REF-YSL-MAKE-TEIPEN46', 'SKU-YSL-MAKE-TEIPEN46', 46, 7,
+        'REF-YSL-MAKE-TEIPEN46', 46, 7,
         '65f020632bc46470c104b76f', 6)
 on conflict (product_id) do nothing;
 
@@ -89,11 +89,11 @@ on conflict (description_id) do nothing;
 -- Product 47: Guerlain Abeille Royale Advanced Youth Watery Oil (Manuf: 8, Type: 5)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (47, NOW(), NOW(), true, NOW(), false, 12.0,
         false, null, true, false, 0.2, 5.0,
-        'REF-GUER-SKIN-ARWOIL47', 'SKU-GUER-SKIN-ARWOIL47', 47, 8,
+        'REF-GUER-SKIN-ARWOIL47', 47, 8,
         '65f020632bc46470c104b76f', 5)
 on conflict (product_id) do nothing;
 
@@ -166,11 +166,11 @@ on conflict (description_id) do nothing;
 -- Product 48: Shiseido Ultimune Power Infusing Concentrate (Manuf: 9, Type: 5)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (48, NOW(), NOW(), true, NOW(), false, 16.0,
         false, null, true, false, 0.3, 5.5,
-        'REF-SHIS-SKIN-ULTIMUNE48', 'SKU-SHIS-SKIN-ULTIMUNE48', 48, 9,
+        'REF-SHIS-SKIN-ULTIMUNE48', 48, 9,
         '65f020632bc46470c104b76f', 5)
 on conflict (product_id) do nothing;
 
@@ -242,11 +242,11 @@ on conflict (description_id) do nothing;
 -- Product 49: NARS Radiant Creamy Concealer (Manuf: 10, Type: 6)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (49, NOW(), NOW(), true, NOW(), false, 11.0,
         false, null, true, false, 0.04, 1.8,
-        'REF-NARS-MAKE-RCCONC49', 'SKU-NARS-MAKE-RCCONC49', 49, 10,
+        'REF-NARS-MAKE-RCCONC49', 49, 10,
         '65f020632bc46470c104b76f', 6)
 on conflict (product_id) do nothing;
 
@@ -319,11 +319,11 @@ on conflict (description_id) do nothing;
 -- Product 50: La Roche-Posay Anthelios UVMUNE 400 Fluid SPF50+ (Manuf: 11, Type: 5)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (50, NOW(), NOW(), true, NOW(), false, 14.0,
         false, null, true, false, 0.08, 4.5,
-        'REF-LRP-SKIN-ANTHUV50', 'SKU-LRP-SKIN-ANTHUV50', 50, 11,
+        'REF-LRP-SKIN-ANTHUV50', 50, 11,
         '65f020632bc46470c104b76f', 5)
 on conflict (product_id) do nothing;
 
@@ -398,11 +398,11 @@ on conflict (description_id) do nothing;
 -- Product 51: Kérastase Genesis Bain Hydra-Fortifiant Shampoo (Manuf: 12, Type: 8)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (51, NOW(), NOW(), true, NOW(), false, 18.0,
         false, null, true, false, 0.3, 6.0, -- Approx for 250ml bottle
-        'REF-KERA-HAIR-GENSHMP51', 'SKU-KERA-HAIR-GENSHMP51', 51, 12,
+        'REF-KERA-HAIR-GENSHMP51', 51, 12,
         '65f020632bc46470c104b76f', 8)
 on conflict (product_id) do nothing;
 
@@ -473,11 +473,11 @@ on conflict (description_id) do nothing;
 -- Product 52: YSL Black Opium Eau de Parfum (Manuf: 7, Type: 7)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (52, NOW(), NOW(), true, NOW(), false, 10.0,
         false, null, true, false, 0.3, 5.0, -- Approx for 50ml
-        'REF-YSL-FRAG-BLACKOPIUM52', 'SKU-YSL-FRAG-BLACKOPIUM52', 52, 7,
+        'REF-YSL-FRAG-BLACKOPIUM52', 52, 7,
         '65f020632bc46470c104b76f', 7)
 on conflict (product_id) do nothing;
 
@@ -545,11 +545,11 @@ on conflict (description_id) do nothing;
 -- Product 53: Guerlain Terracotta Bronzing Powder (Manuf: 8, Type: 6)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (53, NOW(), NOW(), true, NOW(), false, 2.5,
         false, null, true, false, 0.08, 8.0, -- Compact dimensions
-        'REF-GUER-MAKE-TERRACOTTA53', 'SKU-GUER-MAKE-TERRACOTTA53', 53, 8,
+        'REF-GUER-MAKE-TERRACOTTA53', 53, 8,
         '65f020632bc46470c104b76f', 6)
 on conflict (product_id) do nothing;
 
@@ -624,11 +624,11 @@ on conflict (description_id) do nothing;
 -- Product 54: Shiseido Benefiance Wrinkle Smoothing Cream (Manuf: 9, Type: 5)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (54, NOW(), NOW(), true, NOW(), false, 7.0,
         false, null, true, false, 0.25, 7.5, -- Jar dimensions
-        'REF-SHIS-SKIN-BENEFCR54', 'SKU-SHIS-SKIN-BENEFCR54', 54, 9,
+        'REF-SHIS-SKIN-BENEFCR54', 54, 9,
         '65f020632bc46470c104b76f', 5)
 on conflict (product_id) do nothing;
 
@@ -701,11 +701,11 @@ on conflict (description_id) do nothing;
 -- Product 55: NARS Orgasm Blush (Manuf: 10, Type: 6)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (55, NOW(), NOW(), true, NOW(), false, 1.5,
         false, null, true, false, 0.05, 6.5, -- Compact dimensions
-        'REF-NARS-MAKE-ORGBLUSH55', 'SKU-NARS-MAKE-ORGBLUSH55', 55, 10,
+        'REF-NARS-MAKE-ORGBLUSH55', 55, 10,
         '65f020632bc46470c104b76f', 6)
 on conflict (product_id) do nothing;
 
@@ -772,11 +772,11 @@ on conflict (description_id) do nothing;
 -- Product 56: La Roche-Posay Cicaplast Baume B5 (Manuf: 11, Type: 5)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (56, NOW(), NOW(), true, NOW(), false, 17.0,
         false, null, true, false, 0.12, 5.0, -- Approx for 100ml tube
-        'REF-LRP-SKIN-CICAB5-56', 'SKU-LRP-SKIN-CICAB5-56', 56, 11,
+        'REF-LRP-SKIN-CICAB5-56', 56, 11,
         '65f020632bc46470c104b76f', 5)
 on conflict (product_id) do nothing;
 
@@ -845,11 +845,11 @@ on conflict (description_id) do nothing;
 -- Product 57: Kérastase Elixir Ultime Original Hair Oil (Manuf: 12, Type: 8)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (57, NOW(), NOW(), true, NOW(), false, 16.0,
         false, null, true, false, 0.3, 5.5,
-        'REF-KERA-HAIR-ELIXIR57', 'SKU-KERA-HAIR-ELIXIR57', 57, 12,
+        'REF-KERA-HAIR-ELIXIR57', 57, 12,
         '65f020632bc46470c104b76f', 8)
 on conflict (product_id) do nothing;
 
@@ -923,11 +923,11 @@ on conflict (description_id) do nothing;
 -- Product 58: YSL Libre Eau de Parfum (Manuf: 7, Type: 7)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (58, NOW(), NOW(), true, NOW(), false, 11.0,
         false, null, true, false, 0.32, 6.0, -- Approx for 50ml
-        'REF-YSL-FRAG-LIBREEDP58', 'SKU-YSL-FRAG-LIBREEDP58', 58, 7,
+        'REF-YSL-FRAG-LIBREEDP58', 58, 7,
         '65f020632bc46470c104b76f', 7)
 on conflict (product_id) do nothing;
 
@@ -998,11 +998,11 @@ on conflict (description_id) do nothing;
 -- Product 59: Guerlain Météorites Pearls (Manuf: 8, Type: 6)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (59, NOW(), NOW(), true, NOW(), false, 6.0,
         false, null, true, false, 0.1, 7.0, -- Compact dimensions
-        'REF-GUER-MAKE-METEORITES59', 'SKU-GUER-MAKE-METEORITES59', 59, 8,
+        'REF-GUER-MAKE-METEORITES59', 59, 8,
         '65f020632bc46470c104b76f', 6)
 on conflict (product_id) do nothing;
 
@@ -1074,11 +1074,11 @@ on conflict (description_id) do nothing;
 -- Product 60: Shiseido Synchro Skin Self-Refreshing Foundation (Manuf: 9, Type: 6)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (60, NOW(), NOW(), true, NOW(), false, 12.5,
         false, null, true, false, 0.13, 4.0,
-        'REF-SHIS-MAKE-SYNCSKIN60', 'SKU-SHIS-MAKE-SYNCSKIN60', 60, 9,
+        'REF-SHIS-MAKE-SYNCSKIN60', 60, 9,
         '65f020632bc46470c104b76f', 6)
 on conflict (product_id) do nothing;
 
@@ -1165,11 +1165,11 @@ Timestamps replaced with NOW()
 -- Product 61: NARS Laguna Bronzing Powder (Manuf: 10, Type: 6)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (61, NOW(), NOW(), true, NOW(), false, 1.8,
         false, null, true, false, 0.07, 7.5, -- Compact dimensions
-        'REF-NARS-MAKE-LAGUNABRZ61', 'SKU-NARS-MAKE-LAGUNABRZ61', 61, 10,
+        'REF-NARS-MAKE-LAGUNABRZ61', 61, 10,
         '65f020632bc46470c104b76f', 6)
 on conflict (product_id) do nothing;
 
@@ -1237,11 +1237,11 @@ on conflict (description_id) do nothing;
 -- Product 62: La Roche-Posay Hyalu B5 Serum (Manuf: 11, Type: 5)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (62, NOW(), NOW(), true, NOW(), false, 10.5,
         false, null, true, false, 0.1, 4.0,
-        'REF-LRP-SKIN-HYALUB5-62', 'SKU-LRP-SKIN-HYALUB5-62', 62, 11,
+        'REF-LRP-SKIN-HYALUB5-62', 62, 11,
         '65f020632bc46470c104b76f', 5)
 on conflict (product_id) do nothing;
 
@@ -1312,11 +1312,11 @@ on conflict (description_id) do nothing;
 -- Product 63: Kérastase Blond Absolu Cicaflash Conditioner (Manuf: 12, Type: 8)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (63, NOW(), NOW(), true, NOW(), false, 19.0,
         false, null, true, false, 0.28, 5.0, -- Approx for 250ml tube
-        'REF-KERA-HAIR-BACICAFLASH63', 'SKU-KERA-HAIR-BACICAFLASH63', 63, 12,
+        'REF-KERA-HAIR-BACICAFLASH63', 63, 12,
         '65f020632bc46470c104b76f', 8)
 on conflict (product_id) do nothing;
 
@@ -1387,11 +1387,11 @@ on conflict (description_id) do nothing;
 -- Product 64: YSL Rouge Pur Couture Lipstick (Manuf: 7, Type: 6)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (64, NOW(), NOW(), true, NOW(), false, 7.5,
         false, null, true, false, 0.04, 2.0,
-        'REF-YSL-MAKE-RPCLIP64', 'SKU-YSL-MAKE-RPCLIP64', 64, 7,
+        'REF-YSL-MAKE-RPCLIP64', 64, 7,
         '65f020632bc46470c104b76f', 6)
 on conflict (product_id) do nothing;
 
@@ -1462,11 +1462,11 @@ on conflict (description_id) do nothing;
 -- Product 65: Guerlain Mon Guerlain Eau de Parfum (Manuf: 8, Type: 7)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (65, NOW(), NOW(), true, NOW(), false, 10.5,
         false, null, true, false, 0.35, 7.0, -- Approx for 50ml
-        'REF-GUER-FRAG-MONGUERLAIN65', 'SKU-GUER-FRAG-MONGUERLAIN65', 65, 8,
+        'REF-GUER-FRAG-MONGUERLAIN65', 65, 8,
         '65f020632bc46470c104b76f', 7)
 on conflict (product_id) do nothing;
 
@@ -1535,11 +1535,11 @@ on conflict (description_id) do nothing;
 -- Product 66: Shiseido Vital Perfection Uplifting and Firming Cream (Manuf: 9, Type: 5)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (66, NOW(), NOW(), true, NOW(), false, 7.5,
         false, null, true, false, 0.28, 8.0, -- Jar dimensions
-        'REF-SHIS-SKIN-VPUFCR66', 'SKU-SHIS-SKIN-VPUFCR66', 66, 9,
+        'REF-SHIS-SKIN-VPUFCR66', 66, 9,
         '65f020632bc46470c104b76f', 5)
 on conflict (product_id) do nothing;
 
@@ -1614,11 +1614,11 @@ on conflict (description_id) do nothing;
 -- Product 67: NARS Sheer Glow Foundation (Manuf: 10, Type: 6)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (67, NOW(), NOW(), true, NOW(), false, 12.0,
         false, null, true, false, 0.12, 3.8,
-        'REF-NARS-MAKE-SHEERGLOW67', 'SKU-NARS-MAKE-SHEERGLOW67', 67, 10,
+        'REF-NARS-MAKE-SHEERGLOW67', 67, 10,
         '65f020632bc46470c104b76f', 6)
 on conflict (product_id) do nothing;
 
@@ -1689,11 +1689,11 @@ on conflict (description_id) do nothing;
 -- Product 68: La Roche-Posay Effaclar Duo (+) (Manuf: 11, Type: 5)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (68, NOW(), NOW(), true, NOW(), false, 14.5,
         false, null, true, false, 0.06, 3.5, -- Approx for 40ml tube
-        'REF-LRP-SKIN-EFFADUO68', 'SKU-LRP-SKIN-EFFADUO68', 68, 11,
+        'REF-LRP-SKIN-EFFADUO68', 68, 11,
         '65f020632bc46470c104b76f', 5)
 on conflict (product_id) do nothing;
 
@@ -1768,11 +1768,11 @@ on conflict (description_id) do nothing;
 -- Product 69: Kérastase Chronologiste Huile de Parfum (Manuf: 12, Type: 8)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (69, NOW(), NOW(), true, NOW(), false, 15.0,
         false, null, true, false, 0.35, 6.0,
-        'REF-KERA-HAIR-CHRONOHUILE69', 'SKU-KERA-HAIR-CHRONOHUILE69', 69, 12,
+        'REF-KERA-HAIR-CHRONOHUILE69', 69, 12,
         '65f020632bc46470c104b76f', 8)
 on conflict (product_id) do nothing;
 
@@ -1844,11 +1844,11 @@ on conflict (description_id) do nothing;
 -- Product 70: YSL Mon Paris Eau de Parfum (Manuf: 7, Type: 7)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (70, NOW(), NOW(), true, NOW(), false, 9.0,
         false, null, true, false, 0.3, 8.0, -- Approx for 50ml
-        'REF-YSL-FRAG-MONPARIS70', 'SKU-YSL-FRAG-MONPARIS70', 70, 7,
+        'REF-YSL-FRAG-MONPARIS70', 70, 7,
         '65f020632bc46470c104b76f', 7)
 on conflict (product_id) do nothing;
 
@@ -1917,11 +1917,11 @@ on conflict (description_id) do nothing;
 -- Product 71: Guerlain Orchidée Impériale The Cream (Manuf: 8, Type: 5)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (71, NOW(), NOW(), true, NOW(), false, 8.0,
         false, null, true, false, 0.4, 8.5, -- Jar dimensions, heavier glass
-        'REF-GUER-SKIN-OICREAM71', 'SKU-GUER-SKIN-OICREAM71', 71, 8,
+        'REF-GUER-SKIN-OICREAM71', 71, 8,
         '65f020632bc46470c104b76f', 5)
 on conflict (product_id) do nothing;
 
@@ -1992,11 +1992,11 @@ on conflict (description_id) do nothing;
 -- Product 72: Shiseido Minimalist WhippedPowder Blush (Manuf: 9, Type: 6)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (72, NOW(), NOW(), true, NOW(), false, 4.5,
         false, null, true, false, 0.04, 4.5, -- Small pot dimensions
-        'REF-SHIS-MAKE-MINBLUSH72', 'SKU-SHIS-MAKE-MINBLUSH72', 72, 9,
+        'REF-SHIS-MAKE-MINBLUSH72', 72, 9,
         '65f020632bc46470c104b76f', 6)
 on conflict (product_id) do nothing;
 
@@ -2070,11 +2070,11 @@ on conflict (description_id) do nothing;
 -- Product 73: NARS Climax Mascara (Manuf: 10, Type: 6)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (73, NOW(), NOW(), true, NOW(), false, 13.0,
         false, null, true, false, 0.05, 2.0,
-        'REF-NARS-MAKE-CLIMAXMASC73', 'SKU-NARS-MAKE-CLIMAXMASC73', 73, 10,
+        'REF-NARS-MAKE-CLIMAXMASC73', 73, 10,
         '65f020632bc46470c104b76f', 6)
 on conflict (product_id) do nothing;
 
@@ -2143,11 +2143,11 @@ on conflict (description_id) do nothing;
 -- Product 74: La Roche-Posay Toleriane Sensitive Crème (Manuf: 11, Type: 5)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (74, NOW(), NOW(), true, NOW(), false, 13.0,
         false, null, true, false, 0.06, 3.0, -- Approx for 40ml tube
-        'REF-LRP-SKIN-TOLSENSCR74', 'SKU-LRP-SKIN-TOLSENSCR74', 74, 11,
+        'REF-LRP-SKIN-TOLSENSCR74', 74, 11,
         '65f020632bc46470c104b76f', 5)
 on conflict (product_id) do nothing;
 
@@ -2217,11 +2217,11 @@ on conflict (description_id) do nothing;
 -- Product 75: Kérastase Resistance Ciment Thermique (Manuf: 12, Type: 8)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (75, NOW(), NOW(), true, NOW(), false, 19.0,
         false, null, true, false, 0.18, 4.5, -- Approx for 150ml tube
-        'REF-KERA-HAIR-CIMENTHERM75', 'SKU-KERA-HAIR-CIMENTHERM75', 75, 12,
+        'REF-KERA-HAIR-CIMENTHERM75', 75, 12,
         '65f020632bc46470c104b76f', 8)
 on conflict (product_id) do nothing;
 
@@ -2304,11 +2304,11 @@ Timestamps replaced with NOW()
 -- Product 76: YSL Pure Shots Night Reboot Serum (Manuf: 7, Type: 5)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (76, NOW(), NOW(), true, NOW(), false, 11.0,
         false, null, true, false, 0.15, 4.5,
-        'REF-YSL-SKIN-PSNIGHT76', 'SKU-YSL-SKIN-PSNIGHT76', 76, 7,
+        'REF-YSL-SKIN-PSNIGHT76', 76, 7,
         '65f020632bc46470c104b76f', 5)
 on conflict (product_id) do nothing;
 
@@ -2377,11 +2377,11 @@ on conflict (description_id) do nothing;
 -- Product 77: Guerlain Aqua Allegoria Mandarine Basilic EDT (Manuf: 8, Type: 7)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (77, NOW(), NOW(), true, NOW(), false, 13.0,
         false, null, true, false, 0.4, 6.0, -- Approx for 75ml bottle
-        'REF-GUER-FRAG-AAMANDBAS77', 'SKU-GUER-FRAG-AAMANDBAS77', 77, 8,
+        'REF-GUER-FRAG-AAMANDBAS77', 77, 8,
         '65f020632bc46470c104b76f', 7)
 on conflict (product_id) do nothing;
 
@@ -2450,11 +2450,11 @@ on conflict (description_id) do nothing;
 -- Product 78: Shiseido Tsubaki Premium Repair Mask (Manuf: 9, Type: 8)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (78, NOW(), NOW(), true, NOW(), false, 8.0,
         false, null, true, false, 0.22, 8.5, -- Jar dimensions
-        'REF-SHIS-HAIR-TSUBAKIMASK78', 'SKU-SHIS-HAIR-TSUBAKIMASK78', 78, 9,
+        'REF-SHIS-HAIR-TSUBAKIMASK78', 78, 9,
         '65f020632bc46470c104b76f', 8)
 on conflict (product_id) do nothing;
 
@@ -2525,11 +2525,11 @@ on conflict (description_id) do nothing;
 -- Product 79: NARS Afterglow Lip Balm (Manuf: 10, Type: 6)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (79, NOW(), NOW(), true, NOW(), false, 7.0,
         false, null, true, false, 0.03, 2.0,
-        'REF-NARS-MAKE-AFTERGLOWLB79', 'SKU-NARS-MAKE-AFTERGLOWLB79', 79, 10,
+        'REF-NARS-MAKE-AFTERGLOWLB79', 79, 10,
         '65f020632bc46470c104b76f', 6)
 on conflict (product_id) do nothing;
 
@@ -2597,11 +2597,11 @@ on conflict (description_id) do nothing;
 -- Product 80: La Roche-Posay Lipikar Baume AP+M (Manuf: 11, Type: 5)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (80, NOW(), NOW(), true, NOW(), false, 20.0,
         false, null, true, false, 0.45, 9.0, -- Approx for 400ml pump bottle
-        'REF-LRP-SKIN-LIPIAPM80', 'SKU-LRP-SKIN-LIPIAPM80', 80, 11,
+        'REF-LRP-SKIN-LIPIAPM80', 80, 11,
         '65f020632bc46470c104b76f', 5)
 on conflict (product_id) do nothing;
 
@@ -2672,11 +2672,11 @@ on conflict (description_id) do nothing;
 -- Product 81: Kérastase Nutritive 8H Magic Night Serum (Manuf: 12, Type: 8)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (81, NOW(), NOW(), true, NOW(), false, 15.0,
         false, null, true, false, 0.15, 4.5, -- Approx for 90ml bottle
-        'REF-KERA-HAIR-NUTRI8HSERUM81', 'SKU-KERA-HAIR-NUTRI8HSERUM81', 81, 12,
+        'REF-KERA-HAIR-NUTRI8HSERUM81', 81, 12,
         '65f020632bc46470c104b76f', 8)
 on conflict (product_id) do nothing;
 
@@ -2745,11 +2745,11 @@ on conflict (description_id) do nothing;
 -- Product 82: YSL All Hours Foundation (Manuf: 7, Type: 6)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (82, NOW(), NOW(), true, NOW(), false, 11.5,
         false, null, true, false, 0.11, 3.5,
-        'REF-YSL-MAKE-ALLHOURSFND82', 'SKU-YSL-MAKE-ALLHOURSFND82', 82, 7,
+        'REF-YSL-MAKE-ALLHOURSFND82', 82, 7,
         '65f020632bc46470c104b76f', 6)
 on conflict (product_id) do nothing;
 
@@ -2822,11 +2822,11 @@ on conflict (description_id) do nothing;
 -- Product 83: Guerlain Super Aqua-Serum (Manuf: 8, Type: 5)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (83, NOW(), NOW(), true, NOW(), false, 15.0,
         false, null, true, false, 0.25, 5.0,
-        'REF-GUER-SKIN-SUPERAQUA83', 'SKU-GUER-SKIN-SUPERAQUA83', 83, 8,
+        'REF-GUER-SKIN-SUPERAQUA83', 83, 8,
         '65f020632bc46470c104b76f', 5)
 on conflict (product_id) do nothing;
 
@@ -2897,11 +2897,11 @@ on conflict (description_id) do nothing;
 -- Product 84: Shiseido Ginza Eau de Parfum (Manuf: 9, Type: 7)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (84, NOW(), NOW(), true, NOW(), false, 12.0,
         false, null, true, false, 0.3, 5.0, -- Approx for 50ml
-        'REF-SHIS-FRAG-GINZAEDP84', 'SKU-SHIS-FRAG-GINZAEDP84', 84, 9,
+        'REF-SHIS-FRAG-GINZAEDP84', 84, 9,
         '65f020632bc46470c104b76f', 7)
 on conflict (product_id) do nothing;
 
@@ -2970,11 +2970,11 @@ on conflict (description_id) do nothing;
 -- Product 85: NARS Light Reflecting Setting Powder (Manuf: 10, Type: 6)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (85, NOW(), NOW(), true, NOW(), false, 2.0,
         false, null, true, false, 0.08, 7.0, -- Compact dimensions
-        'REF-NARS-MAKE-LRSPWD85', 'SKU-NARS-MAKE-LRSPWD85', 85, 10,
+        'REF-NARS-MAKE-LRSPWD85', 85, 10,
         '65f020632bc46470c104b76f', 6)
 on conflict (product_id) do nothing;
 
@@ -3045,11 +3045,11 @@ on conflict (description_id) do nothing;
 -- Product 86: La Roche-Posay Pure Vitamin C10 Serum (Manuf: 11, Type: 5)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (86, NOW(), NOW(), true, NOW(), false, 10.0,
         false, null, true, false, 0.1, 3.5,
-        'REF-LRP-SKIN-VITC10-86', 'SKU-LRP-SKIN-VITC10-86', 86, 11,
+        'REF-LRP-SKIN-VITC10-86', 86, 11,
         '65f020632bc46470c104b76f', 5)
 on conflict (product_id) do nothing;
 
@@ -3118,11 +3118,11 @@ on conflict (description_id) do nothing;
 -- Product 87: Kérastase Discipline Fluidissime Spray (Manuf: 12, Type: 8)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (87, NOW(), NOW(), true, NOW(), false, 19.0,
         false, null, true, false, 0.18, 4.0, -- Approx for 150ml spray
-        'REF-KERA-HAIR-DISCFLUID87', 'SKU-KERA-HAIR-DISCFLUID87', 87, 12,
+        'REF-KERA-HAIR-DISCFLUID87', 87, 12,
         '65f020632bc46470c104b76f', 8)
 on conflict (product_id) do nothing;
 
@@ -3197,11 +3197,11 @@ on conflict (description_id) do nothing;
 -- Product 88: YSL Y Eau de Parfum (Manuf: 7, Type: 7)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (88, NOW(), NOW(), true, NOW(), false, 12.0,
         false, null, true, false, 0.4, 6.0, -- Approx for 60ml
-        'REF-YSL-FRAG-YEDP88', 'SKU-YSL-FRAG-YEDP88', 88, 7,
+        'REF-YSL-FRAG-YEDP88', 88, 7,
         '65f020632bc46470c104b76f', 7)
 on conflict (product_id) do nothing;
 
@@ -3269,11 +3269,11 @@ on conflict (description_id) do nothing;
 -- Product 89: Guerlain L'Essentiel Natural Glow Foundation (Manuf: 8, Type: 6)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (89, NOW(), NOW(), true, NOW(), false, 11.0,
         false, null, true, false, 0.15, 4.5,
-        'REF-GUER-MAKE-LESSENTIEL89', 'SKU-GUER-MAKE-LESSENTIEL89', 89, 8,
+        'REF-GUER-MAKE-LESSENTIEL89', 89, 8,
         '65f020632bc46470c104b76f', 6)
 on conflict (product_id) do nothing;
 
@@ -3348,11 +3348,11 @@ on conflict (description_id) do nothing;
 -- Product 90: Shiseido Waso Shikulime Gel-to-Oil Cleanser (Manuf: 9, Type: 5)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (90, NOW(), NOW(), true, NOW(), false, 16.0,
         false, null, true, false, 0.15, 5.0, -- Approx for 125ml tube
-        'REF-SHIS-SKIN-WASOCLEAN90', 'SKU-SHIS-SKIN-WASOCLEAN90', 90, 9,
+        'REF-SHIS-SKIN-WASOCLEAN90', 90, 9,
         '65f020632bc46470c104b76f', 5)
 on conflict (product_id) do nothing;
 

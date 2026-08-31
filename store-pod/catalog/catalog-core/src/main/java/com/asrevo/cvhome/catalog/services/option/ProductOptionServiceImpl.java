@@ -71,8 +71,11 @@ public class ProductOptionServiceImpl implements ProductOptionService {
     @Transactional
     public void delete(StoreMerchantId store, Long id)
             throws ProductOptionNotFoundException, ProductOptionInUseException {
-        // Once products assign options (variants feature), deletion is additionally guarded by reference checks.
-        productOptionRepository.delete(require(store, id));
+        ProductOption option = require(store, id);
+        if (productOptionRepository.isAssignedToProducts(id) || productOptionRepository.isUsedByVariants(id)) {
+            throw ProductOptionInUseException.of(option.getCode(), store);
+        }
+        productOptionRepository.delete(option);
     }
 
     private void requireDistinctValueCodes(PersistableProductOption source)

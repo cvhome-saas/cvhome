@@ -24,4 +24,14 @@ public interface ExternalProductService {
     ReadableMinimalProduct getDetailedProduct(StoreMerchantId store, @RequestParam("sku") String sku,
                                               LanguageCode lang);
 
+    /**
+     * The bulk form: one call for a whole cart's skus. Skus with no product are absent from the answer —
+     * mirroring the inventory availability contract — so a caller must treat "missing" as "gone from the
+     * catalogue".
+     */
+    @GetExchange("/detailed-products")
+    java.util.List<ReadableMinimalProduct> getDetailedProducts(StoreMerchantId store,
+                                                               @RequestParam("skus") java.util.List<String> skus,
+                                                               LanguageCode lang);
+
 }

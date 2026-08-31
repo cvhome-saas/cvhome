@@ -28,4 +28,10 @@ public class ReadableSearchFacets implements Serializable {
     private List<ReadableFacetBucket> brands = new ArrayList<>();
 
     private List<ReadableFacetBucket> types = new ArrayList<>();
+
+    /**
+     * One group per option whose values appear in the current results; value ids round-trip straight back as
+     * {@code optionValueIds}.
+     */
+    private List<ReadableOptionFacet> options = new ArrayList<>();
 }
