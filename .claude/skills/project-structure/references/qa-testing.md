@@ -36,6 +36,13 @@ tell you where that stack lives. Hostnames never change. Everything that has to 
 the Spring services through a generated `SPRING_APPLICATION_JSON`, spg's Caddyfile through `{$LCL_PORT_*}`,
 landing-ui through `INTERNAL_SPG`, and uaa's seeded `web-app` redirect URIs through an `after-up` hook.
 
+**One stack per worktree.** Each feature lives in its own git worktree (AGENTS.md, Working conventions), and
+each worktree runs its own stack: from inside the worktree, `lcl start -d --stack <short-name>` — lcl resolves
+`lcl.yml` upward from the cwd, so the stack builds and serves *that* worktree's code with its own `.lcl/<stack>/`
+state. The dynamic port shifting above is what lets any number of worktrees QA in parallel without conflicts;
+always pass `--stack` and read live ports from `lcl urls --stack <short-name>` rather than assuming the
+configured ones. Stop the stack before removing the worktree.
+
 | command | what it does |
 |---|---|
 | `lcl start [svc…] [-d] [--build] [--stack xxx] [--parallel N] [--infra core\|all]` | start the stack (or just those services plus their dependencies); `-d` returns once everything is healthy |

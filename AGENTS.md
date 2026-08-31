@@ -105,6 +105,13 @@ What binds every change:
 - `lcl start -d` runs the stack under its own per-stack supervisor and returns; check `lcl status` before
   starting one, and stop it with `lcl stop` — never by killing the processes. A second stack alongside the
   first is `lcl start -d --stack xxx`, which shifts every port by +1000·k.
+- **One stack per worktree, named after it.** Run `lcl start -d --stack <short-name>` from *inside* the
+  worktree — lcl finds `lcl.yml` upward from the cwd, so the stack builds and serves that worktree's code,
+  with its own supervisor, compose project, gradle cache and `.lcl/<stack>/` state. Port assignment is
+  dynamic (any taken port shifts the whole stack to the next free +1000·k sequence), so any number of
+  worktrees can run and QA their features in parallel with zero port conflicts. Never assume a configured
+  port when QA-ing: read the live ones from `lcl urls` / `lcl ports --stack <short-name>`, and always pass
+  `--stack` so you don't address (or stop) another worktree's stack. Stop the stack when the worktree is done.
 - QA proves **tenant isolation and the permission gate**, not just the happy path: repeat the action as a
   second store, and confirm a principal without the token gets 403.
 - Java services run **on the host**, not in Docker. Profiles: `lcl`, `fargate`, `test-stores`. Ports, hosts
@@ -124,13 +131,26 @@ What binds every change:
 
 ## Working conventions
 
-- **Never commit to `develop` (or `main`) directly.** Any change starts with a fresh branch cut from an
-  up-to-date `develop` (`git fetch && git switch -c <type>/<short-name> origin/develop`) and lands via PR
-  into `develop`; `main` is the release branch. CI runs on both. If you find yourself already on `develop`
-  with edits, branch first, then commit.
-- **`/go` ships the working tree** (branch if needed → commit → push → PR into `develop`, template filled,
-  changelog label) and **`/reset` returns to a clean `develop`** without losing work. Both live in
-  `.AGENTS/commands/`; prefer them over doing the sequence by hand.
+- **Never commit to `main` directly.** `main` is the integration branch (origin no longer has `develop`);
+  every change lands via PR into `main`. If you find yourself on `main` with edits, move them to a
+  worktree/branch first, then commit.
+- **Every plan or feature starts as a fresh worktree cut from up-to-date `main` — before the first file is
+  written.** Planning a feature, implementing a plan, trying an idea, adding new files: all of it happens in
+  its own worktree, never in the primary checkout:
+
+  ```bash
+  git fetch origin
+  git worktree add .claude/worktrees/<type>-<short-name> -b <type>/<short-name> origin/main
+  ```
+
+  Work, build, run and QA from inside that worktree (its own `lcl` stack — see **Running locally & QA**).
+  The primary checkout stays clean on `main`; parallel efforts never share a working tree or a stack. After
+  the PR merges: `lcl stop --stack <short-name>`, then `git worktree remove` the directory and delete the
+  branch. Tiny same-file follow-ups to an open PR may stay in that PR's existing worktree; anything new gets
+  a new one.
+- **`/go` ships the working tree** (branch if needed → commit → push → PR into `main`, template filled,
+  changelog label) and **`/reset` returns to a clean `main`** without losing work. Both live in
+  `.AGENTS/commands/`; prefer them over doing the sequence by hand. Run `/go` from the worktree being shipped.
 - **PR body follows `.github/PULL_REQUEST_TEMPLATE.md`**: title `<type|area>: <what changed>`, then
   *Why* → *What* → *The parts that are not obvious* → *Deviations* → *Verification*, then the checklist with
   the untouched sections deleted. Label it before merge — `.github/release.yml` builds the changelog from
@@ -214,3 +234,7 @@ the change does not touch, and treat a section you keep as mandatory. The `proje
 Implementation plans live in `.AGENTS/plans/<kebab-case-name>.md`, in-repo so they travel with the branch and
 any tool can read them. Use a descriptive name (`stripe-refund-flow.md`, not an auto-generated one). When
 asked to "create a plan" or entering plan mode, write the file there.
+
+**A plan implies a worktree.** Before implementing any plan, cut its worktree from `origin/main` (see
+**Working conventions**) and do all the work — code, builds, its `lcl --stack`, QA — inside it. One plan, one
+worktree, one branch, one stack, one PR series.
