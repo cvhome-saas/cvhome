@@ -61,3 +61,39 @@ Content-Type: application/json
 ### delete a product's inventory rows (orphan cleanup after a catalog delete)
 DELETE {{SELLER_UI_URL}}/spg/inventory/api/v1/private/inventory/by-product/46?store={{STORE_ID}}&lang={{LANG}}
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+### bulk upsert — the console saving a variant matrix in one call (answers in request order)
+PUT {{SELLER_UI_URL}}/spg/inventory/api/v1/private/inventory/bulk?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{
+  "entries": [
+    {
+      "sku": "SKU-YSL-MAKE-TEIPEN46-A",
+      "inventory": { "productId": 46, "quantity": 5, "available": true, "price": { "amount": 25.00 } }
+    },
+    {
+      "sku": "SKU-YSL-MAKE-TEIPEN46-B",
+      "inventory": { "productId": 46, "quantity": 3, "available": true, "price": { "amount": 27.00 } }
+    }
+  ]
+}
+
+> {%
+    client.test("both rows upserted in order", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        client.assert(response.body.length === 2, "rows " + response.body.length);
+        client.assert(response.body[0].sku === "SKU-YSL-MAKE-TEIPEN46-A", "order lost");
+    });
+%}
+
+### public bulk read, POST form — same answer as the GET, skus in the body (long variant matrices)
+POST {{LANDING_UI_URL}}/inventory/api/v1/availability/query?store={{STORE_ID}}&lang={{LANG}}
+Content-Type: application/json
+
+{ "skus": ["SKU-YSL-MAKE-TEIPEN46-A", "SKU-YSL-MAKE-TEIPEN46-B", "SKU-UNKNOWN"] }
+
+### delete one retired sku (a removed variant combination)
+DELETE {{SELLER_UI_URL}}/spg/inventory/api/v1/private/inventory/SKU-YSL-MAKE-TEIPEN46-B?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}

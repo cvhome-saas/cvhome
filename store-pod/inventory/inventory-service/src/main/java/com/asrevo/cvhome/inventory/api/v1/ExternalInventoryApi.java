@@ -2,12 +2,17 @@ package com.asrevo.cvhome.inventory.api.v1;
 
 import java.util.List;
 
+import jakarta.validation.Valid;
+
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.inventory.model.AvailabilityQuery;
 import com.asrevo.cvhome.inventory.model.SkuInventory;
 import com.asrevo.cvhome.inventory.services.ExternalInventoryService;
 import com.asrevo.cvhome.inventory.services.InventoryService;
@@ -37,5 +42,12 @@ public class ExternalInventoryApi implements ExternalInventoryService {
     @Parameter(name = "store", schema = @Schema(type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
     public List<SkuInventory> getBySkus(StoreMerchantId store, @RequestParam List<String> skus) {
         return inventoryService.getBySkus(store, skus);
+    }
+
+    @Override
+    @PostMapping("/availability/query")
+    @Parameter(name = "store", schema = @Schema(type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    public List<SkuInventory> queryBySkus(StoreMerchantId store, @Valid @RequestBody AvailabilityQuery query) {
+        return inventoryService.getBySkus(store, query.skus());
     }
 }

@@ -17,6 +17,7 @@ import com.asrevo.cvhome.inventory.entity.Inventory;
 import com.asrevo.cvhome.inventory.entity.InventoryPrice;
 import com.asrevo.cvhome.inventory.model.PersistableInventory;
 import com.asrevo.cvhome.inventory.model.PersistablePrice;
+import com.asrevo.cvhome.inventory.model.PersistableSkuInventory;
 import com.asrevo.cvhome.inventory.model.SkuInventory;
 import com.asrevo.cvhome.inventory.repositories.InventoryRepository;
 
@@ -153,5 +154,29 @@ class InventoryServiceImplTest {
         service.deleteByProduct(STORE, 9L);
 
         verify(inventoryRepository).deleteAll(rows);
+    }
+
+    @Test
+    void bulkUpsertUpsertsEveryEntryAndAnswersInRequestOrder() {
+        when(inventoryRepository.findBySku(any(), any())).thenReturn(Optional.empty());
+        when(inventoryRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+
+        List<SkuInventory> result = service.bulkUpsert(STORE, List.of(
+                new PersistableSkuInventory(SKU_2, body(null, null, null)),
+                new PersistableSkuInventory(SKU, body(null, null, null))));
+
+        assertThat(result).extracting(SkuInventory::sku).containsExactly(SKU_2, SKU);
+    }
+
+    @Test
+    void deleteBySkuRemovesTheRowAndIsANoOpWhenAbsent() {
+        Inventory existing = row(1, SKU, 1);
+        when(inventoryRepository.findBySku(STORE, SKU)).thenReturn(Optional.of(existing));
+        service.deleteBySku(STORE, SKU);
+        verify(inventoryRepository).delete(existing);
+
+        when(inventoryRepository.findBySku(STORE, SKU_2)).thenReturn(Optional.empty());
+        service.deleteBySku(STORE, SKU_2);
+        verify(inventoryRepository, never()).delete(row(2, SKU_2, 1));
     }
 }

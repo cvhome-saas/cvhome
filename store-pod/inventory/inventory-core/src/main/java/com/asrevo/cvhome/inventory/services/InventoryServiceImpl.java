@@ -14,6 +14,7 @@ import com.asrevo.cvhome.inventory.entity.Inventory;
 import com.asrevo.cvhome.inventory.entity.InventoryPrice;
 import com.asrevo.cvhome.inventory.model.PersistableInventory;
 import com.asrevo.cvhome.inventory.model.PersistablePrice;
+import com.asrevo.cvhome.inventory.model.PersistableSkuInventory;
 import com.asrevo.cvhome.inventory.model.SkuInventory;
 import com.asrevo.cvhome.inventory.repositories.InventoryRepository;
 
@@ -72,7 +73,19 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Override
     @Transactional
+    public List<SkuInventory> bulkUpsert(StoreMerchantId store, List<PersistableSkuInventory> entries) {
+        return entries.stream().map(entry -> upsert(store, entry.sku(), entry.inventory())).toList();
+    }
+
+    @Override
+    @Transactional
     public void deleteByProduct(StoreMerchantId store, Long productId) {
         inventoryRepository.deleteAll(inventoryRepository.findByStoreMerchantIdAndProductId(store, productId));
+    }
+
+    @Override
+    @Transactional
+    public void deleteBySku(StoreMerchantId store, String sku) {
+        inventoryRepository.findBySku(store, sku).ifPresent(inventoryRepository::delete);
     }
 }

@@ -1,5 +1,7 @@
 package com.asrevo.cvhome.inventory.api.v1;
 
+import java.util.List;
+
 import jakarta.validation.Valid;
 
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.inventory.model.PersistableInventory;
+import com.asrevo.cvhome.inventory.model.PersistableInventoryBatch;
 import com.asrevo.cvhome.inventory.model.SkuInventory;
 import com.asrevo.cvhome.inventory.services.InventoryService;
 
@@ -35,6 +38,14 @@ public class InventoryApi {
 
     private final InventoryService inventoryService;
 
+    @PutMapping("/bulk")
+    @Parameter(name = "store", schema = @Schema(type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.INVENTORY.*')")
+    public List<SkuInventory> bulkUpsert(@Valid @RequestBody PersistableInventoryBatch batch,
+                                         StoreMerchantId merchantStore) {
+        return inventoryService.bulkUpsert(merchantStore, batch.entries());
+    }
+
     @PutMapping("/{sku}")
     @Parameter(name = "store", schema = @Schema(type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.INVENTORY.*')")
@@ -48,5 +59,12 @@ public class InventoryApi {
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.INVENTORY.*')")
     public void deleteByProduct(@PathVariable Long productId, StoreMerchantId merchantStore) {
         inventoryService.deleteByProduct(merchantStore, productId);
+    }
+
+    @DeleteMapping("/{sku}")
+    @Parameter(name = "store", schema = @Schema(type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.INVENTORY.*')")
+    public void deleteBySku(@PathVariable String sku, StoreMerchantId merchantStore) {
+        inventoryService.deleteBySku(merchantStore, sku);
     }
 }
