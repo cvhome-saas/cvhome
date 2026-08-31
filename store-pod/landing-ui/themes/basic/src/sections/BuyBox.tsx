@@ -53,7 +53,7 @@ export function BuyBox({product, storeContext, layout = 'split'}: { product: Pro
                             {p.selection[option.id] === undefined && <span className="ms-2 font-normal text-muted-foreground">— {t('SELECT_OPTION', {option: option.name})}</span>}
                         </legend>
                         <div className="flex flex-wrap gap-2" role="radiogroup" aria-label={option.name}>
-                            {option.optionValues.map(value => {
+                            {option.values.map(value => {
                                 const selected = p.selection[option.id] === value.id;
                                 const available = p.isValueAvailable(option, value);
                                 const label = value.name || value.code;

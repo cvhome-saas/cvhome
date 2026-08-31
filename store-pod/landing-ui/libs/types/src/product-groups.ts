@@ -141,7 +141,13 @@ export interface ProductOption {
     code: string
     name: string
     sortOrder?: number
-    optionValues: ProductOptionValue[]
+    /**
+     * The wire field is `values`, not `optionValues` — `ReadableProductOption.values`. The
+     * deprecated DTO this replaced used `optionValues`, and carrying that name over silently
+     * emptied every chip rail: the option arrived, its values did not, so the PDP rendered a
+     * product with three variants and no way to pick one.
+     */
+    values: ProductOptionValue[]
 }
 
 /** One value of an option. Ids are store-wide — the same ids `ListingQuery.optionValueIds` sends. */

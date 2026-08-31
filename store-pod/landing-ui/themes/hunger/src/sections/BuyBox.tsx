@@ -47,7 +47,7 @@ export function BuyBox({product, storeContext, layout = 'split'}: { product: Pro
                             )}
                         </legend>
                         <div className="flex flex-col" role="radiogroup" aria-label={option.name}>
-                            {option.optionValues.map(value => {
+                            {option.values.map(value => {
                                 const selected = p.selection[option.id] === value.id;
                                 const available = p.isValueAvailable(option, value);
                                 const label = value.name || value.code;

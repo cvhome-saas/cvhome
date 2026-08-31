@@ -11,7 +11,7 @@ export type PurchaseStatus = 'idle' | 'adding';
 
 /** The axes this product varies by, in display order. Every assigned option is variant-defining now. */
 export const variantOptions = (p: Product): ProductOption[] =>
-    (p.options ?? []).filter(o => o.optionValues && o.optionValues.length > 0);
+    (p.options ?? []).filter(o => o.values && o.values.length > 0);
 
 /** Whether a variant is exactly the given selection — one value per option, set equality. */
 const variantMatches = (v: ProductVariant, options: ProductOption[], selection: Record<number, number>): boolean =>
@@ -24,7 +24,7 @@ const variantMatches = (v: ProductVariant, options: ProductOption[], selection: 
 function selectionOf(v: ProductVariant, options: ProductOption[]): Record<number, number> {
     const optionByValue = new Map<number, number>();
     for (const o of options) {
-        for (const value of o.optionValues) optionByValue.set(value.id, o.id);
+        for (const value of o.values) optionByValue.set(value.id, o.id);
     }
     const selection: Record<number, number> = {};
     for (const valueId of v.optionValueIds) {

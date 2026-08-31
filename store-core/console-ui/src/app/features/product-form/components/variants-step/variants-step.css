@@ -88,8 +88,13 @@
   white-space: nowrap;
 }
 
+/*
+ * Wide enough for `<productSku>-<VALUECODES>`, because the suffix is the ONLY thing telling two
+ * rows apart: at 11rem every row of a real matrix read "SKU-ZR-CL-DRS02", clipped before the part
+ * that identifies it, and the column stopped doing its job. Found in QA against the demo store.
+ */
 .cell-sku {
-  min-inline-size: 11rem;
+  min-inline-size: 15rem;
 }
 
 .cell-price {
