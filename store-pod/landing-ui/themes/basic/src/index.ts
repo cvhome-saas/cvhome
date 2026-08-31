@@ -4,6 +4,7 @@ import {fonts} from './fonts';
 import {DEFAULT_COLORS} from './colors';
 import {layoutConfig} from './config';
 import {Root} from './layout/Root';
+import {layoutSections} from './sections/LayoutSections';
 import {Category} from './pages/Category';
 import {Search} from './pages/Search';
 import {Product} from './pages/Product';
@@ -51,6 +52,7 @@ export default defineTheme({
         }),
     },
     layout: {config: layoutConfig, Root},
+    sections: layoutSections,
     pages: {Category, Search, Product, Content, BlogIndex, BlogPost, Faq, Policy, Checkout, CheckoutResult, Customer, Order},
     states: {
         PageSkeleton: {
