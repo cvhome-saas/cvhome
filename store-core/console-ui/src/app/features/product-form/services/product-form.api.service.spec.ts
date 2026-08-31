@@ -5,8 +5,10 @@ import {CategoryService} from '@api/catalog/category.service';
 import {ManufacturerService} from '@api/catalog/manufacturer.service';
 import {ProductImageService} from '@api/catalog/product-image.service';
 import {ProductRelationshipService} from '@api/catalog/product-relationship.service';
+import {ProductOptionService} from '@api/catalog/product-option.service';
 import {ProductService} from '@api/catalog/product.service';
 import {ProductTypeService} from '@api/catalog/product-type.service';
+import {ProductVariantService} from '@api/catalog/product-variant.service';
 import {MerchantStoreService} from '@api/merchant/store.service';
 import type {PageT} from '@core/table/table.types';
 import type {
@@ -21,7 +23,7 @@ import type {
 import type {ReadableMerchantStore} from '@models/merchant';
 import {emptyDraft, type ProductDraft} from '@models/products';
 import {InventoryService} from '@api/inventory/inventory.service';
-import type {SkuInventory} from '@models/catalog';
+import type {ReadableProductVariantDefinition, SkuInventory} from '@models/catalog';
 import {ProductFormApi} from './product-form.api.service';
 
 function page<T>(content: T[]): PageT<T> {
@@ -73,6 +75,21 @@ class FakeInventoryService {
   upsert(sku: string, body: unknown): Observable<unknown> {
     this.upserts.push({sku, body});
     return of({});
+  }
+}
+
+class FakeProductVariantService {
+  list(): Observable<readonly ReadableProductVariantDefinition[]> {
+    // The uniform model: a simple product still owns its one default variant, empty option set.
+    return of([
+      {id: 900, sku: 'ACM-7', sortOrder: 0, defaultVariant: true, optionValueIds: [], optionValues: []},
+    ]);
+  }
+}
+
+class FakeProductOptionService {
+  list(): Observable<PageT<never>> {
+    return of({content: [], size: 0, totalElements: 0, totalPages: 0, pageNumber: 0});
   }
 }
 
@@ -200,6 +217,8 @@ describe('ProductFormApi', () => {
       providers: [
         ProductFormApi,
         {provide: ProductService, useValue: products},
+        {provide: ProductVariantService, useValue: new FakeProductVariantService()},
+        {provide: ProductOptionService, useValue: new FakeProductOptionService()},
         {provide: InventoryService, useValue: inventory},
         {provide: ProductImageService, useValue: images},
         {provide: ProductRelationshipService, useValue: new FakeRelationshipService()},

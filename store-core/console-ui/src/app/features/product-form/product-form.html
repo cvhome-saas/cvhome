@@ -74,6 +74,15 @@
                 animate.enter="step-in"
                 [form]="facade.form"
                 [currency]="facade.currency()"
+                [hasOptions]="facade.hasOptions()"
+                (openVariants)="onStep('variants')"
+              />
+            }
+            @case ('variants') {
+              <app-variants-step
+                animate.enter="step-in"
+                [saved]="!isNew()"
+                [currency]="facade.currency()"
               />
             }
             @case ('organize') {

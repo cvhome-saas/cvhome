@@ -4,18 +4,30 @@ import {Observable, catchError, concat, forkJoin, last, map, of, switchMap, toAr
 import {CatalogReference} from '@api/catalog/catalog-reference.service';
 import {CategoryService} from '@api/catalog/category.service';
 import {ProductImageService} from '@api/catalog/product-image.service';
+import {ProductOptionService} from '@api/catalog/product-option.service';
 import {ProductRelationshipService} from '@api/catalog/product-relationship.service';
 import {ProductService} from '@api/catalog/product.service';
+import {ProductVariantService} from '@api/catalog/product-variant.service';
 import {InventoryService} from '@api/inventory/inventory.service';
 import type {
   PersistableProductDefinition,
   PersistableProductImage,
+  PersistableSkuInventory,
+  PersistableVariantSet,
   ProductDescription,
   ReadableCategory,
   ReadableProductDefinition,
+  ReadableProductOption,
+  ReadableProductVariantDefinition,
   SkuInventory,
 } from '@models/catalog';
-import type {ProductDraft, ProductImageItem, RelatedProduct} from '@models/products';
+import type {
+  ProductDraft,
+  ProductImageItem,
+  RelatedProduct,
+  StoreOption,
+  VariantMatrixRow,
+} from '@models/products';
 import {emptyDraft} from '@models/products';
 import type {LocalisedCopy} from '@models/taxonomy';
 
@@ -48,6 +60,20 @@ export interface ProductFormSnapshot {
   readonly types: readonly ProductTypeOption[];
   readonly languages: readonly string[];
   readonly currency: string | null;
+  /** The store's option vocabulary, for the variants step's axis picker. Empty when unreadable. */
+  readonly vocabulary: readonly StoreOption[];
+  /** The options this product varies by, in display order — ids into `vocabulary`. */
+  readonly assignedOptionIds: readonly number[];
+  /** The combination variants, price/stock merged in. Empty for a simple (default-variant) product. */
+  readonly variants: readonly VariantMatrixRow[];
+}
+
+/** What a variant-set save ended up doing — the same honesty split as `CreateOutcome`. */
+export interface VariantSaveOutcome {
+  /** The catalog write landed (it is atomic — false never reaches the caller, a failure throws). */
+  readonly variantsApplied: true;
+  /** Whether every price/stock upsert and retired-sku cleanup landed. */
+  readonly inventoryApplied: boolean;
 }
 
 /** A category as the Organize step's picker lists it: flat, with its depth kept for the indent. */
@@ -91,6 +117,8 @@ export interface ProductTypeOption {
 @Injectable({providedIn: 'root'})
 export class ProductFormApi {
   private readonly products = inject(ProductService);
+  private readonly variants = inject(ProductVariantService);
+  private readonly productOptions = inject(ProductOptionService);
   private readonly inventory = inject(InventoryService);
   private readonly images = inject(ProductImageService);
   private readonly relationships = inject(ProductRelationshipService);
@@ -99,6 +127,9 @@ export class ProductFormApi {
 
   /** The definition the server last sent, for fields the form does not edit but must not clear. */
   private loaded: ReadableProductDefinition | null = null;
+
+  /** Every variant sku the server last sent — what a variant save diffs against to retire rows. */
+  private loadedVariantSkus: readonly string[] = [];
 
   /**
    * A product, or a blank one.
@@ -109,21 +140,23 @@ export class ProductFormApi {
    */
   load(productId: number | null): Observable<ProductFormSnapshot> {
     return forkJoin({
+      definition: productId === null ? of(null) : this.products.definition(productId),
       /*
-       * Price, quantity and purchasability come from the inventory service since the split, keyed
-       * by the definition's SKU — so the two reads are chained, not parallel. Optional in the same
-       * sense as the reference lists: a form without stock numbers beats no form.
+       * The product's variant set — the matrix rows and, implied by them, the axes. Optional: a
+       * form without its matrix still edits copy and images, and the step says what it could not
+       * load. `null` (leg failed) and `[]` cannot happen apart — every saved product owns ≥1
+       * variant — so `null` is the only "unknown" the step has to render.
        */
-      definition:
+      variantRows:
         productId === null
-          ? of(null)
-          : this.products.definition(productId).pipe(
-              switchMap((definition) =>
-                this.optional(this.inventory.bySkus([definition.sku ?? ''])).pipe(
-                  map((inventories) => ({definition, stock: inventories?.[0] ?? null})),
-                ),
-              ),
-            ),
+          ? of<readonly ReadableProductVariantDefinition[] | null>(null)
+          : this.optional(this.variants.list(productId)),
+      /*
+       * The store's option vocabulary, for the axis picker. Read directly rather than through the
+       * reference cache: options carry their whole value lists, which the other cached lists do
+       * not need, and the catalogue invalidates the cache on every option write anyway.
+       */
+      vocabulary: this.optional(this.productOptions.list({page: 0, count: 200})),
       related: productId === null ? of(null) : this.optional(this.relationships.related(productId)),
       /*
        * Through the shared reference cache, not straight to the endpoints. These four are the same
@@ -136,14 +169,35 @@ export class ProductFormApi {
       types: this.optional(this.reference.typeList()),
       store: this.optional(this.reference.store()),
     }).pipe(
-      map(({definition: loadedDefinition, related, categories, brands, types, store}) => {
-        const definition = loadedDefinition?.definition ?? null;
-        const stock = loadedDefinition?.stock ?? null;
+      /*
+       * Price, quantity and purchasability come from the inventory service since the split — ONE
+       * bulk read for the default variant's sku and every combination sku together, chained after
+       * the catalog reads because the sku list comes from them. Optional in the same sense as the
+       * reference lists: a form without stock numbers beats no form.
+       */
+      switchMap((loaded) => {
+        const skus = new Set<string>();
+        if (loaded.definition?.sku) {
+          skus.add(loaded.definition.sku);
+        }
+        for (const row of loaded.variantRows ?? []) {
+          skus.add(row.sku);
+        }
+        const stock: Observable<readonly SkuInventory[] | null> = skus.size
+          ? this.optional(this.inventory.bySkus([...skus]))
+          : of([]);
+        return stock.pipe(map((inventories) => ({...loaded, inventories: inventories ?? []})));
+      }),
+      map(({definition, variantRows, vocabulary, related, categories, brands, types, store, inventories}) => {
+        const bySku = new Map(inventories.map((inventory) => [inventory.sku, inventory]));
+        const stock = definition?.sku ? (bySku.get(definition.sku) ?? null) : null;
         this.loaded = definition;
+        this.loadedVariantSkus = (variantRows ?? []).map((row) => row.sku);
         const languages = store?.supportedLanguages?.length
           ? [...store.supportedLanguages]
           : [store?.defaultLanguage ?? 'en'];
 
+        const combinationRows = (variantRows ?? []).filter((row) => row.optionValues.length > 0);
         return {
           draft:
             definition === null
@@ -160,6 +214,9 @@ export class ProductFormApi {
                     }),
                   ),
                 ),
+          vocabulary: (vocabulary?.content ?? []).map(toStoreOption),
+          assignedOptionIds: assignedOptions(combinationRows),
+          variants: combinationRows.map((row) => toMatrixRow(row, bySku)),
           categories: flattenCategories(categories?.content ?? [], 0),
           brands: (brands?.content ?? []).map((brand) => ({
             code: brand.code,
@@ -218,7 +275,7 @@ export class ProductFormApi {
    * caller reloads rather than assuming — the pod slugifies, trims and defaults enough of this DTO
    * that echoing the request back would be showing the operator their own typing.
    */
-  update(productId: number, draft: ProductDraft): Observable<UpdateOutcome> {
+  update(productId: number, draft: ProductDraft, writeInventory = true): Observable<UpdateOutcome> {
     const before = (this.loaded?.categories ?? []).map((category) => category.id);
     return this.products.update(productId, toPersistable(draft)).pipe(
       switchMap(() =>
@@ -229,8 +286,13 @@ export class ProductFormApi {
           catchError(() => of(false)),
         ),
       ),
+      /*
+       * `writeInventory: false` is the multi-variant product: price and stock live one row per
+       * combination sku and are written by the variants step's own save — the single-sku upsert
+       * here would race it over the default variant's row for values the form no longer edits.
+       */
       switchMap((categoriesApplied) =>
-        this.applyInventory(draft, productId).pipe(
+        (writeInventory ? this.applyInventory(draft, productId) : of(true)).pipe(
           map((inventoryApplied) => ({categoriesApplied, inventoryApplied})),
         ),
       ),
@@ -287,6 +349,82 @@ export class ProductFormApi {
       ...removed.map((id) => this.products.removeFromCategory(productId, id)),
     ];
     return calls.length ? concat(...calls).pipe(toArray()) : of(null);
+  }
+
+  /* -------------------------------------------------------------------- variants ---- */
+
+  /**
+   * Replace the product's variant set, then bring inventory to match — the explicit orchestration
+   * the module plan demands, with **no silent legs**.
+   *
+   * The catalog `PUT` is atomic (axes and combinations together) and its failure fails the whole
+   * call: nothing else has run, the operator retries the save. Once it lands, the inventory work —
+   * one bulk upsert for every priced row plus one delete per retired sku — is a fact the outcome
+   * reports honestly: `inventoryApplied: false` means the catalog now says one thing and inventory
+   * another, and the facade shows a *retryable* error state rather than a silent half-save. Both
+   * legs are idempotent (`PUT` upsert; delete of a missing row is a no-op), so a retry is safe.
+   */
+  saveVariants(
+    productId: number,
+    set: PersistableVariantSet,
+    rows: readonly VariantMatrixRow[],
+  ): Observable<VariantSaveOutcome> {
+    return this.variants.replace(productId, set).pipe(
+      /*
+       * Which skus to retire is diffed against what the product owns AFTER the write, not against
+       * the request: an empty set restores a default variant whose sku the service *keeps* from
+       * the retiring first row, and diffing against the request would delete that sku's inventory
+       * row — the restored product would lose its price. One extra GET buys the truth.
+       */
+      switchMap(() => this.optional(this.variants.list(productId))),
+      switchMap((after) => {
+        // If the re-read failed, retire nothing — a stale inventory row is recoverable, a deleted
+        // price is a support ticket.
+        const keep = new Set((after ?? []).map((variant) => variant.sku));
+        const removed =
+          after === null ? [] : this.loadedVariantSkus.filter((sku) => !keep.has(sku));
+        return this.applyVariantInventory(productId, rows, removed).pipe(
+          map((inventoryApplied) => ({variantsApplied: true as const, inventoryApplied})),
+        );
+      }),
+    );
+  }
+
+  /**
+   * The inventory half of a variant save, callable on its own — this is the retry the facade
+   * offers when the catalog write landed and the inventory one did not.
+   */
+  applyVariantInventory(
+    productId: number,
+    rows: readonly VariantMatrixRow[],
+    removedSkus: readonly string[],
+  ): Observable<boolean> {
+    const entries: PersistableSkuInventory[] = rows
+      // A row without a price has no inventory record to write yet — the readiness checklist is
+      // what tells the operator, and the publish button stays disabled until it is priced.
+      .filter((row) => row.price !== null)
+      .map((row) => ({
+        sku: row.sku,
+        inventory: {
+          productId,
+          quantity: row.quantity,
+          available: row.available,
+          price: {amount: row.price ?? 0},
+        },
+      }));
+    const writes: Observable<unknown>[] = [
+      ...(entries.length ? [this.inventory.bulkUpsert(entries)] : []),
+      ...removedSkus.map((sku) => this.inventory.deleteBySku(sku)),
+    ];
+    if (writes.length === 0) {
+      return of(true);
+    }
+    return concat(...writes).pipe(
+      toArray(),
+      map(() => true),
+      // Reported, not swallowed: the caller renders a retry, which is the opposite of best-effort.
+      catchError(() => of(false)),
+    );
   }
 
   /* ---------------------------------------------------------------------- images ---- */
@@ -567,6 +705,61 @@ function toPersistable(draft: ProductDraft): PersistableProductDefinition {
         highlights: copy.highlights,
         keyWords: copy.keyWords,
       })),
+  };
+}
+
+/** One vocabulary entry for the axis picker, values in display order. */
+function toStoreOption(option: ReadableProductOption): StoreOption {
+  return {
+    id: option.id,
+    code: option.code,
+    name: option.name ?? option.descriptions[0]?.name ?? option.code,
+    values: [...option.values]
+      .sort((left, right) => (left.sortOrder ?? 0) - (right.sortOrder ?? 0))
+      .map((value) => ({
+        id: value.id,
+        code: value.code,
+        name: value.name ?? value.descriptions[0]?.name ?? value.code,
+      })),
+  };
+}
+
+/**
+ * The axes this product varies by, in display order, read off the variant rows.
+ *
+ * The variant list is the one read the step makes, and every row carries its resolved
+ * `(option, value)` pairs in assignment order — so the axes are the first row's options. Reading
+ * them from a second endpoint would be a request for something already in hand.
+ */
+function assignedOptions(rows: readonly ReadableProductVariantDefinition[]): readonly number[] {
+  const first = rows[0];
+  if (!first) {
+    return [];
+  }
+  return [...first.optionValues]
+    .sort((left, right) => (left.sortOrder ?? 0) - (right.sortOrder ?? 0))
+    .map((pair) => pair.optionId);
+}
+
+/** One matrix row: the catalog variant with its inventory record merged in. */
+function toMatrixRow(
+  row: ReadableProductVariantDefinition,
+  bySku: ReadonlyMap<string, SkuInventory>,
+): VariantMatrixRow {
+  const pairs = [...row.optionValues].sort(
+    (left, right) => (left.sortOrder ?? 0) - (right.sortOrder ?? 0),
+  );
+  const stock = bySku.get(row.sku);
+  return {
+    id: row.id,
+    sku: row.sku,
+    optionValueIds: pairs.map((pair) => pair.valueId),
+    labels: pairs.map((pair) => pair.valueName ?? pair.valueCode),
+    isDefault: row.defaultVariant,
+    price: stock?.price?.originalPrice ?? stock?.price?.finalPrice ?? null,
+    quantity: stock?.quantity ?? 0,
+    // A sku with no inventory record yet defaults to sellable, like the simple product's draft.
+    available: stock?.available ?? true,
   };
 }
 

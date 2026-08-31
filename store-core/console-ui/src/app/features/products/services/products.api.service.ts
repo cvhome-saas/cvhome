@@ -178,6 +178,8 @@ function toRow(product: ReadableProduct, inventory?: SkuInventory): ProductRow {
     id: product.id,
     name: product.description?.name ?? product.sku ?? String(product.id),
     sku: product.sku ?? '',
+    // Every product owns ≥1 variant under the uniform model; a row that predates it reads as one.
+    variantCount: product.variantCount ?? 1,
     categories: (product.categories ?? [])
       .map((category) => category.description?.name ?? category.descriptions[0]?.name ?? category.code)
       .filter(Boolean),

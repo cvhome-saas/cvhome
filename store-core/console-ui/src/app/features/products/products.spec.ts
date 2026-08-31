@@ -18,6 +18,7 @@ function row(id: number, over: Partial<ProductRow> = {}): ProductRow {
     id,
     name: `Product ${id}`,
     sku: `ACM-${id}`,
+    variantCount: 1,
     categories: ['Audio'],
     brand: 'Northwind',
     price: 129,

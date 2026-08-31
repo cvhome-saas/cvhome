@@ -1,0 +1,163 @@
+/* The chosen axes, as removable chips, with the add-select at the end of the run. */
+.axes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .6rem;
+  align-items: center;
+}
+
+.axis-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: .6rem;
+  padding: .45rem .7rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--muted);
+}
+
+.axis-copy {
+  display: grid;
+  gap: .1rem;
+  min-inline-size: 0;
+}
+
+.axis-copy strong {
+  font-size: var(--text-xs);
+  font-weight: 600;
+}
+
+.axis-copy small {
+  overflow: hidden;
+  max-inline-size: 16rem;
+  color: var(--foreground-quiet);
+  font-size: var(--text-3xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.axis-add {
+  min-inline-size: 11rem;
+}
+
+.retry-block {
+  display: grid;
+  gap: .6rem;
+  justify-items: start;
+}
+
+/* The matrix scrolls in its own container; the page never scrolls sideways. */
+.matrix-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+.matrix {
+  inline-size: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-xs);
+}
+
+.matrix th {
+  padding: .6rem .7rem;
+  border-block-end: 1px solid var(--border);
+  background: var(--muted);
+  color: var(--foreground-subtle);
+  font-size: var(--text-3xs);
+  font-weight: 600;
+  letter-spacing: .04em;
+  text-align: start;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.matrix td {
+  padding: .45rem .7rem;
+  border-block-end: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.matrix tbody tr:last-child td {
+  border-block-end: none;
+}
+
+.cell-label {
+  color: var(--foreground);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.cell-sku {
+  min-inline-size: 11rem;
+}
+
+.cell-price {
+  min-inline-size: 8rem;
+}
+
+.cell-quantity {
+  min-inline-size: 6rem;
+}
+
+.matrix-empty {
+  padding: 1.2rem .7rem;
+  color: var(--foreground-quiet);
+  text-align: center;
+}
+
+/* "Default" as a press-button: the state and the command in one control. */
+.default-pick {
+  display: inline-flex;
+  align-items: center;
+  gap: .3rem;
+  padding: .3rem .6rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: transparent;
+  color: var(--foreground-subtle);
+  font-size: var(--text-3xs);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.default-pick:hover {
+  border-color: var(--edge);
+}
+
+.default-pick.is-default {
+  border-color: var(--primary);
+  background: var(--accent);
+  color: var(--primary-emphasis);
+  font-weight: 600;
+}
+
+.default-pick:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+.combine {
+  display: grid;
+  gap: .6rem;
+}
+
+.combine-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .6rem;
+  align-items: center;
+}
+
+.matrix-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-group);
+  flex-wrap: wrap;
+}
+
+.matrix-count {
+  color: var(--foreground-quiet);
+  font-size: var(--text-3xs);
+}

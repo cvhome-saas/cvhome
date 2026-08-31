@@ -6,7 +6,8 @@ import {Observable, of} from 'rxjs';
 
 import {NOTIFICATION_PORT} from '@core/errors/notification.port';
 import {ConsoleApi} from '@layouts/console-shell/services/console.api.service';
-import {emptyDraft, type ProductDraft, type ProductImageItem, type RelatedProduct} from '@models/products';
+import {emptyDraft, type ProductDraft, type ProductImageItem, type RelatedProduct, type VariantMatrixRow} from '@models/products';
+import type {PersistableVariantSet} from '@models/catalog';
 import {CONSOLE_STORES_FAKE, FakeConsoleApi} from '@testing/console-api.fake';
 import {provideFakeProductSearch} from '@testing/product-search.fake';
 import {translocoTesting} from '@testing/transloco-testing';
@@ -51,11 +52,56 @@ function snapshot(product: ProductDraft): ProductFormSnapshot {
     types: [{code: 'SHOES', label: 'Shoes'}],
     languages: LANGUAGES,
     currency: 'SAR',
+    vocabulary: API_REF?.vocabulary ?? [],
+    assignedOptionIds: API_REF?.assignedOptionIds ?? [],
+    variants: API_REF?.variants ?? [],
   };
 }
 
+/** The fake under test, so the snapshot builder above can answer its configured variant state. */
+let API_REF: FakeProductFormApi | null = null;
+
 class FakeProductFormApi {
   loaded: ProductDraft = SAVED;
+  /** The vocabulary and saved variant state `load` answers. Overridden by the variants specs. */
+  vocabulary: ProductFormSnapshot['vocabulary'] = [
+    {
+      id: 9,
+      code: 'color',
+      name: 'Color',
+      values: [
+        {id: 91, code: 'red', name: 'Red'},
+        {id: 92, code: 'blue', name: 'Blue'},
+      ],
+    },
+    {
+      id: 10,
+      code: 'size',
+      name: 'Size',
+      values: [
+        {id: 101, code: 'm', name: 'M'},
+        {id: 102, code: 'l', name: 'L'},
+      ],
+    },
+  ];
+  assignedOptionIds: readonly number[] = [];
+  variants: ProductFormSnapshot['variants'] = [];
+  /** Every variant-set replace the facade sent, so a spec can read the atomic body. */
+  readonly variantSets: {set: PersistableVariantSet; rows: readonly VariantMatrixRow[]}[] = [];
+  variantInventoryApplied = true;
+
+  saveVariants(
+    _id: number,
+    set: PersistableVariantSet,
+    rows: readonly VariantMatrixRow[],
+  ): Observable<{variantsApplied: true; inventoryApplied: boolean}> {
+    this.variantSets.push({set, rows});
+    return of({variantsApplied: true, inventoryApplied: this.variantInventoryApplied});
+  }
+
+  applyVariantInventory(): Observable<boolean> {
+    return of(true);
+  }
   /** How many times the snapshot was actually fetched. See the request-storm spec below. */
   loads = 0;
   readonly created: ProductDraft[] = [];
@@ -122,6 +168,7 @@ describe('ProductForm', () => {
   beforeEach(async () => {
     localStorage.removeItem('cvhome.console.store');
     api = new FakeProductFormApi();
+    API_REF = api;
     toasts = {messages: [], danger(text: string) { this.messages.push(text); }};
 
     await TestBed.configureTestingModule({
@@ -211,7 +258,7 @@ describe('ProductForm', () => {
 
     expect(element.querySelector('app-stepper')).not.toBeNull();
     expect(element.querySelector('.toolbar')).toBeNull();
-    expect(steps(element).length).toBe(4);
+    expect(steps(element).length).toBe(5);
   }));
 
   it('locks Media until the product exists, and says why on the rail', fakeAsync(() => {
@@ -405,5 +452,101 @@ describe('ProductForm', () => {
     const sent = api.replaced.at(-1)!;
     expect(sent.map((image) => image.id)).toEqual([5, 4]);
     expect(sent.map((image) => image.isDefault)).toEqual([true, false]);
+  }));
+
+  /* ------------------------------------------------------------------- variants ---- */
+
+  /** The facade under test — the variants step is state-driven, so the specs drive the state. */
+  function facade() {
+    return fixture.componentInstance['facade'];
+  }
+
+  it('generates the cartesian matrix when an axis is picked, seeding the first row', fakeAsync(() => {
+    load('7');
+
+    facade().addVariantAxis(9); // Color: red, blue
+    const rows = facade().variantRows();
+
+    expect(rows.length).toBe(2);
+    // The first combination inherits the product's own sku, price and stock — a simple product's
+    // numbers carry over instead of silently starting from zero.
+    expect(rows[0].sku).toBe('ACM-7');
+    expect(rows[0].price).toBe(750);
+    expect(rows[0].isDefault).toBe(true);
+    // The rest are suggested `<sku>-<VALUECODE>` and left unpriced for an explicit decision.
+    expect(rows[1].sku).toBe('ACM-7-BLUE');
+    expect(rows[1].price).toBeNull();
+
+    facade().addVariantAxis(10); // × Size: m, l
+    expect(facade().variantRows().length).toBe(4);
+  }));
+
+  it('sends the axes and the combinations as one atomic set, exactly one default', fakeAsync(() => {
+    load('7');
+    facade().addVariantAxis(9);
+    facade().updateVariantRow(1, {price: 30});
+
+    facade().saveVariants();
+    tick();
+
+    const [{set}] = api.variantSets;
+    expect(set.options).toEqual(['color']);
+    expect(set.variants.length).toBe(2);
+    expect(set.variants.map((variant) => variant.sortOrder)).toEqual([0, 1]);
+    expect(set.variants.filter((variant) => variant.defaultVariant).length).toBe(1);
+    expect(set.variants[1].optionValueIds).toEqual([92]);
+  }));
+
+  it('refuses a duplicate sku by name instead of letting the pod 409', fakeAsync(() => {
+    load('7');
+    facade().addVariantAxis(9);
+    facade().updateVariantRow(1, {sku: 'ACM-7'});
+
+    facade().saveVariants();
+    tick();
+
+    expect(api.variantSets.length).toBe(0);
+  }));
+
+  it('reassigns the default when its row is removed', fakeAsync(() => {
+    load('7');
+    facade().addVariantAxis(9);
+
+    facade().removeVariantRow(0);
+
+    const rows = facade().variantRows();
+    expect(rows.length).toBe(1);
+    expect(rows[0].isDefault).toBe(true);
+  }));
+
+  it('swaps the price readiness item for the per-variant one while options are assigned', fakeAsync(() => {
+    load('7');
+
+    expect(facade().readiness().some((item) => item.key === 'price')).toBe(true);
+
+    facade().addVariantAxis(9);
+    const items = facade().readiness();
+    expect(items.some((item) => item.key === 'price')).toBe(false);
+    const variantPricing = items.find((item) => item.key === 'variantPricing');
+    // One row is seeded with the product's price, the other is not — publishing stays blocked.
+    expect(variantPricing?.done).toBe(false);
+    expect(facade().canPublish()).toBe(false);
+
+    facade().updateVariantRow(1, {price: 30});
+    expect(facade().readiness().find((item) => item.key === 'variantPricing')?.done).toBe(true);
+  }));
+
+  it('renders the matrix on the variants step, one row per combination', fakeAsync(() => {
+    const element = load('7');
+    facade().addVariantAxis(9);
+    facade().activeStep.set('variants');
+    fixture.detectChanges();
+
+    const rows = [...element.querySelectorAll('.matrix tbody tr')];
+    expect(rows.length).toBe(2);
+    expect(rows[0].textContent).toContain('Red');
+    expect(rows[1].textContent).toContain('Blue');
+    // The step carries its own save: a different transaction than the header's Save draft.
+    expect(element.querySelector('.matrix-foot .primary-action')?.textContent).toContain('Save variants');
   }));
 });

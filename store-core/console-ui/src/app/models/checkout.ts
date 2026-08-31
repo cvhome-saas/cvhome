@@ -119,6 +119,17 @@ export interface ReadableMinimalProduct {
   readonly name?: string;
 }
 
+/**
+ * Mirrors checkout-commons `ReadableOrderProductAttribute` — one option/value label pair snapshotted
+ * at placement ("Color" / "Red"). `attributePrice` is a Shopizer leftover the platform never fills.
+ */
+export interface ReadableOrderProductAttribute {
+  readonly id?: number;
+  readonly attributeName?: string;
+  readonly attributeValue?: string;
+  readonly attributePrice?: string;
+}
+
 /** Mirrors checkout-commons `ReadableOrderProduct`. `price` and `subTotal` arrive pre-formatted. */
 export interface ReadableOrderProduct {
   readonly id?: number;
@@ -129,6 +140,11 @@ export interface ReadableOrderProduct {
   readonly subTotal?: string;
   readonly sku?: string;
   readonly image?: string;
+  /**
+   * The variant's option labels, copied into `order_product_option` rows at placement so the order
+   * survives later catalog edits. `null` on the wire for a line with no options.
+   */
+  readonly attributes?: readonly ReadableOrderProductAttribute[] | null;
 }
 
 /**

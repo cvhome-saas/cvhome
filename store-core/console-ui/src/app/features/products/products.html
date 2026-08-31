@@ -152,6 +152,12 @@
                       {{ row.name }}
                     </button>
                     <small dir="ltr">{{ row.sku || '—' }}</small>
+                    @if (row.variantCount > 1) {
+                      <!-- Price and stock cells describe the default variant; the tag says there is more. -->
+                      <app-badge tone="blue" shape="square">
+                        {{ t('products.variantsTag', {count: row.variantCount}) }}
+                      </app-badge>
+                    }
                   </span>
                 </div>
 
@@ -244,15 +250,31 @@
                       seller-ui edited these cells on double-click, discoverable only from a `title`
                       tooltip. An explicit control is the whole point of the row action here.
                     -->
-                    <button
-                      class="icon-action"
-                      type="button"
-                      [attr.aria-label]="t('products.editRowFor', {name: row.name})"
-                      [title]="t('products.editRow')"
-                      (click)="startEdit(row)"
-                    >
-                      <app-icon name="pencil" [size]="15" />
-                    </button>
+                    @if (row.variantCount <= 1) {
+                      <button
+                        class="icon-action"
+                        type="button"
+                        [attr.aria-label]="t('products.editRowFor', {name: row.name})"
+                        [title]="t('products.editRow')"
+                        (click)="startEdit(row)"
+                      >
+                        <app-icon name="pencil" [size]="15" />
+                      </button>
+                    } @else {
+                      <!--
+                        One price cell cannot edit a matrix: inline edit writes exactly one sku, and
+                        this row stands for several. The full matrix lives in the product form.
+                      -->
+                      <button
+                        class="icon-action"
+                        type="button"
+                        [attr.aria-label]="t('products.editVariantsFor', {name: row.name})"
+                        [title]="t('products.editVariants')"
+                        (click)="openProduct(row)"
+                      >
+                        <app-icon name="pencil" [size]="15" />
+                      </button>
+                    }
                     <button
                       class="icon-action"
                       type="button"

@@ -10,16 +10,23 @@ import {ReferenceDataService, type ReferenceOption} from '@core/reference/refere
 import {ConsoleShellFacade} from '@layouts/console-shell/facades/console-shell.facade';
 import {
   COPY_FIELD_COUNT,
+  MAX_VARIANTS,
+  MAX_VARIANT_OPTIONS,
   PRODUCT_STEPS,
+  VARIANT_SKU_PATTERN,
+  combinationSignature,
   emptyDraft,
   type ProductDraft,
   type ProductImageItem,
   type ProductStep,
   type ReadinessItem,
   type RelatedProduct,
+  type StoreOption,
+  type StoreOptionValue,
   type TranslationRow,
+  type VariantMatrixRow,
 } from '@models/products';
-import type {PersistableProductImage} from '@models/catalog';
+import type {PersistableProductImage, PersistableVariantSet} from '@models/catalog';
 import type {AutocompleteOption} from '@shared/ui/autocomplete/autocomplete';
 import type {StepItem} from '@shared/ui/stepper/stepper';
 import {ToastService} from '@shared/ui/toast/toast';
@@ -156,6 +163,54 @@ export class ProductFormFacade {
     computation: (draft) => draft.related,
   });
 
+  /* -------------------------------------------------------------------- variants ---- */
+
+  /** The store's option vocabulary, for the axis picker. */
+  readonly vocabulary = computed<readonly StoreOption[]>(() => this.loaded()?.vocabulary ?? []);
+
+  /**
+   * The options this product varies by, as full vocabulary entries in display order.
+   *
+   * `linkedSignal` off the snapshot: the server's assignment is the baseline, and the operator's
+   * picks replace it until a save reloads the truth.
+   */
+  readonly variantAxes = linkedSignal<ProductFormSnapshot | undefined, readonly StoreOption[]>({
+    source: this.loaded,
+    computation: (snapshot) => {
+      if (!snapshot) {
+        return [];
+      }
+      const byId = new Map(snapshot.vocabulary.map((option) => [option.id, option]));
+      return snapshot.assignedOptionIds
+        .map((id) => byId.get(id))
+        .filter((option): option is StoreOption => option !== undefined);
+    },
+  });
+
+  /** The matrix — one row per combination the product sells, price/stock merged in. */
+  readonly variantRows = linkedSignal<ProductFormSnapshot | undefined, readonly VariantMatrixRow[]>({
+    source: this.loaded,
+    computation: (snapshot) => snapshot?.variants ?? [],
+  });
+
+  /**
+   * Whether this product varies by options — the switch the pricing step, the readiness list and
+   * the save path all key on. Derived from the operator's current picks, never stored: the server
+   * has no such flag either.
+   */
+  readonly hasOptions = computed(() => this.variantAxes().length > 0);
+
+  /**
+   * A variant save whose catalog half landed and whose inventory half did not.
+   *
+   * The step renders this as a named, retryable error — the explicit orchestration the module plan
+   * demands in place of the old silent best-effort legs.
+   */
+  readonly variantInventoryPending = signal(false);
+
+  /** Whether the server currently holds combination variants — what "Remove all options" undoes. */
+  readonly hasSavedVariants = computed(() => (this.loaded()?.variants.length ?? 0) > 0);
+
   /** Whether the form has been loaded from a draft yet — guards against binding an empty copy array. */
   private filledFor: number | null | undefined = undefined;
 
@@ -195,10 +250,11 @@ export class ProductFormFacade {
       key: step,
       label: this.transloco.translate(`productForm.step.${step}`),
       meta:
-        step === 'media' && !saved
-          ? this.transloco.translate('productForm.step.mediaLocked')
+        (step === 'media' || step === 'variants') && !saved
+          ? this.transloco.translate(`productForm.step.${step}Locked`)
           : this.transloco.translate(`productForm.step.${step}Meta`),
-      disabled: step === 'media' && !saved,
+      // Both attach to `…/product/{id}/…` endpoints, so there is nothing to edit until it exists.
+      disabled: (step === 'media' || step === 'variants') && !saved,
       complete: this.stepComplete(step, saved),
     }));
   });
@@ -211,10 +267,18 @@ export class ProductFormFacade {
       case 'media':
         return saved && this.images().length > 0;
       case 'pricing':
-        return value.price !== null && value.price > 0;
+        // Superseded for a product with options: its prices live one row per variant.
+        return this.hasOptions() || (value.price !== null && value.price > 0);
+      case 'variants':
+        return this.hasOptions() && this.variantRows().length > 0 && this.variantsPriced();
       case 'organize':
         return this.selectedCategories().length > 0 && value.brandCode !== '';
     }
+  }
+
+  /** Whether every matrix row has a price — the multi-variant reading of "priced". */
+  private variantsPriced(): boolean {
+    return this.variantRows().every((row) => row.price !== null && row.price > 0);
   }
 
   /* ------------------------------------------------------------------- readiness ---- */
@@ -237,7 +301,14 @@ export class ProductFormFacade {
        * the two must agree or the panel would show a tick beside a refused Save.
        */
       {key: 'name', done: value.copy.every((copy) => copy.name.trim() !== ''), required: true},
-      {key: 'price', done: value.price !== null && value.price > 0, required: true},
+      /*
+       * The multi-variant generalisation of "it has a price": every combination sku must have its
+       * inventory row priced, or the storefront will render sellable chips with no figure behind
+       * them. For a simple product it stays the one price field.
+       */
+      this.hasOptions()
+        ? {key: 'variantPricing', done: this.variantRows().length > 0 && this.variantsPriced(), required: true}
+        : {key: 'price', done: value.price !== null && value.price > 0, required: true},
       {key: 'category', done: this.selectedCategories().length > 0, required: true},
       {key: 'brand', done: value.brandCode !== '', required: false},
       {key: 'image', done: saved && this.images().length > 0, required: false},
@@ -360,7 +431,7 @@ export class ProductFormFacade {
       return;
     }
 
-    this.api.update(id, draft).subscribe({
+    this.api.update(id, draft, !this.hasOptions()).subscribe({
       next: ({snapshot, categoriesApplied}) => {
         this.saving.set(false);
         this.loaded.set(snapshot);
@@ -382,6 +453,267 @@ export class ProductFormFacade {
   private fail(failure: unknown): void {
     this.saving.set(false);
     this.apiErrors.applyToForm(failure, this.form);
+  }
+
+  /* -------------------------------------------------------- variants: editing ---- */
+
+  /**
+   * Add an axis: this product now varies by `optionId` too.
+   *
+   * The matrix regenerates immediately — the full cartesian product, existing combinations kept by
+   * signature — because a picked axis with no rows behind it is a state the atomic PUT cannot even
+   * express, and the operator's next question is always "what combinations is that?".
+   */
+  addVariantAxis(optionId: number): void {
+    const option = this.vocabulary().find((candidate) => candidate.id === optionId);
+    if (!option || this.variantAxes().some((axis) => axis.id === optionId)) {
+      return;
+    }
+    if (this.variantAxes().length >= MAX_VARIANT_OPTIONS) {
+      this.toast.warning(
+        this.transloco.translate('productForm.variants.optionLimit', {max: MAX_VARIANT_OPTIONS}),
+      );
+      return;
+    }
+    if (option.values.length === 0) {
+      // Defined in the catalogue with no values yet — there is nothing to combine.
+      this.toast.warning(this.transloco.translate('productForm.variants.optionHasNoValues'));
+      return;
+    }
+    this.variantAxes.set([...this.variantAxes(), option]);
+    this.regenerateMatrix();
+  }
+
+  /** Drop an axis. With no axes left the matrix empties — saving that restores the default variant. */
+  removeVariantAxis(optionId: number): void {
+    this.variantAxes.set(this.variantAxes().filter((axis) => axis.id !== optionId));
+    this.regenerateMatrix();
+  }
+
+  /** One field of one row — the matrix cells write through here, immutably. */
+  updateVariantRow(index: number, patch: Partial<VariantMatrixRow>): void {
+    this.variantRows.set(
+      this.variantRows().map((row, at) => (at === index ? {...row, ...patch} : row)),
+    );
+  }
+
+  removeVariantRow(index: number): void {
+    const rows = this.variantRows().filter((_, at) => at !== index);
+    this.variantRows.set(ensureOneDefault(rows));
+  }
+
+  /** The default radio: the card/list price and the PDP preselection. Exactly one, always. */
+  setDefaultVariant(index: number): void {
+    this.variantRows.set(
+      this.variantRows().map((row, at) => ({...row, isDefault: at === index})),
+    );
+  }
+
+  /**
+   * The escape hatch beside the generator: re-add one combination (for a row removed earlier, or
+   * after a generation was clipped by the cap). `valueIds` carries one value per axis, in order.
+   */
+  addVariantCombination(valueIds: readonly number[]): void {
+    const axes = this.variantAxes();
+    if (valueIds.length !== axes.length || valueIds.some((id) => id === 0)) {
+      return;
+    }
+    const signature = combinationSignature(valueIds);
+    if (this.variantRows().some((row) => combinationSignature(row.optionValueIds) === signature)) {
+      this.toast.warning(this.transloco.translate('productForm.variants.duplicateCombination'));
+      return;
+    }
+    if (this.variantRows().length >= MAX_VARIANTS) {
+      this.toast.warning(
+        this.transloco.translate('productForm.variants.variantLimit', {max: MAX_VARIANTS}),
+      );
+      return;
+    }
+    const values = axes.map(
+      (axis, at) => axis.values.find((value) => value.id === valueIds[at]) as StoreOptionValue,
+    );
+    const row: VariantMatrixRow = {
+      id: null,
+      sku: this.suggestVariantSku(values),
+      optionValueIds: values.map((value) => value.id),
+      labels: values.map((value) => value.name),
+      isDefault: false,
+      price: null,
+      quantity: 0,
+      available: true,
+    };
+    this.variantRows.set(ensureOneDefault([...this.variantRows(), row]));
+  }
+
+  /**
+   * Rebuild the matrix as the cartesian product of the chosen axes' values.
+   *
+   * Existing rows are matched by combination signature and kept whole — their ids (the catalog
+   * rows), skus, prices and stock survive an axis reorder. The first generation of a fresh matrix
+   * seeds its first row from the product's own sku, price and quantity, so a simple product's
+   * stock carries over into its first combination instead of silently starting from zero.
+   */
+  private regenerateMatrix(): void {
+    const axes = this.variantAxes();
+    if (axes.length === 0) {
+      this.variantRows.set([]);
+      return;
+    }
+    const existing = new Map(
+      this.variantRows().map((row) => [combinationSignature(row.optionValueIds), row]),
+    );
+    const fresh = existing.size === 0;
+    const value = this.formValue();
+    const rows: VariantMatrixRow[] = [];
+    let clipped = false;
+    for (const combination of cartesian(axes.map((axis) => axis.values))) {
+      if (rows.length >= MAX_VARIANTS) {
+        clipped = true;
+        break;
+      }
+      const ids = combination.map((entry) => entry.id);
+      const labels = combination.map((entry) => entry.name);
+      const kept = existing.get(combinationSignature(ids));
+      if (kept) {
+        // Re-projected onto the new axis order; everything the operator set survives.
+        rows.push({...kept, optionValueIds: ids, labels});
+        continue;
+      }
+      const seed = fresh && rows.length === 0;
+      rows.push({
+        id: null,
+        sku: seed ? this.baseVariantSku() : this.suggestVariantSku(combination, rows),
+        optionValueIds: ids,
+        labels,
+        isDefault: false,
+        price: seed ? value.price : null,
+        quantity: seed ? value.quantity : 0,
+        available: true,
+      });
+    }
+    this.variantRows.set(ensureOneDefault(rows));
+    if (clipped) {
+      this.toast.warning(
+        this.transloco.translate('productForm.variants.variantLimit', {max: MAX_VARIANTS}),
+      );
+    }
+  }
+
+  /** The product's own sku, made legal for a variant (the variant pattern allows no dot). */
+  private baseVariantSku(): string {
+    return (this.formValue().sku || 'SKU').replace(/[^A-Za-z0-9_-]+/g, '-');
+  }
+
+  /** `<productSku>-<VALUECODES>`, uniquified against the rows already generated. Editable after. */
+  private suggestVariantSku(
+    combination: readonly StoreOptionValue[],
+    rows: readonly VariantMatrixRow[] = this.variantRows(),
+  ): string {
+    const suffix = combination
+      .map((value) => value.code.toUpperCase().replace(/[^A-Z0-9_-]+/g, ''))
+      .filter(Boolean)
+      .join('-');
+    const candidate = `${this.baseVariantSku()}-${suffix}`;
+    const taken = new Set(rows.map((row) => row.sku));
+    if (!taken.has(candidate)) {
+      return candidate;
+    }
+    let attempt = 2;
+    while (taken.has(`${candidate}-${attempt}`)) {
+      attempt += 1;
+    }
+    return `${candidate}-${attempt}`;
+  }
+
+  /* --------------------------------------------------------- variants: saving ---- */
+
+  /**
+   * Save the axes and the matrix — the step's own save, separate from Save draft because it is a
+   * different transaction against a different pair of services.
+   *
+   * Client-side checks mirror the pod's named refusals so the operator gets the row, not a 409:
+   * a blank or illegal sku, a duplicate sku, an empty matrix under declared axes. The write itself
+   * is `ProductFormApi.saveVariants` — catalog PUT first (atomic), inventory second (reported
+   * honestly, retryable via `retryVariantInventory`).
+   */
+  saveVariants(): void {
+    const id = this.productId();
+    if (id === null) {
+      return;
+    }
+    const axes = this.variantAxes();
+    const rows = this.variantRows();
+    if (axes.length > 0 && rows.length === 0) {
+      this.toast.danger(this.transloco.translate('productForm.variants.needsRow'));
+      return;
+    }
+    const illegal = rows.find((row) => !VARIANT_SKU_PATTERN.test(row.sku));
+    if (illegal) {
+      this.toast.danger(
+        this.transloco.translate('productForm.variants.invalidSku', {sku: illegal.sku || '—'}),
+      );
+      return;
+    }
+    if (new Set(rows.map((row) => row.sku)).size !== rows.length) {
+      this.toast.danger(this.transloco.translate('productForm.variants.duplicateSku'));
+      return;
+    }
+
+    const set: PersistableVariantSet = {
+      options: axes.map((axis) => axis.code),
+      variants: rows.map((row, index) => ({
+        ...(row.id !== null ? {id: row.id} : {}),
+        sku: row.sku,
+        sortOrder: index,
+        defaultVariant: row.isDefault,
+        optionValueIds: [...row.optionValueIds],
+      })),
+    };
+
+    this.saving.set(true);
+    this.api.saveVariants(id, set, rows).subscribe({
+      next: ({inventoryApplied}) => {
+        this.saving.set(false);
+        this.list.invalidate();
+        this.variantInventoryPending.set(!inventoryApplied);
+        if (inventoryApplied) {
+          this.toast.success(this.transloco.translate('productForm.variants.saved'));
+        } else {
+          // The catalog now says one thing and inventory another. Named, and retryable in place.
+          this.toast.warning(this.transloco.translate('productForm.variants.inventoryFailed'));
+        }
+        this.snapshot.reload();
+      },
+      error: (failure: unknown) => {
+        this.saving.set(false);
+        this.apiErrors.notify(failure);
+      },
+    });
+  }
+
+  /** Re-run only the inventory half of a variant save that reported `inventoryApplied: false`. */
+  retryVariantInventory(): void {
+    const id = this.productId();
+    if (id === null) {
+      return;
+    }
+    this.saving.set(true);
+    this.api.applyVariantInventory(id, this.variantRows(), []).subscribe({
+      next: (applied) => {
+        this.saving.set(false);
+        this.variantInventoryPending.set(!applied);
+        if (applied) {
+          this.toast.success(this.transloco.translate('productForm.variants.saved'));
+          this.snapshot.reload();
+        } else {
+          this.toast.warning(this.transloco.translate('productForm.variants.inventoryFailed'));
+        }
+      },
+      error: () => {
+        this.saving.set(false);
+        this.variantInventoryPending.set(true);
+      },
+    });
   }
 
   /* ----------------------------------------------------------------------- media ---- */
@@ -566,4 +898,25 @@ export class ProductFormFacade {
   retry(): void {
     this.snapshot.reload();
   }
+}
+
+/* ---------------------------------------------------------------------------- helpers ---- */
+
+/** Every combination, in axis-major order — the order the matrix reads naturally. */
+function cartesian(axes: readonly (readonly StoreOptionValue[])[]): readonly (readonly StoreOptionValue[])[] {
+  return axes.reduce<readonly (readonly StoreOptionValue[])[]>(
+    (built, values) => built.flatMap((row) => values.map((value) => [...row, value])),
+    [[]],
+  );
+}
+
+/** Exactly one default per set — the DB enforces it, this keeps the radio honest before the save. */
+function ensureOneDefault(rows: readonly VariantMatrixRow[]): readonly VariantMatrixRow[] {
+  if (rows.length === 0 || rows.filter((row) => row.isDefault).length === 1) {
+    return rows;
+  }
+  // None flagged falls to the first row — the same lowest-sort-order fallback the service applies.
+  const flagged = rows.findIndex((row) => row.isDefault);
+  const target = flagged === -1 ? 0 : flagged;
+  return rows.map((row, index) => ({...row, isDefault: index === target}));
 }

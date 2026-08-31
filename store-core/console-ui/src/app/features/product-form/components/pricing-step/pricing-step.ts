@@ -1,10 +1,11 @@
-import {Component, computed, inject, input} from '@angular/core';
+import {Component, computed, inject, input, output} from '@angular/core';
 import {ReactiveFormsModule} from '@angular/forms';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 
 import {DIMENSION_UNITS, WEIGHT_UNITS} from '@models/products';
 import {FormField} from '@shared/ui/form-field/form-field';
 import {NoticeBar} from '@shared/ui/notice-bar/notice-bar';
+import {Icon} from '@shared/ui/icon/icon';
 import {NumberField} from '@shared/ui/number-field/number-field';
 import {Panel} from '@shared/ui/panel/panel';
 import {Select, type SelectOption} from '@shared/ui/select/select';
@@ -28,6 +29,7 @@ import type {ProductForm} from '../../services/product-draft-form.service';
   selector: 'app-pricing-step',
   imports: [
     FormField,
+    Icon,
     NoticeBar,
     NumberField,
     Panel,
@@ -47,6 +49,14 @@ export class PricingStep {
   readonly form = input.required<ProductForm>();
   /** The store's currency, shown beside the price. There is no per-product currency. */
   readonly currency = input<string | null>(null);
+  /**
+   * Whether the product varies by options. Price and quantity then live one row per variant on the
+   * Variants step, and the two fields here would write a value the matrix immediately overwrites —
+   * so they are replaced by a pointer to where the numbers actually live.
+   */
+  readonly hasOptions = input(false);
+  /** The pointer's action: jump to the Variants step. */
+  readonly openVariants = output<void>();
 
   private readonly transloco = inject(TranslocoService);
 
