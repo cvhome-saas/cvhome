@@ -10,7 +10,7 @@ import {richtextFallback} from './richtext';
 import {faqFallback} from './faq';
 import {postsFallback} from './posts';
 import {testimonialsFallback} from './testimonials';
-import {newsletterFallback} from './newsletter';
+import {Newsletter} from './newsletter';
 import {uspFallback} from './usp';
 import {videoFallback} from './video';
 import {brandsFallback} from './brands';
@@ -30,7 +30,9 @@ export const FALLBACK_SECTIONS: Record<SectionKind, Record<string, ComponentType
     faq: faqFallback,
     posts: postsFallback,
     testimonials: testimonialsFallback,
-    newsletter: newsletterFallback,
+    // Built here, not in the client module: an OBJECT exported from a 'use client' file arrives
+    // on the server as an opaque client reference whose properties read as undefined.
+    newsletter: {inline: Newsletter, boxed: Newsletter},
     usp: uspFallback,
     video: videoFallback,
     brands: brandsFallback,

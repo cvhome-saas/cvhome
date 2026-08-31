@@ -11,6 +11,15 @@
         ],
         "createdAt": "2026-08-31T21:26:00.724Z",
         "reason": "Angular [src] binding to media-library asset URLs; never ships empty"
+      },
+      {
+        "rule": "layout-transition",
+        "value": "*",
+        "files": [
+          "store-core/console-ui/src/app/features/storefront-builder/components/preview-frame.ts"
+        ],
+        "createdAt": "2026-08-31T22:07:42.531Z",
+        "reason": "Detector matches a CSS comment explaining the transition was removed; no animated layout property remains"
       }
     ]
   }

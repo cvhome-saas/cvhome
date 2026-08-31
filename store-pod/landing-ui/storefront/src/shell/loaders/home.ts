@@ -47,8 +47,9 @@ const productsFor = async (ctx: Awaited<ReturnType<typeof getStoreContext>>, sec
                 {...defaultSearchQuery(), count: limit, sort: 'newest'}, false);
             return {products: {products: toListingProducts(page.content as Product[]) ?? []}};
         }
-    } catch {
+    } catch (error) {
         // one section's source failing must not cost the landing page
+        console.warn('products source failed', source?.type, error);
     }
     return {products: {products: []}};
 };

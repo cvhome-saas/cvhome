@@ -6,7 +6,7 @@ import type {SectionRenderProps} from '@store-front/theme';
  * A capture form with no list behind it yet: submitting thanks the shopper locally. Wiring it to a real
  * audience list is the newsletter feature's job, not the layout's — the section stays honest either way.
  */
-function Newsletter({section}: SectionRenderProps) {
+export function Newsletter({section}: SectionRenderProps) {
     const [done, setDone] = useState(false);
     const boxed = section.variant === 'boxed';
     const heading = section.text.heading ?? 'Stay in the loop';
@@ -30,5 +30,3 @@ function Newsletter({section}: SectionRenderProps) {
         </div>
     );
 }
-
-export const newsletterFallback = {inline: Newsletter, boxed: Newsletter};
