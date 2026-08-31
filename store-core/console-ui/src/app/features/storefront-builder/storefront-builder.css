@@ -1,0 +1,153 @@
+.builder {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  min-height: 0;
+  background: var(--muted);
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  background: var(--background);
+  border-block-end: 1px solid var(--border);
+  flex: none;
+}
+
+.back {
+  gap: 6px;
+}
+
+.divider {
+  width: 1px;
+  height: 24px;
+  background: var(--border);
+}
+
+.title {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.title strong {
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.state {
+  font-size: 11px;
+  color: var(--muted-foreground);
+}
+
+.spacer {
+  flex: 1;
+}
+
+.seg {
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  background: var(--muted);
+  border-radius: var(--radius-md);
+}
+
+.seg-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 30px;
+  height: 26px;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: none;
+  cursor: pointer;
+  color: var(--muted-foreground);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.seg-btn.on {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+.seg-btn.lang {
+  padding-inline: 8px;
+}
+
+.warnings {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 8px 16px;
+  font-size: 12px;
+  background: var(--chart-4-wash, var(--muted));
+  border-block-end: 1px solid var(--border);
+  color: var(--foreground);
+}
+
+.panes {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+}
+
+.left {
+  width: 280px;
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--background);
+  border-inline-end: 1px solid var(--border);
+}
+
+.left-tabs {
+  display: flex;
+  gap: 2px;
+  padding: 8px;
+  border-block-end: 1px solid var(--border);
+}
+
+.left-tab {
+  flex: 1;
+  padding: 7px;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: none;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted-foreground);
+}
+
+.left-tab.on {
+  background: var(--primary-soft, var(--muted));
+  color: var(--foreground);
+}
+
+.pane-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: block;
+}
+
+.center {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+}
+
+.right {
+  width: 320px;
+  flex: none;
+  min-height: 0;
+  background: var(--background);
+  border-inline-start: 1px solid var(--border);
+  overflow: hidden;
+}

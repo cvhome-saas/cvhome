@@ -1,0 +1,93 @@
+<ng-container *transloco="let t">
+  <div class="builder">
+    <header class="topbar">
+      <a routerLink="/store-management/domain" class="secondary-action back">
+        <app-icon name="arrowLeft" [size]="14" [flip]="true" />
+        {{ t('builder.top.back') }}
+      </a>
+      <div class="divider" aria-hidden="true"></div>
+      <div class="title">
+        <strong>{{ t('builder.top.title') }}</strong>
+        <span class="state">{{ t(saveLabelKey()) }}</span>
+      </div>
+      <div class="spacer"></div>
+
+      <div class="seg" role="group" [attr.aria-label]="t('builder.top.devices')">
+        @for (device of devices; track device) {
+          <button type="button" class="seg-btn" [class.on]="facade.device() === device"
+                  [attr.aria-label]="t('builder.device.' + device)" [title]="t('builder.device.' + device)"
+                  (click)="facade.device.set(device)">
+            <app-icon [name]="deviceIcon(device)" [size]="14" />
+          </button>
+        }
+      </div>
+
+      <div class="seg" role="group" [attr.aria-label]="t('builder.top.languages')">
+        @for (code of facade.locales().codes; track code) {
+          <button type="button" class="seg-btn lang" [class.on]="facade.lang() === code"
+                  (click)="facade.lang.set(code)">
+            {{ code }}
+          </button>
+        }
+      </div>
+
+      <button type="button" class="icon-action" [attr.aria-label]="t('builder.top.undo')"
+              [disabled]="!facade.canUndo()" (click)="facade.undo()">
+        <app-icon name="undo" [size]="15" />
+      </button>
+      <button type="button" class="icon-action" [attr.aria-label]="t('builder.top.redo')"
+              [disabled]="!facade.canRedo()" (click)="facade.redo()">
+        <app-icon name="undo" [size]="15" [flip]="true" />
+      </button>
+
+      <div class="divider" aria-hidden="true"></div>
+
+      <button type="button" class="secondary-action" (click)="openPreviewTab()">
+        <app-icon name="externalLink" [size]="14" />
+        {{ t('builder.top.preview') }}
+      </button>
+      <button type="button" class="ghost-action" [disabled]="!facade.dirty()" (click)="facade.discard()">
+        {{ t('builder.top.discard') }}
+      </button>
+      <button type="button" class="primary-action" [disabled]="publishing()" (click)="publish()">
+        {{ published() ? t('builder.top.published') : t('builder.top.publish') }}
+      </button>
+    </header>
+
+    @if (facade.publishWarnings().length > 0) {
+      <div class="warnings">
+        @for (warning of facade.publishWarnings(); track warning.field) {
+          <span>{{ warning.message }}</span>
+        }
+      </div>
+    }
+
+    <div class="panes">
+      <aside class="left">
+        <div class="left-tabs" role="tablist">
+          <button type="button" role="tab" class="left-tab" [class.on]="panel() === 'layers'"
+                  [attr.aria-selected]="panel() === 'layers'" (click)="panel.set('layers')">
+            {{ t('builder.tabs.layout') }}
+          </button>
+          <button type="button" role="tab" class="left-tab" [class.on]="panel() === 'library'"
+                  [attr.aria-selected]="panel() === 'library'" (click)="panel.set('library')">
+            {{ t('builder.tabs.add') }}
+          </button>
+        </div>
+        @if (panel() === 'layers') {
+          <app-builder-layer-list class="pane-body" />
+        } @else {
+          <app-builder-section-library class="pane-body" />
+        }
+      </aside>
+
+      <main class="center">
+        <app-builder-preview-frame />
+      </main>
+
+      <aside class="right">
+        <app-builder-inspector />
+      </aside>
+    </div>
+  </div>
+</ng-container>

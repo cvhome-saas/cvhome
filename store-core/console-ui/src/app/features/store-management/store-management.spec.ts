@@ -384,9 +384,10 @@ describe('StoreManagement', () => {
     const {element} = load();
 
     const links = Array.from(element.querySelectorAll<HTMLAnchorElement>('.nav-item[href]'));
-    // Four: appearance — branding, the home page, the slider and social links — is the content hub's now.
-    expect(links.length).toBe(4);
+    // Four sections (appearance is the content hub's now) plus the storefront builder's own route.
+    expect(links.length).toBe(5);
     expect(links.map((link) => link.getAttribute('href'))).toContain('/store-management/payments');
+    expect(links.map((link) => link.getAttribute('href'))).toContain('/store-management/builder');
   }));
 
   it('keeps Save disabled until the section is dirty', fakeAsync(() => {

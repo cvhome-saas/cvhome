@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "broken-image",
+        "value": "*",
+        "files": [
+          "store-core/console-ui/src/app/features/storefront-builder/components/media-select.ts"
+        ],
+        "createdAt": "2026-08-31T21:26:00.724Z",
+        "reason": "Angular [src] binding to media-library asset URLs; never ships empty"
+      }
+    ]
+  }
+}

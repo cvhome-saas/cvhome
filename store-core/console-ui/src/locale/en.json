@@ -114,6 +114,9 @@
       "faq": "FAQ entry | cvhome",
       "newPolicy": "New policy | cvhome",
       "policy": "Policy | cvhome"
+    },
+    "builder": {
+      "title": "Home page builder"
     }
   },
   "notFound": {
@@ -666,7 +669,6 @@
     },
     "nav": {
       "ariaLabel": "Store settings sections",
-      "builderUnavailable": "The home page builder is not available yet.",
       "heading": "Settings",
       "homePageBuilder": "Home page builder"
     },
@@ -1199,7 +1201,8 @@
       "platformUsers": "Accounts",
       "platformBilling": "Billing",
       "plans": "Plans",
-      "content": "Content management"
+      "content": "Content management",
+      "builder": "Home page builder"
     },
     "toolbar": {
       "breadcrumbNav": "Breadcrumb",
@@ -3632,6 +3635,96 @@
       "socialHost": "Use a {{host}} link.",
       "socialUrl": "Enter a valid web address.",
       "socialProfile": "Link to the profile page, not just the site."
+    }
+  },
+  "builder": {
+    "top": {
+      "back": "Store management",
+      "title": "Home page builder",
+      "devices": "Preview device",
+      "languages": "Editing language",
+      "undo": "Undo",
+      "redo": "Redo",
+      "preview": "Preview",
+      "discard": "Discard draft",
+      "publish": "Publish",
+      "published": "Published ✓",
+      "saving": "Saving…",
+      "saved": "Saved",
+      "conflict": "Someone else saved — reload the page",
+      "error": "Save failed",
+      "unpublished": "Draft · unpublished changes",
+      "live": "Live"
+    },
+    "tabs": {
+      "layout": "Layout",
+      "add": "Add section"
+    },
+    "layers": {
+      "empty": "No sections yet — add one from the library.",
+      "hide": "Hide section",
+      "show": "Show section",
+      "defaultVariant": "default"
+    },
+    "library": {
+      "presets": "Sections",
+      "mySections": "My sections",
+      "deleteSaved": "Delete saved section",
+      "noManifest": "The theme's section catalogue could not be loaded.",
+      "noSaved": "Nothing saved yet — configure a section and use “Save as preset”."
+    },
+    "inspector": {
+      "variant": "Layout variant",
+      "themeVariant": "designed by this theme",
+      "duplicate": "Duplicate section",
+      "remove": "Remove section",
+      "items": "Items",
+      "addItem": "Add item",
+      "removeItem": "Remove item",
+      "pickMedia": "Pick from library",
+      "replaceMedia": "Replace image",
+      "htmlAllowed": "HTML is allowed",
+      "style": "Style",
+      "nothingSelected": "Select a section to edit it.",
+      "saveAsPreset": "Save as preset",
+      "savePreset": "Save",
+      "presetName": "Preset name"
+    },
+    "style": {
+      "spacing": "Spacing",
+      "width": "Width",
+      "tone": "Background",
+      "spacing-none": "None",
+      "spacing-sm": "Tight",
+      "spacing-md": "Normal",
+      "spacing-lg": "Roomy",
+      "width-content": "Content",
+      "width-wide": "Wide",
+      "width-full": "Full bleed",
+      "tone-default": "Default",
+      "tone-muted": "Muted",
+      "tone-inverse": "Accent"
+    },
+    "source": {
+      "group": "A product group",
+      "category": "A category",
+      "newest": "Newest products",
+      "code": "Code",
+      "codeHint": "e.g. FEATURED_ITEMS"
+    },
+    "device": {
+      "desktop": "Desktop",
+      "tablet": "Tablet",
+      "mobile": "Mobile"
+    },
+    "canvas": {
+      "title": "Storefront preview",
+      "unavailable": "The storefront preview could not be reached. Check that the store's domain resolves from this browser."
+    },
+    "media": {
+      "title": "Media library",
+      "close": "Close",
+      "empty": "No images in the library yet — upload some in Content → Media."
     }
   }
 }
