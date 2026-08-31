@@ -25,7 +25,6 @@
   "dependencies": {
     "@store-front/types": "0.0.0",
     "html-entities": "^2.6.0",
-    "uuid": "^13.0.0",
     "crypto-js": "^4.2.0"
   },
   "devDependencies": {

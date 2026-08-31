@@ -8,9 +8,8 @@ import {CartService} from "@store-front/services/cart-service";
 import {ContentService} from "@store-front/services/content-service";
 import {getCartManager} from "@store-front/services/cart-manager";
 import {parseDescription} from "@store-front/services/description-view-util";
-import {showToast} from "nextjs-toast-notify";
-import {toastDirection} from "@store-front/services/direction-utils";
 import {useUser} from "./use-user";
+import {notify} from "./notify";
 
 export const useCheckoutForm = (storeContext: StoreContext, requireLoginForOrderPlacement: boolean) => {
     const t = useTranslations('PAGE.CHECKOUT');
@@ -138,21 +137,9 @@ export const useCheckoutForm = (storeContext: StoreContext, requireLoginForOrder
                     setSuccessDialogOpen(true);
                     reset();
                 } else {
-                    showToast.error(t('PAYMENT_FAILED'), {
-                        duration: 3000,
-                        progress: false,
-                        position: toastDirection(storeContext.locale),
-                        transition: "bounceIn",
-                        sound: false,
-                    });
+                    notify('error', t('PAYMENT_FAILED'), storeContext.locale);
                 }
-            }, () => showToast.error(t('FAILED_TO_PLACE_ORDER'), {
-                duration: 3000,
-                progress: false,
-                position: toastDirection(storeContext.locale),
-                transition: "bounceIn",
-                sound: false,
-            })
+            }, () => notify('error', t('FAILED_TO_PLACE_ORDER'), storeContext.locale)
         );
     }, [cartManager, loading, requireLoginForOrderPlacement, reset, storeContext.locale, t, user]);
 

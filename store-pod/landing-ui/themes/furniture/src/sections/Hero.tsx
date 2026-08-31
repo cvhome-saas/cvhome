@@ -1,12 +1,9 @@
 'use client'
 import Image from 'next/image';
 import {useTranslations} from 'next-intl';
-import {Swiper, SwiperSlide} from 'swiper/react';
-import {A11y, Pagination} from 'swiper/modules';
-import 'swiper/css';
-import 'swiper/css/pagination';
 import {useDir} from '@store-front/i18n/use-dir';
 import type {Banner} from '@store-front/types';
+import {Swiper, SwiperSlide} from '@store-front/ui/swiper';
 import {PlanPlate} from '../components/PlanPlate';
 
 /**
@@ -38,7 +35,7 @@ export function Hero({slides, caption, planCaption}: { slides: Banner[]; caption
                     <PlanPlate caption={planCaption} label={planCaption}/>
                 </div>
             ) : (
-                <Swiper key={dir} dir={dir} modules={[Pagination, A11y]} loop={slides.length > 1}
+                <Swiper key={dir} dir={dir} loop={slides.length > 1}
                         observer observeParents observeSlideChildren resizeObserver
                         pagination={{clickable: true}}
                         a11y={{enabled: true}} className="size-full">

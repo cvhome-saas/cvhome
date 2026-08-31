@@ -63,15 +63,27 @@ public final class ProductSpecifications {
         return (root, query, cb) -> cb.like(cb.lower(root.get("sku")), "%%%s%%".formatted(sku.toLowerCase()));
     }
 
+    /**
+     * Membership of any of the given categories.
+     *
+     * <p>
+     * A correlated {@code exists} rather than a join: a product sitting in several of the selected categories
+     * would come back once per category row, and de-duplicating that with {@code distinct} is not free here.
+     * Postgres requires every {@code order by} expression of a {@code select distinct} to appear in the select
+     * list, which rules out ordering by relevance — a function of the search index, not a column of the row.
+     * The {@code exists} keeps one row per product, so neither the {@code distinct} nor that restriction applies.
+     * </p>
+     */
     public static Specification<Product> inCategories(Collection<Long> categoryIds) {
         if (categoryIds == null || categoryIds.isEmpty()) {
             return always();
         }
         return (root, query, cb) -> {
-            if (query != null) {
-                query.distinct(true);
-            }
-            return root.join("categories").get(ID).in(categoryIds);
+            Subquery<Integer> sub = query.subquery(Integer.class);
+            Root<Product> product = sub.correlate(root);
+            sub.select(cb.literal(1));
+            sub.where(product.join("categories").get(ID).in(categoryIds));
+            return cb.exists(sub);
         };
     }
 

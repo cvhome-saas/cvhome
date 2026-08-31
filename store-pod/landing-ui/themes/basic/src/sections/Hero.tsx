@@ -2,13 +2,10 @@
 import Image from 'next/image';
 import {useTranslations} from 'next-intl';
 import {ArrowDownIcon} from 'lucide-react';
-import {Swiper, SwiperSlide} from 'swiper/react';
-import {A11y, Autoplay, Pagination} from 'swiper/modules';
-import 'swiper/css';
-import 'swiper/css/pagination';
 import {useDir} from '@store-front/i18n/use-dir';
 import type {Banner} from '@store-front/types';
 import {cn} from '@store-front/ui/lib/utils';
+import {Swiper, SwiperSlide} from '@store-front/ui/swiper';
 
 /**
  * The cover: the merchant's slider as a ruled stage (21:9 desktop, 4:3 mobile, height-capped) with numbered page stubs
@@ -30,7 +27,7 @@ export function Hero({slides, banner, storeName, facts, anchor}: {
         <section aria-roledescription={slides.length > 1 ? 'carousel' : undefined} aria-label={storeName} className="cover relative">
             {slides.length > 0 ? (
                 <div className="relative border">
-                    <Swiper key={dir} dir={dir} modules={[Pagination, Autoplay, A11y]} loop={slides.length > 1}
+                    <Swiper key={dir} dir={dir} loop={slides.length > 1}
                             pagination={{clickable: true, renderBullet: (i, cls) => `<button type="button" class="${cls}" aria-label="${t('HERO_SLIDE', {index: i + 1, total: slides.length})}">${i + 1}</button>`}}
                             autoplay={slides.length > 1 ? {delay: 6000, disableOnInteraction: true} : false}
                             a11y={{enabled: true}} className={stage}>

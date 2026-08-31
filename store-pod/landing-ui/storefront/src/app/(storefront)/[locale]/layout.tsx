@@ -29,11 +29,21 @@ export default async function StorefrontLayout({children, params}: { children: R
     // language — Lighthouse measured 383 KB for one such probe.
     if (!(routing.locales as readonly string[]).includes(locale)) notFound();
 
-    const [theme, storeContext] = await Promise.all([getTheme(), getStoreContext()]);
+    // Start the independent storefront reads together. React's request cache deduplicates the store read
+    // shared by getTheme(), loadLayoutData(), and getStore().
+    const themePromise = getTheme();
+    const storeContextPromise = getStoreContext();
+    const storePromise = getStore();
+    const layoutDataPromise = loadLayoutData();
+    // A redirect can end this render before the eager reads are awaited; attach handlers so a peer
+    // service failure cannot become an unhandled rejection during that early exit.
+    void storePromise.catch(() => undefined);
+    void layoutDataPromise.catch(() => undefined);
+    const [theme, storeContext] = await Promise.all([themePromise, storeContextPromise]);
 
     let store;
     try {
-        store = await getStore();
+        store = await storePromise;
     } catch (e) {
         // The whole storefront renders from the store record; without it this domain has no store.
         if (isApiError(e) && (e.category === 'NOT_FOUND' || e.category === 'FORBIDDEN')) redirect('/store-not-found');
@@ -44,8 +54,8 @@ export default async function StorefrontLayout({children, params}: { children: R
         redirectToSupportedLang(store, await headers(), locale);
     }
 
-    const data = await loadLayoutData();
-    const merchant = resolveMerchantTokens(theme, await getColorThemeRequest(store));
+    const [data, colorThemeRequest] = await Promise.all([layoutDataPromise, getColorThemeRequest(store)]);
+    const merchant = resolveMerchantTokens(theme, colorThemeRequest);
     const dir = getDirection(locale);
     const ctx = {store, storeContext, locale, dir, layout: theme.layout.config};
 
