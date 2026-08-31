@@ -8,8 +8,18 @@
     "build": "next build && node scripts/prune-font-subsets.mjs",
     "start": "node start.mjs",
     "lint": "cd .. && npm run lint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "node --test scripts/*.test.mjs"
   },
+  "browserslist": [
+    "chrome >= 93",
+    "edge >= 93",
+    "firefox >= 92",
+    "safari >= 15.4",
+    "ios_saf >= 15.4",
+    "and_chr >= 93",
+    "opera >= 79"
+  ],
   "dependencies": {
     "@aws-sdk/client-s3": "^3.750.0",
     "@hookform/resolvers": "^5.2.2",
@@ -52,7 +62,6 @@
     "react-dom": "19.2.0",
     "react-hook-form": "^7.68.0",
     "server-only": "^0.0.1",
-    "swiper": "^12.0.3",
     "tailwind-merge": "^3.4.0",
     "yup": "^1.7.1"
   },

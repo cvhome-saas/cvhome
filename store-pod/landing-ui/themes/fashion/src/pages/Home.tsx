@@ -1,4 +1,5 @@
 import type {HomeData, PageProps} from '@store-front/theme';
+import {BannerImage} from '@store-front/ui/banner-image';
 import {PageShell} from '../components/PageShell';
 import {SectionHeading} from '../components/SectionHeading';
 import {ProductGrid} from '../components/ProductGrid';
@@ -40,8 +41,7 @@ export async function Home({ctx, data}: PageProps<HomeData>) {
                     ))}
                     {!slides[0] && !heroProducts.length && data.hero.banner?.desktopUrl && (
                         <figure className="sheet sheen peel relative col-span-2 aspect-[21/9] overflow-hidden lg:col-span-7">
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img src={data.hero.banner.desktopUrl ?? ''} alt={data.hero.banner.altText ?? ''} className="size-full object-cover"/>
+                            <BannerImage banner={data.hero.banner} priority sizes="(max-width: 1024px) 100vw, 1152px" className="object-cover"/>
                         </figure>
                     )}
                 </section>

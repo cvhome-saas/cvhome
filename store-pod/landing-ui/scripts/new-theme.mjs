@@ -76,7 +76,7 @@ function insertBefore(file, marker, line) {
     writeFileSync(p, text.replace(marker, `${line}\n${marker}`));
 }
 insertBefore('storefront/src/shell/theme/registry.ts', '    // @themes:end', `    '${id}': () => import('@store-front/theme-${id}'),`);
-insertBefore('storefront/src/app/themes.css', '/* @themes:end */', `@source "../../../themes/${id}/src";\n@import "@store-front/theme-${id}/tokens.css";`);
+insertBefore('storefront/src/app/themes.css', '/* @themes:end */', `@source "../../../themes/${id}/src";`);
 insertBefore('storefront/next.config.ts', '        // @themes:end', `        '@store-front/theme-${id}',`);
 {
     // Legacy map: a same-name enum value (e.g. `beauty`) already has an entry — repoint it instead of duplicating the key.

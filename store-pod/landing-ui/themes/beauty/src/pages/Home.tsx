@@ -1,5 +1,6 @@
 import {getTranslations} from 'next-intl/server';
 import type {HomeData, PageProps} from '@store-front/theme';
+import {BannerImage} from '@store-front/ui/banner-image';
 import {PageShell} from '../components/PageShell';
 import {SectionHeading} from '../components/SectionHeading';
 import {ProductGrid} from '../components/ProductGrid';
@@ -29,8 +30,7 @@ export async function Home({ctx, data}: PageProps<HomeData>) {
                     <div className="order-3 flex min-w-0 flex-col gap-5 lg:col-start-1 lg:row-start-2 lg:self-start">
                         {data.hero.banner?.desktopUrl && !hasSlides && (
                             <div className="plate relative aspect-[21/9] overflow-hidden bg-muted">
-                                {/* eslint-disable-next-line @next/next/no-img-element */}
-                                <img src={data.hero.banner.desktopUrl ?? ''} alt={data.hero.banner.altText ?? ''} className="size-full object-cover"/>
+                                <BannerImage banner={data.hero.banner} priority sizes="(max-width: 1024px) 100vw, 45vw" className="object-cover"/>
                             </div>
                         )}
                         {firstGroup && (

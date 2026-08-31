@@ -1,28 +1,17 @@
 /* GENERATED — managed by scripts/new-theme.mjs. Per registered theme: a Tailwind @source (class scanning)
-   and the tokens.css import. Globs are not used on purpose: Tailwind v4 @source wants concrete paths. */
+   only. tokens.css is imported by the theme's index.ts to ensure dynamic loading.
+   Globs are not used on purpose: Tailwind v4 @source wants concrete paths. */
 /* @themes:start */
 @source "../../../themes/starter/src";
-@import "@store-front/theme-starter/tokens.css";
 @source "../../../themes/beauty/src";
-@import "@store-front/theme-beauty/tokens.css";
 @source "../../../themes/fashion/src";
-@import "@store-front/theme-fashion/tokens.css";
 @source "../../../themes/basic/src";
-@import "@store-front/theme-basic/tokens.css";
 @source "../../../themes/grocery/src";
-@import "@store-front/theme-grocery/tokens.css";
 @source "../../../themes/pink/src";
-@import "@store-front/theme-pink/tokens.css";
 @source "../../../themes/hunger/src";
-@import "@store-front/theme-hunger/tokens.css";
 @source "../../../themes/furniture/src";
-@import "@store-front/theme-furniture/tokens.css";
 @source "../../../themes/glasses/src";
-@import "@store-front/theme-glasses/tokens.css";
 @source "../../../themes/cosmetics/src";
-@import "@store-front/theme-cosmetics/tokens.css";
 @source "../../../themes/sports/src";
-@import "@store-front/theme-sports/tokens.css";
 @source "../../../themes/jewellery/src";
-@import "@store-front/theme-jewellery/tokens.css";
 /* @themes:end */

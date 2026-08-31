@@ -1,14 +1,11 @@
 'use client'
-import Image from 'next/image';
 import {useTranslations} from 'next-intl';
 import {ArrowDownIcon} from 'lucide-react';
-import {Swiper, SwiperSlide} from 'swiper/react';
-import {A11y, Autoplay, Pagination} from 'swiper/modules';
-import 'swiper/css';
-import 'swiper/css/pagination';
 import {useDir} from '@store-front/i18n/use-dir';
 import type {Banner} from '@store-front/types';
 import {cn} from '@store-front/ui/lib/utils';
+import {BannerImage} from '@store-front/ui/banner-image';
+import {Swiper, SwiperSlide} from '@store-front/ui/swiper';
 
 /**
  * The floor entrance: the price board (a flat field of the merchant primary — store name at signage
@@ -45,20 +42,20 @@ export function Hero({slides, banner, storeName, facts, anchor}: {
 
             {slides.length > 0 ? (
                 <div className="min-w-0">
-                    <Swiper key={dir} dir={dir} modules={[Pagination, Autoplay, A11y]} loop={slides.length > 1}
+                    <Swiper key={dir} dir={dir} loop={slides.length > 1}
                             pagination={{clickable: true}}
                             autoplay={slides.length > 1 ? {delay: 6000, disableOnInteraction: true} : false}
                             a11y={{enabled: true}} className={stage}>
                         {slides.map((s, i) => (
                             <SwiperSlide key={s.id} aria-label={t('HERO_SLIDE', {index: i + 1, total: slides.length})}>
-                                <Image src={s.desktopUrl ?? ''} alt={s.altText ?? ''} fill priority={i === 0} sizes="(max-width: 1344px) 100vw, 820px" className="object-cover"/>
+                                <BannerImage banner={s} priority={i === 0} sizes="(max-width: 1344px) 100vw, 820px" className="object-cover"/>
                             </SwiperSlide>
                         ))}
                     </Swiper>
                 </div>
             ) : banner?.desktopUrl ? (
                 <div className={cn(stage, 'min-w-0')}>
-                    <Image src={banner.desktopUrl} alt={banner.altText ?? ''} fill priority sizes="(max-width: 1344px) 100vw, 820px" className="object-cover"/>
+                    <BannerImage banner={banner} priority sizes="(max-width: 1344px) 100vw, 820px" className="object-cover"/>
                 </div>
             ) : null}
         </section>

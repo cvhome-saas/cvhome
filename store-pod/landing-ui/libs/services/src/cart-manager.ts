@@ -1,16 +1,12 @@
-import {emitter} from "next/client";
-import {v4 as uuidv4} from 'uuid';
 import {Cart, CART_DATA_KEY, CheckoutCart, Order, StoreContext} from "@store-front/types";
 import {CartService} from "./cart-service";
-
-
-const CART_CHANGED_EVENT = "CART_STORAGE_CHANGED";
 
 export class CartManager {
     private static instance: CartManager;
     private cart: Cart | undefined = undefined;
     private storeContext: StoreContext;
     private subscribers: Map<string, CartCallbackSubscriberWrapper> = new Map();
+    private nextSubscriptionId = 0;
 
     private constructor(storeContext: StoreContext) {
         this.storeContext = storeContext;
@@ -40,18 +36,16 @@ export class CartManager {
     }
 
     public subscribe(callback: CartSubscriber): string {
-        const id = uuidv4();
+        const id = String(++this.nextSubscriptionId);
         const callbackWrapper: CartCallbackSubscriberWrapper = () => callback(this.cart);
         callbackWrapper();
         this.subscribers.set(id, callbackWrapper);
-        emitter.on(CART_CHANGED_EVENT, callbackWrapper);
         return id;
     }
 
     public unsubscribe(id: string) {
         const subscriber: CartCallbackSubscriberWrapper | undefined = this.subscribers.get(id);
         if (subscriber) {
-            emitter.off(CART_CHANGED_EVENT, subscriber);
             this.subscribers.delete(id);
         }
     }
@@ -65,7 +59,7 @@ export class CartManager {
             }
         }
         this.cart = cart;
-        emitter.emit(CART_CHANGED_EVENT, "");
+        this.subscribers.forEach(subscriber => subscriber());
     }
 
     getMatchedProductsInCart(productId: number) {

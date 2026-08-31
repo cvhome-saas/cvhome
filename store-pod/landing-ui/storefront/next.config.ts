@@ -17,6 +17,11 @@ const nextConfig: NextConfig = {
     images: {
         unoptimized: true,
     },
+    // Lighthouse flags 15 render-blocking CSS <link>s on the storefront; inlining puts the (small,
+    // post-PR-#303) CSS into the HTML so first render never waits on stylesheet round-trips.
+    experimental: {
+        inlineCss: true,
+    },
     turbopack: {
         root: monorepoRoot,
     },

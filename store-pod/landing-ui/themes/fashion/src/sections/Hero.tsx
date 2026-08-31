@@ -14,7 +14,7 @@ export function SlidePoster({slide, index, total, storeName, priority, className
     // the ratio rides a variable so a `lg:aspect-auto` on the same element can still win (an inline style could not be overridden)
     return (
         <figure className={cn('sheet sheen peel relative min-w-0 overflow-hidden aspect-(--ratio)', className)} style={{'--ratio': ratio} as React.CSSProperties}>
-            <PosterImage src={slide.desktopUrl ?? ''} alt={slide.altText ?? ''} title={storeName} tone="faint" meta={`${String(index + 1).padStart(2, '0')} / ${String(total).padStart(2, '0')}`}
+            <PosterImage src={slide.desktopUrl ?? ''} mobileSrc={slide.mobileUrl ?? undefined} alt={slide.altText ?? ''} title={storeName} tone="faint" meta={`${String(index + 1).padStart(2, '0')} / ${String(total).padStart(2, '0')}`}
                          sizes="(max-width: 1024px) 100vw, 40vw" priority={priority}/>
         </figure>
     );

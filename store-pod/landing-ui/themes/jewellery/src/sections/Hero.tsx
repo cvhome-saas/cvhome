@@ -1,12 +1,9 @@
 'use client'
-import Image from 'next/image';
 import {useTranslations} from 'next-intl';
-import {Swiper, SwiperSlide} from 'swiper/react';
-import {A11y, Autoplay, Pagination} from 'swiper/modules';
-import 'swiper/css';
-import 'swiper/css/pagination';
 import {useDir} from '@store-front/i18n/use-dir';
 import type {Banner} from '@store-front/types';
+import {BannerImage} from '@store-front/ui/banner-image';
+import {Swiper, SwiperSlide} from '@store-front/ui/swiper';
 
 /**
  * Homepage hero from the store's CMS banners. Swiper needs `dir` explicitly (it does not read CSS
@@ -18,12 +15,12 @@ export function Hero({slides}: { slides: Banner[] }) {
     if (slides.length === 0) return null;
     return (
         <section aria-roledescription="carousel" className="jewellery-hero">
-            <Swiper key={dir} dir={dir} modules={[Pagination, Autoplay, A11y]} loop={slides.length > 1}
+                        <Swiper key={dir} dir={dir} loop={slides.length > 1}
                     pagination={{clickable: true}} autoplay={slides.length > 1 ? {delay: 5000, disableOnInteraction: true} : false}
                     a11y={{enabled: true}} className="aspect-[16/7] w-full bg-muted sm:aspect-[21/8]">
                 {slides.map((s, i) => (
                     <SwiperSlide key={s.id} aria-label={t('HERO_SLIDE', {index: i + 1, total: slides.length})}>
-                        <Image src={s.desktopUrl ?? ''} alt={s.altText ?? ''} fill priority={i === 0} sizes="100vw" className="object-cover"/>
+                        <BannerImage banner={s} priority={i === 0} sizes="100vw" className="object-cover"/>
                     </SwiperSlide>
                 ))}
             </Swiper>
