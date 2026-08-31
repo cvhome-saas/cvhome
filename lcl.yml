@@ -107,6 +107,24 @@ defaults:
         "management.otlp.metrics.export.url": "http://localhost:${port.otel-collector.4318}/v1/metrics",
         "otel.exporter.otlp.endpoint": "http://localhost:${port.otel-collector.4317}"
       }
+    # Whose code is this? One worktree per feature means several stacks are up at once, serving different
+    # branches on ports that differ only by the offset — and nothing in a response says which. Spring's relaxed
+    # binding maps `INFO_STACK_*` to `info.stack.*`, and `management.info.env.enabled` is already true in
+    # store-commons/autoconfigure/common-config.yml, so these land on `/actuator/info` for all twelve Spring
+    # services with no code change. `/actuator/info` is the one to read: `/actuator/env` lists the three names
+    # under systemEnvironment but masks every value as `******`, its `show-values` default being `never`.
+    #
+    # `${root}` is the directory lcl found lcl.yml in — the worktree the stack was started from, which is the
+    # answer to "which checkout is serving :12001". The branch is one `git -C <that> rev-parse --abbrev-ref HEAD`
+    # away, and that is precisely what `lcl list` runs to fill its own branch column; there is no `${branch}` to
+    # interpolate, so the checkout is what can be passed. Single-word keys on purpose: relaxed binding turns each
+    # `_` back into a `.`, so INFO_STACK_PORT_OFFSET would arrive nested as `info.stack.port.offset`.
+    #
+    # The Angular console and the Next storefront are not Spring and ignore all three, but lcl exports LCL_STACK
+    # and LCL_STACK_DIR to every service it starts, so their process env names the stack anyway.
+    INFO_STACK_NAME: "${stack}"
+    INFO_STACK_WORKTREE: "${root}"
+    INFO_STACK_OFFSET: "${offset}"
 
 services:
   # Both profiles, always: `lcl` is the environment slice (datasource, discovery, MinIO) and `test-stores` seeds
@@ -114,6 +132,12 @@ services:
   # the pod services have no demo store to serve. The per-stack gradle cache lets two stacks build side by side.
   uaa:
     description: OAuth2 authorization server for staff; issues the tokens every other service validates
+    # No npm prepare step, unlike console-ui and landing-ui below, even though uaa ships an Angular app in
+    # src/main/resources/uaa-fe: Gradle owns that install. `node { download = true; nodeProjectDir = 'uaa-fe' }`
+    # plus `processResources → copyAngularApp → npm_run_build → npmInstall` means bootRun installs and builds the
+    # frontend itself, with a Node it downloaded — adding a bare `npm install` here would run a *different* npm
+    # over the same directory. (cua has no frontend at all to install: its login and register pages are
+    # server-rendered Thymeleaf, and it has no package.json.)
     command: [./gradlew, ":store-core:uaa:bootRun", "--args=--spring.profiles.active=lcl,test-stores", "--project-cache-dir=${stack.dir}/gradle", --console=plain]
     ports: { http: 8001 }
     depends-on: [postgres]
