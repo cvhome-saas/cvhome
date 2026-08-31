@@ -104,6 +104,22 @@ Tags: `[verified]` run end to end against the local stack · `[tests]` covered b
   server re-render), and loading that URL cold lands preselected on that variant.
 - **Result** — both directions confirmed.
 
+### SF-03b — A purchase carries the combination all the way to the order · high · [verified]
+
+- **Steps** — signed in as the demo shopper, cart holding one combination line (Zara dress Blue/M, SAR 365)
+  and one optionless line (Gucci bag) as the control; Cash on Delivery, order placed.
+- **The snapshot** — `checkout.order_product_option` gained **exactly two rows, both on the dress line**:
+  `color`/`Color`/`blue`/`Blue` (sort 0) and `size`/`Size`/`m`/`M` (sort 1). The bag's line has none. Codes
+  *and* names are stored, which is what lets an order keep saying what was bought after an option is renamed
+  or deleted. `order_product.product_name` is the real localized name — the `"Product {sku}"` placeholder the
+  rework set out to fix is gone.
+- **Stock** — decremented on the bought sku **only**: `SKU-ZR-CL-DRS02-BL-M` 8 → 7, while the product's
+  default variant stayed at 40 and its Blue/L variant at 0. Two variants of one product really are
+  independent inventory rows.
+- **Both order views render it** — the console order detail shows `Color: Blue · Size: M` between the name and
+  the sku; the storefront's own order view shows `Color: Blue / Size: M` under the name. The optionless line
+  shows nothing on either, which is the control.
+
 ### SF-03 — The cart line names the combination · high · [verified]
 
 - **Expect** — adding Blue/M gives a line reading **"Color: Blue / Size: M"** at the variant's own price.
@@ -227,14 +243,13 @@ Tags: `[verified]` run end to end against the local stack · `[tests]` covered b
 ## Known gaps
 
 - **SF-05** (facet rail, `matchedVariantSku` deep link) is wired and type-checked but never run end to end.
-- **A full purchase** through to the order's `order_product_option` snapshot is **still not run**, and not for
-  want of trying: the cart and the checkout summary both render the line correctly — the checkout page shows
-  **"Color: Blue / Size: M"** against SAR 365 on the variant line and nothing on the simple line beside it —
-  but placing the order needs a shopper sign-in, and entering a password is not something this assistant does.
-  Someone signed in as the demo shopper can finish it in a minute; what remains unproven is only the last hop,
-  the `order_product_option` rows written at placement and their rendering on the two order views. The
-  placement path itself is covered by checkout's integration tests.
-- **A suggestion's `matchedVariantSku` deep link** — see SF-05.
+- **A suggestion's `matchedVariantSku` deep link** — the only interaction in this feature never driven end to
+  end. Everything it depends on is verified (suggest returns the field, the provider maps it into the href,
+  and `?sku=` preselection works — SF-02), so what is untested is the wiring between them.
+
+Everything else in this file has now been run against the stack. The chain the feature exists to serve —
+catalogue option → product variants → storefront selection → cart → checkout → placement → order snapshot →
+both order views, with stock moving on the right sku alone — is verified end to end.
 - **`ProductAttribute*`** remains in landing-ui's types, documented as dead on the wire: every theme's product
   page renders a specifications block from it that degrades to nothing. Descriptive attributes are a stated
   future feature — delete the shape together with those blocks, or revive it when the feature lands.
