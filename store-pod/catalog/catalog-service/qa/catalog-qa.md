@@ -5,6 +5,14 @@ tree, brands, product types, groups and the image gallery. It owns no prices and
 [inventory](../../../inventory/inventory-service/qa/inventory-qa.md), and the two are composed for the shopper
 by [checkout](../../../checkout/checkout-service/qa/checkout-qa.md).
 
+> **Superseded in part (2026-08-31, the variant rework).** The ARC cases below record the catalog/inventory
+> split, at which point variants and product options were removed and parked. They are **back** — a store-wide
+> option vocabulary assigned per product, and a uniform variant model in which every product owns at least one
+> `catalog.product_variant` and sku/price/stock live at the variant level. The ARC entries are marked where that
+> changed them; everything else still holds, because the rework kept the same wire contract again.
+> `store-pod/catalog-deprecated` is deleted — the Shopizer-era model it parked was a reference for what not to
+> repeat, and the rework did not reuse it.
+
 - **Scope** — `/api/v2/products`, `/api/v2/product/**`, category, manufacturer, product-type, product-group and
   product-image APIs; the console's Catalogue module as a client; the billing write gate on catalog writes
 - **Runs on** — `lcl start -d --stack <name>`; read the live port from `lcl urls`. Address it through the
@@ -757,26 +765,31 @@ CAT-08, CAT-16, GRP-04, IMG-04, INV-04, LST-08. Run them as a set.
 
 ## ARC — What the rewrite left behind
 
-
-
-### ARC-01 — The live schema creates no attribute tables · high · [verified]
+### ARC-01 — The live schema creates no attribute tables · high · [superseded by the variant rework]
 
 - **Steps** — on a fresh database, `\dt catalog.*`.
-- **Expect** — 14 tables: sequencer, category(+description), manufacturer(+description), product_type
-  (+description), product, product_category, product_description, product_image, product_group(+description),
-  product_group_product. No `product_option*`, `product_attribute`, `product_opt_set*`, `product_digital`,
-  `product_image_description`. On an **existing** database those tables still exist (`create if not exists`
-  never drops) — that is expected; `catalog-deprecated/deprecated-ddl.sql` documents them.
+- **Was** — 14 tables, and no `product_option*` among them.
+- **Now** — the rework adds seven: `product_option`, `product_option_description`, `product_option_value`,
+  `product_option_value_description`, `product_option_assignment`, `product_variant`,
+  `product_variant_option_value` — and **drops `catalog.product.sku`**, because the sku moved to the variant.
+  Still absent, and still correct to assert: `product_attribute`, `product_opt_set*`, `product_digital`,
+  `product_image_description`. The `product_option*` tables here are the NEW vocabulary, unrelated in shape to
+  the Shopizer ones this entry was written about.
 
 ### ARC-03 — Nothing in the repo calls a removed type or endpoint · [verified]
 
 - **Steps** — `./gradlew build -x test -x check`; `npm run build` in console-ui and landing-ui.
 - **Expect** — clean. checkout compiles against the new `ReadableMinimalProduct` and `SkuInventory`.
 
-### ARC-04 — `catalog-deprecated` is not built · [verified]
+### ARC-04 — `catalog-deprecated` is deleted · [superseded by the variant rework]
 
-- **Expect** — no `settings.gradle` entry; the directory compiles nothing. Its README describes the
-  reintroduction path and the error codes that were pruned with it.
+- **Was** — the directory existed, unregistered from `settings.gradle`, parking the Shopizer-era variant code
+  against the day variants returned.
+- **Now** — variants returned as a different model, so the parked code had no reader and is removed. Nothing
+  in `settings.gradle` referenced it, so the build is unchanged.
+- **Watch instead** — `extra/scripts/drop-catalog-inventory-tables.sql` no longer drops
+  `catalog.product_variant`: the rework reused that name for a live table, and dropping it would take every
+  product's sku with it. The script's remaining drops are the genuinely dead Shopizer tables.
 
 ---
 
