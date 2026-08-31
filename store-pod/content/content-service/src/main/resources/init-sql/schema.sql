@@ -299,7 +299,7 @@ alter table content.media_usage add constraint media_usage_unique
     unique (asset_id, owner_kind, owner_ref, field);
 alter table content.media_usage drop constraint if exists media_usage_owner_kind_check;
 alter table content.media_usage add constraint media_usage_owner_kind_check
-    check (owner_kind in ('CONTENT', 'SITE_SETTINGS', 'PRODUCT', 'CATEGORY', 'BRAND'));
+    check (owner_kind in ('CONTENT', 'SITE_SETTINGS', 'PRODUCT', 'CATEGORY', 'BRAND', 'LAYOUT'));
 create index if not exists media_usage_content_idx on content.media_usage (content_id);
 create index if not exists media_usage_owner_idx on content.media_usage (owner_kind, owner_ref);
 
@@ -324,3 +324,54 @@ create table if not exists content.media_quota
     bytes_used        bigint      not null default 0,
     file_count        bigint      not null default 0
 );
+
+-- ---------------------------------------------------------------------------------------------------------------
+-- page layouts (the storefront builder)
+-- ---------------------------------------------------------------------------------------------------------------
+-- One JSON document per (store, page): `draft` is the builder's working copy, `published` is what shoppers see.
+-- Publish copies draft over published in one transaction and snapshots it into page_layout_revision; discard
+-- copies published back over draft. draft_version is the optimistic lock every save and publish sends back.
+-- This supersedes the content rows with content_type = 'SECTION': a layout is ordered, published atomically and
+-- undone as a whole, which per-section rows could never make honest.
+create table if not exists content.page_layout
+(
+    id                bigint       not null primary key,
+    store_merchant_id varchar(50)  not null,
+    page              varchar(32)  not null check (page in ('HOME')),
+    draft             jsonb        not null,
+    published         jsonb,
+    draft_version     integer      not null default 1,
+    published_version integer,
+    published_at      timestamp(6),
+    date_created      timestamp(6),
+    last_modified     timestamp(6),
+    modified_by       varchar(120),
+    constraint page_layout_store_page_unique unique (store_merchant_id, page)
+);
+
+create table if not exists content.page_layout_revision
+(
+    id           bigint       not null primary key,
+    layout_id    bigint       not null
+        constraint page_layout_revision_layout_fk references content.page_layout on delete cascade,
+    version      integer      not null,
+    snapshot     jsonb        not null,
+    published_by varchar(120),
+    date_created timestamp(6) not null,
+    constraint page_layout_revision_unique unique (layout_id, version)
+);
+create index if not exists page_layout_revision_layout_idx on content.page_layout_revision (layout_id, version desc);
+
+-- Merchant-saved reusable sections ("My sections" in the builder library). Snapshots, copied on insert with
+-- fresh ids — never live references, so deleting one cannot break a page.
+create table if not exists content.section_preset
+(
+    id                bigint       not null primary key,
+    store_merchant_id varchar(50)  not null,
+    name              varchar(120) not null,
+    kind              varchar(40)  not null,
+    snapshot          jsonb        not null,
+    date_created      timestamp(6) not null,
+    modified_by       varchar(120)
+);
+create index if not exists section_preset_store_idx on content.section_preset (store_merchant_id, date_created desc);

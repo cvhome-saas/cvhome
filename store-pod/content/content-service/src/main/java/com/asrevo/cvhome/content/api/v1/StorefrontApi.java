@@ -106,6 +106,21 @@ public class StorefrontApi {
     }
 
     /**
+     * The page's layout document, render-ready. Serves the published copy (or the starter default before any
+     * publish); with a valid preview token it serves the draft instead, uncached, which is what the builder's
+     * canvas iframe renders.
+     */
+    @GetMapping("layout/{page}")
+    public ResponseEntity<com.asrevo.cvhome.content.model.storefront.StorefrontLayout> layout(
+            StoreMerchantId merchantStore, LanguageCode language,
+            @PathVariable com.asrevo.cvhome.content.model.layout.PageKind page,
+            @RequestParam(required = false) String preview) {
+        boolean draft = previews.valid(preview, merchantStore, LayoutApi.previewSlug(page));
+        var layout = storefront.layout(merchantStore, language, page, draft);
+        return draft ? ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(layout) : cached(layout);
+    }
+
+    /**
      * The home page's blocks, in order. Kept out of {@code site} on purpose: {@code site} is fetched on every
      * page, and only the home page needs these.
      */

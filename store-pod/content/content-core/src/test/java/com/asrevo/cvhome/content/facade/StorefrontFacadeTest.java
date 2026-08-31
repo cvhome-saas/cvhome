@@ -175,7 +175,8 @@ class StorefrontFacadeTest {
                 .thenReturn(new SiteBranding(null, null, null, null));
         when(siteSettings.socialLinks(any())).thenReturn(List.of());
         facade = new StorefrontFacade(contents, menus, media, policies, categories, faq, banners, redirects,
-                siteSettings, ContentFixtures.clock());
+                siteSettings, mock(com.asrevo.cvhome.content.service.PageLayoutService.class),
+                ContentFixtures.clock());
     }
 
     private static PostCategory category(Long id, String slug, Map<String, String> names) {

@@ -1,0 +1,103 @@
+# The storefront builder's layout document API (content service).
+# The demo store 65f023632bc46470c104b76f seeds a published HOME layout; GET materializes a draft row on first touch.
+
+# curl 'GET {{GATEWAY_URL}}/spg/content/api/v1/private/content/layouts/HOME?lang=en&store=65f023632bc46470c104b76f'
+GET {{GATEWAY_URL}}/spg/content/api/v1/private/content/layouts/HOME?lang=en&store=65f023632bc46470c104b76f
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
+
+###
+
+# Save the draft. baseVersion must equal the draftVersion the GET returned; a stale value is a 409.
+PUT {{GATEWAY_URL}}/spg/content/api/v1/private/content/layouts/HOME?lang=en&store=65f023632bc46470c104b76f
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
+Content-Type: application/json
+
+{
+  "baseVersion": 1,
+  "document": {
+    "schemaVersion": 1,
+    "page": "HOME",
+    "sections": [
+      {
+        "id": "sec-hero",
+        "kind": "hero",
+        "variant": "minimal",
+        "props": {"height": "md"},
+        "text": {"heading": {"en": "Edited from layout.http", "ar": "عنوان تجريبي"}},
+        "style": {"spacing": "lg", "width": "full", "tone": "default"},
+        "visibility": {"hidden": false}
+      },
+      {
+        "id": "sec-featured",
+        "kind": "products",
+        "variant": "grid",
+        "props": {"source": {"type": "group", "code": "FEATURED_ITEMS"}, "limit": 8},
+        "text": {"title": {"en": "Featured"}}
+      }
+    ]
+  }
+}
+
+###
+
+# Publish the draft (bump baseVersion to what the PUT returned). Warnings come back in the body.
+POST {{GATEWAY_URL}}/spg/content/api/v1/private/content/layouts/HOME/publish?lang=en&store=65f023632bc46470c104b76f
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
+Content-Type: application/json
+
+{"baseVersion": 2}
+
+###
+
+# Throw the draft away — the published document becomes the draft again.
+POST {{GATEWAY_URL}}/spg/content/api/v1/private/content/layouts/HOME/discard?lang=en&store=65f023632bc46470c104b76f
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
+Content-Type: application/json
+
+{"baseVersion": 3}
+
+###
+
+GET {{GATEWAY_URL}}/spg/content/api/v1/private/content/layouts/HOME/revisions?lang=en&store=65f023632bc46470c104b76f
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
+
+###
+
+POST {{GATEWAY_URL}}/spg/content/api/v1/private/content/layouts/HOME/revisions/1/restore?lang=en&store=65f023632bc46470c104b76f
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
+
+###
+
+# Mint a preview token for the builder's canvas iframe / new-tab preview.
+POST {{GATEWAY_URL}}/spg/content/api/v1/private/content/layouts/HOME/preview-token?lang=en&store=65f023632bc46470c104b76f
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
+
+###
+
+# ------------------------------------------------------------------------------------- saved sections
+
+GET {{GATEWAY_URL}}/spg/content/api/v1/private/content/layouts/section-presets?lang=en&store=65f023632bc46470c104b76f
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
+
+###
+
+POST {{GATEWAY_URL}}/spg/content/api/v1/private/content/layouts/section-presets?lang=en&store=65f023632bc46470c104b76f
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
+Content-Type: application/json
+
+{
+  "name": "My promo strip",
+  "section": {
+    "id": "sec-promo",
+    "kind": "promo",
+    "variant": "strip",
+    "props": {},
+    "text": {"message": {"en": "Free delivery over $50"}},
+    "style": {"spacing": "sm", "width": "full", "tone": "inverse"}
+  }
+}
+
+###
+
+DELETE {{GATEWAY_URL}}/spg/content/api/v1/private/content/layouts/section-presets/1?lang=en&store=65f023632bc46470c104b76f
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f

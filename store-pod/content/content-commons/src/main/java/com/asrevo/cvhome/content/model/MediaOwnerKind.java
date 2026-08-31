@@ -14,7 +14,7 @@ package com.asrevo.cvhome.content.model;
  */
 public enum MediaOwnerKind {
 
-    CONTENT, SITE_SETTINGS, PRODUCT, CATEGORY, BRAND;
+    CONTENT, SITE_SETTINGS, PRODUCT, CATEGORY, BRAND, LAYOUT;
 
     /**
      * Whether rows of this kind live in this service's own {@code content} table, so a title can be resolved

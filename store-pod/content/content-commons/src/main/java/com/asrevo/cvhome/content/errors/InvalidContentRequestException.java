@@ -37,6 +37,11 @@ public class InvalidContentRequestException extends ValidationException {
                 .param("size", size).param("max", max).build();
     }
 
+    public static InvalidContentRequestException layoutInvalid(String reason) {
+        return new ErrorBuilder<>(ContentErrors.LAYOUT_INVALID, InvalidContentRequestException::new)
+                .detail("Invalid layout: %s", reason).build();
+    }
+
     public static InvalidContentRequestException mediaTypeNotAllowed(String filename, String mimeType) {
         return new ErrorBuilder<>(ContentErrors.MEDIA_TYPE_NOT_ALLOWED, InvalidContentRequestException::new)
                 .detail("%s (%s) is not an accepted file type.", filename, mimeType)
