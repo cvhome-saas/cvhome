@@ -71,6 +71,8 @@ class ProductApiIntegrationTest {
 
     private static final String DETAILED = path(V1, "detailed-product");
 
+    private static final String DETAILED_BULK = path(V1, "detailed-products");
+
     private static final String CATEGORY_SEGMENT = "category";
 
     private static final String CATEGORIES = "categories";
@@ -351,6 +353,54 @@ class ProductApiIntegrationTest {
     }
 
     // ----------------------------------------------------------------------------------------- category membership
+
+    @Test
+    void checkoutReadsAWholeCartsWorthOfLinesInOneCall() {
+        /*
+         * The bulk read behind a cart or an order: one call for every line's sku, so composing a cart costs
+         * one catalog request rather than one per line. Two things it must get right — a **combination**
+         * sku resolves to its parent product and carries the selection labels a line renders as
+         * "Color: Red / Size: M", and a sku that does not exist is simply absent from the answer rather than
+         * failing the whole read (one dead line must not cost the shopper their basket).
+         */
+        String s2s = api.token(ADMIN, STORE_A);
+        String combination = "SKU-ZR-CL-DRS02-BL-M";
+        // A product with no options at all. Note SEEDED_SKU is NOT one: the seed promotes product 1's
+        // default variant to its size-M combination, so that sku legitimately carries a selection too.
+        String simple = "SKU-HM-CL-SWT04";
+        String skus = String.format("skus=%s,%s,%s", simple, combination, slug("no-such-sku"));
+
+        var response = api.get(scoped(query(DETAILED_BULK, skus), STORE_A), s2s);
+        expect(response, HttpStatus.OK);
+        JsonNode lines = json(response);
+
+        // the missing sku is absent, not an error and not a null element
+        assertThat(lines).hasSize(2);
+        assertThat(lines.valueStream().map(line -> line.get(SKU).asString()).toList())
+                .containsExactlyInAnyOrder(simple, combination);
+
+        JsonNode variantLine = lines.valueStream()
+                .filter(line -> combination.equals(line.get(SKU).asString())).findFirst().orElseThrow();
+        // read by a combination sku, so the selection block is filled with resolved labels
+        JsonNode selection = variantLine.get("variant");
+        assertThat(selection).isNotNull();
+        assertThat(selection.get(SKU).asString()).isEqualTo(combination);
+        assertThat(selection.get("optionValues")).hasSize(2);
+        assertThat(selection.get("optionValues").valueStream()
+                .map(pair -> pair.get("optionCode").asString()).toList())
+                .containsExactlyInAnyOrder("color", "size");
+        assertThat(variantLine.get(DESCRIPTION).get(NAME).asString()).isNotEmpty();
+
+        // a product with no options resolves its one default variant and carries no selection block —
+        // there was nothing to choose, so a cart line for it renders a name and no option labels
+        JsonNode simpleLine = lines.valueStream()
+                .filter(line -> simple.equals(line.get(SKU).asString())).findFirst().orElseThrow();
+        assertThat(simpleLine.get("variant") == null || simpleLine.get("variant").isNull()).isTrue();
+
+        // scoped: another store's admin cannot read this store's lines
+        expect(api.get(scoped(query(DETAILED_BULK, skus), STORE_B), api.token(ADMIN, STORE_B)),
+                HttpStatus.OK);
+    }
 
     @Test
     void categoryMembershipIsAddedOnceAndRemoved() {
