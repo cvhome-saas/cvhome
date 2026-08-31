@@ -1,4 +1,5 @@
 import {defineTheme} from '@store-front/theme';
+import './tokens.css';
 import {fonts} from './fonts';
 import {DEFAULT_COLORS} from './colors';
 import {layoutConfig} from './config';
