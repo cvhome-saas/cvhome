@@ -43,7 +43,8 @@ import {BuilderFacade} from '../facades/builder.facade';
     }
     iframe {
       border: 1px solid var(--border, #d4d4d8); border-radius: 10px; background: #fff;
-      width: 100%; height: 100%; box-shadow: 0 8px 24px rgb(0 0 0 / 0.08); transition: width 0.25s ease;
+      /* no width transition: animating an iframe's width relayouts the embedded page every frame */
+      width: 100%; height: 100%; box-shadow: 0 8px 24px rgb(0 0 0 / 0.08);
     }
     .device-tablet iframe { width: 768px; }
     .device-mobile iframe { width: 390px; }

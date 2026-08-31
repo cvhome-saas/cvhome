@@ -1,5 +1,7 @@
 /** Console-native; not a port from seller-core. */
-import {ChangeDetectionStrategy, Component, type OnInit, computed, inject, signal} from '@angular/core';
+import {
+  ChangeDetectionStrategy, Component, HostListener, type OnDestroy, type OnInit, computed, inject, signal,
+} from '@angular/core';
 import {RouterLink} from '@angular/router';
 import {TranslocoDirective} from '@jsverse/transloco';
 
@@ -31,7 +33,7 @@ import {BuilderSectionLibrary} from './components/section-library';
   templateUrl: './storefront-builder.html',
   styleUrl: './storefront-builder.css',
 })
-export class StorefrontBuilder implements OnInit {
+export class StorefrontBuilder implements OnInit, OnDestroy {
   protected readonly facade = inject(BuilderFacade);
 
   protected readonly panel = signal<'layers' | 'library'>('layers');
@@ -58,6 +60,28 @@ export class StorefrontBuilder implements OnInit {
 
   ngOnInit(): void {
     this.facade.load();
+  }
+
+  /** Leaving costs nothing — the draft autosaves — as long as the pending debounce is flushed first. */
+  ngOnDestroy(): void {
+    void this.facade.saveNow();
+  }
+
+  @HostListener('window:keydown', ['$event'])
+  protected onKeydown(event: KeyboardEvent): void {
+    if (!(event.metaKey || event.ctrlKey) || event.key.toLowerCase() !== 'z') {
+      return;
+    }
+    const target = event.target as HTMLElement | null;
+    if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) {
+      return; // text fields keep their own undo
+    }
+    event.preventDefault();
+    if (event.shiftKey) {
+      this.facade.redo();
+    } else {
+      this.facade.undo();
+    }
   }
 
   protected deviceIcon(device: BuilderDevice): IconName {

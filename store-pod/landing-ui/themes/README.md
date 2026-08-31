@@ -51,6 +51,18 @@ fallback results page, which is built from tokens and so still wears the theme's
 the header box: it submits to `/search`, and it takes its provider from `useSearchProvider(capabilities)` so
 it never claims a search the deployment cannot answer.
 
+## Layout sections (the storefront builder)
+
+The home page is no longer theme code. The shell composes it from the store's **layout document**
+(content service, `page_layout`), rendering each section through the theme's optional `sections`
+registry — `Partial<Record<SectionKind, Record<VariantId, ComponentType<SectionRenderProps>>>>` on
+`ThemeDefinition` — with shell fallback renderers covering every kind and variant, so any merchant
+layout renders on any theme. The catalogue of kinds, variants, inspector fields and presets lives in
+`libs/theme/src/sections/catalog.ts`; `/api/theme-manifest` serves it merged with the active theme's
+registry to the console builder. A theme adopts designed sections kind by kind (see
+`themes/starter/src/sections/LayoutSections.tsx`, the reference), and may add exclusive variants —
+beauty's `hero.editorial` is the proof. A theme with no registry at all still renders everything.
+
 ## Directions
 
 | id | Target merchant · replaces enum values | Structural thesis (header · hero · card · PDP · listing · cart) | Colour strategy · density | Not a recolour because |

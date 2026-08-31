@@ -34,7 +34,7 @@ create index if not exists content_code_idx on content.content (code);
 
 -- BOX held the store "snippets" (meta-title, header-message, agreement, LANDING_PAGE) — a workflow-less parallel
 -- to the components that say the same things better. Each moved to its successor: site SEO to site_settings, the
--- announcement to a STRIP banner, the agreement to the live TERMS policy, the landing copy to SECTION rows.
+-- announcement to a STRIP banner, the agreement to the live TERMS policy, the landing copy to the page layout document.
 alter table content.content drop column if exists link_to_menu;
 alter table content.content drop column if exists product_group;
 alter table content.content drop column if exists content_position;
@@ -114,14 +114,15 @@ alter table content.content_description add constraint content_description_state
     check (state in ('MISSING', 'DRAFT', 'TRANSLATED', 'STALE'));
 create index if not exists content_description_content_idx on content.content_description (content_id);
 
--- Purge the legacy BOX rows, then narrow the type check. Both wait until here: the descriptions have a foreign
--- key to content, so they have to go first, and the check cannot be added while a BOX row still exists.
+-- Purge the legacy BOX and SECTION rows, then narrow the type check. Both wait until here: the descriptions
+-- have a foreign key to content, so they go first, and the check cannot be added while such a row exists.
+-- SECTION was the per-row home-page model; the page_layout document below replaced it whole.
 delete from content.content_description where content_id in
-    (select content_id from content.content where content_type = 'BOX');
-delete from content.content where content_type = 'BOX';
+    (select content_id from content.content where content_type in ('BOX', 'SECTION'));
+delete from content.content where content_type in ('BOX', 'SECTION');
 alter table content.content drop constraint if exists content_content_type_check;
 alter table content.content add constraint content_content_type_check
-    check (content_type in ('PAGE', 'SECTION', 'POST', 'BANNER', 'FAQ', 'POLICY'));
+    check (content_type in ('PAGE', 'POST', 'BANNER', 'FAQ', 'POLICY'));
 
 -- ---------------------------------------------------------------------------------------------------------------
 -- revisions, status audit, redirects

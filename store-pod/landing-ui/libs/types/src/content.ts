@@ -104,32 +104,6 @@ export interface SocialLink {
     url: string
 }
 
-/** What a home-page section renders. */
-export type HomeSectionKind =
-    'PRODUCT_GROUP' | 'CATEGORY_GRID' | 'BANNER_REF' | 'RICH_TEXT' | 'IMAGE' | 'POST_FEED' | 'FAQ_REF'
-
-/**
- * One block of the store's home page. Before these existed the page was a hard-coded list of four product groups
- * in the storefront's loader, so a seller could not reorder it or put anything else on it.
- */
-export interface HomeSection {
-    id: number
-    slug: string
-    sortOrder: number
-    servedLocale: string | null
-    kind: HomeSectionKind
-    /** The product group code, category code, banner slug or FAQ group key this block draws. */
-    targetValue: string | null
-    title: string | null
-    subtitle: string | null
-    body: string | null
-    ctaLabel: string | null
-    cta: { kind: MenuTargetKind; value: string | null } | null
-    imageUrl: string | null
-    itemLimit: number | null
-    layout: string | null
-}
-
 export interface SiteContent {
     servedLocale: string | null
     /** The store's own title and description, already resolved to the served locale. */

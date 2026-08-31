@@ -18,14 +18,12 @@ import com.asrevo.cvhome.content.entity.PostCategory;
 import com.asrevo.cvhome.content.entity.SiteSettings;
 import com.asrevo.cvhome.content.errors.ContentNotFoundException;
 import com.asrevo.cvhome.content.model.BannerPlacement;
-import com.asrevo.cvhome.content.model.HomeSectionKind;
 import com.asrevo.cvhome.content.model.PolicyType;
 import com.asrevo.cvhome.content.model.PolicyVersionStatus;
 import com.asrevo.cvhome.content.model.banner.BannerArtwork;
 import com.asrevo.cvhome.content.model.banner.BannerMeta;
 import com.asrevo.cvhome.content.model.banner.BannerTarget;
 import com.asrevo.cvhome.content.model.post.PostMeta;
-import com.asrevo.cvhome.content.model.section.SectionMeta;
 import com.asrevo.cvhome.content.model.site.SiteBranding;
 import com.asrevo.cvhome.content.model.storefront.SitemapEntry;
 import com.asrevo.cvhome.content.model.storefront.StorefrontBanner;
@@ -35,7 +33,6 @@ import com.asrevo.cvhome.content.model.storefront.StorefrontPage;
 import com.asrevo.cvhome.content.model.storefront.StorefrontPolicy;
 import com.asrevo.cvhome.content.model.storefront.StorefrontPost;
 import com.asrevo.cvhome.content.model.storefront.StorefrontPostList;
-import com.asrevo.cvhome.content.model.storefront.StorefrontSection;
 import com.asrevo.cvhome.content.model.storefront.StorefrontSite;
 import com.asrevo.cvhome.content.repository.ContentRepository;
 import com.asrevo.cvhome.content.service.FaqService;
@@ -785,114 +782,6 @@ class StorefrontFacadeTest {
     }
 
 
-    /**
-     * The store's home page.
-     *
-     * <p>
-     * It used to be four product groups written into the storefront's loader, so a seller could not reorder it,
-     * retitle it, or put anything else on it. What the storefront reads now is this list, in the seller's order.
-     * </p>
-     */
-    @Nested
-    class HomeSections {
 
-        private static final String FEATURED = "FEATURED_ITEMS";
-
-        private static final String IMAGE_URL = "https://cdn.test/hero.png";
-
-        private static final String FIRST = "first";
-
-        private static final String ORDERED = "ordered";
-
-        private static final String UNORDERED = "unordered";
-
-        private static final String CAROUSEL = "carousel";
-
-        private Content section(Long id, String slug, Integer sortOrder, SectionMeta meta) {
-            Content c = ContentFixtures.published(id, ContentType.SECTION, slug, slug);
-            c.setSortOrder(sortOrder);
-            c.setMeta(JsonCodec.write(meta));
-            return c;
-        }
-
-        private void live(Content... sections) {
-            when(contents.findVisibleByType(ContentFixtures.STORE, ContentType.SECTION))
-                    .thenReturn(List.of(sections));
-        }
-
-        @Test
-        void sectionsComeBackInTheSellersOrderRatherThanTheDatabasesReadOrder() {
-            live(section(1L, SECOND_SLUG, 1, new SectionMeta(HomeSectionKind.PRODUCT_GROUP, FEATURED, null, null, null,
-                            null)),
-                    section(2L, FIRST, 0, new SectionMeta(HomeSectionKind.RICH_TEXT, null, null, null, null,
-                            null)));
-
-            List<StorefrontSection> out = facade.homeSections(ContentFixtures.STORE, ContentFixtures.EN);
-
-            assertThat(out).extracting(StorefrontSection::getSlug).containsExactly(FIRST, SECOND_SLUG);
-        }
-
-        /**
-         * A section with no order sorts as if it were first rather than throwing — a row can reach this state
-         * from a seed, and a home page that 500s is worse than one whose new block is at the top.
-         */
-        @Test
-        void aSectionWithNoOrderIsTreatedAsZero() {
-            live(section(1L, ORDERED, 1, new SectionMeta(HomeSectionKind.RICH_TEXT, null, null, null, null, null)),
-                    section(2L, UNORDERED, null,
-                            new SectionMeta(HomeSectionKind.RICH_TEXT, null, null, null, null, null)));
-
-            assertThat(facade.homeSections(ContentFixtures.STORE, ContentFixtures.EN))
-                    .extracting(StorefrontSection::getSlug).containsExactly(UNORDERED, ORDERED);
-        }
-
-        @Test
-        void everythingTheThemeDrawsIsCarriedThrough() {
-            when(media.urls(any(), any())).thenReturn(Map.of(42L, IMAGE_URL));
-            live(section(1L, "hero", 0,
-                    new SectionMeta(HomeSectionKind.IMAGE, null, 42L, 8, CAROUSEL, null)));
-
-            StorefrontSection s = facade.homeSections(ContentFixtures.STORE, ContentFixtures.EN).get(0);
-
-            assertThat(s.getKind()).isEqualTo(HomeSectionKind.IMAGE);
-            assertThat(s.getImageUrl()).isEqualTo(IMAGE_URL);
-            assertThat(s.getItemLimit()).isEqualTo(8);
-            assertThat(s.getLayout()).isEqualTo(CAROUSEL);
-            assertThat(s.getServedLocale()).isEqualTo(ContentFixtures.EN.code());
-        }
-
-        @Test
-        void aSectionWithNoImageIsNotGivenOne() {
-            live(section(1L, "rail", 0,
-                    new SectionMeta(HomeSectionKind.PRODUCT_GROUP, FEATURED, null, null, null, null)));
-
-            StorefrontSection s = facade.homeSections(ContentFixtures.STORE, ContentFixtures.EN).get(0);
-
-            assertThat(s.getImageUrl()).isNull();
-            assertThat(s.getTargetValue()).isEqualTo(FEATURED);
-        }
-
-        /**
-         * A block with nothing written in any language the reader can be served is left out rather than rendered
-         * as an untitled gap the seller cannot see the cause of.
-         */
-        @Test
-        void aSectionWithNothingToShowInAnyLanguageIsSkipped() {
-            Content c = section(1L, "empty", 0,
-                    new SectionMeta(HomeSectionKind.RICH_TEXT, null, null, null, null, null));
-            c.getDescriptions().clear();
-            live(c);
-
-            assertThat(facade.homeSections(ContentFixtures.STORE, ContentFixtures.EN)).isEmpty();
-        }
-
-        @Test
-        void aStoreWithNoSectionsGetsAnEmptyPageRatherThanAnError() {
-            live();
-
-            assertThat(facade.homeSections(ContentFixtures.STORE, ContentFixtures.EN)).isEmpty();
-        }
-
-    }
 
 }

@@ -19,7 +19,7 @@ export const CONTENT_LIST_TYPES: readonly ContentListType[] = ['pages', 'posts',
 export const CONTENT_TABS: readonly ContentTab[] =
   ['pages', 'posts', 'banners', 'faq', 'media', 'menus', 'policies', 'branding'];
 
-export type ContentType = 'PAGE' | 'SECTION' | 'POST' | 'BANNER' | 'FAQ' | 'POLICY';
+export type ContentType = 'PAGE' | 'POST' | 'BANNER' | 'FAQ' | 'POLICY';
 
 export type ContentStatus = 'DRAFT' | 'REVIEW' | 'SCHEDULED' | 'PUBLISHED' | 'ARCHIVED';
 
