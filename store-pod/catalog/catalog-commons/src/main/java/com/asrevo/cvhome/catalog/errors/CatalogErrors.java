@@ -102,11 +102,6 @@ public enum CatalogErrors implements ErrorCode {
     PRODUCT_OPTION_IN_USE("CATALOG.PRODUCT_OPTION.IN_USE", ErrorCategory.CONFLICT),
 
     /**
-     * No variant with that id or sku exists on the product / in this store.
-     */
-    PRODUCT_VARIANT_NOT_FOUND("CATALOG.PRODUCT_VARIANT.NOT_FOUND", ErrorCategory.NOT_FOUND),
-
-    /**
      * The sku is already taken in this store.
      */
     PRODUCT_VARIANT_DUPLICATE_SKU("CATALOG.PRODUCT_VARIANT.DUPLICATE_SKU", ErrorCategory.CONFLICT),

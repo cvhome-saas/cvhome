@@ -162,7 +162,6 @@
       "CATALOG_PRODUCT_OPTION_NOT_FOUND": "هذا الخيار لم يعد موجودًا. ربما تم حذفه.",
       "CATALOG_PRODUCT_OPTION_DUPLICATE": "خيار آخر يستخدم هذا الرمز بالفعل.",
       "CATALOG_PRODUCT_OPTION_IN_USE": "هذا الخيار لا يزال مستخدمًا في منتج أو أحد متغيراته. أزله من كل المنتجات أولًا.",
-      "CATALOG_PRODUCT_VARIANT_NOT_FOUND": "هذا المتغير لم يعد موجودًا. ربما تم استبداله.",
       "CATALOG_PRODUCT_VARIANT_DUPLICATE_SKU": "منتج أو متغير آخر يستخدم أحد هذه الرموز (SKU) بالفعل.",
       "CATALOG_PRODUCT_VARIANT_DUPLICATE_COMBINATION": "متغيران يصفان تركيبة القيم نفسها.",
       "CATALOG_PRODUCT_VARIANT_OPTIONS_INVALID": "يجب أن يختار كل متغير قيمة واحدة بالضبط من كل خيار محدد.",

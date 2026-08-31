@@ -266,6 +266,46 @@ class ProductApiIntegrationTest {
     }
 
     @Test
+    void theListingFiltersByOptionValueAnchoredToOneVariant() {
+        /*
+         * The filter semantics the whole facet rail rests on: **OR within an option, AND across options, and
+         * both anchored to a SINGLE variant**. The seeded fashion store is built for exactly this — the Zara
+         * dress sells red/M, blue/M and blue/L, and deliberately not red/L.
+         *
+         * So red AND L must find nothing. If the AND were evaluated per *product* rather than per variant the
+         * dress would match — it owns a red variant and it owns an L variant — and a shopper filtering for a
+         * red L dress would be shown one that does not exist in that combination. That negative case is the
+         * point of this test; the positive ones only prove the query runs.
+         */
+        String red = "optionValueIds=1";
+        String blue = "optionValueIds=2";
+        String medium = "optionValueIds=3";
+        String large = "optionValueIds=4";
+
+        // one value: every product owning a variant with it
+        JsonNode inRed = json(api.get(scoped(query(PRODUCTS, red), STORE_A), null));
+        assertThat(inRed.get(CONTENT)).isNotEmpty();
+
+        // two values of the SAME option are an OR — red or blue is at least as wide as red alone
+        JsonNode redOrBlue = json(api.get(scoped(query(PRODUCTS, "optionValueIds=1,2"), STORE_A), null));
+        assertThat(redOrBlue.get(TOTAL_ELEMENTS).asLong())
+                .isGreaterThanOrEqualTo(inRed.get(TOTAL_ELEMENTS).asLong());
+
+        // across options it is an AND, and one variant must satisfy both: blue + M exists, red + L does not
+        JsonNode blueMedium = json(api.get(scoped(query(PRODUCTS, "optionValueIds=2,3"), STORE_A), null));
+        assertThat(blueMedium.get(CONTENT)).isNotEmpty();
+
+        JsonNode redLarge = json(api.get(scoped(query(PRODUCTS, "optionValueIds=1,4"), STORE_A), null));
+        assertThat(redLarge.get(TOTAL_ELEMENTS).asLong()).isZero();
+
+        // and the two halves of that impossible pair are each non-empty on their own, so the zero above is
+        // the anchoring and not simply an empty catalogue
+        assertThat(json(api.get(scoped(query(PRODUCTS, blue), STORE_A), null)).get(CONTENT)).isNotEmpty();
+        assertThat(json(api.get(scoped(query(PRODUCTS, large), STORE_A), null)).get(CONTENT)).isNotEmpty();
+        assertThat(json(api.get(scoped(query(PRODUCTS, medium), STORE_A), null)).get(CONTENT)).isNotEmpty();
+    }
+
+    @Test
     void theProductPageAnswersBySlugAndOnlyWhenVisible() {
         var page = api.get(scoped(path(BY_NAME, SEEDED_SLUG), STORE_A), null);
         expect(page, HttpStatus.OK);

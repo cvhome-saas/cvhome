@@ -136,6 +136,27 @@ class ProductOptionApiIntegrationTest {
     }
 
     @Test
+    void anOptionAProductStillVariesByCannotBeDeleted() {
+        /*
+         * The delete guard. Store A's seed assigns colour (option 1) to a product and its variants sell that
+         * option's values, so the vocabulary entry is load-bearing: deleting it would orphan those variants,
+         * and the pod refuses with a typed 409 the console surfaces as a named toast rather than a generic
+         * conflict. The option must survive the refusal.
+         */
+        var refused = api.send(HttpMethod.DELETE, scoped(path(V1_PRIVATE, PRODUCT, OPTION, 1L), STORE_A),
+                admin, null);
+        expect(refused, HttpStatus.CONFLICT);
+
+        expect(api.get(scoped(path(V1_PRIVATE, PRODUCT, OPTION, 1L), STORE_A), admin), HttpStatus.OK);
+    }
+
+    @Test
+    void anOptionThatDoesNotExistAnswersNotFound() {
+        expect(api.get(scoped(path(V1_PRIVATE, PRODUCT, OPTION, 999999L), STORE_A), admin),
+                HttpStatus.NOT_FOUND);
+    }
+
+    @Test
     void anotherStoreCannotSeeOrTouchThisStoresOption() {
         long id = create(slug("iso"));
         String otherAdmin = api.token(ADMIN, STORE_B);

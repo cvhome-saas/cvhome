@@ -162,7 +162,6 @@
       "CATALOG_PRODUCT_OPTION_NOT_FOUND": "That option no longer exists. It may have been deleted.",
       "CATALOG_PRODUCT_OPTION_DUPLICATE": "Another option already uses this code.",
       "CATALOG_PRODUCT_OPTION_IN_USE": "This option is still used by a product or one of its variants. Remove it from every product first.",
-      "CATALOG_PRODUCT_VARIANT_NOT_FOUND": "That variant no longer exists. It may have been replaced.",
       "CATALOG_PRODUCT_VARIANT_DUPLICATE_SKU": "Another product or variant already uses one of these SKUs.",
       "CATALOG_PRODUCT_VARIANT_DUPLICATE_COMBINATION": "Two variants describe the same combination of values.",
       "CATALOG_PRODUCT_VARIANT_OPTIONS_INVALID": "Every variant must pick exactly one value of each chosen option.",

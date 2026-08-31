@@ -154,6 +154,46 @@ class ProductVariantApiIntegrationTest {
     }
 
     @Test
+    void theGuardrailsRefuseAMatrixNoConsoleCouldDrawAnyway() {
+        /*
+         * 4 options / 100 variants per product, enforced server-side. The console caps its picker and its
+         * generator, so these are only reachable through the API — which is exactly why they are tested here:
+         * the limits protect the matrix UI, the facet queries and the PDP availability call.
+         */
+        try {
+            // A fifth axis. The guardrail is checked BEFORE the codes are resolved, so this answers the
+            // limit error even though three of the five codes do not exist in the store — the cheap check
+            // runs first, which is the right order and worth pinning.
+            expect(replace(STORE_A, admin, PRODUCT,
+                            """
+                            {"options":["color","size","material","fit","finish"],"variants":[]}"""),
+                    HttpStatus.BAD_REQUEST);
+
+            // 101 combinations of one real axis: past the variant cap, refused before anything is written.
+            StringBuilder variants = new StringBuilder();
+            for (int i = 0; i < 101; i++) {
+                variants.append(i == 0 ? "" : ",")
+                        .append("{\"sku\":\"SKU-CAP-%d\",\"sortOrder\":%d,\"optionValueIds\":[1]}"
+                                .formatted(i, i));
+            }
+            expect(replace(STORE_A, admin, PRODUCT,
+                            "{\"options\":[\"color\"],\"variants\":[%s]}".formatted(variants)),
+                    HttpStatus.BAD_REQUEST);
+
+            // Nothing landed: the product still sells by its one default variant.
+            assertThat(list(PRODUCT)).hasSize(1);
+        } finally {
+            expect(replace(STORE_A, admin, PRODUCT, BACK_TO_SIMPLE), HttpStatus.OK);
+        }
+    }
+
+    @Test
+    void aProductThatDoesNotExistInThisStoreHasNoVariants() {
+        expect(api.get(scoped(path(V2_PRIVATE, PRODUCT_SEGMENT, 999999L, VARIANTS), STORE_A), admin),
+                HttpStatus.NOT_FOUND);
+    }
+
+    @Test
     void anotherStoreAndLesserRolesAreRejected() {
         String otherAdmin = api.token(ADMIN, STORE_B);
         expect(api.get(scoped(path(V2_PRIVATE, PRODUCT_SEGMENT, PRODUCT, VARIANTS), STORE_B), otherAdmin),

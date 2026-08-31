@@ -102,9 +102,9 @@ Content-Type: application/json
 
 ###
 
-# An option code the store's vocabulary does not hold — 404 CATALOG.PRODUCT_OPTION.NOT_FOUND. Worth
-# knowing before the limit case below: the axes are resolved BEFORE they are counted, so a set naming
-# five invented codes answers this, not the limit error.
+# An option code the store's vocabulary does not hold — 404 CATALOG.PRODUCT_OPTION.NOT_FOUND, as long as
+# the set is within the guardrails: the limit check runs BEFORE the codes are resolved, so a set naming
+# five invented codes answers the limit error instead of this one.
 PUT {{GATEWAY_URL}}/spg/catalog/api/v2/private/product/2/variants?store=65f023632bc46470c104b76f&lang=en
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
 Content-Type: application/json
@@ -123,9 +123,8 @@ Content-Type: application/json
 # "422" was never what shipped). The console caps its picker at 4 and its generator at 100, so this
 # is reachable only through the API.
 #
-# To try the option limit you need five options actually defined in the store — create three more in
-# product-option.http first, or the unknown-code 404 above fires instead. The variant limit needs no
-# setup: 101 combinations of any declared axis.
+# Neither needs setup: the count is checked before the codes are resolved, so five arbitrary option codes
+# answer the limit error, and 101 combinations of any declared axis answer the variant one.
 PUT {{GATEWAY_URL}}/spg/catalog/api/v2/private/product/2/variants?store=65f023632bc46470c104b76f&lang=en
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
 Content-Type: application/json
