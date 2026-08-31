@@ -1,9 +1,9 @@
 import type {ComponentType, ReactNode} from 'react';
 import type {
-    AnnouncementData, Banner, BreadcrumbItem, Category, ColorSchema, FaqDocument, HomeSection, ListingFacets,
-    ListingQuery, MenuNode, NavPage, Policy, PostList, PostSummary, Product, ProductGroupCode, ProductListingPage,
-    ProductSearchPage, ProductSearchQuery, SearchCapabilities, SearchFacets, SiteBranding, SocialLink, Store,
-    StoreContext, StorefrontLink, StorefrontSeo,
+    AnnouncementData, BreadcrumbItem, Category, ColorSchema, FaqDocument, LayoutSectionData, ListingFacets,
+    ListingQuery, MenuNode, NavPage, Policy, PostList, PostSummary, Product, ProductListingPage,
+    ProductSearchPage, ProductSearchQuery, SearchCapabilities, SearchFacets, SectionKind, SiteBranding,
+    SocialLink, Store, StoreContext, StorefrontLink, StorefrontSeo,
 } from '@store-front/types';
 import type {ColorRoleTokens} from './tokens';
 
@@ -87,18 +87,35 @@ export interface RootLayoutProps {
     children: ReactNode;
 }
 
-export interface HomeData {
-    /**
-     * What goes at the top of the page. The slides are CMS banners now — merchant's separate slider is gone, so
-     * the two competing hero concepts the storefront used to merge are one.
-     */
-    hero: { slides: Banner[]; banner?: Banner };
-    /** CMS banners that win each placement right now. */
-    banners: { hero: Banner[]; carousel: Banner[]; strip?: Banner };
-    /** The merchant-ordered blocks of the page, replacing a hard-coded list of four product groups. */
-    sections: HomeSection[];
-    groups: { code: ProductGroupCode; title: string; products: Product[] }[];
+/**
+ * What the shell resolved for one layout section before rendering it: the referenced catalog or content data,
+ * fetched in one batched fan-out. Kinds whose content is entirely inline (`richtext`, `usp`, …) get none.
+ */
+export interface SectionResolvedData {
+    /** For `products`: the source's products, already presented for cards. */
+    products?: { title?: string; products: Product[] };
+    /** For `categories`: visible category tree roots. */
+    categories?: Category[];
+    /** For `faq`: the referenced FAQ document. */
+    faq?: FaqDocument;
+    /** For `posts`: the latest posts. */
+    posts?: PostList;
 }
+
+export interface SectionRenderProps {
+    ctx: PageContext;
+    section: LayoutSectionData;
+    data: SectionResolvedData | undefined;
+    /** True inside the builder's canvas iframe — empty sections show hints instead of collapsing. */
+    preview: boolean;
+}
+
+/**
+ * The renderers a theme brings per section kind, keyed by variant id. Partial on purpose: any kind or variant
+ * a theme does not cover renders through the shell's fallback set, so every layout renders on every theme.
+ * A theme may add its own variant ids beyond the catalogue's — the builder offers them on that theme only.
+ */
+export type ThemeSectionRegistry = Partial<Record<SectionKind, Record<string, ComponentType<SectionRenderProps>>>>;
 
 export interface CategoryData {
     category: Category;
@@ -193,7 +210,6 @@ export interface PageProps<D> {
 /* ------------------------------------------------------------------------------------------------ */
 
 export interface ThemePages {
-    Home: ComponentType<PageProps<HomeData>>;
     Category: ComponentType<PageProps<CategoryData>>;
     Product: ComponentType<PageProps<ProductData>>;
     Content: ComponentType<PageProps<ContentData>>;
@@ -247,6 +263,13 @@ export interface ThemeDefinition {
     layout: { config: ThemeLayoutConfig; Root: ComponentType<RootLayoutProps> };
     pages: ThemePages;
     states: ThemeStates;
+    /**
+     * Optional, like {@code pages.Search}: the home page is composed by the shell from the store's layout
+     * document, and any kind/variant missing here renders through the shell's fallback renderers — so a theme
+     * with no registry at all still renders every merchant layout. A theme adopts designed sections (and may
+     * add exclusive variants) kind by kind.
+     */
+    sections?: ThemeSectionRegistry;
     /**
      * CSS served at `/css/login.css` for the customer auth pages rendered by `cua` (which link that path).
      * Optional; the shell ships a neutral default.

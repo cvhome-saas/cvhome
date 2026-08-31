@@ -2,6 +2,7 @@ import {
     FaqDocument, Policy, PolicyType, PostList, PostSummary, SiteContent, SitemapEntry,
     StorefrontPage, Banner, BannerPlacement, MenuNode, HomeSection,
 } from "@store-front/types/content";
+import {PageLayoutData} from "@store-front/types/layout";
 import {storeBaseServiceUrl, StoreContext} from "@store-front/types/store-context";
 import {apiFetch, get, orUndefined} from "./http-utils";
 
@@ -42,6 +43,16 @@ export class ContentService {
     /** The home page's blocks, in order. Degrades to none: the rest of the page still renders. */
     public static getHomeSections = async (ctx: StoreContext): Promise<HomeSection[]> => {
         return (await orUndefined(apiFetch<HomeSection[]>(sf(ctx, 'home-sections'), get()))) ?? [];
+    }
+
+    /**
+     * The page's layout document, render-ready. `preview` (the builder's token) serves the draft, uncached.
+     * Degrades to an empty page: the shell still renders header and footer if the CMS is down.
+     */
+    public static getPageLayout = async (ctx: StoreContext, page: 'HOME', preview?: string): Promise<PageLayoutData> => {
+        return (await orUndefined(apiFetch<PageLayoutData>(
+            sf(ctx, `layout/${page}`, preview ? `&preview=${encodeURIComponent(preview)}` : ''), get())))
+            ?? {page, servedLocale: ctx.locale, sections: []};
     }
 
     public static getFaq = async (ctx: StoreContext, group?: string): Promise<FaqDocument | undefined> => {
