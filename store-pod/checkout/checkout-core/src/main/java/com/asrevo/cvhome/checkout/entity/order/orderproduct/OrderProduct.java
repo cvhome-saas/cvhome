@@ -46,7 +46,7 @@ public class OrderProduct extends SalesManagerEntity<Long, OrderProduct> {
     @Column(name = "PRODUCT_SKU")
     private String sku;
 
-    @Column(name = "PRODUCT_NAME", length = 64, nullable = false)
+    @Column(name = "PRODUCT_NAME", length = 255, nullable = false)
     private String productName;
 
     @Column(name = "PRODUCT_QUANTITY")
@@ -60,8 +60,11 @@ public class OrderProduct extends SalesManagerEntity<Long, OrderProduct> {
     @JoinColumn(name = "ORDER_ID", nullable = false)
     private Order order;
 
+    /**
+     * The sold variant's option/value labels, snapshotted at placement — empty for a default-variant line.
+     */
     @OneToMany(mappedBy = "orderProduct", cascade = CascadeType.ALL)
-    private Set<OrderProductAttribute> orderAttributes = new HashSet<>();
+    private Set<OrderProductOption> orderOptions = new HashSet<>();
 
     @OneToMany(mappedBy = "orderProduct", cascade = CascadeType.ALL)
     private Set<OrderProductPrice> prices = new HashSet<>();

@@ -19,6 +19,8 @@ public class ProductNotPurchasableException extends OperationNotAllowedException
     @Serial
     private static final long serialVersionUID = 1L;
 
+    private static final String SKU = "sku";
+
     protected ProductNotPurchasableException(ErrorPayload payload, Throwable cause) {
         super(payload, cause);
     }
@@ -26,7 +28,22 @@ public class ProductNotPurchasableException extends OperationNotAllowedException
     public static ProductNotPurchasableException of(String sku) {
         return new ErrorBuilder<>(CheckoutErrors.PRODUCT_NOT_PURCHASABLE, ProductNotPurchasableException::new)
                 .detail("Product %s cannot be purchased.", sku)
-                .param("sku", sku)
+                .param(SKU, sku)
+                .build();
+    }
+
+    /**
+     * The merchant's per-order quantity floor or ceiling refuses the requested amount.
+     */
+    public static ProductNotPurchasableException quantityOutOfRange(String sku, int quantity, int minimum,
+                                                                    int maximum) {
+        return new ErrorBuilder<>(CheckoutErrors.PRODUCT_NOT_PURCHASABLE, ProductNotPurchasableException::new)
+                .detail("Product %s sells between %d and %s per order; %d was asked.", sku, minimum,
+                        maximum > 0 ? String.valueOf(maximum) : "unlimited", quantity)
+                .param(SKU, sku)
+                .param("quantity", quantity)
+                .param("minimum", minimum)
+                .param("maximum", maximum)
                 .build();
     }
 

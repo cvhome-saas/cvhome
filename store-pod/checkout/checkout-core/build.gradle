@@ -3,6 +3,12 @@ plugins {
 }
 
 dependencies {
+    // The unit tests build entities (SalesManagerEntity extends Spring Data's AbstractAggregateRoot) and read
+    // JPA-annotated fields, so the interfaces production code only compiles against must resolve at test time.
+    testImplementation libs.spring.data.commons
+    testImplementation libs.spring.data.jpa
+    testImplementation libs.jakarta.persistence.api
+    testImplementation libs.hibernate.core
     api project(':store-pod:commons:store-commons')
     api project(':store-pod:merchant:merchant-external-api')
     api project(':store-pod:catalog:catalog-external-api')

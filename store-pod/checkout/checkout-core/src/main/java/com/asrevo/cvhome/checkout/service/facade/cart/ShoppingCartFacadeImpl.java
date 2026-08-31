@@ -60,6 +60,7 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
         if (!inventory.canBePurchased() || inventory.price() == null) {
             throw ProductNotPurchasableException.of(inventory.sku());
         }
+        requireQuantityInRange(inventory, shoppingCartItem.getQuantity());
 
         ShoppingCartItem item = shoppingCartService.populateShoppingCartItem(inventory.sku(),
                 inventory.price().finalPrice(), store);
@@ -69,6 +70,23 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
         item.setSku(inventory.sku());
 
         return item;
+    }
+
+    /**
+     * The merchant's per-order floor and ceiling, enforced where the quantity enters — the storefront clamps
+     * client-side, but only this makes the limits real. A maximum of {@code 0} means unlimited, and a quantity
+     * of {@code 0} passes through: it is the modify path's "remove this line" signal, not a purchase.
+     */
+    private static void requireQuantityInRange(SkuInventory inventory, int quantity)
+            throws ProductNotPurchasableException {
+        if (quantity == 0) {
+            return;
+        }
+        int minimum = Math.max(inventory.quantityOrderMinimum(), 1);
+        int maximum = inventory.quantityOrderMaximum();
+        if (quantity < minimum || maximum > 0 && quantity > maximum) {
+            throw ProductNotPurchasableException.quantityOutOfRange(inventory.sku(), quantity, minimum, maximum);
+        }
     }
 
     private ShoppingCartItem getEntryToUpdate(final long entryId, final ShoppingCart cartModel) {

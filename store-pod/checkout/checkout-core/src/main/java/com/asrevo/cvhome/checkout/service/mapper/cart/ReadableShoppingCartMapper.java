@@ -8,6 +8,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -107,9 +108,13 @@ public class ReadableShoppingCartMapper implements Mapper<ShoppingCart, Readable
         int cartQuantity = 0;
         Set<ShoppingCartItem> items = Optional.ofNullable(source.getLineItems()).orElse(Set.of());
 
+        // one catalog call + one inventory call for the whole cart, never one pair per line
+        Map<String, ProductDetails> detailsBySku = productDetailsComposer.getDetailedProducts(store,
+                items.stream().map(ShoppingCartItem::getSku).toList(), language);
+
         for (ShoppingCartItem item : items) {
-            ProductDetails detailedProduct = productDetailsComposer.getDetailedProduct(store, item.getSku(), language);
-            ReadableMinimalProduct minimalProduct = detailedProduct.product();
+            ProductDetails detailedProduct = detailsBySku.get(item.getSku());
+            ReadableMinimalProduct minimalProduct = detailedProduct == null ? null : detailedProduct.product();
             if (minimalProduct == null) {
                 continue;
             }
