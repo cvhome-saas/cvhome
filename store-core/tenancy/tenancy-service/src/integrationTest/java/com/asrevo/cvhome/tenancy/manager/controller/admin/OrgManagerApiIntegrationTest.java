@@ -263,14 +263,30 @@ class OrgManagerApiIntegrationTest {
         when(userAccountService.createUser(any())).thenReturn(created);
         String email = String.format("%s@example.com", slug("founder"));
 
-        expect(api.post(CREATE, api.superAdmin(),
-                String.format("{\"user\":{\"emailAddress\":\"%s\",\"password\":\"pw\"}}", email)), HttpStatus.OK);
+        expect(api.post(CREATE, api.superAdmin(), signUpBody(email, "correct-horse-8")), HttpStatus.OK);
 
         ArgumentCaptor<PersistableUser> user = ArgumentCaptor.forClass(PersistableUser.class);
         verify(userAccountService).createUser(user.capture());
         assertThat(user.getValue().getRoles()).containsExactly("ORG_ADMIN");
         assertThat(user.getValue().getUserName()).isEqualTo(email);
         assertThat(user.getValue().getOrg()).isNotBlank();
+    }
+
+    /**
+     * The same {@code @Valid} that guards public signup guards this one — they share {@code CreateOrgRequest} and
+     * {@code SignupService}, so an operator cannot create an organization the form rules would have refused. The
+     * old body on this very test ({@code password: "pw"}, no names at all) is what used to be accepted.
+     */
+    @Test
+    void creatingAnOrganizationWithAPasswordTheStoreWouldNotAcceptIsRefused() {
+        expect(api.post(CREATE, api.superAdmin(), signUpBody("founder@example.com", "pw")),
+                HttpStatus.BAD_REQUEST);
+    }
+
+    private static String signUpBody(String email, String password) {
+        return String.format("""
+                {"user":{"firstName":"Ada","lastName":"Lovelace","emailAddress":"%s",\
+                "password":"%s","repeatPassword":"%s"}}""", email, password, password);
     }
 
     @Test

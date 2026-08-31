@@ -238,10 +238,12 @@ describe('Organizations', () => {
     typeInto(field('first'), 'Ada');
     typeInto(field('last'), 'Lovelace');
     typeInto(field('email'), 'ada@example.com');
-    typeInto(field('password')!, 'Passw0rd');
+    // Not `Passw0rd`, which this test used before the dialog started applying tenancy's rules: it is on the
+    // common-password list, and satisfying three character classes is exactly why it is.
+    typeInto(field('password')!, 'correct-horse-8');
     // The repeat field is the second password box; the first matched above.
     const passwords = Array.from(dialog.querySelectorAll('input[type="password"]')) as HTMLInputElement[];
-    passwords[1]!.value = 'Passw0rd';
+    passwords[1]!.value = 'correct-horse-8';
     passwords[1]!.dispatchEvent(new Event('input'));
     fixture.detectChanges();
 
@@ -249,7 +251,14 @@ describe('Organizations', () => {
     settle();
 
     expect(api.created).toEqual([
-      {firstName: 'Ada', lastName: 'Lovelace', emailAddress: 'ada@example.com', password: 'Passw0rd'},
+      {
+        firstName: 'Ada',
+        lastName: 'Lovelace',
+        emailAddress: 'ada@example.com',
+        password: 'correct-horse-8',
+        // tenancy's `@PasswordsMatch` reads this; the dialog used to collect it and never send it.
+        repeatPassword: 'correct-horse-8',
+      },
     ]);
     // Re-read rather than echoed: the row shown is the one tenancy stored.
     expect(api.requests.length).toBe(2);

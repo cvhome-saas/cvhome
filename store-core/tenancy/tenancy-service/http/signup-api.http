@@ -5,7 +5,12 @@
 # permission, so the shared prefix implied an audience it did not have.
 #
 # Creating the organization and the uaa user is one transaction: a duplicate email can no longer leave an
-# organization behind that nobody can log into.
+# organization behind that nobody can log into. And because uaa is not in that transaction, a rollback after
+# it has already created the account deletes the account too — otherwise the address is burned for good.
+#
+# The body is CreateOrgRequest(SignUpUser), not uaa's PersistableUser: roles, org, store and active are not
+# fields a stranger may set, and every remaining field is validated. The blocks below are the failures worth
+# being able to reproduce by hand.
 #
 # Requires a running stack: lcl start -d
 
@@ -15,10 +20,12 @@ Content-Type: application/json
 
 {
   "user": {
-    "emailAddress": "founder+{{$timestamp}}@example.com",
     "firstName": "New",
     "lastName": "Founder",
-    "password": "Passw0rd!"
+    "emailAddress": "founder+{{$timestamp}}@example.com",
+    "organizationName": "Nordwerk",
+    "password": "correct-horse-8",
+    "repeatPassword": "correct-horse-8"
   }
 }
 
@@ -26,24 +33,133 @@ Content-Type: application/json
     client.test("an organization and its administrator are created together", function () {
         client.assert(response.status === 200, "status " + response.status);
     });
+    client.test("the caller is told nothing privileged it did not send", function () {
+        client.assert(response.body.roles.indexOf("ORG_ADMIN") >= 0, "roles " + response.body.roles);
+        client.assert(response.body.store === null, "store " + response.body.store);
+    });
 %}
 
-### the same address twice — uaa refuses, and the organization must roll back with it
+### sign up with no organization name — the org is named after its founder rather than left blank
 POST {{SELLER_UI_URL}}/tenancy/api/v1/signup/public/create?lang={{LANG}}
 Content-Type: application/json
 
 {
   "user": {
-    "emailAddress": "org1-admin@mail.com",
-    "firstName": "Dup",
+    "firstName": "Unnamed",
     "lastName": "Founder",
-    "password": "Passw0rd!"
+    "emailAddress": "unnamed+{{$timestamp}}@example.com",
+    "password": "correct-horse-8",
+    "repeatPassword": "correct-horse-8"
   }
 }
 
 > {%
-    client.test("refused", function () {
-        client.assert(response.status >= 400, "status " + response.status);
+    client.test("created", function () {
+        client.assert(response.status === 200, "status " + response.status);
+    });
+    // Then: select name from tenancy.manager_org order by created_date desc limit 1 → 'Unnamed Founder'.
+    // It was null for every organization on the platform before signup started writing it.
+%}
+
+### the same address twice — the conflict names itself and the field it is about
+POST {{SELLER_UI_URL}}/tenancy/api/v1/signup/public/create?lang={{LANG}}
+Content-Type: application/json
+
+{
+  "user": {
+    "firstName": "Dup",
+    "lastName": "Founder",
+    "emailAddress": "org1-admin@mail.com",
+    "password": "correct-horse-8",
+    "repeatPassword": "correct-horse-8"
+  }
+}
+
+> {%
+    client.test("refused as a conflict this client can act on", function () {
+        client.assert(response.status === 409, "status " + response.status);
+        // Not COMMON.DATA_INTEGRITY_VIOLATION, which also means six other things — the console used to have
+        // to guess that a fieldless 409 meant a taken address, and was sometimes wrong.
+        client.assert(response.body.code === "CONTROL_PLANE.SIGNUP.EMAIL_TAKEN", response.body.code);
+        client.assert(response.body.fieldErrors[0].field === "user.emailAddress",
+            JSON.stringify(response.body.fieldErrors));
     });
     // Then check by hand that tenancy.manager_org gained no row: that orphan is what the transaction prevents.
+%}
+
+### everything wrong at once — one 400 naming every field, not a 200
+POST {{SELLER_UI_URL}}/tenancy/api/v1/signup/public/create?lang={{LANG}}
+Content-Type: application/json
+
+{
+  "user": {
+    "firstName": "",
+    "lastName": "   ",
+    "emailAddress": "not-an-email",
+    "password": "a",
+    "repeatPassword": "b"
+  }
+}
+
+> {%
+    // This exact body used to answer 200 with an account and an organization created. It is the probe that
+    // started all of this; see console-ui/lessons.md, "Auth — public signup validates nothing".
+    client.test("refused, with a field error per offending control", function () {
+        client.assert(response.status === 400, "status " + response.status);
+        var fields = response.body.fieldErrors.map(function (it) { return it.field; });
+        ["user.firstName", "user.lastName", "user.emailAddress", "user.password"].forEach(function (field) {
+            client.assert(fields.indexOf(field) >= 0, field + " not in " + fields);
+        });
+    });
+%}
+
+### a password containing the name typed above it
+POST {{SELLER_UI_URL}}/tenancy/api/v1/signup/public/create?lang={{LANG}}
+Content-Type: application/json
+
+{
+  "user": {
+    "firstName": "Ada",
+    "lastName": "Lovelace",
+    "emailAddress": "ada+{{$timestamp}}@example.com",
+    "password": "lovelace2026",
+    "repeatPassword": "lovelace2026"
+  }
+}
+
+> {%
+    client.test("refused, and the password is what is blamed", function () {
+        client.assert(response.status === 400, "status " + response.status);
+        client.assert(response.body.fieldErrors[0].field === "user.password",
+            JSON.stringify(response.body.fieldErrors));
+    });
+%}
+
+### a privileged field a public caller must not be able to set
+POST {{SELLER_UI_URL}}/tenancy/api/v1/signup/public/create?lang={{LANG}}
+Content-Type: application/json
+
+{
+  "user": {
+    "firstName": "Sneaky",
+    "lastName": "Founder",
+    "emailAddress": "sneaky+{{$timestamp}}@example.com",
+    "password": "correct-horse-8",
+    "repeatPassword": "correct-horse-8",
+    "roles": ["SUPER_ADMIN"],
+    "store": "11111111111111111111bb01",
+    "org": "21f023932bc66470c104b76f"
+  }
+}
+
+> {%
+    // SignUpUser has no such components and ignores unknown properties, so the extra fields are dropped
+    // rather than refused — the wire shape stays backwards compatible. What matters is that they do not
+    // arrive: the account gets ORG_ADMIN on its own brand-new org, and no store at all.
+    client.test("the extra fields are ignored, not honoured", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        client.assert(response.body.roles.indexOf("SUPER_ADMIN") < 0, "roles " + response.body.roles);
+        client.assert(response.body.store === null, "store " + response.body.store);
+        client.assert(response.body.org !== "21f023932bc66470c104b76f", "org " + response.body.org);
+    });
 %}

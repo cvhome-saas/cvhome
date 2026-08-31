@@ -174,4 +174,9 @@ export interface CreateOrgUser {
   readonly lastName: string;
   readonly emailAddress: string;
   readonly password: string;
+  /**
+   * Sent because tenancy's `SignUpUser` compares the two and refuses a mismatch — `@PasswordsMatch`, reported
+   * on this field. It used to be omitted here, which was harmless only for as long as nothing read it.
+   */
+  readonly repeatPassword: string;
 }

@@ -219,11 +219,7 @@ describe('SignUp', () => {
 
   it('lets the visitor fix the email a server error landed on', () => {
     spyOn(router, 'navigateByUrl');
-    api.error = new ApiError({
-      code: 'COMMON.DATA_INTEGRITY_VIOLATION',
-      category: 'CONFLICT',
-      status: 409,
-    });
+    api.error = takenEmail();
     fill();
     submit();
 
@@ -257,23 +253,35 @@ describe('SignUp', () => {
     expect(button.disabled).toBeFalse();
   });
 
-  it('blames the email when tenancy answers a bare conflict', () => {
-    // What the running stack actually returns for an address that already exists: a generic
-    // COMMON.DATA_INTEGRITY_VIOLATION with no fieldErrors at all.
-    api.error = new ApiError({
-      code: 'COMMON.DATA_INTEGRITY_VIOLATION',
-      category: 'CONFLICT',
-      status: 409,
-    });
+  it('blames the email when the address is already registered', () => {
+    api.error = takenEmail();
     fill();
     submit();
 
     const email = fixture.nativeElement.querySelector('[formControlName="emailAddress"]')
       .closest('label') as HTMLElement;
     expect(email.textContent).toContain('already uses this email');
-    // Not the generic "This changed somewhere else. Refresh and try again." toast.
+    // Not the generic "This changed somewhere else. Refresh and try again." toast, which is what a fieldless
+    // COMMON.DATA_INTEGRITY_VIOLATION resolves to — the shape tenancy used to answer with, and the reason
+    // `AuthFacade.bindTakenEmail` existed to guess at it.
     expect(toasts.messages).toEqual([]);
   });
+
+  /**
+   * What tenancy answers for an address that already exists.
+   *
+   * A code of its own and a field error naming the control, since `DuplicateSignupEmailException`. Before that
+   * it was a bare `COMMON.DATA_INTEGRITY_VIOLATION` with no `fieldErrors[]` — which an over-long address
+   * produced too, so the console's guess was sometimes a lie.
+   */
+  function takenEmail(): ApiError {
+    return new ApiError({
+      code: 'CONTROL_PLANE.SIGNUP.EMAIL_TAKEN',
+      category: 'CONFLICT',
+      status: 409,
+      fieldErrors: [{field: 'user.emailAddress', code: 'CONTROL_PLANE.SIGNUP.EMAIL_TAKEN', message: 'taken'}],
+    });
+  }
 
   it('lands a server field error on the control that caused it', () => {
     // What uaa answers when the email is already registered.

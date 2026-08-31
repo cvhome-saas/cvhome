@@ -11,7 +11,18 @@ import com.asrevo.cvhome.tenancy.errors.OrgNotFoundException;
 
 public interface InternalOrgService {
 
-    ManagerOrgId createOrgForUser(Email email);
+    /**
+     * Creates the organization a signup is for.
+     *
+     * <p>
+     * {@code name} is new to this signature and is the reason the column stopped being null for every row on the
+     * platform: {@code createOrgFromUser} set an id, a date, an email and a status, so an organization arrived
+     * unnamed and stayed that way until somebody renamed it by hand — which is why the console's list screen falls
+     * back to showing a contact email. Signup always knows a name, at worst the founder's own; see
+     * {@code SignUpUser.organizationNameOrDefault()}.
+     * </p>
+     */
+    ManagerOrgId createOrgForUser(Email email, String name);
 
     Page<ManagerOrgDto> findAll(Pageable pageable);
 

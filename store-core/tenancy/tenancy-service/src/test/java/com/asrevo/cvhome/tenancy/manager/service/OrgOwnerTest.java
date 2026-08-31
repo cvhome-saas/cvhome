@@ -18,12 +18,12 @@ import com.asrevo.cvhome.tenancy.errors.OrgNotFoundException;
 import com.asrevo.cvhome.tenancy.errors.OrgOwnerUnknownException;
 import com.asrevo.cvhome.tenancy.manager.controller.admin.OrgManagerApi;
 import com.asrevo.cvhome.tenancy.manager.dto.CreateOrgRequest;
+import com.asrevo.cvhome.tenancy.manager.dto.SignUpUser;
 import com.asrevo.cvhome.tenancy.manager.entity.ManagerOrgEntity;
 import com.asrevo.cvhome.tenancy.manager.mappers.ManagerOrgMappers;
 import com.asrevo.cvhome.tenancy.manager.repository.ManagerOrgRepository;
 import com.asrevo.cvhome.tenancy.manager.service.impl.InternalOrgServiceImpl;
 import com.asrevo.cvhome.tenancy.manager.service.impl.SignupServiceImpl;
-import com.asrevo.cvhome.uaa.domain.user.PersistableUser;
 import com.asrevo.cvhome.uaa.domain.user.ReadableUser;
 import com.asrevo.cvhome.uaa.domain.user.ReadableUserList;
 import com.asrevo.cvhome.uaa.domain.user.UserPassword;
@@ -63,6 +63,11 @@ class OrgOwnerTest {
 
     private static final String NEW_PASSWORD = "Passw0rd";
 
+    private static final String ORG_NAME = "Nordwerk";
+
+    /** Long enough, unguessable enough and unrelated to the founder's name — the signup rules in one value. */
+    private static final String SIGNUP_PASSWORD = "correct-horse-8";
+
     private ManagerOrgRepository orgRepository;
 
     private UserAccountService userAccountService;
@@ -70,7 +75,7 @@ class OrgOwnerTest {
     private InternalOrgService internalOrgService;
 
     private static ManagerOrgEntity org(String ownerUserId) {
-        ManagerOrgEntity entity = ManagerOrgEntity.createOrgFromUser(new Email(OWNER_EMAIL));
+        ManagerOrgEntity entity = ManagerOrgEntity.createOrgFromUser(new Email(OWNER_EMAIL), ORG_NAME);
         entity.setId(ORG);
         entity.setOwnerUserId(ownerUserId);
         return entity;
@@ -98,12 +103,11 @@ class OrgOwnerTest {
     @DisplayName("creating an organization records the administrator uaa just made as its owner")
     void signupRecordsTheOwner() throws Exception {
         InternalOrgService orgs = mock(InternalOrgService.class);
-        when(orgs.createOrgForUser(any())).thenReturn(ORG);
+        when(orgs.createOrgForUser(any(), any())).thenReturn(ORG);
         when(userAccountService.createUser(any())).thenReturn(user(OWNER_ID, OWNER_EMAIL, Set.of(OWNER_ROLE)));
 
-        PersistableUser first = new PersistableUser();
-        first.setEmailAddress(OWNER_EMAIL);
-        new SignupServiceImpl(userAccountService, orgs).createOrgUser(new CreateOrgRequest(first));
+        new SignupServiceImpl(userAccountService, orgs).createOrgUser(new CreateOrgRequest(
+                new SignUpUser("Ada", "Lovelace", OWNER_EMAIL, ORG_NAME, SIGNUP_PASSWORD, SIGNUP_PASSWORD)));
 
         // The id uaa answered with, not the org's — the confusion that made change-password unimplementable.
         verify(orgs).recordOwner(ORG, OWNER_ID);
@@ -176,7 +180,7 @@ class OrgOwnerTest {
     }
 
     private static ManagerOrgDto dto(String ownerUserId) {
-        return new ManagerOrgDto(ORG, new Email(OWNER_EMAIL), null, "Nordwerk", OrgStatus.ACTIVE,
+        return new ManagerOrgDto(ORG, new Email(OWNER_EMAIL), null, ORG_NAME, OrgStatus.ACTIVE,
                 ownerUserId);
     }
 

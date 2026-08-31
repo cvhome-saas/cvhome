@@ -5,8 +5,6 @@ import {Router} from '@angular/router';
 import {TranslocoService} from '@jsverse/transloco';
 
 import {ApiErrorService} from '@core/errors/api-error.service';
-import {SERVER_ERROR_KEY} from '@core/errors/form-error.utils';
-import {toApiError} from '@core/errors/problem-detail.parser';
 import {AuthStory} from '@models/auth';
 import type {CreateOrgRequest} from '@models/signup';
 import {ToastService} from '@shared/ui/toast/toast';
@@ -92,8 +90,8 @@ export class AuthFacade {
   /**
    * Creates the account, then sends the browser to sign in.
    *
-   * The form is passed in so a server `fieldErrors[]` can be bound to the control that caused it — uaa answers a
-   * duplicate email with a field error, and a toast saying "conflict" would leave the seller guessing which field.
+   * The form is passed in so a server `fieldErrors[]` can be bound to the control that caused it — a duplicate
+   * address is the most likely way this call fails, and it comes back naming `user.emailAddress`.
    */
   createAccount(request: CreateOrgRequest, form: AbstractControl): void {
     if (this.busy()) {
@@ -110,46 +108,16 @@ export class AuthFacade {
       },
       error: (error: unknown) => {
         this.busy.set(false);
-        if (!this.bindTakenEmail(error, form)) {
-          this.apiErrors.applyToForm(error, form);
-        }
+        /*
+         * No special case for the taken address any more. `bindTakenEmail` used to read *any* fieldless 409 on
+         * this call as "already registered", because tenancy answered a duplicate with the generic
+         * `COMMON.DATA_INTEGRITY_VIOLATION` — which an over-long address also produced, so the guess was
+         * sometimes a lie that sent someone to sign in to an account that did not exist. Signup now answers
+         * `CONTROL_PLANE.SIGNUP.EMAIL_TAKEN` with a `user.emailAddress` field error, and every validation
+         * failure names its field too, so the ordinary path binds all of them.
+         */
+        this.apiErrors.applyToForm(error, form);
       },
     });
-  }
-
-  /**
-   * Turns the one conflict this endpoint can actually produce into a message on the field that caused it.
-   *
-   * Signing up with an address that already exists answers `409 COMMON.DATA_INTEGRITY_VIOLATION` with **no**
-   * `fieldErrors[]` — verified against the running stack. `applyToForm` would therefore fall through to a
-   * toast reading "This changed somewhere else. Refresh and try again.", which is the right message for the
-   * generic code and the wrong one for this form. seller-ui has the same problem: its facade names
-   * `CUA.REGISTRATION.EMAIL_TAKEN` in a comment, but that code is never sent.
-   *
-   * Deliberately narrow — a 409 that *does* carry field errors, and every other status, goes the normal way.
-   * The proper fix is a specific code and a field error from tenancy; see lessons.md, "Auth — a taken email
-   * is indistinguishable from any other conflict".
-   */
-  private bindTakenEmail(error: unknown, form: AbstractControl): boolean {
-    const apiError = toApiError(error);
-    if (apiError.status !== 409 || apiError.fieldErrors.length > 0) {
-      return false;
-    }
-
-    const email = form.get('user.emailAddress');
-    if (!email) {
-      return false;
-    }
-
-    email.setErrors({
-      ...(email.errors ?? {}),
-      [SERVER_ERROR_KEY]: {
-        field: 'user.emailAddress',
-        code: apiError.code,
-        message: this.transloco.translate('auth.signUp.emailTaken'),
-      },
-    });
-    email.markAsTouched();
-    return true;
   }
 }

@@ -3,9 +3,9 @@ import {AbstractControl, ValidationErrors} from '@angular/forms';
 /**
  * The two password rules the console applies on top of a length minimum.
  *
- * They exist because nothing on the server applies any — see lessons.md, "Auth — public signup validates
- * nothing". Public signup is the one endpoint anyone on the internet may call and it creates a tenant, so the
- * form is the whole gate.
+ * They mirror tenancy's `@StrongPassword` exactly — see `StrongPasswordValidator` — and that is not redundancy:
+ * the form's job is to say so before the round trip, the server's is to be true for callers that never loaded
+ * the form. When one list changes, change both.
  *
  * Deliberately **not** composition rules ("one upper, one digit, one symbol"). Those push people towards
  * `Password1!`, which is on the list below, and NIST has recommended against them since SP 800-63B. Length plus
@@ -36,13 +36,30 @@ const COMMON_PASSWORDS: ReadonlySet<string> = new Set([
  */
 const MIN_PERSONAL_TOKEN = 4;
 
+/**
+ * The password is one of the handful everybody tries first.
+ *
+ * Exported as a plain predicate as well as a validator because the two places that apply these rules are not
+ * both reactive forms: `SignUpFormService` is, and the platform-admin create-org dialog is signal-based. Two
+ * copies of the list is how they end up disagreeing about the same password.
+ */
+export function isCommonPassword(value: string): boolean {
+  return COMMON_PASSWORDS.has(value.toLowerCase());
+}
+
 /** The password is not one of the handful everybody tries first. */
 export function notACommonPassword(control: AbstractControl): ValidationErrors | null {
   const value = control.value;
   if (typeof value !== 'string' || value.length === 0) {
     return null;
   }
-  return COMMON_PASSWORDS.has(value.toLowerCase()) ? {weakPassword: true} : null;
+  return isCommonPassword(value) ? {weakPassword: true} : null;
+}
+
+/** The password contains the name or address it protects. See {@link passwordIsNotPersonal}. */
+export function containsPersonalToken(password: string, firstName: string, lastName: string, email: string): boolean {
+  const haystack = password.toLowerCase();
+  return tokensOf([firstName, lastName, localPart(email)]).some((token) => haystack.includes(token));
 }
 
 /**
@@ -59,19 +76,19 @@ export function passwordIsNotPersonal(group: AbstractControl): ValidationErrors 
   }
 
   const haystack = password.toLowerCase();
-  return personalTokens(group).some((token) => haystack.includes(token)) ? {passwordPersonal: true} : null;
-}
-
-/** The name and address fragments a password must not contain, lowercased and long enough to mean something. */
-function personalTokens(group: AbstractControl): string[] {
-  const candidates = [
+  return tokensOf([
     group.get('firstName')?.value,
     group.get('lastName')?.value,
     // The local part only: every address at the same provider shares its domain, so `gmail` would fail
     // half the passwords on the platform for saying nothing about this account.
     localPart(group.get('emailAddress')?.value),
-  ];
+  ]).some((token) => haystack.includes(token))
+    ? {passwordPersonal: true}
+    : null;
+}
 
+/** The name and address fragments a password must not contain, lowercased and long enough to mean something. */
+function tokensOf(candidates: readonly unknown[]): string[] {
   return candidates
     .filter((value): value is string => typeof value === 'string')
     .map((value) => value.trim().toLowerCase())

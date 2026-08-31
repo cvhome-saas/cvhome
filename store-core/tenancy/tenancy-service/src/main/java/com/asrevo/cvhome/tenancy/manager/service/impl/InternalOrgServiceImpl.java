@@ -35,8 +35,8 @@ public class InternalOrgServiceImpl implements InternalOrgService {
 
     @Transactional
     @Override
-    public ManagerOrgId createOrgForUser(Email email) {
-        ManagerOrgEntity entity = managerOrgRepository.save(ManagerOrgEntity.createOrgFromUser(email));
+    public ManagerOrgId createOrgForUser(Email email, String name) {
+        ManagerOrgEntity entity = managerOrgRepository.save(ManagerOrgEntity.createOrgFromUser(email, name));
         return entity.getId();
     }
 

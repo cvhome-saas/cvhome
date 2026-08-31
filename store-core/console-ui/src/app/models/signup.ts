@@ -4,23 +4,35 @@
  *
  * Two corrections against the seller-core original, both verified against the Java:
  *
- * - The request wrapper is `CreateOrgRequest(PersistableUser user)` — a record with **one** component. seller-core's
+ * - The request wrapper is `CreateOrgRequest(SignUpUser user)` — a record with **one** component. seller-core's
  *   `SignUpForm` also carried a `subscriptionPlan`, which no server field ever read. Sending it was harmless and
  *   meaningless; declaring it here would suggest the plan chosen on the pricing page reaches billing, and it does not.
  * - The response is `ReadableUser`, not `{status: string}`. Nothing rendered the old shape, so nothing depended on
  *   the mistake.
  */
 
-/** Mirrors uaa-client's `PersistableUser` (the subset public signup fills in; the server sets the rest). */
+/**
+ * Mirrors tenancy's `SignUpUser` — the request type public signup actually takes.
+ *
+ * It used to be uaa's `PersistableUser`, which is the type the *platform* writes a user with: `roles`, `org`,
+ * `store`, `active` and `id` were all on the wire and settable by anyone. tenancy now takes a record that
+ * cannot express them, which is why this interface has no such fields to omit.
+ *
+ * `organizationName` exists on the server and is deliberately not sent: an omitted name is defaulted to the
+ * administrator's own, and a field with a good default is friction on the one screen that cannot afford any.
+ * See lessons.md, "Auth — signup collects no organization name".
+ */
 export interface PersistableUser {
   readonly firstName: string;
   readonly lastName: string;
   readonly emailAddress: string;
   readonly password: string;
   /**
-   * Sent because `PersistableUser` declares it, but **nothing on the server reads it**. Verified against the
-   * running stack: a payload with `password: "a"` and `repeatPassword: "b"` is accepted with 200. The form is
-   * the only place the two are compared — see lessons.md, "Auth — public signup validates nothing".
+   * Compared with `password` by tenancy's `@PasswordsMatch`, which reports the mismatch on this field.
+   *
+   * It used to be read by **nothing**: a payload with `password: "a"` and `repeatPassword: "b"` was accepted
+   * with 200 and the account created with the first of the two. The form was the only place they were ever
+   * compared.
    */
   readonly repeatPassword: string;
 }

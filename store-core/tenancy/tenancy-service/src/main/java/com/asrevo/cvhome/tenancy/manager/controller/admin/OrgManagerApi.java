@@ -1,5 +1,7 @@
 package com.asrevo.cvhome.tenancy.manager.controller.admin;
 
+import jakarta.validation.Valid;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,6 +17,7 @@ import com.asrevo.cvhome.commons.domain.ManagerOrgId;
 import com.asrevo.cvhome.tenancy.commons.dto.ListOrgQuery;
 import com.asrevo.cvhome.tenancy.commons.dto.ManagerOrgDto;
 import com.asrevo.cvhome.tenancy.commons.dto.ManagerStoreDto;
+import com.asrevo.cvhome.tenancy.errors.DuplicateSignupEmailException;
 import com.asrevo.cvhome.tenancy.errors.IllegalLifecycleTransitionException;
 import com.asrevo.cvhome.tenancy.errors.OrgNotFoundException;
 import com.asrevo.cvhome.tenancy.errors.OrgOwnerUnknownException;
@@ -24,7 +27,6 @@ import com.asrevo.cvhome.tenancy.manager.service.InternalStoreService;
 import com.asrevo.cvhome.tenancy.manager.service.OrgLifecycleService;
 import com.asrevo.cvhome.tenancy.manager.service.SignupService;
 import com.asrevo.cvhome.uaa.api.errors.UaaApiUnavailableException;
-import com.asrevo.cvhome.uaa.api.errors.UaaConflictException;
 import com.asrevo.cvhome.uaa.api.errors.UaaUserNotFoundException;
 import com.asrevo.cvhome.uaa.domain.user.ReadableUser;
 import com.asrevo.cvhome.uaa.domain.user.UserPassword;
@@ -88,9 +90,8 @@ public class OrgManagerApi {
 
     @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN')")
     @PostMapping("create")
-
-    public ReadableUser create(@RequestBody CreateOrgRequest request)
-            throws UaaConflictException, UaaApiUnavailableException {
+    public ReadableUser create(@Valid @RequestBody CreateOrgRequest request)
+            throws DuplicateSignupEmailException, UaaApiUnavailableException {
         return signupService.createOrgUser(request);
     }
 

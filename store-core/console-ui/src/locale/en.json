@@ -157,7 +157,8 @@
       "MEDIA_REFERENCED": "This file is used by published content. Remove it there first.",
       "MEDIA_FOLDER_NOT_EMPTY": "Empty the folder before deleting it.",
       "MEDIA_UNREADABLE": "That file could not be read.",
-      "MEDIA_STORAGE_FAILED": "The file could not be stored. Try again."
+      "MEDIA_STORAGE_FAILED": "The file could not be stored. Try again.",
+      "CONTROL_PLANE_SIGNUP_EMAIL_TAKEN": "An account already uses this email address. Sign in instead, or use another address."
     }
   },
   "auth": {
@@ -193,8 +194,7 @@
     "signUp.passwordPersonal": "Your password must not contain your name or email address.",
     "signUp.creating": "Creating account…",
     "signUp.created": "Account created. Sign in to continue.",
-    "signingOut": "Signing you out…",
-    "signUp.emailTaken": "An account already uses this email address. Sign in instead, or use another address."
+    "signingOut": "Signing you out…"
   },
   "dashboard": {
     "heading": {
@@ -2350,8 +2350,8 @@
         "email": "Contact email",
         "password": "Password",
         "repeatPassword": "Repeat password",
-        "passwordHint": "6 to 12 characters, with an uppercase letter, a lowercase letter and a digit.",
-        "unnamedHint": "The organization will be listed under this email address until someone gives it a name.",
+        "passwordHint": "At least 8 characters, and not a common password or your own name.",
+        "unnamedHint": "The organization will be named after this administrator until someone renames it.",
         "emailInvalid": "Enter a valid email address.",
         "passwordWeak": "The password does not meet the rule above.",
         "passwordMismatch": "The two passwords do not match.",

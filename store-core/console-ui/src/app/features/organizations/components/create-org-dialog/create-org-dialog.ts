@@ -1,6 +1,7 @@
 import {Component, ElementRef, computed, effect, input, output, signal, viewChild} from '@angular/core';
 
 import type {CreateOrgUser} from '@api/tenancy/org.service';
+import {containsPersonalToken, isCommonPassword} from '@shared/validators/password-strength';
 import {FormField} from '@shared/ui/form-field/form-field';
 import {TextField} from '@shared/ui/text-field/text-field';
 
@@ -8,17 +9,21 @@ import {TextField} from '@shared/ui/text-field/text-field';
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 /**
- * seller-ui's `PWD_PATTERN`, carried over verbatim: upper, lower, a digit, six to twelve characters.
+ * The rules tenancy will actually accept, not seller-ui's.
  *
- * **Six to twelve is seller-ui's rule and not a policy**, because the platform has none —
- * `AdminService.resetPassword` accepts whatever it is given and uaa validates nothing. Module 8's
- * own reset dialog uses eight-or-more with the same three classes, and the two disagree at the
- * bottom end. Reproduced rather than reconciled here so that an organization created in this
- * console can be created in seller-ui's too, which is what parity testing needs; the twelve-character
- * ceiling in particular is a rule no password store should have. See lessons.md, "Users — no
- * password policy anywhere".
+ * This dialog carried seller-ui's `PWD_PATTERN` verbatim — upper, lower, a digit, **six to twelve**
+ * characters — on the argument that the platform had no policy to mirror. It has one now: this endpoint
+ * shares `CreateOrgRequest` and `SignupService` with public signup, so `SignUpUser`'s constraints apply
+ * here too, and a six-character password is a 400 rather than an organization. The twelve-character ceiling
+ * was the worse half anyway: it is a rule no password store should have, and it forbade exactly the
+ * passphrases that survive contact with an attacker.
+ *
+ * Composition is deliberately gone with it. `Password1!` satisfies three character classes and is on the
+ * common-password list two lines below; NIST has advised against composition rules since SP 800-63B.
  */
-const PASSWORD_PATTERN = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{6,12}$/;
+const MIN_PASSWORD_LENGTH = 8;
+
+const MAX_PASSWORD_LENGTH = 72;
 
 /**
  * Creates an organization and its first administrator.
@@ -27,9 +32,9 @@ const PASSWORD_PATTERN = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{6,12}$/;
  * this collects five values. The same split Module 7 made for the payment approval dialog and
  * Module 8 made twice over — collecting and confirming are different jobs.
  *
- * **What it deliberately does not ask for.** A *name* for the organization, because
- * `ManagerOrgEntity.createOrgFromUser` sets none and `rename` on the detail page is the only writer
- * — the dialog says the organization will appear under its contact email until it is named. And a
+ * **What it deliberately does not ask for.** A *name* for the organization: signup now names one after its
+ * first administrator when none is given (`SignUpUser.organizationNameOrDefault`), so the dialog says which
+ * name it will get rather than offering a control for something with a sensible default. And a
  * subscription plan, which seller-ui's form offered and `CreateOrgRequest` has no field for: a plan
  * belongs to a store now, so that control was choosing something applied nowhere.
  *
@@ -77,7 +82,15 @@ export class CreateOrgDialog {
   protected readonly touched = signal(false);
 
   protected readonly emailInvalid = computed(() => !EMAIL_PATTERN.test(this.email().trim()));
-  protected readonly weak = computed(() => !PASSWORD_PATTERN.test(this.password()));
+  protected readonly weak = computed(() => {
+    const password = this.password();
+    return (
+      password.length < MIN_PASSWORD_LENGTH ||
+      password.length > MAX_PASSWORD_LENGTH ||
+      isCommonPassword(password) ||
+      containsPersonalToken(password, this.firstName(), this.lastName(), this.email())
+    );
+  });
   protected readonly mismatched = computed(() => this.password() !== this.repeat());
   protected readonly invalid = computed(
     () => !this.firstName().trim() || !this.lastName().trim() || this.emailInvalid() || this.weak() || this.mismatched(),
@@ -125,6 +138,7 @@ export class CreateOrgDialog {
         lastName: this.lastName().trim(),
         emailAddress: this.email().trim(),
         password: this.password(),
+        repeatPassword: this.repeat(),
       });
     }
   }
