@@ -42,6 +42,24 @@ class ProductVariantMapperTest {
 
     private static final String SKU = "SKU-RED-M";
 
+    private static final String COLOR_NAME = "Color";
+
+    private static final String SIZE_NAME = "Size";
+
+    private static final String RED_NAME = "Red";
+
+    private static final String BLUE = "blue";
+
+    private static final String MEDIUM = "m";
+
+    private static final String MEDIUM_NAME = "M";
+
+    private static final String SKU_A = "A";
+
+    private static final String SKU_B = "B";
+
+    private static final String SKU_C = "C";
+
     private static ProductOption option(long id, String code, Integer sortOrder, String enName, String frName) {
         ProductOption option = new ProductOption();
         option.setId(id);
@@ -95,8 +113,8 @@ class ProductVariantMapperTest {
 
     @Test
     void readableCarriesTheSellableFactsAndNothingElse() {
-        ProductOption color = option(1L, COLOR, 0, "Color", null);
-        ProductVariant variant = variant(50L, SKU, 2, true, value(color, 11L, RED, "Red"));
+        ProductOption color = option(1L, COLOR, 0, COLOR_NAME, null);
+        ProductVariant variant = variant(50L, SKU, 2, true, value(color, 11L, RED, RED_NAME));
 
         ReadableProductVariant readable = ProductVariantMapper.toReadable(variant);
 
@@ -110,10 +128,10 @@ class ProductVariantMapperTest {
     @Test
     void definitionResolvesLabelsInTheAskedLanguageAndOrdersThemByOptionSortOrder() {
         // size sorts first deliberately, so the assertion proves the ordering is the option's, not insertion's.
-        ProductOption size = option(2L, SIZE, 0, "Size", "Taille");
-        ProductOption color = option(1L, COLOR, 1, "Color", "Couleur");
+        ProductOption size = option(2L, SIZE, 0, SIZE_NAME, "Taille");
+        ProductOption color = option(1L, COLOR, 1, COLOR_NAME, "Couleur");
         ProductVariant variant = variant(51L, SKU, 0, false,
-                value(color, 11L, RED, "Red"), value(size, 21L, "m", "M"));
+                value(color, 11L, RED, RED_NAME), value(size, 21L, MEDIUM, MEDIUM_NAME));
 
         ReadableProductVariantDefinition definition = ProductVariantMapper.toDefinition(variant, EN);
 
@@ -122,16 +140,16 @@ class ProductVariantMapperTest {
                 .extracting(ReadableVariantOptionValue::getOptionCode)
                 .containsExactly(SIZE, COLOR);
         ReadableVariantOptionValue colorLabel = definition.getOptionValues().get(1);
-        assertThat(colorLabel.getOptionName()).isEqualTo("Color");
+        assertThat(colorLabel.getOptionName()).isEqualTo(COLOR_NAME);
         assertThat(colorLabel.getValueId()).isEqualTo(11L);
-        assertThat(colorLabel.getValueName()).isEqualTo("Red");
+        assertThat(colorLabel.getValueName()).isEqualTo(RED_NAME);
     }
 
     @Test
     void aLabelFallsBackToItsCodeWhenTheLanguageHasNoCopy() {
         // The storefront must never render an empty chip because a merchant skipped a translation.
-        ProductOption color = option(1L, COLOR, 0, "Color", null);
-        ProductVariant variant = variant(52L, SKU, 0, false, value(color, 11L, RED, "Red"));
+        ProductOption color = option(1L, COLOR, 0, COLOR_NAME, null);
+        ProductVariant variant = variant(52L, SKU, 0, false, value(color, 11L, RED, RED_NAME));
 
         ReadableVariantOptionValue label = ProductVariantMapper.toDefinition(variant, FR).getOptionValues()
                 .getFirst();
@@ -149,8 +167,8 @@ class ProductVariantMapperTest {
 
     @Test
     void selectionCarriesTheSkuAndItsLabelsForACombination() {
-        ProductOption color = option(1L, COLOR, 0, "Color", null);
-        ProductVariant variant = variant(54L, SKU, 0, false, value(color, 11L, RED, "Red"));
+        ProductOption color = option(1L, COLOR, 0, COLOR_NAME, null);
+        ProductVariant variant = variant(54L, SKU, 0, false, value(color, 11L, RED, RED_NAME));
 
         ReadableVariantSelection selection = ProductVariantMapper.toSelection(variant, EN);
 
@@ -158,8 +176,8 @@ class ProductVariantMapperTest {
         assertThat(selection.getSku()).isEqualTo(SKU);
         assertThat(selection.getOptionValues()).singleElement()
                 .satisfies(label -> {
-                    assertThat(label.getOptionName()).isEqualTo("Color");
-                    assertThat(label.getValueName()).isEqualTo("Red");
+                    assertThat(label.getOptionName()).isEqualTo(COLOR_NAME);
+                    assertThat(label.getValueName()).isEqualTo(RED_NAME);
                 });
     }
 
@@ -169,12 +187,12 @@ class ProductVariantMapperTest {
          * The "no dead chips" rule: the store's Color has three values, but this product only sells red and
          * blue, so green must not reach the PDP — a chip that resolves to no variant is unpickable.
          */
-        ProductOption color = option(1L, COLOR, 0, "Color", null);
-        ProductOptionValue red = value(color, 11L, RED, "Red");
-        ProductOptionValue blue = value(color, 12L, "blue", "Blue");
+        ProductOption color = option(1L, COLOR, 0, COLOR_NAME, null);
+        ProductOptionValue red = value(color, 11L, RED, RED_NAME);
+        ProductOptionValue blue = value(color, 12L, BLUE, "Blue");
         value(color, 13L, "green", "Green");
-        ProductOption size = option(2L, SIZE, 0, "Size", null);
-        ProductOptionValue medium = value(size, 21L, "m", "M");
+        ProductOption size = option(2L, SIZE, 0, SIZE_NAME, null);
+        ProductOptionValue medium = value(size, 21L, MEDIUM, MEDIUM_NAME);
 
         Product product = new Product();
         product.setId(7L);
@@ -183,7 +201,7 @@ class ProductVariantMapperTest {
         product.getOptionAssignments().add(new ProductOptionAssignment(product, size, 1));
 
         List<ProductVariant> variants = List.of(
-                variant(60L, "SKU-RED-M", 0, true, red, medium),
+                variant(60L, SKU, 0, true, red, medium),
                 variant(61L, "SKU-BLUE-M", 1, false, blue, medium));
 
         List<ReadableProductOption> options = ProductVariantMapper.toOptions(product, variants, EN);
@@ -191,19 +209,19 @@ class ProductVariantMapperTest {
         assertThat(options).extracting(ReadableProductOption::getCode).containsExactly(COLOR, SIZE);
         assertThat(options.getFirst().getValues())
                 .extracting(value -> value.getCode())
-                .containsExactlyInAnyOrder(RED, "blue");
+                .containsExactlyInAnyOrder(RED, BLUE);
         assertThat(options.get(1).getValues()).singleElement()
-                .extracting(value -> value.getCode()).isEqualTo("m");
+                .extracting(value -> value.getCode()).isEqualTo(MEDIUM);
     }
 
     @Test
     void displayOrderSortsBySortOrderThenId() {
-        ProductVariant second = variant(2L, "B", 1, false);
-        ProductVariant first = variant(1L, "A", 0, true);
-        ProductVariant third = variant(3L, "C", 1, false);
+        ProductVariant second = variant(2L, SKU_B, 1, false);
+        ProductVariant first = variant(1L, SKU_A, 0, true);
+        ProductVariant third = variant(3L, SKU_C, 1, false);
 
         assertThat(List.of(third, second, first).stream().sorted(ProductVariantMapper.DISPLAY_ORDER).toList())
                 .extracting(ProductVariant::getSku)
-                .containsExactly("A", "B", "C");
+                .containsExactly(SKU_A, SKU_B, SKU_C);
     }
 }

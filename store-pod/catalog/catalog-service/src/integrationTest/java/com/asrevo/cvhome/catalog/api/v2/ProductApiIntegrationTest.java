@@ -73,6 +73,10 @@ class ProductApiIntegrationTest {
 
     private static final String DETAILED_BULK = path(V1, "detailed-products");
 
+    private static final String VARIANT_BLOCK = "variant";
+
+    private static final String OPTION_VALUES_FIELD = "optionValues";
+
     private static final String CATEGORY_SEGMENT = "category";
 
     private static final String CATEGORIES = "categories";
@@ -382,11 +386,11 @@ class ProductApiIntegrationTest {
         JsonNode variantLine = lines.valueStream()
                 .filter(line -> combination.equals(line.get(SKU).asString())).findFirst().orElseThrow();
         // read by a combination sku, so the selection block is filled with resolved labels
-        JsonNode selection = variantLine.get("variant");
+        JsonNode selection = variantLine.get(VARIANT_BLOCK);
         assertThat(selection).isNotNull();
         assertThat(selection.get(SKU).asString()).isEqualTo(combination);
-        assertThat(selection.get("optionValues")).hasSize(2);
-        assertThat(selection.get("optionValues").valueStream()
+        assertThat(selection.get(OPTION_VALUES_FIELD)).hasSize(2);
+        assertThat(selection.get(OPTION_VALUES_FIELD).valueStream()
                 .map(pair -> pair.get("optionCode").asString()).toList())
                 .containsExactlyInAnyOrder("color", "size");
         assertThat(variantLine.get(DESCRIPTION).get(NAME).asString()).isNotEmpty();
@@ -395,7 +399,7 @@ class ProductApiIntegrationTest {
         // there was nothing to choose, so a cart line for it renders a name and no option labels
         JsonNode simpleLine = lines.valueStream()
                 .filter(line -> simple.equals(line.get(SKU).asString())).findFirst().orElseThrow();
-        assertThat(simpleLine.get("variant") == null || simpleLine.get("variant").isNull()).isTrue();
+        assertThat(simpleLine.get(VARIANT_BLOCK) == null || simpleLine.get(VARIANT_BLOCK).isNull()).isTrue();
 
         // scoped: another store's admin cannot read this store's lines
         expect(api.get(scoped(query(DETAILED_BULK, skus), STORE_B), api.token(ADMIN, STORE_B)),
