@@ -56,12 +56,12 @@ export function BuyBox({product, storeContext, layout = 'split'}: { product: Pro
                             {option.optionValues.map(value => {
                                 const selected = p.selection[option.id] === value.id;
                                 const available = p.isValueAvailable(option, value);
-                                const label = value.name || value.description || value.code;
+                                const label = value.name || value.code;
                                 return (
                                     <button key={value.id} type="button" role="radio" aria-checked={selected} onClick={() => p.select(option.id, value.id)}
                                             aria-label={available ? label : `${label} — ${t('UNAVAILABLE_COMBINATION')}`}
                                             className={cn('chip min-w-10 justify-center', !available && 'chip-off')}>
-                                        {label}{value.price && <span className="text-xs opacity-75 tabular-nums">({value.price})</span>}
+                                        {label}
                                     </button>
                                 );
                             })}

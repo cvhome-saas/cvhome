@@ -26,7 +26,7 @@ export function Listing({storeContext, category, initial, initialQuery, facets, 
     const tc = useTranslations('COMMON');
     const listing = useProductListing(storeContext, category, {initial: initial.content ? initial : undefined, initialQuery, facets});
     const {items, status, loading, total, page, totalPages, query, sorts} = listing;
-    const hasFacets = listing.facets.manufacturers.length > 0 || listing.facets.variants.length > 0;
+    const hasFacets = listing.facets.manufacturers.length > 0 || listing.facets.options.length > 0;
 
     const facetPanel = hasFacets && (
         <div className="flex flex-col">
@@ -44,7 +44,7 @@ export function Listing({storeContext, category, initial, initialQuery, facets, 
                     </RadioGroup>
                 </fieldset>
             )}
-            {groupVariantFacets(listing.facets.variants).map(group => (
+            {optionFacetGroups(listing.facets.options).map(group => (
                 <fieldset key={group.name} className="hair border-b py-4">
                     <legend className="cover-line mb-3">{t('FILTER_BY_OPTION', {option: group.name})}</legend>
                     <div className="flex flex-col gap-2.5">
@@ -137,16 +137,9 @@ export function Listing({storeContext, category, initial, initialQuery, facets, 
     );
 }
 
-function groupVariantFacets(variants: ListingFacets['variants']): { name: string; values: { id: number; name: string }[] }[] {
-    const groups = new Map<string, Map<number, string>>();
-    for (const v of variants) {
-        for (const vv of [v.variation, v.variationValue]) {
-            const option = vv?.option;
-            const value = vv?.optionValue;
-            if (!option?.name || !value) continue;
-            if (!groups.has(option.name)) groups.set(option.name, new Map());
-            groups.get(option.name)!.set(value.id, value.name || value.description || value.code);
-        }
-    }
-    return [...groups.entries()].map(([name, values]) => ({name, values: [...values.entries()].map(([id, n]) => ({id, name: n}))}));
+/** The counted option groups, as the rail's checkbox lists render them — "Red (12)". */
+function optionFacetGroups(options: ListingFacets['options']): { name: string; values: { id: number; name: string }[] }[] {
+    return options
+        .filter(o => o.values.length > 0)
+        .map(o => ({name: o.name, values: o.values.map(v => ({id: v.id, name: `${v.name} (${v.count})`}))}));
 }

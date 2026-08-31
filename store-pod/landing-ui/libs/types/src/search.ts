@@ -115,6 +115,11 @@ export interface ProductSuggestion {
     sku: string;
     imageUrl?: string;
     brand?: string;
+    /**
+     * When the term matched a combination variant's sku: that sku, so the suggestion can deep-link
+     * the PDP with `?sku=` and land the shopper preselected. Search stays one hit per product.
+     */
+    matchedVariantSku?: string;
 }
 
 const numbers = (raw: string | null): number[] =>

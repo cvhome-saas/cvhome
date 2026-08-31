@@ -65,8 +65,17 @@ export interface ProductItem {
     productName: string
     price: string
     subTotal: string
-    attributes: any[]
+    /**
+     * The variant's option labels, snapshotted at placement ("Color" / "Red") — the order keeps
+     * saying what was bought after any later catalog edit. Empty for a product with no options.
+     */
+    attributes: OrderProductAttribute[] | null | undefined
     image: any
+}
+
+export interface OrderProductAttribute {
+    attributeName?: string
+    attributeValue?: string
 }
 
 export interface OrderStatusResult {

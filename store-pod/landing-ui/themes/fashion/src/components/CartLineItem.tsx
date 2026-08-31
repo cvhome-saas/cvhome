@@ -3,7 +3,7 @@ import {useTranslations} from 'next-intl';
 import {XIcon} from 'lucide-react';
 import {Link} from '@store-front/i18n/navigation';
 import type {Product} from '@store-front/types';
-import {primaryImage, productHref} from '@store-front/services/product-presenter';
+import {primaryImage, productHref, variantSelectionLabel} from '@store-front/services/product-presenter';
 import {QuantityStepper} from '@store-front/ui/quantity-stepper';
 import {PosterImage} from './PosterImage';
 
@@ -24,6 +24,8 @@ export function CartLineItem({product, onQuantity, onRemove, busy}: {
                     <h3 className="line-clamp-2 font-display text-base uppercase leading-[0.95]" dir="auto">
                         <Link prefetch={false} href={productHref(product)}><bdi>{name}</bdi></Link>
                     </h3>
+                    {/* The combination bought — "Color: Red / Size: L" — from the placement-time selection. */}
+                    {variantSelectionLabel(product) && <p className="text-xs text-muted-foreground" dir="auto">{variantSelectionLabel(product)}</p>}
                     <button type="button" onClick={() => onRemove(product.sku)} disabled={busy} aria-label={t('REMOVE')}
                             className="-me-1 -mt-1 flex size-7 shrink-0 items-center justify-center text-muted-foreground hover:bg-foreground hover:text-background disabled:opacity-50">
                         <XIcon className="size-4"/>

@@ -50,14 +50,14 @@ export function BuyBox({product, storeContext, details}: { product: Product; sto
                             {option.optionValues.map(value => {
                                 const selected = p.selection[option.id] === value.id;
                                 const available = p.isValueAvailable(option, value);
-                                const label = value.name || value.description || value.code;
+                                const label = value.name || value.code;
                                 return (
                                     <button key={value.id} type="button" role="radio" aria-checked={selected} onClick={() => p.select(option.id, value.id)}
                                             aria-label={available ? label : `${label} — ${t('UNAVAILABLE_COMBINATION')}`}
                                             className={cn('min-w-11 rounded-control border-2 px-3.5 py-2 text-sm font-semibold transition-colors duration-(--motion-fast)',
                                                 selected ? 'border-primary bg-primary text-primary-foreground' : 'bg-card hover:bg-muted',
                                                 !available && 'border-dashed text-muted-foreground line-through')}>
-                                        {label}{value.price && <span className="ms-1 text-xs opacity-80">({value.price})</span>}
+                                        {label}
                                     </button>
                                 );
                             })}

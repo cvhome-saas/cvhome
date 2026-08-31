@@ -1,7 +1,7 @@
 import {storeBaseServiceUrl, StoreContext} from "@store-front/types/store-context";
 import {Manufacturer} from "@store-front/types/product-groups";
-import {ListingFacets, ListingQuery, ListingSort, ProductListingPage} from "@store-front/types/listing";
-import {apiFetch, get, orUndefined} from "./http-utils";
+import {ListingFacets, ListingQuery, ListingSort, OptionFacet, ProductListingPage} from "@store-front/types/listing";
+import {apiFetch, get, orUndefined, publicGet} from "./http-utils";
 import {InventoryService} from "./inventory-service";
 
 /**
@@ -37,13 +37,44 @@ export class ProductCategory {
     }
 
     /**
-     * The manufacturer facet. Variant facets left with the catalog/inventory split — variants are
-     * deprecated under the single-product model, so the list is always empty and the themes render
-     * no variant filter group.
+     * The filter rail's facets: manufacturers from the category's own endpoint, and the counted
+     * option-value groups from the search endpoint's facet block — the one place the catalog counts
+     * them. The search runs with the category filter and no query (`count=1`, results discarded);
+     * value ids are store-wide, so a toggled value round-trips as `ListingQuery.optionValueIds`.
+     * Both degrade: a rail without a group beats a listing page that fails on its filters.
      */
     public static getFacets = async (storeContext: StoreContext, categoryId: number): Promise<ListingFacets> => {
-        const manufacturers = await ProductCategory.getManufacturers(storeContext, categoryId);
-        return {manufacturers: manufacturers ?? [], variants: []};
+        const [manufacturers, options] = await Promise.all([
+            ProductCategory.getManufacturers(storeContext, categoryId),
+            ProductCategory.getOptionFacets(storeContext, categoryId),
+        ]);
+        return {manufacturers: manufacturers ?? [], options: options ?? []};
+    }
+
+    /** Degrades: the option groups of the filter rail. */
+    private static getOptionFacets = async (storeContext: StoreContext, categoryId: number): Promise<OptionFacet[] | undefined> => {
+        interface FacetsPayload {
+            facets?: {
+                options?: {
+                    optionId: number; code?: string; name?: string;
+                    values?: {id: number; name?: string; count: number; selected?: boolean}[];
+                }[];
+            };
+        }
+        const result = await orUndefined(apiFetch<FacetsPayload>(
+            `${storeBaseServiceUrl('catalog', storeContext)}/api/v2/products/search?store=${storeContext.store}&lang=${storeContext.locale}&categoryIds=${categoryId}&page=0&count=1&facets=true`,
+            publicGet()));
+        return result?.facets?.options?.map(option => ({
+            id: option.optionId,
+            code: option.code,
+            name: option.name ?? option.code ?? '',
+            values: (option.values ?? []).map(value => ({
+                id: value.id,
+                name: value.name ?? '',
+                count: value.count,
+                selected: value.selected,
+            })),
+        }));
     }
 
     /**

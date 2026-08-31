@@ -47,7 +47,7 @@ export function OrderDetails({storeContext, orderId}: { storeContext: StoreConte
                             <TableBody>
                                 {order.products?.map(p => (
                                     <TableRow key={p.id}>
-                                        <TableCell>{p.productName}</TableCell>
+                                        <TableCell>{p.productName}{!!p.attributes?.length && <span className="block text-xs font-normal text-muted-foreground" dir="auto">{p.attributes.map(a => `${a.attributeName}: ${a.attributeValue}`).join(' / ')}</span>}</TableCell>
                                         <TableCell className="figure text-center">{p.orderedQuantity}</TableCell>
                                         <TableCell className="figure text-end">{p.price}</TableCell>
                                         <TableCell className="figure text-end">{p.subTotal}</TableCell>

@@ -53,19 +53,25 @@ export interface Product {
     image: Image | undefined
     images: Image[] | undefined
     manufacturer: Manufacturer | undefined
+    /** Dead on the wire — see `ProductAttribute`. */
     attributes: ProductAttribute[] | undefined
+    /** The axes this product varies by. Filled on the PDP read; listings leave it empty. */
     options: ProductOption[] | undefined
+    /** Every sellable combination (≥1). Filled on the PDP read; listings leave it empty. */
     variants: ProductVariant[] | undefined
-    properties: ProductProperty[] | undefined
+    /**
+     * How many variants the product owns — the one variant fact a listing card gets. `> 1` means
+     * "has options"; nothing stores a flag, and cards never load the variant rows themselves.
+     */
+    variantCount?: number
     categories: Category[] | undefined
     type: any
     canBePurchased: boolean
     owner: any
     subTotal: number
     displaySubTotal: string
-    cartItemattributes: any[]
-    variant: any
-    variantValue: any
+    /** On a cart/order line read by combination sku: the selected option labels. */
+    variant?: VariantSelection
 }
 
 export interface ProductSpecifications {
@@ -122,62 +128,84 @@ export interface Parent {
 /** A product group code the home page renders. */
 export type ProductGroupCode = 'FEATURED_ITEMS' | 'NEWLY_ADDED' | 'HOME_PAGE' | 'RECOMMENDED';
 
-/* ---- options / variants / attributes (mirror catalog ReadableProductOption & co.) ---------------- */
+/* ---- options / variants (mirror the uniform-variant catalog: ReadableProductOption & co.) -------- */
 
-/** e.g. "Color" / "Size". `variant === true` means the choice selects a sellable variant (own SKU). */
+/**
+ * One axis this product varies by — Color, Size. Store-wide vocabulary, assigned per product; the
+ * PDP payload carries the assigned axes in display order, each holding **only the values its
+ * variants actually use** (no dead chips). Every option here is variant-defining — the old
+ * `variant` flag is gone with the old model.
+ */
 export interface ProductOption {
     id: number
     code: string
-    type: string | undefined
-    readOnly: boolean
     name: string
-    lang: string | undefined
-    variant: boolean
+    sortOrder?: number
     optionValues: ProductOptionValue[]
 }
 
+/** One value of an option. Ids are store-wide — the same ids `ListingQuery.optionValueIds` sends. */
 export interface ProductOptionValue {
     id: number
     code: string
-    name: string | undefined
-    /** Pre-formatted surcharge/price for this value, if the catalog defines one. */
-    price: string | undefined
-    image: string | undefined
-    description: string | undefined
-    sortOrder: number | undefined
-    defaultValue: boolean | undefined
+    name: string
+    sortOrder?: number
 }
 
-export interface ProductVariation {
-    id: number
-    code: string | undefined
-    option: ProductOption | undefined
-    optionValue: ProductOptionValue | undefined
-}
-
-export interface ProductVariantInventory {
-    sku: string
-    /** Pre-formatted. */
-    price: string | undefined
-    prices: ProductPrice[] | undefined
-    quantity: number | undefined
-}
-
-/** A sellable combination (own SKU, images, stock, price). */
-export interface ProductVariant {
+/**
+ * One sellable combination — its own sku, one value per assigned option. Every product owns ≥1
+ * variant under the uniform model; a product with no options owns exactly one default variant and
+ * the PDP resolves it without a selection.
+ *
+ * Price and stock are the inventory service's, merged in by `InventoryService.enrichProduct` — the
+ * `VariantPricing` section below is written there and nowhere else.
+ */
+export interface ProductVariant extends VariantPricing {
     id: number
     sku: string
-    code: string
-    available: boolean
-    sortOrder: number
-    defaultSelection: boolean
-    variation: ProductVariation | undefined
-    variationValue: ProductVariation | undefined
-    images: Image[] | undefined
-    inventory: ProductVariantInventory[] | undefined
+    defaultVariant: boolean
+    sortOrder?: number
+    /** One value id per assigned option — match against a selection by set equality. */
+    optionValueIds: number[]
 }
 
-/** Descriptive attribute ("Material: cotton"); never affects the SKU. */
+/** What enrichment attaches to a variant. Absent until `enrichProduct` has run for the PDP. */
+export interface VariantPricing {
+    quantity?: number
+    canBePurchased?: boolean
+    /** Pre-formatted in the store currency, like the product-level pair. */
+    finalPrice?: string
+    originalPrice?: string
+    discounted?: boolean
+}
+
+/**
+ * The variant a sku-addressed read resolved to — filled on cart and order lines, where it renders
+ * as "Color: Red / Size: L". Absent on a default variant and everywhere a read is not by sku.
+ */
+export interface VariantSelection {
+    sku: string
+    optionValues: VariantSelectionValue[]
+}
+
+export interface VariantSelectionValue {
+    optionId: number
+    optionCode: string
+    optionName?: string
+    valueId: number
+    valueCode: string
+    valueName?: string
+    sortOrder?: number
+}
+
+/**
+ * Descriptive attribute ("Material: cotton"); never affects the SKU.
+ *
+ * **Dead on the wire.** The rewritten catalog sends no `attributes` — non-variant descriptive
+ * attributes are a future feature, deliberately not smuggled into the variant model. The shape
+ * stays because every theme's product page renders a specifications block from it (degrading to
+ * nothing today); delete it together with those blocks or revive it when the feature lands.
+ */
 export interface ProductAttribute {
     id: number
     code: string
@@ -193,17 +221,4 @@ export interface ProductAttributeValue {
     name: string | undefined
     lang: string | undefined
     description: string | undefined
-}
-
-export interface ProductProperty {
-    id: number
-    code: string
-    property: ProductOption | undefined
-    propertyValue: ProductOptionValue | undefined
-}
-
-/** `{option: optionId, value: optionValueId}` pairs sent to the variation price endpoint. */
-export interface SelectedVariantValue {
-    option: number
-    value: number
 }

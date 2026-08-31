@@ -50,7 +50,7 @@ export function BuyBox({product, storeContext, layout = 'split'}: { product: Pro
                             {option.optionValues.map(value => {
                                 const selected = p.selection[option.id] === value.id;
                                 const available = p.isValueAvailable(option, value);
-                                const label = value.name || value.description || value.code;
+                                const label = value.name || value.code;
                                 return (
                                     <button key={value.id} type="button" role="radio" aria-checked={selected} onClick={() => p.select(option.id, value.id)}
                                             aria-label={available ? label : `${label} — ${t('UNAVAILABLE_COMBINATION')}`}
@@ -58,7 +58,7 @@ export function BuyBox({product, storeContext, layout = 'split'}: { product: Pro
                                                 selected ? 'plate border-primary' : 'hover:bg-[var(--wash)]',
                                                 !available && 'border-dashed text-muted-foreground line-through')}>
                                         <span>{label}</span>
-                                        {value.price && <span className="price text-sm">{value.price}</span>}
+                                        
                                     </button>
                                 );
                             })}
