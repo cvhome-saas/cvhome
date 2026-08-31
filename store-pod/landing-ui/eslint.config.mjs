@@ -10,7 +10,8 @@ const eslintConfig = defineConfig([
     {settings: {next: {rootDir: "storefront/"}}},
     ...nextVitals,
     ...nextTs,
-    globalIgnores(["**/.next/**", "**/out/**", "**/build/**", "**/next-env.d.ts", "templates-deprecated/**", "**/dist/**", "**/node_modules/**"]),
+    // `.next*` (not just `.next`): NEXT_DIST_DIR gives every lcl stack its own dev build dir (.next-<stack>)
+    globalIgnores(["**/.next*/**", "**/out/**", "**/build/**", "**/next-env.d.ts", "templates-deprecated/**", "**/dist/**", "**/node_modules/**"]),
     {
         // Themes and shared UI are linted through the storefront so one config rules them all.
         files: ["themes/**/*.{ts,tsx}", "libs/ui/**/*.{ts,tsx}", "libs/theme/**/*.{ts,tsx}", "libs/i18n/**/*.{ts,tsx}"],

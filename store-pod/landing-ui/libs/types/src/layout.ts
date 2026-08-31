@@ -42,6 +42,8 @@ export interface LayoutSectionData {
     anchor?: string | null;
     /** Device classes the section shows on; null/empty means all. */
     devices?: SectionDevice[] | null;
+    /** Builder-only: a locked section keeps its place; the canvas suppresses its toolbar. */
+    locked?: boolean | null;
 }
 
 export interface PageLayoutData {

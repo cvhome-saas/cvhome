@@ -161,3 +161,12 @@ app-icon.open {
 .cdk-drag-placeholder {
   opacity: 0.3;
 }
+
+.locked-note {
+  margin: 0;
+  padding: 8px 10px;
+  border-radius: var(--radius-md);
+  font-size: 12px;
+  background: var(--muted);
+  color: var(--muted-foreground);
+}

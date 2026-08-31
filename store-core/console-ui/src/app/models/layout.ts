@@ -39,6 +39,8 @@ export interface LayoutSection {
   style?: LayoutStyle | null;
   visibility?: LayoutVisibility | null;
   anchor?: string | null;
+  /** A locked section cannot be moved, removed, duplicated or dragged until unlocked. */
+  locked?: boolean | null;
 }
 
 export interface LayoutDocument {

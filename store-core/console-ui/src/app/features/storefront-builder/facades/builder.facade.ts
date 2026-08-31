@@ -10,6 +10,7 @@ import type {
   LayoutFieldError,
   LayoutItem,
   LayoutMeta,
+  LayoutRevisionRow,
   LayoutSection,
   ManifestPreset,
   SavedSection,
@@ -67,8 +68,28 @@ export class BuilderFacade {
   // ----------------------------------------------------------------------------------------- selection
 
   readonly selectedId = signal<string | null>(null);
+  /** Layer-row ⇄ canvas hover mirror. */
+  readonly hoveredId = signal<string | null>(null);
   readonly device = signal<BuilderDevice>('desktop');
   readonly lang = signal('en');
+  /** Canvas guides: outline + tag every section, show the add-here zones. */
+  readonly guides = signal(false);
+  /** A library drag in flight (label travels to the bridge); null otherwise. */
+  readonly dragging = signal<{kind: string; label: string} | null>(null);
+  /** What the in-flight drag would insert; consumed by {@link dropDraggedAt}. */
+  private pendingDrag: {preset?: ManifestPreset; saved?: SavedSection} | null = null;
+  /** Registered by the page so canvas add-here intents can open the library panel. */
+  openLibrary?: () => void;
+  /** The bridge's last-reported insertion point during a drag (undefined = no report yet). */
+  readonly dropBeforeId = signal<string | null | undefined>(undefined);
+  /** Where the next library insert lands (from an add-here zone); undefined = after the selection. */
+  readonly insertTarget = signal<string | null | undefined>(undefined);
+
+  readonly lockedIds = computed<string[]>(() =>
+    (this.doc()?.sections ?? []).filter((section) => section.locked).map((section) => section.id));
+
+  /** Every mutation is refused while a conflict stands — reload is the only way forward. */
+  readonly frozen = computed(() => this.saveState() === 'conflict');
 
   readonly selected = computed<LayoutSection | null>(() => {
     const id = this.selectedId();
@@ -162,7 +183,7 @@ export class BuilderFacade {
   /** Every change goes through here: snapshot for undo, mutate a clone, mark dirty, schedule the save. */
   apply(mutate: (doc: LayoutDocument) => void): void {
     const current = this.doc();
-    if (!current) {
+    if (!current || this.frozen()) {
       return;
     }
     this.undoStack.push(clone(current));
@@ -233,15 +254,104 @@ export class BuilderFacade {
     this.insert(section, afterId);
   }
 
+  /**
+   * The add-here / drop target wins when one is set; `undefined` keeps the default (after the
+   * selection); a `null` target appends.
+   */
   private insert(section: LayoutSection, afterId?: string | null): void {
+    const target = this.insertTarget();
+    this.insertTarget.set(undefined);
     this.apply((doc) => {
-      const at = afterId ? doc.sections.findIndex((candidate) => candidate.id === afterId) + 1 : doc.sections.length;
-      doc.sections.splice(at || doc.sections.length, 0, section);
+      let at: number;
+      if (target !== undefined) {
+        at = target === null ? doc.sections.length
+          : Math.max(0, doc.sections.findIndex((candidate) => candidate.id === target));
+      } else {
+        const anchor = afterId ? doc.sections.findIndex((candidate) => candidate.id === afterId) + 1 : 0;
+        at = anchor > 0 ? anchor : doc.sections.length;
+      }
+      doc.sections.splice(at, 0, section);
     });
     this.selectedId.set(section.id);
   }
 
+  /** A canvas drop: insert at the bridge-reported boundary. */
+  insertAt(target: string | null | undefined): void {
+    this.insertTarget.set(target);
+  }
+
+  // -------------------------------------------------------------------------------- library drags
+
+  startDrag(payload: {preset?: ManifestPreset; saved?: SavedSection}, kind: string, label: string): void {
+    this.pendingDrag = payload;
+    this.dropBeforeId.set(undefined);
+    this.dragging.set({kind, label});
+  }
+
+  /** dragend fires on drop, Esc and drop-outside alike — the single disarm path. */
+  endDrag(): void {
+    this.pendingDrag = null;
+    this.dragging.set(null);
+    this.dropBeforeId.set(undefined);
+  }
+
+  /** The canvas drop: insert the pending drag's section at the bridge-reported boundary. */
+  dropDraggedAt(beforeId: string | null | undefined): void {
+    const payload = this.pendingDrag;
+    if (!payload || beforeId === undefined) {
+      return;
+    }
+    this.insertTarget.set(beforeId);
+    if (payload.preset) {
+      this.addFromPreset(payload.preset);
+    } else if (payload.saved) {
+      this.addSavedSection(payload.saved);
+    }
+  }
+
+  moveById(id: string, delta: number): void {
+    const doc = this.doc();
+    if (!doc) {
+      return;
+    }
+    const from = doc.sections.findIndex((section) => section.id === id);
+    const to = from + delta;
+    if (from < 0 || to < 0 || to >= doc.sections.length) {
+      return;
+    }
+    this.move(from, to);
+  }
+
+  /** The bridge's `reorder {sectionId, beforeId}`: move the section in front of the boundary. */
+  reorderBefore(id: string, beforeId: string | null): void {
+    if (this.isLocked(id)) {
+      return;
+    }
+    this.apply((doc) => {
+      const from = doc.sections.findIndex((section) => section.id === id);
+      if (from < 0) {
+        return;
+      }
+      const [section] = doc.sections.splice(from, 1);
+      const at = beforeId === null ? doc.sections.length
+        : Math.max(0, doc.sections.findIndex((candidate) => candidate.id === beforeId));
+      doc.sections.splice(at, 0, section);
+    });
+  }
+
+  toggleLocked(id: string): void {
+    this.apply((doc) => {
+      const section = doc.sections.find((candidate) => candidate.id === id);
+      if (section) {
+        section.locked = !section.locked;
+      }
+    });
+  }
+
   duplicate(id: string): void {
+    if (this.isLocked(id)) {
+      return;
+    }
     let copyId: string | null = null;
     this.apply((doc) => {
       const index = doc.sections.findIndex((section) => section.id === id);
@@ -261,6 +371,9 @@ export class BuilderFacade {
   }
 
   remove(id: string): void {
+    if (this.isLocked(id)) {
+      return;
+    }
     this.apply((doc) => {
       doc.sections = doc.sections.filter((section) => section.id !== id);
     });
@@ -274,6 +387,10 @@ export class BuilderFacade {
       const [section] = doc.sections.splice(fromIndex, 1);
       doc.sections.splice(toIndex, 0, section);
     });
+  }
+
+  isLocked(id: string): boolean {
+    return this.doc()?.sections.find((section) => section.id === id)?.locked === true;
   }
 
   toggleHidden(id: string): void {
@@ -409,6 +526,37 @@ export class BuilderFacade {
       },
       error: () => this.saveState.set('error'),
     });
+  }
+
+  // ------------------------------------------------------------------------------------- revisions
+
+  /** Loaded on demand when the history drawer opens; null = not yet asked. */
+  readonly revisions = signal<LayoutRevisionRow[] | null>(null);
+
+  loadRevisions(): void {
+    this.layouts.revisions(PAGE).subscribe({
+      next: (rows) => this.revisions.set(rows),
+      error: () => this.revisions.set([]),
+    });
+  }
+
+  /** Restores a published version into the draft; publishing it again stays an explicit step. */
+  restoreRevision(version: number): void {
+    this.layouts.restore(PAGE, version).subscribe({
+      next: (layout) => {
+        this.baseVersion = layout.meta.draftVersion;
+        this.doc.set(layout.draft);
+        this.meta.set(layout.meta);
+        this.saveState.set('idle');
+        this.savedRevision.update((revision) => revision + 1);
+      },
+      error: () => this.saveState.set('error'),
+    });
+  }
+
+  /** For the layer list's warning dots: the publish warning aimed at this section, if any. */
+  warningFor(id: string): string | null {
+    return this.publishWarnings().find((warning) => warning.field === id)?.message ?? null;
   }
 
   // --------------------------------------------------------------------------------- saved sections

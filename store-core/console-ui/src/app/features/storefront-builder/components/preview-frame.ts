@@ -15,10 +15,14 @@ import {TranslocoDirective} from '@jsverse/transloco';
 import {BuilderFacade} from '../facades/builder.facade';
 
 /**
- * The canvas: the real storefront rendering the draft, in an iframe at the preview URL. WYSIWYG by
- * construction — nothing is approximated in the console. Selection flows both ways over postMessage
- * (origins checked on both sides); the iframe reloads after every landed save, which is the honest
- * cost of previewing through the server renderer.
+ * The canvas: the real storefront rendering the draft, in an iframe at the preview URL — WYSIWYG by
+ * construction. The iframe is cross-origin, so the storefront's bridge draws every canvas affordance
+ * and this component speaks protocol v2 with it (origins checked both ways, `v: 2` on every message):
+ * selection/hover both directions, guides, locks, the floating toolbar's intents, add-here targeting,
+ * in-canvas reorder, and — because native drags cannot cross into another origin's document — the
+ * wrapper is the drop target for library drags, forwarding pointer Y so the bridge can place the
+ * insertion line and answer with the boundary. The iframe reloads after every landed save, which is
+ * the honest cost of previewing through the server renderer.
  */
 @Component({
   selector: 'app-builder-preview-frame',
@@ -26,7 +30,12 @@ import {BuilderFacade} from '../facades/builder.facade';
   imports: [TranslocoDirective],
   template: `
     <ng-container *transloco="let t">
-      <div class="canvas" [class]="'device-' + facade.device()">
+      <div
+        class="canvas"
+        [class]="'device-' + facade.device()"
+        (dragover)="onDragOver($event)"
+        (drop)="onDrop($event)"
+      >
         @if (url(); as src) {
           <iframe #frame [src]="src" [title]="t('builder.canvas.title')"></iframe>
         } @else {
@@ -39,17 +48,17 @@ import {BuilderFacade} from '../facades/builder.facade';
     :host { display: block; height: 100%; min-height: 0; }
     .canvas {
       height: 100%; display: flex; justify-content: center; overflow: auto;
-      background: var(--surface-canvas, #ececf0); padding: 16px;
+      background: var(--surface-canvas, var(--muted)); padding: 16px;
     }
     iframe {
-      border: 1px solid var(--border, #d4d4d8); border-radius: 10px; background: #fff;
+      border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--background);
       /* no width transition: animating an iframe's width relayouts the embedded page every frame */
-      width: 100%; height: 100%; box-shadow: 0 8px 24px rgb(0 0 0 / 0.08);
+      width: 100%; height: 100%;
     }
     .device-tablet iframe { width: 768px; }
     .device-mobile iframe { width: 390px; }
     .placeholder {
-      margin: auto; font-size: 13px; color: var(--text-muted, #71717a); max-width: 40ch; text-align: center;
+      margin: auto; font-size: 13px; color: var(--muted-foreground); max-width: 40ch; text-align: center;
     }
   `,
 })
@@ -80,12 +89,52 @@ export class BuilderPreviewFrame {
       if (event.origin !== this.facade.storefrontOrigin()) {
         return;
       }
-      const {type, sectionId} = (event.data ?? {}) as {type?: string; sectionId?: string};
-      if (type === 'sectionClicked' && sectionId) {
-        this.facade.selectedId.set(sectionId);
+      const data = (event.data ?? {}) as {v?: number; type?: string; sectionId?: string; beforeId?: string | null; action?: string};
+      if (data.v !== 2 && data.v !== undefined) {
+        return;
       }
-      if (type === 'ready') {
-        this.postSelection();
+      switch (data.type) {
+        case 'ready':
+          // every iframe reload re-handshakes: replay the whole canvas state
+          this.post({type: 'select', sectionId: this.facade.selectedId()});
+          this.post({type: 'guides', on: this.facade.guides()});
+          this.post({type: 'locks', ids: this.facade.lockedIds()});
+          this.post({type: 'dragState', active: !!this.facade.dragging(), label: this.facade.dragging()?.label ?? ''});
+          break;
+        case 'sectionClicked':
+          if (data.sectionId) {
+            this.facade.selectedId.set(data.sectionId);
+          }
+          break;
+        case 'sectionHovered':
+          this.facade.hoveredId.set(data.sectionId ?? null);
+          break;
+        case 'toolbar':
+          if (!data.sectionId) {
+            break;
+          }
+          if (data.action === 'moveUp') {
+            this.facade.moveById(data.sectionId, -1);
+          } else if (data.action === 'moveDown') {
+            this.facade.moveById(data.sectionId, 1);
+          } else if (data.action === 'duplicate') {
+            this.facade.duplicate(data.sectionId);
+          } else if (data.action === 'remove') {
+            this.facade.remove(data.sectionId);
+          }
+          break;
+        case 'dropTarget':
+          this.facade.dropBeforeId.set(data.beforeId ?? null);
+          break;
+        case 'reorder':
+          if (data.sectionId) {
+            this.facade.reorderBefore(data.sectionId, data.beforeId ?? null);
+          }
+          break;
+        case 'addHere':
+          this.facade.insertTarget.set(data.beforeId ?? null);
+          this.facade.openLibrary?.();
+          break;
       }
     };
     window.addEventListener('message', onMessage);
@@ -94,25 +143,50 @@ export class BuilderPreviewFrame {
     // selection changes flow into the canvas: outline + scroll to the block being edited
     effect(() => {
       const id = this.facade.selectedId();
+      this.post({type: 'select', sectionId: id});
       if (id) {
-        this.post({type: 'select', sectionId: id});
         this.post({type: 'scrollTo', sectionId: id});
       }
     });
+    // hover, guides, locks and drag state mirror over as they change
+    effect(() => this.post({type: 'hover', sectionId: this.facade.hoveredId()}));
+    effect(() => this.post({type: 'guides', on: this.facade.guides()}));
+    effect(() => this.post({type: 'locks', ids: this.facade.lockedIds()}));
+    effect(() => {
+      const drag = this.facade.dragging();
+      this.post({type: 'dragState', active: !!drag, label: drag?.label ?? ''});
+    });
   }
 
-  private postSelection(): void {
-    const id = this.facade.selectedId();
-    if (id) {
-      this.post({type: 'select', sectionId: id});
+  // ------------------------------------------------------------------------------ library drag target
+
+  protected onDragOver(event: DragEvent): void {
+    if (!this.facade.dragging()) {
+      return;
     }
+    event.preventDefault();
+    if (event.dataTransfer) {
+      event.dataTransfer.dropEffect = 'copy';
+    }
+    const rect = this.frame()?.nativeElement.getBoundingClientRect();
+    if (rect) {
+      this.post({type: 'dragOver', y: event.clientY - rect.top});
+    }
+  }
+
+  protected onDrop(event: DragEvent): void {
+    if (!this.facade.dragging()) {
+      return;
+    }
+    event.preventDefault();
+    this.facade.dropDraggedAt(this.facade.dropBeforeId());
   }
 
   private post(message: Record<string, unknown>): void {
     const origin = this.facade.storefrontOrigin();
     const target = this.frame()?.nativeElement.contentWindow;
     if (origin && target) {
-      target.postMessage(message, origin);
+      target.postMessage({v: 2, ...message}, origin);
     }
   }
 }

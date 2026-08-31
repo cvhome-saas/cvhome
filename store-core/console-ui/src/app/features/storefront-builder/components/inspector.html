@@ -6,17 +6,26 @@
           <strong>{{ label(spec()?.label) || sec.kind }}</strong>
           <span class="head-kind">{{ sec.variant || t('builder.layers.defaultVariant') }}</span>
         </div>
-        <button type="button" class="icon-action" [attr.aria-label]="t('builder.inspector.duplicate')"
-                [title]="t('builder.inspector.duplicate')" (click)="facade.duplicate(sec.id)">
-          <app-icon name="copy" [size]="15" />
-        </button>
-        <button type="button" class="icon-action" [attr.aria-label]="t('builder.inspector.remove')"
-                [title]="t('builder.inspector.remove')" (click)="facade.remove(sec.id)">
-          <app-icon name="trash" [size]="15" />
-        </button>
+        @if (sec.locked) {
+          <button type="button" class="secondary-action" (click)="facade.toggleLocked(sec.id)">
+            <app-icon name="lock" [size]="13" /> {{ t('builder.inspector.unlock') }}
+          </button>
+        } @else {
+          <button type="button" class="icon-action" [attr.aria-label]="t('builder.inspector.duplicate')"
+                  [title]="t('builder.inspector.duplicate')" (click)="facade.duplicate(sec.id)">
+            <app-icon name="copy" [size]="15" />
+          </button>
+          <button type="button" class="icon-action" [attr.aria-label]="t('builder.inspector.remove')"
+                  [title]="t('builder.inspector.remove')" (click)="facade.remove(sec.id)">
+            <app-icon name="trash" [size]="15" />
+          </button>
+        }
       </header>
 
       <div class="body">
+        @if (sec.locked) {
+          <p class="locked-note">{{ t('builder.inspector.locked') }}</p>
+        }
         @if ((spec()?.variants ?? []).length > 1) {
           <app-form-field [label]="t('builder.inspector.variant')">
             <app-select [options]="variantOptions()" [value]="sec.variant ?? ''"

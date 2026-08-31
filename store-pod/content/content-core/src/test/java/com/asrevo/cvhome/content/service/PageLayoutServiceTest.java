@@ -80,7 +80,7 @@ class PageLayoutServiceTest {
     private static LayoutDocument doc(String heading) {
         return new LayoutDocument(LayoutDocument.CURRENT_SCHEMA_VERSION, PageKind.HOME, List.of(
                 new LayoutSection("sec-1", "hero", "minimal", Map.of(), null,
-                        Map.of("heading", Map.of("en", heading)), null, null, null)));
+                        Map.of("heading", Map.of("en", heading)), null, null, null, null)));
     }
 
     @Test
@@ -110,7 +110,7 @@ class PageLayoutServiceTest {
         PageLayout row = existing(JsonCodec.write(doc("old")), null, 1);
         LayoutDocument next = new LayoutDocument(LayoutDocument.CURRENT_SCHEMA_VERSION, PageKind.HOME, List.of(
                 new LayoutSection("sec-img", "image", "contained", Map.of("mediaId", 9), null, null, null,
-                        null, null)));
+                        null, null, null)));
 
         ReadableLayout saved = service.save(ContentFixtures.STORE, PageKind.HOME,
                 new PersistableLayout(next, 1), ACTOR);
@@ -141,7 +141,7 @@ class PageLayoutServiceTest {
     void publishBlocksOnAMediaReferenceTheLibraryDoesNotHold() {
         LayoutDocument withMedia = new LayoutDocument(LayoutDocument.CURRENT_SCHEMA_VERSION, PageKind.HOME,
                 List.of(new LayoutSection("sec-img", "image", null, Map.of("mediaId", 404), null, null, null,
-                        null, null)));
+                        null, null, null)));
         existing(JsonCodec.write(withMedia), null, 1);
         when(media.urls(eq(ContentFixtures.STORE), anyList())).thenReturn(Map.of());
 

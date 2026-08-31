@@ -3654,7 +3654,8 @@
       "conflict": "Someone else saved — reload the page",
       "error": "Save failed",
       "unpublished": "Draft · unpublished changes",
-      "live": "Live"
+      "live": "Live",
+      "guides": "Toggle guides"
     },
     "tabs": {
       "layout": "Layout",
@@ -3664,14 +3665,16 @@
       "empty": "No sections yet — add one from the library.",
       "hide": "Hide section",
       "show": "Show section",
-      "defaultVariant": "default"
+      "defaultVariant": "default",
+      "locked": "Locked"
     },
     "library": {
       "presets": "Sections",
       "mySections": "My sections",
       "deleteSaved": "Delete saved section",
       "noManifest": "The theme's section catalogue could not be loaded.",
-      "noSaved": "Nothing saved yet — configure a section and use “Save as preset”."
+      "noSaved": "Nothing saved yet — configure a section and use “Save as preset”.",
+      "insertingHere": "Inserting at the chosen spot — pick a section"
     },
     "inspector": {
       "variant": "Layout variant",
@@ -3688,7 +3691,9 @@
       "nothingSelected": "Select a section to edit it.",
       "saveAsPreset": "Save as preset",
       "savePreset": "Save",
-      "presetName": "Preset name"
+      "presetName": "Preset name",
+      "locked": "This section is locked. Unlock it to edit, move or remove it.",
+      "unlock": "Unlock"
     },
     "style": {
       "spacing": "Spacing",
@@ -3725,6 +3730,20 @@
       "title": "Media library",
       "close": "Close",
       "empty": "No images in the library yet — upload some in Content → Media."
+    },
+    "conflict": {
+      "reload": "Reload draft",
+      "retry": "Retry"
+    },
+    "page": {
+      "heading": "Page",
+      "theme": "Theme & colors",
+      "seo": "SEO & metadata"
+    },
+    "revisions": {
+      "title": "History",
+      "restore": "Restore",
+      "empty": "No published versions yet."
     }
   }
 }

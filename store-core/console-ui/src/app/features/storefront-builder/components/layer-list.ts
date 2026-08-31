@@ -22,18 +22,31 @@ import {BuilderFacade} from '../facades/builder.facade';
           <div
             class="layer"
             cdkDrag
+            [cdkDragDisabled]="section.locked === true"
             role="button"
             tabindex="0"
             [class.selected]="section.id === facade.selectedId()"
+            [class.hovered]="section.id === facade.hoveredId()"
             [class.hidden-section]="section.visibility?.hidden"
             (click)="facade.selectedId.set(section.id)"
             (keyup.enter)="facade.selectedId.set(section.id)"
+            (keyup.alt.arrowup)="facade.moveById(section.id, -1)"
+            (keyup.alt.arrowdown)="facade.moveById(section.id, 1)"
+            (mouseenter)="facade.hoveredId.set(section.id)"
+            (mouseleave)="facade.hoveredId.set(null)"
           >
-            <span class="grip" cdkDragHandle><app-icon name="grip" [size]="14" /></span>
+            @if (section.locked) {
+              <span class="grip locked-glyph" [title]="t('builder.layers.locked')"><app-icon name="lock" [size]="13" /></span>
+            } @else {
+              <span class="grip" cdkDragHandle><app-icon name="grip" [size]="14" /></span>
+            }
             <span class="layer-copy">
               <span class="layer-name">{{ name(section.kind) }}</span>
               <span class="layer-kind">{{ section.variant || t('builder.layers.defaultVariant') }}</span>
             </span>
+            @if (facade.warningFor(section.id); as warning) {
+              <span class="warn-dot" [title]="warning" aria-hidden="true"></span>
+            }
             <button
               type="button"
               class="eye"
@@ -57,6 +70,12 @@ import {BuilderFacade} from '../facades/builder.facade';
     }
     .layer:hover { background: var(--muted); }
     .layer.selected { background: var(--primary-soft, var(--muted)); }
+    .layer.hovered:not(.selected) { background: var(--muted); }
+    .locked-glyph { cursor: default; }
+    .warn-dot {
+      width: 8px; height: 8px; border-radius: 50%; flex: none;
+      background: var(--chart-4-foreground, var(--chart-5-foreground));
+    }
     .layer.hidden-section .layer-copy { opacity: 0.45; }
     .grip { cursor: grab; color: var(--muted-foreground); display: inline-flex; }
     .layer-copy { display: flex; flex-direction: column; min-width: 0; flex: 1; }

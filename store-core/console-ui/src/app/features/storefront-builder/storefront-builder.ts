@@ -2,6 +2,7 @@
 import {
   ChangeDetectionStrategy, Component, HostListener, type OnDestroy, type OnInit, computed, inject, signal,
 } from '@angular/core';
+import {DatePipe} from '@angular/common';
 import {RouterLink} from '@angular/router';
 import {TranslocoDirective} from '@jsverse/transloco';
 
@@ -27,7 +28,7 @@ import {BuilderSectionLibrary} from './components/section-library';
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [BuilderFacade],
   imports: [
-    BuilderInspector, BuilderLayerList, BuilderPreviewFrame, BuilderSectionLibrary, Icon, RouterLink,
+    BuilderInspector, BuilderLayerList, BuilderPreviewFrame, BuilderSectionLibrary, DatePipe, Icon, RouterLink,
     TranslocoDirective,
   ],
   templateUrl: './storefront-builder.html',
@@ -58,8 +59,18 @@ export class StorefrontBuilder implements OnInit, OnDestroy {
     }
   });
 
+  protected readonly revisionsOpen = signal(false);
+
   ngOnInit(): void {
+    this.facade.openLibrary = () => this.panel.set('library');
     this.facade.load();
+  }
+
+  protected toggleRevisions(): void {
+    this.revisionsOpen.update((open) => !open);
+    if (this.revisionsOpen()) {
+      this.facade.loadRevisions();
+    }
   }
 
   /** Leaving costs nothing — the draft autosaves — as long as the pending debounce is flushed first. */
@@ -69,18 +80,25 @@ export class StorefrontBuilder implements OnInit, OnDestroy {
 
   @HostListener('window:keydown', ['$event'])
   protected onKeydown(event: KeyboardEvent): void {
-    if (!(event.metaKey || event.ctrlKey) || event.key.toLowerCase() !== 'z') {
-      return;
-    }
     const target = event.target as HTMLElement | null;
     if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) {
-      return; // text fields keep their own undo
+      return; // text fields keep their own undo and Delete
     }
-    event.preventDefault();
-    if (event.shiftKey) {
-      this.facade.redo();
-    } else {
-      this.facade.undo();
+    if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'z') {
+      event.preventDefault();
+      if (event.shiftKey) {
+        this.facade.redo();
+      } else {
+        this.facade.undo();
+      }
+      return;
+    }
+    if (event.key === 'Delete' || event.key === 'Backspace') {
+      const id = this.facade.selectedId();
+      if (id) {
+        event.preventDefault();
+        this.facade.remove(id);
+      }
     }
   }
 

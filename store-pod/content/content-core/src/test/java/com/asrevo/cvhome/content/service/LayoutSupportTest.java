@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class LayoutSupportTest {
 
     private static LayoutSection section(String id, String kind, Map<String, Object> props, List<LayoutItem> items) {
-        return new LayoutSection(id, kind, null, props, items, null, null, null, null);
+        return new LayoutSection(id, kind, null, props, items, null, null, null, null, null);
     }
 
     private static LayoutDocument document(LayoutSection... sections) {

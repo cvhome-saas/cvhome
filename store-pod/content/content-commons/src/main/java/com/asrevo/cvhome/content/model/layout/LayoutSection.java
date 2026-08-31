@@ -17,7 +17,7 @@ import java.util.Map;
  */
 public record LayoutSection(String id, String kind, String variant, Map<String, Object> props,
                             List<LayoutItem> items, Map<String, Map<String, String>> text, LayoutStyle style,
-                            LayoutVisibility visibility, String anchor) {
+                            LayoutVisibility visibility, String anchor, Boolean locked) {
 
     /** The most items one section may hold; the same bound Shopify applies to a section's blocks. */
     public static final int MAX_ITEMS = 50;
