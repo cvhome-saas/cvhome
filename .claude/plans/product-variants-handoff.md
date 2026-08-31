@@ -173,7 +173,40 @@ themes and is dead — this phase re-activates it against the new contract.
 5. **Search UX**: one card per product; a suggestion carrying `matchedVariantSku` links the PDP with `?sku=`.
 6. Gates: `npm run build`, lint, hook unit specs if `libs/hooks` has a spec setup.
 
-### Phase 7 — polish/QA
+### Phase 7 — QA: RUN 2026-08-31, one real bug found and fixed
+
+Stack reset and brought up clean (`lcl start -d`, profiles `lcl,test-stores`). There is no named
+postgres volume — data lives in the container layer, so recreating the container IS the reset.
+
+**Verified against the running stack:**
+
+| What | Evidence |
+|---|---|
+| Schema initializes in final shape, no migrations | fresh DB: `catalog.product_variant` present, `catalog.product.sku` **gone**, all 5 option tables, dormant `product_image.product_variant_id`, `uk_product_variant_default` partial index, inventory's dropped columns absent + `uk_prd_avail_store_sku` + `sku NOT NULL`, `checkout.order_product_option` present and the two dead tables gone |
+| Uniform-model invariant | every seeded product owns ≥1 variant; products 1 and 2 carry combinations, all others one `DEFAULT` |
+| Search folds variant skus | `product_search_source` aggregates `string_agg(v.sku)` into weight B; querying `SKU-ZR-CL-DRS02-BL-L` returns **product 2 only**, one row per language |
+| PDP | chips render; default preselected; Red/L greyed (no such combination) and Blue/L greyed (exists, qty 0 → `canBePurchased:false`); Blue swaps price 350→365 and the sku; URL syncs `?sku=`; a fresh load of that URL lands preselected |
+| Cart line | reads **"Color: Blue / Size: M"** at the variant's own 365 — catalog → sku-addressed read → `variant` block → presenter → theme |
+| Console Options tab | list with value summaries, editor, AR/EN locale chips, code locked on an existing record; **409 IN_USE delete guard** surfaces as the named toast and the option survives |
+| Console Variants step | 5-step rail; axis chips; matrix rows carry the right sku/price/qty merged from inventory; exactly one default; readiness swaps `price` → **"Every variant has a price"**; per-row aria labels name their combination |
+| Arabic / RTL | the whole variants step mirrors correctly; SKU and figures stay LTR |
+| Products list | "2 variants" / "3 variants" badges, price = **default** variant's, and variant rows' edit action routes to the form while single-variant rows keep inline edit |
+
+**The bug this caught** (commit `fix(landing-ui): the option wire field is values…`): the reshaped
+`ProductOption` declared `optionValues`, but `ReadableProductOption` serialises `values`. Every
+option was filtered out of `variantOptions()`, so a three-variant PDP rendered **no chips at all**.
+tsc could not see it (optional-shaped wire data) and no theme test drives a real payload. Fixed in
+the type + hook + 12 BuyBox files.
+
+**Also fixed:** the console matrix's SKU column was 11rem, clipping every row to `SKU-ZR-CL-DRS02` —
+the suffix is the only thing distinguishing rows. Now 15rem.
+
+**Not exercised live** (covered by unit + integration tests): the variant-set save round-trip
+(atomic PUT → inventory bulk → retired-sku delete), the storefront facet rail, and a full purchase
+through to the order's option snapshot. The seeded stock made those non-trivial to drive without
+mutating the demo data.
+
+### Phase 7 — polish/QA (original notes)
 
 Reset DBs (`lcl` postgres volume) → `lcl start -d` (profiles `lcl,test-stores`) → rebuild the search index
 per store → walk the **Verification** section at the end of the plan file (console flow, storefront flow,
