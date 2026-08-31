@@ -165,7 +165,8 @@
       "CATALOG_PRODUCT_VARIANT_DUPLICATE_SKU": "منتج أو متغير آخر يستخدم أحد هذه الرموز (SKU) بالفعل.",
       "CATALOG_PRODUCT_VARIANT_DUPLICATE_COMBINATION": "متغيران يصفان تركيبة القيم نفسها.",
       "CATALOG_PRODUCT_VARIANT_OPTIONS_INVALID": "يجب أن يختار كل متغير قيمة واحدة بالضبط من كل خيار محدد.",
-      "CATALOG_PRODUCT_VARIANT_LIMIT_EXCEEDED": "يمكن للمنتج أن يتنوع بأربعة خيارات على الأكثر ويبيع 100 متغير على الأكثر."    }
+      "CATALOG_PRODUCT_VARIANT_LIMIT_EXCEEDED": "يمكن للمنتج أن يتنوع بأربعة خيارات على الأكثر ويبيع 100 متغير على الأكثر."
+    }
   },
   "auth": {
     "accountAccess": "الوصول إلى الحساب",
