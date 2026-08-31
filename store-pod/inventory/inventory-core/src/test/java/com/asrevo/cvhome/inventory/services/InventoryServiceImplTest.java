@@ -81,6 +81,37 @@ class InventoryServiceImplTest {
     }
 
     @Test
+    void emptyProductListNeverHitsTheDatabase() {
+        assertThat(service.getByProductIds(STORE, List.of())).isEmpty();
+        verify(inventoryRepository, never()).findByProductIds(any(), any());
+    }
+
+    @Test
+    void productAddressedReadAnswersEverySkuOfTheProducts() {
+        // What the console's list totals a product's stock from: it knows each product's default sku
+        // only, so asking by sku would report the default variant's quantity as the product's.
+        when(inventoryRepository.findByProductIds(STORE, List.of(9L)))
+                .thenReturn(List.of(row(1, SKU, 5), row(2, SKU_2, 7)));
+
+        List<SkuInventory> result = service.getByProductIds(STORE, List.of(9L));
+
+        assertThat(result).extracting(SkuInventory::sku).containsExactly(SKU, SKU_2);
+        assertThat(result).extracting(SkuInventory::quantity).containsExactly(5, 7);
+    }
+
+    @Test
+    void productAddressedReadKeepsTheFirstRowPerSkuLikeTheSkuAddressedOne() {
+        // Both readers must agree on which row wins, or a sku's stock would depend on who asked.
+        when(inventoryRepository.findByProductIds(STORE, List.of(9L)))
+                .thenReturn(List.of(row(1, SKU, 5), row(2, SKU, 99)));
+
+        assertThat(service.getByProductIds(STORE, List.of(9L)))
+                .singleElement()
+                .extracting(SkuInventory::quantity)
+                .isEqualTo(5);
+    }
+
+    @Test
     void upsertCreatesTheRowAndItsDefaultPriceForANewSku() {
         when(inventoryRepository.findBySku(STORE, SKU)).thenReturn(Optional.empty());
         when(inventoryRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));

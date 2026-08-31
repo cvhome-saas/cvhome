@@ -64,6 +64,10 @@ class InventoryApiIntegrationTest {
 
     private static final String BY_PRODUCT = "by-product";
 
+    private static final String BY_PRODUCTS = "by-products";
+
+    private static final String PRODUCT_IDS = "productIds=%s";
+
     private static final String BULK = "bulk";
 
     private static final String AVAILABILITY_QUERY = "/api/v1/availability/query";
@@ -182,6 +186,49 @@ class InventoryApiIntegrationTest {
 
         assertThat(availability(STORE_A, skuOne, skuTwo)).isEmpty();
         assertThat(availability(STORE_B, otherSku)).hasSize(1);
+    }
+
+    @Test
+    void productAddressedReadAnswersEverySkuOfTheProductsInThatStoreOnly() {
+        /*
+         * The console list's stock column. It knows each product's DEFAULT sku only, so a sku-keyed read
+         * reported that one row's quantity as the product's and understated every variant product; this
+         * answers all of a product's rows so the row can total them.
+         */
+        long productId = 900010L;
+        String defaultSku = ApiClient.slug("SKU-TOTAL-DEFAULT");
+        String variantSku = ApiClient.slug("SKU-TOTAL-VARIANT");
+        String otherAdmin = tokens.staff(Tokens.ROLE_STORE_ADMIN, STORE_B);
+        String otherSku = ApiClient.slug("SKU-TOTAL-OTHER");
+        ApiClient.expect(upsert(STORE_A, admin, defaultSku, body(productId, 4, true, NULL, NULL, NULL)),
+                HttpStatus.OK);
+        ApiClient.expect(upsert(STORE_A, admin, variantSku, body(productId, 6, true, NULL, NULL, NULL)),
+                HttpStatus.OK);
+        // Same product id in the other store — a tenant must never see it in this answer.
+        ApiClient.expect(upsert(STORE_B, otherAdmin, otherSku, body(productId, 99, true, NULL, NULL, NULL)),
+                HttpStatus.OK);
+
+        var response = api.get(ApiClient.scoped(
+                ApiClient.query(ApiClient.path(PRIVATE, BY_PRODUCTS), PRODUCT_IDS.formatted(productId)),
+                STORE_A), admin);
+        ApiClient.expect(response, HttpStatus.OK);
+        JsonNode rows = ApiClient.json(response);
+
+        assertThat(rows).hasSize(2);
+        assertThat(rows).extracting(row -> row.get(SKU_FIELD).asString())
+                .containsExactlyInAnyOrder(defaultSku, variantSku);
+        // What the console sums — the product holds ten, not the four its default sku shows.
+        assertThat(rows).extracting(row -> row.get(QUANTITY).asInt()).containsExactlyInAnyOrder(4, 6);
+    }
+
+    @Test
+    void productAddressedReadIsRefusedWithoutAStaffSessionForThatStore() {
+        String otherAdmin = tokens.staff(Tokens.ROLE_STORE_ADMIN, STORE_B);
+        String path = ApiClient.scoped(
+                ApiClient.query(ApiClient.path(PRIVATE, BY_PRODUCTS), PRODUCT_IDS.formatted(1)), STORE_A);
+
+        ApiClient.expect(api.get(path, otherAdmin), HttpStatus.FORBIDDEN);
+        ApiClient.expect(api.get(path, null), HttpStatus.UNAUTHORIZED);
     }
 
     @Test
