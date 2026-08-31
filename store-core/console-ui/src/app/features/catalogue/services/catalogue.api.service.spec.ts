@@ -4,6 +4,7 @@ import {Observable, of, throwError} from 'rxjs';
 import {CategoryService} from '@api/catalog/category.service';
 import {ManufacturerService} from '@api/catalog/manufacturer.service';
 import {ProductGroupService} from '@api/catalog/product-group.service';
+import {ProductOptionService} from '@api/catalog/product-option.service';
 import {ProductService} from '@api/catalog/product.service';
 import {ProductTypeService} from '@api/catalog/product-type.service';
 import {MerchantStoreService} from '@api/merchant/store.service';
@@ -13,6 +14,7 @@ import type {
   ReadableCategory,
   ReadableManufacturer,
   ReadableProductGroup,
+  ReadableProductOption,
   ReadableProductType,
 } from '@models/catalog';
 import {CatalogueApi} from './catalogue.api.service';
@@ -123,6 +125,32 @@ class FakeProductTypeService {
   }
 }
 
+class FakeProductOptionService {
+  failing = false;
+
+  list(): Observable<PageT<ReadableProductOption>> {
+    if (this.failing) {
+      return throwError(() => new Error('product options is down'));
+    }
+    return of(
+      page<ReadableProductOption>([
+        {
+          id: 9,
+          code: 'color',
+          name: 'Color',
+          sortOrder: 0,
+          descriptions: [{language: 'en', name: 'Color'}],
+          // Deliberately out of order: the mapper must sort them, the server does not.
+          values: [
+            {id: 92, code: 'blue', name: 'Blue', sortOrder: 1, descriptions: [{language: 'en', name: 'Blue'}]},
+            {id: 91, code: 'red', name: 'Red', sortOrder: 0, descriptions: [{language: 'en', name: 'Red'}]},
+          ],
+        },
+      ]),
+    );
+  }
+}
+
 class FakeProductGroupService {
   failing = false;
   /** Only the by-code read fails: the list still answers, as a partial outage would. */
@@ -178,12 +206,14 @@ describe('CatalogueApi', () => {
   let brands: FakeManufacturerService;
   let types: FakeProductTypeService;
   let groups: FakeProductGroupService;
+  let options: FakeProductOptionService;
 
   beforeEach(() => {
     categories = new FakeCategoryService();
     brands = new FakeManufacturerService();
     types = new FakeProductTypeService();
     groups = new FakeProductGroupService();
+    options = new FakeProductOptionService();
 
     TestBed.configureTestingModule({
       providers: [
@@ -192,6 +222,7 @@ describe('CatalogueApi', () => {
         {provide: ManufacturerService, useValue: brands},
         {provide: ProductTypeService, useValue: types},
         {provide: ProductGroupService, useValue: groups},
+        {provide: ProductOptionService, useValue: options},
         {provide: ProductService, useValue: {}},
         {provide: MerchantStoreService, useValue: new FakeMerchantStoreService()},
       ],
@@ -210,15 +241,23 @@ describe('CatalogueApi', () => {
     });
   });
 
-  it('keeps the tree when the three optional lists fail, and names which tabs are down', (done) => {
+  it('keeps the tree when the four optional lists fail, and names which tabs are down', (done) => {
     brands.failing = true;
     types.failing = true;
     groups.failing = true;
+    options.failing = true;
 
     api.load().subscribe((snapshot) => {
       expect(snapshot.categories.length).toBe(1);
       expect(snapshot.brands).toEqual([]);
-      expect([...snapshot.unavailable].sort()).toEqual(['brands', 'groups', 'types']);
+      expect([...snapshot.unavailable].sort()).toEqual(['brands', 'groups', 'options', 'types']);
+      done();
+    });
+  });
+
+  it('orders an option’s values by their sort order, whatever order the server sent', (done) => {
+    api.load().subscribe((snapshot) => {
+      expect(snapshot.options[0].values.map((value) => value.code)).toEqual(['red', 'blue']);
       done();
     });
   });

@@ -46,6 +46,11 @@
               <app-brand-tab />
             </div>
           }
+          @case ('options') {
+            <div id="catalogue-panel" class="tab-panel" animate.enter="tab-panel-in">
+              <app-options-tab />
+            </div>
+          }
           @case ('groups') {
             <div id="catalogue-panel" class="tab-panel" animate.enter="tab-panel-in">
               <app-group-tab />

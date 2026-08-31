@@ -1439,6 +1439,12 @@ now being built per [`../../.agents/plans/console-ui-content.md`](../../.agents/
   return them.
 - **Placeholder:** the tab shows a notice saying so, backed by
   `catalogue.types.noAttributes`.
+- **2026-08-31, still accurate under the variant rework — deliberately.** Variants and options
+  shipped as a *per-product* concern (see "Catalogue — a console gap, not a backend one: variants,
+  options and attributes — CLOSED"): a product declares which store options it varies by in its own
+  form, and the type carries nothing. This entry stays open only in the narrow sense that a type is
+  still a label; the platform's answer to "attributes that generate variants" now lives on the
+  product, not the type, and the tab's notice remains true.
 
 ## Catalogue — a category has no banner image and a brand has no logo or publish flag
 
@@ -1528,7 +1534,7 @@ now being built per [`../../.agents/plans/console-ui-content.md`](../../.agents/
 - **Placeholder:** the console calls only the body form; the `?order=` form is not ported. Noted in
   `api/catalog/product.service.ts`.
 
-## Catalogue — a console gap, not a backend one: variants, options and attributes
+## Catalogue — a console gap, not a backend one: variants, options and attributes — CLOSED
 
 Recorded here for completeness because it is the reverse of every entry above, and belongs in the
 module's plan rather than in this file's remit. `ProductVariantApi`, `ProductVariationApi`,
@@ -1537,6 +1543,18 @@ module's plan rather than in this file's remit. `ProductVariantApi`, `ProductVar
 are all **fully mapped on the backend** and have no seller-core client and no UI — seller-ui's menu
 has its Options group commented out. Module 6 ships one product with no variants, matching what
 seller-ui writes. Nothing is missing from the platform here; what is missing is a console for it.
+
+- **How it closed:** the uniform-variant rework replaced the Shopizer-era variant surface outright
+  — the deprecated `ProductVariationApi`/`ProductVariantGroupApi`/attribute APIs are gone, and the
+  model is now a **store-wide option vocabulary** (`ProductOptionApi`, whole-document writes)
+  assigned **per product** (Shopify/Medusa style, not per product type) with an atomic whole-set
+  variant replace (`PUT /api/v2/private/product/{id}/variants` — axes and combinations together).
+  Every product owns at least one variant; sku, price and stock live at the variant level, price
+  and stock in the inventory service keyed by variant sku.
+- **What the console does now:** `/catalogue/options` manages the vocabulary (the Options tab), and
+  the product form's Variants step assigns axes, generates the matrix and writes price/stock
+  through the inventory bulk upsert. The product-type tab is untouched — a type still carries no
+  option configuration, by design, so the entry below this one stays open on its own terms.
 
 ## Catalogue — the category tree's "move to top level" is an undocumented `-1`
 

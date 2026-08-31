@@ -1,0 +1,132 @@
+.option-list {
+  display: grid;
+  gap: .6rem;
+  padding: .9rem;
+}
+
+.option-card {
+  display: grid;
+  gap: .35rem;
+  padding: .8rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--muted);
+  color: var(--foreground);
+  text-align: start;
+  cursor: pointer;
+  transition:
+    border-color var(--default-transition-duration),
+    background-color var(--default-transition-duration);
+}
+
+.option-card:hover {
+  border-color: var(--edge);
+}
+
+.option-card.current {
+  border-color: var(--primary);
+  background: var(--accent);
+}
+
+.option-card:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+.option-copy {
+  display: flex;
+  align-items: baseline;
+  gap: .6rem;
+  min-inline-size: 0;
+}
+
+.option-copy strong {
+  overflow: hidden;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.option-code {
+  color: var(--foreground-quiet);
+  font-size: var(--text-3xs);
+  letter-spacing: .04em;
+}
+
+.option-values {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--foreground-subtle);
+  font-size: var(--text-3xs);
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.list-empty {
+  margin: 0;
+  padding: 2rem 0;
+  color: var(--foreground-quiet);
+  font-size: var(--text-xs);
+  text-align: center;
+}
+
+.list-foot {
+  padding: 0 .9rem .9rem;
+}
+
+.editor-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-group);
+  flex-wrap: wrap;
+}
+
+/*
+ * The value matrix: name, code, remove — one grid so the header row and every value row share
+ * their columns. The remove column is sized to the icon button, not a fraction, so it does not
+ * stretch into a gutter.
+ */
+.value-rows {
+  display: grid;
+  gap: .6rem;
+}
+
+.value-head,
+.value-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) auto;
+  gap: .6rem;
+  align-items: center;
+}
+
+.value-head {
+  color: var(--foreground-quiet);
+  font-size: var(--text-3xs);
+  font-weight: 600;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.value-head-actions {
+  inline-size: 2rem;
+}
+
+.values-empty {
+  margin: 0;
+  padding: .9rem 0;
+  color: var(--foreground-quiet);
+  font-size: var(--text-xs);
+}
+
+.value-foot {
+  padding-block-start: .3rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .option-card {
+    transition: none;
+  }
+}

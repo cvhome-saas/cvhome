@@ -19,11 +19,12 @@
  * optional, and their mappers narrow. Assuming otherwise took the catalogue page down on first
  * load with "Cannot read properties of null".
  *
- * **What is deliberately not modelled.** `ReadableProductVariant`, `ReadableProductOption`,
- * `ReadableProductAttribute`, `ReadableProductProperty` and the price list. All are mapped on the
- * backend and none has ever had a client or a UI; the console builds one product with no variants.
- * That is a console gap, not a backend gap, so it is recorded in the module plan rather than in
- * `lessons.md`.
+ * **Variants and options are modelled since the uniform-variant rework.** The catalog now holds a
+ * store-wide option vocabulary (`ReadableProductOption` and its values) and every product owns at
+ * least one variant — sku, price and stock live at the variant level, and a product with no options
+ * owns exactly one default variant carrying the sku the operator typed. What stays unmodelled is
+ * the old attribute/property surface (`ReadableProductAttribute`, `ReadableProductProperty`, the
+ * price list), which has no console UI and no current backend design.
  */
 
 /* ------------------------------------------------------------------ shared entity bases ---- */
@@ -184,6 +185,114 @@ export interface PersistableProductType {
   readonly descriptions: readonly ProductTypeDescription[];
 }
 
+/* --------------------------------------------------------------------- product options ---- */
+
+/** `model/option/ProductOptionDescription` — a `NamedEntity`, though only `name` is rendered. */
+export type ProductOptionDescription = NamedDescription;
+
+/**
+ * `model/option/ReadableProductOptionValue` → `Entity`.
+ *
+ * One value of a store-wide option — "Red" under Color. `descriptions` is required because the DTO
+ * initialises it to an empty list; `name` is the requested language's label, resolved server-side.
+ */
+export interface ReadableProductOptionValue {
+  readonly id: number;
+  readonly code: string;
+  readonly name?: string;
+  readonly sortOrder?: number;
+  readonly descriptions: readonly ProductOptionDescription[];
+}
+
+/**
+ * `model/option/ReadableProductOption` → `Entity` — one axis of the store's vocabulary (Color,
+ * Size, …), defined once per store and assigned per product. Value ids are store-wide, which is
+ * what makes id-based faceting and the variant matrix possible.
+ */
+export interface ReadableProductOption {
+  readonly id: number;
+  readonly code: string;
+  readonly name?: string;
+  readonly sortOrder?: number;
+  readonly descriptions: readonly ProductOptionDescription[];
+  readonly values: readonly ReadableProductOptionValue[];
+}
+
+/** `PersistableProductOptionValue`. Carrying the id keeps the existing row — edits are not re-creates. */
+export interface PersistableProductOptionValue {
+  readonly id?: number;
+  readonly code: string;
+  readonly sortOrder?: number;
+  readonly descriptions: readonly ProductOptionDescription[];
+}
+
+/**
+ * `PersistableProductOption` — a whole-document write: the option and all its values travel
+ * together, values addressed by id keep their rows. `POST` echoes an `Entity`; `PUT` answers `void`.
+ */
+export interface PersistableProductOption {
+  readonly id?: number;
+  readonly code: string;
+  readonly sortOrder?: number;
+  readonly descriptions: readonly ProductOptionDescription[];
+  readonly values: readonly PersistableProductOptionValue[];
+}
+
+/* -------------------------------------------------------------------- product variants ---- */
+
+/**
+ * `model/product/ReadableProductVariant` → `Entity` — one sellable combination. Price and stock
+ * are the inventory service's, keyed by `sku`; the catalog row carries no availability flag.
+ */
+export interface ReadableProductVariant {
+  readonly id: number;
+  readonly sku: string;
+  readonly sortOrder?: number;
+  readonly defaultVariant: boolean;
+  readonly optionValueIds: readonly number[];
+}
+
+/**
+ * `model/product/ReadableVariantOptionValue` — one resolved (option, value) pair with the requested
+ * language's labels: what renders as "Color: Red" in the variant matrix and on an order line.
+ */
+export interface ReadableVariantOptionValue {
+  readonly optionId: number;
+  readonly optionCode: string;
+  readonly optionName?: string;
+  readonly valueId: number;
+  readonly valueCode: string;
+  readonly valueName?: string;
+  readonly sortOrder?: number;
+}
+
+/** `ReadableProductVariantDefinition` — the console's matrix row: the variant plus resolved labels. */
+export interface ReadableProductVariantDefinition extends ReadableProductVariant {
+  readonly optionValues: readonly ReadableVariantOptionValue[];
+}
+
+/**
+ * `PersistableProductVariant` — one combination inside a `PersistableVariantSet`. Carrying the id
+ * keeps the existing row; `optionValueIds` must hold exactly one value of every declared option.
+ */
+export interface PersistableProductVariant {
+  readonly id?: number;
+  readonly sku: string;
+  readonly sortOrder?: number;
+  readonly defaultVariant: boolean;
+  readonly optionValueIds: readonly number[];
+}
+
+/**
+ * `PersistableVariantSet` — the atomic whole-set replace `PUT …/product/{id}/variants` takes: the
+ * axes (option codes, in display order) and the combinations together, so they can never desync.
+ * Empty options and variants restore the single default variant.
+ */
+export interface PersistableVariantSet {
+  readonly options: readonly string[];
+  readonly variants: readonly PersistableProductVariant[];
+}
+
 /* ---------------------------------------------------------------------------- products ---- */
 
 /** `model/product/ProductDescription`. */
@@ -246,12 +355,16 @@ export interface PersistableProductImage {
  * brand, and `ReadableProductPopulator` fills all three, so asking a second endpoint per row would
  * be waste. `categories` and `images` are required because the DTO initialises them to empty lists.
  *
- * The variant, option, attribute and property lists the DTO also carries are not declared — see the
- * file header.
+ * `sku` is the **default variant's** sku since the uniform-variant rework, and `variantCount` says
+ * how many variants the product owns — a card or a list row needs only those two; the variant rows
+ * themselves never ship at listing altitude.
  */
 export interface ReadableProduct {
   readonly id: number;
+  /** The default variant's sku — every sellable sku lives on a variant now. */
   readonly sku?: string;
+  /** How many variants the product owns. `> 1` means "has options" — nothing stores a flag. */
+  readonly variantCount?: number;
   readonly available?: boolean;
   readonly visible?: boolean;
   readonly sortOrder?: number;
@@ -384,6 +497,26 @@ export interface PersistableInventory {
     readonly specialStartDate?: string | null;
     readonly specialEndDate?: string | null;
   };
+}
+
+/**
+ * `PersistableSkuInventory` — one element of the bulk upsert: the sku plus the same body the
+ * single-sku `PUT /{sku}` takes.
+ */
+export interface PersistableSkuInventory {
+  readonly sku: string;
+  readonly inventory: PersistableInventory;
+}
+
+/**
+ * `PersistableInventoryBatch` — the body of `PUT /private/inventory/bulk`: a whole variant matrix
+ * in one call. Capped at 200 entries server-side; the console saves one product's matrix at a time.
+ *
+ * A record wrapper rather than a bare list, deliberately: Spring 6.1 method-parameter validation on
+ * a naked `@RequestBody List` surfaces as a 500 through the shared advice, so the pod wraps it.
+ */
+export interface PersistableInventoryBatch {
+  readonly entries: readonly PersistableSkuInventory[];
 }
 
 /**
