@@ -145,23 +145,143 @@ describe('SignUp', () => {
     expect(fixture.nativeElement.textContent).toContain('at least 8 characters');
   });
 
-  it('blames the email when tenancy answers a bare conflict', () => {
-    // What the running stack actually returns for an address that already exists: a generic
-    // COMMON.DATA_INTEGRITY_VIOLATION with no fieldErrors at all.
-    api.error = new ApiError({
-      code: 'COMMON.DATA_INTEGRITY_VIOLATION',
-      category: 'CONFLICT',
-      status: 409,
+  it('refuses a password from the top of every breach list', () => {
+    fill({password: 'password123', repeatPassword: 'password123'});
+    submit();
+
+    expect(api.requests).toEqual([]);
+    expect(fixture.nativeElement.textContent).toContain('most common passwords');
+  });
+
+  it('refuses a password built out of the name typed above it', () => {
+    fill({password: 'lovelace99', repeatPassword: 'lovelace99'});
+    submit();
+
+    expect(api.requests).toEqual([]);
+    expect(fixture.nativeElement.textContent).toContain('must not contain your name');
+  });
+
+  it('refuses a password built out of the email local part', () => {
+    fill({
+      emailAddress: 'countess@example.com',
+      password: 'countess-1815',
+      repeatPassword: 'countess-1815',
     });
+    submit();
+
+    expect(api.requests).toEqual([]);
+    expect(fixture.nativeElement.textContent).toContain('must not contain your name');
+  });
+
+  it('caps the email at the 50 characters manager_org.email can hold', () => {
+    // 51 characters. The organization row is inserted first, so this address cannot sign up at all — and the
+    // 409 it would come back with is the one `bindTakenEmail` reads as "already registered".
+    const tooLong = `${'a'.repeat(39)}@example.com`;
+    expect(tooLong.length).toBe(51);
+
+    fill({emailAddress: tooLong});
+    submit();
+
+    expect(api.requests).toEqual([]);
+    // The length message, not "Enter a valid email address." — the address is perfectly well formed.
+    expect(fixture.nativeElement.textContent).toContain('at most 50 characters');
+  });
+
+  it('caps a name at the 50 characters uaa stores', () => {
+    fill({firstName: 'A'.repeat(51)});
+    submit();
+
+    expect(api.requests).toEqual([]);
+    expect(fixture.nativeElement.textContent).toContain('at most 50 characters');
+  });
+
+  it('trims the name and address, and rejects a name that was only spaces', () => {
+    fill({firstName: '   '});
+    submit();
+
+    expect(api.requests).toEqual([]);
+    expect(fixture.nativeElement.textContent).toContain('This field is required.');
+
+    // The passwords keep their whitespace: a space is a character like any other in a secret.
+    fill({firstName: '  Ada  ', emailAddress: '  ada@example.com  ', password: ' pass phrase ',
+      repeatPassword: ' pass phrase '});
+    submit();
+
+    expect(api.requests).toEqual([
+      {
+        user: {
+          firstName: 'Ada', lastName: 'Lovelace', emailAddress: 'ada@example.com',
+          password: ' pass phrase ', repeatPassword: ' pass phrase ',
+        },
+      },
+    ]);
+  });
+
+  it('lets the visitor fix the email a server error landed on', () => {
+    spyOn(router, 'navigateByUrl');
+    api.error = takenEmail();
     fill();
     submit();
 
     const email = fixture.nativeElement.querySelector('[formControlName="emailAddress"]')
       .closest('label') as HTMLElement;
     expect(email.textContent).toContain('already uses this email');
-    // Not the generic "This changed somewhere else. Refresh and try again." toast.
+
+    // A server error is not a validator: without `clearServerErrorsOnChange` nothing removes it, and the
+    // visitor types a new address only to watch the message stay and the form refuse to submit again.
+    api.error = null;
+    set('emailAddress', 'ada2@example.com');
+    fixture.detectChanges();
+    expect(email.textContent).not.toContain('already uses this email');
+
+    submit();
+    expect(api.requests.length).toBe(2);
+    expect(api.requests[1].user.emailAddress).toBe('ada2@example.com');
+  });
+
+  it('is submittable again for a second account in the same browser session', () => {
+    spyOn(router, 'navigateByUrl');
+    fill();
+    submit();
+    expect(api.requests.length).toBe(1);
+
+    // `AuthFacade` is a root singleton and `submitted` latches, so a second visit to the page would otherwise
+    // find the button permanently disabled.
+    const second = TestBed.createComponent(SignUp);
+    second.detectChanges();
+    const button = second.nativeElement.querySelector('button.auth-submit') as HTMLButtonElement;
+    expect(button.disabled).toBeFalse();
+  });
+
+  it('blames the email when the address is already registered', () => {
+    api.error = takenEmail();
+    fill();
+    submit();
+
+    const email = fixture.nativeElement.querySelector('[formControlName="emailAddress"]')
+      .closest('label') as HTMLElement;
+    expect(email.textContent).toContain('already uses this email');
+    // Not the generic "This changed somewhere else. Refresh and try again." toast, which is what a fieldless
+    // COMMON.DATA_INTEGRITY_VIOLATION resolves to — the shape tenancy used to answer with, and the reason
+    // `AuthFacade.bindTakenEmail` existed to guess at it.
     expect(toasts.messages).toEqual([]);
   });
+
+  /**
+   * What tenancy answers for an address that already exists.
+   *
+   * A code of its own and a field error naming the control, since `DuplicateSignupEmailException`. Before that
+   * it was a bare `COMMON.DATA_INTEGRITY_VIOLATION` with no `fieldErrors[]` — which an over-long address
+   * produced too, so the console's guess was sometimes a lie.
+   */
+  function takenEmail(): ApiError {
+    return new ApiError({
+      code: 'CONTROL_PLANE.SIGNUP.EMAIL_TAKEN',
+      category: 'CONFLICT',
+      status: 409,
+      fieldErrors: [{field: 'user.emailAddress', code: 'CONTROL_PLANE.SIGNUP.EMAIL_TAKEN', message: 'taken'}],
+    });
+  }
 
   it('lands a server field error on the control that caused it', () => {
     // What uaa answers when the email is already registered.

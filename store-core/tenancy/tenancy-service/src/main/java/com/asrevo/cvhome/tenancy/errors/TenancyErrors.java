@@ -48,7 +48,18 @@ public enum TenancyErrors implements ErrorCode {
     INVITATION_NOT_USABLE("CONTROL_PLANE.INVITATION.NOT_USABLE", ErrorCategory.UNPROCESSABLE),
 
     /** That address already has a live invitation to this organization, or already belongs to it. */
-    INVITATION_ALREADY_EXISTS("CONTROL_PLANE.INVITATION.ALREADY_EXISTS", ErrorCategory.CONFLICT);
+    INVITATION_ALREADY_EXISTS("CONTROL_PLANE.INVITATION.ALREADY_EXISTS", ErrorCategory.CONFLICT),
+
+    /**
+     * Signup was given an address uaa already has an account for.
+     *
+     * <p>
+     * Distinct from {@code COMMON.DATA_INTEGRITY_VIOLATION}, which is what a duplicate used to arrive as: that code
+     * is also what an over-long value produces, so a client could not tell the two apart and the console guessed.
+     * See {@link DuplicateSignupEmailException}.
+     * </p>
+     */
+    SIGNUP_EMAIL_TAKEN("CONTROL_PLANE.SIGNUP.EMAIL_TAKEN", ErrorCategory.CONFLICT);
 
     private final String code;
 

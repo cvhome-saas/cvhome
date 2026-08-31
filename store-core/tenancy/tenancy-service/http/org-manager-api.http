@@ -68,3 +68,50 @@ Cookie: SESSION={{SESSION_ID}}
         client.assert(response.body.status === "ACTIVE", "status " + response.body.status);
     });
 %}
+
+### create an organization for someone — the operator's version of public signup
+### Same CreateOrgRequest and same SignupService as api/v1/signup/public/create, so the same rules apply here:
+### an operator cannot create an organization the sign-up form would have refused.
+POST {{SELLER_UI_URL}}/tenancy/api/v1/org-manager/create?lang={{LANG}}
+Content-Type: application/json
+Cookie: SESSION={{SESSION_ID}}
+
+{
+  "user": {
+    "firstName": "Operator",
+    "lastName": "Created",
+    "emailAddress": "operator+{{$timestamp}}@example.com",
+    "organizationName": "Acme Trading",
+    "password": "correct-horse-8",
+    "repeatPassword": "correct-horse-8"
+  }
+}
+
+> {%
+    client.test("created", function () {
+        client.assert(response.status === 200, "status " + response.status);
+    });
+%}
+
+### the password rule this dialog used to allow — six characters with three character classes
+POST {{SELLER_UI_URL}}/tenancy/api/v1/org-manager/create?lang={{LANG}}
+Content-Type: application/json
+Cookie: SESSION={{SESSION_ID}}
+
+{
+  "user": {
+    "firstName": "Operator",
+    "lastName": "Created",
+    "emailAddress": "weak+{{$timestamp}}@example.com",
+    "password": "Pass1a",
+    "repeatPassword": "Pass1a"
+  }
+}
+
+> {%
+    client.test("refused, and the password is what is blamed", function () {
+        client.assert(response.status === 400, "status " + response.status);
+        client.assert(response.body.fieldErrors[0].field === "user.password",
+            JSON.stringify(response.body.fieldErrors));
+    });
+%}

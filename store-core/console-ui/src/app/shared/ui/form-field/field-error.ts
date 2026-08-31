@@ -3,6 +3,7 @@ import {AbstractControl} from '@angular/forms';
 import {TranslocoService} from '@jsverse/transloco';
 
 import {serverErrorOf} from '@core/errors/form-error.utils';
+import {fieldErrorMessage} from '@core/errors/problem-message';
 import {validationMessage} from '@shared/forms/validation-messages';
 
 /**
@@ -17,7 +18,11 @@ import {validationMessage} from '@shared/forms/validation-messages';
  *
  * **Where the words come from**, in order:
  *
- * 1. the server's own message, when a `fieldErrors[]` entry has been bound to this control;
+ * 1. a server `fieldErrors[]` entry bound to this control, translated by its **code** where the console has
+ *    words for it and falling back to the server's own `message` where it does not — see
+ *    `problem-message.ts`, shared with `ApiErrorService` rather than injected from it, because injecting
+ *    that service drags `NOTIFICATION_PORT` into every spec that renders a form. This used to render the
+ *    raw `message`, so a code the console *had* translated still showed the server's English;
  * 2. `fallback`, when the field has something specific to say;
  * 3. `shared.validation.*`, keyed on the validator that failed — see `validation-messages.ts`.
  *
@@ -85,7 +90,7 @@ export class FieldError {
 
     const server = serverErrorOf(control);
     if (server) {
-      return server.message ?? null;
+      return fieldErrorMessage(this.transloco, server);
     }
     if (!control.invalid) {
       return null;

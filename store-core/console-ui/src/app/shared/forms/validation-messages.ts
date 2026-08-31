@@ -23,6 +23,7 @@ const MESSAGE_KEYS: Readonly<Record<string, string>> = {
   email: 'shared.validation.email',
   minlength: 'shared.validation.minLength',
   maxlength: 'shared.validation.maxLength',
+  weakPassword: 'shared.validation.weakPassword',
   min: 'shared.validation.min',
   max: 'shared.validation.max',
   pattern: 'shared.validation.pattern',
@@ -44,6 +45,9 @@ const PRECEDENCE: readonly string[] = [
   'required',
   'minlength',
   'maxlength',
+  // Before the shape rules: a password that is long enough but is `password1` has a problem the visitor can
+  // act on, and it is the only thing left to say about a value that is otherwise perfectly well formed.
+  'weakPassword',
   'min',
   'max',
   'email',

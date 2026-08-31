@@ -50,6 +50,11 @@ class InternalOrgServiceImplTest {
 
     private static final String FOUNDER_EMAIL = "founder@example.com";
 
+    private static final String ORG_NAME = "Nordwerk";
+
+    /** Whitespace with nothing in it, which several rules here have to treat as absence rather than as a value. */
+    private static final String BLANK = "   ";
+
     private ManagerOrgRepository repository;
 
     private InternalOrgServiceImpl service;
@@ -78,7 +83,7 @@ class InternalOrgServiceImplTest {
 
     @Test
     void aBlankTermIsNormalisedToNoFilterAtAll() {
-        assertThat(filtersOf(new ListOrgQuery("   ", null))).containsExactly(null, null);
+        assertThat(filtersOf(new ListOrgQuery(BLANK, null))).containsExactly(null, null);
     }
 
     @Test
@@ -139,10 +144,18 @@ class InternalOrgServiceImplTest {
 
     @Test
     void anOrganizationIsCreatedFromTheSignupEmail() {
-        ManagerOrgEntity saved = ManagerOrgEntity.createOrgFromUser(new Email(FOUNDER_EMAIL));
+        ManagerOrgEntity saved = ManagerOrgEntity.createOrgFromUser(new Email(FOUNDER_EMAIL), ORG_NAME);
         when(repository.save(any())).thenReturn(saved);
 
-        assertThat(service.createOrgForUser(new Email(FOUNDER_EMAIL))).isEqualTo(saved.getId());
+        assertThat(service.createOrgForUser(new Email(FOUNDER_EMAIL), ORG_NAME)).isEqualTo(saved.getId());
+        assertThat(saved.getName()).isEqualTo(ORG_NAME);
+    }
+
+    @Test
+    void anOrganizationWithNoNameKeepsANullColumnRatherThanAnEmptyOne() {
+        // The column is nullable and the console's list screen falls back to the contact email when it is null.
+        // An empty string would defeat that fallback and show a blank cell instead.
+        assertThat(ManagerOrgEntity.createOrgFromUser(new Email(FOUNDER_EMAIL), BLANK).getName()).isNull();
     }
 
 }

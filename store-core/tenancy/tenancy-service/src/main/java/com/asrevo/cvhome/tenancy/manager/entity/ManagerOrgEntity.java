@@ -34,11 +34,22 @@ public class ManagerOrgEntity extends BaseEntity<ManagerOrgEntity, ManagerOrgId>
     @Column("owner_user_id")
     private String ownerUserId;
 
-    public static ManagerOrgEntity createOrgFromUser(Email email) {
+    /**
+     * A new organization, named.
+     *
+     * <p>
+     * The name is an argument rather than something a later {@code rename} supplies because {@code rename} was the
+     * only writer this column ever had, and nothing called it on the way in: every organization on the platform was
+     * created nameless. A signup knows what to call one — see {@code SignUpUser.organizationNameOrDefault()} — so
+     * the row is complete from the first insert.
+     * </p>
+     */
+    public static ManagerOrgEntity createOrgFromUser(Email email, String name) {
         ManagerOrgEntity entity = new ManagerOrgEntity();
         entity.id = entity.generateId();
         entity.setCreatedDate(Instant.now());
         entity.setEmail(email);
+        entity.setName(name == null || name.isBlank() ? null : name.strip());
         entity.setStatus(OrgStatus.ACTIVE);
         return entity;
     }

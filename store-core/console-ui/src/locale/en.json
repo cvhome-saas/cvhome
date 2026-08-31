@@ -157,7 +157,8 @@
       "MEDIA_REFERENCED": "This file is used by published content. Remove it there first.",
       "MEDIA_FOLDER_NOT_EMPTY": "Empty the folder before deleting it.",
       "MEDIA_UNREADABLE": "That file could not be read.",
-      "MEDIA_STORAGE_FAILED": "The file could not be stored. Try again."
+      "MEDIA_STORAGE_FAILED": "The file could not be stored. Try again.",
+      "CONTROL_PLANE_SIGNUP_EMAIL_TAKEN": "An account already uses this email address. Sign in instead, or use another address."
     }
   },
   "auth": {
@@ -182,22 +183,18 @@
     "signUp.point2": "Regions, currencies and tax rules configured per store.",
     "signUp.point3": "No card until the trial ends.",
     "signUp.email": "Email",
-    "signUp.emailFallback": "Enter a valid email address.",
     "signUp.password": "Password",
-    "signUp.passwordFallback": "Use at least 8 characters.",
+    "signUp.passwordHint": "At least 8 characters, and not your name or email address.",
     "signUp.showPassword": "Show password",
     "signUp.legalNote": "Free for 14 days. No card. Close the account and every store with it, whenever you like.",
     "signUp.firstName": "First name",
-    "signUp.firstNameFallback": "Enter your first name.",
     "signUp.lastName": "Last name",
-    "signUp.lastNameFallback": "Enter your last name.",
     "signUp.repeatPassword": "Repeat password",
-    "signUp.repeatPasswordFallback": "Repeat your password.",
     "signUp.passwordMismatch": "The two passwords do not match.",
+    "signUp.passwordPersonal": "Your password must not contain your name or email address.",
     "signUp.creating": "Creating account…",
     "signUp.created": "Account created. Sign in to continue.",
-    "signingOut": "Signing you out…",
-    "signUp.emailTaken": "An account already uses this email address. Sign in instead, or use another address."
+    "signingOut": "Signing you out…"
   },
   "dashboard": {
     "heading": {
@@ -418,6 +415,7 @@
       "email": "Enter a valid email address.",
       "minLength": "Use at least {requiredLength} characters.",
       "maxLength": "Use at most {requiredLength} characters.",
+      "weakPassword": "This is one of the most common passwords. Choose something harder to guess.",
       "min": "Enter {min} or more.",
       "max": "Enter {max} or less.",
       "pattern": "This is not a valid value.",
@@ -2352,8 +2350,8 @@
         "email": "Contact email",
         "password": "Password",
         "repeatPassword": "Repeat password",
-        "passwordHint": "6 to 12 characters, with an uppercase letter, a lowercase letter and a digit.",
-        "unnamedHint": "The organization will be listed under this email address until someone gives it a name.",
+        "passwordHint": "At least 8 characters, and not a common password or your own name.",
+        "unnamedHint": "The organization will be named after this administrator until someone renames it.",
         "emailInvalid": "Enter a valid email address.",
         "passwordWeak": "The password does not meet the rule above.",
         "passwordMismatch": "The two passwords do not match.",

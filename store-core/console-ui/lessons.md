@@ -144,6 +144,13 @@ now being built per [`../../.agents/plans/console-ui-content.md`](../../.agents/
 - **What would be needed to bring it back:** a `name` on the organization created by signup — a second
   component on `CreateOrgRequest` and a column behind `InternalOrgService.createOrgForUser`. Worth doing: an
   org currently has no display name anywhere in the console.
+- **Resolved since:** the server half exists. `SignUpUser` carries an optional `organizationName` (capped at
+  `manager_org.name`'s `varchar(100)`), `InternalOrgService.createOrgForUser` takes a name, and
+  `createOrgFromUser` writes it — so the column is no longer null for every organization on the platform.
+  When it is omitted the organization is named after its founder rather than left blank, which is why the
+  form still does not ask: a field that can be defaulted well is friction on the one screen that cannot
+  afford any. Adding the control back is now a one-line form change if the name matters more than the
+  friction.
 
 ## Auth — public signup validates nothing
 
@@ -167,12 +174,64 @@ now being built per [`../../.agents/plans/console-ui-content.md`](../../.agents/
   It does not.
 - **What the console does meanwhile:** `SignUpFormService` is now the only validation there is, and says so.
   An earlier revision of it deliberately dropped the password minimum "because uaa owns the policy" — that
-  assumption was wrong and the minimum is back.
+  assumption was wrong and the minimum is back. It now also caps every field at the column that will store it
+  (see the next entry), screens the password against the passwords an attacker tries first, and refuses a
+  password containing the name or address typed above it. `SignUp.submit` trims the three text fields before
+  checking validity, because `Validators.required` accepts `"   "` and no `@NotBlank` will catch it either.
+  Composition rules ("one upper, one digit") were deliberately **not** added: they produce `Password1!`, which
+  is on the screen list, and NIST has advised against them since SP 800-63B.
 - **Expected contract:** `@Valid` on the request, `@NotBlank` on `firstName`/`lastName`, `@Email` on
   `emailAddress`, a password policy (length and character classes) applied in uaa, and an `@AssertTrue` for
   the password match. Failures should come back as RFC-7807 with `fieldErrors[]` paths like
   `user.emailAddress`, which the console's form is already shaped to receive.
+- **Resolved since:** the endpoint validates. `SignUpApi.create` takes `@Valid`, `CreateOrgRequest` holds a
+  `@Valid SignUpUser` instead of uaa's `PersistableUser`, and that record carries `@NotBlank` on both names,
+  `@Email` on the address, `@Size` on all four, and two class-level constraints — `@PasswordsMatch` (the
+  confirmation was read by *nothing*) and `@StrongPassword` (the common-password screen and the
+  name-in-password rule, the same two the form applies). Failures arrive exactly as this entry asked:
+  RFC-7807 with `fieldErrors[]` paths like `user.emailAddress` and `user.repeatPassword`, proved over real
+  HTTP by `SignUpApiIntegrationTest`. The form keeps its rules — it is what says so without a round trip —
+  but it is no longer the only thing that has them. Two things the probe did not ask for came with it:
+  swapping `PersistableUser` out closed a **privilege hole** (a public body could name a `store`, which is
+  what the store-scoped permission checks read, and the old overwrite missed that field), and a rollback
+  after uaa has already created the account now deletes it, so a half-finished signup no longer burns the
+  address for good. uaa itself still has no password policy of its own — that part of the contract is open,
+  and matters for every path that sets a password other than this one.
 - **Note:** the probe left a junk organization and user (`not-an-email`) in the local development database.
+
+## Auth — signup's field limits are the database's, and only the console knows them
+
+- **Screen:** `/sign-up`.
+- **What is missing:** any length constraint on the request. With no `@Size` anywhere, the first thing that
+  objects to an over-long value is the column, and by then a tenant is half-created.
+- **The limits, each read off the schema rather than guessed:**
+
+  | Field | Column | Limit |
+  | --- | --- | --- |
+  | `firstName`, `lastName` | `uaa.users.first_name` / `last_name` | `varchar(50)` |
+  | `emailAddress` | `tenancy.manager_org.email` | **`varchar(50)`** |
+  | `emailAddress` (again) | `uaa.users.username` / `email` | `varchar(190)` / `varchar(254)` |
+  | `password` | bcrypt input, via `PasswordEncoderFactories.createDelegatingPasswordEncoder()` | 72 **bytes** |
+
+- **Why the email limit is 50 and not 254:** `SignupServiceImpl.createOrgUser` inserts the organization
+  *first*, and `manager_org.email` is `varchar(50)`. uaa's roomier columns never get a chance to matter. An
+  address of 51 characters — an ordinary corporate address — therefore cannot sign up at all.
+- **What it looks like when it happens:** the insert throws `DataIntegrityViolationException`, which
+  `DataIntegrityErrorHandler` answers as `409 COMMON.DATA_INTEGRITY_VIOLATION` with no `fieldErrors[]` — the
+  same shape a duplicate address produces. `AuthFacade.bindTakenEmail` cannot tell them apart and tells the
+  visitor the address is already registered. **The message is not merely unhelpful, it is false**, and it sends
+  someone to a sign-in page for an account that does not exist. This is the second failure to hide behind that
+  bare 409; see the next entry.
+- **What the console does meanwhile:** `SignUpFormService` caps each field at the limit above, so the request
+  that cannot succeed is never sent. The password cap is stated as a truncation, not a rule — bcrypt ignores
+  everything past 72 bytes whether or not the form mentions it, so the limit is honest rather than arbitrary.
+- **Resolved since:** half of it. `SignUpUser` now carries the `@Size` this entry asked for, so an over-long
+  value comes back as a 400 naming the field rather than as a conflict that means something else — the false
+  "already registered" message is gone. The column itself is **not** widened: `manager_org.email` is still
+  `varchar(50)`, so an ordinary 51-character corporate address still cannot sign up, it is merely now told
+  the truth about why. Widening it stays the real fix and is a migration, not a constraint.
+- **Expected contract:** widen `manager_org.email` to `varchar(254)` — an organization's email is a real
+  address and 50 is below the standard maximum.
 
 ## Auth — a taken email is indistinguishable from any other conflict
 
@@ -189,12 +248,14 @@ now being built per [`../../.agents/plans/console-ui-content.md`](../../.agents/
   `CUA.REGISTRATION.EMAIL_TAKEN` in a comment, but nothing sends that code.
 - **Why it is required:** a duplicate address is the single most likely way a signup fails, and it is the one
   the visitor can act on — by signing in instead.
-- **What the console does meanwhile:** `AuthFacade.bindTakenEmail` treats a 409 with no field errors on *this
-  call* as a taken address and puts a specific message on the email control. Deliberately narrow, and it should
-  be deleted the moment the server can say what it means.
-- **Expected contract:** a distinct code (`TENANCY.SIGNUP.EMAIL_TAKEN`) with
-  `fieldErrors: [{field: "user.emailAddress", code: "..."}]`. Note the conflict currently leaks the internal
-  uaa path (`/api/v1/admin/users`) in `params`, which a public endpoint should not do.
+- **Resolved since:** the server says what it means, and `AuthFacade.bindTakenEmail` has been **deleted** as
+  this entry said it should be. A duplicate now answers `409 CONTROL_PLANE.SIGNUP.EMAIL_TAKEN` with
+  `fieldErrors: [{field: "user.emailAddress"}]`, which `applyToForm` binds with no special case; the sentence
+  moved from `auth.signUp.emailTaken` to `errors.code.CONTROL_PLANE_SIGNUP_EMAIL_TAKEN`, where the error chain
+  finds it by code. `DuplicateSignupEmailException` deliberately does not chain the uaa failure, which also
+  stops the internal uaa path leaking into `params` on a public endpoint.
+- **Expected contract:** met, under the code `CONTROL_PLANE.SIGNUP.EMAIL_TAKEN` rather than the
+  `TENANCY.SIGNUP.*` guessed here — tenancy's codes are all `CONTROL_PLANE.*`.
 
 ## Auth — the trial a visitor is promised is not the trial the catalog publishes
 
