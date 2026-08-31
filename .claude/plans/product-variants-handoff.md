@@ -76,7 +76,37 @@ to final shape; dev/QA databases are dropped and reseeded.
 
 ## Remaining work
 
-### Phase 5 — console-ui (`store-core/console-ui`) — NOT STARTED
+> **2026-08-31 update:** Phases 5 and 6 are DONE (commits below). Only Phase 7 (live QA against a
+> reset stack) remains. The sections beneath are kept as the record of what was asked; deltas worth
+> knowing:
+>
+> - **Phase 5 commits:** `feat(console-ui): store option vocabulary — models, api tier, Options tab`
+>   and `feat(console-ui): variants step, variant-aware list rows and order lines`. All gates green
+>   (`npm run build`, `npm run lint`, `npm run test:ci` — 997 specs).
+>   - The variants step lives in the wizard as a fifth step (locked until saved, like media) and
+>     **saves itself** (atomic PUT → inventory bulk + retired-sku deletes, retryable
+>     `variantInventoryPending` state). Retired skus are diffed against the **post-write** variant
+>     list, not the request — clearing all options must not delete the restored default variant's
+>     inventory row.
+>   - Pricing step yields to a pointer when options are assigned; `ProductFormApi.update` takes
+>     `writeInventory=false` then. Readiness swaps `price` for `variantPricing`.
+>   - `ProductFormApi.load` now: catalog reads (definition, variants, option vocabulary, refs) then
+>     ONE `bySkus` over default + combination skus.
+>   - lessons.md: the variants console-gap entry is CLOSED; the type-attributes entry stays open by
+>     design with a dated note.
+> - **Phase 6 commit:** `feat(landing-ui): re-activate the variant UI against the uniform model`.
+>   Gates: `build:libs`, `next build`, libs/theme tests; lint error count unchanged (539 pre-existing).
+>   - **One deliberate deviation:** `ProductAttribute*` types were NOT deleted — every theme's
+>     product page renders a specifications accordion from them (degrading to nothing; the wire
+>     never sends attributes). Documented dead in `product-groups.ts`; delete together with those
+>     blocks or revive when descriptive attributes land.
+>   - `?sku=` sync uses `history.replaceState` (the listing's own pattern), not `router.replace`.
+>   - Facet counts render inside the value label ("Red (12)") via each theme's `optionFacetGroups`.
+>   - 13 themes touched mechanically: BuyBox (no `value.description`/`value.price`), Listing
+>     (facet groups from `facets.options`), CartLineItem (`variantSelectionLabel`), OrderDetails
+>     (attributes snapshot line).
+
+### Phase 5 — console-ui (`store-core/console-ui`) — DONE (see update above)
 
 Read `ARCHITECTURE.md` (tiers, shared controls), `CLAUDE.md` (the rules easiest to break), `lessons.md`
 (~L1363 "a product type carries no attribute definitions", ~L1470 "variants, options and attributes" — mark
@@ -115,7 +145,7 @@ both CLOSED, append-only, pointing at the per-product model; the type tab itself
 8. i18n: `src/locale/en.json` + `ar.json` (lint fails on unused AND on missing keys — transloco throws at
    runtime on missing). Gates: `npm run build` (AOT strict), `npm run lint`, `npm run test:ci`.
 
-### Phase 6 — landing-ui (`store-pod/landing-ui`) — NOT STARTED
+### Phase 6 — landing-ui (`store-pod/landing-ui`) — DONE (see update above)
 
 Read `.claude/skills/project-structure/references/landing-ui.md`. The variant UI already exists in all 12
 themes and is dead — this phase re-activates it against the new contract.
