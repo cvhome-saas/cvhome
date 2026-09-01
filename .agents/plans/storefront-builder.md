@@ -117,16 +117,17 @@ One JSONB doc per (store, page), draft + published copies:
 
 ## Status (2026-09-01)
 
-Phases 0–5 are implemented and committed on `feat/storefront-builder` (worktree stack
-`storefront-builder`), live-QA'd against the running stack: backend + seeds, shell-composed home with
-theme registries (starter/basic/beauty designed, beauty's exclusive `hero.editorial`), the console
-builder, SECTION-flow retirement, plus post-QA fixes (newsletter client-reference bug, storefront origin
-now taken from the pod's EXTERNAL endpoint). Remaining from those phases: PR via /go, and the deferrals
-recorded in Phase 5 (banner HERO/CAROUSEL retirement, 5 remaining theme registries, manual product
-source, newsletter wiring).
+Phases 0-6 are implemented, committed and live-QA'd on the `storefront-builder` stack. Phase 6 canvas
+parity verified in the browser end to end: select/hover sync both ways, scrollTo, floating toolbar,
+in-canvas grip reorder, library drag→drop with insertion targeting, add-here zones, guides, locks
+(with inspector lockdown), Alt+Arrow + Delete, undo/redo, publish + revisions drawer, 409 conflict
+bar recovery, RTL chrome. The builder now runs shell-free at its own top-level route (full viewport).
 
-Phase 6 below is the continuation: full parity with `Storefront Builder.dc.html` — canvas drag-and-drop,
-on-canvas toolbar, guides, lock, page links, revisions drawer, and the stability pass.
+Phase 7 batch 1 done: registries for fashion (wall hero recaptured), grocery, pink, hunger,
+furniture (DirectoryBoard as `categories`); `slidesAsBanners` shared via @store-front/theme; fallback
+audit fixes (drawn usp icons, translated newsletter copy); duplicate policy links dropped from all 12
+footers; "Section design rules" contract in themes/README.md. Remaining: deeper per-theme DESIGN.md
+audits and the full screenshot matrix, then PR via /go.
 
 ## Phase 0 — Worktree setup (per AGENTS.md worktree-per-feature rules)
 
