@@ -25,7 +25,7 @@
       <div class="body">
         @if (sec.locked) {
           <p class="locked-note">{{ t('builder.inspector.locked') }}</p>
-        }
+        } @else {
         @if ((spec()?.variants ?? []).length > 1) {
           <app-form-field [label]="t('builder.inspector.variant')">
             <app-select [options]="variantOptions()" [value]="sec.variant ?? ''"
@@ -169,6 +169,7 @@
           <app-select [options]="styleOptions(['default', 'muted', 'inverse'], 'tone-')"
                       [value]="sec.style?.tone ?? 'default'" (valueChange)="setStyle('tone', $event)" />
         </app-form-field>
+        }
       </div>
 
       <footer class="foot">

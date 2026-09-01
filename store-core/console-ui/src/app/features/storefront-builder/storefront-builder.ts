@@ -120,6 +120,9 @@ export class StorefrontBuilder implements OnInit, OnDestroy {
     this.publishing.set(false);
     this.published.set(ok);
     if (ok) {
+      if (this.revisionsOpen()) {
+        this.facade.loadRevisions();
+      }
       setTimeout(() => this.published.set(false), 3000);
     }
   }

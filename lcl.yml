@@ -268,7 +268,7 @@ services:
       NEXT_DIST_DIR: ".next-${stack}"
       # Console origins the builder's canvas bridge trusts for postMessage; without it the bridge is
       # deliberately silent and the builder falls back to layer-list-only editing.
-      NEXT_PUBLIC_BUILDER_ORIGINS: "http://gateway.com:${port.store-core-gateway.8000},http://console-ui.gateway.com:${port.store-core-gateway.8000}"
+      NEXT_PUBLIC_BUILDER_ORIGINS: "http://gateway.com:${port.store-core-gateway.http},http://console-ui.gateway.com:${port.store-core-gateway.http}"
     depends-on: [spg, merchant, content, catalog, checkout, inventory]
     health: { type: tcp, port: http, timeout: 300 }
 

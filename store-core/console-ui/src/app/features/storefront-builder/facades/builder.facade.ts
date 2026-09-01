@@ -311,7 +311,7 @@ export class BuilderFacade {
 
   moveById(id: string, delta: number): void {
     const doc = this.doc();
-    if (!doc) {
+    if (!doc || this.isLocked(id)) {
       return;
     }
     const from = doc.sections.findIndex((section) => section.id === id);

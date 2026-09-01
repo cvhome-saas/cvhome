@@ -76,6 +76,11 @@ export const serverRoutes: ServerRoute[] = [
     renderMode: RenderMode.Client,
   },
   {
+    // The builder is its own shell-free top-level route; same store-scoped SSR constraint.
+    path: 'store-management/builder',
+    renderMode: RenderMode.Client,
+  },
+  {
     // Required, not optional: `SelectedStoreRequestContext.params()` throws during SSR.
     path: 'store-management/**',
     renderMode: RenderMode.Client,

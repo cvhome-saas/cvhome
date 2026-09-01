@@ -458,6 +458,16 @@ export const routes: Routes = [
     ],
   },
   {
+    // The storefront builder escapes the console shell entirely: an editor wants the whole viewport,
+    // and the page brings its own top chrome. Same URL as before, declared ahead of the
+    // `store-management` branch so it wins the match.
+    path: 'store-management/builder',
+    loadComponent: () =>
+      import('@features/storefront-builder/storefront-builder').then((page) => page.StorefrontBuilder),
+    canActivate: [canAccessSecuredPages, consoleContext, merchantOnly, requiresStore],
+    data: {titleKey: 'route.builder.title', breadcrumbKey: 'shell.breadcrumb.builder'},
+  },
+  {
     path: 'store-management',
     loadComponent: () => import('@layouts/console-shell/console-shell').then((layout) => layout.ConsoleShell),
     // Authentication and the store list for the whole branch; a *store* is not required, because
@@ -474,15 +484,6 @@ export const routes: Routes = [
         path: 'create',
         loadComponent: () => import('@features/create-store/create-store').then((page) => page.CreateStore),
         data: {titleKey: 'route.createStore.title', breadcrumbKey: 'shell.breadcrumb.createStore'},
-      },
-      // The storefront builder: its own route (not a `:section` pane) because it needs the whole
-      // viewport and brings its own top chrome. Static before the section param, like `create`.
-      {
-        path: 'builder',
-        loadComponent: () =>
-          import('@features/storefront-builder/storefront-builder').then((page) => page.StorefrontBuilder),
-        canActivate: [requiresStore],
-        data: {titleKey: 'route.builder.title', breadcrumbKey: 'shell.breadcrumb.builder'},
       },
       // The section is part of the URL, so a settings card is linkable and survives a reload.
       // `domain` because it is the first section; `branding` used to be, and stayed here after
