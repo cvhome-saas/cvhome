@@ -40,6 +40,13 @@ import static org.mockito.Mockito.when;
  * publish is an atomic copy plus a snapshot, and the storefront never sees an unpublished draft.
  */
 class PageLayoutServiceTest {
+    private static final String HOME = "HOME";
+    private static final String LIVE = "live";
+    private static final String SEC_IMG = "sec-img";
+    private static final String IMAGE = "image";
+    private static final String MEDIA_ID = "mediaId";
+    private static final String SECRET_DRAFT = "secret draft";
+
 
     private static final String ACTOR = "tester";
 
@@ -72,7 +79,7 @@ class PageLayoutServiceTest {
         row.setDraft(draft);
         row.setPublished(published);
         row.setDraftVersion(draftVersion);
-        when(layouts.findByStoreMerchantIdAndPage(ContentFixtures.STORE.getId(), "HOME"))
+        when(layouts.findByStoreMerchantIdAndPage(ContentFixtures.STORE.getId(), HOME))
                 .thenReturn(Optional.of(row));
         return row;
     }
@@ -85,7 +92,7 @@ class PageLayoutServiceTest {
 
     @Test
     void firstTouchMaterializesTheStarterDefault() {
-        when(layouts.findByStoreMerchantIdAndPage(ContentFixtures.STORE.getId(), "HOME"))
+        when(layouts.findByStoreMerchantIdAndPage(ContentFixtures.STORE.getId(), HOME))
                 .thenReturn(Optional.empty());
 
         ReadableLayout layout = service.get(ContentFixtures.STORE, PageKind.HOME);
@@ -98,7 +105,7 @@ class PageLayoutServiceTest {
 
     @Test
     void aStaleSaveIsAConflictNotAClobber() {
-        existing(JsonCodec.write(doc("live")), null, 4);
+        existing(JsonCodec.write(doc(LIVE)), null, 4);
 
         assertThatThrownBy(() -> service.save(ContentFixtures.STORE, PageKind.HOME,
                 new PersistableLayout(doc("mine"), 3), ACTOR))
@@ -109,7 +116,7 @@ class PageLayoutServiceTest {
     void aSaveBumpsTheVersionAndReindexesMediaUsage() throws Exception {
         PageLayout row = existing(JsonCodec.write(doc("old")), null, 1);
         LayoutDocument next = new LayoutDocument(LayoutDocument.CURRENT_SCHEMA_VERSION, PageKind.HOME, List.of(
-                new LayoutSection("sec-img", "image", "contained", Map.of("mediaId", 9), null, null, null,
+                new LayoutSection(SEC_IMG, IMAGE, "contained", Map.of(MEDIA_ID, 9), null, null, null,
                         null, null, null)));
 
         ReadableLayout saved = service.save(ContentFixtures.STORE, PageKind.HOME,
@@ -118,12 +125,12 @@ class PageLayoutServiceTest {
         assertThat(saved.meta().draftVersion()).isEqualTo(2);
         assertThat(row.getModifiedBy()).isEqualTo(ACTOR);
         verify(usage).replace(eq(ContentFixtures.STORE), eq(MediaOwnerKind.LAYOUT), eq("41"), any(), any(),
-                any(), eq(Map.of("sec-img", 9L)));
+                any(), eq(Map.of(SEC_IMG, 9L)));
     }
 
     @Test
     void publishCopiesTheDraftAndSnapshotsARevision() throws Exception {
-        PageLayout row = existing(JsonCodec.write(doc("next")), JsonCodec.write(doc("live")), 3);
+        PageLayout row = existing(JsonCodec.write(doc("next")), JsonCodec.write(doc(LIVE)), 3);
         when(media.urls(eq(ContentFixtures.STORE), anyList())).thenReturn(Map.of());
 
         var result = service.publish(ContentFixtures.STORE, PageKind.HOME, 3, ACTOR);
@@ -140,7 +147,7 @@ class PageLayoutServiceTest {
     @Test
     void publishBlocksOnAMediaReferenceTheLibraryDoesNotHold() {
         LayoutDocument withMedia = new LayoutDocument(LayoutDocument.CURRENT_SCHEMA_VERSION, PageKind.HOME,
-                List.of(new LayoutSection("sec-img", "image", null, Map.of("mediaId", 404), null, null, null,
+                List.of(new LayoutSection(SEC_IMG, IMAGE, null, Map.of(MEDIA_ID, 404), null, null, null,
                         null, null, null)));
         existing(JsonCodec.write(withMedia), null, 1);
         when(media.urls(eq(ContentFixtures.STORE), anyList())).thenReturn(Map.of());
@@ -151,17 +158,17 @@ class PageLayoutServiceTest {
 
     @Test
     void theStorefrontServesTheDefaultUntilFirstPublishAndNeverTheDraft() {
-        existing(JsonCodec.write(doc("secret draft")), null, 2);
+        existing(JsonCodec.write(doc(SECRET_DRAFT)), null, 2);
 
         LayoutDocument served = service.served(ContentFixtures.STORE, PageKind.HOME, false);
 
-        assertThat(JsonCodec.write(served)).doesNotContain("secret draft");
+        assertThat(JsonCodec.write(served)).doesNotContain(SECRET_DRAFT);
         assertThat(served.sections()).isNotEmpty();
     }
 
     @Test
     void discardReturnsToThePublishedDocument() throws Exception {
-        PageLayout row = existing(JsonCodec.write(doc("draft")), JsonCodec.write(doc("live")), 5);
+        PageLayout row = existing(JsonCodec.write(doc("draft")), JsonCodec.write(doc(LIVE)), 5);
 
         service.discard(ContentFixtures.STORE, PageKind.HOME, 5, ACTOR);
 

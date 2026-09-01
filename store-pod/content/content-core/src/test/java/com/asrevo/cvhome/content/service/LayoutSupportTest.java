@@ -20,6 +20,13 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  * section catalogue.
  */
 class LayoutSupportTest {
+    private static final String SEC_A = "a";
+    private static final String HERO = "hero";
+    private static final String MEDIA_ID = "mediaId";
+    private static final String HOLOGRAM = "hologram";
+    private static final String IMG = "img";
+    private static final String ITEM_P = "p";
+
 
     private static LayoutSection section(String id, String kind, Map<String, Object> props, List<LayoutItem> items) {
         return new LayoutSection(id, kind, null, props, items, null, null, null, null, null);
@@ -32,21 +39,21 @@ class LayoutSupportTest {
     @Test
     void aWellFormedDocumentPasses() throws InvalidContentRequestException {
         LayoutSupport.validate(document(
-                section("a", "hero", Map.of(), List.of(new LayoutItem("i1", Map.of("mediaId", 5), null))),
+                section(SEC_A, HERO, Map.of(), List.of(new LayoutItem("i1", Map.of(MEDIA_ID, 5), null))),
                 section("b", "richtext", Map.of(), null)));
     }
 
     @Test
     void anUnknownKindIsRefused() {
-        assertThatThrownBy(() -> LayoutSupport.validate(document(section("a", "hologram", Map.of(), null))))
+        assertThatThrownBy(() -> LayoutSupport.validate(document(section(SEC_A, HOLOGRAM, Map.of(), null))))
                 .isInstanceOf(InvalidContentRequestException.class)
-                .hasMessageContaining("hologram");
+                .hasMessageContaining(HOLOGRAM);
     }
 
     @Test
     void duplicateSectionIdsAreRefused() {
         assertThatThrownBy(() -> LayoutSupport.validate(document(
-                section("a", "hero", Map.of(), null), section("a", "usp", Map.of(), null))))
+                section(SEC_A, HERO, Map.of(), null), section(SEC_A, "usp", Map.of(), null))))
                 .isInstanceOf(InvalidContentRequestException.class)
                 .hasMessageContaining("Duplicate");
     }
@@ -62,20 +69,20 @@ class LayoutSupportTest {
     @Test
     void mediaReferencesAreCollectedFromSectionsAndItems() {
         Map<String, Long> refs = LayoutSupport.mediaReferences(document(
-                section("img", "image", Map.of("mediaId", 7), null),
-                section("hero", "hero", Map.of(), List.of(
-                        new LayoutItem("s1", Map.of("mediaId", 8), null),
+                section(IMG, "image", Map.of(MEDIA_ID, 7), null),
+                section(HERO, HERO, Map.of(), List.of(
+                        new LayoutItem("s1", Map.of(MEDIA_ID, 8), null),
                         new LayoutItem("s2", Map.of(), null)))));
 
-        assertThat(refs).containsExactly(Map.entry("img", 7L), Map.entry("hero/s1", 8L));
+        assertThat(refs).containsExactly(Map.entry(IMG, 7L), Map.entry("hero/s1", 8L));
     }
 
     @Test
     void aSourcelessProductsSectionIsAWarningNotAWall() {
-        var warnings = LayoutSupport.warnings(document(section("p", "products", Map.of(), null)));
+        var warnings = LayoutSupport.warnings(document(section(ITEM_P, "products", Map.of(), null)));
 
         assertThat(warnings).singleElement()
-                .satisfies(w -> assertThat(w.field()).isEqualTo("p"));
+                .satisfies(w -> assertThat(w.field()).isEqualTo(ITEM_P));
     }
 
 }

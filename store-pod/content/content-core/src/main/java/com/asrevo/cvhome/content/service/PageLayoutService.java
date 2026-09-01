@@ -2,7 +2,6 @@ package com.asrevo.cvhome.content.service;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Clock;
-import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -178,7 +177,7 @@ public class PageLayoutService {
         List<FieldError> missing = refs.entrySet().stream()
                 .filter(e -> !known.containsKey(e.getValue()))
                 .map(e -> FieldError.of(e.getKey(), ContentErrors.MEDIA_NOT_FOUND,
-                        "Media " + e.getValue() + " is not in this store's library."))
+                        String.format("Media %d is not in this store's library.", e.getValue())))
                 .toList();
         if (!missing.isEmpty()) {
             throw ContentRuleException.publishIncomplete(entity.getId(), missing);
@@ -209,7 +208,7 @@ public class PageLayoutService {
     }
 
     private String ownerTitle(PageKind page) {
-        return page == PageKind.HOME ? "Home page layout" : page.name() + " layout";
+        return page == PageKind.HOME ? "Home page layout" : String.format("%s layout", page.name());
     }
 
 }

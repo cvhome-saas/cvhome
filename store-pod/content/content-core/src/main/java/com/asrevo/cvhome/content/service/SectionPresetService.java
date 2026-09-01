@@ -42,7 +42,8 @@ public class SectionPresetService {
             throws InvalidContentRequestException {
         LayoutSection section = body.section();
         if (section.kind() == null || !LayoutKinds.KNOWN.contains(section.kind())) {
-            throw InvalidContentRequestException.layoutInvalid("Unknown section kind " + section.kind() + ".");
+            throw InvalidContentRequestException.layoutInvalid(
+                    String.format("Unknown section kind %s.", section.kind()));
         }
         SectionPreset entity = new SectionPreset();
         entity.setStoreMerchantId(store.getId());

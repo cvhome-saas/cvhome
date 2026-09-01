@@ -41,35 +41,45 @@ public final class LayoutSupport {
         }
         if (document.schemaVersion() == null || document.schemaVersion() != LayoutDocument.CURRENT_SCHEMA_VERSION) {
             throw InvalidContentRequestException.layoutInvalid(
-                    "Unsupported schemaVersion " + document.schemaVersion() + ".");
+                    String.format("Unsupported schemaVersion %s.", document.schemaVersion()));
         }
         List<LayoutSection> sections = document.sections();
         if (sections.size() > LayoutDocument.MAX_SECTIONS) {
             throw InvalidContentRequestException.layoutInvalid(
-                    "A page holds at most " + LayoutDocument.MAX_SECTIONS + " sections.");
+                    String.format("A page holds at most %d sections.", LayoutDocument.MAX_SECTIONS));
         }
         Set<String> ids = new HashSet<>();
         for (LayoutSection section : sections) {
-            if (section.id() == null || section.id().isBlank()) {
-                throw InvalidContentRequestException.layoutInvalid("Every section needs an id.");
-            }
-            if (!ids.add(section.id())) {
-                throw InvalidContentRequestException.layoutInvalid("Duplicate section id " + section.id() + ".");
-            }
-            if (section.kind() == null || !LayoutKinds.KNOWN.contains(section.kind())) {
+            validateSection(section, ids);
+        }
+    }
+
+    private static void validateSection(LayoutSection section, Set<String> ids)
+            throws InvalidContentRequestException {
+        if (section.id() == null || section.id().isBlank()) {
+            throw InvalidContentRequestException.layoutInvalid("Every section needs an id.");
+        }
+        if (!ids.add(section.id())) {
+            throw InvalidContentRequestException.layoutInvalid(
+                    String.format("Duplicate section id %s.", section.id()));
+        }
+        if (section.kind() == null || !LayoutKinds.KNOWN.contains(section.kind())) {
+            throw InvalidContentRequestException.layoutInvalid(
+                    String.format("Unknown section kind %s.", section.kind()));
+        }
+        if (section.items().size() > LayoutSection.MAX_ITEMS) {
+            throw InvalidContentRequestException.layoutInvalid(
+                    String.format("A section holds at most %d items.", LayoutSection.MAX_ITEMS));
+        }
+        validateItems(section);
+    }
+
+    private static void validateItems(LayoutSection section) throws InvalidContentRequestException {
+        Set<String> itemIds = new HashSet<>();
+        for (LayoutItem item : section.items()) {
+            if (item.id() == null || item.id().isBlank() || !itemIds.add(item.id())) {
                 throw InvalidContentRequestException.layoutInvalid(
-                        "Unknown section kind " + section.kind() + ".");
-            }
-            if (section.items().size() > LayoutSection.MAX_ITEMS) {
-                throw InvalidContentRequestException.layoutInvalid(
-                        "A section holds at most " + LayoutSection.MAX_ITEMS + " items.");
-            }
-            Set<String> itemIds = new HashSet<>();
-            for (LayoutItem item : section.items()) {
-                if (item.id() == null || item.id().isBlank() || !itemIds.add(item.id())) {
-                    throw InvalidContentRequestException.layoutInvalid(
-                            "Items of section " + section.id() + " need unique ids.");
-                }
+                        String.format("Items of section %s need unique ids.", section.id()));
             }
         }
     }
@@ -88,7 +98,7 @@ public final class LayoutSupport {
             for (LayoutItem item : section.items()) {
                 Long ref = mediaId(item.props());
                 if (ref != null) {
-                    refs.put(section.id() + "/" + item.id(), ref);
+                    refs.put(String.format("%s/%s", section.id(), item.id()), ref);
                 }
             }
         }
