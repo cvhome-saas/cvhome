@@ -11,7 +11,7 @@ somewhere else entirely — that is [cua](../../../store-pod/cua/qa/cua-qa.md).
   is where the platform's sign-in page lives
 - **Runs on** — `lcl start -d --stack <name>`; uaa is `http://uaa.gateway.com:8001` and is the **first**
   service the stack brings up, because it issues the tokens. Read the live port from `lcl urls`
-- **Cases** — 29 (13 verified, 3 unit only, 13 not verified)
+- **Cases** — 30 (16 verified, 3 unit only, 11 not verified)
 - **Also see** — [gateway](../../gateway/gateway-service/qa/gateway-qa.md) (which relays the token and holds
   the session), [tenancy](../../tenancy/tenancy-service/qa/tenancy-qa.md) (which owns the *store-scoped*
   accounts and calls uaa to create them),
@@ -310,19 +310,42 @@ to `/clients` reaches the router rather than 404ing.
 - **What must NOT mirror** — a client id, a grant type, a scope, a role name. Those fields are `latin mono`
   and stay left-to-right, because `client_secret_basic` reversed is not a translation.
 
-### CON-06 — A non-super-admin gets nothing · critical · [not verified]
+### CON-06 — A non-super-admin gets nothing · critical · [verified]
 
 - **Steps** — sign in as `org1-admin` and open each of the three sections.
-- **Expect** — the shell renders (they are authenticated) and every list fails with a permission error the
-  toast reports. The double gate in ADM-02 is what enforces it; this case is that the console *renders* the
-  refusal rather than an empty table that looks like there is nothing to see.
+- **Seen** — the shell renders (they *are* authenticated: `/auth/me` answers with `ROLE_ORG_ADMIN`), and all
+  three lists fail. `GET /api/v1/admin/{users,roles,clients}` each answer **403**, which is ADM-02 verified
+  from the console's side.
+- **The refusal is rendered, but as a code.** The strip reads `CLIENT.HTTP_403 [403]` where the string
+  "You do not have permission to do that." already exists in the kit's dictionary. Two things combine: the
+  filter chain's 403 carries **no problem+json body**, so the parser synthesises
+  `code: CLIENT.HTTP_403, category: FORBIDDEN` — correctly — and then `app-load-error` is bound to
+  `failure.message`, which is developer text. See console-ui-qa.md KIT-04b; it is pre-existing and affects
+  both consoles.
 
-### CON-07 — Write paths round-trip · high · [not verified]
+### CON-09 — The tab title is translated on a cold load · [verified]
 
-- **Steps** — from Users: disable an account, re-enable it, reset its password, grant and revoke a role.
-  From Clients: register one, rotate its secret, delete it.
-- **Expect** — a toast per action and the list re-reads from the server rather than echoing what you typed.
-  Most of these endpoints answer `void`, which is why the page re-fetches.
+- **Steps** — open `/login` in a fresh tab and read the browser tab.
+- **Expect** — "Sign in", not `route.signIn`.
+- **What this guards.** A `*transloco` directive triggers its own load, so the *screen* looks right without
+  any initializer. Anything translating imperatively does not: `TranslatedTitleStrategy` runs on the first
+  navigation and, with no dictionary in place, `translate()` returns the key. The app now preloads the
+  active language in `provideAppInitializer`, the way console-ui does. The facades' toast messages are the
+  same shape and would have followed.
+
+### CON-07 — Write paths round-trip · high · [verified]
+
+- **Seen, from Roles** — create `ROLE_QA_TEMP` (list re-read to 6, form closed), rename it to
+  `ROLE_QA_RENAMED` **keeping the same UUID** so it is an update rather than a create, then delete it.
+  Toast on each — "…was saved.", "…was deleted." — and the list re-read from the server every time. The
+  delete's **Delete button stays disabled until the role name is typed**.
+- **Seen, from Users** — disable `org1-store2-moderator`: toast "…can no longer sign in.", server
+  `enabled: false`, and the row's own action flipped to **Enable**, which is the re-read proving itself.
+  Re-enabled afterwards.
+- **Seed restored** — 5 roles, no `ROLE_QA*` left, no account left disabled. Verified against the server,
+  not the screen.
+- **Still [not verified]** — reset password, grant/revoke a role, and the whole client register → rotate →
+  delete path.
 - **Restore whatever you change** — the seed only runs on a clean database.
 
 ### CON-08 — Rebuilding the kit under a running dev server · [verified]

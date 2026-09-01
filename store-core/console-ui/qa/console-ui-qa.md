@@ -10,7 +10,7 @@ service's answer.
 - **Runs on** — `lcl start -d --stack <name>`; the console is served through the gateway at
   `http://gateway.com:8000/` and also answers on `http://console-ui.gateway.com:8000`. Read the live port from
   `lcl urls` — **never assume 8000**
-- **Cases** — 97 (47 verified, 12 unit only, 38 not verified)
+- **Cases** — 98 (48 verified, 12 unit only, 38 not verified)
 - **Also see** — the service behind each module:
   [tenancy](../../tenancy/tenancy-service/qa/tenancy-qa.md) (users, stores, invitations),
   [catalog](../../../store-pod/catalog/catalog-service/qa/catalog-qa.md),
@@ -942,16 +942,27 @@ every one of them fails silently rather than loudly.
   dictionary and deep-merged under the console's by `withKitCopy()`. Raw keys here mean the merge is
   broken; the whole `shared.*` and `errors.*` namespaces come the same way.
 
-### KIT-04 — A 4xx still reads as itself · critical · [not verified]
+### KIT-04 — A 4xx still reads as itself · critical · [verified]
 
-- **Steps** — force a validation failure (a duplicate SKU, a taken username).
-- **Expect** — the specific message and the field errors, not "System Error". The
-  `errors.code.x → errors.category.x → errors.generic` chain is in the library while the console's own
-  `errors.*` overrides sit on top of it.
-- **Partly seen** — the *generic* leg of that chain was observed working from the library in uaa's console:
-  a 500 produced "We could not complete that request" with a support reference, so
-  `ApiErrorService → NOTIFICATION_PORT → ToastService` is wired. The coded and field-error legs, which are
-  the ones that matter here, have not been driven since the move.
+- **Steps** — User management → **Add user**, with a username that already exists.
+- **Seen** — the toast reads *"This changed somewhere else. Refresh and try again."* — which is
+  `errors.category.conflict` **out of the kit's own dictionary**, reached through the
+  `errors.code.x → errors.category.x → errors.generic` chain and merged under the console's copy by
+  `withKitCopy()`. Not "System Error", and not a raw code.
+- **Also seen** — a 500 in uaa's console produced "We could not complete that request" plus a support
+  reference, so the generic leg and the trace suffix work from the library too.
+
+### KIT-04b — …but an inline load failure still shows developer text · high · [not verified]
+
+- **Steps** — make a list endpoint fail (open uaa's console as `org1-admin`, or stop a service the
+  console reads).
+- **Seen** — `app-load-error` renders `CLIENT.HTTP_403 [403]`, a raw code, where the toast on the same
+  failure would say "You do not have permission to do that."
+- **Why** — `ApiError.message` is deliberately developer text (`` `${code} [${status}]` ``), and every page
+  binds `[message]="failure.message"` rather than `ApiErrorService.messageFor(failure)`. **Pre-existing and
+  repo-wide** — ~15 console-ui pages do it, and the extraction only made it visible by giving uaa's console
+  a bodyless 403 to render. The strings already exist; nothing needs writing, only the binding changed.
+  Left alone here because it touches every feature page and none of it is this PR's subject.
 
 ### KIT-05 — Every request still carries its store · critical · [verified]
 
@@ -1088,6 +1099,15 @@ product form, variant-aware product rows and order lines. The model is
 ---
 
 ## 99 — Known gaps
+
+**`app-load-error` shows a developer string.** See KIT-04b. `[message]="failure.message"` on ~15 pages
+renders `CODE [status]` where `ApiErrorService.messageFor()` would give a sentence.
+
+**Three kit controls render `id="null"`.** `text-field`, `textarea-field` and `number-field` bind
+`[id]="id()"` on a nullable input, and Angular property-binding a null `id` stringifies it — so every
+unlabelled field carries the literal attribute `id="null"`, and two in one dialog collide. It is the same
+shape as the "Literal `null` tooltips" row on the watchlist: `[attr.id]` removes the attribute where `[id]`
+writes the string. Pre-existing on `main`; the move carried it unchanged.
 
 **No console screens for the store lifecycle.** Store suspend / archive / delete, org profile, members and
 invitations all have endpoints and none have screens. **Invitations most of all**, since the token is displayed

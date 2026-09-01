@@ -1,13 +1,15 @@
 import {
   ApplicationConfig,
   ErrorHandler,
+  inject,
   isDevMode,
+  provideAppInitializer,
   provideBrowserGlobalErrorListeners,
   provideZoneChangeDetection,
 } from '@angular/core';
 import {provideHttpClient, withInterceptors} from '@angular/common/http';
 import {TitleStrategy, provideRouter, withComponentInputBinding} from '@angular/router';
-import {provideTransloco, provideTranslocoMissingHandler} from '@jsverse/transloco';
+import {TranslocoService, provideTransloco, provideTranslocoMissingHandler} from '@jsverse/transloco';
 import {provideTranslocoLocale} from '@jsverse/transloco-locale';
 import {provideTranslocoMessageformat} from '@jsverse/transloco-messageformat';
 
@@ -65,5 +67,18 @@ export const appConfig: ApplicationConfig = {
     provideTranslocoMissingHandler(StrictMissingHandler),
     // Route `titleKey`s are inert without this: the strategy is what turns one into a tab title.
     {provide: TitleStrategy, useClass: TranslatedTitleStrategy},
+    /*
+     * Load the active language before the app renders.
+     *
+     * A `*transloco` directive triggers its own load, so the screen usually looks right without this.
+     * Anything that translates *imperatively* does not: `TranslatedTitleStrategy` runs on the first
+     * navigation and, with no dictionary in place, `translate()` returns the key — the browser tab
+     * read `route.signIn` instead of "Sign in" on every cold load. The facades' toast messages are
+     * the same shape and would have followed.
+     */
+    provideAppInitializer(() => {
+      const transloco = inject(TranslocoService);
+      return transloco.load(transloco.getActiveLang());
+    }),
   ],
 };
