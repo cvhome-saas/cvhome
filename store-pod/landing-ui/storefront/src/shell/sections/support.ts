@@ -1,11 +1,3 @@
-import type {LayoutSectionData, SectionItem} from '@store-front/types';
-
-export {linkHref, type SectionLink} from '@store-front/theme';
-
-export const mediaUrl = (props: Record<string, unknown>): string | undefined =>
-    typeof props.mediaUrl === 'string' ? props.mediaUrl : undefined;
-
-export const items = (section: LayoutSectionData): SectionItem[] => section.items ?? [];
-
-export const num = (value: unknown, fallback: number): number =>
-    typeof value === 'number' && Number.isFinite(value) ? value : fallback;
+// The shell's aliases for the shared section-model helpers — one implementation, in the theme
+// contract package, shared with every theme registry.
+export {linkHref, mediaUrl, num, sectionItems as items, type SectionLink} from '@store-front/theme';
