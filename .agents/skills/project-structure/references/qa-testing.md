@@ -78,6 +78,58 @@ Those credentials are local seed data only (`store-core/uaa/.../init-sql/data-te
 The storefront account is scoped per store (`cua.users.client_id`), so it only authenticates *through the
 store host* — posting to `localhost:8124/login` directly always fails, and that is not a bug.
 
+
+### The seeded tenants
+
+| | org | store 1 | store 2 |
+|---|---|---|---|
+| **ORG1** | `21f023932bc66470c104b76f` | `65f023632bc46470c104b76f` | `65f023632bc46470c104b75f` |
+| **ORG2** | `352023632b046970c104b76f` | `65f020632bc46470c104b76f` | `65f023632bc26470c104b75f` |
+
+The shared pod is `507f1f77bcf86cd799439011`, seeded from `store-core-lcl-config.yml` by `PodSeedInitializer`;
+it is the only one, so placement cases have to insert a second. org1-store1 and org1-store2 are the **same
+org** (use store 2 for "another store"); org2-store1 is "another org". Locales differ on purpose:
+org1-store1 is `en, ar` — the RTL cases need it — and org2-store2 is Arabic-first.
+
+### The seeded accounts
+
+From `store-core/uaa/src/main/resources/init-sql/data-test-stores.sql`, all with password `admin`:
+
+| Username | Role | Store metadata |
+|---|---|---|
+| `super-admin` | SUPER_ADMIN | the platform screens |
+| `org1-admin` | ORG_ADMIN | **none** — an org admin is in no store's user list |
+| `org1-store1-admin` | STORE_ADMIN | ORG1-STORE1 |
+| `org1-store1-moderator` | STORE_MODERATOR | ORG1-STORE1 — the read-only case |
+| `org1-store2-admin` | STORE_ADMIN | ORG1-STORE2 |
+| `org2-admin` | ORG_ADMIN | another org — the isolation cases |
+
+**If you change a password, change it back**; the seed only runs on a clean database.
+
+### A service-to-service token
+
+Placement, capacity and the pods' s2s endpoints need client credentials, **not** a session:
+
+```bash
+TOK=$(curl -s -u 'store-core@service.store-core.internal:<the shared lcl secret>' \
+  -d 'grant_type=client_credentials&scope=store_core' \
+  http://uaa.gateway.com:8001/oauth2/token | jq -r .access_token)
+```
+
+### Billing's quota will stop you after a few stores
+
+Every test store is provisioned unpaid and `max-pending-stores` is 3, after which creation answers 422
+`BILLING.QUOTA.STORE_EXCEEDED`. Between runs:
+
+```sql
+delete from billing.store_subscription where id in (select id from tenancy.manager_store where name like 'TEST%');
+delete from pod_registry.pod_store_placement;
+delete from tenancy.manager_store where name like 'TEST%';
+```
+
+The gateway holds sessions **in memory**: restarting it logs you out, and the symptom is a 401 where you
+expected a 403.
+
 ---
 
 ## 3. Driving the UI in a browser
@@ -113,6 +165,17 @@ Run it in IntelliJ's HTTP Client against the `lcl` environment. Rules and file l
 - Exercise the failure modes too, not just the happy path: the 4xx blocks are where the typed-exception
   contract is actually verified (`references/error-handling.md`).
 
+
+**Two addressing forms, and the `pod` predicate.** Both go through a gateway; neither uses a service port:
+
+```
+http://gateway.com:8000/spg/<service>/api/v1/...?store=<id>&pod=507f1f77bcf86cd799439011&lang=en   # seller path
+http://<store>.spg-507f1f77.gateway.com/<service>/api/v1/...?store=<id>&lang=en                    # pod path
+```
+
+**The platform gateway route predicates on `pod` as well as `store`** — a `/spg/**` URL carrying only `store`
+is a 404 that looks like missing data, and it is the single most common false alarm in this repo.
+
 ---
 
 ## 5. Reading the evidence
@@ -128,6 +191,14 @@ Run it in IntelliJ's HTTP Client against the `lcl` environment. Rules and file l
 Response bodies never carry root-cause text; the detail is in the log, joined by `traceId`. Don't guess from
 the HTTP body alone.
 
+
+Reading a database directly, the idiom every QA document uses (`...` continues the same command):
+
+```bash
+docker exec cvhome-postgres-1 psql -U postgres -d cvhome -c "select ...;"
+... "select ...;"
+```
+
 ---
 
 ## 6. Known local gaps — expected, don't file them
@@ -138,23 +209,39 @@ the HTTP body alone.
 
 ---
 
-## 7. Writing the QA document — `qa/<plan>.md`
+## 7. Writing the QA document — `<service>/qa/<module>-qa.md`
 
-The QA that a human tester runs lives in **one markdown file per plan or feature**, at the repo root under
-`qa/`, named after the plan it belongs to (`qa/billing-per-store-subscriptions.md` for
-`.claude/plans/billing-subscription-service.md`). Markdown so it reviews in the PR and travels with the branch.
+The QA that a human tester runs lives in **one markdown file per service**, beside that service's `http/`
+folder: `store-core/tenancy/tenancy-service/qa/tenancy-qa.md`,
+`store-pod/catalog/catalog-service/qa/catalog-qa.md`, `store-core/console-ui/qa/console-ui-qa.md`. The name
+drops the `-service` suffix. Every runnable app has one — the thirteen Java services plus `console-ui` and
+`landing-ui`. Library modules (`-commons`, `-core`, `-external-api`, `store-commons/*`) do not: QA is end to
+end and they have no running surface. The one file that is not beside a service is **`qa/lcl-qa.md`** at the
+repo root, which covers the stack itself.
 
-**One file per plan, not one per phase.** A plan that ships in ten PRs still produces one QA document, appended
-to as each phase lands. Ten files covering one feature is the failure mode: a tester has no idea which to run,
-the same setup is repeated ten times and drifts, later phases silently invalidate earlier files, and cases end
-up recorded as blocked in one file and passing in another with nothing connecting them. Fold each phase into
-the existing document instead.
+Markdown so it reviews in the PR and travels with the branch.
 
-**`qa/billing-per-store-subscriptions.md` is the reference implementation.** Match its structure:
+**One file per service, not one per plan.** A plan that ships in ten PRs and touches four services appends its
+cases to **those four files**, into the section that theme belongs to. It does not get a document of its own.
+Organising by plan is what this replaced, and it failed in a specific way: `content` cases ended up spread
+across eight files named after changes nobody remembers, the same setup was repeated in each and drifted, later
+plans silently invalidated earlier files, and a tester opening a service directory had no way to know which
+document applied. Fold each plan into the service files instead, and note the plan in the section's provenance
+line.
 
-1. **Title and a short intro** — what changed, and why anyone should read this rather than the PR.
-2. **A scope block** — `Scope` (the services touched) · `Change` (PR number, branch, plan path) · `Cases` (the
-   count) · anything a tester must know before touching it (a test-mode key, a migration order).
+**A case lives with the service that owns the flow's entry point.** A console screen backed by tenancy is a
+console case if the assertion is what the screen does, and a tenancy case if the assertion is what the endpoint
+answers. Cross-reference the other side by path (`- **Also touches** — ../../..`), and **never duplicate the
+case text**: two copies drift, and then one of them is wrong.
+
+**`store-core/billing/billing-service/qa/billing-qa.md` is the reference implementation.** Match its structure:
+
+1. **Title and a short intro** — `# QA — <service> (<module path>)`, then what this service owns and what a
+   tester is actually proving here.
+2. **A scope block** — `Scope` (the endpoints and screens covered) · `Runs on` (`lcl start -d --stack <name>`,
+   and to address it through the gateway, never its own port) · `Cases` (the count, with the tag split) ·
+   `Also see` (the service files holding the other half of any cross-service flow) · anything a tester must
+   know before touching it (a test-mode key, a migration order).
 3. **The tag legend.** Every case is tagged, and the tags are the point of the document:
    - **[verified]** — run against a running stack and passed.
    - **[unit only]** — the branch is covered by a named test, but nobody drove it through the stack. Name the
@@ -162,19 +249,26 @@ the existing document instead.
    - **[not verified]** — never run end to end by anyone.
 
    A case nobody has executed is where the bugs are. **Marking it is more useful than implying otherwise** —
-   never quietly present an unrun case as passing, and never drop it to keep the document tidy.
-4. **`## 00 — Before you start`** — setup, logins, seeded ids, fixture SQL, and the queries that show the truth
-   underneath. Everything a tester needs before case 1, in one place, so no case repeats it.
+   never quietly present an unrun case as passing, and never drop it to keep the document tidy. A case that
+   moves between files keeps the tag it earned; a case rewritten from scratch starts at **[not verified]**.
+4. **`## 00 — Before you start`** — open by pointing at §§1–5 of this file for the shared prerequisites (stack
+   startup, demo logins, seeded ids, addressing, the `psql` idiom), then list **only what is specific to this
+   service**: its fixture SQL, its config overrides, its provider keys, and the queries that show the truth
+   underneath it. Do not copy the shared blocks in: fifteen copies of the seeded-ids table is the drift this
+   layout exists to prevent.
 5. **Sections with a short prefix**, each opening with the design points a tester needs in order to judge what
-   they see — especially anything deliberate that *looks* like a bug (fail-open here, fail-closed there;
-   404 instead of 403). One section per theme, not one per phase.
+   they see — especially anything deliberate that *looks* like a bug (fail-open here, fail-closed there; 404
+   instead of 403). One section per theme, not one per phase. A section holding cases that came from a plan
+   carries a one-line **provenance** (`_From qa/<plan>.md §PFX._`, naming the plan-shaped file it came from — those live on in git history) so the history stays reachable.
+   **A prefix must be unique within its file**: when two sources collide, renumber and say so
+   (`_Was CAT-01…08; renumbered because catalog's own `CAT` is the category tree._`).
 6. **Cases as `### PFX-NN — what it proves · severity · [tag]`**, numbered within their section, with
    `- **Setup**` / `- **Steps**` / `- **Expect**` bullets. Mark the ones that matter `· critical` or `· high`.
    Add `- **Seen**` with the concrete evidence when the observation is worth more than "it passed" (the actual
    status codes, the log line, the timing). State plainly what is *expected to fail* so a tester does not spend
    a morning re-finding a known gap.
 7. **`## MIG`** when there is a migration — the order, and what breaks silently if a step is skipped.
-8. **`## REG — Regression watchlist`** — a table of every defect that actually happened during the work: what
+8. **`## REG — Regression watchlist`** — a table of every defect that actually happened in this service: what
    broke, how it looked, and which case catches it again. Highest-value section in the file, because each row
    has already proven it can happen.
 9. **`## 99 — Known gaps`** — behaviour that is expected today, so nobody re-raises it. Lead with the largest.

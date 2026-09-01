@@ -92,7 +92,11 @@ Content-Type: application/json
   (a 404 for another store's row, a 422 a provider refusal maps to). A file with only 200s documents half
   the contract, and the typed-error work is exactly the half it omits.
 
-Reference implementation: **`store-pod/catalog/catalog-service/http/product-api.http`** — create → chain the
+Reference implementation: **`store-pod/catalog/catalog-service/http/product-api.http`**
+
+`http/` has a human-facing sibling: **`<service>/qa/<module>-qa.md`**, the QA script a person runs for
+that same service. `http/` is the machine-checkable path and `qa/` is the one that explains *why* a case
+exists; neither replaces the other. Rules: `references/qa-testing.md` §7. — create → chain the
 id → patch → cross-store 404 → delete.
 
 ## Known-stale files, do not copy

@@ -42,6 +42,7 @@ Branch cut from an up-to-date `origin/develop`, merged into `develop`. Never pus
 - [ ] `./gradlew test` — or the touched module's `:test` — clean (Docker up for Testcontainers)
 - [ ] Touched `-ui` module: `npm run build` clean (landing-ui: the **root** build chain, libs → templates → app)
 - [ ] Exercised against a running stack (`lcl start -d`) where behaviour changed
+- [ ] `<service>/qa/<module>-qa.md` updated for what changed, with each new case tagged
 
 ---
 
@@ -62,6 +63,7 @@ section you keep is mandatory.** Every row here has a repo mechanism behind it t
 - [ ] Ids/codes use `store-commons/commons/.../domain/` value objects, not raw `String`/`Long`
 - [ ] Request DTOs validated (`@Valid` + bean-validation annotations)
 - [ ] Endpoint has a runnable block in `<service>/http/<api-class>.http` — gateway path form, not the service port; `?store={{STORE_ID}}&lang={{LANG}}`; a new url/id in `http-client.env.json` rather than inlined; at least one non-2xx block where the endpoint declares a failure mode
+- [ ] User-visible behaviour has a case in `<service>/qa/<module>-qa.md` — the service's own QA file, appended to, never a new file per plan; tagged `[verified]` / `[unit only]` / `[not verified]` honestly
 
 **Persistence**
 - [ ] Table/column in the service's DDL (`schema.sql`, or `init-sql/schema.sql` for JPA pods) — an entity change alone is not a schema change

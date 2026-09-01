@@ -1,45 +1,47 @@
-# QA — the content platform
+# QA — content (`store-pod/content/content-service`)
 
-`store-pod/content` was rebuilt. The old service was two tables behind two flat CRUD screens; the new one is a
-CMS: seven content domains, a draft→review→scheduled→published→archived workflow, per-locale translation state,
-revisions, a media library with quota and usage tracking, navigation menus, versioned legal policies, and a
-public read API the storefront renders from. console-ui gained `/content`, landing-ui gained `/blog`, `/help`,
-`/policies/*` and a sitemap, and the legacy `/api/v1/content/**` compatibility surface was deleted with
-seller-ui.
+Content owns everything a seller writes and everything the storefront renders that is not a product: pages,
+posts, banners, FAQs, legal policies, navigation menus, the home page's sections, the store's appearance
+(logo, favicon, SEO, social links) and the media library that all of it — including
+[catalog](../../../catalog/catalog-service/qa/catalog-qa.md)'s product gallery — draws its images from.
 
-This is what to try in order to believe it works, and — just as usefully — the things that were already broken
-once during the build and could break again.
-
-- **Scope** — content · console-ui · landing-ui · spg · uaa permission evaluator
-- **Change** — PR #276, branch `feat/mirror-console-ui`, plans `.agents/plans/console-ui-content.md`
-  (Module 12) and `.agents/plans/console-ui-retire-seller-ui.md` (Module 13 / content phase 7)
-- **Cases** — 80 (16 verified, 19 covered by tests only, 45 never run end to end)
-- **Storage** — media uploads go to MinIO in `docker-compose-lcl.yml`. It runs **without a volume**, so
-  everything uploaded is gone after a container restart. That is the local stack, not a defect.
+- **Scope** — the private content API and its workflow, the scheduler, the storefront read API, the media
+  library and its cross-service usage index, store appearance, and the `STORE-POD.CONTENT.*` permission gate
+- **Runs on** — `lcl start -d --stack <name>`; read the live port from `lcl urls`. Address it through the
+  gateway, never `:8121`
+- **Cases** — 94 (24 verified, 21 unit only, 49 not verified)
+- **Also see** — [landing-ui](../../../landing-ui/qa/landing-ui-qa.md) (the storefront that renders this),
+  catalog (the gallery that consumes media assets),
+  [merchant](../../../merchant/merchant-service/qa/merchant-qa.md) (which no longer holds any appearance),
+  [console-ui](../../../../store-core/console-ui/qa/console-ui-qa.md) (the content module that drives it)
 
 Each case is tagged:
 
-- **[verified]** — driven end to end against a running stack during the build and passed.
-- **[unit only]** — covered by a named automated test, but nobody drove it through the stack. The test is named
-  so you can judge how much that is worth.
-- **[not verified]** — never run end to end by anyone. These are where a tester is most likely to find
-  something, and they are called out rather than buried.
+- **[verified]** — run against a running stack and passed.
+- **[unit only]** — covered by the named test; nobody drove it through the stack.
+- **[not verified]** — never run end to end by anyone.
 
 Sections [REG](#reg--regression-watchlist) and [99](#99--known-gaps) are the highest-value reading: one is
-defects that have already happened here, the other is behaviour that looks wrong and is not.
+defects that have already happened, the other is behaviour that looks wrong and is expected.
 
 ---
 
 ## 00 — Before you start
 
-```bash
-sudo ./extra/scripts/configure-domain.sh        # once per machine
-lcl start -d             # stop later with `lcl stop`
-```
+**Shared prerequisites** — starting the stack, the demo logins, the seeded org/store/pod ids, gateway-vs-pod
+addressing and the `psql` idiom are in
+[`references/qa-testing.md`](../../../../.claude/skills/project-structure/references/qa-testing.md) §§1–5.
+Only what is specific to content is below.
 
-**Sign-in.** Console `http://gateway.com:8000` — `org1-admin` / `admin` (org owner), `org1-store1-admin` /
-`admin` (store admin), `org1-store1-moderator` / `admin` (the read-only case). Storefront
-`http://org1-store1.spg-507f1f77.gateway.com` — shopper `user` / `revo`.
+> **Starting from a database older than the appearance move?** That change shipped with no migration by
+> design. An old database will start — the DDL is written defensively — but merchant's slider and social-link
+> tables and catalog's product-image filenames are dropped, and the demo photos are re-registered under new
+> ids. Drop the three schemas first:
+>
+> ```bash
+> docker exec cvhome-postgres-1 psql -U postgres -d cvhome \
+>   -c 'drop schema if exists content cascade; drop schema if exists catalog cascade; drop schema if exists merchant cascade;'
+> ```
 
 ### The demo stores, and which one to use for what
 
@@ -51,13 +53,11 @@ lcl start -d             # stop later with `lcl stop`
 | org2-store2 | `65f023632bc26470c104b75f` | ar, fr | an Arabic-first store |
 
 Every store is seeded with six legacy pages (`about-us`, `contact-us`, `terms`, `privacy`, `location`, `faq`),
-four legacy boxes (`header-message`, `agreement`, `meta-title`, `meta-description`) and — added by Module 13 —
-one published **TERMS policy with a LIVE version**, on negative ids. Nothing else: no posts, no banners, no FAQ
-entries, no media. Those you create.
+four legacy boxes (`header-message`, `agreement`, `meta-title`, `meta-description`) and one published **TERMS
+policy with a LIVE version**, on negative ids. Nothing else: no posts, no banners, no FAQ entries, no media.
+Those you create.
 
 ### Addressing
-
-Everything goes through a gateway, never the service port. Two forms, both valid:
 
 ```
 http://gateway.com:8000/spg/content/api/v1/...?store=<id>&pod=507f1f77bcf86cd799439011&lang=en   # seller path
@@ -66,9 +66,30 @@ http://spg-507f1f77.gateway.com/content/api/v1/...?store=<id>&lang=en           
 
 **The platform gateway route predicates on `pod` as well as `store`.** A request through
 `gateway.com:8000/spg/**` with only `store` is a 404 that looks like missing content. The `.http` files in
-`store-pod/content/content-service/http/` carry runnable blocks for every endpoint — nine files, one per API
-class — and are the fastest way to work through the API cases. Session id goes in the gitignored
+`store-pod/content/content-service/http/` carry runnable blocks for every endpoint — one per API class — and
+are the fastest way to work through the API cases. Session id goes in the gitignored
 `http-client.private.env.json`.
+
+### Populating MinIO
+
+The local MinIO runs without a volume, so a Docker restart empties it and every storefront image 404s. Every
+seeded asset row names a `storage_key`, so the objects can be generated from the database rather than guessed.
+This takes about a minute and makes the storefront render fully:
+
+```bash
+# one placeholder per aspect: products are square, banner/slider wide, the logo a wordmark strip
+# (sips is enough — no image library needed; see the local-stack-minio-demo-images note)
+psql ... -tAc 'select storage_key from content.media_asset order by 1' > keys.txt
+# stage a local tree mirroring the bucket, one file per key, then upload it in one sync
+AWS_ACCESS_KEY_ID=minioadmin AWS_SECRET_ACCESS_KEY=minioadmin \
+  aws --endpoint-url http://localhost:9000 s3 cp --recursive --content-type image/jpeg \
+      stage/ s3://d0dd4299-963a-4458-b31f-8efe31c35e8e/
+```
+
+938 keys across the four demo stores. The seeds register objects at the keys that generator writes:
+`products/<store>/<sku>/SMALL/<file>` for product photos and `files/<store>/{LOGO,BANNER,SLIDER}/<file>` for
+the store's own images. Until they exist the storefront renders with broken images — that is the local-stack
+gap, not a fault in the code.
 
 ### Looking at the truth underneath
 
@@ -92,7 +113,7 @@ docker exec cvhome-postgres-1 psql -U postgres -d cvhome -c \
 ... "select * from content.redirect;"
 ```
 
-Service log: `.lcl/default/logs/content.log`. The scheduler prints `Content scheduler moved N item(s)` when it
+Service log: `.lcl/<stack>/logs/content.log`. The scheduler prints `Content scheduler moved N item(s)` when it
 does anything, and nothing when it doesn't.
 
 ---
@@ -198,6 +219,8 @@ never earned.
 
 ---
 
+---
+
 ## SCH — Scheduling
 
 A job runs every 60 seconds (30 s after startup) and does two things: promotes `SCHEDULED` items whose
@@ -235,6 +258,8 @@ The live half of SCH-01, and the one the test cannot prove.
   `publishAt` in the past.
 - **Expect** — **400 `CONTENT.SCHEDULE.INVALID`** for all three, with a message a seller can act on, and
   nothing written.
+
+---
 
 ---
 
@@ -284,13 +309,7 @@ as the meta title; save it again and it must not be lost or promoted into the vi
 - **Expect** — both locales come back. The storefront `site` document's `snippets.metaDescription` changes with
   it. No status, no publish button on a snippet.
 
-### PAG-06 — The store home card still writes the landing snippet · high · [not verified]
-
-Module 5's store-management home card was repointed at `snippets/LANDING_PAGE` when the old box service was
-deleted. Same screen, different backend — so it is worth one check that it did not silently stop saving.
-
-- **Steps** — Store management → home section, edit the text, save, reload, then check the storefront home.
-- **Expect** — it persists and renders. A 404 in the network panel here means the repoint is wrong.
+> PAG-06 (the store home card writes the landing snippet) is a console screen — it moved to [console-ui-qa.md](../../../../store-core/console-ui/qa/console-ui-qa.md).
 
 ---
 
@@ -322,6 +341,8 @@ Posts add categories, tags, a hero image, an author and a derived reading time. 
 - **Expect** — a defined outcome — either a refusal naming the posts, or the posts losing that category and
   staying published. Record which. What must **not** happen is a post disappearing from `/blog` or the index
   500ing.
+
+---
 
 ---
 
@@ -372,6 +393,8 @@ Same test.
 
 ---
 
+---
+
 ## FAQ — Groups and entries
 
 Entries hang off groups by `parentId` and order by `sortOrder`. Reorder is **one atomic write** of both fields
@@ -405,6 +428,8 @@ Same test.
 
 - **Expect** — a defined outcome, recorded. Entries must not become invisible orphans that no console screen
   can reach — check the FAQ list after the delete, and the storefront `/help`.
+
+---
 
 ---
 
@@ -451,6 +476,8 @@ fallback is gone, which is why all four demo stores were given a seeded TERMS po
 - **Steps** — open `/content/policies` on a store that has only TERMS.
 - **Expect** — a card per type with its "required by" regions and its real status: TERMS published, the rest
   missing with a Create call to action. Publish one and its card changes without a hard reload.
+
+---
 
 ---
 
@@ -531,6 +558,8 @@ rearrange is a regression for anyone who cannot use one.
 
 ---
 
+---
+
 ## MED — Media library
 
 Uploads go through the service to MinIO — no presigned URLs on this platform. Deduplicated by sha-256 **per
@@ -596,6 +625,8 @@ Best done by dropping the quota in config rather than uploading 5 GiB:
 
 ---
 
+---
+
 ## SF — The storefront read API
 
 `/api/v1/storefront/**` is public, unauthenticated and cacheable (`Cache-Control: public, max-age=60`,
@@ -656,43 +687,194 @@ cache on top.
 
 ---
 
-## LUI — The storefront itself
+---
 
-### LUI-01 — The home page renders content from the new API · critical · [verified]
+## APP — Store appearance
 
-- **Steps** — open `http://org1-store1.spg-507f1f77.gateway.com`.
-- **Expect** — footer pages from the CMS, navigation from the MAIN menu, the announcement bar when a STRIP
-  banner or `header-message` box is live. Broken product/logo images after a Docker restart are the known MinIO
-  gap.
+_From `qa/content-owns-appearance-and-media.md` §APP. APP-08 (store management has no appearance left) is a merchant assertion and moved to [merchant-qa.md](../../../merchant/merchant-service/qa/merchant-qa.md)._
 
-### LUI-02 — A content page renders with its title · critical · [verified]
+The console's **Content → Store appearance** tab is the only place these live now.
 
-- **Steps** — `/en/content/about-us`, then `/ar/content/about-us`.
-- **Expect** — heading and body from the CMS, the browser tab title from the meta title, and the Arabic version
-  right-to-left with the Arabic font (not Arial-substituted boxes).
+### APP-01 — The seeded store's title and description survived the move · critical · [verified]
 
-### LUI-03 — Blog, help and policy routes exist and behave · high · [not verified]
+- **Steps** — open **Content → Store appearance** on `org1-store1`.
+- **Expect** — Store title and Store description already filled, in each of the store's languages. They were
+  the `meta-title` / `meta-description` BOX rows; the seed carries them across as per-locale maps.
 
-- **Steps** — `/en/blog`, `/en/blog/<slug>`, `/en/help`, `/en/policies/terms`; then a slug that does not exist
-  on each.
-- **Expect** — content where there is content, the store's own not-found page where there is not — never an
-  unhandled error page or an empty shell.
+### APP-02 — Uploading and setting a logo · critical · [verified]
 
-### LUI-04 — Checkout still shows the agreement · critical · [verified]
+- **Steps** — **Choose** on the Logo slot; upload a PNG in the picker; pick it.  Save.
+- **Expect** — the thumbnail fills, the toast confirms, and the storefront header shows it after a reload.
+  `content.site_settings.logo_media_id` names the asset.
+- **Result** — verified by picking an existing library asset rather than uploading a new one; the upload leg
+  of the picker is still untested here.
 
-This is the one that breaks quietly: the agreement now comes only from the TERMS policy.
+### APP-03 — Clearing a logo · critical · [verified]
 
-- **Steps** — add a product, reach checkout, look for the terms text.
-- **Expect** — the LIVE TERMS text for that store, in the shopper's locale. Repeat on **all four** demo stores.
+- **Steps** — **Clear** on a filled Logo slot. Save.
+- **Expect** — the thumbnail empties and the storefront falls back to the store name. This was impossible
+  before: merchant had upload endpoints and no delete.
+- **Result** — `branding.logo` goes `null` and the storefront header renders the store name as a wordmark.
 
-### LUI-05 — The CMS being down does not take the storefront down · high · [not verified]
+### APP-04 — The favicon is not the logo · [verified]
 
-The site loader degrades to an empty document on purpose; the page loader does not (a page with no content is a
-404 by definition).
+- **Steps** — set a Logo and a different Favicon. Save. Open the storefront.
+- **Expect** — the browser tab shows the favicon, the header shows the logo. They used to be one field.
 
-- **Steps** — stop `content`; open the storefront home, then `/en/content/about-us`.
-- **Expect** — the home page still renders products with a plain header and no announcement; the content page
-  gives the not-found page. Neither should be a stack trace.
+### APP-05 — Social links round-trip, and an emptied one is removed · [partly verified]
+
+- **Steps** — fill two providers, Save; reload; empty one, Save.
+- **Expect** — the storefront footer shows two, then one. The whole set is sent each time and the server
+  replaces, which is what makes clearing work.
+- **Found** — the rows had shipped labelled with the raw enum (`FACEBOOK`), with no provider icons and no
+  validation, so a TikTok URL saved happily in the Facebook row and the storefront rendered it under a
+  Facebook mark. That check has no server-side equivalent — `SocialLink` is a provider and a free string — so
+  the console is the only place it can happen. The provider knowledge moved out of store management with the
+  links rather than being deleted; Save is now blocked while a link is wrong, rather than the bad value being
+  dropped at the seam where it would look to the operator exactly like a successful save.
+
+### APP-06 — Per-locale SEO · [verified]
+
+- **Steps** — switch the locale chip, write a different Store title, Save, reload.
+- **Expect** — both languages hold their own copy; the storefront `<title>` follows `?lang=`.
+
+### APP-07 — A read-only operator cannot save · critical · [not verified]
+
+- **Setup** — sign in as a store moderator.
+- **Expect** — the tab loads and every field is disabled; Save is absent. A direct
+  `PUT /spg/content/api/v1/private/content/site-settings` returns **403**.
+- **Still open** — needs a second sign-in as a moderator, which this pass could not do.
+
+---
+
+## HOME — Home-page sections
+
+_From `qa/content-owns-appearance-and-media.md` §SEC, renumbered `SEC-0N` → `HOME-0N`: that file used `SEC` for *home-page sections* where every other file uses it for security._
+
+### HOME-01 — The seeded home page still renders · critical · [verified]
+
+- **Steps** — open the storefront home page.
+- **Expect** — the hero carousel shows the five seeded slides (now CMS `CAROUSEL` banners, formerly merchant's
+  slider) and the product rails below it.
+
+### HOME-02 — A product-group section · [not verified]
+
+- **Steps** — create a `PRODUCT_GROUP` section pointing at `FEATURED_ITEMS`, publish it.
+- **Expect** — the rail appears on the home page. `GET /spg/content/api/v1/storefront/home-sections` lists it.
+- **Partly** — the storefront read is live: `GET :8121/api/v1/storefront/home-sections?store=<id>` answers
+  **200 `[]`**, which is why the home page still falls back to the four hard-coded groups. The write half is
+  untested; there is no console editor for sections yet (the documented gap), so it needs an `.http` client.
+- **Note for the next tester** — the private API cannot be driven from the console's devtools. The session is
+  an HttpOnly cookie, so a token cannot be read out for `curl`, and `fetch('/spg/content/…')` against the
+  console's own origin 404s — that prefix is the pod gateway's, not the console dev server's. Use an `.http`
+  client with a token from a fresh login.
+
+### HOME-03 — Reordering the page · [not verified]
+
+- **Steps** — with two published sections, reorder them.
+- **Expect** — the home page follows. `PATCH /sections/reorder` sends the whole order in one request.
+
+### HOME-04 — Publishing an incomplete section is refused · [unit only]
+
+- **Steps** — publish a `PRODUCT_GROUP` section with no `targetValue`.
+- **Expect** — **422 `CONTENT.PUBLISH.INCOMPLETE`**, naming `targetValue`. An `IMAGE` section with no image is
+  refused the same way.
+
+---
+
+---
+
+## USG — The media library's usage index
+
+_From `qa/content-owns-appearance-and-media.md` §MED, renumbered `MED-0N` → `USG-0N` to clear the way for §MED above. These are the cases about *ownership* — who may delete an asset another service is using._
+
+### USG-01 — The seeded photos are library assets · critical · [verified]
+
+- **Steps** — open **Content → Media library**.
+- **Expect** — the store's product photos, logo, banner and slides are all there. They were registered by the
+  seeds rather than re-uploaded, so the bytes never moved.
+
+### USG-02 — Deleting an asset a product uses is refused · critical · [verified]
+
+- **Steps** — find a product photo in the library; delete it.
+- **Expect** — **409 `MEDIA.REFERENCED`**, and the drawer names the product. This is the whole point of the
+  cross-service usage index — nothing could know this before.
+
+### USG-03 — A forced delete goes through · [verified]
+
+- **Steps** — delete the same asset with **Delete anyway**.
+- **Expect** — 204. The product's card falls back to the placeholder, because the cached URL now 404s. That is
+  the documented cost of forcing.
+
+### USG-04 — The usage list names non-content owners · [verified]
+
+- **Steps** — open the asset drawer for a product photo.
+- **Expect** — "Product · <sku>". The title travels with the registration; content never asks catalog for it.
+
+### USG-05 — Uploading deduplicates · [verified]
+
+- **Steps** — upload the same file twice.
+- **Expect** — one asset, and the quota moves once.
+
+### USG-06 — The starter folders appear even when the seller made one first · [unit only]
+
+- **Steps** — on a store with no folders, create a folder of your own, then reload the tab.
+- **Expect** — the five system folders are there beside it. The starter set used to be skipped whenever *any*
+  folder existed, so a seller who made one first never got the defaults.
+
+---
+
+---
+
+## APX — Appearance as the storefront sees it
+
+_From `qa/content-owns-appearance-and-media.md` §SF, renumbered: SF-01 → APX-01 and SF-03 → APX-02, because
+§SF above is content's storefront read API. SF-02 (the checkout agreement) moved to
+[checkout-qa.md](../../../checkout/checkout-service/qa/checkout-qa.md) and SF-04 (the store record carries no
+appearance) to merchant-qa.md._
+
+### APX-01 — The announcement comes from the STRIP banner alone · critical · [verified]
+
+- **Steps** — unpublish the seeded `announcement` banner; reload the storefront.
+- **Expect** — the strip disappears. It used to fall back to a `header-message` snippet, so unpublishing
+  silently resurrected whatever that row still held.
+- **Result** — `site.announcement` goes `null` and the strip is gone from the rendered page, with no snippet
+  behind it. Republishing brings it back.
+- **Note for the next tester** — the storefront must be reached through the **spg gateway on :80**
+  (`org1-store1.spg-507f1f77.gateway.com`), not landing-ui's own port. The `Store-Id` header is set by that
+  gateway; going direct to `:8110` silently serves `FALLBACK_STORE_ID` instead, so every host looks like the
+  same store and it reads like a tenancy leak. It is not.
+
+### APX-02 — Product alt text · [verified]
+
+- **Steps** — set alt text on an asset in the library; open a product card that shows it.
+- **Expect** — the `alt` is that text. It used to be the *filename*.
+
+---
+
+## ISO — Isolation & permissions
+
+### ISO-01 — A second store sees none of the first store's appearance · critical · [verified]
+
+- **Steps** — switch to `org1-store2`; open Store appearance and the media library.
+- **Expect** — its own record and its own assets. Fetching store 1's asset by id answers as though it does not
+  exist.
+
+### ISO-02 — The usage index is not writable by a seller · critical · [verified]
+
+- **Steps** — as a store admin, `PUT /private/content/external/media/usage`.
+- **Expect** — **403**. That token is for services in the same pod, not for operators — `CONTENT.*` resolves to
+  "org or store admin", which is why the write needed its own token.
+
+### ISO-03 — A service token for another pod is refused · [verified]
+
+- **Expect** — **403** on the external media API.
+
+### ISO-04 — A moderator can read but not write content · [verified]
+
+- **Expect** — lists load, `PUT`s are 403.
+
+---
 
 ---
 
@@ -750,62 +932,33 @@ org*; org1-store2 shares an admin and proves less.
 
 ---
 
-## UI — The console content module
+---
 
-### UI-01 — The hub shows seven tabs and honest counts · critical · [verified]
+## LEG — The merchant → content split, still asserted
 
-- **Steps** — open `/content` as a store admin.
-- **Expect** — four KPI cards (published, drafts, awaiting translation, media) and seven tabs — pages, posts,
-  banners, FAQ, media, menus, policies — each with a count that matches the number of rows in its list. "All
-  files" comes from the summary, not from the current page of the grid.
+_From `qa/split-merchant-content-services.md` §SEC, renumbered `SEC-0N` → `LEG-0N` to clear §SEC above. They
+overlap what §SEC proves, and are kept because they were **run** where several of the §SEC cases are unit-only.
+The rest of that file is superseded — see [99](#99--known-gaps)._
 
-### UI-02 — Every editor opens · critical · [verified]
+### LEG-01 — Missing content permission is denied · critical · [verified]
 
-All five editors crashed on open at one point, on three separate defects. This is the cheapest high-value check
-in the document.
+- **Setup** — sign in as `org1-store1-moderator` / `admin`.
+- **Steps** — directly open `/pages/content/pages/list` even though CMS navigation is hidden.
+- **Expect** — private content requests return 403 and no content is exposed.
+- **Observed** — UI displayed “You don't have permission to do that”; Problem Detail was
+  `COMMON.ACCESS_DENIED` with status 403. No rows rendered.
 
-- **Steps** — open New Page, New Post, New Banner, New FAQ Entry, New Policy, and one existing item of each
-  type by deep link (paste the URL into a fresh tab).
-- **Expect** — every one renders with no console error. `NG01203`, `NG0951` or a blank panel is the regression.
+### LEG-02 — Public reads are store-scoped · critical · [verified]
 
-### UI-03 — Save and Publish are never dead buttons · critical · [verified]
+- **Steps** — request `about-us` for demo store 1 and demo store 2 using otherwise identical gateway URLs.
+- **Expect** — both resolve only their own seeded rows; their payloads differ.
+- **Observed** — 200/200 and payloads differed.
 
-They used to disable themselves on a form invalidity whose cause (the slug) sits below the fold, so the seller
-saw two buttons that did nothing and no reason why.
+### LEG-03 — Cross-store mutation is refused · critical · [not verified]
 
-- **Steps** — open New Page, type a title only, press **Save draft**, then press **Publish**.
-- **Expect** — the button is clickable, the first offending field is scrolled into view and marked, and a
-  message says what is missing. Never a silent no-op.
-
-### UI-04 — A newly published item shows as published · high · [verified]
-
-Publishing ran two loads and the older response could land last, leaving a published item wearing a DRAFT
-badge until a reload.
-
-- **Steps** — create and publish in one go, without reloading.
-- **Expect** — the badge reads **Published** immediately, and the success panel matches.
-
-### UI-05 — The editor opens in the store's source language · high · [verified]
-
-- **Steps** — on org2-store2 (Arabic-first), open any editor.
-- **Expect** — the locale strip starts on the store's own source locale, not on English, and the publish
-  checklist judges **that** locale — the same one the server's gate will judge.
-
-### UI-06 — Arabic, right to left, on every content screen · high · [verified]
-
-- **Steps** — switch the console to Arabic and walk the hub, all seven tabs, the bulk bar, all five editors, the
-  media drawer, the menu editor and the policy version history.
-- **Expect** — no raw keys such as `content.list.empty` on screen; the layout mirrors — rails, chips, the locale
-  strip, table alignment, the up/down reorder arrows; no literal "null" tooltips; no English word baked into a
-  row subtitle.
-
-### UI-07 — Errors say something a seller can act on · high · [verified]
-
-- **Steps** — trigger, in Arabic and English: a duplicate slug, an incomplete publish, a full banner placement,
-  a referenced media delete, a version conflict.
-- **Expect** — each shows copy specific to the code, in both languages. Where the failure names a narrower
-  cause, that is what is shown — a full banner placement must not say "write the title and body". A bare
-  `errors.content.…` key on screen is a defect.
+- **Setup** — create uniquely coded content in store 1 and authenticate for store 2.
+- **Steps** — fetch, update and delete the store-1 id while scoped to store 2.
+- **Expect** — no visibility or mutation; store-1 content remains unchanged.
 
 ---
 
@@ -832,15 +985,6 @@ exists` so it is both the fresh DDL and the migration.
 - **Expect** — the first run drops the `uk…`-named indexes; the second reports none; the named constraints from
   `schema.sql` are untouched and duplicate-slug inserts are still refused.
 
-### MIG-03 — The legacy compatibility API really is gone · critical · [verified]
-
-Phase 7 deleted `LegacyContentApi`, the Caddy `@legacy_content` alias and `store-pod/content-deprecated`.
-
-- **Steps** — call `/api/v1/content/pages` and `/api/v1/content/boxes/header-message` directly on 8121 and
-  through spg; then click through the storefront and the console watching the network panel.
-- **Expect** — **404** on the legacy paths, 200 on `/api/v1/storefront/**`, and **nothing on any screen still
-  calls the old paths**. The second half matters more than the first.
-
 ### MIG-04 — Seeded ids and generated ids cannot collide · high · [not verified]
 
 The Module 13 TERMS seeds use **negative** ids on purpose: `SM_SEQUENCER` only counts upward.
@@ -848,6 +992,10 @@ The Module 13 TERMS seeds use **negative** ids on purpose: `SM_SEQUENCER` only c
 - **Steps** — on a seeded store, create several content items and policy versions.
 - **Expect** — new ids are positive and increasing; no primary-key violation on insert; the seeded TERMS policy
   is still readable afterwards.
+
+---
+
+> MIG-03 (the Caddy `@legacy_content` alias is gone) is the edge's — it moved to [spg-qa.md](../../../spg/qa/spg-qa.md).
 
 ---
 
@@ -871,6 +1019,29 @@ the highest-value re-tests, and several were invisible from the screen.
 | **Eleven duplicate unique indexes** | `ddl-auto: update` could not match unnamed entity constraints to the named ones in `schema.sql` and created a second index beside each — paid for on every insert. | MIG-02 |
 | **The delete dialog lied to four types out of five** | Every content type was told "a page linked from a menu is removed from the menu too". | PAG-04 and one delete of each other type |
 | **Requests through the platform gateway 404'd** | The `/spg/**` route predicates on `pod` as well as `store`; a URL with only `store` looks like missing content. | Any `.http` block — they all carry `pod={{POD_ID}}` |
+
+---
+
+Found during the appearance and media move, and just as quiet:
+
+- **Re-saving a product's images duplicated a usage row.** Hibernate flushes inserts before deletes, so
+  re-stating an owner's references inserted a duplicate of a row it was about to remove and tripped the unique
+  constraint. The delete is a bulk `@Modifying` query for that reason. Re-save a gallery twice and watch for a
+  409.
+- **…and clearing the persistence context to fix that broke every page save.** The usage delete runs inside the
+  caller's transaction, so `clearAutomatically` detached the content item mid-save. Editing a page is the
+  canary.
+- **The media library's starter folders depended on test ordering.** They were seeded only when a store had no
+  folders at all. See USG-06.
+- **A media filter test asserted against page one of the whole library.** With hundreds of seeded assets that
+  says nothing about the asset under test. Any new filter assertion should be scoped.
+- **A store's favicon competed with the framework's.** `storefront/src/app/favicon.ico` is a Next file
+  convention, so the page shipped two `<link rel="icon">` — the framework's, with an explicit `sizes="256x256"`,
+  ahead of the store's. The browser then chose by size heuristics rather than by the seller's choice. Found by
+  running APP-04 and fixed by moving the file to `public/` and always resolving exactly one icon. **Check for a
+  single icon link** whenever the metadata changes.
+- **`social_links` came back from jsonb as maps, not `SocialLink`s.** A generic `List` deserialisation returns
+  maps and the cast only fails later, when the response is written — as a 500 with "Failed to write request".
 
 ---
 
@@ -924,3 +1095,35 @@ from `.lcl/default/logs/content.log` — the scheduler, the media writes and the
 asynchronous or cached, so the log is usually the only place the real cause appears. For a console defect,
 attach the browser console and the failing request from the network panel: a 403 there is a permission problem,
 a 409 is a version conflict, and a 404 through `/spg/**` is usually a missing `pod` parameter.
+
+**Product thumbnails are full-size originals.** `store-cms-commons` used to write a cropped `SMALL`
+derivative; content stores what it is given. The console still enforces ≥800×800 square on upload, and
+`next/image` runs unoptimised, so pages are heavier than they will be once the media service grows derivative
+sizes.
+
+**Theme and colour scheme are still merchant's.** Deliberately out of scope — content is meant to own views
+config, and this is the next step. Store management still edits them.
+
+**The seeded asset URLs are local.** The demo seeds hard-code `http://localhost:9000/<bucket>/…`, so on a
+`+1000` shifted stack the demo images 404 until they are re-uploaded. Real uploads resolve against the
+configured CDN base and are unaffected.
+
+**Demo media assets report 0 bytes.** The seed registers pre-existing objects without weighing them, so the
+quota bar ignores them.
+
+**There is no Sections tab in the console yet.** `SectionApi` and `SectionsService` exist and `.http` blocks
+drive them, but the hub has no editor — sections are creatable over HTTP only. HOME-02 and HOME-03 are `.http`
+cases until it lands.
+
+**`qa/split-merchant-content-services.md` is superseded, not lost.** Its ROUTE-01/02/04/05 asserted that the
+legacy `/spg/merchant/api/v1/content/**` alias still answered; MIG-03 asserts it is gone, and the later
+assertion wins. ROUTE-03 and REG-02 moved to spg-qa.md, its SEC cases are §LEG above, and its MER section was
+already folded into merchant-qa.md.
+
+---
+
+Raise anything unexpected against the content PR. Include the store id, the content id, the time and the
+matching lines from `.lcl/<stack>/logs/content.log` — the scheduler, the media writes and the storefront reads
+are all asynchronous or cached, so the log is usually the only place the real cause appears. For a console
+defect, attach the browser console and the failing request from the network panel: a 403 there is a permission
+problem, a 409 is a version conflict, and a 404 through `/spg/**` is usually a missing `pod` parameter.

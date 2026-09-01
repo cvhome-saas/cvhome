@@ -1,52 +1,38 @@
-# QA — catalog and inventory (products, categories, brands, groups, images · stock, price, reservations)
+# QA — catalog (`store-pod/catalog/catalog-service`)
 
-`store-pod/catalog` is what a store *sells*: products with their copy per language, images, brand, type and
-categories, the category tree, and the merchandising groups the home page is built from. `store-pod/inventory`
-is what a store *has and charges*: stock, price and the reservations checkout takes while an order is paid for.
-They were one service until PR #282 split them; the seam between them is the **sku**, and nothing else — the
-inventory schema has no foreign key into catalog, and a catalog response never carries a price or a quantity.
+Catalog owns the product definition and everything a shopper browses by: products and their copy, the category
+tree, brands, product types, groups and the image gallery. It owns no prices and no stock — those are
+[inventory](../../../inventory/inventory-service/qa/inventory-qa.md), and the two are composed for the shopper
+by [checkout](../../../checkout/checkout-service/qa/checkout-qa.md).
 
-Both services were then rewritten from their consumers inward (same PR): one shape per domain, entities that
-map only the columns the single-product model uses, no facade/populator layers. Every endpoint the console, the
-storefront and checkout call kept its path and JSON shape; endpoints nothing called are gone; variants and
-product options/attributes are parked in `store-pod/catalog-deprecated`. That is what makes this file
-necessary: the wire contract is unchanged and the code behind every line of it is new.
-
-- **Scope** — catalog · inventory · checkout's composition of the two · console-ui Products, Product form and
-  Catalogue pages · landing-ui listing, product page, category page and home strips
-- **Change** — PR #282, branch `refactor/split-inventory-from-catalog` (three commits: the split, the inventory
-  rewrite, the catalog rewrite). Plan: `.claude/plans/i-want-to-split-reflective-muffin.md`.
-- **Cases** — 119 (37 verified, 8 covered by tests only, 74 never run end to end)
-- **Related** — [`qa/merchant-store-service.md`](merchant-store-service.md) for the store record both services
-  read (units of measure, default language); [`qa/lcl-lifecycle.md`](lcl-lifecycle.md) for the stack.
+- **Scope** — `/api/v2/products`, `/api/v2/product/**`, category, manufacturer, product-type, product-group and
+  product-image APIs; the console's Catalogue module as a client; the billing write gate on catalog writes
+- **Runs on** — `lcl start -d --stack <name>`; read the live port from `lcl urls`. Address it through the
+  gateway, never `:8122`
+- **Cases** — 95 (33 verified, 1 unit only, 61 not verified)
+- **Also see** — inventory (stock and price), checkout (the composed cart line),
+  [content](../../../content/content-service/qa/content-qa.md) (the media library the gallery reads from),
+  [billing](../../../../store-core/billing/billing-service/qa/billing-qa.md) (the plan ceiling behind PRD-14/15)
 
 Each case is tagged:
 
-- **[verified]** — driven end to end against a running stack and passed, during the PR's own QA.
-- **[unit only]** — covered by a named automated test; nobody drove it through the stack.
-- **[not verified]** — never run end to end. Every merchant *write* through the console is in this state:
-  the PR's QA had no console session, so the console write paths were exercised only by their Karma specs
-  and the `.http` files.
+- **[verified]** — run against a running stack and passed.
+- **[unit only]** — covered by the named test; nobody drove it through the stack.
+- **[not verified]** — never run end to end by anyone.
 
-Sections [REG](#reg--regression-watchlist) and [99](#99--known-gaps) are the highest-value reading. Several
-things that look like defects are decisions — a product with no inventory row is *not stocked*, not an error;
-a private catalog read returns two description fields; the console reads its product table through a public
-endpoint. Read section 99 before filing anything.
+Sections [REG](#reg--regression-watchlist) and [99](#99--known-gaps) are the highest-value reading: one is
+defects that have already happened, the other is behaviour that looks wrong and is expected.
 
 ---
 
 ## 00 — Before you start
 
-```bash
-sudo ./extra/scripts/configure-domain.sh        # once per machine
-lcl start -d
-```
+**Shared prerequisites** — starting the stack, the demo logins, the seeded org/store/pod ids, gateway-vs-pod
+addressing and the `psql` idiom are in
+[`references/qa-testing.md`](../../../../.claude/skills/project-structure/references/qa-testing.md) §§1–5.
+Only what is specific to catalog is below.
 
-Use `lcl restart <service>` while iterating; the rest of the supervised stack remains running.
-
-**Sign-in.** Console `http://gateway.com:8000` — `org1-admin` / `admin` (org owner), `org1-store1-admin` /
-`admin`, `org1-store1-moderator` / `admin` (read-only). Storefront `http://org1-store1.spg-507f1f77.gateway.com`
-(`user` / `revo` for a signed-in shopper; most cases here are anonymous).
+---
 
 ### The demo catalog (org1-store1 · `65f023632bc46470c104b76f`)
 
@@ -85,6 +71,8 @@ seller session works locally because `STORE-POD.INVENTORY.RESERVE` maps to same-
 Private (console) reads answer that **and** every language in `descriptions`. A case that says "every
 language" means the `descriptions` array.
 
+---
+
 ### Looking at the truth underneath
 
 ```bash
@@ -95,30 +83,18 @@ docker exec cvhome-postgres-1 psql -U postgres -d cvhome -c \
        where store_merchant_id='65f023632bc46470c104b76f' order by lineage;"
 ... "select g.code, count(pp.product_id) from catalog.product_group g
        left join catalog.product_group_product pp on pp.product_group_id=g.product_group_id group by 1;"
-... "select product_avail_id, sku, quantity, available, quantity_ord_min, quantity_ord_max
-       from inventory.product_availability where store_merchant_id='65f023632bc46470c104b76f' order by 1;"
-... "select p.product_price_id, a.sku, p.product_price_amount, p.product_price_special_amount,
-            p.product_price_special_st_date, p.product_price_special_end_date, p.default_price
-       from inventory.product_price p join inventory.product_availability a using (product_avail_id);"
-... "select ref, status, expire_at from inventory.product_reservation order by id desc limit 10;"
-... "select * from inventory.sm_sequencer;"
 ```
 
-Logs: `.lcl/default/logs/catalog.log`, `.lcl/default/logs/inventory.log`, `.lcl/default/logs/checkout.log`. An
-`Unhandled failure [traceId=…]` line in any of them is a defect regardless of what the screen showed.
+Logs: `.lcl/<stack>/logs/catalog.log`. An `Unhandled failure [traceId=…]` line in it is a defect regardless of
+what the screen showed.
 
-### State the PR's QA left behind
+### State an earlier QA pass left behind
 
-The PR's smoke tests reserved stock on org1-store1: `SKU-NK-RUN-001` is at **23** units (a reservation under
-ref `smoke-1` was committed; `smoke-2` was refused), price still 750.00 with no special. The upsert with a
-special was refused (403 — a service token cannot manage stock, INV-04), so no price was changed. Reset before
-the INV cases if you want the seeded number:
+The PR #282 smoke tests reserved stock on org1-store1: `SKU-NK-RUN-001` is at **23** units rather than the
+seeded 25. That is inventory's row — see inventory's `## 00` for the reset — and it changes what LST-01 and the
+GRP strips show as available.
 
-```sql
-update inventory.product_availability set quantity=25 where sku='SKU-NK-RUN-001';
-```
-
-or `docker compose down -v` + a fresh `lcl start -d`, which reseeds everything.
+---
 
 ---
 
@@ -188,7 +164,11 @@ the console reads its own catalogue through it on purpose (see [99](#99--known-g
 
 ---
 
+---
+
 ## PDP — The product page (`GET /api/v2/product/name/{friendlyUrl}`)
+
+
 
 ### PDP-01 — A product resolves by its slug in the shopper's language · critical · [verified]
 
@@ -213,12 +193,7 @@ the console reads its own catalogue through it on purpose (see [99](#99--known-g
 
 - **Expect** — 404 with `CATALOG.PRODUCT.NOT_FOUND` and a traceId; not a 500, not an empty 200.
 
-### PDP-05 — The storefront page renders it, with the price from inventory · critical · [verified]
-
-- **Steps** — open `http://org1-store1.spg-507f1f77.gateway.com/en/product/nike-zoomx-invincible-run-3`.
-- **Expect** — 200, the product name, `SAR 750.00` (or whatever INV state you left — the price is *not* in
-  the catalog payload, landing-ui fetches it from inventory by sku and formats it), quantity and an enabled
-  add-to-cart. With inventory stopped the page still renders, without a price and with add-to-cart disabled.
+> The storefront's own render of this page is **PDP-05**, now in [landing-ui](../../../landing-ui/qa/landing-ui-qa.md).
 
 ---
 
@@ -349,6 +324,8 @@ product form writes the definition here and the price/stock to inventory in a **
 
 ---
 
+---
+
 ## CAT — Categories
 
 The tree is materialised: each row carries `lineage` (`/1/7/` — every ancestor id then its own) and `depth`.
@@ -460,6 +437,8 @@ subtree delete.
 
 ---
 
+---
+
 ## BRD — Brands (manufacturers)
 
 ### BRD-01 — The console list, with every language, and its name filter · critical · [not verified]
@@ -499,6 +478,8 @@ subtree delete.
 
 ---
 
+---
+
 ## TYP — Product types
 
 ### TYP-01 — List, get, create, update, delete · critical · [not verified]
@@ -517,6 +498,8 @@ subtree delete.
 ### TYP-03 — Deleting a type that products use · [not verified]
 
 - As BRD-03: expected to be a constraint 500 today.
+
+---
 
 ---
 
@@ -583,6 +566,8 @@ Store-level groups (`FEATURED_ITEMS`, …) have no parent product. A product's r
 
 ---
 
+---
+
 ## IMG — Product images
 
 Files live on the store's bucket (MinIO locally, S3 on Fargate) under `products/<store>/<sku>/`; the row
@@ -633,307 +618,111 @@ case. Regenerate: `qa/lcl-lifecycle.md`.
 
 ---
 
-## INV — Stock and price (inventory)
+---
 
-`GET /inventory/api/v1/availability?skus=a,b,c` is the **only read** — public, store-scoped, bulk. A sku with
-no record is **absent** from the answer, not present with zeros. `PUT /private/inventory/{sku}` is the
-**only write**: quantity, available, order min/max and one price with an optional special amount and window.
+## GAL — The gallery reads the media library
 
-### INV-01 — Bulk read · critical · [verified]
+_From `qa/content-owns-appearance-and-media.md` §CAT, renumbered `CAT-0N` → `GAL-0N` because catalog's own
+`CAT` prefix is the category tree._
 
-- **Steps** — `?skus=SKU-NK-RUN-001,SKU-NOPE&store=<org1-store1>`.
-- **Expect** — one element: `sku, productId, available, canBePurchased, quantity, quantityOrderMinimum,
-  quantityOrderMaximum, price{originalPrice, finalPrice, discounted, discountPercent, specialAmount,
-  specialStartDate, specialEndDate}`. Raw numbers — no currency strings; every caller formats. `SKU-NOPE`
-  absent.
+Product images are no longer files catalog uploads and owns. Catalog stores a `media_asset_id` per gallery row
+and content owns the asset, the bytes and the usage index. Catalog has no upload endpoint left.
 
-### INV-02 — `canBePurchased` is available **and** in stock · critical · [unit only]
+### GAL-01 — The seeded gallery reads · critical · [verified]
 
-`SkuInventoryMapperTest.notPurchasableWithoutStockOrWhenUnavailable`.
+- **Steps** — `GET /catalog/api/v1/product/1/images?store=…`.
+- **Expect** — images in sort order, each with a `mediaAssetId` and a cached `imageUrl`. No `imageName`.
 
-- **Steps** — set `available: false` on a sku (INV-05), read; set `quantity: 0`, read.
-- **Expect** — `canBePurchased: false` in both; `available` reports the flag alone.
+### GAL-02 — Attaching from the library · critical · [verified]
 
-### INV-03 — Discount windows · critical · [unit only]
+- **Steps** — open a saved product's **Media** step; **Choose from media library**; pick two images.
+- **Expect** — both appear; the first becomes the default on an empty gallery.
+- **Found** — the step did not render at all: `productForm.media.pick` was in neither locale, and Transloco is
+  configured strict, so the throw took the whole panel down. `npm run lint` catches this and had not been run.
+  Then the tiles were captioned with the gallery row's database id ("901") because a picked asset was attached
+  with `altText: null` unless it had a title. Both fixed; a picked asset now carries its title or filename.
 
-`SkuInventoryMapperTest` (7 cases: inside window, start-only, end-only, open-ended, start today, end today,
-default price over other rows).
+### GAL-03 — Changing the default image · critical · [verified]
 
-- **Steps** — through INV-05 set `specialAmount 608` with no dates; then `specialEndDate` yesterday; then
-  `specialStartDate` tomorrow; then start today.
-- **Expect** — `discounted: true, finalPrice 608, discountPercent 20` (on 760); then not discounted; then not;
-  then discounted. Start is inclusive, end exclusive; a window with only a start is honoured (the legacy rule
-  ignored it — a deliberate change).
+- **Steps** — move another image to the front of the gallery.
+- **Expect** — it becomes the storefront thumbnail and the previous one is no longer default. This was
+  impossible before: `PATCH ?order=` only renumbered.
+- **Found** — the endpoint gap was closed by `PUT …/product/{id}/images` but the console had not followed. The
+  facade kept `isDefault` on whichever image already held it, so a reorder carried the badge off position 1
+  while the panel above went on saying the first image is the thumbnail. Fixed: reordering re-designates, and
+  moving an image to the front *is* how the thumbnail changes. The step's hint said the opposite and now says
+  that. **There is deliberately no separate "make default" control** — that would be a second way to express
+  one write.
 
-### INV-04 — Cross-tenant and no-token · critical · [verified]
+### GAL-04 — Reordering · [verified]
 
-- **Steps** — the bulk read with `store=<org2-store1>` and org1's skus; `PUT /private/inventory/…` with no
-  token.
-- **Expect** — `[]`; **401**. Then `PUT` with the pod's **s2s token** (client-credentials against uaa,
-  scope `store_pod`): **403** `COMMON.ACCESS_DENIED` (verified) — a service principal can reserve, not manage.
+- **Steps** — move an image up.
+- **Expect** — the whole gallery is renumbered in one `PUT`, with no two images sharing a position.
+- **Result** — holds, and survives a reload.
 
-### INV-05 — The upsert creates, then updates, one row · critical · [not verified] (400/401 paths verified)
+### GAL-05 — An asset from another store is refused · critical · [verified]
 
-- **Steps** — `PUT /private/inventory/HTTP-DEMO-001` with `{"productId": <PRD-01 id>, "quantity": 12,
-  "available": true, "price": {"amount": 25, "specialAmount": 19.9, "specialEndDate": "2099-12-31"}}`; read the
-  DB; `PUT` again with `quantity 3` and `price.amount 30`, no special.
-- **Expect** — 200 with the resolved `SkuInventory` (`finalPrice 19.9, discounted true, discountPercent 20`);
-  one `product_availability` row with `sku`, `product_id`, `store_merchant_id`, and one `product_price` row
-  (`base`, default, `store_merchant_id` set). The second call **updates both rows in place** (same ids) and
-  clears the special. `quantityOrderMinimum/Maximum` omitted: kept (1 / 0 on create).
+- **Steps** — `POST /private/product/1/images` with a `mediaAssetId` belonging to another store.
+- **Expect** — **400 `CATALOG.PRODUCT_IMAGE.ASSET_UNKNOWN`**, and nothing written. Reported as 400 rather than
+  404 so probing tells the caller nothing about whether the asset exists.
 
-### INV-06 — Validation · high · [verified]
+### GAL-06 — Detaching leaves the asset alone · [verified]
 
-- **Steps** — `{"quantity": -1, "available": true}` (no price); `{"quantity": 1, "available": true, "price":
-  {"amount": -5}}`.
-- **Expect** — 400 with `fields` on `quantity` / `price`, then on `price.amount`.
+- **Steps** — remove an image from a product; open the media library.
+- **Expect** — the asset is still there. Another product may be showing the same photo.
 
-### INV-07 — A legacy sku with several price rows · [unit only]
+### GAL-07 — Deleting a product releases its assets · [unit only]
 
-`SkuInventoryMapperTest.defaultPriceWinsOverOtherLegacyPriceRows`. Insert a second, non-default price row for
-a sku by SQL; the read answers the default one; an upsert **edits the default one** and leaves the other.
+- **Steps** — delete a product that held images; check `content.media_usage`.
+- **Expect** — no rows for that product. The assets themselves remain.
 
-### INV-08 — Delete by product is best-effort orphan cleanup · high · [not verified]
+### GAL-08 — Catalog no longer uploads · [verified]
 
-- **Steps** — `DELETE /private/inventory/by-product/<PRD-01 id>`; again.
-- **Expect** — 200 both times (a product with no rows is a no-op). A row referenced by a reservation line
-  (RES-01 first): **record what happens** — the FK from `product_reservation_line` is expected to make it a
-  **500**; the console swallows it and the row stays, which is harmless but should be known.
-
-### INV-09 — Boot migration from the old catalog tables · critical · [verified]
-
-`CatalogDataMigration` runs `migrate-from-catalog.sql` on **every** start; idempotent; no-op once the catalog
-tables are gone.
-
-- **Steps** — on a database that still has `catalog.product_availability` / `product_price` /
-  `product_reservation*` rows (a pre-split dump, or the simulation the PR ran), start inventory; read the log
-  and `inventory.sm_sequencer`.
-- **Expect** — every availability row copied **with `sku` backfilled** from `catalog.product` (the column was
-  NULL pre-split and it is now the reservation key); every price row copied with `store_merchant_id` from its
-  availability; reservations and lines copied; every sequencer **≥ the max copied id**; log line
-  `Catalog-to-inventory data migration completed; all availability rows carry a sku`. A second start changes
-  nothing. Any row left with a NULL sku logs an **ERROR** naming the count — that is a finding.
-
-### INV-10 — Dropping the old tables is manual · [not verified]
-
-- **Steps** — after INV-09 is verified on the target, run `extra/scripts/drop-catalog-inventory-tables.sql`.
-- **Expect** — catalog boots without them; nothing in either service references them. Do not run it before
-  INV-09 has been checked on that database.
+- **Steps** — `POST /spg/catalog/api/v1/private/product/1/image` (singular, multipart).
+- **Expect** — **404**. There is no upload endpoint in catalog any more.
 
 ---
 
-## RES — Reservations (checkout ↔ inventory)
-
-Every call is keyed by the order ref and idempotent. Expiry is 45 minutes (`reservation.expiry.minutes`), the
-sweep runs every 60 s (`reservation.cleanup.interval`) and tells checkout.
-
-### RES-01 — Reserve takes stock; a retry does not take it twice · critical · [verified]
-
-- **Steps** — `POST /private/reserve/qa-1` with `{"entries": [{"sku": "SKU-NK-RUN-001", "reserveQty": 2}]}`;
-  read INV-01; `POST` the same again.
-- **Expect** — `{"status": true, "reservationId": n, "expireAt": <now+45m>}`; quantity down by 2; the retry
-  answers the **same** reservation and the quantity is **still** down by only 2.
-
-### RES-02 — Not enough stock, and a sku that is not stocked · critical · [verified]
-
-- **Steps** — `reserveQty: 999`; then `"sku": "SKU-NOPE"`.
-- **Expect** — **422** `INVENTORY.RESERVATION.INSUFFICIENT_INVENTORY` with `params {sku, requested,
-  available}` (available `0` for the unstocked sku); **nothing was taken** for any line of that request
-  (the transaction rolls back — send two entries, the second short, and check the first's quantity).
-
-### RES-03 — No lines · high · [verified]
-
-- **Expect** — `{"entries": []}` → **400** `INVENTORY.RESERVATION.EMPTY`.
-
-### RES-04 — Commit, then release after commit · critical · [verified]
-
-- **Steps** — `POST /private/commit/qa-1`; `POST /private/release/qa-1`.
-- **Expect** — `status: true` (row `COMPLETED`); then `status: false` — a committed reservation is not given
-  back. Commit again: `true` (idempotent). Commit an unknown ref: `status: false`, no exception.
-
-### RES-05 — Release gives the stock back · critical · [not verified]
-
-- **Steps** — reserve `qa-2` for 3; release; release again; read the quantity.
-- **Expect** — `true` (row `ROLLBACK`, quantity restored); `true` again; the quantity restored **once**.
-
-### RES-06 — Expiry sweeps a held reservation and tells checkout · critical · [not verified]
-
-- **Steps** — set `reservation.expiry.minutes=1` for inventory (`application-lcl.yml` or `-D`), reserve
-  `qa-3`, wait two minutes, read the quantity and `inventory.log` / `checkout.log`.
-- **Expect** — quantity restored, row `ROLLBACK`, inventory logs `Released expired reservation qa-3`, checkout
-  received `handleReservationExpired` (checkout's log; the order — if one exists under that ref — moves to
-  its expired state). Commit after expiry: `status: false` with a warning logged. If checkout is down the
-  release still happens and inventory logs the failed notification once.
-
-### RES-07 — Two orders racing for the last unit · high · [not verified]
-
-- **Steps** — set a sku to quantity 1; fire two reserves for 1 with different refs concurrently (two `curl &`).
-- **Expect** — exactly one `status: true`, one 422. The reserve path reads the row with a pessimistic write
-  lock.
-
-### RES-08 — Reservation calls are same-pod only · critical · [verified] / [not verified]
-
-- **Steps** — no token (verified 401); a seller session from **another pod's** store (only possible with a
-  second pod locally — see `qa/tenancy-and-pod-registry-split.md`).
-- **Expect** — 401; 403.
-
 ---
 
-## CHK — Checkout composes the two services
+## ENF — The plan ceiling and the write gate
 
-`ProductDetailsComposer` (checkout-core) calls catalog's `detailed-product` and inventory's bulk read for one
-sku and hands the cart and order code a `(product, inventory)` pair.
+_From `qa/billing-per-store-subscriptions.md` §ENF. The edge half of enforcement (ENF-01, ENF-04) is the gateway's, in [gateway-qa.md](../../../../store-core/gateway/gateway-service/qa/gateway-qa.md); ENF-03 (a lapsed store's storefront keeps selling) is landing-ui's._
 
-### CHK-01 — Add to cart shows catalog copy and inventory price · critical · [verified]
+A store that has not paid cannot be *changed*. It can still be read, and its shopfront still sells — both
+deliberate.
 
-- **Steps** — `POST /checkout/api/v1/cart?store=…&lang=en` with `{"product": "SKU-NK-RUN-001", "quantity": 1}`.
-- **Expect** — the cart line with the product's name and image from catalog and `displayTotal` `SAR750.00`
-  from inventory (or 608 while the special is on — the cart charges `finalPrice`).
+### ENF-02 — Reading a lapsed store still works · critical · [verified]
 
-### CHK-02 — A sku with no inventory cannot be added · critical · [not verified]
+A seller has to see what they are being asked to pay for. This was wrong once and is worth re-checking.
 
-- **Steps** — add PRD-01's sku (catalog only, no inventory row).
-- **Expect** — refused with checkout's `ProductNotPurchasableException` code; the same for `available: false`
-  or `quantity: 0` in inventory. The composer treats a missing sku as *not stocked* — never a 500.
+- **Steps** — on the same lapsed store, browse products, orders and settings.
+- **Expect** — everything lists normally. Only changes are refused.
 
-### CHK-03 — A cart line whose product lost its price is dropped · high · [not verified]
+### ENF-05 — The product ceiling refuses the one that would exceed it · high · [not verified]
 
-- **Steps** — add a product, then delete its inventory rows by SQL, then read the cart.
-- **Expect** — the cart is rebuilt without that line (checkout marks the item obsolete). Before the rewrite
-  this was a NullPointerException.
+> **Expect this to be permissive today.** The catalog guard shipped only partly wired — see
+> [Known gaps](#99--known-gaps). If the limit is not enforced, that is the known state, not a new bug. Record
+> what you observe either way.
 
-### CHK-04 — Catalog down · critical · [not verified]
+- **Setup** — a store on Free, which allows 25 products.
+- **Steps** — create products up to 25, then attempt one more.
+- **Expect** — *if wired:* the 26th is refused with a message naming the limit and the current count, and
+  existing products stay editable. *If not:* it succeeds — log it against the known gap.
 
-- **Steps** — stop catalog, add to cart.
-- **Expect** — a typed remote failure from checkout, not a 500 with a stack trace; the storefront's cart
-  page reports it. Inventory down: the same, with `INVENTORY.*` codes.
+### ENF-06 — Unlimited means unlimited · [not verified]
 
-### CHK-05 — Placing an order reserves, then commits · critical · [not verified]
+Pro does not cap products. An absent limit must never behave as a limit of zero.
 
-- **Steps** — a full storefront checkout (`qa/billing-per-store-subscriptions.md` has the payment set-up).
-- **Expect** — `inventory.product_reservation` gains a `TEMPORARY_RESERVED` row under the order ref on
-  placement and it becomes `COMPLETED` on payment; the sku's quantity drops by the ordered amount and stays
-  down. A failed payment: `ROLLBACK` and the quantity back.
-
-### CHK-06 — The order records the price it sold at · high · [not verified]
-
-- **Steps** — after CHK-05 with a special price active, read `checkout.order_product_price`.
-- **Expect** — one row per line: `product_price_code base`, `default_price true`, `product_price` = the final
-  price, and the special amount/dates copied when the sale was discounted. Changing the price afterwards does
-  not change the order.
+- **Expect** — on Pro, product creation is never refused for a ceiling, however many exist.
 
 ---
-
-## UI — The console
-
-Products (`/products`), the product form (`/products/new`, `/products/{id}`) and Catalogue (categories,
-brands, types, groups). Specs: `features/products/**`, `features/product-form/**`, `features/catalogue/**`,
-`api/catalog/*.spec.ts`, `api/inventory` — 962 Karma cases pass, which is what every [unit only] below means.
-
-### UI-01 — The product table merges price and stock from inventory · critical · [verified]
-
-- **Steps** — open Products as org1-admin.
-- **Expect** — rows with name, categories, brand, image, **price and quantity** (one bulk inventory call for
-  the page's skus — check the network tab: `GET /spg/inventory/api/v1/availability?skus=…`). A product with
-  no inventory row shows `0` and no price, not an error.
-
-### UI-02 — Inline edit writes two services · critical · [unit only] (`products.api.service.spec.ts`)
-
-- **Steps** — change price and quantity of a row inline, toggle availability, save.
-- **Expect** — a `PATCH /spg/catalog/api/v1/private/product/{id}` with **both** switches and a
-  `PUT /spg/inventory/api/v1/private/inventory/{sku}` with `{productId, quantity, available, price: {amount}}`;
-  the row re-renders from the reload. An empty price sends `amount: 0`, not nothing.
-
-### UI-03 — The product form loads the definition and the stock · critical · [unit only]
-
-- **Steps** — open a seeded product.
-- **Expect** — the Pricing step shows the inventory price (`originalPrice`, falling back to `finalPrice`) and
-  quantity; "can be purchased" reflects the inventory record's `available`; the definition steps show every
-  language, the brand and type by code, the categories ticked.
-
-### UI-04 — Create from the form is two writes, and a partial failure is honest · critical · [unit only]
-
-- **Steps** — create a product with a price; then repeat with inventory stopped.
-- **Expect** — `POST /spg/catalog/api/v2/private/product` then `PUT /spg/inventory/.../{sku}`; on the second
-  run the definition lands, the inventory write fails, and the form **says so** (`inventoryApplied: false`)
-  rather than pretending — the product exists with no stock, which UI-01 then shows as `0`.
-
-### UI-05 — Update merges categories by diff · high · [unit only]
-
-- **Steps** — tick one category, untick another, save.
-- **Expect** — one `POST .../category/{added}` and one `DELETE .../category/{removed}`, run **sequentially**
-  (`concat`, not `forkJoin`), never a `PUT` with `categories` in the body.
-
-### UI-06 — Delete cleans inventory best-effort · high · [unit only]
-
-- **Steps** — delete a product from the table.
-- **Expect** — `DELETE /spg/catalog/api/v1/private/product/{id}` then
-  `DELETE /spg/inventory/api/v1/private/inventory/by-product/{id}`; the second failing does not fail the
-  delete.
-
-### UI-07 — The category tree page · critical · [not verified]
-
-- **Steps** — open Catalogue → categories; create a root, a child under it; rename; move; hide; delete.
-- **Expect** — each maps to the CAT endpoints (create/`PUT`/`move`/`visible`/`DELETE`); the tree re-renders
-  with names in the console's language from `descriptions`; the uniqueness check runs on the code field.
-
-### UI-08 — Brands, types and groups pages · high · [not verified]
-
-- **Steps** — create / edit / delete one of each; add and remove a group member.
-- **Expect** — the BRD / TYP / GRP endpoints, in the shapes those sections describe; the brand page shows no
-  logo and no publish flag (by design — `lessons.md`).
-
-### UI-09 — Related products picker · high · [not verified]
-
-- **Steps** — on a product, search the picker by **sku** (not name), add two related products, remove one.
-- **Expect** — the picker searches `GET /api/v2/products?sku=` (the only text filter the catalog has); adds
-  and removes hit `/private/products/{id}/relationship/{productId}`.
-
-### UI-10 — The moderator can read and cannot write · critical · [not verified]
-
-- **Steps** — as `org1-store1-moderator`, open every page above and try one write on each.
-- **Expect** — pages render (the reads are public or read-permitted); every write is a **403** surfaced as a
-  disabled control or an error, never a silent no-op.
-
-### UI-11 — Arabic, right to left · high · [not verified]
-
-- **Steps** — switch the console to `ar`, open Products, the form, Catalogue.
-- **Expect** — product and category names in Arabic (from `descriptions`, matched on `ar`), layout mirrored,
-  the price column still showing the store currency correctly formatted.
-
----
-
-## SF — The storefront
-
-### SF-01 — Home strips carry prices from inventory · critical · [verified]
-
-- **Steps** — open `/en` (or `/ar` — org1-store1's default is Arabic).
-- **Expect** — 200; the four strips render products with names, images and prices. The price is fetched in
-  bulk from inventory for each strip's skus (`InventoryService.enrichProducts`); a strip whose group 404s is
-  simply absent.
-
-### SF-02 — Category page: listing, facets, sort · critical · [verified] (page) / [not verified] (facets, sort)
-
-- **Steps** — `/en/category/men`; filter by brand; sort newest.
-- **Expect** — 200 with the subtree's products and prices; the brand facet is BRD-04's list; sort sends
-  `sort=dateAvailable,desc`; the "variants" facet group is **never** rendered (always empty since the split).
-
-### SF-03 — Product page without related items, without inventory · high · [verified] / [not verified]
-
-- **Steps** — a product with no `RELATED_ITEM` group (all seeded ones); then stop inventory and reload.
-- **Expect** — the page renders without the related strip (verified); without inventory it renders with no
-  price and add-to-cart disabled — the product itself **must not** fail because a strip did.
-
-### SF-04 — Unknown slugs · [verified]
-
-- **Steps** — `/en/product/does-not-exist`.
-- **Expect** — the catalog answers 404; the Next dev server currently renders a **500** for it (a pre-existing
-  stream error in the dev server, `.lcl/default/logs/landing-ui.log`, `controller[kState].transformAlgorithm is
-  not a function`). Not a catalog defect; listed so it is not filed as one.
 
 ---
 
 ## SEC — Permissions and tenant isolation
+
+_These five cases sweep catalog **and** inventory together; they are kept whole here rather than split in half. Inventory's own gate cases are INV-04 and RES-08 in [inventory-qa.md](../../../inventory/inventory-service/qa/inventory-qa.md)._
 
 ### SEC-01 — Every private catalog and inventory endpoint refuses without a session · critical · [verified] (sample)
 
@@ -964,7 +753,11 @@ CAT-08, CAT-16, GRP-04, IMG-04, INV-04, LST-08. Run them as a set.
 
 ---
 
+---
+
 ## ARC — What the rewrite left behind
+
+
 
 ### ARC-01 — The live schema creates no attribute tables · high · [verified]
 
@@ -974,11 +767,6 @@ CAT-08, CAT-16, GRP-04, IMG-04, INV-04, LST-08. Run them as a set.
   product_group_product. No `product_option*`, `product_attribute`, `product_opt_set*`, `product_digital`,
   `product_image_description`. On an **existing** database those tables still exist (`create if not exists`
   never drops) — that is expected; `catalog-deprecated/deprecated-ddl.sql` documents them.
-
-### ARC-02 — The inventory schema holds no price descriptions · [verified]
-
-- **Expect** — `\dt inventory.*`: sequencer, product_availability, product_price, product_reservation,
-  product_reservation_line. Seeds create no description rows; the migration copies none.
 
 ### ARC-03 — Nothing in the repo calls a removed type or endpoint · [verified]
 
@@ -992,21 +780,103 @@ CAT-08, CAT-16, GRP-04, IMG-04, INV-04, LST-08. Run them as a set.
 
 ---
 
+> ARC-02 (the inventory schema holds no price descriptions) is in inventory-qa.md.
+
+---
+
+## SID — One store id, end to end
+
+_From `qa/unify-store-id-value-objects.md` §EDGE, §T and §REG, reformatted from that file's bold run-in cases
+into the case shape used everywhere else. The text of each case is unchanged._
+
+A store had two identifier types: `ManagerStoreId` in store-core, `StoreMerchantId` in the pods. They are now
+one type and it serializes as a **bare string**. Catalog is where the merged id is easiest to drive, so the
+edge cases live here even though the resolver is `store-commons`.
+
+### SID-01 — A malformed store parameter is a 400, not a 500 or a 403 · critical · [verified]
+
+_Was E1._ Previously a bad `?store=` travelled inwards and blew up as an `IllegalArgumentException` deep inside
+the permission evaluator (a 500). It is now refused at the argument resolver.
+
+- **Steps** —
+
+  ```bash
+  curl -i 'http://spg-507f1f77.gateway.com/catalog/api/v1/category/anything?store=abc&lang=en'
+  ```
+
+- **Expect** — **400** with `"code":"COMMON.CONVERSION_FAILED"`, `"detail":"abc is not a valid store id."`,
+  `"params":{"store":"abc"}` and a `traceId`. No stack trace, no root-cause text in `detail`.
+
+### SID-02 — A missing store parameter is a 400 · [verified]
+
+_Was E2._
+
+- **Steps** —
+
+  ```bash
+  curl -i 'http://spg-507f1f77.gateway.com/catalog/api/v1/category/anything?lang=en'
+  ```
+
+- **Expect** — **400**, `"code":"COMMON.MISSING_PARAMETER"`, `"params":{"parameter":"store"}`.
+
+### SID-03 — A valid store id still resolves past the resolver · [verified]
+
+_Was E3._ Same URL with `?store=65f023632bc46470c104b76f&lang=en` returns **404** (no such category) — a 400
+here would mean the validation is rejecting good ids.
+
+### SID-04 — The same public endpoint, two stores, two different catalogs · critical · [verified]
+
+_Was T1._
+
+- **Steps** —
+
+  ```bash
+  B=http://spg-507f1f77.gateway.com/catalog/api/v1
+  curl -s "$B/category-hierarchy?count=20&page=0&store=65f023632bc46470c104b76f"   # Men, Women, Kids, Accessories
+  curl -s "$B/category-hierarchy?count=20&page=0&store=65f023632bc46470c104b75f"   # Computers, Mobile Phones, Audio, …
+  ```
+
+- **Expect** — no overlap between the two. Any would mean store scoping was lost.
+
+### SID-05 — A principal without the permission token gets 403 · high · [not verified]
+
+_Was T3._ Call a `/private/**` catalog endpoint with a session for a store you do not own. **403**, not 200 and
+not 500.
+
+### SID-06 — A write into a brand-new store uses its id correctly · critical · [verified]
+
+_Was R5, and the strongest single case in the file it came from: a fresh id minted by store-core, written
+through a pod's JPA `@Embedded` column, read back, and tenant-scoped._
+
+- **Setup** — provision a store through the console (see
+  [tenancy-qa.md](../../../../store-core/tenancy/tenancy-service/qa/tenancy-qa.md) SID-03) and select it.
+- **Steps** — `POST /spg/catalog/api/v1/private/category`, then read `category-hierarchy` for the new store and
+  for org1-store1.
+- **Expect** — **201**, and the row persisted as
+  `catalog.category.store_merchant_id = <the new id>`. Reading back `category-hierarchy?store=<new id>` returns
+  exactly `[QA-CAT-STOREID]` while `category-hierarchy?store=65f023632bc46470c104b76f` still returns
+  `[MEN, WOMEN, KIDS, ACCESSORIES]` — no leakage in either direction. The console agrees: switch to the new
+  store and Category → List of category shows one row.
+- **Expect a 402 first.** An org gets **one trial grant**, so the *second* and later stores in an org are
+  created with a `PENDING` subscription, which billing reports as blocked — the write is refused
+  `402 BILLING.STORE.SUSPENDED`. That is correct behaviour, not a store-id bug. Give the store an active
+  subscription (or use the org's first store) before expecting a write to land; the gateway takes up to a
+  minute to notice.
+
+---
+
 ## REG — Regression watchlist
 
-Every row was a real defect found while building or verifying this PR.
+Every row was a real defect found while building or verifying the catalog rewrite (PR #282).
 
 | What broke | How it looked | How to catch it again |
 |---|---|---|
-| **Upsert 400'd from the console** | `PersistableInventory.sku` was `@NotEmpty`, validated before the controller could copy it from the path. | INV-05 |
 | **Every catalog read 500'd on first boot of the rewrite** | Seed rows have `null` in `visible`, `sort_order`, `prd_type_add_to_cart`; the entities had primitive fields. Hibernate refused to set them. | LST-01, CAT-01, TYP-01 — any read of seeded data |
 | **Category tree and brand list 500'd with no filter** | `?2 is null or lower(d.name) like …` — Postgres typed the null parameter as `bytea`. Split into two queries. | CAT-01, CAT-03, BRD-01 |
 | **Every request 500'd with "Cannot change HTTP Accept-Language header"** | The locale resolver bean looked unused and was removed; the shared request context writes the locale. | Any request at all — SEC-01's sample |
 | **The console's category tree showed codes instead of names** | The private hierarchy passed `nonLanguage`, so neither `description` nor `descriptions` was set. | CAT-02 |
-| **A cart line with no price NPE'd** | The composer handed a null `price` to the cart populator. | CHK-03 |
 | **The old catalog listing hid products with no availability row** | Inner joins to `product_availability` in the fetch queries; the count was right only because every seed had one. | LST-01 (`totalElements` 45 with a product created by PRD-01 → 46) |
-| **`restart inventory` took the whole stack down** | Under the old `run-lcl.sh` supervisor a restart read as a service exit and brought everything down. `lcl restart <svc>` replaces one service and leaves the rest up. | `qa/lcl-lifecycle.md` case 06 |
-| **Generated seed inserts had 7 values for 6 columns** | A regex added `sku` to wrapped column lists inconsistently. | ARC-01 — inventory boots and `select count(*) from inventory.product_availability` = 180 |
+| **The store id column went blank in the console** | A template reached into the id (`{{ value.id }}`) after it became a bare string. A grep could not have caught it. | SID-06, and console-ui's SW cases |
 
 ---
 
@@ -1045,27 +915,19 @@ through the flag above, with the caveat above.
 **A description with no language is a 500.** `language_code` is NOT NULL and nothing validates it above the
 database. The console always sends it.
 
-**Inventory has no billing write gate.** `StoreBillingWriteGate` is catalog's; a store with a lapsed
-subscription can still change stock and prices through the inventory API. The console reaches inventory only
-after a catalog write that the gate refuses, so it is not reachable from the screen.
-
 **A merchant's related-items and groups are single-store.** There is no cross-store or org-level group.
-
-**An inventory row survives its product.** The console deletes it best-effort; by API, nothing does. Orphans
-are invisible to every reader (the bulk read is by sku and the listing never joins inventory) and cost a row.
-
-**`quantityOrderMaximum` is `0` for "no limit" and the seeds set it to `1`.** Nothing enforces either value
-today — checkout does not read the limits. Recorded so a future enforcement does not surprise anyone.
 
 **Sorting the listing by anything but a direct `Product` column is a 500.** `SORT_MAP` in landing-ui exposes
 only `dateAvailable`.
 
-**The Next dev server 500s on unknown slugs** instead of rendering a 404 page (SF-04). Dev-only.
+**The legacy `split-merchant-content-services.md` ROUTE cases are gone, not lost.** They asserted the old
+`/spg/merchant/api/v1/content/**` alias still answered; content's MIG-03 asserts it is removed, and the later
+assertion wins.
 
 ---
 
-Raise anything unexpected against PR #282. Include the store id, the sku or category id, the time, and the
-matching `Unhandled failure [traceId=…]` block from `.lcl/default/logs/catalog.log`, `inventory.log` or
-`checkout.log`. For a console defect attach the browser console and the failing request: a 401 is a missing
-session, a 403 is a permission problem, a 404 through `/spg/**` is usually a missing `pod` parameter, and a
-400 with a `*.REFERENCE_UNRESOLVABLE` code names the exact value that did not resolve in this store.
+Raise anything unexpected against the catalog PR. Include the store id, the sku or category id, the time, and
+the matching `Unhandled failure [traceId=…]` block from `.lcl/<stack>/logs/catalog.log`. For a console defect
+attach the browser console and the failing request: a 401 is a missing session, a 403 is a permission problem,
+a 404 through `/spg/**` is usually a missing `pod` parameter, and a 400 with a `*.REFERENCE_UNRESOLVABLE` code
+names the exact value that did not resolve in this store.
