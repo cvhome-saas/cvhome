@@ -3,6 +3,27 @@
   <div class="step-stack" [formGroup]="form()">
     <app-panel [title]="t('productForm.pricing.title')" [subtitle]="t('productForm.pricing.subtitle')">
       <div class="editor-body">
+        @if (hasOptions()) {
+          <!--
+            One source of truth per number: with options assigned, every combination sku carries its
+            own price and stock in the variants matrix, and a second pair of fields here would be a
+            write the matrix immediately overwrites. The flags and the shipping box below still
+            belong to the product itself.
+          -->
+          <app-notice-bar
+            icon="info"
+            tone="blue"
+            [message]="t('productForm.pricing.managedByVariants')"
+          />
+          <div class="field-grid">
+            <div class="field field-wide">
+              <button class="secondary-action" type="button" (click)="openVariants.emit()">
+                <app-icon name="arrowRight" />
+                {{ t('productForm.pricing.openVariants') }}
+              </button>
+            </div>
+          </div>
+        } @else {
         <div class="field-grid">
           <app-form-field
             required
@@ -46,6 +67,7 @@
           real ones hard to find, which is why this step departs from Module 5's "keep them, marked".
         -->
         <app-notice-bar icon="info" tone="blue" [message]="t('productForm.pricing.notModelled')" />
+        }
 
         <hr class="divider" />
 

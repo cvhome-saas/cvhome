@@ -84,7 +84,43 @@ public enum CatalogErrors implements ErrorCode {
     /**
      * A category was addressed by a friendly URL that matches nothing in this store.
      */
-    CATEGORY_FRIENDLY_URL_NOT_FOUND("CATALOG.CATEGORY.FRIENDLY_URL_NOT_FOUND", ErrorCategory.NOT_FOUND);
+    CATEGORY_FRIENDLY_URL_NOT_FOUND("CATALOG.CATEGORY.FRIENDLY_URL_NOT_FOUND", ErrorCategory.NOT_FOUND),
+
+    /**
+     * No product option with that id or code exists in this store.
+     */
+    PRODUCT_OPTION_NOT_FOUND("CATALOG.PRODUCT_OPTION.NOT_FOUND", ErrorCategory.NOT_FOUND),
+
+    /**
+     * A product option with that code already exists in this store.
+     */
+    PRODUCT_OPTION_DUPLICATE("CATALOG.PRODUCT_OPTION.DUPLICATE", ErrorCategory.CONFLICT),
+
+    /**
+     * The option (or one of its values) is still referenced by a product's assignments or variants.
+     */
+    PRODUCT_OPTION_IN_USE("CATALOG.PRODUCT_OPTION.IN_USE", ErrorCategory.CONFLICT),
+
+    /**
+     * The sku is already taken in this store.
+     */
+    PRODUCT_VARIANT_DUPLICATE_SKU("CATALOG.PRODUCT_VARIANT.DUPLICATE_SKU", ErrorCategory.CONFLICT),
+
+    /**
+     * Two variants of one product describe the same option-value combination.
+     */
+    PRODUCT_VARIANT_DUPLICATE_COMBINATION("CATALOG.PRODUCT_VARIANT.DUPLICATE_COMBINATION",
+            ErrorCategory.CONFLICT),
+
+    /**
+     * A variant set does not fit its declared option axes.
+     */
+    PRODUCT_VARIANT_OPTIONS_INVALID("CATALOG.PRODUCT_VARIANT.OPTIONS_INVALID", ErrorCategory.VALIDATION),
+
+    /**
+     * The write exceeds the option/variant guardrails.
+     */
+    PRODUCT_VARIANT_LIMIT_EXCEEDED("CATALOG.PRODUCT_VARIANT.LIMIT_EXCEEDED", ErrorCategory.VALIDATION);
 
     private final String code;
 

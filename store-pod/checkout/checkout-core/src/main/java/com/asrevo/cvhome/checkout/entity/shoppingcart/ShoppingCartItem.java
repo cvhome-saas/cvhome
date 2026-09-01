@@ -57,12 +57,12 @@ public class ShoppingCartItem extends SalesManagerEntity<Long, ShoppingCartItem>
     @Embedded
     private AuditSection auditSection = new AuditSection();
 
-    // SKU
+    /**
+     * The whole business key of a cart line — always a variant sku since the uniform variant model (the
+     * inventory and catalog sides cannot tell a "simple" sku apart, and neither can we).
+     */
     @Column(name = "SKU")
     private String sku;
-
-    @Column(name = "PRODUCT_VARIANT")
-    private Long variant;
 
     @JsonIgnore
     @Transient

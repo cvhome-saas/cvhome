@@ -2,6 +2,7 @@ package com.asrevo.cvhome.checkout.services.shoppingcart;
 
 import java.math.BigDecimal;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -110,11 +111,14 @@ public class ShoppingCartServiceImpl extends SalesManagerEntityServiceImpl<Long,
                 return shoppingCart;
             }
 
+            // one catalog call + one inventory call for the whole cart, never one pair per line
+            Map<String, ProductDetails> detailsBySku = productDetailsComposer.getDetailedProducts(store,
+                    items.stream().map(ShoppingCartItem::getSku).toList(), language);
+
             for (ShoppingCartItem item : items) {
                 log.debug("Populate item {}", item.getId());
-                ProductDetails detailedProduct = productDetailsComposer.getDetailedProduct(store, item.getSku(),
-                        language);
-                SkuPrice price = detailedProduct.inventory().price();
+                ProductDetails detailedProduct = detailsBySku.get(item.getSku());
+                SkuPrice price = detailedProduct == null ? null : detailedProduct.inventory().price();
                 if (price == null) {
                     // Priced nowhere any more: the line cannot be sold, and the cart is rebuilt without it.
                     item.setObsolete(true);

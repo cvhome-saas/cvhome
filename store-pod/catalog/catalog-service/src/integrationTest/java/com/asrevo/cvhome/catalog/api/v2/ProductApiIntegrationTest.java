@@ -1,5 +1,8 @@
 package com.asrevo.cvhome.catalog.api.v2;
 
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,6 +64,11 @@ class ProductApiIntegrationTest {
 
     private static final String PRODUCTS = path(V2, "products");
 
+    /** The seeded Zara dress: colour x size, deliberately without the red/L combination. */
+    private static final long DRESS = 2L;
+
+    private static final String OPTION_VALUES_QUERY = "optionValueIds=%s";
+
     private static final String BY_NAME = path(V2, PRODUCT_SEGMENT, "name");
 
     private static final String PRIVATE_PRODUCT_V2 = path(V2_PRIVATE, PRODUCT_SEGMENT);
@@ -70,6 +78,12 @@ class ProductApiIntegrationTest {
     private static final String UNIQUE = path(PRIVATE_PRODUCT_V1, "unique");
 
     private static final String DETAILED = path(V1, "detailed-product");
+
+    private static final String DETAILED_BULK = path(V1, "detailed-products");
+
+    private static final String VARIANT_BLOCK = "variant";
+
+    private static final String OPTION_VALUES_FIELD = "optionValues";
 
     private static final String CATEGORY_SEGMENT = "category";
 
@@ -265,6 +279,49 @@ class ProductApiIntegrationTest {
                 HttpStatus.OK);
     }
 
+    /** Product ids on a listing page, so a filter can be asserted against a named product. */
+    private static Set<Long> ids(JsonNode listing) {
+        return listing.get(CONTENT).valueStream().map(product -> product.get(ID).asLong())
+                .collect(Collectors.toSet());
+    }
+
+    private Set<Long> filterBy(String values) {
+        return ids(json(api.get(scoped(query(PRODUCTS, OPTION_VALUES_QUERY.formatted(values)), STORE_A), null)));
+    }
+
+    @Test
+    void theListingFiltersByOptionValueAnchoredToOneVariant() {
+        /*
+         * The filter semantics the whole facet rail rests on: **OR within an option, AND across options, and
+         * both anchored to a SINGLE variant**. The Zara dress (product 2) is built for exactly this — it
+         * sells red/M, blue/M and blue/L, and deliberately not red/L.
+         *
+         * So red AND L must not return the dress. If the AND were evaluated per *product* rather than per
+         * variant it would match — it owns a red variant and it owns an L variant — and a shopper filtering
+         * for a red L dress would be shown one that does not exist in that combination. That negative case is
+         * the point of this test; the positive ones only prove the query runs.
+         *
+         * Asserted against the dress by id rather than against an empty page: the store's other products sell
+         * red/L quite legitimately, so a store-wide zero would only hold while the seed stayed tiny.
+         */
+        Set<Long> inRed = filterBy("1");
+        assertThat(inRed).contains(DRESS);
+
+        // two values of the SAME option are an OR — red or blue is at least as wide as red alone
+        assertThat(filterBy("1,2")).containsAll(inRed);
+
+        // across options it is an AND, and one variant must satisfy both
+        assertThat(filterBy("2,3")).as("blue + M is a combination the dress sells").contains(DRESS);
+        assertThat(filterBy("1,4")).as("red + L is not, however many red and L variants it owns")
+                .doesNotContain(DRESS);
+
+        // and each half of that impossible pair finds the dress on its own, so the exclusion above is the
+        // anchoring and not simply an empty catalogue
+        assertThat(filterBy("2")).contains(DRESS);
+        assertThat(filterBy("4")).contains(DRESS);
+        assertThat(filterBy("3")).contains(DRESS);
+    }
+
     @Test
     void theProductPageAnswersBySlugAndOnlyWhenVisible() {
         var page = api.get(scoped(path(BY_NAME, SEEDED_SLUG), STORE_A), null);
@@ -311,6 +368,54 @@ class ProductApiIntegrationTest {
     }
 
     // ----------------------------------------------------------------------------------------- category membership
+
+    @Test
+    void checkoutReadsAWholeCartsWorthOfLinesInOneCall() {
+        /*
+         * The bulk read behind a cart or an order: one call for every line's sku, so composing a cart costs
+         * one catalog request rather than one per line. Two things it must get right — a **combination**
+         * sku resolves to its parent product and carries the selection labels a line renders as
+         * "Color: Red / Size: M", and a sku that does not exist is simply absent from the answer rather than
+         * failing the whole read (one dead line must not cost the shopper their basket).
+         */
+        String s2s = api.token(ADMIN, STORE_A);
+        String combination = "SKU-ZR-CL-DRS02-BL-M";
+        // A product with no options at all. Note SEEDED_SKU is NOT one: the seed promotes product 1's
+        // default variant to its size-M combination, so that sku legitimately carries a selection too.
+        String simple = "SKU-HM-CL-SWT04";
+        String skus = String.format("skus=%s,%s,%s", simple, combination, slug("no-such-sku"));
+
+        var response = api.get(scoped(query(DETAILED_BULK, skus), STORE_A), s2s);
+        expect(response, HttpStatus.OK);
+        JsonNode lines = json(response);
+
+        // the missing sku is absent, not an error and not a null element
+        assertThat(lines).hasSize(2);
+        assertThat(lines.valueStream().map(line -> line.get(SKU).asString()).toList())
+                .containsExactlyInAnyOrder(simple, combination);
+
+        JsonNode variantLine = lines.valueStream()
+                .filter(line -> combination.equals(line.get(SKU).asString())).findFirst().orElseThrow();
+        // read by a combination sku, so the selection block is filled with resolved labels
+        JsonNode selection = variantLine.get(VARIANT_BLOCK);
+        assertThat(selection).isNotNull();
+        assertThat(selection.get(SKU).asString()).isEqualTo(combination);
+        assertThat(selection.get(OPTION_VALUES_FIELD)).hasSize(2);
+        assertThat(selection.get(OPTION_VALUES_FIELD).valueStream()
+                .map(pair -> pair.get("optionCode").asString()).toList())
+                .containsExactlyInAnyOrder("color", "size");
+        assertThat(variantLine.get(DESCRIPTION).get(NAME).asString()).isNotEmpty();
+
+        // a product with no options resolves its one default variant and carries no selection block —
+        // there was nothing to choose, so a cart line for it renders a name and no option labels
+        JsonNode simpleLine = lines.valueStream()
+                .filter(line -> simple.equals(line.get(SKU).asString())).findFirst().orElseThrow();
+        assertThat(simpleLine.get(VARIANT_BLOCK) == null || simpleLine.get(VARIANT_BLOCK).isNull()).isTrue();
+
+        // scoped: another store's admin cannot read this store's lines
+        expect(api.get(scoped(query(DETAILED_BULK, skus), STORE_B), api.token(ADMIN, STORE_B)),
+                HttpStatus.OK);
+    }
 
     @Test
     void categoryMembershipIsAddedOnceAndRemoved() {

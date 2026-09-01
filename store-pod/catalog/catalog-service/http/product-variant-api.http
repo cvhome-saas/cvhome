@@ -1,0 +1,57 @@
+# ProductVariantApi — com.asrevo.cvhome.catalog.api.v2
+#
+# A product's variant set: one atomic whole-set replace carrying the axes (option codes) and the combinations.
+# Console only. Requires a running stack (lcl start -d) and the demo option vocabulary (color/size) seeded by
+# the test-stores profile.
+
+### the console matrix: the product's variants with resolved option/value labels
+GET {{SELLER_UI_URL}}/spg/catalog/api/v2/private/product/2/variants?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+### replace the whole set: axes + combinations together (ids keep rows; absent rows are removed)
+PUT {{SELLER_UI_URL}}/spg/catalog/api/v2/private/product/2/variants?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{
+  "options": ["color", "size"],
+  "variants": [
+    { "id": 2, "sku": "SKU-ZR-CL-DRS02", "sortOrder": 0, "defaultVariant": true, "optionValueIds": [1, 3] },
+    { "sku": "SKU-ZR-CL-DRS02-RD-L", "sortOrder": 1, "defaultVariant": false, "optionValueIds": [1, 4] },
+    { "sku": "SKU-ZR-CL-DRS02-BL-M", "sortOrder": 2, "defaultVariant": false, "optionValueIds": [2, 3] }
+  ]
+}
+
+### duplicate combination — 409
+PUT {{SELLER_UI_URL}}/spg/catalog/api/v2/private/product/2/variants?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{
+  "options": ["color"],
+  "variants": [
+    { "sku": "DUP-A", "optionValueIds": [1] },
+    { "sku": "DUP-B", "optionValueIds": [1] }
+  ]
+}
+
+### a variant that misses an axis — 400
+PUT {{SELLER_UI_URL}}/spg/catalog/api/v2/private/product/2/variants?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{
+  "options": ["color", "size"],
+  "variants": [ { "sku": "HALF", "optionValueIds": [1] } ]
+}
+
+### back to a simple product: empty axes restore the single default variant (sku from the entry)
+PUT {{SELLER_UI_URL}}/spg/catalog/api/v2/private/product/2/variants?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{ "options": [], "variants": [ { "sku": "SKU-ZR-CL-DRS02" } ] }
+
+### tenant isolation — another store's product id is not found for this store
+GET {{SELLER_UI_URL}}/spg/catalog/api/v2/private/product/2/variants?store={{STORE_ID_2}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}

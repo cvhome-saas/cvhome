@@ -20,6 +20,17 @@ public enum CheckoutErrors implements ErrorCode {
     PRODUCT_NOT_PURCHASABLE("CHECKOUT.CART.PRODUCT_NOT_PURCHASABLE", ErrorCategory.UNPROCESSABLE),
 
     /**
+     * The quantity asked for is outside the merchant's per-order floor or ceiling for that sku.
+     *
+     * <p>
+     * Its own code rather than {@link #PRODUCT_NOT_PURCHASABLE}: that one means the item is not sellable at all,
+     * so a storefront rightly tells the shopper to give up on it. This one refuses only <em>this amount</em> —
+     * the same shopper buying fewer succeeds — and the message it renders needs the numbers to say so.
+     * </p>
+     */
+    CART_QUANTITY_OUT_OF_RANGE("CHECKOUT.CART.QUANTITY_OUT_OF_RANGE", ErrorCategory.UNPROCESSABLE),
+
+    /**
      * No order exists with that id in this store — or, when a customer asked, none belonging to them.
      *
      * <p>

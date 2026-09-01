@@ -13,9 +13,15 @@ import type {Tone} from '@models/ui';
  */
 
 /** Which tab of `/catalogue` is open. Part of the URL, so a tab is linkable. */
-export type CatalogueTab = 'categories' | 'types' | 'brands' | 'groups';
+export type CatalogueTab = 'categories' | 'types' | 'brands' | 'options' | 'groups';
 
-export const CATALOGUE_TABS: readonly CatalogueTab[] = ['categories', 'types', 'brands', 'groups'];
+export const CATALOGUE_TABS: readonly CatalogueTab[] = [
+  'categories',
+  'types',
+  'brands',
+  'options',
+  'groups',
+];
 
 /** Whether a string names a tab — guards the route param before it reaches the facade. */
 export function isCatalogueTab(value: string | null | undefined): value is CatalogueTab {
@@ -107,6 +113,42 @@ export interface TypeCard {
   readonly copy: readonly LocalisedCopy[];
 }
 
+/**
+ * One name in one language — the option editor's whole per-language payload.
+ *
+ * Options carry none of `LocalisedCopy`'s slug/SEO fields: `product_option_description` is a
+ * `NamedEntity` of which only `name` renders anywhere, so the view model says so instead of
+ * dragging six empty strings around.
+ */
+export interface OptionName {
+  readonly language: string;
+  readonly name: string;
+}
+
+/** One value of a store option — "Red" under Color. Ids are store-wide; faceting keys on them. */
+export interface OptionValueCard {
+  readonly id: number;
+  readonly code: string;
+  readonly name: string;
+  readonly sortOrder: number;
+  readonly copy: readonly OptionName[];
+}
+
+/**
+ * One store option (Color, Size, …), as the Options tab lists it.
+ *
+ * Store-wide and reusable: defined once, translated once, then assigned per product in the product
+ * form's variants step. Deleting one is refused (409) while any product still uses it.
+ */
+export interface OptionCard {
+  readonly id: number;
+  readonly code: string;
+  readonly name: string;
+  readonly sortOrder: number;
+  readonly copy: readonly OptionName[];
+  readonly values: readonly OptionValueCard[];
+}
+
 /** One product group, and the products in it. */
 export interface GroupRow {
   readonly code: string;
@@ -127,6 +169,7 @@ export interface CatalogueSnapshot {
   readonly categories: readonly CategoryNode[];
   readonly brands: readonly BrandCard[];
   readonly types: readonly TypeCard[];
+  readonly options: readonly OptionCard[];
   readonly groups: readonly GroupRow[];
   /** The languages this store's copy can be written in, from the store's own supported set. */
   readonly languages: readonly string[];
@@ -139,6 +182,7 @@ export const TAB_TONE: Readonly<Record<CatalogueTab, Tone>> = {
   categories: 'green',
   types: 'blue',
   brands: 'violet',
+  options: 'amber',
   groups: 'cyan',
 };
 

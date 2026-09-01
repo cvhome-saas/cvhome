@@ -21,7 +21,22 @@ public class ReadableMinimalProduct extends Entity {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    /**
+     * The default variant's sku — or, on a sku-addressed read, the sku that was asked for.
+     */
     private String sku;
+
+    /**
+     * How many variants the product owns (always at least 1). {@code > 1} is what a card derives "has options"
+     * from; the variant rows themselves ship only on the product page shape.
+     */
+    private int variantCount;
+
+    /**
+     * Filled only when this read was addressed by a combination variant's sku: the resolved option/value labels
+     * ("Color: Red / Size: L") a cart or order line renders. Null on default variants and on listings.
+     */
+    private ReadableVariantSelection variant;
 
     private boolean available;
 

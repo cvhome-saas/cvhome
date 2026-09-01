@@ -26,4 +26,10 @@ public class ProductFilter {
     private List<Long> categoryIds;
 
     private Long manufacturerId;
+
+    /**
+     * Option-value ids to filter by: OR within one option, AND across options, anchored to a single variant —
+     * "Red and L" means one variant is both.
+     */
+    private List<Long> optionValueIds;
 }

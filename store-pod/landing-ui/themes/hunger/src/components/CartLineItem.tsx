@@ -3,7 +3,7 @@ import {useTranslations} from 'next-intl';
 import {XIcon} from 'lucide-react';
 import {Link} from '@store-front/i18n/navigation';
 import type {Product} from '@store-front/types';
-import {productHref} from '@store-front/services/product-presenter';
+import {productHref, variantSelectionLabel} from '@store-front/services/product-presenter';
 import {QuantityStepper} from '@store-front/ui/quantity-stepper';
 
 /**
@@ -20,6 +20,8 @@ export function CartLineItem({product, onQuantity, onRemove, busy}: {
             <h3 className="col-start-2 text-sm font-semibold leading-snug">
                 <Link prefetch={false} href={productHref(product)} className="hover:underline">{product.description?.name}</Link>
             </h3>
+            {/* The combination bought — "Color: Red / Size: L" — from the placement-time selection. */}
+            {variantSelectionLabel(product) && <p className="text-xs text-muted-foreground" dir="auto">{variantSelectionLabel(product)}</p>}
             <p className="price col-start-3 text-base">{product.displaySubTotal || product.finalPrice}</p>
             <div className="col-start-2 col-end-4 flex items-center gap-3">
                 <QuantityStepper size="sm" value={product.quantity}

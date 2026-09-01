@@ -23,6 +23,8 @@ import jakarta.persistence.Table;
 import jakarta.persistence.TableGenerator;
 import jakarta.persistence.UniqueConstraint;
 
+import org.hibernate.annotations.BatchSize;
+
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.constants.SchemaConstant;
@@ -91,6 +93,8 @@ public class Category extends SalesManagerEntity<Long, Category> implements Audi
     private String lineage;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    // Batched: a listing page names every product's categories, so they load per page, not per row.
+    @BatchSize(size = 100)
     private Set<CategoryDescription> descriptions = new HashSet<>();
 
     public Optional<CategoryDescription> description(LanguageCode language) {

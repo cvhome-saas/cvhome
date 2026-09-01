@@ -12,7 +12,24 @@ export const isOnSale = (p: Product): boolean =>
 
 export const isLowStock = (p: Product, threshold = 5): boolean => !isOutOfStock(p) && p.quantity <= threshold;
 
-export const hasVariants = (p: Product): boolean => !!p.options?.some(o => o.variant && o.optionValues?.length);
+/**
+ * Whether the product varies by options — a **derived** predicate, nothing stored. On the PDP the
+ * assigned axes are in the payload; on a listing card only `variantCount` travels (the rows never
+ * do), and more than one variant can only mean options.
+ */
+export const hasVariants = (p: Product): boolean =>
+    (p.options?.length ?? 0) > 0 || (p.variantCount ?? 1) > 1;
+
+/**
+ * A cart/order line's selected combination, as one printable string — "Color: Red / Size: L".
+ * Undefined when the line is a default variant (nothing was selected) or predates the read-by-sku.
+ */
+export function variantSelectionLabel(p: Product): string | undefined {
+    const pairs = (p.variant?.optionValues ?? [])
+        .filter(v => (v.optionName || v.optionCode) && (v.valueName || v.valueCode))
+        .map(v => `${v.optionName || v.optionCode}: ${v.valueName || v.valueCode}`);
+    return pairs.length ? pairs.join(' / ') : undefined;
+}
 
 /** "Save 20 %" when both prices parse to numbers, otherwise undefined (prices are pre-formatted strings). */
 export function discountPercent(p: Product): number | undefined {
@@ -64,11 +81,13 @@ const LISTING_IMAGE_COUNT = 2;
  * compiler already forces callers to cope) or unread anywhere in the storefront — `productSpecifications`,
  * `properties`, `variants` and the four `Image` fields have no reader at all.
  *
- * Deliberately kept: `description` in full (hunger's card prints the copy), `options` (`hasVariants` reads
- * it), and every price/stock field. The product page keeps the untouched record — never use this there.
+ * Deliberately kept: `description` in full (hunger's card prints the copy), `variantCount` (the one
+ * variant fact a card needs — `hasVariants` reads it), and every price/stock field. `options` and
+ * `variants` are dropped with the rest: a card gets the default variant's price and a count, never
+ * the rows. The product page keeps the untouched record — never use this there.
  */
 export function toListingProduct(p: Product): Product {
-    const {productSpecifications, attributes, properties, variants, categories, ...rest} = p;
+    const {productSpecifications, attributes, options, variants, categories, ...rest} = p;
     const slim = (img: Image): Image => ({
         id: img.id,
         imageUrl: img.imageUrl,
@@ -80,7 +99,7 @@ export function toListingProduct(p: Product): Product {
         ...rest,
         productSpecifications: undefined,
         attributes: undefined,
-        properties: undefined,
+        options: undefined,
         variants: undefined,
         categories: undefined,
         image: p.image ? slim(p.image) : undefined,

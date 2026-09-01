@@ -10,9 +10,11 @@ import {getCartManager} from "@store-front/services/cart-manager";
 import {parseDescription} from "@store-front/services/description-view-util";
 import {useUser} from "./use-user";
 import {notify} from "./notify";
+import {useErrorMessage} from "./use-error-message";
 
 export const useCheckoutForm = (storeContext: StoreContext, requireLoginForOrderPlacement: boolean) => {
     const t = useTranslations('PAGE.CHECKOUT');
+    const messageFor = useErrorMessage();
     const [successDialogOpen, setSuccessDialogOpen] = useState(false);
     const [agreeDialogOpen, setAgreeDialogOpen] = useState(false);
     const [loginRequiredDialogOpen, setLoginRequiredDialogOpen] = useState(false);
@@ -139,9 +141,9 @@ export const useCheckoutForm = (storeContext: StoreContext, requireLoginForOrder
                 } else {
                     notify('error', t('PAYMENT_FAILED'), storeContext.locale);
                 }
-            }, () => notify('error', t('FAILED_TO_PLACE_ORDER'), storeContext.locale)
+            }, (error) => notify('error', messageFor(error, t('FAILED_TO_PLACE_ORDER')), storeContext.locale)
         );
-    }, [cartManager, loading, requireLoginForOrderPlacement, reset, storeContext.locale, t, user]);
+    }, [cartManager, loading, messageFor, requireLoginForOrderPlacement, reset, storeContext.locale, t, user]);
 
     return {
         register,

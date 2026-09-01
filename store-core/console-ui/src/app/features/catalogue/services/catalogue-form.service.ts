@@ -1,5 +1,12 @@
 import {Injectable, inject} from '@angular/core';
-import {AsyncValidatorFn, FormBuilder, Validators} from '@angular/forms';
+import {
+  AsyncValidatorFn,
+  FormBuilder,
+  Validators,
+  type FormArray,
+  type FormControl,
+  type FormGroup,
+} from '@angular/forms';
 import {Observable} from 'rxjs';
 
 import {
@@ -15,6 +22,21 @@ import {
 import {uniqueAsync} from '@shared/forms/unique-async';
 import {CODE_PATTERN, slugify} from '@shared/validators/slug';
 import {CatalogueApi} from './catalogue.api.service';
+
+/** One value row of the option editor. */
+export type OptionValueForm = FormGroup<{
+  id: FormControl<number | null>;
+  key: FormControl<string>;
+  code: FormControl<string>;
+  name: FormControl<string>;
+}>;
+
+/** The option editor: code, the active language's name, and the value rows. */
+export type OptionForm = FormGroup<{
+  code: FormControl<string>;
+  name: FormControl<string>;
+  values: FormArray<OptionValueForm>;
+}>;
 
 /**
  * The forms behind `/catalogue`'s four editors.
@@ -102,6 +124,42 @@ export class CatalogueFormService {
       allowAddToCart: [true],
       copy: this.copy(),
     });
+  }
+
+  /**
+   * A store option and its values.
+   *
+   * Unlike the other four editors this one carries no `copy` block: an option's per-language
+   * payload is one name, for itself and for each value, so the form holds the **active language's**
+   * names directly and the facade parks the other languages the same way it parks copy drafts.
+   *
+   * Value rows carry three identities: `id` (the server row — kept so an edit is not a re-create,
+   * which would retire a store-wide value id every variant references), `key` (a client-side handle
+   * that survives add/remove, which is what the language drafts are parked under), and `code`.
+   */
+  option(): OptionForm {
+    return this.fb.nonNullable.group({
+      code: [
+        '',
+        [Validators.required, Validators.maxLength(CODE_MAX), Validators.pattern(CODE_PATTERN)],
+        [this.uniqueCode((code) => this.api.optionCodeTaken(code))],
+      ],
+      name: ['', [Validators.required, Validators.maxLength(NAME_MAX)]],
+      values: this.fb.array<OptionValueForm>([]),
+    }) as OptionForm;
+  }
+
+  /** One value row. `code` is disabled by the facade once the value exists — a code is identity. */
+  optionValue(seed: {id: number | null; key: string; code: string; name: string}): OptionValueForm {
+    return this.fb.nonNullable.group({
+      id: this.fb.control<number | null>(seed.id),
+      key: [seed.key],
+      code: [
+        seed.code,
+        [Validators.required, Validators.maxLength(CODE_MAX), Validators.pattern(CODE_PATTERN)],
+      ],
+      name: [seed.name, [Validators.required, Validators.maxLength(NAME_MAX)]],
+    }) as OptionValueForm;
   }
 
   group() {

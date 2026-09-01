@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.asrevo.cvhome.billing.commons.errors.EntitlementExceededException;
 import com.asrevo.cvhome.catalog.errors.CategoryReferenceUnresolvableException;
+import com.asrevo.cvhome.catalog.errors.DuplicateVariantSkuException;
 import com.asrevo.cvhome.catalog.errors.ManufacturerReferenceUnresolvableException;
 import com.asrevo.cvhome.catalog.errors.ProductNotFoundException;
 import com.asrevo.cvhome.catalog.errors.ProductTypeReferenceUnresolvableException;
@@ -141,7 +142,7 @@ public class ProductApiV2 {
     @PreAuthorize(MANAGE)
     public Entity create(@Valid @RequestBody PersistableProductDefinition product, StoreMerchantId merchantStore)
             throws ManufacturerReferenceUnresolvableException, ProductTypeReferenceUnresolvableException,
-            CategoryReferenceUnresolvableException, EntitlementExceededException {
+            CategoryReferenceUnresolvableException, EntitlementExceededException, DuplicateVariantSkuException {
         return new Entity(productService.create(merchantStore, product));
     }
 
@@ -151,7 +152,8 @@ public class ProductApiV2 {
     public void update(@PathVariable Long id, @Valid @RequestBody PersistableProductDefinition product,
                        StoreMerchantId merchantStore)
             throws ProductNotFoundException, ManufacturerReferenceUnresolvableException,
-            ProductTypeReferenceUnresolvableException, CategoryReferenceUnresolvableException {
+            ProductTypeReferenceUnresolvableException, CategoryReferenceUnresolvableException,
+            DuplicateVariantSkuException {
         productService.update(merchantStore, id, product);
     }
 }

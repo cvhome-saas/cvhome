@@ -6,13 +6,18 @@ import {Observable, of} from 'rxjs';
 
 import {NOTIFICATION_PORT} from '@core/errors/notification.port';
 import {ConsoleApi} from '@layouts/console-shell/services/console.api.service';
-import {emptyDraft, type ProductDraft, type ProductImageItem, type RelatedProduct} from '@models/products';
+import {emptyDraft, type ProductDraft, type ProductImageItem, type RelatedProduct, type VariantMatrixRow} from '@models/products';
+import type {PersistableVariantSet} from '@models/catalog';
 import {CONSOLE_STORES_FAKE, FakeConsoleApi} from '@testing/console-api.fake';
 import {provideFakeProductSearch} from '@testing/product-search.fake';
 import {translocoTesting} from '@testing/transloco-testing';
 import {ToastService} from '@shared/ui/toast/toast';
 import {ProductForm} from './product-form';
-import {ProductFormApi, type ProductFormSnapshot} from './services/product-form.api.service';
+import {
+  ProductFormApi,
+  type ProductFormSnapshot,
+  type VariantSaveOutcome,
+} from './services/product-form.api.service';
 
 const LANGUAGES = ['en', 'ar'];
 
@@ -51,11 +56,82 @@ function snapshot(product: ProductDraft): ProductFormSnapshot {
     types: [{code: 'SHOES', label: 'Shoes'}],
     languages: LANGUAGES,
     currency: 'SAR',
+    vocabulary: API_REF?.vocabulary ?? [],
+    assignedOptionIds: API_REF?.assignedOptionIds ?? [],
+    variants: API_REF?.variants ?? [],
+    variantsUnavailable: API_REF?.variantsUnavailable ?? false,
+    vocabularyUnavailable: API_REF?.vocabularyUnavailable ?? false,
   };
 }
 
+/** The fake under test, so the snapshot builder above can answer its configured variant state. */
+let API_REF: FakeProductFormApi | null = null;
+
 class FakeProductFormApi {
   loaded: ProductDraft = SAVED;
+  /** The vocabulary and saved variant state `load` answers. Overridden by the variants specs. */
+  vocabulary: ProductFormSnapshot['vocabulary'] = [
+    {
+      id: 9,
+      code: 'color',
+      name: 'Color',
+      values: [
+        {id: 91, code: 'red', name: 'Red'},
+        {id: 92, code: 'blue', name: 'Blue'},
+      ],
+    },
+    {
+      id: 10,
+      code: 'size',
+      name: 'Size',
+      values: [
+        {id: 101, code: 'm', name: 'M'},
+        {id: 102, code: 'l', name: 'L'},
+      ],
+    },
+  ];
+  assignedOptionIds: readonly number[] = [];
+  variants: ProductFormSnapshot['variants'] = [];
+  variantsUnavailable = false;
+  vocabularyUnavailable = false;
+  /** Every variant-set replace the facade sent, so a spec can read the atomic body. */
+  readonly variantSets: {set: PersistableVariantSet; rows: readonly VariantMatrixRow[]}[] = [];
+  variantInventoryApplied = true;
+
+  /** What the failed inventory leg reported it was writing — the retry must replay exactly this. */
+  variantRemovedSkus: readonly string[] = [];
+
+  saveVariants(
+    _id: number,
+    set: PersistableVariantSet,
+    rows: readonly VariantMatrixRow[],
+  ): Observable<VariantSaveOutcome> {
+    this.variantSets.push({set, rows});
+    return of({
+      variantsApplied: true,
+      inventoryApplied: this.variantInventoryApplied,
+      pendingInventory: this.variantInventoryApplied
+        ? null
+        : {rows, removedSkus: this.variantRemovedSkus},
+    });
+  }
+
+  /**
+   * Declared with its real parameters on purpose: the fake used to take none, which is why the
+   * retry silently dropping `removedSkus` could not be caught by any test written against it.
+   */
+  readonly inventoryWrites: {rows: readonly VariantMatrixRow[]; removedSkus: readonly string[]}[] = [];
+
+  inventoryRetrySucceeds = true;
+
+  applyVariantInventory(
+    _id: number,
+    rows: readonly VariantMatrixRow[],
+    removedSkus: readonly string[],
+  ): Observable<boolean> {
+    this.inventoryWrites.push({rows, removedSkus});
+    return of(this.inventoryRetrySucceeds);
+  }
   /** How many times the snapshot was actually fetched. See the request-storm spec below. */
   loads = 0;
   readonly created: ProductDraft[] = [];
@@ -122,6 +198,7 @@ describe('ProductForm', () => {
   beforeEach(async () => {
     localStorage.removeItem('cvhome.console.store');
     api = new FakeProductFormApi();
+    API_REF = api;
     toasts = {messages: [], danger(text: string) { this.messages.push(text); }};
 
     await TestBed.configureTestingModule({
@@ -211,7 +288,7 @@ describe('ProductForm', () => {
 
     expect(element.querySelector('app-stepper')).not.toBeNull();
     expect(element.querySelector('.toolbar')).toBeNull();
-    expect(steps(element).length).toBe(4);
+    expect(steps(element).length).toBe(5);
   }));
 
   it('locks Media until the product exists, and says why on the rail', fakeAsync(() => {
@@ -405,5 +482,196 @@ describe('ProductForm', () => {
     const sent = api.replaced.at(-1)!;
     expect(sent.map((image) => image.id)).toEqual([5, 4]);
     expect(sent.map((image) => image.isDefault)).toEqual([true, false]);
+  }));
+
+  /* ------------------------------------------------------------------- variants ---- */
+
+  /** The facade under test — the variants step is state-driven, so the specs drive the state. */
+  function facade() {
+    return fixture.componentInstance['facade'];
+  }
+
+  it('generates the cartesian matrix when an axis is picked, seeding the first row', fakeAsync(() => {
+    load('7');
+
+    facade().addVariantAxis(9); // Color: red, blue
+    const rows = facade().variantRows();
+
+    expect(rows.length).toBe(2);
+    // The first combination inherits the product's own sku, price and stock — a simple product's
+    // numbers carry over instead of silently starting from zero.
+    expect(rows[0].sku).toBe('ACM-7');
+    expect(rows[0].price).toBe(750);
+    expect(rows[0].isDefault).toBe(true);
+    // The rest are suggested `<sku>-<VALUECODE>` and left unpriced for an explicit decision.
+    expect(rows[1].sku).toBe('ACM-7-BLUE');
+    expect(rows[1].price).toBeNull();
+
+    facade().addVariantAxis(10); // × Size: m, l
+    expect(facade().variantRows().length).toBe(4);
+  }));
+
+  it('sends the axes and the combinations as one atomic set, exactly one default', fakeAsync(() => {
+    load('7');
+    facade().addVariantAxis(9);
+    facade().updateVariantRow(1, {price: 30});
+
+    facade().saveVariants();
+    tick();
+
+    const [{set}] = api.variantSets;
+    expect(set.options).toEqual(['color']);
+    expect(set.variants.length).toBe(2);
+    expect(set.variants.map((variant) => variant.sortOrder)).toEqual([0, 1]);
+    expect(set.variants.filter((variant) => variant.defaultVariant).length).toBe(1);
+    expect(set.variants[1].optionValueIds).toEqual([92]);
+  }));
+
+  /*
+   * The four regressions below are the data-loss paths review found. Each was reachable in one
+   * click on a normal workflow, and each shipped because nothing here drove it.
+   */
+
+  it('keeps an unsaved matrix when the header saves the draft', fakeAsync(() => {
+    // The matrix and the definition are edited on one screen and saved by different buttons.
+    // While both signals were linked to the snapshot, `Save draft` reset the matrix to the
+    // server's and reported success — the operator lost the whole thing to a green toast.
+    load('7');
+    facade().addVariantAxis(9);
+    facade().updateVariantRow(0, {price: 11});
+    facade().updateVariantRow(1, {price: 22});
+
+    facade().saveDraft();
+    tick();
+
+    expect(facade().variantAxes().length).toBe(1);
+    expect(facade().variantRows().map((row) => row.price)).toEqual([11, 22]);
+  }));
+
+  it('carries price and stock onto the wider combinations when an axis is added', fakeAsync(() => {
+    /*
+     * Rows used to be kept only on an exact signature match, which can never hold when the axis
+     * SET changes — so adding Size to a priced colour-only product nulled every price, and the
+     * save then deleted the old inventory rows and wrote nothing back (unpriced rows are skipped).
+     */
+    load('7');
+    facade().addVariantAxis(9); // Color: red, blue
+    facade().updateVariantRow(0, {price: 10, quantity: 3});
+    facade().updateVariantRow(1, {price: 12, quantity: 4});
+
+    facade().addVariantAxis(10); // × Size: m, l
+
+    const rows = facade().variantRows();
+    expect(rows.length).toBe(4);
+    expect(rows.map((row) => row.price)).toEqual([10, 10, 12, 12]);
+    expect(rows.map((row) => row.quantity)).toEqual([3, 3, 4, 4]);
+    // Each is a genuinely new combination, so none of them claims an existing catalog row...
+    expect(rows.every((row) => row.id === null)).toBe(true);
+    // ...and each gets its own sku rather than four rows fighting over two.
+    expect(new Set(rows.map((row) => row.sku)).size).toBe(4);
+  }));
+
+  it('retries the inventory write it actually attempted, not whatever the screen holds', fakeAsync(() => {
+    /*
+     * The retry used to re-send `variantRows()` with no removed skus — and because the facade
+     * reloaded the snapshot on the failure branch, those rows had already reverted to the
+     * server's. So it wrote the old prices back and orphaned every retired sku's row for good.
+     */
+    load('7');
+    facade().addVariantAxis(9);
+    facade().updateVariantRow(0, {price: 99});
+    facade().updateVariantRow(1, {price: 77});
+    api.variantInventoryApplied = false;
+    api.variantRemovedSkus = ['ACM-7-OLD'];
+
+    facade().saveVariants();
+    tick();
+
+    expect(facade().variantInventoryPending()).toBe(true);
+    // The operator's numbers are still on screen; nothing reverted under the banner.
+    expect(facade().variantRows().map((row) => row.price)).toEqual([99, 77]);
+
+    api.inventoryRetrySucceeds = true;
+    facade().retryVariantInventory();
+    tick();
+
+    const [write] = api.inventoryWrites;
+    expect(write.rows.map((row) => row.price)).toEqual([99, 77]);
+    expect(write.removedSkus).toEqual(['ACM-7-OLD']);
+    expect(facade().variantInventoryPending()).toBe(false);
+  }));
+
+  it('refuses to replace a variant set it could not read', fakeAsync(() => {
+    /*
+     * `null` (the read failed) used to collapse into `[]` (this product sells as one sku), so the
+     * step invited a whole-set replace over combinations it had never seen — and retired none of
+     * their inventory rows either, because the loaded sku list was empty too.
+     */
+    api.variantsUnavailable = true;
+    const danger = spyOn(TestBed.inject(ToastService), 'danger');
+    load('7');
+
+    expect(facade().canSaveVariants()).toBe(false);
+
+    facade().addVariantAxis(9);
+    facade().saveVariants();
+    tick();
+
+    expect(api.variantSets.length).toBe(0);
+    // and the step says so rather than looking like it worked
+    expect(danger).toHaveBeenCalled();
+  }));
+
+  it('refuses a duplicate sku by name instead of letting the pod 409', fakeAsync(() => {
+    load('7');
+    facade().addVariantAxis(9);
+    facade().updateVariantRow(1, {sku: 'ACM-7'});
+
+    facade().saveVariants();
+    tick();
+
+    expect(api.variantSets.length).toBe(0);
+  }));
+
+  it('reassigns the default when its row is removed', fakeAsync(() => {
+    load('7');
+    facade().addVariantAxis(9);
+
+    facade().removeVariantRow(0);
+
+    const rows = facade().variantRows();
+    expect(rows.length).toBe(1);
+    expect(rows[0].isDefault).toBe(true);
+  }));
+
+  it('swaps the price readiness item for the per-variant one while options are assigned', fakeAsync(() => {
+    load('7');
+
+    expect(facade().readiness().some((item) => item.key === 'price')).toBe(true);
+
+    facade().addVariantAxis(9);
+    const items = facade().readiness();
+    expect(items.some((item) => item.key === 'price')).toBe(false);
+    const variantPricing = items.find((item) => item.key === 'variantPricing');
+    // One row is seeded with the product's price, the other is not — publishing stays blocked.
+    expect(variantPricing?.done).toBe(false);
+    expect(facade().canPublish()).toBe(false);
+
+    facade().updateVariantRow(1, {price: 30});
+    expect(facade().readiness().find((item) => item.key === 'variantPricing')?.done).toBe(true);
+  }));
+
+  it('renders the matrix on the variants step, one row per combination', fakeAsync(() => {
+    const element = load('7');
+    facade().addVariantAxis(9);
+    facade().activeStep.set('variants');
+    fixture.detectChanges();
+
+    const rows = [...element.querySelectorAll('.matrix tbody tr')];
+    expect(rows.length).toBe(2);
+    expect(rows[0].textContent).toContain('Red');
+    expect(rows[1].textContent).toContain('Blue');
+    // The step carries its own save: a different transaction than the header's Save draft.
+    expect(element.querySelector('.matrix-foot .primary-action')?.textContent).toContain('Save variants');
   }));
 });

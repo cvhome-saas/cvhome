@@ -7,6 +7,7 @@ import com.asrevo.cvhome.catalog.entity.Product;
 import com.asrevo.cvhome.catalog.errors.CategoryAlreadyAttachedException;
 import com.asrevo.cvhome.catalog.errors.CategoryNotFoundException;
 import com.asrevo.cvhome.catalog.errors.CategoryReferenceUnresolvableException;
+import com.asrevo.cvhome.catalog.errors.DuplicateVariantSkuException;
 import com.asrevo.cvhome.catalog.errors.ManufacturerReferenceUnresolvableException;
 import com.asrevo.cvhome.catalog.errors.ProductNotFoundException;
 import com.asrevo.cvhome.catalog.errors.ProductTypeReferenceUnresolvableException;
@@ -38,10 +39,18 @@ public interface ProductService {
             throws ProductNotFoundException;
 
     /**
-     * The product data a cart or order needs, by sku.
+     * The product data a cart or order needs, by sku. Every sellable sku is a variant sku; a combination sku
+     * answers with the owning product plus the {@code variant} label block.
      */
     ReadableMinimalProduct getBySku(StoreMerchantId store, String sku, LanguageCode language)
             throws ProductNotFoundException;
+
+    /**
+     * The bulk form of {@link #getBySku}: one call for a whole cart. Skus with no product are absent from the
+     * answer, mirroring the inventory availability contract.
+     */
+    java.util.List<ReadableMinimalProduct> getBySkus(StoreMerchantId store, java.util.List<String> skus,
+                                                     LanguageCode language);
 
     ReadableProductDefinition getDefinition(StoreMerchantId store, Long id, LanguageCode language)
             throws ProductNotFoundException;
@@ -49,15 +58,20 @@ public interface ProductService {
     boolean exists(StoreMerchantId store, String sku);
 
     /**
+     * Creates the product <em>and its default variant</em> in one transaction — the invariant is that every
+     * product owns at least one variant, and the definition's sku is the default variant's.
+     *
      * @throws EntitlementExceededException the store's plan caps products and the cap is reached
      */
     Long create(StoreMerchantId store, PersistableProductDefinition product)
             throws ManufacturerReferenceUnresolvableException, ProductTypeReferenceUnresolvableException,
-            CategoryReferenceUnresolvableException, EntitlementExceededException;
+            CategoryReferenceUnresolvableException, EntitlementExceededException,
+            DuplicateVariantSkuException;
 
     void update(StoreMerchantId store, Long id, PersistableProductDefinition product)
             throws ProductNotFoundException, ManufacturerReferenceUnresolvableException,
-            ProductTypeReferenceUnresolvableException, CategoryReferenceUnresolvableException;
+            ProductTypeReferenceUnresolvableException, CategoryReferenceUnresolvableException,
+            DuplicateVariantSkuException;
 
     /**
      * The console's inline edit: the two switches, nothing else.

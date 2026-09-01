@@ -3,7 +3,7 @@ import {useState} from 'react';
 import {useTranslations} from 'next-intl';
 import {PlusIcon} from 'lucide-react';
 import type {Product, StoreContext} from '@store-front/types';
-import {useProductPurchase} from '@store-front/hooks/use-product-purchase';
+import {useProductPurchase, type ProductPurchase} from '@store-front/hooks/use-product-purchase';
 import {QuantityStepper} from '@store-front/ui/quantity-stepper';
 import {cn} from '@store-front/ui/lib/utils';
 import {Gallery} from './Gallery';
@@ -14,6 +14,9 @@ import {TagButton} from '../components/TagButton';
  * option values as plates where the chosen one wears the tag and unavailable ones are struck, then the
  * quantity plates and the add tag. The gallery window sits on the start side.
  */
+/** The first axis with nothing chosen — what the "please choose" line names. */
+const unpicked = (p: ProductPurchase) => p.options.find(o => p.selection[o.id] === undefined);
+
 export function BuyBox({product, storeContext}: { product: Product; storeContext: StoreContext }) {
     const t = useTranslations('PAGE.PRODUCT');
     const p = useProductPurchase(storeContext, product);
@@ -38,7 +41,7 @@ export function BuyBox({product, storeContext}: { product: Product; storeContext
                     <div className="contents">
                         <dt className="border-e border-foreground px-3 py-1.5 text-muted-foreground">{t('IN_STOCK')}</dt>
                         <dd className="px-3 py-1.5">
-                            {p.isOutOfStock ? <span className="q bg-foreground px-1.5 text-background">{t('OUT_OF_STOCK')}</span>
+                            {p.isOutOfStock ? <span className="q bg-foreground px-1.5 text-background">{t(p.unresolved ? 'UNAVAILABLE_COMBINATION' : 'OUT_OF_STOCK')}</span>
                                 : p.maxQty <= 5 ? <span>{t('LOW_STOCK', {count: p.maxQty})}</span>
                                     : <span className="text-success">{t('IN_STOCK')}</span>}
                         </dd>
@@ -53,19 +56,20 @@ export function BuyBox({product, storeContext}: { product: Product; storeContext
                 {p.options.map(option => (
                     <fieldset key={option.id} className="flex flex-col gap-2">
                         <legend className="q mb-2 font-display text-sm font-semibold uppercase tracking-wide">
-                            {option.name}{p.selection[option.id] === undefined && <span className="ms-2 font-mono text-[0.7rem] font-normal normal-case tracking-wide text-muted-foreground">— {t('SELECT_OPTION', {option: option.name})}</span>}
+                            {option.name || option.code}{p.selection[option.id] === undefined && <span className="ms-2 font-mono text-[0.7rem] font-normal normal-case tracking-wide text-muted-foreground">— {t('SELECT_OPTION', {option: option.name || option.code})}</span>}
                         </legend>
-                        <div className="flex flex-wrap" role="radiogroup" aria-label={option.name}>
-                            {option.optionValues.map(value => {
+                        <div className="flex flex-wrap" role="radiogroup" aria-label={option.name || option.code}>
+                            {option.values.map(value => {
                                 const selected = p.selection[option.id] === value.id;
                                 const available = p.isValueAvailable(option, value);
-                                const label = value.name || value.description || value.code;
+                                const label = value.name || value.code;
                                 return (
                                     <button key={value.id} type="button" role="radio" aria-checked={selected} onClick={() => p.select(option.id, value.id)}
                                             aria-label={available ? label : `${label} — ${t('UNAVAILABLE_COMBINATION')}`}
+                                            aria-disabled={!available}
                                             className={cn('-ms-px -mt-px min-w-11 px-3 py-2 font-mono text-xs uppercase tracking-wide transition-colors duration-(--motion-fast)',
                                                 selected ? 'tag z-10 rounded-none' : 'plate hover:bg-foreground hover:text-background', !available && !selected && 'struck')}>
-                                        {label}{value.price && <span className="ms-1 opacity-70">({value.price})</span>}
+                                        {label}
                                     </button>
                                 );
                             })}
@@ -77,11 +81,11 @@ export function BuyBox({product, storeContext}: { product: Product; storeContext
                     <QuantityStepper value={p.quantity} onDecrement={p.decrementQuantity} onIncrement={p.incrementQuantity} canDecrement={p.canDecrease} canIncrement={p.canIncrease}
                                      decrementLabel={t('DECREASE_QUANTITY')} incrementLabel={t('INCREASE_QUANTITY')} className="[&_button]:rounded-none [&_button]:border-foreground"/>
                     <TagButton size="lg" className="flex-1" swing={swing} disabled={!p.canAdd} onClick={() => { setSwing(false); requestAnimationFrame(() => setSwing(true)); p.addToCart(); }}>
-                        <PlusIcon className="size-4"/>{p.status === 'adding' ? t('ADDING') : p.isOutOfStock ? t('OUT_OF_STOCK') : t('ADD_TO_CART')}
+                        <PlusIcon className="size-4"/>{p.status === 'adding' ? t('ADDING') : p.isOutOfStock ? t(p.unresolved ? 'UNAVAILABLE_COMBINATION' : 'OUT_OF_STOCK') : t('ADD_TO_CART')}
                     </TagButton>
                 </div>
                 {p.inCartQuantity > 0 && <p className="font-mono text-xs uppercase tracking-wide text-muted-foreground">{t('IN_CART', {count: p.inCartQuantity})}</p>}
-                {!p.allSelected && !p.isOutOfStock && <p className="font-mono text-xs uppercase tracking-wide text-muted-foreground">{t('OPTION_REQUIRED', {option: p.options.find(o => p.selection[o.id] === undefined)?.name ?? ''})}</p>}
+                {!p.allSelected && !p.isOutOfStock && <p className="font-mono text-xs uppercase tracking-wide text-muted-foreground">{t('OPTION_REQUIRED', {option: unpicked(p)?.name || unpicked(p)?.code || ''})}</p>}
             </div>
         </div>
     );

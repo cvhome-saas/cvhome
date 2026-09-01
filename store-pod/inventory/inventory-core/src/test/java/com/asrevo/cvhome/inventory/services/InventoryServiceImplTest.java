@@ -17,6 +17,7 @@ import com.asrevo.cvhome.inventory.entity.Inventory;
 import com.asrevo.cvhome.inventory.entity.InventoryPrice;
 import com.asrevo.cvhome.inventory.model.PersistableInventory;
 import com.asrevo.cvhome.inventory.model.PersistablePrice;
+import com.asrevo.cvhome.inventory.model.PersistableSkuInventory;
 import com.asrevo.cvhome.inventory.model.SkuInventory;
 import com.asrevo.cvhome.inventory.repositories.InventoryRepository;
 
@@ -77,6 +78,37 @@ class InventoryServiceImplTest {
         assertThat(result).extracting(SkuInventory::sku).containsExactly(SKU, SKU_2);
         assertThat(result.getFirst().quantity()).isEqualTo(5);
         assertThat(result.getFirst().price()).isNull();
+    }
+
+    @Test
+    void emptyProductListNeverHitsTheDatabase() {
+        assertThat(service.getByProductIds(STORE, List.of())).isEmpty();
+        verify(inventoryRepository, never()).findByProductIds(any(), any());
+    }
+
+    @Test
+    void productAddressedReadAnswersEverySkuOfTheProducts() {
+        // What the console's list totals a product's stock from: it knows each product's default sku
+        // only, so asking by sku would report the default variant's quantity as the product's.
+        when(inventoryRepository.findByProductIds(STORE, List.of(9L)))
+                .thenReturn(List.of(row(1, SKU, 5), row(2, SKU_2, 7)));
+
+        List<SkuInventory> result = service.getByProductIds(STORE, List.of(9L));
+
+        assertThat(result).extracting(SkuInventory::sku).containsExactly(SKU, SKU_2);
+        assertThat(result).extracting(SkuInventory::quantity).containsExactly(5, 7);
+    }
+
+    @Test
+    void productAddressedReadKeepsTheFirstRowPerSkuLikeTheSkuAddressedOne() {
+        // Both readers must agree on which row wins, or a sku's stock would depend on who asked.
+        when(inventoryRepository.findByProductIds(STORE, List.of(9L)))
+                .thenReturn(List.of(row(1, SKU, 5), row(2, SKU, 99)));
+
+        assertThat(service.getByProductIds(STORE, List.of(9L)))
+                .singleElement()
+                .extracting(SkuInventory::quantity)
+                .isEqualTo(5);
     }
 
     @Test
@@ -153,5 +185,29 @@ class InventoryServiceImplTest {
         service.deleteByProduct(STORE, 9L);
 
         verify(inventoryRepository).deleteAll(rows);
+    }
+
+    @Test
+    void bulkUpsertUpsertsEveryEntryAndAnswersInRequestOrder() {
+        when(inventoryRepository.findBySku(any(), any())).thenReturn(Optional.empty());
+        when(inventoryRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+
+        List<SkuInventory> result = service.bulkUpsert(STORE, List.of(
+                new PersistableSkuInventory(SKU_2, body(null, null, null)),
+                new PersistableSkuInventory(SKU, body(null, null, null))));
+
+        assertThat(result).extracting(SkuInventory::sku).containsExactly(SKU_2, SKU);
+    }
+
+    @Test
+    void deleteBySkuRemovesTheRowAndIsANoOpWhenAbsent() {
+        Inventory existing = row(1, SKU, 1);
+        when(inventoryRepository.findBySku(STORE, SKU)).thenReturn(Optional.of(existing));
+        service.deleteBySku(STORE, SKU);
+        verify(inventoryRepository).delete(existing);
+
+        when(inventoryRepository.findBySku(STORE, SKU_2)).thenReturn(Optional.empty());
+        service.deleteBySku(STORE, SKU_2);
+        verify(inventoryRepository, never()).delete(row(2, SKU_2, 1));
     }
 }

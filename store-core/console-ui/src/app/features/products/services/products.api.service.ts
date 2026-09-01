@@ -49,14 +49,17 @@ export class ProductsApi {
     return forkJoin({
       /*
        * Price and quantity live in the inventory service since the catalog/inventory split; the
-       * catalog rows carry neither. One bulk call for the page's SKUs, merged by SKU below. A page
-       * whose inventory read fails still renders — with empty price/stock cells, not an error.
+       * catalog rows carry neither. ONE bulk call for the page — **by product id, not by sku**: a
+       * product's stock is the sum of its variants', and the listing payload only carries each
+       * product's default sku, so a sku-keyed read reported the default variant's quantity as
+       * though it were the product's and understated every variant product. A page whose inventory
+       * read fails still renders — with empty price/stock cells, not an error.
        */
       pageWithStock: this.products.list(toProductQuery(query)).pipe(
         switchMap((page) => {
-          const skus = page.content.map((product) => product.sku).filter((sku): sku is string => !!sku);
-          const stock: Observable<readonly SkuInventory[]> = skus.length
-            ? this.inventory.bySkus(skus).pipe(catchError(() => of<readonly SkuInventory[]>([])))
+          const productIds = page.content.map((product) => product.id);
+          const stock: Observable<readonly SkuInventory[]> = productIds.length
+            ? this.inventory.byProducts(productIds).pipe(catchError(() => of<readonly SkuInventory[]>([])))
             : of<readonly SkuInventory[]>([]);
           return stock.pipe(map((inventories) => ({page, inventories})));
         }),
@@ -77,12 +80,30 @@ export class ProductsApi {
       map(({pageWithStock, categories, brands, currency}) => {
         const {page, inventories} = pageWithStock;
         const bySku = new Map(inventories.map((inventory) => [inventory.sku, inventory]));
+        // Every row of a product, so the stock cell can total them. Keyed by product id, which the
+        // inventory rows carry precisely so this question can be asked.
+        const byProduct = new Map<number, SkuInventory[]>();
+        for (const inventory of inventories) {
+          if (inventory.productId === null || inventory.productId === undefined) {
+            continue;
+          }
+          const rows = byProduct.get(inventory.productId);
+          if (rows) {
+            rows.push(inventory);
+          } else {
+            byProduct.set(inventory.productId, [inventory]);
+          }
+        }
         this.loadedRows.clear();
         for (const product of page.content) {
           this.loadedRows.set(product.id, product);
         }
         return {
-          page: {...page, content: page.content.map((product) => toRow(product, bySku.get(product.sku ?? '')))},
+          page: {
+            ...page,
+            content: page.content.map((product) =>
+              toRow(product, bySku.get(product.sku ?? ''), byProduct.get(product.id) ?? [])),
+          },
           categories: flattenForSelect(categories?.content ?? [], 0),
           brands: (brands?.content ?? []).map((brand) => ({
             id: brand.id,
@@ -173,11 +194,17 @@ function toProductQuery(query: ProductsQuery): ProductQuery {
  * language — the request context stamps `lang`. A product with no copy in that language falls back
  * to its SKU rather than to an empty cell, because a nameless row is a row that cannot be acted on.
  */
-function toRow(product: ReadableProduct, inventory?: SkuInventory): ProductRow {
+function toRow(
+  product: ReadableProduct,
+  inventory: SkuInventory | undefined,
+  allVariants: readonly SkuInventory[],
+): ProductRow {
   return {
     id: product.id,
     name: product.description?.name ?? product.sku ?? String(product.id),
     sku: product.sku ?? '',
+    // Every product owns ≥1 variant under the uniform model; a row that predates it reads as one.
+    variantCount: product.variantCount ?? 1,
     categories: (product.categories ?? [])
       .map((category) => category.description?.name ?? category.descriptions[0]?.name ?? category.code)
       .filter(Boolean),
@@ -186,8 +213,18 @@ function toRow(product: ReadableProduct, inventory?: SkuInventory): ProductRow {
       product.manufacturer?.descriptions?.[0]?.name ??
       product.manufacturer?.code ??
       null,
+    /*
+     * The **default** variant's price, which is the merchant's own choice of what this product costs
+     * on a card — deliberately not a range, and not the cheapest variant.
+     */
     price: inventory?.price?.finalPrice ?? null,
-    quantity: inventory?.quantity ?? 0,
+    /*
+     * The stock the merchant actually holds: every variant's quantity summed. Showing the default
+     * variant's alone said "39 in stock" for a product with 48 across three combinations.
+     */
+    quantity: allVariants.length
+      ? allVariants.reduce((total, row) => total + (row.quantity ?? 0), 0)
+      : (inventory?.quantity ?? 0),
     available: product.available ?? false,
     shipeable: product.productShipeable ?? true,
     /*

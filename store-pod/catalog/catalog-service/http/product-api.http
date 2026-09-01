@@ -153,3 +153,22 @@ PATCH {{SELLER_UI_URL}}/spg/catalog/api/v1/private/product/1?store={{STORE_ID}}&
 Content-Type: application/json
 
 {"available": true, "productShipeable": true}
+
+### the s2s bulk read: one call for a whole cart's skus (missing skus are simply absent)
+GET {{LANDING_UI_URL}}/catalog/api/v1/detailed-products?store={{STORE_ID}}&lang={{LANG}}&skus=SKU-NK-RUN-001,SKU-ZR-CL-DRS02-BL-M,NO-SUCH-SKU
+
+### a combination sku resolves to its parent product, with the option/value label block
+GET {{LANDING_UI_URL}}/catalog/api/v1/detailed-product?store={{STORE_ID}}&lang={{LANG}}&sku=SKU-ZR-CL-DRS02-BL-M
+
+> {%
+    client.test("carries the selection labels", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        client.assert(response.body.variant.optionValues.length === 2, "labels missing");
+    });
+%}
+
+### listing filtered by option values (OR within an option, AND across options, one variant matches both)
+GET {{LANDING_UI_URL}}/catalog/api/v2/products?store={{STORE_ID}}&lang={{LANG}}&optionValueIds=2,3&page=0&count=24
+
+### search with option facets in the rail
+GET {{LANDING_UI_URL}}/catalog/api/v2/products/search?store={{STORE_ID}}&lang={{LANG}}&q=&optionValueIds=4&page=0&count=24

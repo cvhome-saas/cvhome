@@ -71,8 +71,11 @@ class ProductImageServiceImplTest {
         service = new ProductImageServiceImpl(productRepository, productImageRepository, media, new ImageMapper(CDN));
         product = new Product();
         product.setId(PRODUCT_ID);
-        product.setSku(SKU);
         product.setStore(STORE);
+        com.asrevo.cvhome.catalog.entity.ProductVariant defaultVariant =
+                new com.asrevo.cvhome.catalog.entity.ProductVariant(product, SKU);
+        defaultVariant.setDefaultVariant(true);
+        product.getVariants().add(defaultVariant);
     }
 
     private void productExists() {

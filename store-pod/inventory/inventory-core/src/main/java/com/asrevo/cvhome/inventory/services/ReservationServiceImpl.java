@@ -2,6 +2,8 @@ package com.asrevo.cvhome.inventory.services;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Comparator;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -54,7 +56,10 @@ public class ReservationServiceImpl implements ReservationService {
         reservation.setStatus(ProductReservationStatus.TEMPORARY_RESERVED);
         reservation.setExpireAt(Instant.now().plus(expiry));
 
-        for (ReserveProductEntry entry : request.entries()) {
+        // Locked in sku order so two orders holding overlapping sku sets cannot deadlock each other.
+        List<ReserveProductEntry> entries = request.entries().stream()
+                .sorted(Comparator.comparing(ReserveProductEntry::sku)).toList();
+        for (ReserveProductEntry entry : entries) {
             if (reservation.holds(entry.sku())) {
                 continue; // a retry of the same ref must not take the stock twice
             }

@@ -91,6 +91,7 @@ function snapshot(over: Partial<CatalogueSnapshot> = {}): CatalogueSnapshot {
     categories: [node(1, 'electronics', 'Electronics', [AUDIO, DISPLAYS])],
     brands: [BRAND],
     types: [TYPE],
+    options: [],
     groups: [GROUP],
     languages: ['en', 'ar'],
     unavailable: [],
@@ -300,7 +301,7 @@ describe('Catalogue', () => {
     expect(element.querySelector('app-brand-tab')).not.toBeNull();
     expect(element.querySelector('app-category-tab')).toBeNull();
     const badges = [...element.querySelectorAll('.tab-badge')].map((node) => node.textContent!.trim());
-    expect(badges).toEqual(['3', '1', '1', '1']);
+    expect(badges).toEqual(['3', '1', '1', '0', '1']);
   }));
 
   it('shows a brand’s initials — there is no logo on the record to show', fakeAsync(() => {
@@ -344,7 +345,7 @@ describe('Catalogue', () => {
     expect(element.querySelector('app-notice-bar')?.textContent).toContain('could not be loaded');
     // No count on a tab the console could not read — zero would be a claim it cannot make.
     const badges = [...element.querySelectorAll('.tab-badge')].map((node) => node.textContent!.trim());
-    expect(badges).toEqual(['3', '1', '1']);
+    expect(badges).toEqual(['3', '1', '0', '1']);
   }));
 
   it('offers a retry when the hierarchy fails, because the tree is the page', fakeAsync(() => {

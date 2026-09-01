@@ -260,3 +260,8 @@ export function get(options?: RequestOptions) {
 export function publicGet(): RequestInit {
     return {method: 'GET', headers: {}};
 }
+
+/** A POST that carries no credentials — the body form of a public read (`publicGet`'s reasoning applies). */
+export function publicPost<T>(it: T): RequestInit {
+    return {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(it)};
+}

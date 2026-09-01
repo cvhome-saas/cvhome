@@ -1,0 +1,186 @@
+<ng-container *transloco="let t">
+  @if (unavailable()) {
+    <app-notice-bar icon="alertCircle" tone="red" [message]="t('catalogue.options.unavailable')" />
+  }
+
+  <div class="split">
+    <app-panel
+      class="list-panel"
+      [title]="t('catalogue.options.title')"
+      [subtitle]="t('catalogue.options.subtitle', {count: options().length})"
+    >
+      <div class="option-list">
+        @for (option of options(); track option.id) {
+          <button
+            class="option-card"
+            type="button"
+            [class.current]="option.id === facade.selectedOptionId()"
+            [attr.aria-pressed]="option.id === facade.selectedOptionId()"
+            (click)="facade.select('options', option.id)"
+          >
+            <span class="option-copy">
+              <strong dir="auto">{{ option.name }}</strong>
+              <small class="option-code" dir="ltr">{{ option.code }}</small>
+            </span>
+            <!-- The values themselves, not a count: "Red · Blue" answers what a count only hints at. -->
+            <span class="option-values" dir="auto">
+              {{
+                option.values.length
+                  ? valueSummary(option.values)
+                  : t('catalogue.options.noValuesYet')
+              }}
+            </span>
+          </button>
+        } @empty {
+          <p class="list-empty">{{ t('catalogue.options.none') }}</p>
+        }
+      </div>
+
+      <div class="list-foot">
+        <button class="secondary-action" type="button" (click)="facade.startCreate()">
+          <app-icon name="plus" />
+          {{ t('catalogue.add.options') }}
+        </button>
+      </div>
+    </app-panel>
+
+    <app-panel
+      class="editor-panel"
+      [title]="creating() ? t('catalogue.options.newTitle') : (selected()?.name ?? t('catalogue.options.noneTitle'))"
+      [subtitle]="creating() ? t('catalogue.options.newSubtitle') : (selected()?.code ?? null)"
+    >
+      @if (!creating() && !selected()) {
+        <app-empty-state icon="tag" [message]="t('catalogue.options.empty')">
+          <button class="secondary-action" type="button" (click)="facade.startCreate()">
+            {{ t('catalogue.add.options') }}
+          </button>
+        </app-empty-state>
+      } @else {
+        <form class="editor-body" [formGroup]="form" (ngSubmit)="facade.saveOption()">
+          <div class="editor-head">
+            <app-locale-switcher
+              [languages]="facade.languages()"
+              [active]="facade.activeLanguage()"
+              [filled]="facade.translatedLanguages()"
+              [label]="t('catalogue.copy.languageLabel')"
+              (activeChange)="facade.setLanguage($event)"
+            />
+
+            @if (!creating() && selected(); as option) {
+              <button
+                class="danger-action"
+                type="button"
+                [disabled]="facade.busy()"
+                (click)="facade.askDelete('options', option.id, option.name)"
+              >
+                <app-icon name="trash" />
+                {{ t('catalogue.options.delete') }}
+              </button>
+            }
+          </div>
+
+          <!-- Where the option is *used*: the product form assigns axes, this tab only defines them. -->
+          <app-notice-bar icon="info" tone="blue" [message]="t('catalogue.options.usage')" />
+
+          <div class="field-grid">
+            <!-- Automatic direction: the name is written in the shopper's language. -->
+            <app-form-field
+              [label]="t('catalogue.options.name')"
+              [control]="form.controls.name"
+              required
+              controlId="option-name"
+              [fallback]="t('catalogue.options.nameRequired')"
+            >
+              <app-text-field
+                id="option-name"
+                formControlName="name"
+                (valueChange)="onNameInput($event)"
+              />
+            </app-form-field>
+
+            <app-form-field
+              [label]="t('catalogue.code')"
+              [control]="form.controls.code"
+              required
+              controlId="option-code"
+              [hint]="creating() ? t('catalogue.codeHintNew') : t('catalogue.codeHintExisting')"
+              [fallback]="form.controls.code.hasError('codeTaken') ? t('catalogue.codeTaken') : ''"
+            >
+              <app-text-field
+                id="option-code"
+                formControlName="code"
+                latin
+                [check]="codeCheck()"
+                [checkLabel]="t('catalogue.codeChecking')"
+                [invalid]="form.controls.code.hasError('codeTaken')"
+              />
+            </app-form-field>
+          </div>
+
+          <hr class="divider" />
+
+          <p class="group-label">{{ t('catalogue.options.values') }}</p>
+          <p class="field-hint">{{ t('catalogue.options.valuesHint') }}</p>
+
+          <div formArrayName="values" class="value-rows">
+            @if (form.controls.values.length) {
+              <div class="value-head" aria-hidden="true">
+                <span>{{ t('catalogue.options.valueName') }}</span>
+                <span>{{ t('catalogue.code') }}</span>
+                <span class="value-head-actions"></span>
+              </div>
+            }
+            @for (row of form.controls.values.controls; track row.controls.key.value; let i = $index) {
+              <div class="value-row" [formGroupName]="i">
+                <app-text-field
+                  formControlName="name"
+                  [ariaLabel]="t('catalogue.options.valueNameFor', {position: i + 1})"
+                  [invalid]="row.controls.name.touched && row.controls.name.invalid"
+                  (valueChange)="facade.suggestValueCode(i, $event)"
+                />
+                <app-text-field
+                  formControlName="code"
+                  latin
+                  [ariaLabel]="t('catalogue.options.valueCodeFor', {position: i + 1})"
+                  [invalid]="row.controls.code.touched && row.controls.code.invalid"
+                />
+                <button
+                  class="icon-action danger"
+                  type="button"
+                  [attr.aria-label]="t('catalogue.options.removeValueFor', {position: i + 1})"
+                  [title]="t('catalogue.options.removeValue')"
+                  (click)="facade.removeOptionValue(i)"
+                >
+                  <app-icon name="trash" [size]="15" />
+                </button>
+              </div>
+            } @empty {
+              <p class="values-empty">{{ t('catalogue.options.noValues') }}</p>
+            }
+          </div>
+
+          <div class="value-foot">
+            <button class="secondary-action" type="button" (click)="facade.addOptionValue()">
+              <app-icon name="plus" />
+              {{ t('catalogue.options.addValue') }}
+            </button>
+          </div>
+
+          <div class="editor-actions">
+            <button class="secondary-action" type="button" (click)="facade.cancelEdit()">
+              {{ t('shared.actions.cancel') }}
+            </button>
+            <button
+              class="primary-action"
+              type="submit"
+              [disabled]="facade.busy()"
+              [attr.aria-busy]="facade.busy()"
+            >
+              {{ creating() ? t('catalogue.options.create') : t('catalogue.options.save') }}
+            </button>
+          </div>
+        </form>
+      }
+    </app-panel>
+  </div>
+</ng-container>

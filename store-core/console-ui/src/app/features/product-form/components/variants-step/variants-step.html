@@ -1,0 +1,261 @@
+<ng-container *transloco="let t">
+  <div class="step-stack">
+    <app-panel
+      [title]="t('productForm.variants.title')"
+      [subtitle]="t('productForm.variants.subtitle')"
+    >
+      <div class="editor-body">
+        @if (!saved()) {
+          <!-- Unreachable through the rail (the step is disabled), kept for a direct landing. -->
+          <app-notice-bar icon="info" tone="blue" [message]="t('productForm.variants.needsSave')" />
+        } @else if (!facade.canSaveVariants()) {
+          <!--
+            A read failed, so what this product sells is unknown. Everything below writes the WHOLE
+            set, so drawing an empty matrix here would invite replacing real combinations with it.
+          -->
+          <app-notice-bar
+            icon="alertCircle"
+            tone="amber"
+            [message]="
+              facade.variantsUnavailable()
+                ? t('productForm.variants.unreadable')
+                : t('productForm.variants.vocabularyUnreadable')
+            "
+          />
+          <button type="button" class="btn btn-secondary" (click)="facade.retry()">
+            {{ t('shared.actions.retry') }}
+          </button>
+        } @else {
+          @if (facade.vocabulary().length === 0) {
+            <!-- The vocabulary is the catalogue's; this step only assigns from it. -->
+            <app-notice-bar icon="info" tone="blue" [message]="t('productForm.variants.noVocabulary')" />
+          } @else {
+            <p class="field-hint">{{ t('productForm.variants.explainer') }}</p>
+
+            <!-- The axes this product varies by, in display order, each removable. -->
+            <div class="axes" role="list" [attr.aria-label]="t('productForm.variants.axesLabel')">
+              @for (axis of facade.variantAxes(); track axis.id; let i = $index) {
+                <span class="axis-chip" role="listitem">
+                  <span class="axis-copy">
+                    <strong dir="auto">{{ axis.name }}</strong>
+                    <small dir="auto">{{ axisValues(i) }}</small>
+                  </span>
+                  <button
+                    class="icon-action"
+                    type="button"
+                    [attr.aria-label]="t('productForm.variants.removeAxisFor', {name: axis.name})"
+                    [title]="t('productForm.variants.removeAxis')"
+                    (click)="facade.removeVariantAxis(axis.id)"
+                  >
+                    <app-icon name="x" [size]="13" />
+                  </button>
+                </span>
+              }
+
+              @if (facade.variantAxes().length < maxOptions && availableOptions().length) {
+                <app-select
+                  class="axis-add"
+                  [options]="availableOptions()"
+                  [value]="axisPick()"
+                  (valueChange)="onAddAxis($event)"
+                  [placeholder]="t('productForm.variants.addOption')"
+                  [ariaLabel]="t('productForm.variants.addOption')"
+                />
+              }
+            </div>
+
+            @if (facade.variantInventoryPending()) {
+              <!--
+                The catalog write landed; prices and stock did not. Named and retryable in place —
+                the explicit replacement for the old silent best-effort save legs.
+              -->
+              <div class="retry-block">
+                <app-notice-bar
+                  icon="alertCircle"
+                  tone="red"
+                  [message]="t('productForm.variants.inventoryPending')"
+                />
+                <button
+                  class="secondary-action"
+                  type="button"
+                  [disabled]="facade.saving()"
+                  (click)="facade.retryVariantInventory()"
+                >
+                  {{ t('productForm.variants.retryInventory') }}
+                </button>
+              </div>
+            }
+
+            @if (facade.variantAxes().length) {
+              <!-- Wide content scrolls inside its own container; the page never scrolls sideways. -->
+              <div class="matrix-scroll">
+                <table class="matrix">
+                  <caption class="sr-only">{{ t('productForm.variants.matrixLabel') }}</caption>
+                  <thead>
+                    <tr>
+                      @for (axis of facade.variantAxes(); track axis.id) {
+                        <th scope="col" dir="auto">{{ axis.name }}</th>
+                      }
+                      <th scope="col">{{ t('productForm.variants.column.sku') }}</th>
+                      <th scope="col">{{ t('productForm.variants.column.price') }}</th>
+                      <th scope="col">{{ t('productForm.variants.column.quantity') }}</th>
+                      <th scope="col">{{ t('productForm.variants.column.available') }}</th>
+                      <th scope="col">{{ t('productForm.variants.column.defaultVariant') }}</th>
+                      <th scope="col">
+                        <span class="sr-only">{{ t('productForm.variants.column.actions') }}</span>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (row of facade.variantRows(); track $index; let i = $index) {
+                      <tr>
+                        @for (label of row.labels; track $index) {
+                          <td class="cell-label" dir="auto">{{ label }}</td>
+                        }
+                        <td class="cell-sku">
+                          <app-text-field
+                            latin
+                            [value]="row.sku"
+                            (valueChange)="facade.updateVariantRow(i, {sku: $event})"
+                            [invalid]="skuInvalid(row.sku)"
+                            [ariaLabel]="t('productForm.variants.skuFor', {name: rowLabel(row.labels)})"
+                          />
+                        </td>
+                        <td class="cell-price">
+                          <app-number-field
+                            compact
+                            [prefix]="currency()"
+                            [decimals]="2"
+                            [min]="0"
+                            [value]="row.price"
+                            (valueChange)="facade.updateVariantRow(i, {price: $event})"
+                            [ariaLabel]="t('productForm.variants.priceFor', {name: rowLabel(row.labels)})"
+                          />
+                        </td>
+                        <td class="cell-quantity">
+                          <app-number-field
+                            compact
+                            [decimals]="0"
+                            [min]="0"
+                            [value]="row.quantity"
+                            (valueChange)="facade.updateVariantRow(i, {quantity: $event ?? 0})"
+                            [ariaLabel]="t('productForm.variants.quantityFor', {name: rowLabel(row.labels)})"
+                          />
+                        </td>
+                        <td class="cell-available">
+                          <app-toggle
+                            [checked]="row.available"
+                            (checkedChange)="facade.updateVariantRow(i, {available: $event})"
+                            [name]="t('productForm.variants.availableFor', {name: rowLabel(row.labels)})"
+                          />
+                        </td>
+                        <td class="cell-default">
+                          <!--
+                            A press-button rather than a radio group: the shared controls have no
+                            radio, and "make this the default" is a command with visible state.
+                          -->
+                          <button
+                            class="default-pick"
+                            type="button"
+                            [class.is-default]="row.isDefault"
+                            [attr.aria-pressed]="row.isDefault"
+                            [attr.aria-label]="t('productForm.variants.defaultFor', {name: rowLabel(row.labels)})"
+                            (click)="facade.setDefaultVariant(i)"
+                          >
+                            @if (row.isDefault) {
+                              <app-icon name="checkCircle" [size]="14" />
+                              {{ t('productForm.variants.isDefault') }}
+                            } @else {
+                              {{ t('productForm.variants.makeDefault') }}
+                            }
+                          </button>
+                        </td>
+                        <td class="cell-actions">
+                          <button
+                            class="icon-action danger"
+                            type="button"
+                            [attr.aria-label]="t('productForm.variants.removeRowFor', {name: rowLabel(row.labels)})"
+                            [title]="t('productForm.variants.removeRow')"
+                            (click)="facade.removeVariantRow(i)"
+                          >
+                            <app-icon name="trash" [size]="15" />
+                          </button>
+                        </td>
+                      </tr>
+                    } @empty {
+                      <tr>
+                        <td class="matrix-empty" [attr.colspan]="facade.variantAxes().length + 6">
+                          {{ t('productForm.variants.noRows') }}
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- The escape hatch: bring back a removed combination, one value per option. -->
+              <div class="combine">
+                <span class="group-label">{{ t('productForm.variants.addCombination') }}</span>
+                <div class="combine-controls">
+                  @for (axis of facade.variantAxes(); track axis.id; let i = $index) {
+                    <app-select
+                      [options]="valuesOf(i)"
+                      [value]="combinationPick(i)"
+                      (valueChange)="onCombinationPick(i, $event)"
+                      [placeholder]="axis.name"
+                      [ariaLabel]="t('productForm.variants.pickValueFor', {name: axis.name})"
+                    />
+                  }
+                  <button
+                    class="secondary-action"
+                    type="button"
+                    [disabled]="!canAddCombination()"
+                    (click)="addCombination()"
+                  >
+                    <app-icon name="plus" />
+                    {{ t('productForm.variants.add') }}
+                  </button>
+                </div>
+              </div>
+
+              <hr class="divider" />
+
+              <div class="matrix-foot">
+                <span class="matrix-count">{{ countLine() }}</span>
+                <button
+                  class="primary-action"
+                  type="button"
+                  [disabled]="facade.saving()"
+                  [attr.aria-busy]="facade.saving()"
+                  (click)="facade.saveVariants()"
+                >
+                  <app-icon name="check" />
+                  {{ t('productForm.variants.save') }}
+                </button>
+              </div>
+            } @else {
+              <!--
+                No axes: the product sells as one sku, priced on the Pricing step. Saving an empty
+                set is also how a product with variants goes back to being simple — offered only
+                when there is something to remove.
+              -->
+              <app-notice-bar icon="info" tone="blue" [message]="t('productForm.variants.noneYet')" />
+              @if (facade.draft().id !== null && facade.hasSavedVariants()) {
+                <div class="matrix-foot">
+                  <button
+                    class="danger-action"
+                    type="button"
+                    [disabled]="facade.saving()"
+                    (click)="facade.saveVariants()"
+                  >
+                    {{ t('productForm.variants.removeAll') }}
+                  </button>
+                </div>
+              }
+            }
+          }
+        }
+      </div>
+    </app-panel>
+  </div>
+</ng-container>

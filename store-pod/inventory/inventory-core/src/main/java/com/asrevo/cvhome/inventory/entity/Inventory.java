@@ -29,12 +29,13 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * One sku's stock in one store, with its prices.
+ * One sku's stock in one store, with its prices — unique per {@code (store, sku)}.
  *
  * <p>
- * The table is {@code product_availability}, inherited from the catalog service, and keeps dormant columns for the
- * variant/region features that will return later; this entity maps only what the single-product model uses.
- * {@code productId} is informational — the catalog owns the product, there is no foreign key.
+ * The table is {@code product_availability}. A sku may belong to a catalog product or to one of its variants; this
+ * service cannot tell and does not care — the sku is the whole key. {@code productId} is informational — the
+ * catalog owns the product, there is no foreign key. Dormant dimension columns (weight/height/length/width) are
+ * kept in the DDL for per-sku shipping specs later.
  * </p>
  */
 @Entity
@@ -63,7 +64,7 @@ public class Inventory extends SalesManagerEntity<Long, Inventory> implements Au
             column = @Column(name = "STORE_MERCHANT_ID", nullable = false, length = 50))
     private StoreMerchantId storeMerchantId;
 
-    @Column(name = "SKU")
+    @Column(name = "SKU", nullable = false)
     private String sku;
 
     @Column(name = "PRODUCT_ID")

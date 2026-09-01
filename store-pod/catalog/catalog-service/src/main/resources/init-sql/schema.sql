@@ -97,6 +97,61 @@ create table if not exists catalog.product_type_description
         constraint fk5yingh0egjkus0xfkl1hhmwy references catalog.product_type,
     constraint UKedftn4kxppmgot0f38hvk83sm unique (product_type_id, language_code)
 );
+
+-- The store's option vocabulary (Color, Size, ...): defined once per store, translated once, reused by any
+-- product that assigns it. Value ids are store-wide, which is what makes id-based option faceting possible.
+create table if not exists catalog.product_option
+(
+    product_option_id bigint       not null primary key,
+    date_created      timestamp(6),
+    date_modified     timestamp(6),
+    updt_id           varchar(60),
+    code              varchar(100) not null,
+    sort_order        integer,
+    store_merchant_id varchar(50)  not null,
+    constraint uk_product_option_code unique (store_merchant_id, code)
+);
+create table if not exists catalog.product_option_description
+(
+    description_id    bigint       not null primary key,
+    date_created      timestamp(6),
+    date_modified     timestamp(6),
+    updt_id           varchar(60),
+    description       text,
+    name              varchar(120) not null,
+    title             varchar(100),
+    language_code     varchar(6)   not null,
+    product_option_id bigint       not null
+        constraint fk_prd_opt_desc_option references catalog.product_option,
+    constraint uk_product_option_desc unique (product_option_id, language_code)
+);
+create table if not exists catalog.product_option_value
+(
+    product_option_value_id bigint       not null primary key,
+    date_created            timestamp(6),
+    date_modified           timestamp(6),
+    updt_id                 varchar(60),
+    code                    varchar(100) not null,
+    sort_order              integer,
+    product_option_id       bigint       not null
+        constraint fk_prd_opt_value_option references catalog.product_option,
+    constraint uk_product_option_value_code unique (product_option_id, code)
+);
+create table if not exists catalog.product_option_value_description
+(
+    description_id          bigint       not null primary key,
+    date_created            timestamp(6),
+    date_modified           timestamp(6),
+    updt_id                 varchar(60),
+    description             text,
+    name                    varchar(120) not null,
+    title                   varchar(100),
+    language_code           varchar(6)   not null,
+    product_option_value_id bigint       not null
+        constraint fk_prd_opt_value_desc_value references catalog.product_option_value,
+    constraint uk_product_option_value_desc unique (product_option_value_id, language_code)
+);
+
 create table if not exists catalog.product
 (
     product_id        bigint      not null primary key,
@@ -129,14 +184,12 @@ create table if not exists catalog.product
             (rental_status >= 0)
                 AND (rental_status <= 1)
             ),
-    sku               varchar(255),
     sort_order        integer,
     manufacturer_id   bigint
         constraint fk89igr5j06uw5ps04djxgom0l1 references catalog.manufacturer,
     store_merchant_id varchar(50) not null,
     product_type_id   bigint
-        constraint fklabq3c2e90ybbxk58rc48byqo references catalog.product_type,
-    constraint UK8y3h56fhn50m59svlocxwqnn0 unique (store_merchant_id, sku)
+        constraint fklabq3c2e90ybbxk58rc48byqo references catalog.product_type
 );
 create table if not exists catalog.product_category
 (
@@ -146,6 +199,59 @@ create table if not exists catalog.product_category
         constraint fkkud35ls1d40wpjb5htpp14q4e references catalog.category,
     primary key (product_id, category_id)
 );
+
+-- The axes THIS product varies by: its ordered pick from the store option vocabulary. Written atomically with
+-- the variant set, so axes and combinations can never disagree. Empty for a simple product.
+create table if not exists catalog.product_option_assignment
+(
+    product_id        bigint  not null
+        constraint fk_prd_opt_assign_product references catalog.product,
+    product_option_id bigint  not null
+        constraint fk_prd_opt_assign_option references catalog.product_option,
+    sort_order        integer not null,
+    primary key (product_id, product_option_id)
+);
+create index if not exists product_option_assignment_option_idx
+    on catalog.product_option_assignment (product_option_id);
+
+-- The sellable unit. Every product owns at least one row; a product with no options owns exactly one with the
+-- 'DEFAULT' signature. The sku is the cross-service key to the inventory service (price + stock); there is no
+-- availability column here on purpose — sellability is inventory's single flag.
+create table if not exists catalog.product_variant
+(
+    product_variant_id bigint       not null primary key,
+    date_created       timestamp(6),
+    date_modified      timestamp(6),
+    updt_id            varchar(60),
+    store_merchant_id  varchar(50)  not null,
+    product_id         bigint       not null
+        constraint fk_prd_variant_product references catalog.product,
+    sku                varchar(255) not null,
+    sort_order         integer,
+    default_variant    boolean      not null default false,
+    option_signature   varchar(255) not null,
+    constraint uk_product_variant_sku unique (store_merchant_id, sku),
+    constraint uk_product_variant_signature unique (product_id, option_signature)
+);
+create index if not exists product_variant_product_idx on catalog.product_variant (product_id);
+-- exactly one default variant per product: it supplies the card/list price and the PDP preselection
+create unique index if not exists uk_product_variant_default
+    on catalog.product_variant (product_id) where default_variant;
+
+-- One chosen value per option per variant (the primary key enforces "one value per axis").
+create table if not exists catalog.product_variant_option_value
+(
+    product_variant_id      bigint not null
+        constraint fk_pvov_variant references catalog.product_variant,
+    product_option_id       bigint not null
+        constraint fk_pvov_option references catalog.product_option,
+    product_option_value_id bigint not null
+        constraint fk_pvov_value references catalog.product_option_value,
+    primary key (product_variant_id, product_option_id)
+);
+-- the facet/filter path: drive from a selective value to its variants without touching the heap
+create index if not exists pvov_value_variant_idx
+    on catalog.product_variant_option_value (product_option_value_id, product_variant_id);
 create table if not exists catalog.product_description
 (
     description_id    bigint       not null primary key,
@@ -182,7 +288,9 @@ create table if not exists catalog.product_image
     product_image_url varchar(500),
     sort_order        integer,
     product_id        bigint  not null
-        constraint fk6oo0cvcdtb6qmwsga468uuukk references catalog.product
+        constraint fk6oo0cvcdtb6qmwsga468uuukk references catalog.product,
+    -- dormant: per-variant images are a later phase; the column exists so adding them is purely additive
+    product_variant_id bigint
 );
 alter table catalog.product_image add column if not exists media_asset_id bigint;
 alter table catalog.product_image add column if not exists image_url      varchar(500);
@@ -349,7 +457,7 @@ select pd.product_id,
        setweight(to_tsvector(catalog.search_config(pd.language_code),
                              catalog.search_normalize(
                                      concat_ws(' ', pd.meta_title, pd.title, pd.meta_keywords,
-                                               p.sku, p.ref_sku, md.name))), 'B') ||
+                                               vs.skus, p.ref_sku, md.name))), 'B') ||
        setweight(to_tsvector(catalog.search_config(pd.language_code),
                              catalog.search_normalize(pd.product_highlight)), 'C') ||
        setweight(to_tsvector(catalog.search_config(pd.language_code),
@@ -360,7 +468,12 @@ select pd.product_id,
 from catalog.product_description pd
          join catalog.product p on p.product_id = pd.product_id
          left join catalog.manufacturer_description md
-                   on md.manufacturer_id = p.manufacturer_id and md.language_code = pd.language_code;
+                   on md.manufacturer_id = p.manufacturer_id and md.language_code = pd.language_code
+         -- every variant sku (the default one included) is searchable; one expression covers simple and
+         -- multi-variant products alike
+         left join lateral (select string_agg(v.sku, ' ') as skus
+                            from catalog.product_variant v
+                            where v.product_id = p.product_id) vs on true;
 
 -- Rebuild every language of one product.
 --

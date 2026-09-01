@@ -47,7 +47,10 @@ export const NO_FILTERS: ProductFilters = {sku: '', categoryId: null, brandId: n
 export interface ProductRow {
   readonly id: number;
   readonly name: string;
+  /** The default variant's sku — the row's price and stock cells describe this sku. */
   readonly sku: string;
+  /** How many variants the product owns. `> 1` disables inline edit; the matrix lives in the form. */
+  readonly variantCount: number;
   /** The categories the product is in, already named in the reader's language. */
   readonly categories: readonly string[];
   readonly brand: string | null;
@@ -84,10 +87,16 @@ export interface InlineProductEdit {
 
 /* ------------------------------------------------------------------------ the form ---- */
 
-/** The wizard's four steps, in order. */
-export type ProductStep = 'essentials' | 'media' | 'pricing' | 'organize';
+/** The wizard's five steps, in order. */
+export type ProductStep = 'essentials' | 'media' | 'pricing' | 'variants' | 'organize';
 
-export const PRODUCT_STEPS: readonly ProductStep[] = ['essentials', 'media', 'pricing', 'organize'];
+export const PRODUCT_STEPS: readonly ProductStep[] = [
+  'essentials',
+  'media',
+  'pricing',
+  'variants',
+  'organize',
+];
 
 export function isProductStep(value: string | null | undefined): value is ProductStep {
   return value !== null && value !== undefined && (PRODUCT_STEPS as readonly string[]).includes(value);
@@ -114,6 +123,61 @@ export function isProductStep(value: string | null | undefined): value is Produc
  */
 export const WEIGHT_UNITS: readonly string[] = ['g', 'kg', 'l', 'lb', 'T'];
 export const DIMENSION_UNITS: readonly string[] = ['cm', 'cu', 'ft', 'in', 'm'];
+
+/* -------------------------------------------------------------------------- variants ---- */
+
+/**
+ * What a variant sku may be — the pod's own `@Pattern` on `PersistableProductVariant.sku`.
+ *
+ * Stricter than the product form's `SKU_PATTERN`: no dot. The suggestion logic maps a base sku's
+ * dots to hyphens rather than proposing something the server would refuse.
+ */
+export const VARIANT_SKU_PATTERN = /^[A-Za-z0-9_-]+$/;
+
+/** The pod's guardrails: at most this many assigned options and variants per product (422 beyond). */
+export const MAX_VARIANT_OPTIONS = 4;
+export const MAX_VARIANTS = 100;
+
+/** One store option as the variants step offers it: the vocabulary entry, values in display order. */
+export interface StoreOption {
+  readonly id: number;
+  readonly code: string;
+  readonly name: string;
+  readonly values: readonly StoreOptionValue[];
+}
+
+/** One value of a store option. The id is store-wide — it is what variants and facets key on. */
+export interface StoreOptionValue {
+  readonly id: number;
+  readonly code: string;
+  readonly name: string;
+}
+
+/**
+ * One row of the variant matrix — a sellable combination with the fields the console edits.
+ *
+ * Catalog and inventory in one row, deliberately: the operator thinks "Red / L costs 30 and there
+ * are 5", not "two services". `id` is the catalog variant row (kept so a save is not a re-create);
+ * `price`/`quantity`/`available` are the inventory record for `sku`, merged in at load and written
+ * back through the bulk upsert.
+ */
+export interface VariantMatrixRow {
+  readonly id: number | null;
+  readonly sku: string;
+  /** One value id per assigned option, in axis order. */
+  readonly optionValueIds: readonly number[];
+  /** The value names, in axis order — the read-only cells of the row. */
+  readonly labels: readonly string[];
+  readonly isDefault: boolean;
+  readonly price: number | null;
+  readonly quantity: number;
+  readonly available: boolean;
+}
+
+/** The canonical identity of a combination — sorted value ids, the pod's `option_signature`. */
+export function combinationSignature(optionValueIds: readonly number[]): string {
+  return [...optionValueIds].sort((left, right) => left - right).join('-');
+}
 
 /**
  * One product's images, as the Media step holds them.

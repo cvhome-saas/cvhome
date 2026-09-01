@@ -1190,3 +1190,10 @@
   font-size: var(--text-3xs);
   text-align: end;
 }
+
+/* The variant bought — "Color: Red · Size: L" — between the name and the sku. */
+.item-options {
+  display: block;
+  color: var(--foreground-subtle);
+  font-size: var(--text-3xs);
+}

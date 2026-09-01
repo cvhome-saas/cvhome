@@ -158,7 +158,14 @@
       "MEDIA_FOLDER_NOT_EMPTY": "Empty the folder before deleting it.",
       "MEDIA_UNREADABLE": "That file could not be read.",
       "MEDIA_STORAGE_FAILED": "The file could not be stored. Try again.",
-      "CONTROL_PLANE_SIGNUP_EMAIL_TAKEN": "An account already uses this email address. Sign in instead, or use another address."
+      "CONTROL_PLANE_SIGNUP_EMAIL_TAKEN": "An account already uses this email address. Sign in instead, or use another address.",
+      "CATALOG_PRODUCT_OPTION_NOT_FOUND": "That option no longer exists. It may have been deleted.",
+      "CATALOG_PRODUCT_OPTION_DUPLICATE": "Another option already uses this code.",
+      "CATALOG_PRODUCT_OPTION_IN_USE": "This option is still used by a product or one of its variants. Remove it from every product first.",
+      "CATALOG_PRODUCT_VARIANT_DUPLICATE_SKU": "Another product or variant already uses one of these SKUs.",
+      "CATALOG_PRODUCT_VARIANT_DUPLICATE_COMBINATION": "Two variants describe the same combination of values.",
+      "CATALOG_PRODUCT_VARIANT_OPTIONS_INVALID": "Every variant must pick exactly one value of each chosen option.",
+      "CATALOG_PRODUCT_VARIANT_LIMIT_EXCEEDED": "A product can vary by at most 4 options and sell at most 100 variants."
     }
   },
   "auth": {
@@ -1523,30 +1530,35 @@
       "categories": "Categories",
       "types": "Product types",
       "brands": "Brands",
+      "options": "Options",
       "groups": "Groups"
     },
     "add": {
       "categories": "New category",
       "types": "New product type",
       "brands": "New brand",
+      "options": "New option",
       "groups": "New group"
     },
     "delete": {
       "categories": "Delete {name}?",
       "types": "Delete {name}?",
       "brands": "Delete {name}?",
+      "options": "Delete {name}?",
       "groups": "Delete {name}?"
     },
     "deleteMessage": {
       "categories": "This deletes the category and every category inside it. Products stay, but they lose this category.",
       "types": "Products already using this type keep working, but you will not be able to set it on a new one.",
       "brands": "Products already using this brand keep working, but they will no longer name it.",
+      "options": "Only an unused option can be deleted — if any product still varies by it, the server will refuse.",
       "groups": "The products stay. Only the group and its membership go."
     },
     "saved": {
       "category": "Category saved.",
       "brand": "Brand saved.",
       "type": "Product type saved.",
+      "option": "Option saved.",
       "group": "Group saved.",
       "visibility": "Storefront navigation updated.",
       "moved": "Category moved.",
@@ -1654,7 +1666,35 @@
     },
     "codeChecking": "Checking…",
     "codeTaken": "That code is already used by another record in this store.",
-    "missingLanguages": "Cannot save yet — no name written in {languages}."
+    "missingLanguages": "Cannot save yet — no name written in {languages}.",
+    "options": {
+      "title": "Options",
+      "subtitle": "{count, plural, one {# option} other {# options}}",
+      "unavailable": "The option list could not be loaded. Everything else on this page is up to date.",
+      "none": "This store has no options yet.",
+      "noValuesYet": "No values yet",
+      "newTitle": "New option",
+      "newSubtitle": "What products can vary by — a name, a code and its values.",
+      "noneTitle": "No option selected",
+      "empty": "This store has no options yet.",
+      "usage": "Options are store-wide. A product picks which of them it varies by in its own form, under Variants.",
+      "name": "Name",
+      "nameRequired": "Give the option a name.",
+      "values": "Values",
+      "valuesHint": "The choices a shopper picks from — Red, Blue; S, M, L. Every combination a product sells becomes its own SKU.",
+      "valueName": "Value",
+      "valueNameFor": "Name of value {position}",
+      "valueCodeFor": "Code of value {position}",
+      "removeValue": "Remove value",
+      "removeValueFor": "Remove value {position}",
+      "noValues": "No values yet. An option needs at least one before a product can use it.",
+      "addValue": "Add value",
+      "needsValue": "Add at least one value before saving.",
+      "duplicateValueCode": "Two values share the same code. Codes must be unique within an option.",
+      "create": "Create option",
+      "save": "Save option",
+      "delete": "Delete"
+    }
   },
   "products": {
     "loading": "Loading products…",
@@ -1722,7 +1762,10 @@
       "title": "Delete {name}?",
       "message": "This removes the product, its images and its category assignments. Orders that already include it are not affected.",
       "confirm": "Delete product"
-    }
+    },
+    "variantsTag": "{count} variants",
+    "editVariants": "Edit variants in the product form",
+    "editVariantsFor": "Edit the variants of {name} in the product form"
   },
   "productForm": {
     "loading": "Loading the product…",
@@ -1743,7 +1786,10 @@
       "pricing": "Pricing & stock",
       "pricingMeta": "Price, quantity and the shipping box",
       "organize": "Organize",
-      "organizeMeta": "Categories, brand and related products"
+      "organizeMeta": "Categories, brand and related products",
+      "variants": "Variants",
+      "variantsMeta": "Options and combinations",
+      "variantsLocked": "Save the draft first"
     },
     "saved": {
       "created": "Product created. Images and related products are available now.",
@@ -1837,7 +1883,9 @@
         "m": "Metres"
       },
       "weightValue": "Weight",
-      "dimensions": "Dimensions"
+      "dimensions": "Dimensions",
+      "managedByVariants": "This product varies by options, so each combination carries its own price and stock. Set them per variant on the Variants step; the flags and the shipping box below still apply to the whole product.",
+      "openVariants": "Go to variants"
     },
     "organize": {
       "categories": "Categories",
@@ -1876,7 +1924,8 @@
         "category": "At least one category",
         "brand": "A brand",
         "image": "At least one image",
-        "description": "A description"
+        "description": "A description",
+        "variantPricing": "Every variant has a price"
       }
     },
     "translations": {
@@ -1885,7 +1934,57 @@
       "missing": "Not written",
       "filled": "{filled} of {total}"
     },
-    "missingLanguages": "Cannot save yet — no name written in {languages}."
+    "missingLanguages": "Cannot save yet — no name written in {languages}.",
+    "variants": {
+      "title": "Variants",
+      "subtitle": "What this product varies by, and every combination it sells",
+      "needsSave": "Save the draft first — variants attach to a saved product.",
+      "noVocabulary": "This store has no options yet. Define them on the catalogue’s Options tab — Color, Size, whatever your products vary by — then pick them here.",
+      "unreadable": "We couldn't read what this product currently sells, so its variants can't be changed right now. Try again — saving now could replace combinations that are still there.",
+      "vocabularyUnreadable": "We couldn't load this store's options, so there is nothing to build a matrix from. Try again.",
+      "explainer": "Pick the options this product varies by. Every combination becomes its own SKU with its own price and stock; remove the rows you do not sell.",
+      "axesLabel": "Options this product varies by",
+      "addOption": "Add option…",
+      "removeAxis": "Remove option",
+      "removeAxisFor": "Stop varying by {name}",
+      "optionLimit": "A product can vary by at most {max} options.",
+      "optionHasNoValues": "That option has no values yet. Add some on the catalogue’s Options tab first.",
+      "variantLimit": "A product can sell at most {max} variants — the matrix was cut off there.",
+      "duplicateCombination": "That combination is already in the matrix.",
+      "inventoryPending": "The variants were saved, but their prices and stock were not. Retry to write them — nothing is lost.",
+      "retryInventory": "Retry prices and stock",
+      "inventoryFailed": "Variants saved, but writing prices and stock failed. Retry from the Variants step.",
+      "saved": "Variants saved.",
+      "needsRow": "A product with options needs at least one combination. Remove the options instead if it should sell as one SKU.",
+      "invalidSku": "The SKU \"{sku}\" is not valid. Use letters, digits, hyphen or underscore.",
+      "duplicateSku": "Two variants share the same SKU.",
+      "matrixLabel": "Variant combinations",
+      "column": {
+        "sku": "SKU",
+        "price": "Price",
+        "quantity": "Quantity",
+        "available": "Available",
+        "defaultVariant": "Default",
+        "actions": "Actions"
+      },
+      "skuFor": "SKU for {name}",
+      "priceFor": "Price for {name}",
+      "quantityFor": "Quantity for {name}",
+      "availableFor": "Available for sale: {name}",
+      "defaultFor": "Make {name} the default variant",
+      "isDefault": "Default",
+      "makeDefault": "Make default",
+      "removeRow": "Remove combination",
+      "removeRowFor": "Stop selling {name}",
+      "noRows": "No combinations left. Add one below, or remove the options to sell as one SKU.",
+      "addCombination": "Add a combination",
+      "pickValueFor": "Pick a {name}",
+      "add": "Add",
+      "count": "{count} of {max} variants",
+      "save": "Save variants",
+      "noneYet": "This product sells as one SKU. Its price and stock live on the Pricing step; pick an option above to start selling combinations.",
+      "removeAll": "Remove variants — sell as one SKU again"
+    }
   },
   "payments": {
     "heading": {

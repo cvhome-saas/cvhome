@@ -19,6 +19,8 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.TableGenerator;
 
+import org.hibernate.annotations.BatchSize;
+
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.constants.SchemaConstant;
@@ -38,6 +40,13 @@ import lombok.Setter;
 @Table(name = "PRODUCT_TYPE")
 @Getter
 @Setter
+/*
+ * Batched at the class level so a listing page initialises every distinct type proxy in one
+ * query instead of one apiece — a page showing six types issued six selects and six more for their
+ * descriptions. Bounded by distinct entities rather than by rows, so it was never the worst offender,
+ * but it is the same fix and the same one line.
+ */
+@BatchSize(size = 100)
 public class ProductType extends SalesManagerEntity<Long, ProductType> implements Auditable {
 
     @Serial
@@ -70,6 +79,8 @@ public class ProductType extends SalesManagerEntity<Long, ProductType> implement
     private Boolean visible;
 
     @OneToMany(mappedBy = "productType", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    // Batched: the type a listing row names.
+    @BatchSize(size = 100)
     private Set<ProductTypeDescription> descriptions = new HashSet<>();
 
     public Optional<ProductTypeDescription> description(LanguageCode language) {

@@ -3,6 +3,7 @@ export * from './product-search-provider';
 export * from './use-cart';
 export * from './use-checkout-form';
 export * from './use-customer';
+export * from './use-error-message';
 export * from './use-order-status';
 export * from './use-product-listing';
 export * from './use-product-search';

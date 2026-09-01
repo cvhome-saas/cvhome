@@ -13,10 +13,10 @@ Domain: electronics
 -- Product 136: Apple iPhone 15 Pro (Man: 19, Type: 13)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (136, '2024-04-02 18:00:00.000000', '2024-04-02 18:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
-        5.77, false, 2.78, true, false, 0.41, 0.32, 'ELEC-REF-136', 'ELEC-SKU-136', 0, 19,
+        5.77, false, 2.78, true, false, 0.41, 0.32, 'ELEC-REF-136', 0, 19,
         '65f023632bc46470c104b75f', 13) -- Type 13 (SMARTPHONES)
 on conflict (product_id) do nothing;
 
@@ -45,10 +45,10 @@ on conflict (description_id) do nothing;
 -- Product 137: Samsung Galaxy S24 Ultra (Man: 20, Type: 13)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (137, '2024-04-02 18:00:00.000000', '2024-04-02 18:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
-        6.40, false, 3.11, true, false, 0.51, 0.34, 'ELEC-REF-137', 'ELEC-SKU-137', 1, 20,
+        6.40, false, 3.11, true, false, 0.51, 0.34, 'ELEC-REF-137', 1, 20,
         '65f023632bc46470c104b75f', 13) -- Type 13 (SMARTPHONES)
 on conflict (product_id) do nothing;
 
@@ -79,10 +79,10 @@ on conflict (description_id) do nothing;
 -- Product 138: Dell XPS 15 Laptop (Man: 23, Type: 14)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (138, '2024-04-02 18:00:00.000000', '2024-04-02 18:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
-        0.71, false, 9.06, true, false, 4.21, 13.57, 'ELEC-REF-138', 'ELEC-SKU-138', 2, 23,
+        0.71, false, 9.06, true, false, 4.21, 13.57, 'ELEC-REF-138', 2, 23,
         '65f023632bc46470c104b75f', 14) -- Type 14 (LAPTOPS)
 on conflict (product_id) do nothing;
 
@@ -113,10 +113,10 @@ on conflict (description_id) do nothing;
 -- Product 139: Sony WH-1000XM5 Headphones (Man: 21, Type: 15)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (139, '2024-04-02 18:00:00.000000', '2024-04-02 18:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
-        null, false, null, true, false, 0.55, null, 'ELEC-REF-139', 'ELEC-SKU-139', 3, 21,
+        null, false, null, true, false, 0.55, null, 'ELEC-REF-139', 3, 21,
         '65f023632bc46470c104b75f', 15) -- Type 15 (HEADPHONES)
 on conflict (product_id) do nothing;
 
@@ -147,10 +147,10 @@ on conflict (description_id) do nothing;
 -- Product 140: LG C3 65-inch OLED TV (Man: 22, Type: 16)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (140, '2024-04-02 18:00:00.000000', '2024-04-02 18:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
-        32.5, false, 1.8, true, false, 35.9, 56.7, 'ELEC-REF-140', 'ELEC-SKU-140', 4, 22,
+        32.5, false, 1.8, true, false, 35.9, 56.7, 'ELEC-REF-140', 4, 22,
         '65f023632bc46470c104b75f', 16) -- Type 16 (TELEVISIONS)
 on conflict (product_id) do nothing;
 
@@ -181,10 +181,10 @@ on conflict (description_id) do nothing;
 -- Product 141: Apple MacBook Air M3 (Man: 19, Type: 14)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (141, '2024-04-02 18:00:00.000000', '2024-04-02 18:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
-        0.44, false, 8.46, true, false, 2.7, 11.97, 'ELEC-REF-141', 'ELEC-SKU-141', 5, 19,
+        0.44, false, 8.46, true, false, 2.7, 11.97, 'ELEC-REF-141', 5, 19,
         '65f023632bc46470c104b75f', 14) -- Type 14 (LAPTOPS)
 on conflict (product_id) do nothing;
 
@@ -215,10 +215,10 @@ on conflict (description_id) do nothing;
 -- Product 142: Samsung QN90C 55-inch QLED TV (Man: 20, Type: 16)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (142, '2024-04-02 18:00:00.000000', '2024-04-02 18:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
-        27.9, false, 1.0, true, false, 34.0, 48.3, 'ELEC-REF-142', 'ELEC-SKU-142', 6, 20,
+        27.9, false, 1.0, true, false, 34.0, 48.3, 'ELEC-REF-142', 6, 20,
         '65f023632bc46470c104b75f', 16) -- Type 16 (TELEVISIONS)
 on conflict (product_id) do nothing;
 
@@ -250,10 +250,10 @@ on conflict (description_id) do nothing;
 -- Product 143: HP Spectre x360 14 (Man: 24, Type: 14)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (143, '2024-04-02 18:00:00.000000', '2024-04-02 18:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
-        0.67, false, 8.68, true, false, 3.19, 12.35, 'ELEC-REF-143', 'ELEC-SKU-143', 7, 24,
+        0.67, false, 8.68, true, false, 3.19, 12.35, 'ELEC-REF-143', 7, 24,
         '65f023632bc46470c104b75f', 14) -- Type 14 (LAPTOPS)
 on conflict (product_id) do nothing;
 
@@ -284,10 +284,10 @@ on conflict (description_id) do nothing;
 -- Product 144: Apple AirPods Pro (2nd Gen) (Man: 19, Type: 15)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (144, '2024-04-02 18:00:00.000000', '2024-04-02 18:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
-        null, false, null, true, false, 0.01, null, 'ELEC-REF-144', 'ELEC-SKU-144', 8, 19,
+        null, false, null, true, false, 0.01, null, 'ELEC-REF-144', 8, 19,
         '65f023632bc46470c104b75f', 15) -- Type 15 (HEADPHONES)
 on conflict (product_id) do nothing;
 
@@ -318,10 +318,10 @@ on conflict (description_id) do nothing;
 -- Product 145: Samsung Galaxy Buds2 Pro (Man: 20, Type: 15)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (145, '2024-04-02 18:00:00.000000', '2024-04-02 18:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
-        null, false, null, true, false, 0.012, null, 'ELEC-REF-145', 'ELEC-SKU-145', 9, 20,
+        null, false, null, true, false, 0.012, null, 'ELEC-REF-145', 9, 20,
         '65f023632bc46470c104b75f', 15) -- Type 15 (HEADPHONES)
 on conflict (product_id) do nothing;
 
@@ -352,10 +352,10 @@ on conflict (description_id) do nothing;
 -- Product 146: Sony Bravia X90L 65-inch TV (Man: 21, Type: 16)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (146, '2024-04-02 18:00:00.000000', '2024-04-02 18:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
-        32.9, false, 2.2, true, false, 51.7, 57.1, 'ELEC-REF-146', 'ELEC-SKU-146', 10, 21,
+        32.9, false, 2.2, true, false, 51.7, 57.1, 'ELEC-REF-146', 10, 21,
         '65f023632bc46470c104b75f', 16) -- Type 16 (TELEVISIONS)
 on conflict (product_id) do nothing;
 
@@ -386,10 +386,10 @@ on conflict (description_id) do nothing;
 -- Product 147: Samsung Galaxy A54 (Man: 20, Type: 13)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (147, '2024-04-02 18:00:00.000000', '2024-04-02 18:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
-        6.23, false, 3.07, true, false, 0.45, 0.32, 'ELEC-REF-147', 'ELEC-SKU-147', 11, 20,
+        6.23, false, 3.07, true, false, 0.45, 0.32, 'ELEC-REF-147', 11, 20,
         '65f023632bc46470c104b75f', 13) -- Type 13 (SMARTPHONES)
 on conflict (product_id) do nothing;
 
@@ -420,10 +420,10 @@ on conflict (description_id) do nothing;
 -- Product 148: Sony LinkBuds S (Man: 21, Type: 15)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (148, '2024-04-02 18:00:00.000000', '2024-04-02 18:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
-        null, false, null, true, false, 0.01, null, 'ELEC-REF-148', 'ELEC-SKU-148', 12, 21,
+        null, false, null, true, false, 0.01, null, 'ELEC-REF-148', 12, 21,
         '65f023632bc46470c104b75f', 15) -- Type 15 (HEADPHONES)
 on conflict (product_id) do nothing;
 
@@ -454,10 +454,10 @@ on conflict (description_id) do nothing;
 -- Product 149: Dell Inspiron 16 Laptop (Man: 23, Type: 14)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (149, '2024-04-02 18:00:00.000000', '2024-04-02 18:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
-        0.72, false, 9.92, true, false, 4.12, 14.05, 'ELEC-REF-149', 'ELEC-SKU-149', 13, 23,
+        0.72, false, 9.92, true, false, 4.12, 14.05, 'ELEC-REF-149', 13, 23,
         '65f023632bc46470c104b75f', 14) -- Type 14 (LAPTOPS)
 on conflict (product_id) do nothing;
 
@@ -488,10 +488,10 @@ on conflict (description_id) do nothing;
 -- Product 150: LG Gram 17 Laptop (Man: 22, Type: 14)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (150, '2024-04-02 18:00:00.000000', '2024-04-02 18:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
-        0.70, false, 10.18, true, false, 2.98, 14.91, 'ELEC-REF-150', 'ELEC-SKU-150', 14, 22,
+        0.70, false, 10.18, true, false, 2.98, 14.91, 'ELEC-REF-150', 14, 22,
         '65f023632bc46470c104b75f', 14) -- Type 14 (LAPTOPS)
 on conflict (product_id) do nothing;
 
@@ -521,10 +521,10 @@ on conflict (description_id) do nothing;
 -- Product 151: HP Envy x360 16 Laptop (Man: 24, Type: 14)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (151, '2024-04-02 18:00:00.000000', '2024-04-02 18:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
-        0.77, false, 9.02, true, false, 4.13, 14.11, 'ELEC-REF-151', 'ELEC-SKU-151', 15, 24,
+        0.77, false, 9.02, true, false, 4.13, 14.11, 'ELEC-REF-151', 15, 24,
         '65f023632bc46470c104b75f', 14) -- Type 14 (LAPTOPS)
 on conflict (product_id) do nothing;
 
@@ -555,10 +555,10 @@ on conflict (description_id) do nothing;
 -- Product 152: Apple TV 4K (2022) (Man: 19, Type: 16)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (152, '2024-04-02 18:00:00.000000', '2024-04-02 18:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
-        1.2, false, 3.66, true, false, 0.47, 3.66, 'ELEC-REF-152', 'ELEC-SKU-152', 16, 19,
+        1.2, false, 3.66, true, false, 0.47, 3.66, 'ELEC-REF-152', 16, 19,
         '65f023632bc46470c104b75f', 16) -- Type 16 (TELEVISIONS - *Streaming Device*)
 on conflict (product_id) do nothing;
 
@@ -589,10 +589,10 @@ on conflict (description_id) do nothing;
 -- Product 153: Samsung The Frame TV (55-inch) (Man: 20, Type: 16)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (153, '2024-04-02 18:00:00.000000', '2024-04-02 18:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
-        27.9, false, 1.0, true, false, 35.3, 48.6, 'ELEC-REF-153', 'ELEC-SKU-153', 17, 20,
+        27.9, false, 1.0, true, false, 35.3, 48.6, 'ELEC-REF-153', 17, 20,
         '65f023632bc46470c104b75f', 16) -- Type 16 (TELEVISIONS)
 on conflict (product_id) do nothing;
 
@@ -623,10 +623,10 @@ on conflict (description_id) do nothing;
 -- Product 154: Sony INZONE H9 Wireless Headset (Man: 21, Type: 15)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (154, '2024-04-02 18:00:00.000000', '2024-04-02 18:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
-        null, false, null, true, false, 0.71, null, 'ELEC-REF-154', 'ELEC-SKU-154', 18, 21,
+        null, false, null, true, false, 0.71, null, 'ELEC-REF-154', 18, 21,
         '65f023632bc46470c104b75f', 15) -- Type 15 (HEADPHONES)
 on conflict (product_id) do nothing;
 
@@ -657,10 +657,10 @@ on conflict (description_id) do nothing;
 -- Product 155: LG UltraGear 27" OLED Monitor (Man: 22, Type: 16)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (155, '2024-04-02 18:00:00.000000', '2024-04-02 18:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
-        15.6, false, 10.3, true, false, 11.2, 23.8, 'ELEC-REF-155', 'ELEC-SKU-155', 19, 22,
+        15.6, false, 10.3, true, false, 11.2, 23.8, 'ELEC-REF-155', 19, 22,
         '65f023632bc46470c104b75f', 16) -- Type 16 (TELEVISIONS - *Monitor*)
 on conflict (product_id) do nothing;
 
@@ -691,10 +691,10 @@ on conflict (description_id) do nothing;
 -- Product 156: Dell Alienware m16 Gaming Laptop (Man: 23, Type: 14)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (156, '2024-04-02 18:00:00.000000', '2024-04-02 18:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
-        1.0, false, 11.41, true, false, 6.65, 14.5, 'ELEC-REF-156', 'ELEC-SKU-156', 20, 23,
+        1.0, false, 11.41, true, false, 6.65, 14.5, 'ELEC-REF-156', 20, 23,
         '65f023632bc46470c104b75f', 14) -- Type 14 (LAPTOPS)
 on conflict (product_id) do nothing;
 
@@ -725,10 +725,10 @@ on conflict (description_id) do nothing;
 -- Product 157: HP OMEN 16 Gaming Laptop (Man: 24, Type: 14)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (157, '2024-04-02 18:00:00.000000', '2024-04-02 18:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
-        0.93, false, 10.21, true, false, 5.29, 14.53, 'ELEC-REF-157', 'ELEC-SKU-157', 21, 24,
+        0.93, false, 10.21, true, false, 5.29, 14.53, 'ELEC-REF-157', 21, 24,
         '65f023632bc46470c104b75f', 14) -- Type 14 (LAPTOPS)
 on conflict (product_id) do nothing;
 
@@ -759,10 +759,10 @@ on conflict (description_id) do nothing;
 -- Product 158: Apple Studio Display (Man: 19, Type: 16)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (158, '2024-04-02 18:00:00.000000', '2024-04-02 18:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
-        18.8, false, 6.6, true, false, 13.9, 24.5, 'ELEC-REF-158', 'ELEC-SKU-158', 22, 19,
+        18.8, false, 6.6, true, false, 13.9, 24.5, 'ELEC-REF-158', 22, 19,
         '65f023632bc46470c104b75f', 16) -- Type 16 (TELEVISIONS - *Monitor*)
 on conflict (product_id) do nothing;
 
@@ -793,10 +793,10 @@ on conflict (description_id) do nothing;
 -- Product 159: Samsung Galaxy Book4 Pro (Man: 20, Type: 14)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (159, '2024-04-02 18:00:00.000000', '2024-04-02 18:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
-        0.49, false, 9.86, true, false, 3.44, 13.99, 'ELEC-REF-159', 'ELEC-SKU-159', 23, 20,
+        0.49, false, 9.86, true, false, 3.44, 13.99, 'ELEC-REF-159', 23, 20,
         '65f023632bc46470c104b75f', 14) -- Type 14 (LAPTOPS)
 on conflict (product_id) do nothing;
 
@@ -827,10 +827,10 @@ on conflict (description_id) do nothing;
 -- Product 160: Sony HT-A5000 Soundbar (Man: 21, Type: 16)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (160, '2024-04-02 18:00:00.000000', '2024-04-02 18:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
-        2.75, false, 5.25, true, false, 13.5, 47.75, 'ELEC-REF-160', 'ELEC-SKU-160', 24, 21,
+        2.75, false, 5.25, true, false, 13.5, 47.75, 'ELEC-REF-160', 24, 21,
         '65f023632bc46470c104b75f', 16) -- Type 16 (TELEVISIONS - *Soundbar*)
 on conflict (product_id) do nothing;
 
@@ -861,10 +861,10 @@ on conflict (description_id) do nothing;
 -- Product 161: LG Tone Free FP9 Earbuds (Man: 22, Type: 15)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (161, '2024-04-02 18:00:00.000000', '2024-04-02 18:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
-        null, false, null, true, false, 0.011, null, 'ELEC-REF-161', 'ELEC-SKU-161', 25, 22,
+        null, false, null, true, false, 0.011, null, 'ELEC-REF-161', 25, 22,
         '65f023632bc46470c104b75f', 15) -- Type 15 (HEADPHONES)
 on conflict (product_id) do nothing;
 
@@ -895,10 +895,10 @@ on conflict (description_id) do nothing;
 -- Product 162: Dell G15 Gaming Laptop (Man: 23, Type: 14)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (162, '2024-04-02 18:00:00.000000', '2024-04-02 18:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
-        1.06, false, 10.74, true, false, 5.95, 14.07, 'ELEC-REF-162', 'ELEC-SKU-162', 26, 23,
+        1.06, false, 10.74, true, false, 5.95, 14.07, 'ELEC-REF-162', 26, 23,
         '65f023632bc46470c104b75f', 14) -- Type 14 (LAPTOPS)
 on conflict (product_id) do nothing;
 
@@ -928,10 +928,10 @@ on conflict (description_id) do nothing;
 -- Product 163: HP Pavilion Plus 14 Laptop (Man: 24, Type: 14)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (163, '2024-04-02 18:00:00.000000', '2024-04-02 18:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
-        0.72, false, 8.92, true, false, 3.09, 12.36, 'ELEC-REF-163', 'ELEC-SKU-163', 27, 24,
+        0.72, false, 8.92, true, false, 3.09, 12.36, 'ELEC-REF-163', 27, 24,
         '65f023632bc46470c104b75f', 14) -- Type 14 (LAPTOPS)
 on conflict (product_id) do nothing;
 
@@ -962,10 +962,10 @@ on conflict (description_id) do nothing;
 -- Product 164: Apple Beats Studio Pro Headphones (Man: 19, Type: 15)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (164, '2024-04-02 18:00:00.000000', '2024-04-02 18:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
-        null, false, null, true, false, 0.57, null, 'ELEC-REF-164', 'ELEC-SKU-164', 28, 19,
+        null, false, null, true, false, 0.57, null, 'ELEC-REF-164', 28, 19,
         '65f023632bc46470c104b75f', 15) -- Type 15 (HEADPHONES)
 on conflict (product_id) do nothing;
 
@@ -996,10 +996,10 @@ on conflict (description_id) do nothing;
 -- Product 165: Samsung Galaxy S23 FE (Man: 20, Type: 13)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (165, '2024-04-02 18:00:00.000000', '2024-04-02 18:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
-        6.22, false, 3.01, true, false, 0.46, 0.32, 'ELEC-REF-165', 'ELEC-SKU-165', 29, 20,
+        6.22, false, 3.01, true, false, 0.46, 0.32, 'ELEC-REF-165', 29, 20,
         '65f023632bc46470c104b75f', 13) -- Type 13 (SMARTPHONES)
 on conflict (product_id) do nothing;
 
@@ -1029,10 +1029,10 @@ on conflict (description_id) do nothing;
 -- Product 166: LG OLED evo C3 55-inch TV (Man: 22, Type: 16)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (166, '2024-04-02 18:00:00.000000', '2024-04-02 18:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
-        27.7, false, 1.8, true, false, 32.6, 48.2, 'ELEC-REF-166', 'ELEC-SKU-166', 30, 22,
+        27.7, false, 1.8, true, false, 32.6, 48.2, 'ELEC-REF-166', 30, 22,
         '65f023632bc46470c104b75f', 16) -- Type 16 (TELEVISIONS)
 on conflict (product_id) do nothing;
 
@@ -1063,10 +1063,10 @@ on conflict (description_id) do nothing;
 -- Product 167: Dell UltraSharp 27 Monitor - U2723QE (Man: 23, Type: 16)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (167, '2024-04-02 18:00:00.000000', '2024-04-02 18:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
-        15.2, false, 7.3, true, false, 9.8, 24.1, 'ELEC-REF-167', 'ELEC-SKU-167', 31, 23,
+        15.2, false, 7.3, true, false, 9.8, 24.1, 'ELEC-REF-167', 31, 23,
         '65f023632bc46470c104b75f', 16) -- Type 16 (TELEVISIONS - *Monitor*)
 on conflict (product_id) do nothing;
 
@@ -1097,10 +1097,10 @@ on conflict (description_id) do nothing;
 -- Product 168: Sony WF-1000XM5 Earbuds (Man: 21, Type: 15)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (168, '2024-04-02 18:00:00.000000', '2024-04-02 18:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
-        null, false, null, true, false, 0.013, null, 'ELEC-REF-168', 'ELEC-SKU-168', 32, 21,
+        null, false, null, true, false, 0.013, null, 'ELEC-REF-168', 32, 21,
         '65f023632bc46470c104b75f', 15) -- Type 15 (HEADPHONES)
 on conflict (product_id) do nothing;
 
@@ -1131,10 +1131,10 @@ on conflict (description_id) do nothing;
 -- Product 169: Apple Watch Series 9 (Man: 19, Type: 13)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (169, '2024-04-02 18:00:00.000000', '2024-04-02 18:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
-        1.77, false, 0.42, true, false, 0.07, 1.5, 'ELEC-REF-169', 'ELEC-SKU-169', 33, 19,
+        1.77, false, 0.42, true, false, 0.07, 1.5, 'ELEC-REF-169', 33, 19,
         '65f023632bc46470c104b75f', 13) -- Type 13 (SMARTPHONES - *Smartwatch*)
 on conflict (product_id) do nothing;
 
@@ -1165,10 +1165,10 @@ on conflict (description_id) do nothing;
 -- Product 170: Samsung Galaxy Tab S9 (Man: 20, Type: 14)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (170, '2024-04-02 18:00:00.000000', '2024-04-02 18:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
-        10.01, false, 0.23, true, false, 1.1, 6.51, 'ELEC-REF-170', 'ELEC-SKU-170', 34, 20,
+        10.01, false, 0.23, true, false, 1.1, 6.51, 'ELEC-REF-170', 34, 20,
         '65f023632bc46470c104b75f', 14) -- Type 14 (LAPTOPS - *Tablet*)
 on conflict (product_id) do nothing;
 
@@ -1199,10 +1199,10 @@ on conflict (description_id) do nothing;
 -- Product 171: HP Chromebook x360 14c (Man: 24, Type: 14)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (171, '2024-04-02 18:00:00.000000', '2024-04-02 18:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
-        0.71, false, 8.08, true, false, 3.35, 12.7, 'ELEC-REF-171', 'ELEC-SKU-171', 35, 24,
+        0.71, false, 8.08, true, false, 3.35, 12.7, 'ELEC-REF-171', 35, 24,
         '65f023632bc46470c104b75f', 14) -- Type 14 (LAPTOPS)
 on conflict (product_id) do nothing;
 
@@ -1233,10 +1233,10 @@ on conflict (description_id) do nothing;
 -- Product 172: Samsung Galaxy Z Fold5 (Man: 20, Type: 13)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (172, '2024-04-02 18:00:00.000000', '2024-04-02 18:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
-        6.1, false, 0.53, true, false, 0.56, 5.11, 'ELEC-REF-172', 'ELEC-SKU-172', 36, 20,
+        6.1, false, 0.53, true, false, 0.56, 5.11, 'ELEC-REF-172', 36, 20,
         '65f023632bc46470c104b75f', 13) -- Type 13 (SMARTPHONES)
 on conflict (product_id) do nothing;
 
@@ -1267,10 +1267,10 @@ on conflict (description_id) do nothing;
 -- Product 173: LG UltraFine 32" 4K Monitor (Man: 22, Type: 16)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (173, '2024-04-02 18:00:00.000000', '2024-04-02 18:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
-        19.4, false, 9.1, true, false, 14.1, 28.1, 'ELEC-REF-173', 'ELEC-SKU-173', 37, 22,
+        19.4, false, 9.1, true, false, 14.1, 28.1, 'ELEC-REF-173', 37, 22,
         '65f023632bc46470c104b75f', 16) -- Type 16 (TELEVISIONS - *Monitor*)
 on conflict (product_id) do nothing;
 
@@ -1301,11 +1301,11 @@ on conflict (description_id) do nothing;
 -- Product 174: Apple iPad Air (M2) (Man: 19, Type: 14)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (174, '2024-04-02 18:00:00.000000', '2024-04-02 18:00:00.000000', true, '2024-05-15 00:00:00.000000',
         true, -- Assuming pre-order for a newer model
-        9.74, false, 0.24, true, false, 1.02, 7.02, 'ELEC-REF-174', 'ELEC-SKU-174', 38, 19,
+        9.74, false, 0.24, true, false, 1.02, 7.02, 'ELEC-REF-174', 38, 19,
         '65f023632bc46470c104b75f', 14) -- Type 14 (LAPTOPS - *Tablet*)
 on conflict (product_id) do nothing;
 
@@ -1336,11 +1336,11 @@ on conflict (description_id) do nothing;
 -- Product 175: Sony Bravia 7 QLED TV (65-inch) (Man: 21, Type: 16)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (175, '2024-04-02 18:00:00.000000', '2024-04-02 18:00:00.000000', true, '2024-05-01 00:00:00.000000',
         true, -- Assuming pre-order
-        32.8, false, 2.3, true, false, 50.3, 57.0, 'ELEC-REF-175', 'ELEC-SKU-175', 39, 21,
+        32.8, false, 2.3, true, false, 50.3, 57.0, 'ELEC-REF-175', 39, 21,
         '65f023632bc46470c104b75f', 16) -- Type 16 (TELEVISIONS)
 on conflict (product_id) do nothing;
 
@@ -1371,10 +1371,10 @@ on conflict (description_id) do nothing;
 -- Product 176: Dell Latitude 7440 Laptop (Man: 23, Type: 14)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (176, '2024-04-02 18:00:00.000000', '2024-04-02 18:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
-        0.72, false, 8.27, true, false, 3.0, 12.32, 'ELEC-REF-176', 'ELEC-SKU-176', 40, 23,
+        0.72, false, 8.27, true, false, 3.0, 12.32, 'ELEC-REF-176', 40, 23,
         '65f023632bc46470c104b75f', 14) -- Type 14 (LAPTOPS)
 on conflict (product_id) do nothing;
 
@@ -1406,10 +1406,10 @@ on conflict (description_id) do nothing;
 -- Product 177: Samsung Galaxy Watch6 (Man: 20, Type: 13)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (177, '2024-04-02 18:00:00.000000', '2024-04-02 18:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
-        1.57, false, 0.35, true, false, 0.06, 1.53, 'ELEC-REF-177', 'ELEC-SKU-177', 41, 20,
+        1.57, false, 0.35, true, false, 0.06, 1.53, 'ELEC-REF-177', 41, 20,
         '65f023632bc46470c104b75f', 13) -- Type 13 (SMARTPHONES - *Smartwatch*)
 on conflict (product_id) do nothing;
 
@@ -1440,10 +1440,10 @@ on conflict (description_id) do nothing;
 -- Product 178: Beats Fit Pro Earbuds (Man: 19, Type: 15)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (178, '2024-04-02 18:00:00.000000', '2024-04-02 18:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
-        null, false, null, true, false, 0.012, null, 'ELEC-REF-178', 'ELEC-SKU-178', 42, 19,
+        null, false, null, true, false, 0.012, null, 'ELEC-REF-178', 42, 19,
         '65f023632bc46470c104b75f', 15) -- Type 15 (HEADPHONES)
 on conflict (product_id) do nothing;
 
@@ -1474,10 +1474,10 @@ on conflict (description_id) do nothing;
 -- Product 179: HP EliteBook 840 G10 Laptop (Man: 24, Type: 14)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (179, '2024-04-02 18:00:00.000000', '2024-04-02 18:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
-        0.76, false, 8.43, true, false, 3.04, 12.42, 'ELEC-REF-179', 'ELEC-SKU-179', 43, 24,
+        0.76, false, 8.43, true, false, 3.04, 12.42, 'ELEC-REF-179', 43, 24,
         '65f023632bc46470c104b75f', 14) -- Type 14 (LAPTOPS)
 on conflict (product_id) do nothing;
 
@@ -1509,10 +1509,10 @@ on conflict (description_id) do nothing;
 -- Product 180: LG S90QY Soundbar (Man: 22, Type: 16)
 INSERT INTO catalog.product (product_id, date_created, date_modified, available, date_available, preorder,
                              product_height, product_free, product_length, product_ship, product_virtual,
-                             product_weight, product_width, ref_sku, sku, sort_order, manufacturer_id,
+                             product_weight, product_width, ref_sku, sort_order, manufacturer_id,
                              store_merchant_id, product_type_id)
 VALUES (180, '2024-04-02 18:00:00.000000', '2024-04-02 18:00:00.000000', true, '2024-04-02 00:00:00.000000', false,
-        2.5, false, 4.7, true, false, 9.9, 39.4, 'ELEC-REF-180', 'ELEC-SKU-180', 44, 22,
+        2.5, false, 4.7, true, false, 9.9, 39.4, 'ELEC-REF-180', 44, 22,
         '65f023632bc46470c104b75f', 16) -- Type 16 (TELEVISIONS - *Soundbar*)
 on conflict (product_id) do nothing;
 

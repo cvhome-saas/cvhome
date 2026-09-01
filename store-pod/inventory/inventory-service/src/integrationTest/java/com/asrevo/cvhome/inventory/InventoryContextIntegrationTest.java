@@ -3,29 +3,24 @@ package com.asrevo.cvhome.inventory;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import com.asrevo.cvhome.inventory.config.CatalogDataMigration;
 import com.asrevo.cvhome.inventory.config.ExternalClientsTestConfiguration;
 import com.asrevo.cvhome.testsupport.annotations.ServiceIntegrationTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
- * The context, the schema, the seed, and the startup migration's two outcomes.
+ * The context, the schema in its final shape, and the seed.
  */
 @ServiceIntegrationTest
 @Import(ExternalClientsTestConfiguration.class)
 class InventoryContextIntegrationTest {
 
-    private static final String COUNT_NULL_SKUS =
-            "select count(*) from inventory.product_availability where sku is null";
-
     @Autowired
     private JdbcTemplate jdbcTemplate;
-
-    @Autowired
-    private CatalogDataMigration migration;
 
     @Test
     void initializesOnlyInventorySchema() {
@@ -52,20 +47,19 @@ class InventoryContextIntegrationTest {
     }
 
     @Test
-    void migrationIsIdempotentAndReportsRowsWithoutASku() throws Exception {
-        assertThat(jdbcTemplate.queryForObject(COUNT_NULL_SKUS, Integer.class)).isZero();
-        migration.run(null);
-        assertThat(jdbcTemplate.queryForObject(COUNT_NULL_SKUS, Integer.class)).isZero();
-
-        jdbcTemplate.update("""
+    void skuIsMandatoryAndUniquePerStore() {
+        assertThatThrownBy(() -> jdbcTemplate.update("""
                 insert into inventory.product_availability (product_avail_id, store_merchant_id, quantity, sku)
                 values (999001, '65f023632bc46470c104b76f', 1, null)
-                """);
-        try {
-            migration.run(null);
-            assertThat(jdbcTemplate.queryForObject(COUNT_NULL_SKUS, Integer.class)).isOne();
-        } finally {
-            jdbcTemplate.update("delete from inventory.product_availability where product_avail_id = 999001");
-        }
+                """)).isInstanceOf(DataIntegrityViolationException.class);
+
+        String existingSku = jdbcTemplate.queryForObject("""
+                select sku from inventory.product_availability
+                 where store_merchant_id = '65f023632bc46470c104b76f' order by product_avail_id limit 1
+                """, String.class);
+        assertThatThrownBy(() -> jdbcTemplate.update("""
+                insert into inventory.product_availability (product_avail_id, store_merchant_id, quantity, sku)
+                values (999002, '65f023632bc46470c104b76f', 1, ?)
+                """, existingSku)).isInstanceOf(DataIntegrityViolationException.class);
     }
 }

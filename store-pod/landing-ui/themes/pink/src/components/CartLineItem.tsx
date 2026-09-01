@@ -4,7 +4,7 @@ import {useTranslations} from 'next-intl';
 import {XIcon} from 'lucide-react';
 import {Link} from '@store-front/i18n/navigation';
 import type {Product} from '@store-front/types';
-import {primaryImage, productHref} from '@store-front/services/product-presenter';
+import {primaryImage, productHref, variantSelectionLabel} from '@store-front/services/product-presenter';
 import {QuantityStepper} from '@store-front/ui/quantity-stepper';
 
 /** One line of the order slip: die-cut, name, quantity, and the line total printed on its flag. */
@@ -23,6 +23,8 @@ export function CartLineItem({product, onQuantity, onRemove, busy}: {
                     <h3 className="line-clamp-2 text-sm font-bold leading-snug">
                         <Link prefetch={false} href={productHref(product)} className="hover:underline">{product.description?.name}</Link>
                     </h3>
+                    {/* The combination bought — "Color: Red / Size: L" — from the placement-time selection. */}
+                    {variantSelectionLabel(product) && <p className="text-xs text-muted-foreground" dir="auto">{variantSelectionLabel(product)}</p>}
                     <button type="button" onClick={() => onRemove(product.sku)} disabled={busy}
                             aria-label={t('REMOVE')}
                             className="hair relative -mt-0.5 inline-flex size-6 shrink-0 items-center justify-center border transition-colors duration-(--motion-fast) before:absolute before:-inset-2.5 before:content-[''] hover:bg-primary hover:text-primary-foreground disabled:opacity-40">

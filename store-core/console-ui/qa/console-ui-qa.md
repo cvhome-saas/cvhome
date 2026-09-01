@@ -932,6 +932,89 @@ Every row was a real defect, and several were invisible from the screen.
 
 ---
 
+## VAR — the variant model in the console
+
+Added by the variant rework (PR #306): a store-wide **Options tab** in Catalogue, a **Variants step** in the
+product form, variant-aware product rows and order lines. The model is
+[catalog](../../../store-pod/catalog/catalog-service/qa/catalog-qa.md#var--the-uniform-variant-model).
+
+### CON-01 — The Options tab · high · [verified]
+
+- **Expect** — a fifth Catalogue tab listing the store vocabulary with each option's values summarised; the
+  editor writes the whole document (values carrying their id keep their row, and therefore the store-wide value
+  id every variant references); per-language names park across a locale switch.
+- **Result** — confirmed. Deleting an in-use option surfaces the 409 as the named toast ("This option is still
+  used by a product or one of its variants…") and the option survives.
+
+### CON-02 — The Variants step · high · [verified]
+
+- **Expect** — a fifth wizard step, locked until the product is saved; axes picked from the vocabulary generate
+  the cartesian matrix; each row carries sku, price, quantity, available and a default toggle, with exactly one
+  default; the step saves itself (atomic catalog PUT, then the inventory bulk upsert and retired-sku cleanup).
+- **Result** — matrix rows carry the right per-row price and stock merged from inventory, exactly one default,
+  and every control is labelled with the combination it belongs to ("Price for Red / M").
+- **The save round-trip, both directions, driven from the UI on the seeded simple product 3:**
+  - *Adding an axis* — picking Colour generated the two combinations, **seeding row 1 from the product's own
+    sku, price and stock** (SKU-AD-CL-TPT03 / 320 / 35) and suggesting `…-BLUE` for the second. The readiness
+    item swapped to "Every variant has a price", went unmet, dropped the product to 86% and blocked publish
+    until the second row was priced — then returned to 100% the moment it was.
+  - *Saving* — "Variants saved." Catalog got both variants with the right signatures, exactly one default and
+    the assignment row; inventory got both skus priced (320/35 and 345/12). The storefront PDP picked it up
+    with no further action: `variantCount: 2`, Colour chips, Red and Blue.
+  - *Removing the axis* — "Remove variants — sell as one SKU again" restored a single `DEFAULT` variant
+    **keeping the original sku**, cleared the assignment, and **deleted only the retired sku's inventory row
+    while the surviving default kept its price and stock**. That is the specific hazard the post-write diff
+    exists for (diffing against the request instead would have deleted the restored default's row), confirmed
+    live rather than reasoned about.
+- **Fixed during QA** — the SKU column was 11rem, which clipped every row to `SKU-ZR-CL-DRS02`; the suffix is
+  the only thing distinguishing rows, so the column was showing nothing useful. Now 15rem.
+
+### CON-03 — Publish gating · [verified]
+
+- **Expect** — with options assigned, the readiness checklist swaps its "price" item for **"Every variant has a
+  price"**, and publish stays blocked until every combination sku is priced.
+- **Result** — confirmed; the pricing step defers to a pointer at the matrix so one number has one home.
+
+### CON-04 — The products list · high · [verified]
+
+- **Expect** — one row per product: an "N variants" badge, the **default** variant's price, and the product's
+  **total** stock across its variants. Inline edit is disabled on a variant row (it writes one sku and the row
+  stands for several) and routes to the form instead.
+- **Result** — Nike reads 37 (25 + 12), the Zara dress 46 (38 + 8 + 0), single-variant rows unchanged.
+- **Fixed during QA** — the row previously showed the **default variant's** quantity as the product's, because
+  the listing payload carries only the default sku. Inventory gained a product-addressed bulk read
+  (`GET /private/inventory/by-products`) and the row totals from it.
+
+### CON-05 — Arabic / RTL · [verified]
+
+- **Expect** — the Variants step mirrors correctly, with SKU and figures staying left-to-right.
+- **Result** — confirmed, including the matrix column order and the axis chips.
+
+### CON-06 — Responsive · [verified]
+
+- **Expect** — the matrix is wide, so it must scroll **inside its own container** and never make the page
+  scroll sideways; the axis chips, the add-combination row and the footer all wrap.
+- **Result** — at a 360px panel the page does not scroll sideways, the scroller fits, the table overflows into
+  its own scroll and no input is clipped. The Options tab uses the shared `.split`, which stacks below 1100px.
+
+**Console-ui — four ways to lose data in one click**
+
+- *Save draft wiped an unsaved matrix.* `variantAxes`/`variantRows` were `linkedSignal`s off the snapshot, so
+  every assignment to `loaded` reset them — and the same save passed `writeInventory = !hasOptions()`, so the
+  Pricing-step price went too. The matrix is now the operator's, seeded once per product and re-seeded only
+  when a variants save reloads the truth.
+- *"Retry prices and stock" wrote the server's stale numbers back* and passed no retired skus, orphaning
+  inventory rows that the products list then counts forever. The failure branch no longer reloads, and the
+  retry replays the payload the failed leg reported (`VariantSaveOutcome.pendingInventory`).
+- *Adding an axis nulled every price and id* — rows were kept only on an exact signature match, which only
+  survives a reorder — and the save then deleted the old inventory and wrote nothing back, because unpriced
+  rows are skipped. Rows now carry forward onto the wider or narrower combination.
+- *A failed variant read looked like "no variants"*, so the step invited a whole-set replace over combinations
+  it had never seen. The snapshot carries `variantsUnavailable` / `vocabularyUnavailable`, the step says so
+  with a retry, and `saveVariants` refuses.
+
+---
+
 ## 99 — Known gaps
 
 **No console screens for the store lifecycle.** Store suspend / archive / delete, org profile, members and
@@ -993,3 +1076,5 @@ in console-ui `lessons.md`.
 Raise anything unexpected against the console PR. Attach the browser console, the failing request from the
 network panel, and `.lcl/<stack>/logs/console-ui.log` — and say which theme and which language were active, as
 a bug that only appears in one of the four is the interesting kind.
+
+---

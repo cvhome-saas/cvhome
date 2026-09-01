@@ -31,7 +31,7 @@ export const useProductListing = (storeContext: StoreContext, category: Category
     const [page, setPage] = useState<ProductListingPage | undefined>(initial);
     const [loading, setLoading] = useState<boolean>(!initial);
     const [error, setError] = useState<ApiError | null>(null);
-    const [facets, setFacets] = useState<ListingFacets>(options.facets ?? {manufacturers: [], variants: []});
+    const [facets, setFacets] = useState<ListingFacets>(options.facets ?? {manufacturers: [], options: []});
     const requestId = useRef(0);
     const skipFirstFetch = useRef(!!initial);
 

@@ -64,6 +64,14 @@ class InventoryApiIntegrationTest {
 
     private static final String BY_PRODUCT = "by-product";
 
+    private static final String BY_PRODUCTS = "by-products";
+
+    private static final String PRODUCT_IDS = "productIds=%s";
+
+    private static final String BULK = "bulk";
+
+    private static final String AVAILABILITY_QUERY = "/api/v1/availability/query";
+
     private static final String NULL = "null";
 
     private static final String BODY = """
@@ -181,6 +189,49 @@ class InventoryApiIntegrationTest {
     }
 
     @Test
+    void productAddressedReadAnswersEverySkuOfTheProductsInThatStoreOnly() {
+        /*
+         * The console list's stock column. It knows each product's DEFAULT sku only, so a sku-keyed read
+         * reported that one row's quantity as the product's and understated every variant product; this
+         * answers all of a product's rows so the row can total them.
+         */
+        long productId = 900010L;
+        String defaultSku = ApiClient.slug("SKU-TOTAL-DEFAULT");
+        String variantSku = ApiClient.slug("SKU-TOTAL-VARIANT");
+        String otherAdmin = tokens.staff(Tokens.ROLE_STORE_ADMIN, STORE_B);
+        String otherSku = ApiClient.slug("SKU-TOTAL-OTHER");
+        ApiClient.expect(upsert(STORE_A, admin, defaultSku, body(productId, 4, true, NULL, NULL, NULL)),
+                HttpStatus.OK);
+        ApiClient.expect(upsert(STORE_A, admin, variantSku, body(productId, 6, true, NULL, NULL, NULL)),
+                HttpStatus.OK);
+        // Same product id in the other store — a tenant must never see it in this answer.
+        ApiClient.expect(upsert(STORE_B, otherAdmin, otherSku, body(productId, 99, true, NULL, NULL, NULL)),
+                HttpStatus.OK);
+
+        var response = api.get(ApiClient.scoped(
+                ApiClient.query(ApiClient.path(PRIVATE, BY_PRODUCTS), PRODUCT_IDS.formatted(productId)),
+                STORE_A), admin);
+        ApiClient.expect(response, HttpStatus.OK);
+        JsonNode rows = ApiClient.json(response);
+
+        assertThat(rows).hasSize(2);
+        assertThat(rows).extracting(row -> row.get(SKU_FIELD).asString())
+                .containsExactlyInAnyOrder(defaultSku, variantSku);
+        // What the console sums — the product holds ten, not the four its default sku shows.
+        assertThat(rows).extracting(row -> row.get(QUANTITY).asInt()).containsExactlyInAnyOrder(4, 6);
+    }
+
+    @Test
+    void productAddressedReadIsRefusedWithoutAStaffSessionForThatStore() {
+        String otherAdmin = tokens.staff(Tokens.ROLE_STORE_ADMIN, STORE_B);
+        String path = ApiClient.scoped(
+                ApiClient.query(ApiClient.path(PRIVATE, BY_PRODUCTS), PRODUCT_IDS.formatted(1)), STORE_A);
+
+        ApiClient.expect(api.get(path, otherAdmin), HttpStatus.FORBIDDEN);
+        ApiClient.expect(api.get(path, null), HttpStatus.UNAUTHORIZED);
+    }
+
+    @Test
     void anotherStoresAdminCannotWriteIntoThisStore() {
         String other = tokens.staff(Tokens.ROLE_STORE_ADMIN, STORE_B);
 
@@ -199,5 +250,68 @@ class InventoryApiIntegrationTest {
 
         ApiClient.expect(upsert(STORE_A, moderator, SEEDED_SKU, body), HttpStatus.FORBIDDEN);
         ApiClient.expect(upsert(STORE_A, null, SEEDED_SKU, body), HttpStatus.UNAUTHORIZED);
+    }
+
+    @Test
+    void bulkUpsertCreatesAndEditsInOneCallAnsweringInRequestOrder() {
+        String skuNew = ApiClient.slug("SKU-BULK-NEW");
+        String skuEdit = ApiClient.slug("SKU-BULK-EDIT");
+        ApiClient.expect(upsert(STORE_A, admin, skuEdit, body(900003L, 1, true, NULL, NULL, NULL)), HttpStatus.OK);
+
+        String bulk = """
+                {"entries":[{"sku":"%s","inventory":%s},
+                 {"sku":"%s","inventory":%s}]}"""
+                .formatted(skuEdit, body(900003L, 9, true, NULL, NULL, NULL),
+                        skuNew, body(900003L, 2, true, NULL, NULL, NULL));
+        var response = api.send(HttpMethod.PUT, ApiClient.scoped(ApiClient.path(PRIVATE, BULK), STORE_A),
+                admin, bulk);
+        ApiClient.expect(response, HttpStatus.OK);
+        JsonNode result = ApiClient.json(response);
+        assertThat(result).hasSize(2);
+        assertThat(result.get(0).get(SKU_FIELD).asString()).isEqualTo(skuEdit);
+        assertThat(result.get(0).get(QUANTITY).asInt()).isEqualTo(9);
+        assertThat(result.get(1).get(SKU_FIELD).asString()).isEqualTo(skuNew);
+
+        var forbidden = api.send(HttpMethod.PUT, ApiClient.scoped(ApiClient.path(PRIVATE, BULK), STORE_A),
+                tokens.staff(Tokens.ROLE_STORE_ADMIN, STORE_B), bulk);
+        ApiClient.expect(forbidden, HttpStatus.FORBIDDEN);
+        var anonymous = api.send(HttpMethod.PUT, ApiClient.scoped(ApiClient.path(PRIVATE, BULK), STORE_A),
+                null, bulk);
+        ApiClient.expect(anonymous, HttpStatus.UNAUTHORIZED);
+        var empty = api.send(HttpMethod.PUT, ApiClient.scoped(ApiClient.path(PRIVATE, BULK), STORE_A),
+                admin, "{\"entries\":[]}");
+        ApiClient.expect(empty, HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
+    void postAvailabilityQueryAnswersLikeTheGet() {
+        var response = api.send(HttpMethod.POST, ApiClient.scoped(AVAILABILITY_QUERY, STORE_A), null,
+                "{\"skus\":[\"%s\",\"NO-SUCH-SKU\"]}".formatted(SEEDED_SKU));
+        ApiClient.expect(response, HttpStatus.OK);
+        JsonNode result = ApiClient.json(response);
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).get(SKU_FIELD).asString()).isEqualTo(SEEDED_SKU);
+        assertThat(result.get(0).get(QUANTITY).asInt()).isEqualTo(25);
+
+        var otherStore = api.send(HttpMethod.POST, ApiClient.scoped(AVAILABILITY_QUERY, STORE_B), null,
+                "{\"skus\":[\"%s\"]}".formatted(SEEDED_SKU));
+        ApiClient.expect(otherStore, HttpStatus.OK);
+        assertThat(ApiClient.json(otherStore)).isEmpty();
+    }
+
+    @Test
+    void deleteBySkuRemovesOnlyThatStoresRow() {
+        String sku = ApiClient.slug("SKU-RETIRE");
+        ApiClient.expect(upsert(STORE_A, admin, sku, body(900004L, 1, true, NULL, NULL, NULL)), HttpStatus.OK);
+
+        var forbidden = api.send(HttpMethod.DELETE, ApiClient.scoped(ApiClient.path(PRIVATE, sku), STORE_A),
+                tokens.staff(Tokens.ROLE_STORE_ADMIN, STORE_B), null);
+        ApiClient.expect(forbidden, HttpStatus.FORBIDDEN);
+        assertThat(availability(STORE_A, sku)).hasSize(1);
+
+        var deleted = api.send(HttpMethod.DELETE, ApiClient.scoped(ApiClient.path(PRIVATE, sku), STORE_A),
+                admin, null);
+        ApiClient.expect(deleted, HttpStatus.OK);
+        assertThat(availability(STORE_A, sku)).isEmpty();
     }
 }

@@ -5,13 +5,13 @@ create table if not exists inventory.sm_sequencer
     seq_count bigint
 );
 
--- Moved from the catalog schema as-is, so migrate-from-catalog.sql can copy rows column for column. The former
--- foreign keys to catalog.product / catalog.product_variant are gone; sku is the cross-service key.
--- The service maps only: product_avail_id, audit, store_merchant_id, sku, product_id, quantity, available,
--- quantity_ord_min, quantity_ord_max. Everything else is dormant until variants return.
+-- One row per (store, sku): the sku is the cross-service key — the catalog owns the product/variant it belongs
+-- to, there is no foreign key. product_id is informational (lets a catalog product delete find its rows).
+-- The dormant height/length/weight/width columns are kept for per-sku shipping specs later; owner, date_available,
+-- free_shipping and status are legacy and unmapped.
 create table if not exists inventory.product_availability
 (
-    product_avail_id  bigint  not null primary key,
+    product_avail_id  bigint       not null primary key,
     date_created      timestamp(6),
     date_modified     timestamp(6),
     updt_id           varchar(60),
@@ -23,28 +23,19 @@ create table if not exists inventory.product_availability
     owner             varchar(255),
     date_available    date,
     free_shipping     boolean,
-    quantity          integer not null,
+    quantity          integer      not null,
     quantity_ord_max  integer,
     quantity_ord_min  integer,
     status            boolean,
-    region            varchar(255),
-    region_variant    varchar(255),
-    sku               varchar(255),
+    sku               varchar(255) not null,
     store_merchant_id varchar(50),
     product_id        bigint,
-    product_variant   bigint,
-    constraint UK3cq0pcvlrorbgahh1r1o6fao5 unique (
-                                                   store_merchant_id, product_id, product_variant,
-                                                   region_variant
-        )
+    constraint uk_prd_avail_store_sku unique (store_merchant_id, sku)
 );
 create index if not exists prd_avail_store_prd_idx on inventory.product_availability (product_id, store_merchant_id);
-create index if not exists prd_avail_store_sku_idx on inventory.product_availability (store_merchant_id, sku);
 
--- store_merchant_id is new here: the catalog schema inherited tenancy through the availability FK, a standalone
--- price row carries it directly (backfilled by migrate-from-catalog.sql). The service maps: product_price_id,
--- store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount and the three
--- special_* columns.
+-- The price rows of one availability row. The service maps: product_price_id, store_merchant_id, product_avail_id,
+-- product_price_code, default_price, product_price_amount and the three special_* columns.
 create table if not exists inventory.product_price
 (
     product_price_id               bigint       not null primary key,

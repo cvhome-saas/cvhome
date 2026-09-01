@@ -320,12 +320,27 @@ create table if not exists checkout.order_product
 (
     order_product_id bigint         not null primary key,
     onetime_charge   numeric(38, 2) not null,
-    product_name     varchar(64)    not null,
+    product_name     varchar(255)   not null,
     product_quantity integer,
     product_sku      varchar(255),
     order_id         bigint         not null
         constraint fkl5mnj9n0di7k1v90yxnthkc73 references checkout.orders
 );
+-- The sold variant's option/value labels, copied at placement so the order renders "Color: Red / Size: L"
+-- however the catalog is edited later. Empty for a default-variant line.
+create table if not exists checkout.order_product_option
+(
+    order_product_option_id bigint       not null primary key,
+    option_code             varchar(100) not null,
+    option_name             varchar(120) not null,
+    value_code              varchar(100) not null,
+    value_name              varchar(120) not null,
+    sort_order              integer,
+    order_product_id        bigint       not null
+        constraint fk_order_product_option_line references checkout.order_product
+);
+create index if not exists order_product_option_line_idx
+    on checkout.order_product_option (order_product_id);
 create table if not exists checkout.order_account_product
 (
     order_account_product_id       bigint  not null primary key,
@@ -341,19 +356,6 @@ create table if not exists checkout.order_account_product
         constraint fk238g8uilgxlh5fa6ieub3ods references checkout.order_account,
     order_product_id               bigint  not null
         constraint fkl3rvhrb6nq9sdb1nai9cr9klm references checkout.order_product
-);
-create table if not exists checkout.order_product_attribute
-(
-    order_product_attribute_id bigint         not null primary key,
-    product_attribute_is_free  boolean        not null,
-    product_attribute_name     varchar(255),
-    product_attribute_price    numeric(15, 4) not null,
-    product_attribute_val_name varchar(255),
-    product_attribute_weight   numeric(15, 4),
-    product_option_id          bigint         not null,
-    product_option_value_id    bigint         not null,
-    order_product_id           bigint         not null
-        constraint fk9w04pur2suf544spmowxfr3xg references checkout.order_product
 );
 create table if not exists checkout.order_product_download
 (
@@ -463,17 +465,6 @@ create table if not exists checkout.shopping_cart_item
     updt_id          varchar(60),
     quantity         integer,
     sku              varchar(255) not null,
-    product_variant  bigint,
     shp_cart_id      bigint       not null
         constraint fk10kmhpldycqc7cvn24tesj8yx references checkout.shopping_cart
-);
-create table if not exists checkout.shopping_cart_attr_item
-(
-    shp_cart_attr_item_id bigint not null primary key,
-    date_created          timestamp(6),
-    date_modified         timestamp(6),
-    updt_id               varchar(60),
-    product_attr_id       bigint not null,
-    shp_cart_item_id      bigint not null
-        constraint fkt3iw5nxx7h55j5vta1tyrvgv3 references checkout.shopping_cart_item
 );

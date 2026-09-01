@@ -12,11 +12,12 @@ import {isCatalogueTab} from '@models/taxonomy';
 import {BrandTab} from './components/brand-tab/brand-tab';
 import {CategoryTab} from './components/category-tab/category-tab';
 import {GroupTab} from './components/group-tab/group-tab';
+import {OptionsTab} from './components/options-tab/options-tab';
 import {TypeTab} from './components/type-tab/type-tab';
 import {CatalogueFacade} from './facades/catalogue.facade';
 
 /**
- * The catalogue: categories, product types, brands and product groups.
+ * The catalogue: categories, product types, brands, store options and product groups.
  *
  * Renders into `ConsoleShell`, so this is only its own content — a page header, a tab strip and
  * whichever tab is open.
@@ -41,6 +42,7 @@ import {CatalogueFacade} from './facades/catalogue.facade';
     ConfirmDialog,
     GroupTab,
     Icon,
+    OptionsTab,
     PageHeader,
     TabSwitcher,
     TranslocoDirective,

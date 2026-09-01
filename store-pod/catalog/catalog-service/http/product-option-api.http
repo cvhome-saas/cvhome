@@ -1,0 +1,74 @@
+# ProductOptionApi — com.asrevo.cvhome.catalog.api.v1
+#
+# The store's option vocabulary (Color, Size, ...). Console only; products assign options per product in the
+# variants API. Addressed through the gateway. Env vars from the repo-root http-client.env.json; the session id
+# from http-client.private.env.json (gitignored).
+#
+# Requires a running stack: lcl start -d
+
+### create an option with its values (whole document; value ids keep rows on later writes)
+POST {{SELLER_UI_URL}}/spg/catalog/api/v1/private/product/option?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{
+  "code": "color",
+  "sortOrder": 0,
+  "descriptions": [
+    { "language": "en", "name": "Color" },
+    { "language": "fr", "name": "Couleur" }
+  ],
+  "values": [
+    { "code": "red", "sortOrder": 0, "descriptions": [ { "language": "en", "name": "Red" }, { "language": "fr", "name": "Rouge" } ] },
+    { "code": "blue", "sortOrder": 1, "descriptions": [ { "language": "en", "name": "Blue" }, { "language": "fr", "name": "Bleu" } ] }
+  ]
+}
+
+> {%
+    client.test("created", function () {
+        client.assert(response.status === 201, "status " + response.status);
+        client.global.set("OPTION_ID", response.body.id);
+    });
+%}
+
+### list the store's options (paged, all languages for the console editor)
+GET {{SELLER_UI_URL}}/spg/catalog/api/v1/private/product/options?store={{STORE_ID}}&lang={{LANG}}&page=0&size=20
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+### read one option
+GET {{SELLER_UI_URL}}/spg/catalog/api/v1/private/product/option/{{OPTION_ID}}?store={{STORE_ID}}&lang=_all
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+### code uniqueness probe (for the console's async validator)
+GET {{SELLER_UI_URL}}/spg/catalog/api/v1/private/product/option/unique?code=color&store={{STORE_ID}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+### edit — values list replaces the whole value set; entries with ids keep their rows
+PUT {{SELLER_UI_URL}}/spg/catalog/api/v1/private/product/option/{{OPTION_ID}}?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{
+  "code": "color",
+  "sortOrder": 0,
+  "descriptions": [ { "language": "en", "name": "Colour" } ],
+  "values": [
+    { "code": "red", "sortOrder": 0, "descriptions": [ { "language": "en", "name": "Red" } ] },
+    { "code": "green", "sortOrder": 1, "descriptions": [ { "language": "en", "name": "Green" } ] }
+  ]
+}
+
+### duplicate option code — 409
+POST {{SELLER_UI_URL}}/spg/catalog/api/v1/private/product/option?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{ "code": "color", "descriptions": [ { "language": "en", "name": "Color" } ], "values": [] }
+
+### tenant isolation — another store's session cannot read this store's option (403)
+GET {{SELLER_UI_URL}}/spg/catalog/api/v1/private/product/option/{{OPTION_ID}}?store={{STORE_ID_2}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+### delete (409 once products assign or variants reference it)
+DELETE {{SELLER_UI_URL}}/spg/catalog/api/v1/private/product/option/{{OPTION_ID}}?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}

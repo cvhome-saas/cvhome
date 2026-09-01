@@ -1,0 +1,10 @@
+# curl '{{LANDING_UI_URL}}/inventory/api/v1/availability?skus=SKU-YSL-MAKE-TEIPEN46&store=65f023632bc46470c104b76f&lang=en'
+GET {{LANDING_UI_URL}}/inventory/api/v1/availability?skus=SKU-YSL-MAKE-TEIPEN46&store=65f023632bc46470c104b76f&lang=en
+
+###
+
+# curl -X POST '{{LANDING_UI_URL}}/inventory/api/v1/availability/query?store=65f023632bc46470c104b76f&lang=en' -d '{"skus":["SKU-YSL-MAKE-TEIPEN46"]}'
+POST {{LANDING_UI_URL}}/inventory/api/v1/availability/query?store=65f023632bc46470c104b76f&lang=en
+Content-Type: application/json
+
+{ "skus": ["SKU-YSL-MAKE-TEIPEN46"] }

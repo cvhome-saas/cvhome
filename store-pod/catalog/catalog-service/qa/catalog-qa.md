@@ -5,6 +5,14 @@ tree, brands, product types, groups and the image gallery. It owns no prices and
 [inventory](../../../inventory/inventory-service/qa/inventory-qa.md), and the two are composed for the shopper
 by [checkout](../../../checkout/checkout-service/qa/checkout-qa.md).
 
+> **Superseded in part (2026-08-31, the variant rework).** The ARC cases below record the catalog/inventory
+> split, at which point variants and product options were removed and parked. They are **back** — a store-wide
+> option vocabulary assigned per product, and a uniform variant model in which every product owns at least one
+> `catalog.product_variant` and sku/price/stock live at the variant level. The ARC entries are marked where that
+> changed them; everything else still holds, because the rework kept the same wire contract again.
+> `store-pod/catalog-deprecated` is deleted — the Shopizer-era model it parked was a reference for what not to
+> repeat, and the rework did not reuse it.
+
 - **Scope** — `/api/v2/products`, `/api/v2/product/**`, category, manufacturer, product-type, product-group and
   product-image APIs; the console's Catalogue module as a client; the billing write gate on catalog writes
 - **Runs on** — `lcl start -d --stack <name>`; read the live port from `lcl urls`. Address it through the
@@ -757,26 +765,31 @@ CAT-08, CAT-16, GRP-04, IMG-04, INV-04, LST-08. Run them as a set.
 
 ## ARC — What the rewrite left behind
 
-
-
-### ARC-01 — The live schema creates no attribute tables · high · [verified]
+### ARC-01 — The live schema creates no attribute tables · high · [superseded by the variant rework]
 
 - **Steps** — on a fresh database, `\dt catalog.*`.
-- **Expect** — 14 tables: sequencer, category(+description), manufacturer(+description), product_type
-  (+description), product, product_category, product_description, product_image, product_group(+description),
-  product_group_product. No `product_option*`, `product_attribute`, `product_opt_set*`, `product_digital`,
-  `product_image_description`. On an **existing** database those tables still exist (`create if not exists`
-  never drops) — that is expected; `catalog-deprecated/deprecated-ddl.sql` documents them.
+- **Was** — 14 tables, and no `product_option*` among them.
+- **Now** — the rework adds seven: `product_option`, `product_option_description`, `product_option_value`,
+  `product_option_value_description`, `product_option_assignment`, `product_variant`,
+  `product_variant_option_value` — and **drops `catalog.product.sku`**, because the sku moved to the variant.
+  Still absent, and still correct to assert: `product_attribute`, `product_opt_set*`, `product_digital`,
+  `product_image_description`. The `product_option*` tables here are the NEW vocabulary, unrelated in shape to
+  the Shopizer ones this entry was written about.
 
 ### ARC-03 — Nothing in the repo calls a removed type or endpoint · [verified]
 
 - **Steps** — `./gradlew build -x test -x check`; `npm run build` in console-ui and landing-ui.
 - **Expect** — clean. checkout compiles against the new `ReadableMinimalProduct` and `SkuInventory`.
 
-### ARC-04 — `catalog-deprecated` is not built · [verified]
+### ARC-04 — `catalog-deprecated` is deleted · [superseded by the variant rework]
 
-- **Expect** — no `settings.gradle` entry; the directory compiles nothing. Its README describes the
-  reintroduction path and the error codes that were pruned with it.
+- **Was** — the directory existed, unregistered from `settings.gradle`, parking the Shopizer-era variant code
+  against the day variants returned.
+- **Now** — variants returned as a different model, so the parked code had no reader and is removed. Nothing
+  in `settings.gradle` referenced it, so the build is unchanged.
+- **Watch instead** — `extra/scripts/drop-catalog-inventory-tables.sql` no longer drops
+  `catalog.product_variant`: the rework reused that name for a live table, and dropping it would take every
+  product's sku with it. The script's remaining drops are the genuinely dead Shopizer tables.
 
 ---
 
@@ -880,7 +893,134 @@ Every row was a real defect found while building or verifying the catalog rewrit
 
 ---
 
+## VAR — the uniform variant model
+
+Added by the variant rework (PR #306). `catalog.product` is a pure definition — its `sku` column is gone.
+**Every product owns at least one `catalog.product_variant`**, and sku, price and stock live at the variant
+level. Option vocabulary (`product_option` / `product_option_value`) is store-wide, so value ids are shared and
+id-based faceting works. Axes and combinations are written **atomically together**
+(`PUT /api/v2/private/product/{id}/variants`), so they can never desync.
+
+The console side of this is
+[console-ui](../../../../store-core/console-ui/qa/console-ui-qa.md); the shopper side is
+[landing-ui](../../../landing-ui/qa/landing-ui-qa.md); the order snapshot is
+[checkout](../../../checkout/checkout-service/qa/checkout-qa.md).
+
+### SCH-01 — A fresh database initializes in the final shape · high · [verified]
+
+- **Steps** — drop the stack's postgres container, `lcl start -d`, then `\d catalog.*`.
+- **Expect** — `product_variant`, `product_variant_option_value`, `product_option`, `product_option_value`,
+  `product_option_assignment` and the two description tables exist; **`catalog.product` has no `sku` column**;
+  `product_image.product_variant_id` exists and is nullable (dormant, for per-variant images later).
+- **Result** — all present, `product.sku` absent. There are no `ALTER`-style migration blocks anywhere in this
+  change: `schema.sql` is edited to its final shape and databases are recreated.
+
+### SCH-02 — The constraints that make the model safe exist · high · [verified]
+
+- **Expect** — `uk_product_variant_sku (store_merchant_id, sku)`, `uk_product_variant_signature
+  (product_id, option_signature)`, and the partial unique index `uk_product_variant_default on
+  (product_id) where default_variant` — that last one is what makes "exactly one default per product" a
+  database fact rather than a convention.
+- **Result** — all three present.
+
+### SCH-04 — The old drop script no longer names a live table · high · [verified]
+
+- **Why it matters** — `extra/scripts/drop-catalog-inventory-tables.sql` is documented to be run
+  post-verification, and it used to `drop table catalog.product_variant`. The rework **reused that name** for
+  the live table holding every product's sku, so running the script as written would have destroyed the whole
+  catalogue's variants.
+- **Result** — that drop is removed and the reason is written into the script beside the remaining ones, which
+  are the genuinely dead Shopizer tables (`product_var_image*`, `product_variant_group`, `product_variation`).
+
+### MOD-01 — Every product owns at least one variant · high · [verified]
+
+- **Steps** — after seeding, group `catalog.product_variant` by product.
+- **Expect** — no product without a variant; products with no options carry exactly one row with
+  `option_signature = 'DEFAULT'` and the sku the merchant typed.
+- **Result** — holds across all four demo stores.
+
+### MOD-04 — The demo stores are mostly multi-variant · high · [verified]
+
+The seeds started with two or three showcase products per store, which measured nothing: a listing where 43
+of 45 products carry one sku exercises none of the variant paths at page scale. The stores are now bulk data
+as well as demo data.
+
+- **Steps** — `extra/scripts/generate-demo-variants.py` regenerates the two seed 18 files per store; drop the
+  `catalog` and `inventory` schemas, restart both services, then count.
+- **Expect** — at least 75% of every store's products sell by more than one variant, with a spread of matrix
+  shapes and a deliberate optionless remainder.
+- **Result** — **36 of 45 (80%) per store**, 590 variants and 590 inventory rows in total (was 207), up to 6
+  per product, 34 option values across the four vocabularies. Nine products per store stay optionless as the
+  control case, including the two the tests pin: product 3 (`ProductVariantApiIntegrationTest` turns it
+  multi-variant and back) and product 4 (`ProductApiIntegrationTest`'s no-selection cart line). The curated
+  showcase products — 1, 2, 46–48, 91–93, 136–138 — are untouched, so SF-01's deliberately-missing red/L
+  combination still exists.
+- **Integrity, checked in SQL** — 0 variants without an inventory row · 0 `option_signature` values
+  disagreeing with the variant's own option-value rows · 0 variants whose option count differs from their
+  product's axis count · 0 products without a default variant · 0 duplicate signatures within a product.
+
+### MOD-02 — A combination sku resolves to one product in search · [verified]
+
+- **Steps** — query the search index for `SKU-ZR-CL-DRS02-BL-L`.
+- **Expect** — one hit per language for the **parent** product, never one row per variant. The
+  `product_search_source` view folds `string_agg(variant skus)` into weight B, replacing the old `p.sku`.
+- **Result** — product 2 only, in both `en` and `ar`.
+
+### MOD-03 — The typed refusals · [tests]
+
+- Covered by `ProductVariantApiIntegrationTest`: a variant missing an axis → **400**
+  (`PRODUCT_VARIANT.OPTIONS_INVALID`), a duplicate combination → **409**, a sku another product owns → **409**,
+  an unknown option code → **404**. Note the limit guard is **400**, not the 422 the plan predicted — its
+  category is `VALIDATION`.
+- Option deletes are refused **409** (`PRODUCT_OPTION.IN_USE`) while a product assigns the option or a variant
+  uses one of its values.
+
+### PERF-01 — The listing is flat in the number of products · high · [verified]
+
+- **Steps** — Hibernate SQL logging on, request the same listing at `count=5`, `20` and `45`, count statements.
+- **Found first** — a 20-product page issued **100** statements: 20 each for images, descriptions and
+  categories, plus per-entity loads for brands and types. `findAllHydrated` fetch-joins those, but the listing
+  pages ids through `search(...)` and maps entities directly, so nothing batched them. **This predates the
+  variant work** — the variant collections were the only ones already batched and measured 1 query for 20
+  products.
+- **Fix** — `@BatchSize(100)` on `Product.{categories,descriptions,images}`, on the description collections of
+  `Category`/`Manufacturer`/`ProductType`, on `ProductVariant.optionValues`, and at class level on
+  `Manufacturer` and `ProductType` so their lazy proxies initialise in one query.
+- **Result** — 5 products → 12 statements, 20 → 15, 45 → 13. Flat; the variance is the background outbox
+  poller. Roughly 9 statements belong to the request, each a bounded `IN` query.
+- **Re-measured after MOD-04 tripled the variant count** — the same 45-product listing issues **11**
+  statements and answers in 14–37 ms; a whole store's 137 skus priced in one availability call takes 39 ms.
+  Nothing about the query shape depends on how many variants the catalogue holds.
+
+### PERF-02 — The PDP is flat in the number of variants · high · [verified]
+
+- **Steps** — same method, on a 3-variant product and a 6-variant one.
+- **Result** — **12 statements each**. Doubling the variants adds no queries: the PDP hydrates through one
+  fetch-join (`findByProductIdHydrated`) and the option values are batched. Re-measured on the expanded seed:
+  9 statements for a generated 3-variant product, 15 ms.
+
+**Backend — a reachable 500 and an unguarded FK**
+
+- *Promoting an earlier row to default violated `uk_product_variant_default`.* It is a partial unique **index**
+  and Postgres never defers those, so the two `UPDATE`s in one dirty-checking pass could hit "set true" while
+  the old default was still true. Cleared and flushed before the new one is set. Promoting a *later* row
+  happened to succeed, which is exactly what CON-02 did — the direction that failed was never run.
+- *Editing an option could delete a value a variant still sells by*, answering a raw FK 500 where deleting the
+  option answers a named 409. `update` now diffs the dropped values and raises `PRODUCT_OPTION.IN_USE`.
+- The per-order quantity refusal moved to its own `CartQuantityOutOfRangeException`: sharing
+  `ProductNotPurchasableException` meant a caller wanting to retry smaller could not branch on the type.
+- `findByProductIdHydrated` is store-scoped, and an explicit `"optionValueIds": null` is a 400 rather than a 500.
+
+---
+
 ## 99 — Known gaps
+
+- **`GET /api/v1/detailed-products?skus=` takes an uncapped sku list.** Its siblings cap (`AvailabilityQuery`
+  at 500, the inventory batch at 200) and it is on the anonymous path, so it should too — but the obvious
+  `@Validated` + `@Size` does not work here: `ExternalProductApi` implements `ExternalProductService`, so the
+  annotation makes Spring proxy the controller through the interface and every request to it 500s (caught by
+  `ProductApiIntegrationTest`, reverted). `InventoryApi.getByProducts` implements nothing and does carry the
+  cap. A fix for the catalog side needs an explicit in-method guard rather than bean validation.
 
 Behaviour that is expected today. Please don't spend time raising these — but do shout if you see something
 *beyond* what is described.
@@ -931,3 +1071,5 @@ the matching `Unhandled failure [traceId=…]` block from `.lcl/<stack>/logs/cat
 attach the browser console and the failing request: a 401 is a missing session, a 403 is a permission problem,
 a 404 through `/spg/**` is usually a missing `pod` parameter, and a 400 with a `*.REFERENCE_UNRESOLVABLE` code
 names the exact value that did not resolve in this store.
+
+---

@@ -33,6 +33,11 @@ public class ProductSearchCriteria {
 
     private List<Long> productTypeIds;
 
+    /**
+     * Option-value ids: OR within one option, AND across options, anchored to a single variant.
+     */
+    private List<Long> optionValueIds;
+
     private Boolean available;
 
     private ProductSearchSort sort;

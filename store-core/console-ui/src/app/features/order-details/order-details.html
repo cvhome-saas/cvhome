@@ -112,6 +112,14 @@
                           <td>
                             <span class="item-copy">
                               <strong>{{ item.name }}</strong>
+                              @if (item.options.length) {
+                                <!-- The combination bought, from the placement-time snapshot. -->
+                                <small class="item-options" dir="auto">
+                                  @for (option of item.options; track option.name; let last = $last) {
+                                    <span>{{ option.name }}: {{ option.value }}</span>@if (!last) {<span aria-hidden="true"> · </span>}
+                                  }
+                                </small>
+                              }
                               <small class="mono">{{ item.sku }}</small>
                             </span>
                           </td>
@@ -459,6 +467,13 @@
                         <tr>
                           <td>
                             <strong>{{ item.name }}</strong>
+                            @if (item.options.length) {
+                              <small class="item-options" dir="auto">
+                                @for (option of item.options; track option.name; let last = $last) {
+                                  <span>{{ option.name }}: {{ option.value }}</span>@if (!last) {<span aria-hidden="true"> · </span>}
+                                }
+                              </small>
+                            }
                             <small class="mono">{{ item.sku }}</small>
                           </td>
                           <td class="numeric">{{ item.quantity | translocoDecimal }}</td>

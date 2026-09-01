@@ -1,100 +1,158 @@
 'use client'
 import {useCallback, useEffect, useMemo, useState} from "react";
+import {useSearchParams} from "next/navigation";
 import {useTranslations} from "next-intl";
 import {Image, Product, ProductOption, ProductOptionValue, ProductVariant, StoreContext} from "@store-front/types";
 import {getCartManager} from "@store-front/services/cart-manager";
 import {sortedImages} from "@store-front/services/product-presenter";
 import {notify} from "./notify";
+import {useErrorMessage} from "./use-error-message";
 
 export type PurchaseStatus = 'idle' | 'adding';
 
-/** Options whose values pick a sellable variant, in display order. */
+/** The axes this product varies by, in display order. Every assigned option is variant-defining now. */
 export const variantOptions = (p: Product): ProductOption[] =>
-    (p.options ?? []).filter(o => o.variant && o.optionValues && o.optionValues.length > 0);
+    (p.options ?? []).filter(o => o.values && o.values.length > 0);
 
-function variantMatches(v: ProductVariant, selection: Record<number, number>): boolean {
-    const pairs: [number | undefined, number | undefined][] = [
-        [v.variation?.option?.id, v.variation?.optionValue?.id],
-        [v.variationValue?.option?.id, v.variationValue?.optionValue?.id],
-    ];
-    const defined = pairs.filter(([o, val]) => o !== undefined && val !== undefined) as [number, number][];
-    if (defined.length === 0) return false;
-    return defined.every(([o, val]) => selection[o] === val);
+/** Whether a variant is exactly the given selection — one value per option, set equality. */
+const variantMatches = (v: ProductVariant, options: ProductOption[], selection: Record<number, number>): boolean =>
+    options.length > 0
+    && options.every(o => selection[o.id] !== undefined)
+    && v.optionValueIds.length === options.length
+    && options.every(o => v.optionValueIds.includes(selection[o.id]));
+
+/** The selection a variant's value ids describe, via the options' own valueId → optionId index. */
+function selectionOf(v: ProductVariant, options: ProductOption[]): Record<number, number> {
+    const optionByValue = new Map<number, number>();
+    for (const o of options) {
+        for (const value of o.values) optionByValue.set(value.id, o.id);
+    }
+    const selection: Record<number, number> = {};
+    for (const valueId of v.optionValueIds) {
+        const optionId = optionByValue.get(valueId);
+        if (optionId !== undefined) selection[optionId] = valueId;
+    }
+    return selection;
 }
 
 /**
- * Product purchase state: option selection → resolved variant (sku / price / images / stock) → quantity →
- * add to cart. Replaces `useProductDetailedAddToCart`. Stock, purchasability and the price arrive merged
- * into the product payload by the service layer (the inventory service owns them since the
- * catalog/inventory split); variant pricing is resolved from the payload itself.
+ * Product purchase state under the uniform variant model: option selection → resolved variant (sku /
+ * price / stock) → quantity → add to cart.
+ *
+ * Every product owns ≥1 variant; a product with no options resolves its single default variant with
+ * nothing to select, and a multi-option product resolves once every axis has a value — both flow into
+ * the same add-to-cart-by-sku call. Price and stock arrive attached per variant by
+ * `InventoryService.enrichProduct` (the PDP fetches the whole matrix's availability in one call);
+ * chips for combinations that do not exist, or whose sku inventory says cannot be bought, grey out.
+ *
+ * The resolved variant syncs to the URL as `?sku=` (history.replaceState — no reload, no server
+ * re-render), so every combination is directly addressable and a shared link lands preselected.
  */
 export const useProductPurchase = (storeContext: StoreContext, product: Product) => {
     const t = useTranslations('PAGE.PRODUCT');
+    const messageFor = useErrorMessage();
+    const searchParams = useSearchParams();
     const cartManager = useMemo(() => getCartManager(storeContext), [storeContext.store, storeContext.locale]);
     const options = useMemo(() => variantOptions(product), [product]);
-    const variants = product.variants ?? [];
+    const variants = useMemo(() => product.variants ?? [], [product]);
 
     const [selection, setSelection] = useState<Record<number, number>>(() => {
-        const initial: Record<number, number> = {};
-        const def = variants.find(v => v.defaultSelection);
-        if (def) {
-            for (const vv of [def.variation, def.variationValue]) {
-                if (vv?.option?.id !== undefined && vv.optionValue?.id !== undefined) initial[vv.option.id] = vv.optionValue.id;
-            }
-        }
-        return initial;
+        // `?sku=` wins — a shared variant link lands preselected; the default variant otherwise.
+        const requested = searchParams?.get('sku');
+        const preselected =
+            (requested && variants.find(v => v.sku === requested))
+            || variants.find(v => v.defaultVariant)
+            || variants[0];
+        return preselected ? selectionOf(preselected, options) : {};
     });
-    const [quantity, setQuantity] = useState(1);
+    const [requestedQuantity, setQuantity] = useState(1);
     const [status, setStatus] = useState<PurchaseStatus>('idle');
 
     const allSelected = options.every(o => selection[o.id] !== undefined);
-    const variant = useMemo(() => allSelected && variants.length ? variants.find(v => variantMatches(v, selection)) : undefined, [allSelected, variants, selection]);
 
-    const inventory = variant?.inventory?.[0];
-    const sku = inventory?.sku ?? variant?.sku ?? product.sku;
-    const maxQty = inventory?.quantity ?? product.quantity ?? 0;
-    const isOutOfStock = !product.available || !product.canBePurchased || maxQty < 1 || (variant ? !variant.available : false);
-    const images: Image[] = variant?.images?.length ? variant.images : sortedImages(product);
+    /**
+     * The resolved combination. A product with no options resolves its single (default) variant
+     * immediately — there is nothing to select and `allSelected` is vacuously true.
+     */
+    const variant = useMemo(() => {
+        if (options.length === 0) return variants.find(v => v.defaultVariant) ?? variants[0];
+        return allSelected ? variants.find(v => variantMatches(v, options, selection)) : undefined;
+    }, [allSelected, variants, options, selection]);
 
-    const selectedValuePrice = useMemo(() => {
-        // a single option with its own price (e.g. "Large +$2") when there is no sellable variant
-        if (variant) return undefined;
-        for (const o of options) {
-            const v = o.optionValues.find(ov => ov.id === selection[o.id]);
-            if (v?.price) return v.price;
-        }
-        return undefined;
-    }, [options, selection, variant]);
+    /*
+     * An unresolved combination must never fall back to the product's own sku.
+     *
+     * `allSelected` only says every axis has a value — the combination it names may not exist (the
+     * seeded dress sells Red/M, Blue/M and Blue/L, deliberately not Red/L). The fallbacks below
+     * then described the DEFAULT variant: the box said "In stock", showed Red/M's price, kept Add
+     * to Cart enabled, and adding put Red/M in the basket while the page showed Red and L picked.
+     */
+    const unresolved = options.length > 0 && !variant;
+    const sku = variant?.sku ?? product.sku;
+    /** Units on hand for the resolved sku — what "Only 3 left" counts. */
+    const maxQty = variant?.quantity ?? product.quantity ?? 0;
+    /*
+     * The merchant's per-order floor and ceiling, per sku — a combination may sell in different amounts
+     * than its siblings, so they come off the resolved variant and fall back to the product. The cart
+     * enforces them; the buy box has to agree, or the stepper offers an amount the server then refuses
+     * ("sells between 1 and 1 per order; 2 was asked"). A maximum of 0 means no limit, and the ceiling is
+     * kept apart from the stock count: 8 on the shelf with a limit of 1 is not "only 1 left".
+     */
+    const minOrderQty = Math.max(1, variant?.quantityOrderMinimum ?? product.quantityOrderMinimum ?? 1);
+    const orderCeiling = variant?.quantityOrderMaximum ?? product.quantityOrderMaximum ?? 0;
+    const maxOrderQty = orderCeiling > 0 ? Math.min(maxQty, orderCeiling) : maxQty;
+    const purchasable = variant ? variant.canBePurchased !== false : product.canBePurchased;
+    // Below the floor there is no buyable amount at all, whatever the shelf says.
+    // An unresolved combination is unbuyable, so it belongs here: every theme already keys its
+    // badge and its button off this one flag, and `unresolved` only chooses the wording.
+    const isOutOfStock = unresolved || !product.available || !purchasable || maxOrderQty < minOrderQty;
+    // Per-variant images are a later phase; the gallery is the product's, whatever is selected.
+    const images: Image[] = sortedImages(product);
 
-    const finalPrice = inventory?.price ?? selectedValuePrice ?? product.productPrice?.finalPrice ?? product.finalPrice;
-    const originalPrice = product.productPrice?.originalPrice ?? product.originalPrice;
-    const discounted = !!product.productPrice?.discounted && !inventory?.price && !selectedValuePrice;
+    const finalPrice = variant?.finalPrice ?? product.productPrice?.finalPrice ?? product.finalPrice;
+    const originalPrice = variant?.originalPrice ?? product.productPrice?.originalPrice ?? product.originalPrice;
+    const discounted = variant ? !!variant.discounted : !!product.productPrice?.discounted;
+
+    /*
+     * Clamped during render rather than corrected by an effect. The effect version tripped the repo's
+     * `react-hooks/set-state-in-effect` rule and rendered one frame with the stale amount: switching to a
+     * combination that sells fewer showed the old number until the effect caught up.
+     */
+    const quantity = Math.min(Math.max(minOrderQty, requestedQuantity), Math.max(minOrderQty, maxOrderQty));
 
     useEffect(() => {
-        // clamp quantity to what is sellable for the current selection
-        setQuantity(q => Math.min(Math.max(1, q), Math.max(1, maxQty)));
-    }, [maxQty]);
+        // The resolved variant is part of the page's address. Native history update, like the
+        // listing's filters: Next syncs useSearchParams() with it and does not re-render the server
+        // page. Only a real combination writes; nothing is erased while a selection is incomplete.
+        if (typeof window === 'undefined' || options.length === 0 || !variant) return;
+        const url = new URL(window.location.href);
+        if (url.searchParams.get('sku') === variant.sku) return;
+        url.searchParams.set('sku', variant.sku);
+        window.history.replaceState(window.history.state, '', url.toString());
+    }, [variant, options.length]);
 
     const select = useCallback((optionId: number, valueId: number) => {
         setSelection(prev => ({...prev, [optionId]: valueId}));
     }, []);
 
+    /**
+     * Whether picking this value (keeping the rest of the selection) can reach a sellable variant.
+     * Two gates, both from data already in hand: the combination must exist, and its sku's
+     * inventory must say it can be bought — sellability is inventory's one flag, merged in by
+     * enrichment. Chips failing either grey out.
+     */
     const isValueAvailable = useCallback((option: ProductOption, value: ProductOptionValue): boolean => {
         if (variants.length === 0) return true;
-        const trial = {...selection, [option.id]: value.id};
-        return variants.some(v => {
-            const pairs = [v.variation, v.variationValue];
-            return pairs.some(p => p?.option?.id === option.id && p.optionValue?.id === value.id)
-                && Object.entries(trial).every(([o, val]) => {
-                    const oid = Number(o);
-                    if (oid === option.id) return true;
-                    return pairs.some(p => p?.option?.id === oid && p.optionValue?.id === val) || !pairs.some(p => p?.option?.id === oid);
-                });
-        });
+        return variants.some(v =>
+            v.optionValueIds.includes(value.id)
+            && v.canBePurchased !== false
+            && Object.entries(selection).every(([optionId, valueId]) =>
+                Number(optionId) === option.id || v.optionValueIds.includes(valueId)),
+        );
     }, [variants, selection]);
 
     const inCartQuantity = cartManager.getMatchedProductsInCart(product.id)?.quantity ?? 0;
-    const canAdd = !isOutOfStock && allSelected && status === 'idle';
+    const canAdd = !isOutOfStock && allSelected && !unresolved && status === 'idle';
 
     const addToCart = useCallback(async () => {
         if (!canAdd) return;
@@ -102,11 +160,11 @@ export const useProductPurchase = (storeContext: StoreContext, product: Product)
         cartManager.addProductToCart(sku, quantity, (cart) => {
             setStatus('idle');
             if (cart) notify('success', t('SUCCESSFULLY_ADDED_PRODUCT_TO_CART'), storeContext.locale);
-        }, () => {
+        }, (error) => {
             setStatus('idle');
-            notify('error', t('FAILED_TO_ADD_PRODUCT_TO_CART'), storeContext.locale);
+            notify('error', messageFor(error, t('FAILED_TO_ADD_PRODUCT_TO_CART')), storeContext.locale);
         });
-    }, [canAdd, cartManager, sku, quantity, storeContext.locale, t]);
+    }, [canAdd, cartManager, messageFor, sku, quantity, storeContext.locale, t]);
 
     return {
         options,
@@ -120,14 +178,21 @@ export const useProductPurchase = (storeContext: StoreContext, product: Product)
         price: {finalPrice, originalPrice, discounted},
         quantity,
         maxQty,
-        canDecrease: quantity > 1,
-        canIncrease: quantity < maxQty,
-        incrementQuantity: () => setQuantity(q => Math.min(q + 1, Math.max(1, maxQty))),
-        decrementQuantity: () => setQuantity(q => Math.max(1, q - 1)),
+        minOrderQty,
+        maxOrderQty,
+        canDecrease: quantity > minOrderQty,
+        canIncrease: quantity < maxOrderQty,
+        incrementQuantity: () => setQuantity(q => Math.min(q + 1, Math.max(minOrderQty, maxOrderQty))),
+        decrementQuantity: () => setQuantity(q => Math.max(minOrderQty, q - 1)),
         isOutOfStock,
+        /** Every axis is picked but no variant sells that combination — themes say so and disable Add. */
+        unresolved,
         inCartQuantity,
         canAdd,
         status,
         addToCart,
     };
 };
+
+/** What {@link useProductPurchase} hands a theme — named so a theme can take it as a parameter. */
+export type ProductPurchase = ReturnType<typeof useProductPurchase>;

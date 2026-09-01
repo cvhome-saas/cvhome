@@ -5,6 +5,7 @@ import {CatalogReference} from '@api/catalog/catalog-reference.service';
 import {CategoryService} from '@api/catalog/category.service';
 import {ManufacturerService} from '@api/catalog/manufacturer.service';
 import {ProductGroupService} from '@api/catalog/product-group.service';
+import {ProductOptionService} from '@api/catalog/product-option.service';
 import {ProductService} from '@api/catalog/product.service';
 import {ProductTypeService} from '@api/catalog/product-type.service';
 import {MerchantStoreService} from '@api/merchant/store.service';
@@ -13,10 +14,13 @@ import type {
   NamedDescription,
   PersistableCategory,
   PersistableProductGroup,
+  PersistableProductOption,
   PersistableProductType,
   ReadableCategory,
   ReadableManufacturer,
   ReadableProductGroup,
+  ReadableProductOption,
+  ReadableProductOptionValue,
   ReadableProductType,
 } from '@models/catalog';
 import type {
@@ -26,6 +30,9 @@ import type {
   CategoryNode,
   GroupRow,
   LocalisedCopy,
+  OptionCard,
+  OptionName,
+  OptionValueCard,
   TypeCard,
 } from '@models/taxonomy';
 
@@ -58,6 +65,7 @@ export class CatalogueApi {
   private readonly categories = inject(CategoryService);
   private readonly brands = inject(ManufacturerService);
   private readonly types = inject(ProductTypeService);
+  private readonly options = inject(ProductOptionService);
   private readonly groups = inject(ProductGroupService);
   private readonly products = inject(ProductService);
   private readonly stores = inject(MerchantStoreService);
@@ -67,6 +75,7 @@ export class CatalogueApi {
   private loadedCategories = new Map<number, ReadableCategory>();
   private loadedBrands = new Map<number, ReadableManufacturer>();
   private loadedTypes = new Map<number, ReadableProductType>();
+  private loadedOptions = new Map<number, ReadableProductOption>();
   private loadedGroups = new Map<string, ReadableProductGroup>();
 
   /**
@@ -124,6 +133,7 @@ export class CatalogueApi {
        */
       brands: this.optional(this.brands.list(CATALOGUE_PAGE)),
       types: this.optional(this.types.list(CATALOGUE_PAGE)),
+      options: this.optional(this.options.list(CATALOGUE_PAGE)),
       groups: this.optional(this.groupsWithProducts()),
       /*
        * Which languages the store trades in — the merchant pod, not the catalog one, and not the
@@ -132,10 +142,11 @@ export class CatalogueApi {
        */
       languages: this.stores.supportedLanguages().pipe(catchError(() => of<string[]>([]))),
     }).pipe(
-      map(({hierarchy, brands, types, groups, languages}) => {
+      map(({hierarchy, brands, types, options, groups, languages}) => {
         this.index(hierarchy.content);
         this.loadedBrands = new Map((brands?.content ?? []).map((brand) => [brand.id, brand]));
         this.loadedTypes = new Map((types?.content ?? []).map((type) => [type.id, type]));
+        this.loadedOptions = new Map((options?.content ?? []).map((option) => [option.id, option]));
         this.loadedGroups = new Map(
           (groups?.content ?? []).filter((group) => group.code).map((group) => [group.code as string, group]),
         );
@@ -147,6 +158,9 @@ export class CatalogueApi {
         if (types === null) {
           unavailable.push('types');
         }
+        if (options === null) {
+          unavailable.push('options');
+        }
         if (groups === null) {
           unavailable.push('groups');
         }
@@ -155,6 +169,7 @@ export class CatalogueApi {
           categories: hierarchy.content.map((category) => toNode(category, null)),
           brands: (brands?.content ?? []).map(toBrand),
           types: (types?.content ?? []).map(toType),
+          options: (options?.content ?? []).map(toOption),
           groups: (groups?.content ?? []).map(toGroup),
           languages,
           unavailable,
@@ -309,6 +324,45 @@ export class CatalogueApi {
 
   typeCodeTaken(code: string): Observable<boolean> {
     return this.types.codeTaken(code).pipe(map((answer) => answer.exists === true));
+  }
+
+  /* ---------------------------------------------------------------- product options ---- */
+
+  /**
+   * Create a store option with its values — one whole-document write.
+   *
+   * `sortOrder` on new values is their position in the editor, because the storefront's chips and
+   * the variant matrix both render values in this order and an unordered vocabulary shuffles on
+   * every read.
+   */
+  createOption(option: PersistableProductOption): Observable<CatalogueSnapshot> {
+    return this.options.create(option).pipe(switchMap(() => this.reload()));
+  }
+
+  /**
+   * Save an option. The values travel with it; a value carrying its id keeps its row — and its
+   * store-wide id, which every variant that sells it references.
+   */
+  updateOption(id: number, option: PersistableProductOption): Observable<CatalogueSnapshot> {
+    return this.options.update(id, {...option, id}).pipe(switchMap(() => this.reload()));
+  }
+
+  /**
+   * Delete an option. The pod refuses with 409 (`CATALOG.PRODUCT_OPTION.IN_USE`) while any product
+   * assigns it or a variant uses one of its values — the facade shows that refusal by name rather
+   * than as a generic conflict.
+   */
+  deleteOption(id: number): Observable<CatalogueSnapshot> {
+    return this.options.delete(id).pipe(switchMap(() => this.reload()));
+  }
+
+  optionCodeTaken(code: string): Observable<boolean> {
+    return this.options.codeTaken(code).pipe(map((answer) => answer.exists === true));
+  }
+
+  /** What the selected option's untouched fields hold, for a write that must not clear them. */
+  loadedOption(id: number): ReadableProductOption | undefined {
+    return this.loadedOptions.get(id);
   }
 
   /* ---------------------------------------------------------------- product groups ---- */
@@ -492,6 +546,40 @@ function toType(type: ReadableProductType): TypeCard {
     allowAddToCart: type.allowAddToCart ?? true,
     copy: descriptions.map(toCopy),
   };
+}
+
+/**
+ * One store option with its values.
+ *
+ * Values are ordered by `sortOrder` here so the editor, the variant matrix and the storefront's
+ * chips all agree on an order the server does not guarantee in the list response.
+ */
+function toOption(option: ReadableProductOption): OptionCard {
+  return {
+    id: option.id,
+    code: option.code,
+    name: option.name ?? option.descriptions[0]?.name ?? option.code,
+    sortOrder: option.sortOrder ?? 0,
+    copy: option.descriptions.map(toOptionName),
+    values: [...option.values]
+      .sort((left, right) => (left.sortOrder ?? 0) - (right.sortOrder ?? 0))
+      .map(toOptionValue),
+  };
+}
+
+function toOptionValue(value: ReadableProductOptionValue): OptionValueCard {
+  return {
+    id: value.id,
+    code: value.code,
+    name: value.name ?? value.descriptions[0]?.name ?? value.code,
+    sortOrder: value.sortOrder ?? 0,
+    copy: value.descriptions.map(toOptionName),
+  };
+}
+
+/** Only `name` renders anywhere on an option — see `OptionName` in `@models/taxonomy`. */
+function toOptionName(description: NamedDescription): OptionName {
+  return {language: description.language, name: description.name ?? ''};
 }
 
 function toGroup(group: ReadableProductGroup): GroupRow {

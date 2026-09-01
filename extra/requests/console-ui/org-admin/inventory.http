@@ -1,0 +1,33 @@
+###
+
+# curl '{{GATEWAY_URL}}/spg/inventory/api/v1/availability?skus=SKU-YSL-MAKE-TEIPEN46&store=65f023632bc46470c104b76f&lang=en'
+GET {{GATEWAY_URL}}/spg/inventory/api/v1/availability?skus=SKU-YSL-MAKE-TEIPEN46&store=65f023632bc46470c104b76f&lang=en
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
+
+###
+
+# curl -X PUT '{{GATEWAY_URL}}/spg/inventory/api/v1/private/inventory/SKU-YSL-MAKE-TEIPEN46?store=65f023632bc46470c104b76f&lang=en'
+PUT {{GATEWAY_URL}}/spg/inventory/api/v1/private/inventory/SKU-YSL-MAKE-TEIPEN46?store=65f023632bc46470c104b76f&lang=en
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
+Content-Type: application/json
+
+{ "productId": 46, "quantity": 12, "available": true, "price": { "amount": 25.00 } }
+
+###
+
+# curl -X PUT '{{GATEWAY_URL}}/spg/inventory/api/v1/private/inventory/bulk?store=65f023632bc46470c104b76f&lang=en'
+PUT {{GATEWAY_URL}}/spg/inventory/api/v1/private/inventory/bulk?store=65f023632bc46470c104b76f&lang=en
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
+Content-Type: application/json
+
+{
+  "entries": [
+    { "sku": "SKU-YSL-MAKE-TEIPEN46", "inventory": { "productId": 46, "quantity": 12, "available": true, "price": { "amount": 25.00 } } }
+  ]
+}
+
+###
+
+# curl -X DELETE '{{GATEWAY_URL}}/spg/inventory/api/v1/private/inventory/SKU-RETIRED?store=65f023632bc46470c104b76f&lang=en'
+DELETE {{GATEWAY_URL}}/spg/inventory/api/v1/private/inventory/SKU-RETIRED?store=65f023632bc46470c104b76f&lang=en
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f

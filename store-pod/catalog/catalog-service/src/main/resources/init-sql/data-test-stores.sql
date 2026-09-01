@@ -34,3 +34,18 @@ on conflict do nothing;
 INSERT INTO catalog.sm_sequencer (seq_name, seq_count)
 VALUES ('PRODUCT_GROUP_DESC_SEQ_NEXT_VAL', 33)
 on conflict do nothing;
+INSERT INTO catalog.sm_sequencer (seq_name, seq_count)
+VALUES ('PRODUCT_OPTION_SEQ_NEXT_VAL', 16)
+on conflict do nothing;
+INSERT INTO catalog.sm_sequencer (seq_name, seq_count)
+VALUES ('PRODUCT_OPTION_DESCRIPTION_SEQ_NEXT_VAL', 32)
+on conflict do nothing;
+INSERT INTO catalog.sm_sequencer (seq_name, seq_count)
+VALUES ('PRODUCT_OPTION_VALUE_SEQ_NEXT_VAL', 48)
+on conflict do nothing;
+INSERT INTO catalog.sm_sequencer (seq_name, seq_count)
+VALUES ('PRODUCT_OPTION_VALUE_DESCRIPTION_SEQ_NEXT_VAL', 80)
+on conflict do nothing;
+INSERT INTO catalog.sm_sequencer (seq_name, seq_count)
+VALUES ('PRODUCT_VARIANT_SEQ_NEXT_VAL', 5000)
+on conflict do nothing;

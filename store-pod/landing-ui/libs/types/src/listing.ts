@@ -1,4 +1,4 @@
-import {Manufacturer, ProductGroupPage, ProductVariant} from "./product-groups";
+import {Manufacturer, ProductGroupPage} from "./product-groups";
 
 /**
  * Sort keys the catalog can honour today. `sort=` is a raw Spring `Pageable` sort on the Product entity,
@@ -24,9 +24,27 @@ export type ProductListingPage = ProductGroupPage;
 
 export interface ListingFacets {
     manufacturers: Manufacturer[];
-    /** Always empty since the catalog/inventory split — variants are deprecated under the
-     *  single-product model. The field stays so themes keep compiling; they render no group for it. */
-    variants: ProductVariant[];
+    /**
+     * The option-value filter groups — Color with Red (12) / Blue (8), counted against the current
+     * results. Value ids are store-wide, so a toggled value round-trips straight back as
+     * `ListingQuery.optionValueIds`.
+     */
+    options: OptionFacet[];
+}
+
+/** One option's slice of the filter rail. */
+export interface OptionFacet {
+    id: number;
+    code?: string;
+    name: string;
+    values: OptionFacetValue[];
+}
+
+export interface OptionFacetValue {
+    id: number;
+    name: string;
+    count: number;
+    selected?: boolean;
 }
 
 /** Parse `?page&sort&manufacturer&options` into a ListingQuery (pure; usable from server and client). */

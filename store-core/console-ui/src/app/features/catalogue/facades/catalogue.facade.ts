@@ -18,6 +18,7 @@ import {
   type CategoryNode,
   type GroupRow,
   type LocalisedCopy,
+  type OptionCard,
   type TypeCard,
 } from '@models/taxonomy';
 import type {AutocompleteOption} from '@shared/ui/autocomplete/autocomplete';
@@ -25,8 +26,9 @@ import type {TabItem} from '@shared/ui/tab-switcher/tab-switcher';
 import type {TreeMove, TreeNode, TreeNodeId} from '@shared/ui/tree/tree';
 import {ToastService} from '@shared/ui/toast/toast';
 import {ProductSearch} from '@api/catalog/product-search.service';
+import type {PersistableProductOption, ProductOptionDescription} from '@models/catalog';
 import {CatalogueApi} from '../services/catalogue.api.service';
-import {CatalogueFormService, slugify} from '../services/catalogue-form.service';
+import {CatalogueFormService, slugify, type OptionValueForm} from '../services/catalogue-form.service';
 
 /** What the editor beside a list is doing: changing a record, or writing a new one. */
 export type EditorMode = 'edit' | 'create';
@@ -71,6 +73,7 @@ export class CatalogueFacade {
   readonly categoryForm = this.forms.category();
   readonly brandForm = this.forms.brand();
   readonly typeForm = this.forms.type();
+  readonly optionForm = this.forms.option();
   readonly groupForm = this.forms.group();
 
   constructor() {
@@ -89,6 +92,16 @@ export class CatalogueFacade {
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe(() => this.copyStamp.update((stamp) => stamp + 1));
     }
+
+    /*
+     * The option editor has no `copy` block — its per-language payload is one name for itself and
+     * one per value — so it joins the two subscriptions above separately, listening to the whole
+     * form: a value row's name is copy too, and the chips must move as it is typed.
+     */
+    clearServerErrorsOnChange(this.optionForm, this.destroyRef);
+    this.optionForm.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.copyStamp.update((stamp) => stamp + 1));
 
     /*
      * Load the active tab's form from whatever record is selected.
@@ -131,7 +144,9 @@ export class CatalogueFacade {
           ? this.selectedBrandId()
           : tab === 'types'
             ? this.selectedTypeId()
-            : this.selectedGroupCode();
+            : tab === 'options'
+              ? this.selectedOptionId()
+              : this.selectedGroupCode();
     return key === null ? null : `${tab}:${key}:${language}`;
   });
 
@@ -167,6 +182,7 @@ export class CatalogueFacade {
   readonly categories = computed<readonly CategoryNode[]>(() => this.loaded()?.categories ?? []);
   readonly brands = computed<readonly BrandCard[]>(() => this.loaded()?.brands ?? []);
   readonly types = computed<readonly TypeCard[]>(() => this.loaded()?.types ?? []);
+  readonly options = computed<readonly OptionCard[]>(() => this.loaded()?.options ?? []);
   readonly groups = computed<readonly GroupRow[]>(() => this.loaded()?.groups ?? []);
 
   /**
@@ -237,6 +253,11 @@ export class CatalogueFacade {
     computation: (types, previous) => keepOrFirst(types, previous?.value, (type) => type.id),
   });
 
+  readonly selectedOptionId = linkedSignal<readonly OptionCard[], number | null>({
+    source: this.options,
+    computation: (options, previous) => keepOrFirst(options, previous?.value, (option) => option.id),
+  });
+
   readonly selectedGroupCode = linkedSignal<readonly GroupRow[], string | null>({
     source: this.groups,
     computation: (groups, previous) => keepOrFirst(groups, previous?.value, (group) => group.code),
@@ -258,6 +279,10 @@ export class CatalogueFacade {
     () => this.types().find((type) => type.id === this.selectedTypeId()) ?? null,
   );
 
+  readonly selectedOption = computed(
+    () => this.options().find((option) => option.id === this.selectedOptionId()) ?? null,
+  );
+
   readonly selectedGroup = computed(
     () => this.groups().find((group) => group.code === this.selectedGroupCode()) ?? null,
   );
@@ -271,6 +296,16 @@ export class CatalogueFacade {
    * for the *active* language; this is the truth for the others.
    */
   private readonly draft = signal<ReadonlyMap<string, LocalisedCopy>>(new Map());
+
+  /**
+   * Unsaved value-row names for the languages the option editor is not showing, keyed by language
+   * then by the row's client key. The generic `draft` above carries the option's own name; value
+   * names are a different shape, so they park here — same lifecycle, cleared at the same points.
+   */
+  private readonly optionValueDraft = signal<ReadonlyMap<string, ReadonlyMap<string, string>>>(new Map());
+
+  /** Which option's value rows the form currently holds. See `fillOption`. */
+  private optionValuesFor: number | null = null;
 
   /* ---------------------------------------------------------------------- heading ---- */
 
@@ -290,9 +325,10 @@ export class CatalogueFacade {
       categories: this.categoryCount(),
       types: this.types().length,
       brands: this.brands().length,
+      options: this.options().length,
       groups: this.groups().length,
     };
-    return (['categories', 'types', 'brands', 'groups'] as const).map((tab) => ({
+    return (['categories', 'types', 'brands', 'options', 'groups'] as const).map((tab) => ({
       key: tab,
       label: this.transloco.translate(`catalogue.tab.${tab}`),
       // No badge on a tab whose list failed: `0` would be a claim the console cannot make.
@@ -338,6 +374,7 @@ export class CatalogueFacade {
   select(tab: CatalogueTab, key: number | string): void {
     this.mode.set('edit');
     this.draft.set(new Map());
+    this.optionValueDraft.set(new Map());
     switch (tab) {
       case 'categories':
         this.selectedCategoryId.set(key as number);
@@ -347,6 +384,9 @@ export class CatalogueFacade {
         break;
       case 'types':
         this.selectedTypeId.set(key as number);
+        break;
+      case 'options':
+        this.selectedOptionId.set(key as number);
         break;
       case 'groups':
         this.selectedGroupCode.set(key as string);
@@ -363,6 +403,7 @@ export class CatalogueFacade {
   startCreate(parentId?: number): void {
     this.mode.set('create');
     this.draft.set(new Map());
+    this.optionValueDraft.set(new Map());
     this.newParentId = parentId ?? null;
 
     switch (this.activeTab()) {
@@ -378,6 +419,12 @@ export class CatalogueFacade {
         this.typeForm.reset({code: '', visible: true, allowAddToCart: true});
         this.typeForm.controls.code.enable();
         break;
+      case 'options':
+        this.optionForm.reset({code: '', name: ''});
+        this.optionForm.controls.values.clear();
+        this.optionForm.controls.code.enable();
+        this.optionValuesFor = null;
+        break;
       case 'groups':
         this.groupForm.reset({code: '', active: true});
         this.groupForm.controls.code.enable();
@@ -391,9 +438,11 @@ export class CatalogueFacade {
   /** Abandon a create, or reload an edit from what the server last said. */
   cancelEdit(): void {
     this.draft.set(new Map());
+    this.optionValueDraft.set(new Map());
     this.mode.set('edit');
     // Forces the effect to reload the form from what the server last said, discarding the draft.
     this.filledFor = null;
+    this.optionValuesFor = null;
   }
 
   /**
@@ -547,6 +596,157 @@ export class CatalogueFacade {
     );
   }
 
+  /**
+   * Save the option and its values — one whole-document write.
+   *
+   * Beyond the shared "every language has a name" guard this checks what only this editor can get
+   * wrong: an option with no values (nothing to generate variants from), a value name missing in a
+   * language the chips cannot show (they track the option's own name), and two rows claiming one
+   * code (the pod would 409 on its per-option unique constraint — refusing here names the row).
+   */
+  saveOption(): void {
+    const form = this.optionForm;
+    if (form.invalid) {
+      form.markAllAsTouched();
+      return;
+    }
+    if (!this.canSave()) {
+      this.refuseIncomplete();
+      return;
+    }
+    const rows = form.controls.values.controls;
+    if (rows.length === 0) {
+      this.toast.danger(this.transloco.translate('catalogue.options.needsValue'));
+      return;
+    }
+    const codes = rows.map((row) => row.controls.code.getRawValue());
+    if (new Set(codes).size !== codes.length) {
+      this.toast.danger(this.transloco.translate('catalogue.options.duplicateValueCode'));
+      return;
+    }
+    this.parkDraft();
+    const missingValueNames = this.optionValueMissingLanguages();
+    if (missingValueNames.length > 0) {
+      this.toast.danger(
+        this.transloco.translate('catalogue.missingLanguages', {
+          languages: missingValueNames.map((language) => language.label).join(', '),
+        }),
+      );
+      return;
+    }
+
+    const copy = this.collectCopy();
+    const body: PersistableProductOption = {
+      code: form.controls.code.getRawValue(),
+      sortOrder: this.mode() === 'create' ? this.options().length : (this.selectedOption()?.sortOrder ?? 0),
+      descriptions: copy
+        .filter((entry) => entry.name.trim() !== '')
+        .map((entry) => ({language: entry.language, name: entry.name})),
+      values: rows.map((row, index) => ({
+        ...(row.controls.id.value !== null ? {id: row.controls.id.value} : {}),
+        code: row.controls.code.getRawValue(),
+        sortOrder: index,
+        descriptions: this.valueDescriptions(row),
+      })),
+    };
+
+    this.run(
+      this.mode() === 'create'
+        ? this.api.createOption(body)
+        : this.api.updateOption(this.selectedOptionId() ?? 0, body),
+      'catalogue.saved.option',
+      form,
+    );
+  }
+
+  /* ---------------------------------------------------------------- option values ---- */
+
+  /** How many value rows have been added this session — the seed for their client-side keys. */
+  private valueKeySeed = 0;
+
+  addOptionValue(): void {
+    this.optionForm.controls.values.push(
+      this.forms.optionValue({id: null, key: `new-${this.valueKeySeed++}`, code: '', name: ''}),
+    );
+  }
+
+  /**
+   * Drop a value row. For an existing value the pod has the final word on save: a value a variant
+   * still sells is refused with `PRODUCT_OPTION.IN_USE`, and the toast names it.
+   */
+  removeOptionValue(index: number): void {
+    const values = this.optionForm.controls.values;
+    const key = values.at(index)?.controls.key.value;
+    values.removeAt(index);
+    if (key === undefined) {
+      return;
+    }
+    // Its parked translations go with it, or they would resurrect on the next save of another row.
+    const next = new Map(
+      [...this.optionValueDraft()].map(([language, names]) => {
+        const kept = new Map(names);
+        kept.delete(key);
+        return [language, kept as ReadonlyMap<string, string>] as const;
+      }),
+    );
+    this.optionValueDraft.set(next);
+  }
+
+  /** Offers a value code derived from its name — only while the row is new and its code untyped. */
+  suggestValueCode(index: number, name: string): void {
+    const row = this.optionForm.controls.values.at(index);
+    if (!row || row.controls.id.value !== null || row.controls.code.dirty) {
+      return;
+    }
+    const slug = slugify(name);
+    if (slug) {
+      row.controls.code.setValue(slug);
+    }
+  }
+
+  /**
+   * The languages in which at least one value row has no name — stored, parked or typed.
+   *
+   * The chips only track the option's own name, so this is the guard that keeps a save from
+   * clearing a value's Arabic label because the operator never opened Arabic.
+   */
+  private optionValueMissingLanguages(): readonly ReferenceOption[] {
+    return this.languages().filter((language) =>
+      this.optionForm.controls.values.controls.some(
+        (row) =>
+          !this.valueDescriptions(row).some(
+            (description) => description.language === language.code && (description.name ?? '').trim() !== '',
+          ),
+      ),
+    );
+  }
+
+  /**
+   * One value row's name in every language: what the server stored, overlaid with what was parked
+   * on a language switch, overlaid with what is in the row right now.
+   */
+  private valueDescriptions(row: OptionValueForm): readonly ProductOptionDescription[] {
+    const merged = new Map<string, string>();
+    const id = row.controls.id.value;
+    if (this.mode() === 'edit' && id !== null) {
+      const stored = this.selectedOption()?.values.find((value) => value.id === id);
+      for (const entry of stored?.copy ?? []) {
+        merged.set(entry.language, entry.name);
+      }
+    }
+    const key = row.controls.key.value;
+    for (const [language, names] of this.optionValueDraft()) {
+      const parked = names.get(key);
+      if (parked !== undefined) {
+        merged.set(language, parked);
+      }
+    }
+    merged.set(this.activeLanguage(), row.controls.name.getRawValue());
+    return [...merged]
+      .filter(([, name]) => name.trim() !== '')
+      .map(([language, name]) => ({language, name}));
+  }
+
   saveGroup(): void {
     const form = this.groupForm;
     if (form.invalid) {
@@ -696,7 +896,9 @@ export class CatalogueFacade {
           ? this.api.deleteBrand(pending.key as number)
           : pending.tab === 'types'
             ? this.api.deleteType(pending.key as number)
-            : this.api.deleteGroup(pending.key as string);
+            : pending.tab === 'options'
+              ? this.api.deleteOption(pending.key as number)
+              : this.api.deleteGroup(pending.key as string);
 
     this.run(call, 'catalogue.saved.deleted');
   }
@@ -722,8 +924,11 @@ export class CatalogueFacade {
         this.busy.set(false);
         this.loaded.set(snapshot);
         this.draft.set(new Map());
+        this.optionValueDraft.set(new Map());
         this.mode.set('edit');
         this.filledFor = null;
+        // Saved value rows now exist server-side with real ids — the matrix must rebuild from them.
+        this.optionValuesFor = null;
         this.toast.success(this.transloco.translate(messageKey));
       },
       error: (failure: unknown) => {
@@ -753,16 +958,33 @@ export class CatalogueFacade {
   private parkDraft(): void {
     const language = this.activeLanguage();
     const copy = this.formCopy();
-    if (!copy) {
+    if (copy) {
+      const next = new Map(this.draft());
+      next.set(language, {...copy, language});
+      this.draft.set(next);
+    }
+    if (this.activeTab() !== 'options') {
       return;
     }
-    const next = new Map(this.draft());
-    next.set(language, {...copy, language});
-    this.draft.set(next);
+    // The value rows' names for this language, keyed by row so they survive add/remove.
+    const names = new Map<string, string>();
+    for (const row of this.optionForm.controls.values.controls) {
+      names.set(row.controls.key.value, row.controls.name.getRawValue());
+    }
+    const parked = new Map(this.optionValueDraft());
+    parked.set(language, names);
+    this.optionValueDraft.set(parked);
   }
 
   /** The copy the active tab's form is holding, for the language on screen. */
   private formCopy(): LocalisedCopy | null {
+    if (this.activeTab() === 'options') {
+      // An option's whole per-language copy is one name; the rest of the shape stays empty.
+      return {
+        ...emptyCopy(this.activeLanguage()),
+        name: this.optionForm.controls.name.getRawValue(),
+      };
+    }
     const form = this.activeForm();
     if (!form) {
       return null;
@@ -789,6 +1011,9 @@ export class CatalogueFacade {
         return this.brandForm;
       case 'types':
         return this.typeForm;
+      case 'options':
+        // Different shape — `formCopy` handles the options tab before it ever asks for this.
+        return null;
       case 'groups':
         return this.groupForm;
     }
@@ -810,6 +1035,12 @@ export class CatalogueFacade {
         return this.selectedBrand()?.copy ?? [];
       case 'types':
         return this.selectedType()?.copy ?? [];
+      case 'options':
+        // Widened to the shared copy shape so the chips and the save guard read one vocabulary.
+        return (this.selectedOption()?.copy ?? []).map((entry) => ({
+          ...emptyCopy(entry.language),
+          name: entry.name,
+        }));
       case 'groups':
         return this.selectedGroup()?.copy ?? [];
     }
@@ -842,6 +1073,9 @@ export class CatalogueFacade {
         break;
       case 'types':
         this.fillType();
+        break;
+      case 'options':
+        this.fillOption();
         break;
       case 'groups':
         this.fillGroup();
@@ -878,6 +1112,56 @@ export class CatalogueFacade {
     this.typeForm.reset({code: type.code, visible: type.visible, allowAddToCart: type.allowAddToCart});
     this.typeForm.controls.code.disable();
     this.fillCopy(this.typeForm.controls.copy, type.copy);
+  }
+
+  /**
+   * Load the option editor from the selected option.
+   *
+   * Runs on selection change **and** on language switch, and the two need different work: a new
+   * selection rebuilds the value rows outright, while a language switch must keep the rows — an
+   * unsaved "add value" row is structure, not copy, and rebuilding would silently drop it. Which is
+   * why the rows are rebuilt only when `optionValuesFor` says the form holds a different option,
+   * and every run then just re-fills the names for the language on screen.
+   */
+  private fillOption(): void {
+    const option = this.selectedOption();
+    if (!option) {
+      return;
+    }
+    const language = this.activeLanguage();
+    this.optionForm.controls.code.reset(option.code);
+    // A code identifies the record; changing it is a different record, not an edit.
+    this.optionForm.controls.code.disable();
+    const parkedName = this.draft().get(language)?.name;
+    const storedName = option.copy.find((entry) => entry.language === language)?.name;
+    this.optionForm.controls.name.reset(parkedName ?? storedName ?? '');
+
+    const values = this.optionForm.controls.values;
+    if (this.optionValuesFor !== option.id) {
+      values.clear({emitEvent: false});
+      for (const value of option.values) {
+        values.push(
+          this.forms.optionValue({id: value.id, key: `value-${value.id}`, code: value.code, name: ''}),
+          {emitEvent: false},
+        );
+      }
+      this.optionValuesFor = option.id;
+    }
+    for (const row of values.controls) {
+      const id = row.controls.id.value;
+      const parked = this.optionValueDraft().get(language)?.get(row.controls.key.value);
+      const stored =
+        id === null
+          ? undefined
+          : option.values
+              .find((value) => value.id === id)
+              ?.copy.find((entry) => entry.language === language)?.name;
+      row.controls.name.reset(parked ?? stored ?? '');
+      if (id !== null) {
+        row.controls.code.disable({emitEvent: false});
+      }
+    }
+    values.updateValueAndValidity();
   }
 
   private fillGroup(): void {
@@ -918,7 +1202,9 @@ export class CatalogueFacade {
           ? this.brandForm
           : tab === 'types'
             ? this.typeForm
-            : this.groupForm;
+            : tab === 'options'
+              ? this.optionForm
+              : this.groupForm;
     if (form.controls.code.dirty) {
       return;
     }

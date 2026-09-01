@@ -14,6 +14,7 @@ import com.asrevo.cvhome.inventory.entity.Inventory;
 import com.asrevo.cvhome.inventory.entity.InventoryPrice;
 import com.asrevo.cvhome.inventory.model.PersistableInventory;
 import com.asrevo.cvhome.inventory.model.PersistablePrice;
+import com.asrevo.cvhome.inventory.model.PersistableSkuInventory;
 import com.asrevo.cvhome.inventory.model.SkuInventory;
 import com.asrevo.cvhome.inventory.repositories.InventoryRepository;
 
@@ -35,6 +36,21 @@ public class InventoryServiceImpl implements InventoryService {
         // Legacy data may hold several rows per sku; the first by id wins, matching the reservation path.
         Map<String, SkuInventory> bySku = new LinkedHashMap<>();
         for (Inventory inventory : inventoryRepository.findBySkus(store, skus)) {
+            bySku.putIfAbsent(inventory.getSku(), SkuInventoryMapper.toSkuInventory(inventory, today));
+        }
+        return List.copyOf(bySku.values());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<SkuInventory> getByProductIds(StoreMerchantId store, Collection<Long> productIds) {
+        if (productIds.isEmpty()) {
+            return List.of();
+        }
+        LocalDate today = LocalDate.now();
+        // Same first-row-per-sku rule as getBySkus: legacy data may hold duplicates and every reader must agree.
+        Map<String, SkuInventory> bySku = new LinkedHashMap<>();
+        for (Inventory inventory : inventoryRepository.findByProductIds(store, productIds)) {
             bySku.putIfAbsent(inventory.getSku(), SkuInventoryMapper.toSkuInventory(inventory, today));
         }
         return List.copyOf(bySku.values());
@@ -72,7 +88,19 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Override
     @Transactional
+    public List<SkuInventory> bulkUpsert(StoreMerchantId store, List<PersistableSkuInventory> entries) {
+        return entries.stream().map(entry -> upsert(store, entry.sku(), entry.inventory())).toList();
+    }
+
+    @Override
+    @Transactional
     public void deleteByProduct(StoreMerchantId store, Long productId) {
         inventoryRepository.deleteAll(inventoryRepository.findByStoreMerchantIdAndProductId(store, productId));
+    }
+
+    @Override
+    @Transactional
+    public void deleteBySku(StoreMerchantId store, String sku) {
+        inventoryRepository.findBySku(store, sku).ifPresent(inventoryRepository::delete);
     }
 }

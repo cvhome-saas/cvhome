@@ -1,7 +1,7 @@
-import {Product} from "@store-front/types/product-groups";
+import {Product, ProductVariant} from "@store-front/types/product-groups";
 import {Store} from "@store-front/types/store";
 import {storeBaseServiceUrl, StoreContext} from "@store-front/types/store-context";
-import {apiFetch, get, orUndefined} from "./http-utils";
+import {apiFetch, get, orUndefined, publicPost} from "./http-utils";
 import {StoreService} from "./store-service";
 
 /**
@@ -36,9 +36,19 @@ export class InventoryService {
     /** The store record, for the currency — one fetch per store, shared by every enrichment. */
     private static storeBySite = new Map<string, Promise<Store | undefined>>();
 
+    /** Above this many skus the GET's query string gets uncomfortable; the POST body form takes over. */
+    private static readonly QUERY_BODY_THRESHOLD = 40;
+
     /** Degrades: a listing without prices is still a listing. */
     public static getBySkus = async (storeContext: StoreContext, skus: string[]): Promise<SkuInventory[] | undefined> => {
         if (skus.length === 0) return [];
+        if (skus.length > InventoryService.QUERY_BODY_THRESHOLD) {
+            // A PDP whose variant matrix exceeds what a query string comfortably carries — same
+            // answer shape, the sku list travels as a JSON body.
+            return orUndefined(apiFetch<SkuInventory[]>(
+                `${storeBaseServiceUrl('inventory', storeContext)}/api/v1/availability/query?store=${storeContext.store}&lang=${storeContext.locale}`,
+                publicPost({skus})));
+        }
         return orUndefined(apiFetch<SkuInventory[]>(
             `${storeBaseServiceUrl('inventory', storeContext)}/api/v1/availability?skus=${encodeURIComponent(skus.join(','))}&store=${storeContext.store}&lang=${storeContext.locale}`,
             get()));
@@ -58,9 +68,25 @@ export class InventoryService {
         }
     }
 
+    /**
+     * The PDP enrichment: price and stock for the product's **whole variant matrix** in one call —
+     * the default variant's sku plus every combination sku — attached per variant so the buy box
+     * can swap price and stock as the shopper selects. Listings never come through here; a page of
+     * cards is one sku per product through `enrichProducts`.
+     */
     public static enrichProduct = async (storeContext: StoreContext, product: Product | undefined): Promise<void> => {
         if (!product) return;
-        await InventoryService.enrichProducts(storeContext, [product]);
+        const variants = product.variants ?? [];
+        const skus = [...new Set([product.sku, ...variants.map(v => v.sku)].filter(Boolean))];
+        const [inventories, store] = await Promise.all([
+            InventoryService.getBySkus(storeContext, skus),
+            InventoryService.storeFor(storeContext),
+        ]);
+        const bySku = new Map((inventories ?? []).map(inv => [inv.sku, inv]));
+        InventoryService.applyInventory(product, bySku.get(product.sku), storeContext, store);
+        for (const variant of variants) {
+            InventoryService.applyVariantInventory(variant, bySku.get(variant.sku), storeContext, store);
+        }
     }
 
     private static storeFor(storeContext: StoreContext): Promise<Store | undefined> {
@@ -112,6 +138,32 @@ export class InventoryService {
             discounted,
             description: undefined as never,
         };
+    }
+
+    /**
+     * The `VariantPricing` section — the ONLY writer of a variant's price/stock fields, mirroring
+     * `applyInventory`'s contract for the product itself. No inventory record means not sellable.
+     */
+    private static applyVariantInventory(variant: ProductVariant, inventory: SkuInventory | undefined,
+                                         storeContext: StoreContext, store: Store | undefined): void {
+        if (!inventory) {
+            variant.quantity = 0;
+            variant.canBePurchased = false;
+            return;
+        }
+        variant.quantity = inventory.quantity;
+        variant.canBePurchased = inventory.canBePurchased;
+        // The per-order bounds are per sku, so a combination may sell in different amounts than its
+        // siblings. Dropping them here is what let the buy box offer a quantity the cart then refused.
+        variant.quantityOrderMinimum = inventory.quantityOrderMinimum;
+        variant.quantityOrderMaximum = inventory.quantityOrderMaximum;
+        const price = inventory.price;
+        if (!price) return;
+        const fmt = (amount: number | undefined): string =>
+            amount === undefined ? '' : InventoryService.formatAmount(amount, storeContext, store);
+        variant.finalPrice = fmt(price.finalPrice);
+        variant.originalPrice = fmt(price.originalPrice);
+        variant.discounted = !!price.discounted;
     }
 
     /** Currency-formatted when the store record is at hand, a plain amount when it is not. */

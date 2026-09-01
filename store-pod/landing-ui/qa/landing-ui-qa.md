@@ -244,7 +244,151 @@ from a past run.
 
 ---
 
+## VAR — the variant model on the storefront
+
+Added by the variant rework (PR #306): the PDP resolves an option selection to a variant and adds to cart by
+its sku, the listing facets by option value id, and cart and order lines render the combination. The model is
+[catalog](../../catalog/catalog-service/qa/catalog-qa.md#var--the-uniform-variant-model).
+
+### SF-01 — The PDP selects a variant · high · [verified]
+
+- **Steps** — open the seeded Zara dress (colour × size, red/L deliberately absent).
+- **Expect** — chips for both axes; the default variant preselected; **Red/L greyed** because the combination
+  does not exist and **Blue/L greyed** because it exists with quantity 0 (inventory says not purchasable);
+  selecting Blue swaps the price 350 → 365 and the sku to `SKU-ZR-CL-DRS02-BL-M`.
+- **Result** — exactly that. Repeated on the electronics store's six-combination iPhone: 512 GB + Silver reads
+  $1,339.00 (999 + 300 + 40 as seeded) and "Out of stock", which is the seeded zero-stock combination.
+
+### SF-02 — A variant is addressable and shareable · high · [verified]
+
+- **Expect** — selecting a combination writes `?sku=<variantSku>` with `history.replaceState` (no reload, no
+  server re-render), and loading that URL cold lands preselected on that variant.
+- **Result** — both directions confirmed.
+
+### SF-03b — A purchase carries the combination all the way to the order · high · [verified]
+
+- **Steps** — signed in as the demo shopper, cart holding one combination line (Zara dress Blue/M, SAR 365)
+  and one optionless line (Gucci bag) as the control; Cash on Delivery, order placed.
+- **The snapshot** — `checkout.order_product_option` gained **exactly two rows, both on the dress line**:
+  `color`/`Color`/`blue`/`Blue` (sort 0) and `size`/`Size`/`m`/`M` (sort 1). The bag's line has none. Codes
+  *and* names are stored, which is what lets an order keep saying what was bought after an option is renamed
+  or deleted. `order_product.product_name` is the real localized name — the `"Product {sku}"` placeholder the
+  rework set out to fix is gone.
+- **Stock** — decremented on the bought sku **only**: `SKU-ZR-CL-DRS02-BL-M` 8 → 7, while the product's
+  default variant stayed at 40 and its Blue/L variant at 0. Two variants of one product really are
+  independent inventory rows.
+- **Both order views render it** — the console order detail shows `Color: Blue · Size: M` between the name and
+  the sku; the storefront's own order view shows `Color: Blue / Size: M` under the name. The optionless line
+  shows nothing on either, which is the control.
+
+### SF-03 — The cart line names the combination · high · [verified]
+
+- **Expect** — adding Blue/M gives a line reading **"Color: Blue / Size: M"** at the variant's own price.
+- **Result** — confirmed. The labels are the placement-time snapshot, never re-joined from the catalog, so an
+  order keeps saying what was bought after the option is renamed or deleted.
+
+### SF-04 — Listing cards stay one-sku-per-product · [verified]
+
+- **Expect** — a card shows the **default** variant's price and never loads the variant rows; `variantCount`
+  is the only variant fact a listing payload carries.
+- **Result** — `toListingProduct` strips `options` and `variants`; the listing enrichment is one availability
+  call for the page's default skus.
+
+### SF-05 — The facet rail filters by option value · high · [verified]
+
+- **Steps** — the seeded Dresses category, whose two products give the rail something to count.
+- **Expect** — counted groups per option, a click narrowing the listing and putting the value in the URL, and
+  the AND across options anchored to a **single variant**.
+- **Result** — the rail renders `FILTER BY COLOR` (Red (1), Blue (1)) and `FILTER BY SIZE` (M (1), L (1))
+  beside the pre-existing manufacturer facet. Red alone narrows 2 → 1 with `?options=1`. **Red + L
+  (`?options=1,4`) answers "No products" while L alone answers 1** — so the empty result is the anchoring
+  and not an empty catalogue, matching the integration test exactly.
+- Also confirmed on those cards: the variant product offers *view details* while the simple one offers
+  quick-add, which is the card contract deriving `hasVariants` from `variantCount`.
+- Still not run: a suggestion carrying `matchedVariantSku` deep-linking the PDP with `?sku=`.
+
+---
+
+### SF-06 — The buy box respects the merchant's per-order limits · high · [verified]
+
+Reported from the running stack: adding 2 of the Zara dress answered 422 `Product SKU-ZR-CL-DRS02 sells
+between 1 and 1 per order; 2 was asked.`, and the storefront rendered "Failed to add product to cart."
+Two defects behind one symptom.
+
+- **The buy box ignored limits the API publishes.** `quantityOrderMinimum/Maximum` are per sku and reach the
+  storefront on every availability read, but `applyVariantInventory` dropped them and `useProductPurchase`
+  built its stepper from stock alone — so it offered a quantity the cart was always going to refuse. The
+  cart's own `requireQuantityInRange` even says "the storefront clamps client-side"; it did not.
+- **Fix** — the bounds ride on `VariantPricing` and enrichment copies them; the stepper's ceiling is
+  `min(stock, quantityOrderMaximum)` with `0` meaning no limit, its floor is `quantityOrderMinimum`, and
+  `isOutOfStock` covers a floor no stock can reach. `maxQty` deliberately keeps meaning **units on hand** —
+  the themes print it as "Only N left", and 8 in stock with a limit of 1 is not "only 1 left".
+- **Steps** — open `SKU-NK-RUN-001` (25 in stock, capped at 1 per order) and a generated variant product
+  (`SKU-NK-CL-KHD07`, uncapped).
+- **Result** — the capped product shows "In stock", quantity pinned at 1 with **both** stepper buttons
+  disabled; the uncapped one increments freely. Sizes render S · M · L in that order after the seed's
+  `sort_order` fix.
+
+### SF-07 — A refusal says what was actually refused · high · [verified]
+
+`locales/*.json` has carried a message per error `code` since the error contract landed, and **nothing read
+them**: every interactive failure notified one fixed string per action, so a quantity cap, an offline
+browser and a declined card were all "Failed to add product to cart" / "Failed to place order".
+
+- **Fix** — `useErrorMessage()` resolves code → the caller's own fallback → category → generic, interpolating
+  the problem's `params`; wired into add-to-cart (both hooks), cart quantity, remove and checkout.
+- **The code was wrong too.** The range refusal reused `CHECKOUT.CART.PRODUCT_NOT_PURCHASABLE`, whose
+  contract says the item is not sellable at all and retrying will not help — the opposite of "buy fewer and
+  it works". It now raises `CHECKOUT.CART.QUANTITY_OUT_OF_RANGE`, still 422, carrying `sku`, `quantity`,
+  `minimum` and `maximum` so the message can name the numbers. Pinned by
+  `ProductNotPurchasableExceptionTest`.
+- **Steps** — the cart drawer's stepper is deliberately server-guarded rather than clamped (a line's bounds
+  are not on the cart payload), so it is the reachable path: put the capped `SKU-NK-RUN-001` in the cart and
+  press +.
+- **Result** — `POST /api/v1/cart` answers `CHECKOUT.CART.QUANTITY_OUT_OF_RANGE`, and the toast reads **"You
+  can order between 1 and 1 of this item — 2 isn't allowed."** Translated in all five locales; the ICU
+  plural renders "at least {minimum}" when the maximum is the `0` no-limit sentinel.
+
+### SF-08 — The demo stores can actually sell more than one of something · [verified]
+
+The fashion and beauty seeds set `quantity_ord_max = 1` on every row, so with the limits now enforced client
+side every stepper in those stores would have been inert.
+
+- **Fix** — both stores get a spread (about half unlimited, the rest 2/3/5/10). Cars stays at 1 throughout,
+  which is right for a car and keeps a whole store exercising the cap; electronics was already 2–10.
+  `SKU-NK-RUN-001` keeps its cap of 1 deliberately as the fixture SF-06 and SF-07 test against.
+- **Result** — fashion 22 unlimited · 1 capped at 1 · the rest 2–10; beauty 23 unlimited and no row left at 1.
+
+**Landing-ui — the wrong item in the cart**
+
+- *An unresolved combination fell back to the default variant.* `canAdd` never checked that a variant
+  resolved and `sku` fell back to `product.sku`, so on the seeded dress (SF-01) picking Red then the greyed L
+  showed "In stock" and Red/M's price, kept the button live, and added **Red/M**. All 12 themes rendered the
+  unavailable chip as a plain clickable button. Now `unresolved` blocks the add, the badge and button say
+  "Not available", and the chips carry `aria-disabled`.
+- *Two `ERRORS.CODE.*` keys were dead*: they said `CATALOG_RESERVATION_*` while the service emits
+  `INVENTORY.RESERVATION.*`, so the one refusal a shopper can act on ("Only 3 left of X") still fell through
+  to "Failed to place order" — the very defect SF-07 exists to fix. Renamed in all five locales.
+- `ReadableProductOption.name` was `null` for a language with no option description while the client types it
+  non-optional, giving an empty `<legend>`, an empty `aria-label` and "Please choose ". It falls back to the
+  code, like `ProductVariantMapper.label` already did.
+
+---
+
 ## 99 — Known gaps
+
+- **`libs/types`, `libs/services` and `libs/hooks` are linted by nothing.** `npm run lint` covers
+  `storefront libs/ui libs/i18n libs/theme themes`, so the three tsc-built libs — including
+  `use-product-purchase.ts`, which carried two of the variant rework's blockers — are checked only by `tsc`.
+  That is how a `react-hooks/set-state-in-effect` **error** sat in the quantity clamp unnoticed (since fixed by
+  deriving during render). Adding them to the script surfaces 54 pre-existing errors of unrelated origin, so
+  the scope change belongs in its own PR.
+- **A suggestion's `matchedVariantSku` deep link** — the one interaction in the variant rework never driven end
+  to end. Everything it depends on is verified (suggest returns the field, the provider maps it into the href,
+  and `?sku=` preselection works — SF-02), so what is untested is the wiring between them.
+- **`ProductAttribute*`** remains in landing-ui's types, dead on the wire: every theme's product page renders a
+  specifications block from it that degrades to nothing. Descriptive attributes are a stated future feature —
+  delete the shape together with those blocks, or revive it when the feature lands.
 
 **The Next dev server 500s on unknown slugs** instead of rendering a 404 page (SF-04). Dev-only; the production
 build renders the 404.
@@ -273,3 +417,5 @@ title and prose. A builder would arrive as its own feature rather than as a dorm
 
 Raise anything unexpected against the landing-ui PR. Include the store **host with its port**, the path, the
 browser console, and `.lcl/<stack>/logs/landing-ui.log` — plus which theme and which locale were active.
+
+---

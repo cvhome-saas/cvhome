@@ -25,6 +25,7 @@ import com.asrevo.cvhome.catalog.entity.ManufacturerDescription;
 import com.asrevo.cvhome.catalog.entity.Product;
 import com.asrevo.cvhome.catalog.entity.ProductDescription;
 import com.asrevo.cvhome.catalog.entity.ProductType;
+import com.asrevo.cvhome.catalog.entity.ProductVariant;
 import com.asrevo.cvhome.catalog.model.product.ProductSearchCriteria;
 import com.asrevo.cvhome.catalog.model.product.ProductSearchSort;
 import com.asrevo.cvhome.catalog.model.product.ReadableProduct;
@@ -33,6 +34,7 @@ import com.asrevo.cvhome.catalog.model.product.ReadableProductSuggestion;
 import com.asrevo.cvhome.catalog.repositories.CategoryRepository;
 import com.asrevo.cvhome.catalog.repositories.ManufacturerRepository;
 import com.asrevo.cvhome.catalog.repositories.ProductFacetRepository;
+import com.asrevo.cvhome.catalog.repositories.ProductOptionValueRepository;
 import com.asrevo.cvhome.catalog.repositories.ProductRepository;
 import com.asrevo.cvhome.catalog.repositories.ProductSearchIndexRepository;
 import com.asrevo.cvhome.catalog.repositories.ProductTypeRepository;
@@ -126,6 +128,9 @@ class ProductSearchServiceImplTest {
     private ProductTypeRepository productTypeRepository;
 
     @Mock
+    private ProductOptionValueRepository optionValueRepository;
+
+    @Mock
     private ProductSearchIndexer indexer;
 
     @Mock
@@ -136,13 +141,13 @@ class ProductSearchServiceImplTest {
     @BeforeEach
     void setUp() {
         service = new ProductSearchServiceImpl(productRepository, searchIndexRepository, facetRepository,
-                categoryRepository, manufacturerRepository, productTypeRepository, indexer, productMapper,
-                new ImageMapper("https://cdn.example/bucket"));
+                categoryRepository, manufacturerRepository, productTypeRepository, optionValueRepository,
+                indexer, productMapper, new ImageMapper("https://cdn.example/bucket"));
         when(productMapper.toReadable(any(), any())).thenAnswer(invocation -> {
             Product product = invocation.getArgument(0);
             ReadableProduct readable = new ReadableProduct();
             readable.setId(product.getId());
-            readable.setSku(product.getSku());
+            product.defaultVariant().ifPresent(variant -> readable.setSku(variant.getSku()));
             return readable;
         });
     }
@@ -152,7 +157,9 @@ class ProductSearchServiceImplTest {
     private static Product product(long id, String sku, String name) {
         Product product = new Product();
         product.setId(id);
-        product.setSku(sku);
+        ProductVariant defaultVariant = new ProductVariant(product, sku);
+        defaultVariant.setDefaultVariant(true);
+        product.getVariants().add(defaultVariant);
         product.setStore(STORE);
         ProductDescription description = new ProductDescription(product);
         description.setLanguageCode(EN);

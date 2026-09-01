@@ -14,11 +14,12 @@ import {EssentialsStep} from './components/essentials-step/essentials-step';
 import {MediaStep} from './components/media-step/media-step';
 import {OrganizeStep} from './components/organize-step/organize-step';
 import {PricingStep} from './components/pricing-step/pricing-step';
+import {VariantsStep} from './components/variants-step/variants-step';
 import {ProductFormFacade} from './facades/product-form.facade';
 import {positiveIntParam} from '@core/routing/route-params';
 
 /**
- * The product wizard: four steps, a readiness checklist and a translations panel.
+ * The product wizard: five steps, a readiness checklist and a translations panel.
  *
  * Replaces seller-ui's two-column form plus four router sub-tabs. The step is *not* in the URL,
  * unlike the catalogue's tab: a step is a position inside one editing session, and making it
@@ -43,6 +44,7 @@ import {positiveIntParam} from '@core/routing/route-params';
     ProgressTrack,
     Stepper,
     TranslocoDirective,
+    VariantsStep,
   ],
   providers: [ProductFormFacade],
   templateUrl: './product-form.html',

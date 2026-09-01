@@ -27,6 +27,7 @@ import com.asrevo.cvhome.catalog.entity.Category;
 import com.asrevo.cvhome.catalog.entity.Manufacturer;
 import com.asrevo.cvhome.catalog.entity.Product;
 import com.asrevo.cvhome.catalog.entity.ProductType;
+import com.asrevo.cvhome.catalog.entity.ProductVariant;
 import com.asrevo.cvhome.catalog.errors.CategoryAlreadyAttachedException;
 import com.asrevo.cvhome.catalog.errors.CategoryNotFoundException;
 import com.asrevo.cvhome.catalog.errors.CategoryReferenceUnresolvableException;
@@ -41,8 +42,10 @@ import com.asrevo.cvhome.catalog.model.product.ProductFilter;
 import com.asrevo.cvhome.catalog.model.product.ReadableProduct;
 import com.asrevo.cvhome.catalog.repositories.CategoryRepository;
 import com.asrevo.cvhome.catalog.repositories.ManufacturerRepository;
+import com.asrevo.cvhome.catalog.repositories.ProductOptionValueRepository;
 import com.asrevo.cvhome.catalog.repositories.ProductRepository;
 import com.asrevo.cvhome.catalog.repositories.ProductTypeRepository;
+import com.asrevo.cvhome.catalog.repositories.ProductVariantRepository;
 import com.asrevo.cvhome.catalog.services.image.ProductImageService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
@@ -50,6 +53,7 @@ import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -82,6 +86,12 @@ class ProductServiceImplTest {
     private ProductRepository productRepository;
 
     @Mock
+    private ProductVariantRepository variantRepository;
+
+    @Mock
+    private ProductOptionValueRepository optionValueRepository;
+
+    @Mock
     private CategoryRepository categoryRepository;
 
     @Mock
@@ -108,8 +118,9 @@ class ProductServiceImplTest {
         // The real guard, over a stubbed billing client: its "no ceiling means unlimited" rule is part of what
         // create() promises, and a mock of the guard would assert nothing about it.
         storeEntitlements = new StoreEntitlements(entitlementService, Duration.ofMinutes(1));
-        service = new ProductServiceImpl(productRepository, categoryRepository, manufacturerRepository,
-                productTypeRepository, productImageService, productMapper, storeEntitlements);
+        service = new ProductServiceImpl(productRepository, variantRepository, optionValueRepository,
+                categoryRepository, manufacturerRepository, productTypeRepository, productImageService,
+                productMapper, storeEntitlements);
     }
 
     private void ceiling(Integer maxProducts) throws Exception {
@@ -123,7 +134,9 @@ class ProductServiceImplTest {
         Product product = new Product();
         product.setId(id);
         product.setStore(STORE);
-        product.setSku(SKU);
+        ProductVariant defaultVariant = new ProductVariant(product, SKU);
+        defaultVariant.setDefaultVariant(true);
+        product.getVariants().add(defaultVariant);
         return product;
     }
 
@@ -158,7 +171,7 @@ class ProductServiceImplTest {
         when(categoryRepository.findByStoreAndId(STORE, 1L)).thenReturn(Optional.of(men));
         when(categoryRepository.findSubtree(STORE, ROOT_LINEAGE))
                 .thenReturn(List.of(men, category(7L, "/1/7/")));
-        when(productRepository.search(eq(STORE), eq(filter), any(Pageable.class)))
+        when(productRepository.search(eq(STORE), eq(filter), anyMap(), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of(product(3L))));
         when(productMapper.toReadable(any(), eq(EN))).thenReturn(new ReadableProduct());
 
@@ -172,7 +185,7 @@ class ProductServiceImplTest {
     void twoCategoriesAreTakenLiterally() {
         ProductFilter filter = new ProductFilter();
         filter.setCategoryIds(List.of(1L, 4L));
-        when(productRepository.search(eq(STORE), eq(filter), any(Pageable.class)))
+        when(productRepository.search(eq(STORE), eq(filter), anyMap(), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of()));
 
         service.list(STORE, filter, EN, PageRequest.of(0, 10));
@@ -183,7 +196,7 @@ class ProductServiceImplTest {
 
     @Test
     void anUnknownSkuOrSlugIsNotFound() {
-        when(productRepository.findByStoreAndSku(STORE, SKU)).thenReturn(Optional.empty());
+        when(variantRepository.findByStoreAndSku(STORE, SKU)).thenReturn(Optional.empty());
         when(productRepository.findByStoreAndFriendlyUrl(STORE, SLUG, EN)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.getBySku(STORE, SKU, EN)).isInstanceOf(ProductNotFoundException.class);
@@ -216,6 +229,24 @@ class ProductServiceImplTest {
 
         verify(productRepository, never()).countByStore(any());
         verify(productRepository).save(any());
+    }
+
+    @Test
+    void createPersistsTheDefaultVariantWithTheProduct() throws Exception {
+        ceiling(null);
+        when(productRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+
+        service.create(STORE, definition());
+
+        org.mockito.ArgumentCaptor<Product> captor = org.mockito.ArgumentCaptor.forClass(Product.class);
+        verify(productRepository).save(captor.capture());
+        Product saved = captor.getValue();
+        assertThat(saved.getVariants()).hasSize(1);
+        ProductVariant defaultVariant = saved.defaultVariant().orElseThrow();
+        assertThat(defaultVariant.getSku()).isEqualTo(SKU);
+        assertThat(defaultVariant.isDefaultVariant()).isTrue();
+        assertThat(defaultVariant.getOptionSignature()).isEqualTo(ProductVariant.DEFAULT_SIGNATURE);
+        assertThat(defaultVariant.getStoreMerchantId()).isEqualTo(STORE);
     }
 
     @Test
@@ -280,7 +311,6 @@ class ProductServiceImplTest {
     @Test
     void patchOnlyMovesTheTwoInlineSwitches() throws Exception {
         Product product = product(3L);
-        product.setSku(SKU);
         when(productRepository.findByStoreAndId(STORE, 3L)).thenReturn(Optional.of(product));
         LightPersistableProduct source = new LightPersistableProduct();
         source.setAvailable(false);
@@ -290,7 +320,7 @@ class ProductServiceImplTest {
 
         assertThat(product.isAvailable()).isFalse();
         assertThat(product.isProductShipeable()).isTrue();
-        assertThat(product.getSku()).isEqualTo(SKU);
+        assertThat(product.defaultVariant().orElseThrow().getSku()).isEqualTo(SKU);
     }
 
     // ------------------------------------------------------------------------------------------- category members

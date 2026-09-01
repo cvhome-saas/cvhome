@@ -4,6 +4,7 @@ import {Observable, of, throwError} from 'rxjs';
 
 import {NOTIFICATION_PORT} from '@core/errors/notification.port';
 import {ConsoleApi} from '@layouts/console-shell/services/console.api.service';
+import type {PersistableProductOption} from '@models/catalog';
 import type {CatalogueSnapshot, CategoryNode, LocalisedCopy} from '@models/taxonomy';
 import {CONSOLE_STORES_FAKE, FakeConsoleApi} from '@testing/console-api.fake';
 import {provideFakeProductSearch} from '@testing/product-search.fake';
@@ -48,6 +49,30 @@ const SNAPSHOT: CatalogueSnapshot = {
   ],
   brands: [],
   types: [],
+  options: [
+    {
+      id: 9,
+      code: 'color',
+      name: 'Color',
+      sortOrder: 0,
+      copy: [
+        {language: 'en', name: 'Color'},
+        {language: 'ar', name: 'اللون'},
+      ],
+      values: [
+        {
+          id: 91,
+          code: 'red',
+          name: 'Red',
+          sortOrder: 0,
+          copy: [
+            {language: 'en', name: 'Red'},
+            {language: 'ar', name: 'أحمر'},
+          ],
+        },
+      ],
+    },
+  ],
   groups: [],
   languages: ['en', 'ar'],
   unavailable: [],
@@ -90,6 +115,22 @@ class FakeCatalogueApi {
 
   groupCodeTaken(): Observable<boolean> {
     return of(false);
+  }
+
+  optionCodeTaken(): Observable<boolean> {
+    return of(false);
+  }
+
+  readonly optionBodies: PersistableProductOption[] = [];
+
+  createOption(body: PersistableProductOption): Observable<CatalogueSnapshot> {
+    this.optionBodies.push(body);
+    return of(this.current);
+  }
+
+  updateOption(_id: number, body: PersistableProductOption): Observable<CatalogueSnapshot> {
+    this.optionBodies.push(body);
+    return of(this.current);
   }
 }
 
@@ -291,6 +332,81 @@ describe('CatalogueFacade', () => {
 
     expect(facade.categoryForm.controls.code.disabled).toBe(true);
     expect(facade.categoryForm.controls.code.hasError('codeTaken')).toBe(false);
+  }));
+
+  /* --------------------------------------------------------------- option editor ---- */
+
+  it('loads the selected option with its value rows, existing codes locked', fakeAsync(() => {
+    settle();
+    facade.activeTab.set('options');
+    settle();
+
+    expect(facade.optionForm.controls.code.value).toBe('color');
+    expect(facade.optionForm.controls.code.disabled).toBe(true);
+    expect(facade.optionForm.controls.name.value).toBe('Color');
+    const rows = facade.optionForm.controls.values.controls;
+    expect(rows.length).toBe(1);
+    expect(rows[0].controls.name.value).toBe('Red');
+    // An existing value's code is its identity — renaming happens through the name, not the code.
+    expect(rows[0].controls.code.disabled).toBe(true);
+  }));
+
+  it('keeps an unsaved value name across a language switch, and an added row too', fakeAsync(() => {
+    settle();
+    facade.activeTab.set('options');
+    settle();
+
+    facade.optionForm.controls.values.at(0).controls.name.setValue('Crimson');
+    facade.addOptionValue();
+    facade.optionForm.controls.values.at(1).controls.name.setValue('Blue');
+
+    facade.setLanguage('ar');
+    settle();
+    expect(facade.optionForm.controls.values.at(0).controls.name.value).toBe('أحمر');
+    // The added row is structure, not copy: it must survive the switch, blank in Arabic.
+    expect(facade.optionForm.controls.values.length).toBe(2);
+    expect(facade.optionForm.controls.values.at(1).controls.name.value).toBe('');
+
+    facade.setLanguage('en');
+    settle();
+    expect(facade.optionForm.controls.values.at(0).controls.name.value).toBe('Crimson');
+    expect(facade.optionForm.controls.values.at(1).controls.name.value).toBe('Blue');
+  }));
+
+  it('sends every language for the option and for each value, ids kept', fakeAsync(() => {
+    settle();
+    facade.activeTab.set('options');
+    settle();
+
+    facade.optionForm.controls.name.setValue('Colour');
+    facade.saveOption();
+    settle();
+
+    const [body] = api.optionBodies;
+    expect(body.code).toBe('color');
+    expect(body.descriptions.find((entry) => entry.language === 'en')?.name).toBe('Colour');
+    // Untouched Arabic goes back exactly as it arrived — the write replaces the whole list.
+    expect(body.descriptions.find((entry) => entry.language === 'ar')?.name).toBe('اللون');
+    const [value] = body.values;
+    // The id is what keeps the store-wide value id stable for every variant referencing it.
+    expect(value.id).toBe(91);
+    expect(value.descriptions.map((entry) => entry.language).sort()).toEqual(['ar', 'en']);
+  }));
+
+  it('refuses to save an option with no values', fakeAsync(() => {
+    settle();
+    facade.activeTab.set('options');
+    settle();
+    facade.startCreate();
+    facade.optionForm.controls.code.setValue('size');
+    facade.optionForm.controls.name.setValue('Size');
+    tick(500);
+
+    facade.saveOption();
+    settle();
+
+    // Nothing was sent: an option with no values has nothing to generate variants from.
+    expect(api.optionBodies.length).toBe(0);
   }));
 
   it('suggests a code from the name while creating, and stops once one is typed', fakeAsync(() => {

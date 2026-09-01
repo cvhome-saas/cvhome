@@ -4,7 +4,7 @@ import {useTranslations} from 'next-intl';
 import {Trash2Icon} from 'lucide-react';
 import {Link} from '@store-front/i18n/navigation';
 import type {Product} from '@store-front/types';
-import {primaryImage, productHref} from '@store-front/services/product-presenter';
+import {primaryImage, productHref, variantSelectionLabel} from '@store-front/services/product-presenter';
 import {Button} from '@store-front/ui/button';
 import {QuantityStepper} from '@store-front/ui/quantity-stepper';
 
@@ -24,6 +24,8 @@ export function CartLineItem({product, onQuantity, onRemove, busy}: {
                     <h3 className="line-clamp-2 text-sm font-semibold leading-snug" dir="auto">
                         <Link prefetch={false} href={productHref(product)}><bdi>{product.description?.name}</bdi></Link>
                     </h3>
+                    {/* The combination bought — "Color: Red / Size: L" — from the placement-time selection. */}
+                    {variantSelectionLabel(product) && <p className="text-xs text-muted-foreground" dir="auto">{variantSelectionLabel(product)}</p>}
                     <span className="price shrink-0 text-lg">{product.displaySubTotal || product.finalPrice}</span>
                 </div>
                 <div className="flex items-center justify-between gap-3">

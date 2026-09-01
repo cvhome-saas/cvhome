@@ -86,7 +86,9 @@ async function productHits(ctx: StoreContext, query: string, signal?: AbortSigna
         kind: 'product' as const,
         id: `p-${s.id}`,
         title: s.name,
-        href: `/product/${s.friendlyUrl}`,
+        // A term that matched a combination variant's sku still suggests the one product — the
+        // deep link lands the PDP with that variant preselected.
+        href: `/product/${s.friendlyUrl}${s.matchedVariantSku ? `?sku=${encodeURIComponent(s.matchedVariantSku)}` : ''}`,
         imageUrl: s.imageUrl,
         subtitle: s.brand,
     }));

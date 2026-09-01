@@ -36,9 +36,17 @@ export interface OrderLine {
   readonly id: number;
   readonly name: string;
   readonly sku: string;
+  /** "Color: Red" pairs, snapshotted at placement — empty for a product with no options. */
+  readonly options: readonly OrderLineOption[];
   readonly quantity: number;
   readonly price: string;
   readonly lineTotal: string;
+}
+
+/** One option label pair on an order line. */
+export interface OrderLineOption {
+  readonly name: string;
+  readonly value: string;
 }
 
 /** The seller, as the invoice prints it in its letterhead. */
@@ -260,6 +268,14 @@ export class OrderDetailsFacade {
       id: item.id ?? index,
       name: item.productName ?? item.product?.name ?? '—',
       sku: item.sku ?? item.product?.sku ?? '',
+      // Labels are the placement-time snapshot, never re-joined from the catalog — an order line
+      // must keep saying "Color: Red" after the option is renamed or deleted.
+      options: (item.attributes ?? [])
+        .filter((attribute) => attribute.attributeName && attribute.attributeValue)
+        .map((attribute) => ({
+          name: attribute.attributeName as string,
+          value: attribute.attributeValue as string,
+        })),
       quantity: item.orderedQuantity ?? 0,
       price: this.lineAmount(item.price, order?.currency),
       lineTotal: this.lineAmount(item.subTotal, order?.currency),

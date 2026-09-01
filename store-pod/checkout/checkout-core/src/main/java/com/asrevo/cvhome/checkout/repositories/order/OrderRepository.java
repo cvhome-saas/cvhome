@@ -40,7 +40,7 @@ public interface OrderRepository extends JpaRepository<Order, Long>, JpaSpecific
             join fetch o.orderTotal ot left
             join fetch o.orderHistory oh left
             join fetch op.downloads opd left
-            join fetch op.orderAttributes opa
+            join fetch op.orderOptions opo
             left join fetch op.prices opp where o.id = ?1 and o.storeMerchantId = ?2""")
     Order findOne(Long id, StoreMerchantId storeMerchantId);
 

@@ -5,6 +5,8 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -39,15 +41,16 @@ import com.asrevo.cvhome.checkout.model.order.v0.ReadableOrderList;
 import com.asrevo.cvhome.checkout.model.order.v1.PersistableOrder;
 import com.asrevo.cvhome.checkout.model.order.v1.ReadableOrderConfirmation;
 import com.asrevo.cvhome.checkout.model.order.v1.ReadableOrderStatus;
+import com.asrevo.cvhome.checkout.model.product.ProductDetails;
 import com.asrevo.cvhome.checkout.service.facade.cart.ShoppingCartFacade;
 import com.asrevo.cvhome.checkout.service.facade.customer.CustomerFacade;
+import com.asrevo.cvhome.checkout.service.facade.product.ProductDetailsComposer;
 import com.asrevo.cvhome.checkout.service.mapper.customer.ReadableCustomerMapper;
+import com.asrevo.cvhome.checkout.service.mapper.order.OrderLineMapper;
 import com.asrevo.cvhome.checkout.service.mapper.order.ReadableOrderProductMapper;
 import com.asrevo.cvhome.checkout.service.mapper.order.ReadableOrderTotalMapper;
-import com.asrevo.cvhome.checkout.service.populator.order.OrderProductPopulator;
 import com.asrevo.cvhome.checkout.service.populator.order.PersistableOrderApiPopulator;
 import com.asrevo.cvhome.checkout.service.populator.order.ReadableOrderPopulator;
-import com.asrevo.cvhome.checkout.service.populator.order.ReadableOrderProductPopulator;
 import com.asrevo.cvhome.checkout.services.order.OrderService;
 import com.asrevo.cvhome.checkout.services.shoppingcart.ShoppingCartService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
@@ -89,9 +92,8 @@ public class OrderFacadeImpl implements OrderFacade {
 
     private final ReadableOrderPopulator readableOrderPopulator;
 
-    private final OrderProductPopulator orderProductPopulator;
+    private final ProductDetailsComposer productDetailsComposer;
 
-    private final ReadableOrderProductPopulator readableOrderProductPopulator;
     private final OrderInventoryOrchestrator orderInventoryOrchestrator;
 
     @Override
@@ -130,11 +132,14 @@ public class OrderFacadeImpl implements OrderFacade {
 
         List<ShoppingCartItem> shoppingCartItems = new ArrayList<>(cart.getLineItems());
 
+        // one catalog call + one inventory call for the whole order, never one pair per line
+        Map<String, ProductDetails> detailsBySku = productDetailsComposer.getDetailedProducts(store,
+                shoppingCartItems.stream().map(ShoppingCartItem::getSku).toList(), language);
+
         Set<OrderProduct> orderProducts = new LinkedHashSet<>();
 
         for (ShoppingCartItem item : shoppingCartItems) {
-            OrderProduct orderProduct = new OrderProduct();
-            orderProduct = orderProductPopulator.populate(item, orderProduct, store, language);
+            OrderProduct orderProduct = OrderLineMapper.toOrderProduct(item, detailsBySku.get(item.getSku()));
             orderProduct.setOrder(modelOrder);
             orderProducts.add(orderProduct);
         }
@@ -203,11 +208,7 @@ public class OrderFacadeImpl implements OrderFacade {
         grandTotal.ifPresent(readableOrderTotal -> readableTotal.setGrandTotal(readableOrderTotal.getText()));
         orderConfirmation.setTotal(readableTotal);
 
-        List<ReadableOrderProduct> products = new ArrayList<>();
-        for (OrderProduct pr : order.getOrderProducts()) {
-            products.add(readableOrderProductMapper.convert(pr, store, language));
-        }
-        orderConfirmation.setProducts(products);
+        orderConfirmation.setProducts(readableProducts(order, store, language));
 
         orderConfirmation.setId(order.getId());
         orderConfirmation.setOrderStatus(order.getStatus());
@@ -273,16 +274,7 @@ public class OrderFacadeImpl implements OrderFacade {
 
         readableOrderPopulator.populate(modelOrder, readableOrder, store, language);
 
-        // order products
-        List<ReadableOrderProduct> orderProducts = new ArrayList<>();
-        for (OrderProduct p : modelOrder.getOrderProducts()) {
-
-            ReadableOrderProduct orderProduct = new ReadableOrderProduct();
-            readableOrderProductPopulator.populate(p, orderProduct, store, language);
-            orderProducts.add(orderProduct);
-        }
-
-        readableOrder.setProducts(orderProducts);
+        readableOrder.setProducts(readableProducts(modelOrder, store, language));
 
         return readableOrder;
     }
@@ -304,18 +296,25 @@ public class OrderFacadeImpl implements OrderFacade {
 
         readableOrderPopulator.populate(modelOrder, readableOrder, store, language);
 
-        // order products
-        List<ReadableOrderProduct> orderProducts = new ArrayList<>();
-        for (OrderProduct p : modelOrder.getOrderProducts()) {
-
-            ReadableOrderProduct orderProduct = new ReadableOrderProduct();
-            readableOrderProductPopulator.populate(p, orderProduct, store, language);
-            orderProducts.add(orderProduct);
-        }
-
-        readableOrder.setProducts(orderProducts);
+        readableOrder.setProducts(readableProducts(modelOrder, store, language));
 
         return readableOrder;
+    }
+
+    /**
+     * Every rendered order goes through here: the composed product details for all its lines arrive in one
+     * catalog call plus one inventory call, and each line is mapped off the prefetched map.
+     */
+    private List<ReadableOrderProduct> readableProducts(Order order, StoreMerchantId store, LanguageCode language)
+            throws PriceNotFormattableException {
+        Map<String, ProductDetails> detailsBySku = productDetailsComposer.getDetailedProducts(store,
+                order.getOrderProducts().stream().map(OrderProduct::getSku).filter(Objects::nonNull).toList(),
+                language);
+        List<ReadableOrderProduct> products = new ArrayList<>();
+        for (OrderProduct line : order.getOrderProducts()) {
+            products.add(readableOrderProductMapper.convert(line, detailsBySku.get(line.getSku()), store));
+        }
+        return products;
     }
 
     /**
