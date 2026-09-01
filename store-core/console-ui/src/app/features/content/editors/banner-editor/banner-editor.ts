@@ -59,8 +59,6 @@ const COPY_STRIP: CopyFields = {
 };
 
 const SIZE_HINTS: Readonly<Record<BannerPlacement, string>> = {
-  HERO: '1920 × 900',
-  CAROUSEL: '1600 × 640',
   COLLECTION: '1600 × 420',
   STRIP: '',
 };
@@ -127,7 +125,7 @@ export class BannerEditor {
     mobileCrop: FormControl<string>;
     loggedInOnly: FormControl<boolean>;
   }> = this.fb.group({
-    placement: this.fb.control<BannerPlacement>('HERO'),
+    placement: this.fb.control<BannerPlacement>('COLLECTION'),
     startsAt: this.fb.control(''),
     endsAt: this.fb.control(''),
     targetKind: this.fb.control<TargetKind>('URL'),

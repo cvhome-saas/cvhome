@@ -263,7 +263,8 @@
       "CART_WITH_COUNT": "Cart, {count, plural, =0 {empty} =1 {1 item} other {# items}}",
       "VIEW_ALL_IN": "All {name}",
       "ANNOUNCEMENT": "Note",
-      "INDEX": "Categories"
+      "INDEX": "Categories",
+      "MORE": "More"
     },
     "FOOTER": {
       "SOCIAL_FACEBOOK": "Facebook",
@@ -309,6 +310,12 @@
       "PRODUCTS": "Products",
       "SUGGESTIONS_ONLY": "Showing categories and pages",
       "SEE_ALL": "See all results"
+    },
+    "NEWSLETTER": {
+      "HEADING": "Stay in the loop",
+      "EMAIL": "email@example.com",
+      "SUBSCRIBE": "Subscribe",
+      "THANKS": "Thanks — you are on the list."
     }
   },
   "ERRORS": {

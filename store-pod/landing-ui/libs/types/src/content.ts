@@ -57,11 +57,12 @@ export interface StorefrontSeo {
     ogImageUrl: string | null
 }
 
-export type BannerPlacement = 'HERO' | 'CAROUSEL' | 'COLLECTION' | 'STRIP'
+export type BannerPlacement = 'COLLECTION' | 'STRIP'
 
 export interface Banner {
     id: number
-    placement: BannerPlacement
+    /** Null for the layout hero's inline slides, which ride this shape through `slidesAsBanners`. */
+    placement: BannerPlacement | null
     position: number
     servedLocale: string | null
     title: string | null
@@ -102,32 +103,6 @@ export interface SiteBranding {
 export interface SocialLink {
     provider: string
     url: string
-}
-
-/** What a home-page section renders. */
-export type HomeSectionKind =
-    'PRODUCT_GROUP' | 'CATEGORY_GRID' | 'BANNER_REF' | 'RICH_TEXT' | 'IMAGE' | 'POST_FEED' | 'FAQ_REF'
-
-/**
- * One block of the store's home page. Before these existed the page was a hard-coded list of four product groups
- * in the storefront's loader, so a seller could not reorder it or put anything else on it.
- */
-export interface HomeSection {
-    id: number
-    slug: string
-    sortOrder: number
-    servedLocale: string | null
-    kind: HomeSectionKind
-    /** The product group code, category code, banner slug or FAQ group key this block draws. */
-    targetValue: string | null
-    title: string | null
-    subtitle: string | null
-    body: string | null
-    ctaLabel: string | null
-    cta: { kind: MenuTargetKind; value: string | null } | null
-    imageUrl: string | null
-    itemLimit: number | null
-    layout: string | null
 }
 
 export interface SiteContent {

@@ -1,55 +1,104 @@
 import 'server-only';
 import {cache} from 'react';
+import {CategoryService} from '@store-front/services/category-service';
 import {ContentService} from '@store-front/services/content-service';
 import {ProductService} from '@store-front/services/product-service';
+import {ProductSearchService} from '@store-front/services/product-search-service';
 import {toListingProducts} from '@store-front/services/product-presenter';
-import type {HomeSection, ProductGroup, ProductGroupCode} from '@store-front/types';
-import type {HomeData} from '@store-front/theme';
+import {defaultSearchQuery} from '@store-front/types/search';
+import type {LayoutSectionData, PageLayoutData, Product, ProductSourceRef} from '@store-front/types';
+import type {SectionResolvedData} from '@store-front/theme';
 import {getStoreContext} from '@/shell/request/store-context';
 
 /**
- * The product groups a `PRODUCT_GROUP` section may draw.
- *
- * The home page used to be exactly this list, in this order, for every store. It is a whitelist now: the page is
- * the merchant's `SECTION` rows, and this only says which group codes exist to point at.
+ * The home page: the store's layout document plus, per section, whatever catalog or content data the section
+ * references — resolved here in one parallel fan-out so section renderers stay synchronous and dumb. Every
+ * store has a layout (the content service materializes a starter default), so there is no legacy branch.
  */
-const GROUPS: ProductGroupCode[] = ['FEATURED_ITEMS', 'NEWLY_ADDED', 'HOME_PAGE', 'RECOMMENDED'];
+export interface HomeLayoutData {
+    layout: PageLayoutData;
+    resolved: Record<string, SectionResolvedData>;
+    /** Set when a preview token rendered the draft — the builder's canvas. */
+    preview: boolean;
+}
 
-const renderable = (g: ProductGroup | undefined) => !!(g && g.active && g.description && g.products && g.products.length > 0);
+const asNumber = (value: unknown, fallback: number): number =>
+    typeof value === 'number' && Number.isFinite(value) ? value : fallback;
 
-/** The group codes the page actually asks for, so a store with no sections still shows its rails. */
-const requested = (sections: HomeSection[]): ProductGroupCode[] => {
-    const named = sections
-        .filter(s => s.kind === 'PRODUCT_GROUP' && s.targetValue)
-        .map(s => s.targetValue as ProductGroupCode)
-        .filter(code => GROUPS.includes(code));
-    return named.length > 0 ? [...new Set(named)] : GROUPS;
+/** One products section's source, resolved. Degrades to an empty list — the section collapses, not the page. */
+const productsFor = async (ctx: Awaited<ReturnType<typeof getStoreContext>>, section: LayoutSectionData):
+    Promise<SectionResolvedData> => {
+    const source = section.props.source as ProductSourceRef | undefined;
+    const limit = asNumber(section.props.limit, 8);
+    try {
+        if (source?.type === 'group' && source.code) {
+            const group = await ProductService.getProductByGroup(ctx, source.code);
+            const products = toListingProducts(group?.products)?.slice(0, limit) ?? [];
+            return {products: {title: group?.description?.name, products}};
+        }
+        if (source?.type === 'category' && source.code) {
+            const category = await CategoryService.getCategory(ctx, source.code);
+            const page = await ProductSearchService.search(ctx,
+                {...defaultSearchQuery(), categoryIds: [category.id], count: limit, sort: 'newest'}, false);
+            return {products: {products: toListingProducts(page.content as Product[]) ?? []}};
+        }
+        if (source?.type === 'newest') {
+            const page = await ProductSearchService.search(ctx,
+                {...defaultSearchQuery(), count: limit, sort: 'newest'}, false);
+            return {products: {products: toListingProducts(page.content as Product[]) ?? []}};
+        }
+    } catch (error) {
+        // one section's source failing must not cost the landing page
+        console.warn('products source failed', source?.type, error);
+    }
+    return {products: {products: []}};
 };
 
-export const loadHome = cache(async (): Promise<HomeData> => {
-    const ctx = await getStoreContext();
-    const [banners, sections] = await Promise.all([
-        ContentService.getBanners(ctx),
-        ContentService.getHomeSections(ctx),
-    ]);
-    const codes = requested(sections);
-    const groups = await Promise.all(codes.map(code => ProductService.getProductByGroup(ctx, code)));
+const resolveSection = async (ctx: Awaited<ReturnType<typeof getStoreContext>>, section: LayoutSectionData):
+    Promise<SectionResolvedData | undefined> => {
+    switch (section.kind) {
+        case 'products':
+            return productsFor(ctx, section);
+        case 'categories': {
+            const page = await CategoryService.getCategories(ctx);
+            const limit = asNumber(section.props.limit, 6);
+            return {categories: (page?.content ?? []).filter(c => c.visible !== false).slice(0, limit)};
+        }
+        case 'faq': {
+            const group = typeof section.props.group === 'string' ? section.props.group : undefined;
+            return {faq: await ContentService.getFaq(ctx, group)};
+        }
+        case 'posts': {
+            const category = typeof section.props.category === 'string' ? section.props.category : undefined;
+            return {posts: await ContentService.getPosts(ctx, {count: asNumber(section.props.limit, 3), category})};
+        }
+        default:
+            // inline kinds (hero, richtext, usp, …) carry everything in props/items/text
+            return undefined;
+    }
+};
 
-    const hero = banners.filter(b => b.placement === 'HERO');
-    const carousel = banners.filter(b => b.placement === 'CAROUSEL');
-    return {
-        // The slides used to come from merchant's own slider and the banner from a separate column, so a store
-        // could have two heroes that knew nothing about each other. Both are CMS banners now.
-        hero: {slides: carousel.length > 0 ? carousel : hero, banner: hero[0]},
-        banners: {
-            hero,
-            carousel,
-            strip: banners.find(b => b.placement === 'STRIP'),
-        },
-        sections,
-        groups: groups.flatMap((g, i) => renderable(g)
-            // Rails render cards, so the products cross into client components — send only what a card reads.
-            ? [{code: codes[i], title: g!.description!.name, products: toListingProducts(g!.products)!}]
-            : []),
-    };
+/** The guard around every section's data: a failing source collapses that section, never the page. */
+const resolveSectionSafely = async (ctx: Awaited<ReturnType<typeof getStoreContext>>,
+                                    section: LayoutSectionData): Promise<SectionResolvedData | undefined> => {
+    try {
+        return await resolveSection(ctx, section);
+    } catch (error) {
+        console.warn('section data failed', section.kind, section.id, error);
+        return undefined;
+    }
+};
+
+export const loadHome = cache(async (previewToken?: string): Promise<HomeLayoutData> => {
+    const ctx = await getStoreContext();
+    const layout = await ContentService.getPageLayout(ctx, 'HOME', previewToken);
+    const entries = await Promise.all(layout.sections.map(async section =>
+        [section.id, await resolveSectionSafely(ctx, section)] as const));
+    const resolved: Record<string, SectionResolvedData> = {};
+    for (const [id, data] of entries) {
+        if (data) {
+            resolved[id] = data;
+        }
+    }
+    return {layout, resolved, preview: !!previewToken};
 });

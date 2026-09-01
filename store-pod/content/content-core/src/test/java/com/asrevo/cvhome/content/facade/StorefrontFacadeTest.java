@@ -18,14 +18,12 @@ import com.asrevo.cvhome.content.entity.PostCategory;
 import com.asrevo.cvhome.content.entity.SiteSettings;
 import com.asrevo.cvhome.content.errors.ContentNotFoundException;
 import com.asrevo.cvhome.content.model.BannerPlacement;
-import com.asrevo.cvhome.content.model.HomeSectionKind;
 import com.asrevo.cvhome.content.model.PolicyType;
 import com.asrevo.cvhome.content.model.PolicyVersionStatus;
 import com.asrevo.cvhome.content.model.banner.BannerArtwork;
 import com.asrevo.cvhome.content.model.banner.BannerMeta;
 import com.asrevo.cvhome.content.model.banner.BannerTarget;
 import com.asrevo.cvhome.content.model.post.PostMeta;
-import com.asrevo.cvhome.content.model.section.SectionMeta;
 import com.asrevo.cvhome.content.model.site.SiteBranding;
 import com.asrevo.cvhome.content.model.storefront.SitemapEntry;
 import com.asrevo.cvhome.content.model.storefront.StorefrontBanner;
@@ -35,7 +33,6 @@ import com.asrevo.cvhome.content.model.storefront.StorefrontPage;
 import com.asrevo.cvhome.content.model.storefront.StorefrontPolicy;
 import com.asrevo.cvhome.content.model.storefront.StorefrontPost;
 import com.asrevo.cvhome.content.model.storefront.StorefrontPostList;
-import com.asrevo.cvhome.content.model.storefront.StorefrontSection;
 import com.asrevo.cvhome.content.model.storefront.StorefrontSite;
 import com.asrevo.cvhome.content.repository.ContentRepository;
 import com.asrevo.cvhome.content.service.FaqService;
@@ -175,7 +172,8 @@ class StorefrontFacadeTest {
                 .thenReturn(new SiteBranding(null, null, null, null));
         when(siteSettings.socialLinks(any())).thenReturn(List.of());
         facade = new StorefrontFacade(contents, menus, media, policies, categories, faq, banners, redirects,
-                siteSettings, ContentFixtures.clock());
+                siteSettings, mock(com.asrevo.cvhome.content.service.PageLayoutService.class),
+                ContentFixtures.clock());
     }
 
     private static PostCategory category(Long id, String slug, Map<String, String> names) {
@@ -578,15 +576,15 @@ class StorefrontFacadeTest {
         @Test
         void bannersAreOrderedBySortThenNewestAndResolveTheirArtwork() {
             Content first = ContentFixtures.published(1L, ContentType.BANNER, SLUG_A, TITLE_A);
-            first.setPlacement(BannerPlacement.CAROUSEL);
+            first.setPlacement(BannerPlacement.COLLECTION);
             first.setSortOrder(0);
             first.setMeta(JsonCodec.write(new BannerMeta(new BannerTarget(BannerTarget.Kind.URL, SALE_PATH),
                     new BannerArtwork(5L, 6L, null), null, false)));
             Content second = ContentFixtures.published(2L, ContentType.BANNER, SLUG_B, "B");
-            second.setPlacement(BannerPlacement.CAROUSEL);
+            second.setPlacement(BannerPlacement.COLLECTION);
             second.setSortOrder(null);
             Content otherPlacement = ContentFixtures.published(3L, ContentType.BANNER, SLUG_C, "C");
-            otherPlacement.setPlacement(BannerPlacement.HERO);
+            otherPlacement.setPlacement(BannerPlacement.STRIP);
             Map<Long, String> urls = new java.util.HashMap<>();
             urls.put(5L, DESKTOP_URL);
             urls.put(6L, MOBILE_URL);
@@ -596,7 +594,7 @@ class StorefrontFacadeTest {
             when(media.urls(any(), anyList())).thenReturn(urls);
 
             List<StorefrontBanner> out = facade.effectiveBanners(ContentFixtures.STORE, ContentFixtures.EN,
-                    BannerPlacement.CAROUSEL);
+                    BannerPlacement.COLLECTION);
 
             assertThat(out).extracting(StorefrontBanner::getId).containsExactly(1L, 2L);
             assertThat(out.getFirst().getPosition()).isZero();
@@ -608,7 +606,7 @@ class StorefrontFacadeTest {
         @Test
         void aBannerTheBindingCallsIneffectiveIsLeftOut() {
             Content banner = ContentFixtures.published(1L, ContentType.BANNER, SLUG_A, TITLE_A);
-            banner.setPlacement(BannerPlacement.HERO);
+            banner.setPlacement(BannerPlacement.STRIP);
             when(contents.findVisibleByType(ContentFixtures.STORE, ContentType.BANNER)).thenReturn(List.of(banner));
             when(banners.effective(banner)).thenReturn(false);
             when(media.urls(any(), anyList())).thenReturn(new java.util.HashMap<>());
@@ -619,7 +617,7 @@ class StorefrontFacadeTest {
         @Test
         void aBannerWithNoTranslationAtAllIsSkipped() {
             Content banner = ContentFixtures.content(1L, ContentType.BANNER, SLUG_A);
-            banner.setPlacement(BannerPlacement.HERO);
+            banner.setPlacement(BannerPlacement.STRIP);
             when(contents.findVisibleByType(ContentFixtures.STORE, ContentType.BANNER)).thenReturn(List.of(banner));
             when(banners.effective(banner)).thenReturn(true);
             when(media.urls(any(), anyList())).thenReturn(new java.util.HashMap<>());
@@ -784,114 +782,6 @@ class StorefrontFacadeTest {
     }
 
 
-    /**
-     * The store's home page.
-     *
-     * <p>
-     * It used to be four product groups written into the storefront's loader, so a seller could not reorder it,
-     * retitle it, or put anything else on it. What the storefront reads now is this list, in the seller's order.
-     * </p>
-     */
-    @Nested
-    class HomeSections {
 
-        private static final String FEATURED = "FEATURED_ITEMS";
-
-        private static final String IMAGE_URL = "https://cdn.test/hero.png";
-
-        private static final String FIRST = "first";
-
-        private static final String ORDERED = "ordered";
-
-        private static final String UNORDERED = "unordered";
-
-        private static final String CAROUSEL = "carousel";
-
-        private Content section(Long id, String slug, Integer sortOrder, SectionMeta meta) {
-            Content c = ContentFixtures.published(id, ContentType.SECTION, slug, slug);
-            c.setSortOrder(sortOrder);
-            c.setMeta(JsonCodec.write(meta));
-            return c;
-        }
-
-        private void live(Content... sections) {
-            when(contents.findVisibleByType(ContentFixtures.STORE, ContentType.SECTION))
-                    .thenReturn(List.of(sections));
-        }
-
-        @Test
-        void sectionsComeBackInTheSellersOrderRatherThanTheDatabasesReadOrder() {
-            live(section(1L, SECOND_SLUG, 1, new SectionMeta(HomeSectionKind.PRODUCT_GROUP, FEATURED, null, null, null,
-                            null)),
-                    section(2L, FIRST, 0, new SectionMeta(HomeSectionKind.RICH_TEXT, null, null, null, null,
-                            null)));
-
-            List<StorefrontSection> out = facade.homeSections(ContentFixtures.STORE, ContentFixtures.EN);
-
-            assertThat(out).extracting(StorefrontSection::getSlug).containsExactly(FIRST, SECOND_SLUG);
-        }
-
-        /**
-         * A section with no order sorts as if it were first rather than throwing — a row can reach this state
-         * from a seed, and a home page that 500s is worse than one whose new block is at the top.
-         */
-        @Test
-        void aSectionWithNoOrderIsTreatedAsZero() {
-            live(section(1L, ORDERED, 1, new SectionMeta(HomeSectionKind.RICH_TEXT, null, null, null, null, null)),
-                    section(2L, UNORDERED, null,
-                            new SectionMeta(HomeSectionKind.RICH_TEXT, null, null, null, null, null)));
-
-            assertThat(facade.homeSections(ContentFixtures.STORE, ContentFixtures.EN))
-                    .extracting(StorefrontSection::getSlug).containsExactly(UNORDERED, ORDERED);
-        }
-
-        @Test
-        void everythingTheThemeDrawsIsCarriedThrough() {
-            when(media.urls(any(), any())).thenReturn(Map.of(42L, IMAGE_URL));
-            live(section(1L, "hero", 0,
-                    new SectionMeta(HomeSectionKind.IMAGE, null, 42L, 8, CAROUSEL, null)));
-
-            StorefrontSection s = facade.homeSections(ContentFixtures.STORE, ContentFixtures.EN).get(0);
-
-            assertThat(s.getKind()).isEqualTo(HomeSectionKind.IMAGE);
-            assertThat(s.getImageUrl()).isEqualTo(IMAGE_URL);
-            assertThat(s.getItemLimit()).isEqualTo(8);
-            assertThat(s.getLayout()).isEqualTo(CAROUSEL);
-            assertThat(s.getServedLocale()).isEqualTo(ContentFixtures.EN.code());
-        }
-
-        @Test
-        void aSectionWithNoImageIsNotGivenOne() {
-            live(section(1L, "rail", 0,
-                    new SectionMeta(HomeSectionKind.PRODUCT_GROUP, FEATURED, null, null, null, null)));
-
-            StorefrontSection s = facade.homeSections(ContentFixtures.STORE, ContentFixtures.EN).get(0);
-
-            assertThat(s.getImageUrl()).isNull();
-            assertThat(s.getTargetValue()).isEqualTo(FEATURED);
-        }
-
-        /**
-         * A block with nothing written in any language the reader can be served is left out rather than rendered
-         * as an untitled gap the seller cannot see the cause of.
-         */
-        @Test
-        void aSectionWithNothingToShowInAnyLanguageIsSkipped() {
-            Content c = section(1L, "empty", 0,
-                    new SectionMeta(HomeSectionKind.RICH_TEXT, null, null, null, null, null));
-            c.getDescriptions().clear();
-            live(c);
-
-            assertThat(facade.homeSections(ContentFixtures.STORE, ContentFixtures.EN)).isEmpty();
-        }
-
-        @Test
-        void aStoreWithNoSectionsGetsAnEmptyPageRatherThanAnError() {
-            live();
-
-            assertThat(facade.homeSections(ContentFixtures.STORE, ContentFixtures.EN)).isEmpty();
-        }
-
-    }
 
 }

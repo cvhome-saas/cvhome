@@ -11,7 +11,11 @@ import {Swiper, SwiperSlide, type SwiperApi} from '@store-front/ui/swiper';
  * The store's CMS banners in a plate frame with an NN / NN counter and plate arrows — a crate window,
  * not a carousel with dots. Swiper is re-keyed on `dir` so RTL swipes the right way.
  */
-export function HeroFrame({slides}: { slides: Banner[] }) {
+export function HeroFrame({slides, autoplay = 6}: {
+    slides: Banner[];
+    /** Seconds between slides, or `false` for a still frame — the builder's hero fields. */
+    autoplay?: number | false;
+}) {
     const t = useTranslations('PAGE.HOME');
     const dir = useDir();
     const [index, setIndex] = useState(0);
@@ -21,7 +25,7 @@ export function HeroFrame({slides}: { slides: Banner[] }) {
     return (
         <section aria-roledescription="carousel" className="plate relative isolate min-w-0 overflow-hidden">
             <Swiper key={dir} dir={dir} loop={slides.length > 1} onSwiper={setSwiper} onSlideChange={s => setIndex(s.realIndex)}
-                    autoplay={slides.length > 1 ? {delay: 6000, disableOnInteraction: true} : false} a11y={{enabled: true}} className="aspect-[4/3] w-full bg-muted lg:aspect-[16/9]">
+                    autoplay={slides.length > 1 && autoplay !== false ? {delay: autoplay * 1000, disableOnInteraction: true} : false} a11y={{enabled: true}} className="aspect-[4/3] w-full bg-muted lg:aspect-[16/9]">
                 {slides.map((s, i) => (
                     <SwiperSlide key={s.id} aria-label={t('HERO_SLIDE', {index: i + 1, total: slides.length})}>
                         <BannerImage banner={s} priority={i === 0} sizes="(max-width: 1024px) 100vw, 55vw" className="object-cover"/>

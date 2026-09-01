@@ -1,5 +1,5 @@
 import {Component, computed, effect, inject, input, signal} from '@angular/core';
-import {Router} from '@angular/router';
+import {Router, RouterLink} from '@angular/router';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 
 import {BusyOverlay} from '@shared/ui/busy-overlay/busy-overlay';
@@ -38,6 +38,7 @@ import {StoreSettingsFacade} from './facades/store-settings.facade';
     Icon,
     PageHeader,
     PaymentsSection,
+    RouterLink,
     SectionNav,
     SocialLoginSection,
     TabSwitcher,

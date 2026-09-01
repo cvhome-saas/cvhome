@@ -1,0 +1,168 @@
+<ng-container *transloco="let t">
+  <div class="builder">
+    <header class="topbar">
+      <a routerLink="/store-management/domain" class="secondary-action back">
+        <app-icon name="arrowLeft" [size]="14" [flip]="true" />
+        {{ t('builder.top.back') }}
+      </a>
+      <div class="divider" aria-hidden="true"></div>
+      <button type="button" class="icon-action" [class.pressed]="leftOpen()"
+              [attr.aria-label]="t('builder.top.panelLayout')" [title]="t('builder.top.panelLayout')"
+              [attr.aria-pressed]="leftOpen()" (click)="leftOpen.set(!leftOpen())">
+        <app-icon [name]="leftOpen() ? 'panelLeftClose' : 'panelLeftOpen'" [size]="15" />
+      </button>
+      <div class="title">
+        <strong>{{ t('builder.top.title') }}</strong>
+        <span class="state">{{ t(saveLabelKey()) }}</span>
+      </div>
+      <div class="spacer"></div>
+
+      <div class="seg" role="group" [attr.aria-label]="t('builder.top.devices')">
+        @for (device of devices; track device) {
+          <button type="button" class="seg-btn" [class.on]="facade.device() === device"
+                  [attr.aria-label]="t('builder.device.' + device)" [title]="t('builder.device.' + device)"
+                  (click)="facade.device.set(device)">
+            <app-icon [name]="deviceIcon(device)" [size]="14" />
+          </button>
+        }
+      </div>
+
+      <div class="seg" role="group" [attr.aria-label]="t('builder.top.languages')">
+        @for (code of facade.locales().codes; track code) {
+          <button type="button" class="seg-btn lang" [class.on]="facade.lang() === code"
+                  (click)="facade.pickLang(code)">
+            {{ code }}
+          </button>
+        }
+      </div>
+
+      <button type="button" class="icon-action" [class.pressed]="facade.guides()"
+              [attr.aria-label]="t('builder.top.guides')" [title]="t('builder.top.guides')"
+              (click)="facade.guides.set(!facade.guides())">
+        <app-icon name="layoutGrid" [size]="15" />
+      </button>
+      <button type="button" class="icon-action" [class.pressed]="revisionsOpen()"
+              [attr.aria-label]="t('builder.revisions.title')" [title]="t('builder.revisions.title')"
+              (click)="toggleRevisions()">
+        <app-icon name="clock" [size]="15" />
+      </button>
+
+      <button type="button" class="icon-action" [attr.aria-label]="t('builder.top.undo')"
+              [disabled]="!facade.canUndo()" (click)="facade.undo()">
+        <app-icon name="undo" [size]="15" />
+      </button>
+      <button type="button" class="icon-action" [attr.aria-label]="t('builder.top.redo')"
+              [disabled]="!facade.canRedo()" (click)="facade.redo()">
+        <app-icon name="undo" [size]="15" [flip]="true" />
+      </button>
+      <button type="button" class="icon-action" [class.pressed]="rightOpen()"
+              [attr.aria-label]="t('builder.top.panelInspector')" [title]="t('builder.top.panelInspector')"
+              [attr.aria-pressed]="rightOpen()" (click)="rightOpen.set(!rightOpen())">
+        <app-icon [name]="rightOpen() ? 'panelLeftClose' : 'panelLeftOpen'" [size]="15" [flip]="true" />
+      </button>
+
+      <div class="divider" aria-hidden="true"></div>
+
+      <button type="button" class="secondary-action" (click)="openPreviewTab()">
+        <app-icon name="externalLink" [size]="14" />
+        {{ t('builder.top.preview') }}
+      </button>
+      <button type="button" class="ghost-action" [disabled]="!facade.dirty()" (click)="facade.discard()">
+        {{ t('builder.top.discard') }}
+      </button>
+      <button type="button" class="primary-action"
+              [disabled]="publishing() || facade.saveState() === 'conflict' || facade.saveState() === 'saving'"
+              (click)="publish()">
+        {{ published() ? t('builder.top.published') : t('builder.top.publish') }}
+      </button>
+    </header>
+
+    @if (facade.saveState() === 'conflict') {
+      <div class="conflict-bar">
+        <span>{{ t('builder.top.conflict') }}</span>
+        <button type="button" class="secondary-action" (click)="facade.load()">{{ t('builder.conflict.reload') }}</button>
+      </div>
+    } @else if (facade.saveState() === 'error') {
+      <div class="conflict-bar">
+        <span>{{ t('builder.top.error') }}</span>
+        <button type="button" class="secondary-action" (click)="facade.retry()">{{ t('builder.conflict.retry') }}</button>
+      </div>
+    }
+
+    @if (facade.publishWarnings().length > 0) {
+      <div class="warnings">
+        @for (warning of facade.publishWarnings(); track warning.field) {
+          <span>{{ warning.message }}</span>
+        }
+      </div>
+    }
+
+    <div class="panes">
+      <aside class="left" [class.closed]="!leftOpen()" [attr.inert]="leftOpen() ? null : ''">
+        <div class="pane-fixed">
+        <div class="left-tabs" role="tablist">
+          <button type="button" role="tab" class="left-tab" [class.on]="panel() === 'layers'"
+                  [attr.aria-selected]="panel() === 'layers'" (click)="panel.set('layers')">
+            {{ t('builder.tabs.layout') }}
+          </button>
+          <button type="button" role="tab" class="left-tab" [class.on]="panel() === 'library'"
+                  [attr.aria-selected]="panel() === 'library'" (click)="panel.set('library')">
+            {{ t('builder.tabs.add') }}
+          </button>
+        </div>
+        @if (panel() === 'layers') {
+          <app-builder-layer-list class="pane-body" />
+          <nav class="page-group" [attr.aria-label]="t('builder.page.heading')">
+            <span class="page-heading">{{ t('builder.page.heading') }}</span>
+            <a routerLink="/store-management/details" class="page-link">
+              <app-icon name="palette" [size]="14" /> {{ t('builder.page.theme') }}
+            </a>
+            <a routerLink="/content/branding" class="page-link">
+              <app-icon name="search" [size]="14" /> {{ t('builder.page.seo') }}
+            </a>
+          </nav>
+        } @else {
+          <app-builder-section-library class="pane-body" />
+        }
+        </div>
+      </aside>
+
+      <main class="center">
+        <app-builder-preview-frame />
+      </main>
+
+      <aside class="right" [class.closed]="!rightOpen()" [attr.inert]="rightOpen() ? null : ''">
+        <div class="pane-fixed pane-fixed-end">
+          <app-builder-inspector />
+        </div>
+      </aside>
+
+      @if (revisionsOpen()) {
+        <aside class="revisions">
+          <header class="revisions-head">
+            <strong>{{ t('builder.revisions.title') }}</strong>
+            <button type="button" class="icon-action" [attr.aria-label]="t('builder.revisions.close')"
+                    [title]="t('builder.revisions.close')" (click)="revisionsOpen.set(false)">
+              <app-icon name="x" [size]="15" />
+            </button>
+          </header>
+          <div class="revisions-body">
+            @for (row of facade.revisions() ?? []; track row.version) {
+              <div class="revision-row">
+                <span class="revision-copy">
+                  <strong>{{ 'v' + row.version }}</strong>
+                  <span class="revision-meta">{{ row.publishedBy }}@if (row.publishedAt; as at) { · {{ at | translocoDate: {dateStyle: 'short', timeStyle: 'short'} }}}</span>
+                </span>
+                <button type="button" class="ghost-action" (click)="restoreRevision(row.version)">
+                  {{ t('builder.revisions.restore') }}
+                </button>
+              </div>
+            } @empty {
+              <p class="revisions-empty">{{ t('builder.revisions.empty') }}</p>
+            }
+          </div>
+        </aside>
+      }
+    </div>
+  </div>
+</ng-container>

@@ -13,8 +13,12 @@ import {Swiper, SwiperSlide} from '@store-front/ui/swiper';
  * slider the banner stands in; with neither, the board alone is the entrance, full width, still finished.
  * Swiper needs `dir` explicitly and is re-keyed on dir so a locale switch re-initialises it.
  */
-export function Hero({slides, banner, storeName, facts, anchor}: {
+export function Hero({slides, banner, storeName, facts, anchor, cta, autoplay = 6}: {
     slides: Banner[]; banner?: Banner; storeName: string; facts: string[]; anchor?: string;
+    /** The builder hero's own call to action; wins over the legacy in-page anchor. */
+    cta?: {label: string; href: string};
+    /** Seconds between slides, or `false` for a still slider — the builder's hero fields. */
+    autoplay?: number | false;
 }) {
     const t = useTranslations('PAGE.HOME');
     const dir = useDir();
@@ -30,11 +34,11 @@ export function Hero({slides, banner, storeName, facts, anchor}: {
                     <bdi dir="auto">{storeName}</bdi>
                 </h1>
                 {facts.length > 0 && <p className="text-sm font-semibold tabular-nums opacity-85 sm:text-base">{facts.join(' · ')}</p>}
-                {anchor && (
+                {(cta || anchor) && (
                     <div className="flex flex-wrap gap-2 pt-1">
-                        <a href={`#${anchor}`}
+                        <a href={cta ? cta.href : `#${anchor}`}
                            className="signage inline-flex h-12 items-center gap-2 rounded-control bg-primary-foreground px-5 text-lg text-primary transition-opacity duration-(--motion-fast) hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-foreground">
-                            {t('SHOP_NOW')}<ArrowDownIcon className="size-5"/>
+                            {cta ? <bdi dir="auto">{cta.label}</bdi> : t('SHOP_NOW')}{!cta && <ArrowDownIcon className="size-5"/>}
                         </a>
                     </div>
                 )}
@@ -44,7 +48,7 @@ export function Hero({slides, banner, storeName, facts, anchor}: {
                 <div className="min-w-0">
                     <Swiper key={dir} dir={dir} loop={slides.length > 1}
                             pagination={{clickable: true}}
-                            autoplay={slides.length > 1 ? {delay: 6000, disableOnInteraction: true} : false}
+                            autoplay={slides.length > 1 && autoplay !== false ? {delay: autoplay * 1000, disableOnInteraction: true} : false}
                             a11y={{enabled: true}} className={stage}>
                         {slides.map((s, i) => (
                             <SwiperSlide key={s.id} aria-label={t('HERO_SLIDE', {index: i + 1, total: slides.length})}>

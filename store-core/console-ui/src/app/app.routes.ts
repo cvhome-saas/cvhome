@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 
 import {canAccessSecuredPages} from '@core/auth/auth-guard.service';
+import {confirmLeave} from '@core/routing/confirm-leave.guard';
 import {
   consoleContext,
   firstRunOnly,
@@ -456,6 +457,17 @@ export const routes: Routes = [
         data: {titleKey: 'route.content.title', breadcrumbKey: 'shell.breadcrumb.content'},
       },
     ],
+  },
+  {
+    // The storefront builder escapes the console shell entirely: an editor wants the whole viewport,
+    // and the page brings its own top chrome. Same URL as before, declared ahead of the
+    // `store-management` branch so it wins the match.
+    path: 'store-management/builder',
+    loadComponent: () =>
+      import('@features/storefront-builder/storefront-builder').then((page) => page.StorefrontBuilder),
+    canActivate: [canAccessSecuredPages, consoleContext, merchantOnly, requiresStore],
+    canDeactivate: [confirmLeave],
+    data: {titleKey: 'route.builder.title', breadcrumbKey: 'shell.breadcrumb.builder'},
   },
   {
     path: 'store-management',

@@ -298,7 +298,7 @@ class ContentApiIntegrationTest {
         JsonNode summary = json(api.get(scoped(SUMMARY, STORE_A), admin));
         JsonNode counts = summary.get("counts");
         assertThat(counts.get(PAGES_SEGMENT).asLong()).isGreaterThanOrEqualTo(6);
-        assertThat(counts.has("sections")).isTrue();
+        assertThat(counts.has("banners")).isTrue();
         assertThat(summary.get("publishedItems").asLong()).isGreaterThanOrEqualTo(6);
         assertThat(summary.get("media").get("bytesQuota").asLong()).isGreaterThan(0);
 

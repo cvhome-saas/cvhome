@@ -51,6 +51,55 @@ fallback results page, which is built from tokens and so still wears the theme's
 the header box: it submits to `/search`, and it takes its provider from `useSearchProvider(capabilities)` so
 it never claims a search the deployment cannot answer.
 
+## Layout sections (the storefront builder)
+
+The home page is no longer theme code. The shell composes it from the store's **layout document**
+(content service, `page_layout`), rendering each section through the theme's optional `sections`
+registry — `Partial<Record<SectionKind, Record<VariantId, ComponentType<SectionRenderProps>>>>` on
+`ThemeDefinition` — with shell fallback renderers covering every kind and variant, so any merchant
+layout renders on any theme. The catalogue of kinds, variants, inspector fields and presets lives in
+`libs/theme/src/sections/catalog.ts`; `/api/theme-manifest` serves it merged with the active theme's
+registry to the console builder. A theme adopts designed sections kind by kind (see
+`themes/starter/src/sections/LayoutSections.tsx`, the reference), and may add exclusive variants —
+beauty's `hero.editorial` is the proof. A theme with no registry at all still renders everything.
+
+### Section design rules
+
+**Consistency is by construction, not by convention.** Section *semantics* — which declared fields
+are honored, empty behavior, CTA dedupe, limits, link/media resolution — live once, in the shared
+models (`libs/theme/src/sections/models.ts`, unit-tested). Section *structure* lives once, in the
+composer (`libs/ui/src/sections/compose.tsx`): a theme supplies a `SectionChrome` — its Heading,
+Badge, NavToken, Band, Panel, Quote, MediaFigure, BrandLabel, VideoFrame, PostCard and a few class
+strings — and gets every composable kind in its own voice. The shell fallbacks are the same
+composer with the neutral chrome. Only `hero` and `products` (plus a rare signature piece like
+furniture's DirectoryBoard) are bespoke overrides — and they consume `heroModel`/`productsModel`,
+so their semantics stay centralized too. A theme that wants to ignore a model value (fashion's wall
+never autoplays; word-stamp badges don't draw the icon) does it *explicitly, with a comment* — never
+by silently not reading it.
+
+Every renderer — composed or override — honors these, so a merchant's layout reads as one page in
+one voice rather than a stack of widgets:
+
+- **Headings come from the theme's own `SectionHeading`.** One scale step for section titles across
+  the page; the section's `text.title` is the heading, never a kicker above a second heading.
+- **Spacing belongs to the wrapper.** The shell applies `style.spacing`/`style.width`/`style.tone`
+  around the renderer; a renderer adds no outer margins of its own. The exception is a
+  typography-led hero (hunger's masthead, fashion's wall): at `width: full` it still keeps its own
+  interior gutters, because print never touches the trim edge.
+- **`tone` must survive.** Text and borders inside a section use token roles (`foreground`, `muted-
+  foreground`, `border`) so `muted` and `inverse` backgrounds keep AA contrast without per-tone code.
+- **Empty data collapses live, hints in preview.** Outside the builder an empty section renders
+  `null`; inside it, `EmptyOrHint` (or the theme's equivalent) names what to add. Never a grey box.
+- **Icons are drawn, not typed.** The `usp` icon names map to one stroke-weight icon set
+  (lucide in the fallbacks); emoji and unicode glyphs are not an icon system.
+- **Shopper-facing copy is translated.** Fallback strings ship in all five locales
+  (`locales/*.json`); builder-only hints may stay English. `<bdi dir="auto">` wraps merchant text so
+  mixed-direction content renders sanely in RTL.
+- **Slides are `Banner`s.** Hero renderers consume the layout's inline slides through
+  `slidesAsBanners` from `@store-front/theme` — one adapter, no per-theme slide types.
+- **Media may be absent.** Every image slot has a designed no-image state (theme plate, drawn mark,
+  or collapse) — a theme must look finished with a single image and with none.
+
 ## Directions
 
 | id | Target merchant · replaces enum values | Structural thesis (header · hero · card · PDP · listing · cart) | Colour strategy · density | Not a recolour because |

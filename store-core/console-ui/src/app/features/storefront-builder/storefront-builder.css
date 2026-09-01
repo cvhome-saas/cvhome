@@ -1,0 +1,381 @@
+.builder {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  min-height: 0;
+  background: var(--muted);
+}
+
+/*
+ * The entry: the workbench settles into place once — top bar first, then the panes in reading
+ * order, the canvas last so the storefront appears into an already-standing frame. Compact
+ * distances and the shared `rise` keyframe per the console's motion rule; the global
+ * prefers-reduced-motion guard collapses it to an instant appearance.
+ */
+.topbar {
+  --rise-from: 6px;
+  animation: rise 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.left {
+  --rise-from: 10px;
+  animation: rise 0.32s 0.06s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.right {
+  --rise-from: 10px;
+  animation: rise 0.32s 0.12s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.center {
+  --rise-from: 12px;
+  animation: rise 0.36s 0.16s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  background: var(--background);
+  border-block-end: 1px solid var(--border);
+  flex: none;
+}
+
+.back {
+  gap: 6px;
+}
+
+.divider {
+  width: 1px;
+  height: 24px;
+  background: var(--border);
+}
+
+.title {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.title strong {
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.state {
+  font-size: 11px;
+  color: var(--muted-foreground);
+}
+
+.spacer {
+  flex: 1;
+}
+
+.seg {
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  background: var(--muted);
+  border-radius: var(--radius-md);
+}
+
+.seg-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 30px;
+  height: 26px;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: none;
+  cursor: pointer;
+  color: var(--muted-foreground);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.seg-btn.on {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+.seg-btn.lang {
+  padding-inline: 8px;
+}
+
+.warnings {
+  animation: drop-in 0.24s cubic-bezier(0.22, 1, 0.36, 1) both;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 8px 16px;
+  font-size: 12px;
+  background: var(--chart-4-wash, var(--muted));
+  border-block-end: 1px solid var(--border);
+  color: var(--foreground);
+}
+
+.panes {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+}
+
+/*
+ * The side panes collapse by animating their own width — the one honest width animation here:
+ * the pane's content sits in a fixed-width inner shell so nothing inside reflows per frame, and
+ * the canvas answers with a transform-only rescale. `inert` keeps a collapsed pane out of the
+ * tab order while it stays mounted (scroll position and open items survive a collapse).
+ */
+.left {
+  width: 280px;
+  flex: none;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--background);
+  border-inline-end: 1px solid var(--border);
+  transition: width 0.28s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.28s;
+}
+
+.left.closed {
+  width: 0;
+  border-inline-end-color: transparent;
+}
+
+.pane-fixed {
+  width: 280px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.pane-fixed-end {
+  width: 320px;
+}
+
+.left-tabs {
+  display: flex;
+  gap: 2px;
+  margin: 8px;
+  padding: 3px;
+  background: var(--muted);
+  border-radius: var(--radius-md);
+}
+
+.left-tab {
+  flex: 1;
+  padding: 6px;
+  border: 0;
+  border-radius: calc(var(--radius-md) - 2px);
+  background: none;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted-foreground);
+  transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+}
+
+.left-tab:hover:not(.on) {
+  color: var(--foreground);
+}
+
+.left-tab.on {
+  background: var(--background);
+  color: var(--foreground);
+  box-shadow: var(--lift-subtle);
+}
+
+.pane-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: block;
+}
+
+.center {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+}
+
+.right {
+  width: 320px;
+  flex: none;
+  min-width: 0;
+  min-height: 0;
+  background: var(--background);
+  border-inline-start: 1px solid var(--border);
+  overflow: hidden;
+  transition: width 0.28s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.28s;
+}
+
+.right.closed {
+  width: 0;
+  border-inline-start-color: transparent;
+}
+
+.icon-action.pressed {
+  background: var(--primary-soft, var(--muted));
+  color: var(--foreground);
+}
+
+/* the topbar's controls answer the hand: icons breathe on hover, dip on press, and every state
+   change (pressed panes, guides, history) crossfades instead of snapping */
+.topbar .icon-action,
+.topbar .seg-btn {
+  transition: background 0.15s, color 0.15s;
+}
+
+.topbar .icon-action app-icon,
+.topbar .seg-btn app-icon {
+  transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.topbar .icon-action:hover:not(:disabled) app-icon,
+.topbar .seg-btn:hover app-icon {
+  transform: scale(1.15);
+}
+
+.topbar .icon-action:active:not(:disabled) app-icon,
+.topbar .seg-btn:active app-icon {
+  transform: scale(0.88);
+}
+
+.conflict-bar {
+  animation: drop-in 0.24s cubic-bezier(0.22, 1, 0.36, 1) both;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  background: var(--chart-5-wash, var(--muted));
+  border-block-end: 1px solid var(--border);
+}
+
+.page-group {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px;
+  border-block-start: 1px solid var(--border);
+}
+
+.page-heading {
+  padding: 2px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+.page-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--foreground);
+  text-decoration: none;
+}
+
+.page-link:hover {
+  background: var(--muted);
+}
+
+.revisions {
+  animation: slide-in 0.26s cubic-bezier(0.22, 1, 0.36, 1) both;
+  width: 300px;
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--background);
+  border-inline-start: 1px solid var(--border);
+}
+
+.revisions-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border-block-end: 1px solid var(--border);
+  font-size: 14px;
+}
+
+.revisions-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.revision-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: var(--radius-md);
+}
+
+.revision-row:hover {
+  background: var(--muted);
+}
+
+.revision-copy {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  font-size: 13px;
+}
+
+.revision-meta {
+  font-size: 11px;
+  color: var(--muted-foreground);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.revisions-empty {
+  padding: 12px;
+  font-size: 13px;
+  color: var(--muted-foreground);
+}
+
+@keyframes drop-in {
+  from { transform: translateY(-6px); opacity: 0; }
+}
+
+@keyframes slide-in {
+  from { transform: translateX(16px); opacity: 0; }
+}
+
+[dir='rtl'] .revisions {
+  animation-name: slide-in-rtl;
+}
+
+@keyframes slide-in-rtl {
+  from { transform: translateX(-16px); opacity: 0; }
+}
+
+.page-link {
+  transition: background 0.15s;
+}
+
+.revision-row {
+  transition: background 0.15s;
+}

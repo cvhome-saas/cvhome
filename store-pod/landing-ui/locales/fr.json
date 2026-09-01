@@ -263,7 +263,8 @@
       "CART_WITH_COUNT": "Panier, {count, plural, =0 {vide} =1 {1 article} other {# articles}}",
       "VIEW_ALL_IN": "Tout {name}",
       "ANNOUNCEMENT": "Note",
-      "INDEX": "Catégories"
+      "INDEX": "Catégories",
+      "MORE": "Plus"
     },
     "FOOTER": {
       "SOCIAL_FACEBOOK": "Facebook",
@@ -309,6 +310,12 @@
       "PRODUCTS": "Produits",
       "SUGGESTIONS_ONLY": "Catégories et pages uniquement",
       "SEE_ALL": "Voir tous les résultats"
+    },
+    "NEWSLETTER": {
+      "HEADING": "Restez informé",
+      "EMAIL": "email@example.com",
+      "SUBSCRIBE": "S'abonner",
+      "THANKS": "Merci, vous êtes inscrit."
     }
   },
   "ERRORS": {

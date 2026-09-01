@@ -16,8 +16,12 @@ export type CoverLine = { id: string; title: string; count: number; href: string
  * Swiper needs `dir` explicitly (it does not read CSS direction) and is re-keyed on dir so a locale switch
  * re-initialises it.
  */
-export function Hero({slides, storeName, lines, actionHref}: {
+export function Hero({slides, storeName, lines, actionHref, actionLabel, autoplay = 5}: {
     slides: Banner[]; storeName: string; lines: CoverLine[]; actionHref?: string;
+    /** Overrides the default SHOP_NOW copy — the builder hero's own CTA label. */
+    actionLabel?: string;
+    /** Seconds between slides, or `false` for a still cover — the builder's hero fields. */
+    autoplay?: number | false;
 }) {
     const t = useTranslations('PAGE.HOME');
     const dir = useDir();
@@ -44,7 +48,7 @@ export function Hero({slides, storeName, lines, actionHref}: {
                     {actionHref && (
                         <a href={actionHref}
                            className="ink-field cover-line inline-flex w-fit items-center gap-2 rounded-control px-6 py-3 text-base transition-transform duration-(--motion-fast) hover:-translate-y-0.5">
-                            <StarMark className="size-3.5" aria-hidden/>{t('SHOP_NOW')}
+                            <StarMark className="size-3.5" aria-hidden/>{actionLabel ? <bdi dir="auto">{actionLabel}</bdi> : t('SHOP_NOW')}
                         </a>
                     )}
                 </div>
@@ -52,7 +56,7 @@ export function Hero({slides, storeName, lines, actionHref}: {
                     <div className="hair -mx-gutter min-w-0 overflow-hidden border-t-2 lg:col-start-3 lg:mx-0 lg:border-s-2 lg:border-t-0">
                         <Swiper key={dir} dir={dir} loop={slides.length > 1}
                                 pagination={{clickable: true}}
-                                autoplay={slides.length > 1 ? {delay: 5000, disableOnInteraction: true} : false}
+                                autoplay={slides.length > 1 && autoplay !== false ? {delay: autoplay * 1000, disableOnInteraction: true} : false}
                                 a11y={{enabled: true}} className="!h-full !w-full">
                             {slides.map((s, i) => (
                                 <SwiperSlide key={s.id} aria-label={t('HERO_SLIDE', {index: i + 1, total: slides.length})}

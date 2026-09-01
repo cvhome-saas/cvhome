@@ -266,6 +266,9 @@ services:
       INTERNAL_SPG: "http://spg-507f1f77.gateway.com:${port.spg.80}"
       # Keeps two stacks from overwriting each other's dev build (read in storefront/next.config.ts).
       NEXT_DIST_DIR: ".next-${stack}"
+      # Console origins the builder's canvas bridge trusts for postMessage; without it the bridge is
+      # deliberately silent and the builder falls back to layer-list-only editing.
+      NEXT_PUBLIC_BUILDER_ORIGINS: "http://gateway.com:${port.store-core-gateway.http},http://console-ui.gateway.com:${port.store-core-gateway.http}"
     depends-on: [spg, merchant, content, catalog, checkout, inventory]
     health: { type: tcp, port: http, timeout: 300 }
 

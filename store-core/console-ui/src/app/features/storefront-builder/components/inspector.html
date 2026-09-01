@@ -1,0 +1,228 @@
+<ng-container *transloco="let t">
+  @if (section(); as sec) {
+    <div class="inspector">
+      <header class="head">
+        <div class="head-copy">
+          <strong>{{ label(spec()?.label) || sec.kind }}</strong>
+          <span class="head-kind">{{ sec.variant || t('builder.layers.defaultVariant') }}</span>
+        </div>
+        @if (sec.locked) {
+          <button type="button" class="secondary-action" (click)="facade.toggleLocked(sec.id)">
+            <app-icon name="lock" [size]="13" /> {{ t('builder.inspector.unlock') }}
+          </button>
+        } @else {
+          <button type="button" class="icon-action" [attr.aria-label]="t('builder.inspector.duplicate')"
+                  [title]="t('builder.inspector.duplicate')" (click)="facade.duplicate(sec.id)">
+            <app-icon name="copy" [size]="15" />
+          </button>
+          <button type="button" class="icon-action" [attr.aria-label]="t('builder.inspector.remove')"
+                  [title]="t('builder.inspector.remove')" (click)="facade.remove(sec.id)">
+            <app-icon name="trash" [size]="15" />
+          </button>
+        }
+      </header>
+
+      <div class="body">
+        @if (sec.locked) {
+          <p class="locked-note">{{ t('builder.inspector.locked') }}</p>
+        } @else {
+        @if ((spec()?.variants ?? []).length > 1) {
+          <app-form-field [label]="t('builder.inspector.variant')">
+            <app-select [options]="variantOptions()" [value]="sec.variant ?? ''"
+                        (valueChange)="setVariant($event)" />
+          </app-form-field>
+        }
+
+        @for (field of spec()?.fields ?? []; track field.key) {
+          @if (visible(field, sec)) {
+            @switch (field.type) {
+              @case ('product-source') {
+                <app-form-field [label]="label(field.label)">
+                  <app-select [options]="sourceOptions()" [value]="sourceType(sec)"
+                              (valueChange)="setSource('type', $event)" />
+                </app-form-field>
+                @if (sourceType(sec) !== 'newest') {
+                  <app-form-field [label]="t('builder.source.code')">
+                    <app-text-field [value]="sourceCode(sec)" (valueChange)="setSource('code', $event)"
+                                    [placeholder]="t('builder.source.codeHint')" latin />
+                  </app-form-field>
+                }
+              }
+              @case ('toggle') {
+                <div class="toggle-row">
+                  <app-toggle [checked]="bool(field, sec)" (checkedChange)="setField(field, $event)" />
+                  <span>{{ label(field.label) }}</span>
+                </div>
+              }
+              @case ('range') {
+                <app-form-field [label]="label(field.label)">
+                  <app-number-field [value]="numOf(field, sec)" (valueChange)="setField(field, $event)"
+                                    [min]="field.min ?? null" [max]="field.max ?? null" compact />
+                </app-form-field>
+              }
+              @case ('select') {
+                <app-form-field [label]="label(field.label)">
+                  <app-select [options]="selectOptions(field)" [value]="str(field, sec)"
+                              (valueChange)="setField(field, $event)" clearable />
+                </app-form-field>
+              }
+              @case ('media') {
+                <div class="media-field">
+                  <span class="media-label">{{ label(field.label) }}</span>
+                  <button type="button" class="secondary-action media-slot" (click)="openMedia(field.key)">
+                    <app-icon name="images" [size]="16" />
+                    {{ has(field, sec) ? t('builder.inspector.replaceMedia') : t('builder.inspector.pickMedia') }}
+                  </button>
+                </div>
+              }
+              @case ('link') {
+                @if (linkOf(field, sec); as link) {
+                  <app-form-field [label]="label(field.label)">
+                    <app-select [options]="linkTypeOptions()" [value]="link.type"
+                                (valueChange)="setLink(field, link, 'type', $event)" />
+                  </app-form-field>
+                  <app-form-field [label]="t('builder.link.value')">
+                    <app-text-field [value]="link.value" (valueChange)="setLink(field, link, 'value', $event)"
+                                    [placeholder]="linkValueHint(link.type)" latin />
+                  </app-form-field>
+                }
+              }
+              @case ('textarea') {
+                <app-form-field [label]="labelWithLang(field)">
+                  <app-textarea [value]="str(field, sec)" (valueChange)="setField(field, $event)" [rows]="3" />
+                </app-form-field>
+              }
+              @case ('richtext') {
+                <app-form-field [label]="labelWithLang(field)">
+                  <app-textarea [value]="str(field, sec)" (valueChange)="setField(field, $event)" [rows]="5"
+                                [placeholder]="t('builder.inspector.htmlAllowed')" />
+                </app-form-field>
+              }
+              @default {
+                <app-form-field [label]="labelWithLang(field)">
+                  <app-text-field [value]="str(field, sec)" (valueChange)="setField(field, $event)" />
+                </app-form-field>
+              }
+            }
+          }
+        }
+
+        @if (spec()?.itemFields; as itemFields) {
+          <div class="items-head">
+            <span class="group-label">{{ label(spec()?.itemLabel) || t('builder.inspector.items') }}</span>
+            <button type="button" class="icon-action" [attr.aria-label]="t('builder.inspector.addItem')"
+                    [disabled]="(sec.items?.length ?? 0) >= (spec()?.maxItems ?? 50)"
+                    (click)="facade.addItem()">
+              <app-icon name="plus" [size]="14" />
+            </button>
+          </div>
+          <div cdkDropList (cdkDropListDropped)="itemDropped($event)" class="items">
+            @for (item of sec.items ?? []; track item.id; let index = $index) {
+              <div class="item" cdkDrag>
+                <button type="button" class="item-head" (click)="toggleItem(item.id)">
+                  <span class="item-grip" cdkDragHandle><app-icon name="grip" [size]="12" /></span>
+                  <span class="item-title">{{ itemTitle(item, index) }}</span>
+                  <app-icon name="chevronDown" [size]="13" [class.open]="openItems().has(item.id)" />
+                </button>
+                @if (openItems().has(item.id)) {
+                  <div class="item-body">
+                    @for (field of itemFields; track field.key) {
+                      @switch (field.type) {
+                        @case ('media') {
+                          <div class="media-field">
+                            <span class="media-label">{{ label(field.label) }}</span>
+                            <button type="button" class="secondary-action media-slot"
+                                    (click)="openMedia(field.key, item.id)">
+                              <app-icon name="images" [size]="16" />
+                              {{ has(field, item) ? t('builder.inspector.replaceMedia') : t('builder.inspector.pickMedia') }}
+                            </button>
+                          </div>
+                        }
+                        @case ('select') {
+                          <app-form-field [label]="label(field.label)">
+                            <app-select [options]="selectOptions(field)" [value]="str(field, item)"
+                                        (valueChange)="setField(field, $event, item.id)" clearable />
+                          </app-form-field>
+                        }
+                        @case ('link') {
+                          @if (linkOf(field, item); as link) {
+                            <app-form-field [label]="label(field.label)">
+                              <app-select [options]="linkTypeOptions()" [value]="link.type"
+                                          (valueChange)="setLink(field, link, 'type', $event, item.id)" />
+                            </app-form-field>
+                            <app-form-field [label]="t('builder.link.value')">
+                              <app-text-field [value]="link.value"
+                                              (valueChange)="setLink(field, link, 'value', $event, item.id)"
+                                              [placeholder]="linkValueHint(link.type)" latin />
+                            </app-form-field>
+                          }
+                        }
+                        @case ('textarea') {
+                          <app-form-field [label]="labelWithLang(field)">
+                            <app-textarea [value]="str(field, item)"
+                                          (valueChange)="setField(field, $event, item.id)" [rows]="3" />
+                          </app-form-field>
+                        }
+                        @default {
+                          <app-form-field [label]="labelWithLang(field)">
+                            <app-text-field [value]="str(field, item)"
+                                            (valueChange)="setField(field, $event, item.id)" />
+                          </app-form-field>
+                        }
+                      }
+                    }
+                    <button type="button" class="danger-action item-delete" (click)="facade.removeItem(item.id)">
+                      <app-icon name="trash" [size]="13" /> {{ t('builder.inspector.removeItem') }}
+                    </button>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
+
+        <span class="group-label styled">{{ t('builder.inspector.style') }}</span>
+        <app-form-field [label]="t('builder.style.spacing')">
+          <app-select [options]="styleOptions(['none', 'sm', 'md', 'lg'], 'spacing-')"
+                      [value]="sec.style?.spacing ?? 'md'" (valueChange)="setStyle('spacing', $event)" />
+        </app-form-field>
+        <app-form-field [label]="t('builder.style.width')">
+          <app-select [options]="styleOptions(['content', 'wide', 'full'], 'width-')"
+                      [value]="sec.style?.width ?? 'content'" (valueChange)="setStyle('width', $event)" />
+        </app-form-field>
+        <app-form-field [label]="t('builder.style.tone')">
+          <app-select [options]="styleOptions(['default', 'muted', 'inverse'], 'tone-')"
+                      [value]="sec.style?.tone ?? 'default'" (valueChange)="setStyle('tone', $event)" />
+        </app-form-field>
+        }
+      </div>
+
+      <footer class="foot">
+        @if (saveAsPresetOpen()) {
+          <app-text-field class="preset-name" [value]="presetName()" (valueChange)="presetName.set($event)"
+                          [placeholder]="t('builder.inspector.presetName')" />
+          <button type="button" class="secondary-action" (click)="savePreset()">
+            {{ t('builder.inspector.savePreset') }}
+          </button>
+          <button type="button" class="icon-action" [attr.aria-label]="t('builder.media.close')"
+                  (click)="saveAsPresetOpen.set(false)">
+            <app-icon name="x" [size]="14" />
+          </button>
+        } @else {
+          <button type="button" class="ghost-action" (click)="saveAsPresetOpen.set(true)">
+            <app-icon name="bookmark" [size]="14" /> {{ t('builder.inspector.saveAsPreset') }}
+          </button>
+        }
+      </footer>
+    </div>
+  } @else {
+    <p class="nothing">{{ t('builder.inspector.nothingSelected') }}</p>
+  }
+
+  <app-builder-media-select
+    [open]="mediaFieldOpen() !== null"
+    [currentId]="mediaCurrentId()"
+    (picked)="mediaPicked($event)"
+    (closed)="mediaFieldOpen.set(null)"
+  />
+</ng-container>

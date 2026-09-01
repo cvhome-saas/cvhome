@@ -19,7 +19,7 @@ export const CONTENT_LIST_TYPES: readonly ContentListType[] = ['pages', 'posts',
 export const CONTENT_TABS: readonly ContentTab[] =
   ['pages', 'posts', 'banners', 'faq', 'media', 'menus', 'policies', 'branding'];
 
-export type ContentType = 'PAGE' | 'SECTION' | 'POST' | 'BANNER' | 'FAQ' | 'POLICY';
+export type ContentType = 'PAGE' | 'POST' | 'BANNER' | 'FAQ' | 'POLICY';
 
 export type ContentStatus = 'DRAFT' | 'REVIEW' | 'SCHEDULED' | 'PUBLISHED' | 'ARCHIVED';
 
@@ -28,9 +28,9 @@ export const CONTENT_STATUSES: readonly ContentStatus[] = ['DRAFT', 'REVIEW', 'S
 /** How complete one locale of an item is. */
 export type TranslationState = 'MISSING' | 'DRAFT' | 'TRANSLATED' | 'STALE';
 
-export type BannerPlacement = 'HERO' | 'CAROUSEL' | 'COLLECTION' | 'STRIP';
+export type BannerPlacement = 'COLLECTION' | 'STRIP';
 
-export const BANNER_PLACEMENTS: readonly BannerPlacement[] = ['HERO', 'CAROUSEL', 'COLLECTION', 'STRIP'];
+export const BANNER_PLACEMENTS: readonly BannerPlacement[] = ['COLLECTION', 'STRIP'];
 
 export type PolicyType = 'TERMS' | 'PRIVACY' | 'RETURNS' | 'SHIPPING' | 'COOKIES' | 'CUSTOM';
 

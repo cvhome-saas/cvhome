@@ -14,8 +14,10 @@ import {Swiper, SwiperSlide} from '@store-front/ui/swiper';
  * the banner stands in; with neither, the title block alone is the cover, full width, still finished.
  * Swiper needs `dir` explicitly and is re-keyed on dir so a locale switch re-initialises it.
  */
-export function Hero({slides, banner, storeName, facts, anchor}: {
+export function Hero({slides, banner, storeName, facts, anchor, autoplay = 6}: {
     slides: Banner[]; banner?: Banner; storeName: string; facts: string[]; anchor?: string;
+    /** Seconds between slides, or `false` for a still stage — the builder's hero fields. */
+    autoplay?: number | false;
 }) {
     const t = useTranslations('PAGE.HOME');
     const dir = useDir();
@@ -29,7 +31,7 @@ export function Hero({slides, banner, storeName, facts, anchor}: {
                 <div className="relative border">
                     <Swiper key={dir} dir={dir} loop={slides.length > 1}
                             pagination={{clickable: true, renderBullet: (i, cls) => `<button type="button" class="${cls}" aria-label="${t('HERO_SLIDE', {index: i + 1, total: slides.length})}">${i + 1}</button>`}}
-                            autoplay={slides.length > 1 ? {delay: 6000, disableOnInteraction: true} : false}
+                            autoplay={slides.length > 1 && autoplay !== false ? {delay: autoplay * 1000, disableOnInteraction: true} : false}
                             a11y={{enabled: true}} className={stage}>
                         {slides.map((s, i) => (
                             <SwiperSlide key={s.id} aria-label={t('HERO_SLIDE', {index: i + 1, total: slides.length})}>

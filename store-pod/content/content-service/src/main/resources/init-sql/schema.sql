@@ -34,7 +34,7 @@ create index if not exists content_code_idx on content.content (code);
 
 -- BOX held the store "snippets" (meta-title, header-message, agreement, LANDING_PAGE) — a workflow-less parallel
 -- to the components that say the same things better. Each moved to its successor: site SEO to site_settings, the
--- announcement to a STRIP banner, the agreement to the live TERMS policy, the landing copy to SECTION rows.
+-- announcement to a STRIP banner, the agreement to the live TERMS policy, the landing copy to the page layout document.
 alter table content.content drop column if exists link_to_menu;
 alter table content.content drop column if exists product_group;
 alter table content.content drop column if exists content_position;
@@ -66,9 +66,8 @@ alter table content.content add column if not exists meta           jsonb;
 alter table content.content drop constraint if exists content_status_check;
 alter table content.content add constraint content_status_check
     check (status in ('DRAFT', 'REVIEW', 'SCHEDULED', 'PUBLISHED', 'ARCHIVED'));
-alter table content.content drop constraint if exists content_placement_check;
-alter table content.content add constraint content_placement_check
-    check (placement is null or placement in ('HERO', 'CAROUSEL', 'COLLECTION', 'STRIP'));
+-- The narrowed placement check waits for the HERO/CAROUSEL purge below (after content_description
+-- exists), because postgres validates existing rows on `add constraint`.
 alter table content.content drop constraint if exists content_policy_type_check;
 alter table content.content add constraint content_policy_type_check
     check (policy_type is null or policy_type in ('TERMS', 'PRIVACY', 'RETURNS', 'SHIPPING', 'COOKIES', 'CUSTOM'));
@@ -114,14 +113,24 @@ alter table content.content_description add constraint content_description_state
     check (state in ('MISSING', 'DRAFT', 'TRANSLATED', 'STALE'));
 create index if not exists content_description_content_idx on content.content_description (content_id);
 
--- Purge the legacy BOX rows, then narrow the type check. Both wait until here: the descriptions have a foreign
--- key to content, so they have to go first, and the check cannot be added while a BOX row still exists.
+-- Purge the legacy BOX and SECTION rows, then narrow the type check. Both wait until here: the descriptions
+-- have a foreign key to content, so they go first, and the check cannot be added while such a row exists.
+-- SECTION was the per-row home-page model; the page_layout document below replaced it whole.
 delete from content.content_description where content_id in
-    (select content_id from content.content where content_type = 'BOX');
-delete from content.content where content_type = 'BOX';
+    (select content_id from content.content where content_type in ('BOX', 'SECTION'));
+delete from content.content where content_type in ('BOX', 'SECTION');
+
+-- Same story for banners in the retired HERO/CAROUSEL placements: an upgraded database that still
+-- holds one would refuse the narrowed check below. The hero lives in the page_layout document now.
+delete from content.content_description where content_id in
+    (select content_id from content.content where placement in ('HERO', 'CAROUSEL'));
+delete from content.content where placement in ('HERO', 'CAROUSEL');
+alter table content.content drop constraint if exists content_placement_check;
+alter table content.content add constraint content_placement_check
+    check (placement is null or placement in ('COLLECTION', 'STRIP'));
 alter table content.content drop constraint if exists content_content_type_check;
 alter table content.content add constraint content_content_type_check
-    check (content_type in ('PAGE', 'SECTION', 'POST', 'BANNER', 'FAQ', 'POLICY'));
+    check (content_type in ('PAGE', 'POST', 'BANNER', 'FAQ', 'POLICY'));
 
 -- ---------------------------------------------------------------------------------------------------------------
 -- revisions, status audit, redirects
@@ -299,7 +308,7 @@ alter table content.media_usage add constraint media_usage_unique
     unique (asset_id, owner_kind, owner_ref, field);
 alter table content.media_usage drop constraint if exists media_usage_owner_kind_check;
 alter table content.media_usage add constraint media_usage_owner_kind_check
-    check (owner_kind in ('CONTENT', 'SITE_SETTINGS', 'PRODUCT', 'CATEGORY', 'BRAND'));
+    check (owner_kind in ('CONTENT', 'SITE_SETTINGS', 'PRODUCT', 'CATEGORY', 'BRAND', 'LAYOUT'));
 create index if not exists media_usage_content_idx on content.media_usage (content_id);
 create index if not exists media_usage_owner_idx on content.media_usage (owner_kind, owner_ref);
 
@@ -324,3 +333,56 @@ create table if not exists content.media_quota
     bytes_used        bigint      not null default 0,
     file_count        bigint      not null default 0
 );
+
+-- ---------------------------------------------------------------------------------------------------------------
+-- page layouts (the storefront builder)
+-- ---------------------------------------------------------------------------------------------------------------
+-- One JSON document per (store, page): `draft` is the builder's working copy, `published` is what shoppers see.
+-- Publish copies draft over published in one transaction and snapshots it into page_layout_revision; discard
+-- copies published back over draft. draft_version is the optimistic lock every save and publish sends back.
+-- This supersedes the content rows with content_type = 'SECTION': a layout is ordered, published atomically and
+-- undone as a whole, which per-section rows could never make honest.
+create table if not exists content.page_layout
+(
+    id                bigint       not null primary key,
+    store_merchant_id varchar(50)  not null,
+    page              varchar(32)  not null check (page in ('HOME')),
+    draft             jsonb        not null,
+    published         jsonb,
+    draft_version     integer      not null default 1,
+    lock_version      bigint       not null default 0,
+    published_version integer,
+    published_at      timestamp(6),
+    date_created      timestamp(6),
+    last_modified     timestamp(6),
+    modified_by       varchar(120),
+    constraint page_layout_store_page_unique unique (store_merchant_id, page)
+);
+alter table content.page_layout add column if not exists lock_version bigint not null default 0;
+
+create table if not exists content.page_layout_revision
+(
+    id           bigint       not null primary key,
+    layout_id    bigint       not null
+        constraint page_layout_revision_layout_fk references content.page_layout on delete cascade,
+    version      integer      not null,
+    snapshot     jsonb        not null,
+    published_by varchar(120),
+    date_created timestamp(6) not null,
+    constraint page_layout_revision_unique unique (layout_id, version)
+);
+create index if not exists page_layout_revision_layout_idx on content.page_layout_revision (layout_id, version desc);
+
+-- Merchant-saved reusable sections ("My sections" in the builder library). Snapshots, copied on insert with
+-- fresh ids — never live references, so deleting one cannot break a page.
+create table if not exists content.section_preset
+(
+    id                bigint       not null primary key,
+    store_merchant_id varchar(50)  not null,
+    name              varchar(120) not null,
+    kind              varchar(40)  not null,
+    snapshot          jsonb        not null,
+    date_created      timestamp(6) not null,
+    modified_by       varchar(120)
+);
+create index if not exists section_preset_store_idx on content.section_preset (store_merchant_id, date_created desc);

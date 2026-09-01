@@ -263,7 +263,8 @@
       "CART_WITH_COUNT": "Корзина, {count, plural, =0 {пусто} =1 {1 товар} other {# товаров}}",
       "VIEW_ALL_IN": "Все в {name}",
       "ANNOUNCEMENT": "Заметка",
-      "INDEX": "Категории"
+      "INDEX": "Категории",
+      "MORE": "Ещё"
     },
     "FOOTER": {
       "SOCIAL_FACEBOOK": "Facebook",
@@ -309,6 +310,12 @@
       "PRODUCTS": "Товары",
       "SUGGESTIONS_ONLY": "Показаны категории и страницы",
       "SEE_ALL": "Показать все результаты"
+    },
+    "NEWSLETTER": {
+      "HEADING": "Будьте в курсе",
+      "EMAIL": "email@example.com",
+      "SUBSCRIBE": "Подписаться",
+      "THANKS": "Спасибо — вы в списке."
     }
   },
   "ERRORS": {

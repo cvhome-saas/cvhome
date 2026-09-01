@@ -15,11 +15,14 @@ GET {{SELLER_UI_URL}}/spg/content/api/v1/storefront/posts/quarterly-supply-budge
 ###
 GET {{SELLER_UI_URL}}/spg/content/api/v1/storefront/post-categories?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
 
-### Home-page sections, in order (public, 60s cache + ETag)
-GET {{SELLER_UI_URL}}/spg/content/api/v1/storefront/home-sections?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+### The page's layout document, render-ready (public, 60s cache; published copy or the starter default)
+GET {{SELLER_UI_URL}}/spg/content/api/v1/storefront/layout/HOME?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+
+### The draft instead, for the builder canvas (?preview=<token> from POST …/layouts/HOME/preview-token; no-store)
+GET {{SELLER_UI_URL}}/spg/content/api/v1/storefront/layout/HOME?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}&preview={{PREVIEW_TOKEN}}
 
 ### Banners that win each placement
-GET {{SELLER_UI_URL}}/spg/content/api/v1/storefront/banners?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}&placement=HERO
+GET {{SELLER_UI_URL}}/spg/content/api/v1/storefront/banners?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}&placement=COLLECTION
 
 ### FAQ (+ FAQPage JSON-LD)
 GET {{SELLER_UI_URL}}/spg/content/api/v1/storefront/faq?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}

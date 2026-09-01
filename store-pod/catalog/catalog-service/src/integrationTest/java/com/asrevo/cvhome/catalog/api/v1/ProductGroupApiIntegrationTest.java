@@ -66,7 +66,7 @@ class ProductGroupApiIntegrationTest {
     private static final String PARENT_PRODUCT = "parentProduct";
 
     /** Seeded store-level strip of store A. */
-    private static final String HOME_PAGE = "HOME_PAGE";
+    private static final String FEATURED_ITEMS = "FEATURED_ITEMS";
 
     /** Seeded products of store A. */
     private static final long PRODUCT_ONE = 1L;
@@ -161,14 +161,14 @@ class ProductGroupApiIntegrationTest {
         JsonNode list = json(api.get(scoped(PRIVATE_GROUPS, STORE_A), admin));
         assertThat(list.get(CONTENT)).isNotEmpty();
         // the list is a summary: it names the groups without dragging every member along
-        assertThat(list.get(CONTENT).valueStream().anyMatch(g -> HOME_PAGE.equals(g.get(CODE).asString()))).isTrue();
+        assertThat(list.get(CONTENT).valueStream().anyMatch(g -> FEATURED_ITEMS.equals(g.get(CODE).asString()))).isTrue();
         assertThat(list.get(CONTENT).valueStream().allMatch(g -> g.get(PRODUCTS).isEmpty())).isTrue();
 
-        var storefront = api.get(scoped(path(PUBLIC_GROUPS, HOME_PAGE), STORE_A), null);
+        var storefront = api.get(scoped(path(PUBLIC_GROUPS, FEATURED_ITEMS), STORE_A), null);
         expect(storefront, HttpStatus.OK);
         assertThat(json(storefront).get(DESCRIPTION).get(NAME).asString()).isNotEmpty();
 
-        assertThat(json(api.get(scoped(query(UNIQUE, String.format("code=%s", HOME_PAGE)), STORE_A), admin))
+        assertThat(json(api.get(scoped(query(UNIQUE, String.format("code=%s", FEATURED_ITEMS)), STORE_A), admin))
                 .get(EXISTS).asBoolean()).isTrue();
 
         expect(api.get(scoped(path(PUBLIC_GROUPS, slug("nothing").toUpperCase()), STORE_A), null),
@@ -187,7 +187,7 @@ class ProductGroupApiIntegrationTest {
         expect(api.get(scoped(path(PRIVATE_GROUPS, code), STORE_A), admin), HttpStatus.NOT_FOUND);
 
         expect(api.send(HttpMethod.POST,
-                scoped(path(PRIVATE_GROUPS, HOME_PAGE, PRODUCT_SEGMENT, 999999L), STORE_A), admin, null),
+                scoped(path(PRIVATE_GROUPS, FEATURED_ITEMS, PRODUCT_SEGMENT, 999999L), STORE_A), admin, null),
                 HttpStatus.NOT_FOUND);
     }
 
@@ -252,7 +252,7 @@ class ProductGroupApiIntegrationTest {
                 scoped(path(V1_PRIVATE, PRODUCTS, PRODUCT_ONE, RELATIONSHIP, PRODUCT_TWO), STORE_A), moderator,
                 null), HttpStatus.FORBIDDEN);
         expect(api.get(scoped(PRIVATE_GROUPS, STORE_A), null), HttpStatus.UNAUTHORIZED);
-        expect(api.get(scoped(path(PUBLIC_GROUPS, HOME_PAGE), STORE_A), null), HttpStatus.OK);
+        expect(api.get(scoped(path(PUBLIC_GROUPS, FEATURED_ITEMS), STORE_A), null), HttpStatus.OK);
     }
 
 }

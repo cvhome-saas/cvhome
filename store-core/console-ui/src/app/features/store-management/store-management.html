@@ -48,15 +48,12 @@
             [(collapsed)]="railCollapsed"
           >
             <hr />
-            <!--
-              The storefront builder is a route of its own and not built yet. A disabled item with a
-              reason beats a link that goes nowhere.
-            -->
-            <span class="nav-item builder" [title]="t('storeSettings.nav.builderUnavailable')">
+            <!-- The storefront builder — a route of its own, full-viewport. -->
+            <a class="nav-item builder" routerLink="/store-management/builder">
               <app-icon name="layoutGrid" />
               <span class="nav-copy">{{ t('storeSettings.nav.homePageBuilder') }}</span>
               <app-icon name="arrowUpRight" [flip]="true" />
-            </span>
+            </a>
           </app-section-nav>
 
           <app-tab-switcher

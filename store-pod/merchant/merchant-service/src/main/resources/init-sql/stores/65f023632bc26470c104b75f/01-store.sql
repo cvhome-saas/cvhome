@@ -15,7 +15,7 @@ Domain: cars
 -- New Org ID generated: '32a034a43cd77581d105c87a'
 
 INSERT INTO merchant.merchant_store (store_merchant_id, currency_format_national, in_business_since, org, theme, color_theme, seizeunitcode, store_email, store_address, store_city, store_name, store_phone, store_postal_code, store_state_prov, use_cache, require_login_for_order_placement, weightunitcode, country_id, currency_id, language_code)
-VALUES ('65f023632bc26470c104b75f', false, '2024-04-01', '352023632b046970c104b76f', 'BEAUTY', 'DEFAULT', 'CM', -- Changed seizeunitcode slightly
+VALUES ('65f023632bc26470c104b75f', false, '2024-04-01', '352023632b046970c104b76f', 'FURNITURE', 'DEFAULT', 'CM', -- Changed seizeunitcode slightly
         'info@egyptcarsales.com', '123 Auto Road', 'Cairo', 'Egypt-Car-Sales', '+201001234567', -- Cars domain reflected
         '11511', 'Cairo', false, true, 'KG', 'EG', 'EGP', 'ar') -- Using 'ar' as the first language
 on conflict (store_merchant_id) do nothing;

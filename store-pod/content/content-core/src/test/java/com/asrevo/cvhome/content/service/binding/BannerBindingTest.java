@@ -46,7 +46,7 @@ class BannerBindingTest {
 
     private static final String DESKTOP_FIELD = "artwork.desktop";
 
-    private static final String HERO_SLUG = "spring-sale";
+    private static final String BANNER_SLUG = "spring-sale";
 
     private static final String ALT = "A field of tulips";
 
@@ -77,7 +77,7 @@ class BannerBindingTest {
         assertThat(binding.persistableClass()).isEqualTo(PersistableBanner.class);
         assertThat(binding.newReadable()).isInstanceOf(ReadableBanner.class);
         assertThat(binding.requiresBody()).isFalse();
-        assertThat(binding.storefrontPath(banner(1L, BannerPlacement.HERO, ContentStatus.DRAFT))).isNull();
+        assertThat(binding.storefrontPath(banner(1L, BannerPlacement.COLLECTION, ContentStatus.DRAFT))).isNull();
     }
 
     /**
@@ -88,16 +88,16 @@ class BannerBindingTest {
     @Test
     void onlyTheAnnouncementStripNeedsABody() {
         assertThat(binding.requiresBody(banner(1L, BannerPlacement.STRIP, ContentStatus.DRAFT))).isTrue();
-        assertThat(binding.requiresBody(banner(2L, BannerPlacement.HERO, ContentStatus.DRAFT))).isFalse();
-        assertThat(binding.requiresBody(banner(3L, BannerPlacement.CAROUSEL, ContentStatus.DRAFT))).isFalse();
-        assertThat(binding.requiresBody(ContentFixtures.content(4L, ContentType.BANNER, HERO_SLUG))).isFalse();
+        assertThat(binding.requiresBody(banner(2L, BannerPlacement.COLLECTION, ContentStatus.DRAFT))).isFalse();
+        assertThat(binding.requiresBody(banner(3L, BannerPlacement.COLLECTION, ContentStatus.DRAFT))).isFalse();
+        assertThat(binding.requiresBody(ContentFixtures.content(4L, ContentType.BANNER, BANNER_SLUG))).isFalse();
     }
 
     @Test
     void applyWritesPlacementWindowAndMeta() {
-        Content c = ContentFixtures.content(1L, ContentType.BANNER, HERO_SLUG);
+        Content c = ContentFixtures.content(1L, ContentType.BANNER, BANNER_SLUG);
         PersistableBanner dto = new PersistableBanner();
-        dto.setPlacement(BannerPlacement.HERO);
+        dto.setPlacement(BannerPlacement.COLLECTION);
         dto.setStartsAt(ContentFixtures.NOW);
         dto.setEndsAt(ContentFixtures.NOW.plusSeconds(60));
         dto.setTarget(new BannerTarget(BannerTarget.Kind.URL, SALE_PATH));
@@ -107,7 +107,7 @@ class BannerBindingTest {
 
         binding.apply(c, dto);
 
-        assertThat(c.getPlacement()).isEqualTo(BannerPlacement.HERO);
+        assertThat(c.getPlacement()).isEqualTo(BannerPlacement.COLLECTION);
         assertThat(c.getEndsAt()).isEqualTo(ContentFixtures.NOW.plusSeconds(60));
         BannerMeta meta = BannerBinding.meta(c);
         assertThat(meta.loggedInOnly()).isTrue();
@@ -117,7 +117,7 @@ class BannerBindingTest {
 
     @Test
     void aRowWithoutMetaReadsAsAnEmptyBannerMeta() {
-        BannerMeta meta = BannerBinding.meta(ContentFixtures.content(1L, ContentType.BANNER, HERO_SLUG));
+        BannerMeta meta = BannerBinding.meta(ContentFixtures.content(1L, ContentType.BANNER, BANNER_SLUG));
 
         assertThat(meta.target()).isNull();
         assertThat(meta.artwork()).isNull();
@@ -126,7 +126,7 @@ class BannerBindingTest {
 
     @Test
     void populateResolvesTheArtworkUrls() {
-        Content c = banner(1L, BannerPlacement.HERO, ContentStatus.PUBLISHED);
+        Content c = banner(1L, BannerPlacement.COLLECTION, ContentStatus.PUBLISHED);
         c.setMeta(JsonCodec.write(new BannerMeta(null, new BannerArtwork(5L, null, null), null, false)));
         // a HashMap, like the real MediaService returns: populate looks up the unset mobile slot by a null key
         Map<Long, String> urls = new java.util.HashMap<>();
@@ -138,7 +138,7 @@ class BannerBindingTest {
 
         assertThat(dto.getDesktopUrl()).isEqualTo(DESKTOP_URL);
         assertThat(dto.getMobileUrl()).isNull();
-        assertThat(dto.getPlacement()).isEqualTo(BannerPlacement.HERO);
+        assertThat(dto.getPlacement()).isEqualTo(BannerPlacement.COLLECTION);
         assertThat(dto.getStatus()).isEqualTo(ContentStatus.PUBLISHED);
         assertThat(dto.getLocales()).hasSize(1);
     }
@@ -156,20 +156,20 @@ class BannerBindingTest {
 
     @Test
     void theRowSubtitleIsThePlacementAndTheTargetWhenThereIsOne() {
-        Content plain = banner(1L, BannerPlacement.HERO, ContentStatus.DRAFT);
-        Content targeted = banner(2L, BannerPlacement.CAROUSEL, ContentStatus.DRAFT);
+        Content plain = banner(1L, BannerPlacement.STRIP, ContentStatus.DRAFT);
+        Content targeted = banner(2L, BannerPlacement.COLLECTION, ContentStatus.DRAFT);
         targeted.setMeta(JsonCodec.write(new BannerMeta(new BannerTarget(BannerTarget.Kind.URL, SALE_PATH), null,
                 null, false)));
         Content unplaced = banner(3L, null, ContentStatus.DRAFT);
 
-        assertThat(binding.subtitle(plain, ContentFixtures.EN)).isEqualTo("hero");
-        assertThat(binding.subtitle(targeted, ContentFixtures.EN)).isEqualTo("carousel · /sale");
+        assertThat(binding.subtitle(plain, ContentFixtures.EN)).isEqualTo("strip");
+        assertThat(binding.subtitle(targeted, ContentFixtures.EN)).isEqualTo("collection · /sale");
         assertThat(binding.subtitle(unplaced, ContentFixtures.EN)).isEqualTo("—");
     }
 
     @Test
     void artworkWithoutAltTextBlocksPublishOutsideTheStrip() {
-        Content c = banner(1L, BannerPlacement.HERO, ContentStatus.DRAFT);
+        Content c = banner(1L, BannerPlacement.COLLECTION, ContentStatus.DRAFT);
         c.setMeta(JsonCodec.write(new BannerMeta(null, new BannerArtwork(5L, null, null), null, false)));
         when(repository.findAllByType(ContentFixtures.STORE, ContentType.BANNER)).thenReturn(List.of());
         ContentDescription source = c.getDescriptions().getFirst();
@@ -198,9 +198,9 @@ class BannerBindingTest {
 
     @Test
     void aFullPlacementWithAnOverlappingWindowIsRefused() {
-        Content candidate = banner(1L, BannerPlacement.HERO, ContentStatus.DRAFT);
+        Content candidate = banner(1L, BannerPlacement.STRIP, ContentStatus.DRAFT);
         candidate.getDescriptions().getFirst().setAltText(ALT);
-        Content live = banner(2L, BannerPlacement.HERO, ContentStatus.PUBLISHED);
+        Content live = banner(2L, BannerPlacement.STRIP, ContentStatus.PUBLISHED);
         when(repository.findAllByType(ContentFixtures.STORE, ContentType.BANNER))
                 .thenReturn(List.of(candidate, live));
 
@@ -213,9 +213,9 @@ class BannerBindingTest {
 
     @Test
     void aScheduledBannerCountsTowardsCapacityButADraftDoesNot() {
-        Content candidate = banner(1L, BannerPlacement.HERO, ContentStatus.DRAFT);
-        Content scheduled = banner(2L, BannerPlacement.HERO, ContentStatus.SCHEDULED);
-        Content draft = banner(3L, BannerPlacement.HERO, ContentStatus.DRAFT);
+        Content candidate = banner(1L, BannerPlacement.STRIP, ContentStatus.DRAFT);
+        Content scheduled = banner(2L, BannerPlacement.STRIP, ContentStatus.SCHEDULED);
+        Content draft = banner(3L, BannerPlacement.STRIP, ContentStatus.DRAFT);
         when(repository.findAllByType(ContentFixtures.STORE, ContentType.BANNER))
                 .thenReturn(List.of(candidate, draft));
         assertThat(binding.capacityConflict(candidate)).isNull();
@@ -227,10 +227,10 @@ class BannerBindingTest {
 
     @Test
     void nonOverlappingWindowsShareAPlacement() {
-        Content candidate = banner(1L, BannerPlacement.HERO, ContentStatus.DRAFT);
+        Content candidate = banner(1L, BannerPlacement.STRIP, ContentStatus.DRAFT);
         candidate.setStartsAt(ContentFixtures.NOW);
         candidate.setEndsAt(ContentFixtures.NOW.plusSeconds(60));
-        Content earlier = banner(2L, BannerPlacement.HERO, ContentStatus.PUBLISHED);
+        Content earlier = banner(2L, BannerPlacement.STRIP, ContentStatus.PUBLISHED);
         earlier.setStartsAt(ContentFixtures.NOW.minusSeconds(120));
         earlier.setEndsAt(ContentFixtures.NOW.minusSeconds(60));
         when(repository.findAllByType(ContentFixtures.STORE, ContentType.BANNER))
@@ -260,7 +260,7 @@ class BannerBindingTest {
 
     @Test
     void mediaReferencesNameEachArtworkSlotThatIsSet() {
-        Content c = banner(1L, BannerPlacement.HERO, ContentStatus.DRAFT);
+        Content c = banner(1L, BannerPlacement.COLLECTION, ContentStatus.DRAFT);
         assertThat(binding.mediaReferences(c)).isEmpty();
 
         c.setMeta(JsonCodec.write(new BannerMeta(null, new BannerArtwork(5L, null, null), null, false)));
@@ -272,7 +272,7 @@ class BannerBindingTest {
 
     @Test
     void aBannerIsEffectiveOnlyInsideBothItsWindows() {
-        Content c = banner(1L, BannerPlacement.HERO, ContentStatus.PUBLISHED);
+        Content c = banner(1L, BannerPlacement.COLLECTION, ContentStatus.PUBLISHED);
         assertThat(binding.effective(c)).isTrue();
 
         c.setStartsAt(ContentFixtures.NOW.plusSeconds(60));
@@ -288,12 +288,12 @@ class BannerBindingTest {
 
     @Test
     void anUnpublishedBannerIsNeverEffective() {
-        assertThat(binding.effective(banner(1L, BannerPlacement.HERO, ContentStatus.DRAFT))).isFalse();
+        assertThat(binding.effective(banner(1L, BannerPlacement.COLLECTION, ContentStatus.DRAFT))).isFalse();
     }
 
     @Test
     void afterSaveDoesNothingOnADraft() {
-        binding.afterSave(banner(1L, BannerPlacement.HERO, ContentStatus.DRAFT));
+        binding.afterSave(banner(1L, BannerPlacement.COLLECTION, ContentStatus.DRAFT));
 
         org.mockito.Mockito.verifyNoInteractions(media);
     }

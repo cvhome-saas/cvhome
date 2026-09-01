@@ -1,0 +1,47 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "design-system-color",
+        "value": "rgb(0 0 0 / 0.55)",
+        "createdAt": "2026-09-01T11:24:50.564Z",
+        "reason": "caption scrim over arbitrary user imagery — image-agnostic contrast, deliberately not a theme tone"
+      },
+      {
+        "rule": "layout-transition",
+        "value": "*",
+        "files": [
+          "src/app/features/storefront-builder/components/preview-frame.ts"
+        ],
+        "createdAt": "2026-09-01T11:27:17.230Z",
+        "reason": "detector matches the words 'width transition' inside a comment documenting the absence of one; the file declares no transition or animation"
+      },
+      {
+        "rule": "layout-transition",
+        "value": "*",
+        "files": [
+          "src/app/features/storefront-builder/storefront-builder.css"
+        ],
+        "createdAt": "2026-09-01T12:14:01.312Z",
+        "reason": "deliberate pane collapse: the one honest width animation — content sits in a fixed-width shell so nothing reflows per frame, runs once per toggle at 280ms"
+      },
+      {
+        "rule": "design-system-radius",
+        "value": "2px)",
+        "createdAt": "2026-09-01T12:14:01.338Z",
+        "reason": "nested-radius math: inner tab pill = outer radius token minus its 2px inset padding"
+      },
+      {
+        "rule": "design-system-radius",
+        "value": "3px",
+        "files": [
+          "src/app/features/storefront-builder/components/layer-list.ts"
+        ],
+        "createdAt": "2026-09-01T12:14:01.363Z",
+        "reason": "the 3px selection accent bar is fully rounded at its own width — a micro-detail, not a surface radius"
+      }
+    ]
+  }
+}

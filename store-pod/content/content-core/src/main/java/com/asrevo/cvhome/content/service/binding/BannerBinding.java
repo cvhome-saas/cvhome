@@ -116,8 +116,8 @@ public class BannerBinding implements ContentTypeBinding<PersistableBanner, Read
     }
 
     /**
-     * Publishing needs alt text once artwork is set, and the placement must have room: HERO 1, CAROUSEL 8,
-     * STRIP 1, COLLECTION 1 per target — counting the other banners whose windows overlap this one's.
+     * Publishing needs alt text once artwork is set, and the placement must have room: STRIP 1,
+     * COLLECTION 1 per target — counting the other banners whose windows overlap this one's.
      */
     @Override
     public List<FieldError> publishProblems(Content entity, ContentDescription source) {

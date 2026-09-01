@@ -16,9 +16,9 @@ describe('BannersService', () => {
   const BASE = '/spg/content/api/v1/private/content/banners';
 
   it('asks what a placement shows right now, and everything when none is named', () => {
-    service.effective('HERO').subscribe();
+    service.effective('COLLECTION').subscribe();
     const filtered = http.expectOne((r) => r.url === `${BASE}/effective`);
-    expect(filtered.request.params.get('placement')).toBe('HERO');
+    expect(filtered.request.params.get('placement')).toBe('COLLECTION');
     expect(filtered.request.params.get('store')).toBe(TEST_STORE);
     filtered.flush([]);
 

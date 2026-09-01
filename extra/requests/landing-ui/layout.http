@@ -1,0 +1,15 @@
+# The storefront's layout read: published document, render-ready (hidden sections dropped, text flattened to
+# ?lang=, mediaId props joined by mediaUrl). With ?preview=<token> (minted via the console layout API) it serves
+# the draft instead, uncached.
+
+# curl '{{LANDING_UI_URL}}/content/api/v1/storefront/layout/HOME?store=65f023632bc46470c104b76f&lang=en'
+GET {{LANDING_UI_URL}}/content/api/v1/storefront/layout/HOME?store=65f023632bc46470c104b76f&lang=en
+
+###
+
+GET {{LANDING_UI_URL}}/content/api/v1/storefront/layout/HOME?store=65f023632bc46470c104b76f&lang=ar
+
+###
+
+# Draft preview (paste a token from POST .../layouts/HOME/preview-token). Response must be Cache-Control: no-store.
+GET {{LANDING_UI_URL}}/content/api/v1/storefront/layout/HOME?store=65f023632bc46470c104b76f&lang=en&preview=PASTE_TOKEN

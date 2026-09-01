@@ -28,25 +28,29 @@ import com.asrevo.cvhome.content.model.PolicyType;
 import com.asrevo.cvhome.content.model.banner.BannerMeta;
 import com.asrevo.cvhome.content.model.common.ContentTranslation;
 import com.asrevo.cvhome.content.model.faq.FaqMeta;
+import com.asrevo.cvhome.content.model.layout.PageKind;
 import com.asrevo.cvhome.content.model.post.PostMeta;
-import com.asrevo.cvhome.content.model.section.SectionMeta;
 import com.asrevo.cvhome.content.model.site.SiteBranding;
 import com.asrevo.cvhome.content.model.storefront.SitemapEntry;
 import com.asrevo.cvhome.content.model.storefront.StorefrontBanner;
 import com.asrevo.cvhome.content.model.storefront.StorefrontFaq;
+import com.asrevo.cvhome.content.model.storefront.StorefrontLayout;
+import com.asrevo.cvhome.content.model.storefront.StorefrontLayoutItem;
+import com.asrevo.cvhome.content.model.storefront.StorefrontLayoutSection;
 import com.asrevo.cvhome.content.model.storefront.StorefrontLink;
 import com.asrevo.cvhome.content.model.storefront.StorefrontMenuNode;
 import com.asrevo.cvhome.content.model.storefront.StorefrontPage;
 import com.asrevo.cvhome.content.model.storefront.StorefrontPolicy;
 import com.asrevo.cvhome.content.model.storefront.StorefrontPost;
 import com.asrevo.cvhome.content.model.storefront.StorefrontPostList;
-import com.asrevo.cvhome.content.model.storefront.StorefrontSection;
 import com.asrevo.cvhome.content.model.storefront.StorefrontSeo;
 import com.asrevo.cvhome.content.model.storefront.StorefrontSite;
 import com.asrevo.cvhome.content.repository.ContentRepository;
 import com.asrevo.cvhome.content.service.FaqService;
+import com.asrevo.cvhome.content.service.LayoutSupport;
 import com.asrevo.cvhome.content.service.MediaService;
 import com.asrevo.cvhome.content.service.MenuService;
+import com.asrevo.cvhome.content.service.PageLayoutService;
 import com.asrevo.cvhome.content.service.PolicyService;
 import com.asrevo.cvhome.content.service.PostCategoryService;
 import com.asrevo.cvhome.content.service.RedirectService;
@@ -54,7 +58,6 @@ import com.asrevo.cvhome.content.service.SiteSettingsService;
 import com.asrevo.cvhome.content.service.binding.BannerBinding;
 import com.asrevo.cvhome.content.service.binding.FaqBinding;
 import com.asrevo.cvhome.content.service.binding.PostBinding;
-import com.asrevo.cvhome.content.service.binding.SectionBinding;
 import com.asrevo.cvhome.content.support.JsonCodec;
 import com.asrevo.cvhome.store.core.entity.content.ContentType;
 
@@ -102,6 +105,8 @@ public class StorefrontFacade {
     private final RedirectService redirects;
 
     private final SiteSettingsService siteSettings;
+
+    private final PageLayoutService pageLayouts;
 
     private final Clock clock;
 
@@ -259,52 +264,6 @@ public class StorefrontFacade {
     }
 
     // --------------------------------------------------------------------------------------------- sections
-
-    /**
-     * The store's home page, in order.
-     *
-     * <p>
-     * Before these existed the home page was a hard-coded list of four product groups in the storefront's loader,
-     * so a seller could neither reorder it nor put anything else on the page.
-     * </p>
-     */
-    @Transactional(readOnly = true)
-    public List<StorefrontSection> homeSections(StoreMerchantId store, LanguageCode language) {
-        Instant now = clock.instant();
-        List<Content> live = contents.findVisibleByType(store, ContentType.SECTION).stream()
-                .filter(c -> c.servable(now))
-                .sorted(Comparator.comparing((Content c) -> c.getSortOrder() == null ? 0 : c.getSortOrder()))
-                .toList();
-        List<Long> mediaIds = live.stream().map(c -> SectionBinding.meta(c).mediaId()).toList();
-        Map<Long, String> urls = media.urls(store, mediaIds);
-        List<StorefrontSection> out = new ArrayList<>();
-        for (Content c : live) {
-            Optional<ContentDescription> picked = pick(c, language);
-            if (picked.isEmpty()) {
-                continue;
-            }
-            ContentDescription d = picked.get();
-            SectionMeta m = SectionBinding.meta(c);
-            StorefrontSection s = new StorefrontSection();
-            s.setId(c.getId());
-            s.setSlug(c.getCode());
-            s.setSortOrder(c.getSortOrder());
-            s.setServedLocale(d.getLanguageCode().code());
-            s.setKind(m.kind());
-            s.setTargetValue(m.targetValue());
-            s.setTitle(title(d));
-            s.setSubtitle(d.getSubtitle());
-            s.setBody(d.getDescription());
-            s.setCtaLabel(d.getCtaLabel());
-            s.setCta(m.cta());
-            s.setImageUrl(m.mediaId() == null ? null : urls.get(m.mediaId()));
-            s.setItemLimit(m.itemLimit());
-            s.setLayout(m.layout());
-            out.add(s);
-        }
-        return out;
-    }
-
     // ---------------------------------------------------------------------------------------------- banners
 
     @Transactional(readOnly = true)
@@ -454,6 +413,62 @@ public class StorefrontFacade {
         p.setRequiresAcceptance(com.asrevo.cvhome.content.service.binding.PolicyBinding.meta(head)
                 .requiresAcceptance());
         return p;
+    }
+
+    // ----------------------------------------------------------------------------------------------- layout
+
+    /**
+     * The page's layout, render-ready: hidden sections dropped, copy flattened to the served locale (requested
+     * locale, else {@code en}, else the first translation), and every {@code mediaId} prop joined by a resolved
+     * {@code mediaUrl} so the storefront never asks again for asset addresses.
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public StorefrontLayout layout(StoreMerchantId store, LanguageCode language, PageKind page, boolean draft) {
+        var document = pageLayouts.served(store, page, draft);
+        Map<String, Long> refs = LayoutSupport.mediaReferences(document);
+        Map<Long, String> urls = media.urls(store, refs.values().stream().distinct().toList());
+        var sections = document.sections().stream()
+                .filter(s -> s.visibility() == null || !s.visibility().isHidden())
+                .map(s -> new StorefrontLayoutSection(
+                        s.id(), s.kind(), s.variant(), withMediaUrl(s.props(), urls),
+                        s.items().stream()
+                                .map(i -> new StorefrontLayoutItem(
+                                        i.id(), withMediaUrl(i.props(), urls), flattened(i.text(), language)))
+                                .toList(),
+                        flattened(s.text(), language), s.style(), s.anchor(),
+                        s.visibility() == null ? null : s.visibility().devices()))
+                .toList();
+        return new StorefrontLayout(page.name(), language == null ? null : language.code(), sections);
+    }
+
+    private static Map<String, String> flattened(Map<String, Map<String, String>> text, LanguageCode language) {
+        Map<String, String> out = new LinkedHashMap<>();
+        text.forEach((field, locales) -> {
+            String v = language == null ? null : locales.get(language.code());
+            if (v == null) {
+                v = locales.get("en");
+            }
+            if (v == null) {
+                v = locales.values().stream().filter(x -> x != null && !x.isBlank()).findFirst().orElse(null);
+            }
+            if (v != null) {
+                out.put(field, v);
+            }
+        });
+        return out;
+    }
+
+    private static Map<String, Object> withMediaUrl(Map<String, Object> props, Map<Long, String> urls) {
+        if (!(props.get(LayoutSupport.MEDIA_ID) instanceof Number n)) {
+            return props;
+        }
+        String url = urls.get(n.longValue());
+        if (url == null) {
+            return props;
+        }
+        Map<String, Object> out = new LinkedHashMap<>(props);
+        out.put("mediaUrl", url);
+        return out;
     }
 
     // ---------------------------------------------------------------------------------------------- sitemap
