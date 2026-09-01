@@ -72,9 +72,9 @@ class ContentPlatformIntegrationTest {
 
     private static final String VERSIONS = "versions";
 
-    private static final String HERO_SLUG = "hero";
+    private static final String COLLECTION_SLUG = "collection";
 
-    private static final String HERO_QUERY = "placement=HERO";
+    private static final String COLLECTION_QUERY = "placement=COLLECTION";
 
     private static final String STRIP_QUERY = "placement=STRIP";
 
@@ -139,7 +139,7 @@ class ContentPlatformIntegrationTest {
 
     private static final String ABOUT_US = "about-us";
 
-    private static final String HERO = "HERO";
+    private static final String COLLECTION_PLACEMENT = "COLLECTION";
 
     private static final String RETURNS = "RETURNS";
 
@@ -395,20 +395,23 @@ class ContentPlatformIntegrationTest {
     // ---------------------------------------------------------------------------------------------- banners
 
     @Test
-    void heroPlacementHoldsOneBannerAndStripFeedsTheAnnouncement() {
-        // HERO holds one, and the seeded store is already using it. Retire it before claiming the slot,
-        // as a seller replacing the starter banner would — the same move the STRIP half of this test makes.
-        retireLiveBanners(HERO_QUERY);
-        long hero1 = createAndPublish(BANNERS, String.format(BANNER, slug(HERO_SLUG), HERO, "Hero one"));
-        var second = send(HttpMethod.POST, path(PRIVATE, BANNERS), String.format(BANNER, slug(HERO_SLUG), HERO, "Hero two"));
-        long hero2 = json(second).get(ID).asLong();
-        var publish2 = send(HttpMethod.POST, path(PRIVATE, BANNERS, hero2, PUBLISH), null);
+    void collectionPlacementHoldsOneBannerPerTargetAndStripFeedsTheAnnouncement() {
+        // COLLECTION holds one per target, and the seeded store is already using it. Retire it before
+        // claiming the slot, as a seller replacing the starter banner would — the same move the STRIP
+        // half of this test makes. (HERO and CAROUSEL retired with the page-layout hero.)
+        retireLiveBanners(COLLECTION_QUERY);
+        long first = createAndPublish(BANNERS,
+                String.format(BANNER, slug(COLLECTION_SLUG), COLLECTION_PLACEMENT, "Collection one"));
+        var second = send(HttpMethod.POST, path(PRIVATE, BANNERS),
+                String.format(BANNER, slug(COLLECTION_SLUG), COLLECTION_PLACEMENT, "Collection two"));
+        long secondId = json(second).get(ID).asLong();
+        var publish2 = send(HttpMethod.POST, path(PRIVATE, BANNERS, secondId, PUBLISH), null);
         expect(publish2, HttpStatus.UNPROCESSABLE_CONTENT);
         assertThat(publish2.getBody()).contains("CONTENT.BANNER.CAPACITY_EXCEEDED");
 
-        JsonNode effective = json(get(query(path(PRIVATE, BANNERS, EFFECTIVE), HERO_QUERY)));
+        JsonNode effective = json(get(query(path(PRIVATE, BANNERS, EFFECTIVE), COLLECTION_QUERY)));
         assertThat(effective.size()).isEqualTo(1);
-        assertThat(effective.get(0).get(ID).asLong()).isEqualTo(hero1);
+        assertThat(effective.get(0).get(ID).asLong()).isEqualTo(first);
 
         // Same for the announcement the `header-message` box became.
         retireLiveBanners(STRIP_QUERY);
@@ -426,12 +429,12 @@ class ContentPlatformIntegrationTest {
         assertThat(site.get(ANNOUNCEMENT).get("body").asString()).contains("shop the sale").contains("/sale");
         assertThat(site.get(MENUS).has("main")).isTrue();
         assertThat(site.get("footerPages").size()).isGreaterThanOrEqualTo(1);
-        JsonNode sfBanners = json(getPublic(query(path(STOREFRONT, BANNERS), HERO_QUERY)));
+        JsonNode sfBanners = json(getPublic(query(path(STOREFRONT, BANNERS), COLLECTION_QUERY)));
         assertThat(sfBanners.get(0).get("ctaLabel").asString()).isEqualTo("Go");
 
         // the console row subtitle names the placement and target
         JsonNode rows = json(get(query(path(PRIVATE, BANNERS), "status=PUBLISHED")));
-        assertThat(rows.get(CONTENT).toString()).contains("hero · /x");
+        assertThat(rows.get(CONTENT).toString()).contains("collection · /x");
     }
 
     // -------------------------------------------------------------------------------------------------- faq

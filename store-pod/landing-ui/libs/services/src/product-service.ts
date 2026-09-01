@@ -6,22 +6,6 @@ import {InventoryService} from "./inventory-service";
 
 export class ProductService {
 
-    public static getHomePageProductGroup = async (storeContext: StoreContext): Promise<ProductGroup | undefined> => {
-        return this.getProductByGroup(storeContext, 'HOME_PAGE');
-    }
-
-    public static getRecommendedProductGroup = async (storeContext: StoreContext): Promise<ProductGroup | undefined> => {
-        return this.getProductByGroup(storeContext, 'RECOMMENDED');
-    }
-
-    public static getNewlyAddedProductGroup = async (storeContext: StoreContext): Promise<ProductGroup | undefined> => {
-        return this.getProductByGroup(storeContext, 'NEWLY_ADDED');
-    }
-
-    public static getFeaturedItemsProductGroup = async (storeContext: StoreContext): Promise<ProductGroup | undefined> => {
-        return this.getProductByGroup(storeContext, 'FEATURED_ITEMS');
-    }
-
     /** Degrades: a strip below the product. Its absence is not worth losing the product page over. */
     public static getRelatedProductGroup = async (storeContext: StoreContext, product: number): Promise<ProductGroup | undefined> => {
         const group = await orUndefined(apiFetch<ProductGroup>(

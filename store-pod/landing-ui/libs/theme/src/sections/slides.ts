@@ -11,7 +11,7 @@ export function slidesAsBanners(items: readonly SectionItem[] | null | undefined
         .filter(item => typeof item.props.mediaUrl === 'string')
         .map((item, index): Banner => ({
             id: index,
-            placement: 'CAROUSEL',
+            placement: null,
             position: index,
             servedLocale: null,
             title: item.text.heading ?? null,

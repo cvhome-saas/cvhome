@@ -6,6 +6,7 @@ import {DatePipe} from '@angular/common';
 import {RouterLink} from '@angular/router';
 import {TranslocoDirective} from '@jsverse/transloco';
 
+import type {ConfirmsLeave} from '@core/routing/confirm-leave.guard';
 import {Icon} from '@shared/ui/icon/icon';
 import type {IconName} from '@shared/ui/icon/icon-paths';
 
@@ -34,8 +35,13 @@ import {BuilderSectionLibrary} from './components/section-library';
   templateUrl: './storefront-builder.html',
   styleUrl: './storefront-builder.css',
 })
-export class StorefrontBuilder implements OnInit, OnDestroy {
+export class StorefrontBuilder implements ConfirmsLeave, OnInit, OnDestroy {
   protected readonly facade = inject(BuilderFacade);
+
+  /** Unsaved edits (or a save in flight) ask before the route is left; see `confirmLeave`. */
+  canLeave(): boolean {
+    return !this.facade.dirty() && this.facade.saveState() !== 'saving';
+  }
 
   protected readonly panel = signal<'layers' | 'library'>('layers');
   protected readonly publishing = signal(false);

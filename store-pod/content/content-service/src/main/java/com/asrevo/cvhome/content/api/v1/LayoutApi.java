@@ -116,7 +116,7 @@ public class LayoutApi {
     }
 
     static String previewSlug(PageKind page) {
-        return "layout:" + page.name();
+        return String.format("layout:%s", page.name());
     }
 
     // ------------------------------------------------------------------------------------- saved sections

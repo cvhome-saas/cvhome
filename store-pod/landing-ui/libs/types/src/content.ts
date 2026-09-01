@@ -57,11 +57,12 @@ export interface StorefrontSeo {
     ogImageUrl: string | null
 }
 
-export type BannerPlacement = 'HERO' | 'CAROUSEL' | 'COLLECTION' | 'STRIP'
+export type BannerPlacement = 'COLLECTION' | 'STRIP'
 
 export interface Banner {
     id: number
-    placement: BannerPlacement
+    /** Null for the layout hero's inline slides, which ride this shape through `slidesAsBanners`. */
+    placement: BannerPlacement | null
     position: number
     servedLocale: string | null
     title: string | null

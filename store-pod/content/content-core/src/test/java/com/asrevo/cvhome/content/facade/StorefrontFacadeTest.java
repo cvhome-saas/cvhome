@@ -576,15 +576,15 @@ class StorefrontFacadeTest {
         @Test
         void bannersAreOrderedBySortThenNewestAndResolveTheirArtwork() {
             Content first = ContentFixtures.published(1L, ContentType.BANNER, SLUG_A, TITLE_A);
-            first.setPlacement(BannerPlacement.CAROUSEL);
+            first.setPlacement(BannerPlacement.COLLECTION);
             first.setSortOrder(0);
             first.setMeta(JsonCodec.write(new BannerMeta(new BannerTarget(BannerTarget.Kind.URL, SALE_PATH),
                     new BannerArtwork(5L, 6L, null), null, false)));
             Content second = ContentFixtures.published(2L, ContentType.BANNER, SLUG_B, "B");
-            second.setPlacement(BannerPlacement.CAROUSEL);
+            second.setPlacement(BannerPlacement.COLLECTION);
             second.setSortOrder(null);
             Content otherPlacement = ContentFixtures.published(3L, ContentType.BANNER, SLUG_C, "C");
-            otherPlacement.setPlacement(BannerPlacement.HERO);
+            otherPlacement.setPlacement(BannerPlacement.STRIP);
             Map<Long, String> urls = new java.util.HashMap<>();
             urls.put(5L, DESKTOP_URL);
             urls.put(6L, MOBILE_URL);
@@ -594,7 +594,7 @@ class StorefrontFacadeTest {
             when(media.urls(any(), anyList())).thenReturn(urls);
 
             List<StorefrontBanner> out = facade.effectiveBanners(ContentFixtures.STORE, ContentFixtures.EN,
-                    BannerPlacement.CAROUSEL);
+                    BannerPlacement.COLLECTION);
 
             assertThat(out).extracting(StorefrontBanner::getId).containsExactly(1L, 2L);
             assertThat(out.getFirst().getPosition()).isZero();
@@ -606,7 +606,7 @@ class StorefrontFacadeTest {
         @Test
         void aBannerTheBindingCallsIneffectiveIsLeftOut() {
             Content banner = ContentFixtures.published(1L, ContentType.BANNER, SLUG_A, TITLE_A);
-            banner.setPlacement(BannerPlacement.HERO);
+            banner.setPlacement(BannerPlacement.STRIP);
             when(contents.findVisibleByType(ContentFixtures.STORE, ContentType.BANNER)).thenReturn(List.of(banner));
             when(banners.effective(banner)).thenReturn(false);
             when(media.urls(any(), anyList())).thenReturn(new java.util.HashMap<>());
@@ -617,7 +617,7 @@ class StorefrontFacadeTest {
         @Test
         void aBannerWithNoTranslationAtAllIsSkipped() {
             Content banner = ContentFixtures.content(1L, ContentType.BANNER, SLUG_A);
-            banner.setPlacement(BannerPlacement.HERO);
+            banner.setPlacement(BannerPlacement.STRIP);
             when(contents.findVisibleByType(ContentFixtures.STORE, ContentType.BANNER)).thenReturn(List.of(banner));
             when(banners.effective(banner)).thenReturn(true);
             when(media.urls(any(), anyList())).thenReturn(new java.util.HashMap<>());

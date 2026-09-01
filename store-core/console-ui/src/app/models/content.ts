@@ -28,9 +28,9 @@ export const CONTENT_STATUSES: readonly ContentStatus[] = ['DRAFT', 'REVIEW', 'S
 /** How complete one locale of an item is. */
 export type TranslationState = 'MISSING' | 'DRAFT' | 'TRANSLATED' | 'STALE';
 
-export type BannerPlacement = 'HERO' | 'CAROUSEL' | 'COLLECTION' | 'STRIP';
+export type BannerPlacement = 'COLLECTION' | 'STRIP';
 
-export const BANNER_PLACEMENTS: readonly BannerPlacement[] = ['HERO', 'CAROUSEL', 'COLLECTION', 'STRIP'];
+export const BANNER_PLACEMENTS: readonly BannerPlacement[] = ['COLLECTION', 'STRIP'];
 
 export type PolicyType = 'TERMS' | 'PRIVACY' | 'RETURNS' | 'SHIPPING' | 'COOKIES' | 'CUSTOM';
 

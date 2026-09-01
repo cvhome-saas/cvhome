@@ -68,7 +68,7 @@ alter table content.content add constraint content_status_check
     check (status in ('DRAFT', 'REVIEW', 'SCHEDULED', 'PUBLISHED', 'ARCHIVED'));
 alter table content.content drop constraint if exists content_placement_check;
 alter table content.content add constraint content_placement_check
-    check (placement is null or placement in ('HERO', 'CAROUSEL', 'COLLECTION', 'STRIP'));
+    check (placement is null or placement in ('COLLECTION', 'STRIP'));
 alter table content.content drop constraint if exists content_policy_type_check;
 alter table content.content add constraint content_policy_type_check
     check (policy_type is null or policy_type in ('TERMS', 'PRIVACY', 'RETURNS', 'SHIPPING', 'COOKIES', 'CUSTOM'));

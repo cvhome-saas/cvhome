@@ -1280,6 +1280,9 @@
       "loading": "Loading stores…",
       "noStoreYet": "No store yet",
       "createStore": "Create store"
+    },
+    "leave": {
+      "unsaved": "You have unsaved changes. Leave the builder anyway?"
     }
   },
   "legal": {
@@ -3458,14 +3461,6 @@
       "placementTitle": "Placement",
       "placementSubtitle": "Where the banner renders. Each placement holds a limited number of live banners at a time.",
       "placement": {
-        "HERO": {
-          "label": "Home hero",
-          "hint": "1920 × 900 · one live at a time"
-        },
-        "CAROUSEL": {
-          "label": "Home carousel",
-          "hint": "1600 × 640 · up to 8, shared with other promos"
-        },
         "COLLECTION": {
           "label": "Collection header",
           "hint": "1600 × 420 · one per collection"

@@ -126,9 +126,9 @@ export interface Parent {
 }
 
 /** A product group code the home page renders. */
-export type ProductGroupCode = 'FEATURED_ITEMS' | 'NEWLY_ADDED' | 'HOME_PAGE' | 'RECOMMENDED';
+export type ProductGroupCode = 'FEATURED_ITEMS' | 'NEWLY_ADDED' | 'RECOMMENDED';
 
-/* ---- options / variants (mirror the uniform-variant catalog: ReadableProductOption & co.) -------- */
+/* ---- options / variants / attributes (mirror catalog ReadableProductOption & co.) ---------------- */
 
 /**
  * One axis this product varies by — Color, Size. Store-wide vocabulary, assigned per product; the
