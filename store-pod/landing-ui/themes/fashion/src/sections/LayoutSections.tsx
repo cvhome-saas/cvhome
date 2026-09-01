@@ -153,6 +153,8 @@ function HeroWall({ctx, section}: SectionRenderProps) {
             <HeadlineSheet ctx={ctx} heading={model.heading} subheading={model.subheading}
                            cta={model.cta} strips={model.strips}
                            className={first ? 'col-span-2 lg:col-span-5 [--tilt:-0.7deg]' : 'col-span-2 lg:col-span-12 [--tilt:-0.7deg]'}/>
+            {/* grid placement lives on these wrappers: a linked poster renders inside an anchor, and
+                column classes on the figure would leave the anchor an unsized grid child */}
             {first && (
                 <div className="col-span-2 min-w-0 lg:col-span-7">
                     <SlidePoster slide={first} index={0} total={model.slides.length} storeName={storeName} priority
@@ -160,8 +162,10 @@ function HeroWall({ctx, section}: SectionRenderProps) {
                 </div>
             )}
             {rest.map((slide, index) => (
-                <SlidePoster key={slide.id} slide={slide} index={index + 1} total={model.slides.length} storeName={storeName}
-                             ratio="4 / 3" className={cn('col-span-1 lg:col-span-4', index % 2 === 0 ? '[--tilt:0.6deg]' : '[--tilt:-0.8deg]')}/>
+                <div key={slide.id} className="col-span-1 min-w-0 lg:col-span-4">
+                    <SlidePoster slide={slide} index={index + 1} total={model.slides.length} storeName={storeName}
+                                 ratio="4 / 3" className={cn('h-full', index % 2 === 0 ? '[--tilt:0.6deg]' : '[--tilt:-0.8deg]')}/>
+                </div>
             ))}
         </div>
     );
