@@ -320,3 +320,44 @@ library and gets no QA file of its own — QA is end to end.
    refactor.
 3. **Publish the kit.** Nothing needs it while both consumers are in this repo, but `@cvhome-saas` is
    already a real npm org and the `file:` link is the only thing tying the apps to this checkout.
+
+
+---
+
+## What actually happened
+
+Written after the fact. The plan held; these are the places it was wrong, and why.
+
+**Phases 3 and 4 merged.** The dependency graph decided the grouping, not the plan: `tone.ts` needs the theme
+provider, the date pickers need `calendar.ts`, and `field-error` needs `validation-messages`. `/ui` could not
+move without `/theme`, `/i18n` and `/forms` moving with it.
+
+**"The controls need no Tailwind content-scanning" was wrong.** I checked it in Phase 1 by grepping for
+utility classes in `class="…"` attributes and concluded there were none. There are: badge, tag-input, tree and
+the chart legends use `inline-flex`, `gap-1`, `ring-1`, `bg-chart-3-wash`, `group-aria-expanded:rotate-180`.
+ng-packagr does not run Tailwind over component CSS, so a consumer must add
+`@source '../node_modules/@cvhome-saas/ui-kit'` or ~2.6 kB of utilities silently vanish. Only a byte
+comparison of the emitted stylesheet showed it — the build, the specs and the page all looked fine.
+
+**`shared/styles/field.css` did not move.** 29 features list it in `styleUrls` by relative path and no kit
+control needs it. `dialog-motion.css` did move, because `app-confirm-dialog` needs it; console-ui's copy is now
+a one-line `@import` so its eleven dialogs and `check-css-vocabulary.mjs` are untouched.
+
+**npm does not fail on a missing `dist/ui-kit`.** The plan said a consumer's `npm install` would fail with
+ENOENT. It exits 0 and writes a dangling symlink; the failure surfaces much later as
+`Could not resolve "@cvhome-saas/ui-kit"` from the build, which reads like a broken import.
+
+**`core/table/table.types.ts` was deleted** rather than moved. It existed to re-export `models/page` under the
+`@core/table` alias so callers need not change their import; behind one entry point every caller writes
+`@cvhome-saas/ui-kit` whichever file the type sits in, so it had become pure indirection.
+
+**Two bugs that only end-to-end QA could find**, both from the same root: uaa serves its console *itself*, so
+every assumption the library had absorbed from "console-ui reaches uaa through the gateway" was wrong in a way
+that answers **200**. `/api/v1/auth/me` returns a different shape on each side, and `/uaa` is the gateway's
+prefix — asking for it on uaa lands on `StaticController` and returns the SPA's HTML. Neither could fail a
+unit test. A third, `ClientAuthMethod.from` recursing into itself, was uaa's own and had survived because the
+endpoint had no caller.
+
+**Not done, deliberately:** `strictNullChecks` is not flipped anywhere (it was already `strict: true` in both
+apps, so the plan's follow-up 1 was moot); console-ui's `/platform/users` and uaa-fe's Users screen both still
+exist, which the locked decision accepted; cua is untouched.
