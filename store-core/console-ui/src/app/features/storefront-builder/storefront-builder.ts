@@ -57,6 +57,9 @@ export class StorefrontBuilder implements ConfirmsLeave, OnInit, OnDestroy {
   }
 
   protected readonly panel = signal<'layers' | 'library'>('layers');
+  /** Both side panes collapse so the canvas can take the whole viewport — the full-website view. */
+  protected readonly leftOpen = signal(true);
+  protected readonly rightOpen = signal(true);
   protected readonly publishing = signal(false);
   protected readonly published = signal(false);
 

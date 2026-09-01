@@ -3650,7 +3650,9 @@
       "error": "Save failed",
       "unpublished": "Draft · unpublished changes",
       "live": "Live",
-      "guides": "Toggle guides"
+      "guides": "Toggle guides",
+      "panelLayout": "Layout panel",
+      "panelInspector": "Inspector panel"
     },
     "tabs": {
       "layout": "Layout",

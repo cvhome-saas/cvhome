@@ -6,6 +6,11 @@
         {{ t('builder.top.back') }}
       </a>
       <div class="divider" aria-hidden="true"></div>
+      <button type="button" class="icon-action" [class.pressed]="leftOpen()"
+              [attr.aria-label]="t('builder.top.panelLayout')" [title]="t('builder.top.panelLayout')"
+              [attr.aria-pressed]="leftOpen()" (click)="leftOpen.set(!leftOpen())">
+        <app-icon [name]="leftOpen() ? 'panelLeftClose' : 'panelLeftOpen'" [size]="15" />
+      </button>
       <div class="title">
         <strong>{{ t('builder.top.title') }}</strong>
         <span class="state">{{ t(saveLabelKey()) }}</span>
@@ -50,6 +55,11 @@
               [disabled]="!facade.canRedo()" (click)="facade.redo()">
         <app-icon name="undo" [size]="15" [flip]="true" />
       </button>
+      <button type="button" class="icon-action" [class.pressed]="rightOpen()"
+              [attr.aria-label]="t('builder.top.panelInspector')" [title]="t('builder.top.panelInspector')"
+              [attr.aria-pressed]="rightOpen()" (click)="rightOpen.set(!rightOpen())">
+        <app-icon [name]="rightOpen() ? 'panelLeftClose' : 'panelLeftOpen'" [size]="15" [flip]="true" />
+      </button>
 
       <div class="divider" aria-hidden="true"></div>
 
@@ -88,6 +98,7 @@
     }
 
     <div class="panes">
+      @if (leftOpen()) {
       <aside class="left">
         <div class="left-tabs" role="tablist">
           <button type="button" role="tab" class="left-tab" [class.on]="panel() === 'layers'"
@@ -114,14 +125,17 @@
           <app-builder-section-library class="pane-body" />
         }
       </aside>
+      }
 
       <main class="center">
         <app-builder-preview-frame />
       </main>
 
+      @if (rightOpen()) {
       <aside class="right">
         <app-builder-inspector />
       </aside>
+      }
 
       @if (revisionsOpen()) {
         <aside class="revisions">
