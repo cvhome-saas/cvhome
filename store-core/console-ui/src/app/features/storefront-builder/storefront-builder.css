@@ -106,6 +106,7 @@
 }
 
 .warnings {
+  animation: drop-in 0.24s cubic-bezier(0.22, 1, 0.36, 1) both;
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
@@ -122,38 +123,70 @@
   display: flex;
 }
 
+/*
+ * The side panes collapse by animating their own width — the one honest width animation here:
+ * the pane's content sits in a fixed-width inner shell so nothing inside reflows per frame, and
+ * the canvas answers with a transform-only rescale. `inert` keeps a collapsed pane out of the
+ * tab order while it stays mounted (scroll position and open items survive a collapse).
+ */
 .left {
   width: 280px;
   flex: none;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--background);
+  border-inline-end: 1px solid var(--border);
+  transition: width 0.28s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.28s;
+}
+
+.left.closed {
+  width: 0;
+  border-inline-end-color: transparent;
+}
+
+.pane-fixed {
+  width: 280px;
+  height: 100%;
   display: flex;
   flex-direction: column;
   min-height: 0;
-  background: var(--background);
-  border-inline-end: 1px solid var(--border);
+}
+
+.pane-fixed-end {
+  width: 320px;
 }
 
 .left-tabs {
   display: flex;
   gap: 2px;
-  padding: 8px;
-  border-block-end: 1px solid var(--border);
+  margin: 8px;
+  padding: 3px;
+  background: var(--muted);
+  border-radius: var(--radius-md);
 }
 
 .left-tab {
   flex: 1;
-  padding: 7px;
+  padding: 6px;
   border: 0;
-  border-radius: var(--radius-md);
+  border-radius: calc(var(--radius-md) - 2px);
   background: none;
   cursor: pointer;
   font-size: 13px;
   font-weight: 600;
   color: var(--muted-foreground);
+  transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+}
+
+.left-tab:hover:not(.on) {
+  color: var(--foreground);
 }
 
 .left-tab.on {
-  background: var(--primary-soft, var(--muted));
+  background: var(--background);
   color: var(--foreground);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.1);
 }
 
 .pane-body {
@@ -172,10 +205,17 @@
 .right {
   width: 320px;
   flex: none;
+  min-width: 0;
   min-height: 0;
   background: var(--background);
   border-inline-start: 1px solid var(--border);
   overflow: hidden;
+  transition: width 0.28s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.28s;
+}
+
+.right.closed {
+  width: 0;
+  border-inline-start-color: transparent;
 }
 
 .icon-action.pressed {
@@ -183,7 +223,30 @@
   color: var(--foreground);
 }
 
+/* the topbar's controls answer the hand: icons breathe on hover, dip on press, and every state
+   change (pressed panes, guides, history) crossfades instead of snapping */
+.topbar .icon-action,
+.topbar .seg-btn {
+  transition: background 0.15s, color 0.15s;
+}
+
+.topbar .icon-action app-icon,
+.topbar .seg-btn app-icon {
+  transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.topbar .icon-action:hover:not(:disabled) app-icon,
+.topbar .seg-btn:hover app-icon {
+  transform: scale(1.15);
+}
+
+.topbar .icon-action:active:not(:disabled) app-icon,
+.topbar .seg-btn:active app-icon {
+  transform: scale(0.88);
+}
+
 .conflict-bar {
+  animation: drop-in 0.24s cubic-bezier(0.22, 1, 0.36, 1) both;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -230,6 +293,7 @@
 }
 
 .revisions {
+  animation: slide-in 0.26s cubic-bezier(0.22, 1, 0.36, 1) both;
   width: 300px;
   flex: none;
   display: flex;
@@ -290,4 +354,28 @@
   padding: 12px;
   font-size: 13px;
   color: var(--muted-foreground);
+}
+
+@keyframes drop-in {
+  from { transform: translateY(-6px); opacity: 0; }
+}
+
+@keyframes slide-in {
+  from { transform: translateX(16px); opacity: 0; }
+}
+
+[dir='rtl'] .revisions {
+  animation-name: slide-in-rtl;
+}
+
+@keyframes slide-in-rtl {
+  from { transform: translateX(-16px); opacity: 0; }
+}
+
+.page-link {
+  transition: background 0.15s;
+}
+
+.revision-row {
+  transition: background 0.15s;
 }

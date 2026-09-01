@@ -68,11 +68,20 @@ import {BuilderFacade} from '../facades/builder.facade';
   styles: `
     .layers { display: flex; flex-direction: column; gap: 2px; padding: 8px; }
     .layer {
-      display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: var(--radius-md);
-      cursor: pointer; background: transparent;
+      position: relative; display: flex; align-items: center; gap: 8px; padding: 8px 10px;
+      border-radius: var(--radius-md); cursor: pointer; background: transparent;
+      transition: background 0.15s;
+    }
+    /* the selected row carries a primary accent bar (logical start, so it flips with RTL) */
+    .layer::before {
+      content: ''; position: absolute; inset-inline-start: 0; inset-block: 6px; width: 3px;
+      border-radius: 3px; background: var(--primary); opacity: 0; transform: scaleY(0.4);
+      transition: opacity 0.18s, transform 0.18s cubic-bezier(0.22, 1, 0.36, 1);
     }
     .layer:hover { background: var(--muted); }
     .layer.selected { background: var(--primary-soft, var(--muted)); }
+    .layer.selected::before { opacity: 1; transform: scaleY(1); }
+    .layer.selected .layer-name { color: var(--foreground); font-weight: 600; }
     .layer.hovered:not(.selected) { background: var(--muted); }
     .locked-glyph { cursor: default; }
     .warn-dot {
@@ -80,7 +89,8 @@ import {BuilderFacade} from '../facades/builder.facade';
       background: var(--chart-4-foreground, var(--chart-5-foreground));
     }
     .layer.hidden-section .layer-copy { opacity: 0.45; }
-    .grip { cursor: grab; color: var(--muted-foreground); display: inline-flex; }
+    .grip { cursor: grab; color: var(--muted-foreground); display: inline-flex; transition: color 0.15s; }
+    .layer:hover .grip { color: var(--foreground); }
     .layer-copy { display: flex; flex-direction: column; min-width: 0; flex: 1; }
     .layer-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .layer-kind { font-size: 11px; color: var(--muted-foreground); }

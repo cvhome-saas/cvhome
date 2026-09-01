@@ -82,9 +82,14 @@ import {BuilderFacade} from '../facades/builder.facade';
     .tile {
       position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 6px;
       padding: 10px; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--background);
-      cursor: pointer; font-size: 12px; font-weight: 600; text-align: start; color: var(--foreground);
+      cursor: grab; font-size: 12px; font-weight: 600; text-align: start; color: var(--foreground);
+      transition: border-color 0.15s, background 0.15s, transform 0.18s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.18s;
     }
-    .tile:hover { border-color: var(--primary); background: var(--primary-soft, var(--muted)); }
+    .tile:hover {
+      border-color: var(--primary); background: var(--primary-soft, var(--muted));
+      transform: translateY(-1px); box-shadow: var(--lift, 0 2px 6px rgb(0 0 0 / 0.08));
+    }
+    .tile:active { transform: translateY(0); }
     /* the picked-up tile stays behind as a dashed shadow of itself while its chip travels */
     .lifting, .tile:has(.tile-main.lifting) { opacity: 0.45; border-style: dashed; }
     .tile.saved { padding: 0; flex-direction: row; align-items: stretch; }

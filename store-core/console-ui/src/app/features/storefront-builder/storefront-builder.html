@@ -98,8 +98,8 @@
     }
 
     <div class="panes">
-      @if (leftOpen()) {
-      <aside class="left">
+      <aside class="left" [class.closed]="!leftOpen()" [attr.inert]="leftOpen() ? null : ''">
+        <div class="pane-fixed">
         <div class="left-tabs" role="tablist">
           <button type="button" role="tab" class="left-tab" [class.on]="panel() === 'layers'"
                   [attr.aria-selected]="panel() === 'layers'" (click)="panel.set('layers')">
@@ -124,18 +124,18 @@
         } @else {
           <app-builder-section-library class="pane-body" />
         }
+        </div>
       </aside>
-      }
 
       <main class="center">
         <app-builder-preview-frame />
       </main>
 
-      @if (rightOpen()) {
-      <aside class="right">
-        <app-builder-inspector />
+      <aside class="right" [class.closed]="!rightOpen()" [attr.inert]="rightOpen() ? null : ''">
+        <div class="pane-fixed pane-fixed-end">
+          <app-builder-inspector />
+        </div>
       </aside>
-      }
 
       @if (revisionsOpen()) {
         <aside class="revisions">
