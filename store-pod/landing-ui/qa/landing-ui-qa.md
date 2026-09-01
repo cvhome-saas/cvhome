@@ -239,8 +239,89 @@ from a past run.
 ### THM-04 — The workspace builds as one · critical · [not verified]
 
 - **Steps** — `cd store-pod/landing-ui && npm run build`.
-- **Expect** — libs → templates → app all build. Building `storefront/` alone compiles against stale types and
+- **Expect** — libs → templates → app all build. Google Fonts shards are downloaded at build time with no retry;
+  a run that fails with `There was an issue requesting https://fonts.gstatic.com/…` is network flakiness — run it
+  again (three attempts were needed once on 2026-09-01). Building `storefront/` alone compiles against stale types and
   is the usual cause of a type error that "does not reproduce".
+
+### THM-05 — A store downloads only its own theme's client code · critical · [verified]
+
+The per-theme client barrier (`themes/ARCHITECTURE.md`, "The client barrier"; `scripts/theme-client-barrier.mjs`).
+Before it, every storefront fetched the `'use client'` components, tokens and fonts of all twelve themes:
+Turbopack chunks a route's client references from the whole server graph, so the registry's per-theme `import()`
+split nothing on the browser side.
+
+- **Setup** — a production build: `cd store-pod/landing-ui && npm run build`, then from `storefront/`
+  `PORT=8111 INTERNAL_SPG=http://spg-507f1f77.gateway.com:80 node start.mjs` (the lcl stack runs `next dev`,
+  whose chunk names and sizes are not the production ones).
+- **Steps** — `curl -H 'Store-Id: <org2-store2 id>' -H 'Theme: furniture' -H 'Default-Language: ar'
+  -H 'Supported-Languages: ar,fr' http://localhost:8111/ar`, then fetch every `<script src>` (skip the
+  `nomodule` one — modern browsers do) and every `<link rel="stylesheet">`; grep each JS file for
+  `-announcement-dismissed` (each theme's Announcement carries `"<theme>-announcement-dismissed"`).
+  Then inspect `.next/server/app/(storefront)/[locale]/product/[url]/page_client-reference-manifest.js`:
+  group `clientModules` by `chunks.join('|')`.
+- **Expect** — exactly one JS file names a theme, and it is `furniture`; the HTML has zero `@font-face` rules and
+  no `--font-<theme>-` variable of any other theme; one `<link rel="stylesheet" data-precedence="dynamic">`
+  carries the furniture tokens and fonts. In the manifest the twelve `themes/*/src/client.ts` barriers share the
+  small route chunk list and no theme component is on it. Reference numbers, furniture home page, measured
+  2026-09-01 (brotli is node `zlib` quality 5 — the CDN's own encoder is a little better):
+
+  | metric | before (production, 2026-09-01) | after |
+  |---|---|---|
+  | JS files fetched | 30 | 21 |
+  | JS decompressed | 1.56 MB | 1.02 MB |
+  | JS brotli | ~445 KB | ~294 KB |
+  | theme chunks fetched | 12 | 1 |
+  | `@font-face` rules in the HTML | 636 | 0 (in the theme's own stylesheet instead) |
+  | inlined CSS | 311 KB | 127 KB (Tailwind utilities for all themes — a follow-up) |
+  | client refs on the product route manifest | 464 sharing 19 chunks | 54, themes on 5 shared chunks |
+
+  Repeat with `Theme: beauty`: a different single theme chunk, beauty's stylesheet, nothing of furniture.
+- **Guard** — `node scripts/theme-client-barrier.mjs --check` (also `npm test`, through
+  `storefront/scripts/theme-client-barrier.test.mjs`) fails when a server file imports a `'use client'` file
+  directly, which is the way this regresses silently.
+
+### THM-06 — The theme's fonts reach `<html>` from inside its chunk, portals included · high · [verified]
+
+`fonts.ts` is no longer in the server graph; the theme's `ThemeFrame` (in its lazy chunk) puts the `next/font`
+variable classes on `<html>` with an inline script before first paint, so `[data-theme] { --font-body: … }` in
+`tokens.css` resolves on the same element and the drawers, menus and toasts that Radix portals into `<body>`
+still inherit the theme font.
+
+- **Steps** — on `org2-store2` (`/ar`, furniture): in the console read `document.documentElement.className`,
+  `getComputedStyle(document.body).fontFamily`, and `[...document.fonts].filter(f => f.status === 'loaded')`;
+  open the cart drawer and read `getComputedStyle(document.querySelector('[role=dialog]')).fontFamily`.
+  Reload with cache disabled and watch the first paint.
+- **Expect** — three `*__variable` classes on `<html>` (Archivo, Golos Text, Tajawal), body and dialog both in
+  Tajawal/Golos, the three families loaded, no flash of unstyled text, no Suspense fallback flash. `?theme=beauty`
+  swaps them for Oswald / JetBrains Mono / Noto Kufi Arabic.
+- **Known, pre-existing, not caused by this** — the dev overlay shows "A tree hydrated but some attributes …
+  didn't match" for Radix `useId` values (navigation menu trigger, language menu, search combobox). That is
+  radix-ui/primitives #3700 (Next ≥ 15.5 with React 19.2 changed `useId`'s prefix), in `libs/ui`, and it appears
+  on the untouched components. Could not be reproduced on `main` in the same session because `main`'s layout
+  entry fetches all twelve themes' fonts at compile time and Google refused enough shards for `next dev` to
+  500 — itself evidence of what the barrier removes.
+
+### THM-07 — `notFound()` still answers 404 with the theme components lazy · critical · [verified]
+
+The generated `client.ts` wraps components in `next/dynamic` **without** a `loading` option. With one, every
+wrapper is a Suspense boundary, the Frame's boundary sits above the page, and a page's `notFound()` streams
+after the shell has flushed — `/ar/product/does-not-exist` answered 200. `--check` rejects a `loading:` in
+`client.ts` for that reason.
+
+- **Steps** — `curl -s -o /dev/null -w '%{http_code}' http://org2-store2.spg-507f1f77.gateway.com/ar/product/does-not-exist`.
+- **Expect** — `404`, and the page shows the furniture "00 — الصفحة غير موجودة" state in the theme font.
+
+### THM-08 — PKCE on Web Crypto (crypto-js removed) · critical · [not verified]
+
+`libs/services/src/pkce-utils.ts` uses `crypto.getRandomValues` and `crypto.subtle.digest`; the 73 KB crypto-js
+chunk is gone from every first load. `libs/services/test/pkce-utils.test.ts` pins the challenge to the
+RFC 7636 appendix B vector, but a wrong challenge fails at the authorization server, not in a unit test.
+
+- **Steps** — on a demo storefront click the account icon → login → sign in as `user` / `revo` on cua → land
+  back on `/<lang>/callback` → `/customer`.
+- **Expect** — the token exchange succeeds and the customer page renders; the network tab shows no
+  `db65ffa2c66eb6e9.js`-sized (~74 KB) crypto chunk on the storefront.
 
 ---
 

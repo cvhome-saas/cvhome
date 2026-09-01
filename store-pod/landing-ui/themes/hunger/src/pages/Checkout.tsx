@@ -2,8 +2,7 @@ import {getTranslations} from 'next-intl/server';
 import type {CheckoutData, PageProps} from '@store-front/theme';
 import {PageShell} from '../components/PageShell';
 import {Breadcrumbs} from '../components/Breadcrumbs';
-import {CheckoutForm} from '../sections/CheckoutForm';
-import {OrderSummary} from '../sections/OrderSummary';
+import {CheckoutForm, OrderSummary} from '../client';
 
 /** The counter: where the order gets written down and paid for. */
 export async function Checkout({ctx, data}: PageProps<CheckoutData>) {

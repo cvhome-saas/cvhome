@@ -5,7 +5,7 @@ import {EmptyOrHint, sectionsFromChrome, type SectionChrome} from '@store-front/
 import {cn} from '@store-front/ui/lib/utils';
 import {HeadlineSheet, SlidePoster} from './Hero';
 import {ProductGrid} from '../components/ProductGrid';
-import {PosterImage} from '../components/PosterImage';
+import {PosterImage} from '../client';
 import {SectionHeading} from '../components/SectionHeading';
 
 /**

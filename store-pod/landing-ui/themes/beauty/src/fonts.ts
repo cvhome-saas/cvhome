@@ -6,9 +6,10 @@ import type {ThemeFonts} from '@store-front/theme';
  * Body/labels: a mono (JetBrains Mono, Latin + Cyrillic) — printed utility labels, exact numerals.
  * Arabic: Noto Kufi Arabic — a squared kufic that keeps the industrial register in RTL locales.
  *
- * `preload: false` on every face: all themes' font CSS lands in the SAME layout entry, so a preload
- * here fires on every storefront whatever theme is active. @font-face still fetches the faces the page
- * actually uses; `display: swap` covers the extra hop.
+ * `preload: false` on every face: this module is imported by ThemeFrame.tsx inside the theme's lazily loaded
+ * client chunk (see scripts/theme-client-barrier.mjs), and next/font emits preload links from the layout
+ * entry's font manifest only, so the flag has nothing to act on here. @font-face still fetches the faces the
+ * page actually uses; `display: swap` covers the extra hop.
  */
 const display = Oswald({subsets: ['latin', 'latin-ext', 'cyrillic'], weight: ['500', '600', '700'], display: 'swap', preload: false, variable: '--font-beauty-display'});
 const mono = JetBrains_Mono({subsets: ['latin', 'latin-ext', 'cyrillic'], weight: ['400', '500', '700'], display: 'swap', preload: false, variable: '--font-beauty-mono'});

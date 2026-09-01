@@ -2,9 +2,7 @@ import Image from 'next/image';
 import {Link} from '@store-front/i18n/navigation';
 import type {LayoutData, PageContext} from '@store-front/theme';
 import {cn} from '@store-front/ui/lib/utils';
-import {MobileNav} from './MobileNav';
-import {HeaderActions} from './HeaderActions';
-import {SearchBox} from '../sections/SearchBox';
+import {MobileNav, HeaderActions, SearchBox} from '../client';
 
 /**
  * The counter: menu (mobile) · logo / wordmark · the search slot (md+) · language / account / basket.

@@ -6,7 +6,7 @@ import {PageShell} from '../components/PageShell';
 import {Breadcrumbs} from '../components/Breadcrumbs';
 import {SectionHeading} from '../components/SectionHeading';
 import {ProductGrid} from '../components/ProductGrid';
-import {BuyBox} from '../sections/BuyBox';
+import {BuyBox} from '../client';
 
 /** Trail · the poster and its spec sheet · a details sheet (description, specifications) · related posters. */
 export async function Product({ctx, data}: PageProps<ProductData>) {

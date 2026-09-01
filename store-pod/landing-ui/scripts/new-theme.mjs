@@ -55,7 +55,8 @@ for (const file of walk(dst)) {
         .replaceAll('--font-starter-', `--font-${id}-`)
         .replaceAll('starter-announcement', `${id}-announcement`)
         .replaceAll('starter-hero', `${id}-hero`)
-        .replaceAll('starter-rail', `${id}-rail`);
+        .replaceAll('starter-rail', `${id}-rail`)
+        .replaceAll('the starter theme', `the ${id} theme`);
     writeFileSync(file, text);
 }
 writeFileSync(path.join(dst, 'DESIGN.md'), `# ${titleCase} — DESIGN.md\n\n_Not written yet._ DESIGN.md is produced at finish by the impeccable documenter from the built theme.\nUntil then this theme is a copy of \`starter\` and has no visual world of its own.\n`);
@@ -118,6 +119,10 @@ if (!new RegExp(`^\\s*${enumName}\\s*=`, 'm').test(enumSrc)) {
 // 4. install
 execSync('npm install', {cwd: root, stdio: 'inherit'});
 
+// 5. the client barrier (client.ts / client-bundle.ts / ThemeFrame.tsx were copied from starter; regenerate
+// them for the new id and prove no server file imports a client file directly — see themes/ARCHITECTURE.md)
+execSync(`node scripts/theme-client-barrier.mjs ${id}`, {cwd: root, stdio: 'inherit'});
+
 console.log(`
 ✅ themes/${id} scaffolded and registered.
 
@@ -129,6 +134,8 @@ Next steps
      new-work + concept-seed (the roll is mandatory), then build page by page, finish review,
      documenter writes themes/${id}/DESIGN.md.
   2. Edit themes/${id}/src/{tokens.css,fonts.ts,config.ts,layout,pages,sections,components,states}.
+     Server files import 'use client' components from src/client.ts only; after adding or renaming one run
+     \`node scripts/theme-client-barrier.mjs ${id}\` to regenerate client.ts / client-bundle.ts.
      Every page in ThemePages is required except Search: a theme without pages/Search.tsx gets the
      shell's plain results page, built from tokens so it still looks like this theme. Copy
      themes/basic/src/{pages/Search.tsx,sections/SearchResults.tsx,states/skeletons/SearchSkeleton.tsx}

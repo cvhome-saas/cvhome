@@ -1,9 +1,8 @@
 import {Link} from '@store-front/i18n/navigation';
 import {heroModel, productsModel, slidesAsBanners, type SectionRenderProps, type ThemeSectionRegistry} from '@store-front/theme';
 import {EmptyOrHint} from '@store-front/ui/sections/compose';
-import {Hero} from './Hero';
+import {Hero, ProductRail} from '../client';
 import {ProductGrid} from '../components/ProductGrid';
-import {ProductRail} from './ProductRail';
 import {SectionHeading} from '../components/SectionHeading';
 
 /**

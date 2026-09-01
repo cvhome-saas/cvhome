@@ -1,7 +1,7 @@
 import {Link} from '@store-front/i18n/navigation';
 import type {HeroSlide, PageContext, SectionAction} from '@store-front/theme';
 import {cn} from '@store-front/ui/lib/utils';
-import {PosterImage} from '../components/PosterImage';
+import {PosterImage} from '../client';
 
 /**
  * A slide pasted as a big peeling poster. No carousel: each of the merchant's images gets its own

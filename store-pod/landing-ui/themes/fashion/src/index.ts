@@ -1,6 +1,4 @@
 import {defineTheme, mix} from '@store-front/theme';
-import './tokens.css';
-import {fonts} from './fonts';
 import {DEFAULT_COLORS} from './colors';
 import {layoutConfig} from './config';
 import {Root} from './layout/Root';
@@ -13,13 +11,10 @@ import {BlogPost} from './pages/BlogPost';
 import {Faq} from './pages/Faq';
 import {Policy} from './pages/Policy';
 import {Checkout} from './pages/Checkout';
-import {CheckoutResult} from './pages/CheckoutResult';
+import {CheckoutResult, ErrorState, EmptyState, Redirecting, ThemeFrame} from './client';
 import {Customer} from './pages/Customer';
 import {Order} from './pages/Order';
-import {ErrorState} from './states/ErrorState';
 import {NotFound} from './states/NotFound';
-import {EmptyState} from './states/EmptyState';
-import {Redirecting} from './states/Redirecting';
 import {HomeSkeleton} from './states/skeletons/HomeSkeleton';
 import {CategorySkeleton} from './states/skeletons/CategorySkeleton';
 import {ProductSkeleton} from './states/skeletons/ProductSkeleton';
@@ -34,7 +29,6 @@ export default defineTheme({
     name: 'Fashion',
     version: '1.1.0',
     description: 'The wheatpaste wall for streetwear and drops: every product a pasted poster on a rendered wall, the merchant primary as day-glo paper, state as rubber stamps.',
-    fonts,
     tokens: {
         defaultColors: DEFAULT_COLORS,
         // Paper and ink come from the preset's background/foreground; the preset's PRIMARY is the day-glo
@@ -47,7 +41,7 @@ export default defineTheme({
             secondary: schema.foreground,
         }),
     },
-    layout: {config: layoutConfig, Root},
+    layout: {config: layoutConfig, Root, Frame: ThemeFrame},
     sections: layoutSections,
     pages: {Category, Product, Content, BlogIndex, BlogPost, Faq, Policy, Checkout, CheckoutResult, Customer, Order},
     states: {

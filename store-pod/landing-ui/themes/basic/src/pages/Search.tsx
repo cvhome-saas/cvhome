@@ -1,7 +1,7 @@
 import {getTranslations} from 'next-intl/server';
 import type {PageProps, SearchData} from '@store-front/theme';
 import {PageShell} from '../components/PageShell';
-import {SearchNotice, SearchResults} from '../sections/SearchResults';
+import {SearchNotice, SearchResults} from '../client';
 
 /**
  * What the shop found: the query as a running head, the count beneath it, then the ruled listing — the same

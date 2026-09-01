@@ -17,9 +17,12 @@ re-implements it. The same split repeats at every level below.
 themes/<id>/
   DESIGN.md              the theme's visual world (written by the impeccable documenter at finish)
   src/
-    index.ts             defineTheme({...}) — the single export the shell loads
+    index.ts             defineTheme({...}) — the single export the shell loads (server side)
+    client.ts            GENERATED 'use client' barrier: one next/dynamic per client component (see below)
+    client-bundle.ts     GENERATED barrel of every 'use client' component + tokens.css + ThemeFrame = ONE chunk
+    ThemeFrame.tsx       'use client'; puts the next/font variables on <html> from inside the theme's chunk
     tokens.css           [data-theme="<id>"] design tokens + the theme's component vocabulary
-    fonts.ts             next/font faces exported as CSS variables
+    fonts.ts             next/font faces exported as CSS variables (imported by ThemeFrame only)
     colors.ts            GENERATED default palette — edit the seed in
                          libs/types/scripts/build-color-schemas.mjs, never this file
     config.ts            ThemeLayoutConfig (container widths, product grid, header behavior)
@@ -37,6 +40,28 @@ Registration lives in the shell and is done by the scaffold: `storefront/src/she
 the `Theme` enum in `libs/types`, and a palette seed. Merchant colors arrive as a `ColorTheme`
 preset through the contrast-guarded bridge in `libs/theme` — a theme may re-map roles
 (`tokens.mapMerchantColors`), never ignore them.
+
+## The client barrier: why server files import from `./client`
+
+Turbopack decides a route's browser chunk group from the *whole* server module graph, dynamic `import()`
+included — the registry's per-theme `import()` splits server chunks only. Left alone, every theme's
+`'use client'` components land in the one chunk group each storefront downloads (twelve themes' worth for a
+store that renders one). What Turbopack does split is an `import()` issued from a client module, so:
+
+- `client-bundle.ts` re-exports every `'use client'` component of the theme, imports `tokens.css` and
+  exports `ThemeFrame` — one module, so one lazily loaded chunk per theme (JS *and* CSS *and* fonts).
+- `client.ts` (`'use client'`) wraps each of them in `next/dynamic(() => import('./client-bundle')…)`.
+  The `import()` literal is what the `next/dynamic` transform records, so SSR preloads the chunk and its
+  CSS: no hydration waterfall, no flash of unstyled content.
+- Server files (`Root`, pages, `LayoutSections`, skeletons, `index.ts`) import client components **only
+  from `./client`**; client files import each other directly (they share the chunk). `index.ts` does not
+  import `tokens.css` or `fonts.ts` — the shell renders `layout.Frame` (= `ThemeFrame` from `./client`)
+  around `Root`, and that is what brings the theme's CSS and fonts in.
+
+Both generated files are written by `node scripts/theme-client-barrier.mjs <id>` (idempotent; re-run it after
+adding a client component) and checked by `storefront/scripts/theme-client-barrier.test.mjs`: a direct import
+of a client file from a server file fails the test, because the build would not warn and every store would
+silently pay for it again.
 
 ## The home page: layout document → sections → voice
 

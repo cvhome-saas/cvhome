@@ -1,8 +1,7 @@
 import {getTranslations} from 'next-intl/server';
 import type {RootLayoutProps} from '@store-front/theme';
-import {Announcement} from './Announcement';
+import {Announcement, AisleStrip} from '../client';
 import {Header} from './Header';
-import {AisleStrip} from './AisleStrip';
 import {Footer} from './Footer';
 
 /*

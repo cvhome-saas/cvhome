@@ -97,7 +97,10 @@ themes/<id>/
 ├── package.json            name @store-front/theme-<id>; exports ".", "./tokens.css"
 ├── DESIGN.md               written at finish by the documenter
 └── src/
-    ├── index.ts            defineTheme({id, name, version, fonts, tokens, layout, pages, states, loginCss?})
+    ├── index.ts            defineTheme({id, name, version, tokens, layout: {config, Root, Frame}, pages, states, loginCss?})
+    ├── client.ts           GENERATED 'use client' barrier — server files import client components from HERE
+    ├── client-bundle.ts    GENERATED: every 'use client' component + tokens.css + ThemeFrame = one lazy chunk
+    ├── ThemeFrame.tsx      'use client'; imports fonts.ts and puts fonts.variables on <html> (layout.Frame)
     ├── fonts.ts            next/font (google or local) → fonts.variables; tokens.css maps --font-body onto it
     ├── tokens.css          [data-theme="<id>"] { every THEME_OWNED_TOKENS entry }  ← the theme's voice
     ├── config.ts           ThemeLayoutConfig (cart drawer/page, mobile nav kind, grid, aspect, container, search)
@@ -108,6 +111,9 @@ themes/<id>/
     ├── components/         ProductCard, ProductGrid, ProductBadges, CartLineItem, Breadcrumbs, PageShell, …
     └── states/             ErrorState*, NotFound, EmptyState*, Redirecting*, skeletons/*   (* = 'use client')
 ```
+
+After adding or renaming a `'use client'` component run `node scripts/theme-client-barrier.mjs <id>` (from
+`store-pod/landing-ui`) to regenerate `client.ts`/`client-bundle.ts`; `themes/ARCHITECTURE.md` explains why.
 
 Never edit for a theme: `storefront/**` (except what the scaffold generated), `libs/**`, `locales/*` other
 than adding keys. A primitive that cannot be themed gets a new variant in `libs/ui` (benefits all themes).

@@ -3,7 +3,7 @@ import type {CategoryData, PageProps} from '@store-front/theme';
 import {Link} from '@store-front/i18n/navigation';
 import {PageShell} from '../components/PageShell';
 import {Breadcrumbs} from '../components/Breadcrumbs';
-import {Listing} from '../sections/Listing';
+import {Listing} from '../client';
 
 /** A stretch of wall for one category: trail strips, the category's name sheet with its subcategory strips, then the listing. */
 export async function Category({ctx, data}: PageProps<CategoryData>) {
