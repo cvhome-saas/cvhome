@@ -5,7 +5,8 @@
     "users": "Users",
     "roles": "Roles",
     "clients": "Clients",
-    "signOut": "Sign out"
+    "signOut": "Sign out",
+    "language": "Language"
   },
   "route": {
     "signIn": "Sign in",
@@ -30,7 +31,9 @@
     "loading": "Loading accounts…",
     "unit": "accounts",
     "paginationLabel": "Account pages",
-    "panel": {"title": "Accounts"},
+    "panel": {
+      "title": "Accounts"
+    },
     "notice": {
       "noSearch": "uaa matches accounts on metadata equality and offers no text search, so this list is not filtered."
     },
@@ -77,8 +80,13 @@
     "loading": "Loading roles…",
     "unit": "roles",
     "paginationLabel": "Role pages",
-    "panel": {"title": "Roles"},
-    "column": {"name": "Role", "id": "Id"},
+    "panel": {
+      "title": "Roles"
+    },
+    "column": {
+      "name": "Role",
+      "id": "Id"
+    },
     "notice": {
       "rename": "Renaming a role does not re-issue anyone's token: whoever is signed in keeps the old authority until they sign in again."
     },
@@ -86,7 +94,11 @@
       "title": "No roles",
       "message": "uaa has no roles registered yet."
     },
-    "action": {"create": "New role", "rename": "Rename", "delete": "Delete"},
+    "action": {
+      "create": "New role",
+      "rename": "Rename",
+      "delete": "Delete"
+    },
     "form": {
       "createTitle": "New role",
       "renameTitle": "Rename role",
@@ -113,8 +125,13 @@
     "loading": "Loading clients…",
     "unit": "clients",
     "paginationLabel": "Client pages",
-    "panel": {"title": "Registered clients"},
-    "column": {"clientId": "Client id", "clientName": "Name"},
+    "panel": {
+      "title": "Registered clients"
+    },
+    "column": {
+      "clientId": "Client id",
+      "clientName": "Name"
+    },
     "notice": {
       "secret": "uaa never returns a client secret. The only moment you can read one is the moment you set it — copy it before you close the dialog."
     },
@@ -122,7 +139,12 @@
       "title": "No clients",
       "message": "No applications are registered against uaa yet."
     },
-    "action": {"register": "Register client", "edit": "Edit", "rotate": "New secret", "delete": "Delete"},
+    "action": {
+      "register": "Register client",
+      "edit": "Edit",
+      "rotate": "New secret",
+      "delete": "Delete"
+    },
     "form": {
       "createTitle": "Register a client",
       "editTitle": "Edit client",

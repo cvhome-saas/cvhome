@@ -23,7 +23,7 @@ every other service trusts. JDBC-backed sessions, Thymeleaf login pages, and an 
 - Main class: `com.asrevo.cvhome.uaa.UaaApplication`
 - Web layer: `web/AuthController`, `web/StaticController`, `web/oidc/UserInfoController`,
   `web/admin/{AdminUserController, AdminClientController, AdminRoleController}`
-- Embedded frontend: `src/main/resources/uaa-fe` (Angular 20, Nebular, module-federation) — see
+- Embedded frontend: `src/main/resources/uaa-fe` (Angular 20 standalone on `@cvhome-saas/ui-kit`) — see
   `frontends.md` for the exact build wiring.
 - Depends on `store-commons:commons`, `store-commons:autoconfigure`, and both `ecs-commons` modules.
 

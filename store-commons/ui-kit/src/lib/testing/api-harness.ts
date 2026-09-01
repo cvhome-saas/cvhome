@@ -34,7 +34,7 @@ export function apiHarness<T>(
     providers: [
       provideHttpClient(),
       provideHttpClientTesting(),
-      {provide: UI_KIT_CONFIG, useValue: {apiUrl: API_BASE, loginUrl: '', logoutUrl: ''}},
+      {provide: UI_KIT_CONFIG, useValue: {apiUrl: API_BASE, loginUrl: '', logoutUrl: '', uaaBasePath: '/uaa'}},
       /*
        * Mirrors `SelectedStoreRequestContext`: an explicit store wins over the open one. A fake
        * that ignored the argument made `storeInfo('ORG1-STORE2')` look like it queried the open

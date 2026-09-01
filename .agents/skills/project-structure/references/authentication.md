@@ -9,7 +9,7 @@ never share an identity realm.
 | Port | 8001 | 8124 |
 | Who it authenticates | Platform staff, org owners, merchants/sellers | **Storefront shoppers** |
 | Reached via | `store-core-gateway` (:8000) | `spg` at `/cua` |
-| Front end | Thymeleaf login + embedded Angular admin SPA (`uaa-fe`) | Thymeleaf login/registration/social-login pages |
+| Front end | Embedded Angular SPA (`uaa-fe`, on `@cvhome-saas/ui-kit`): sign-in, users, roles, clients — plus a Thymeleaf consent page | Thymeleaf login/registration/social-login pages |
 | Self-registration | No — admin-provisioned (`AdminUserController`) | **Yes** — `RegistrationController`, social login |
 | Serves tokens to | console-ui, tenancy, gateway, all `-service` s2s clients | landing-ui storefront sessions |
 | Deployment | One shared instance for the whole SaaS | One per pod |

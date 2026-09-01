@@ -13,6 +13,17 @@ export interface UiKitConfig {
   readonly loginUrl: string;
   /** Where the gateway ends the session. Reached through the `external-logout-link` route, never linked directly. */
   readonly logoutUrl: string;
+  /**
+   * What sits in front of uaa's own paths, for the clients in `@cvhome-saas/ui-kit/uaa`.
+   *
+   * `/uaa` for an application that reaches uaa through store-core-gateway, which is what its forward
+   * route is called. Empty for one uaa serves itself, where the same endpoints are at the root.
+   *
+   * Getting this wrong does not 404: uaa's `StaticController` forwards any dotless path that is not
+   * `/api/` or `/oauth2/` to index.html, so a mis-prefixed call answers 200 with the SPA's HTML and
+   * the error stack reports `CLIENT.HTTP_200` on a page that looks like it simply failed to load.
+   */
+  readonly uaaBasePath: string;
 }
 
 /**
@@ -25,5 +36,6 @@ export const UI_KIT_CONFIG = new InjectionToken<UiKitConfig>('UI_KIT_CONFIG', {
     apiUrl: '',
     loginUrl: '/oauth2/authorization/uaa',
     logoutUrl: '/logout',
+    uaaBasePath: '/uaa',
   }),
 });

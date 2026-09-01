@@ -7,9 +7,20 @@ import {Roles} from './roles';
 import {CrudService} from "../http/crud.service";
 
 /**
- * Raw shape of Spring Security's Authentication object as returned by AuthController#me (declared
- * `Object` on the Java side — genuinely untyped; this is the default serialization of the OIDC
- * principal).
+ * Raw shape of what `/api/v1/auth/me` answers — of which there are **two**, because two different
+ * controllers serve that path and they return different things.
+ *
+ * **Through store-core-gateway** (console-ui): `AuthController#me` returns an
+ * `OAuth2AuthenticationToken`, so the OIDC principal arrives nested under `principal` with its ID
+ * token `claims`.
+ *
+ * **On uaa itself** (uaa's own console): `AuthController#me` returns
+ * `getAuthentication().getPrincipal()` — the principal *unwrapped* — and for a `formLogin` session
+ * that is a `UserDetails`: `{username, authorities, enabled, …}` with no `principal` and no `claims`.
+ *
+ * Both are handled below. Only handling the first is what made uaa's console bounce straight back to
+ * the login page after a successful sign-in: the POST authenticated, the guard then read a shape it
+ * did not recognise and treated it as "not signed in".
  *
  * Verified against the running stack, because the previous typing was wrong about it. `principal.claims`
  * holds the **ID token's** claims and nothing else — `sub, aud, azp, auth_time, iss, exp, iat, nonce,
@@ -20,7 +31,7 @@ import {CrudService} from "../http/crud.service";
  * uaa's ID token carries no profile claims".
  */
 interface AuthenticationResponse {
-  principal: {
+  principal?: {
     claims: IdTokenClaims;
     /** OIDC standard fields. Present as keys, null in practice until uaa fills them in. */
     givenName: string | null;
@@ -30,6 +41,8 @@ interface AuthenticationResponse {
     /** The username. The only identity actually populated today. */
     name: string;
   };
+  /** Present on the *session* shape below, where the principal is not wrapped. */
+  username?: string;
   authorities: {authority: string}[];
 }
 
@@ -53,11 +66,34 @@ export class AuthService {
     } else {
       return this.crudService.get<AuthenticationResponse>("/api/v1/auth/me")
         .pipe(map((it) => {
-          // uaa answers this endpoint with 200 and an *empty body* when nobody is signed in, not a 401.
-          // Reading `it.principal` then threw a TypeError, and the guard's catch-all treated that as
+          // Both endpoints answer 200 with an *empty body* when nobody is signed in, not a 401.
+          // Reading into it then threw a TypeError, and the guard's catch-all treated that as
           // "redirect to login" — the login flow worked by accident. Naming the condition makes it a
           // typed failure the guard can branch on, and keeps a genuine 500 from being read as a logout.
-          if (!it?.principal?.claims) {
+          const principal = it?.principal;
+          if (principal?.claims) {
+            // The gateway's OAuth2AuthenticationToken.
+            this.authUser = {
+              sub: principal.claims.sub,
+              username: principal.name,
+              givenName: principal.givenName,
+              familyName: principal.familyName,
+              email: principal.email,
+              authorities: it.authorities.map(a => a.authority),
+            };
+          } else if (it?.username) {
+            // uaa's own form-login session. There is no ID token, so there are no profile claims and
+            // no `sub`: the username is the whole identity, which is what the JWT carries anyway —
+            // see lessons.md, "Users — the JWT carries no user id".
+            this.authUser = {
+              sub: it.username,
+              username: it.username,
+              givenName: null,
+              familyName: null,
+              email: null,
+              authorities: (it.authorities ?? []).map(a => a.authority),
+            };
+          } else {
             throw new ApiError({
               code: CLIENT_ERROR_CODES.SESSION_MISSING,
               category: 'UNAUTHENTICATED',
@@ -65,15 +101,6 @@ export class AuthService {
               url: "/api/v1/auth/me",
             });
           }
-          const principal = it.principal;
-          this.authUser = {
-            sub: principal.claims.sub,
-            username: principal.name,
-            givenName: principal.givenName,
-            familyName: principal.familyName,
-            email: principal.email,
-            authorities: it.authorities.map(a => a.authority),
-          };
           return this.authUser;
         }))
     }

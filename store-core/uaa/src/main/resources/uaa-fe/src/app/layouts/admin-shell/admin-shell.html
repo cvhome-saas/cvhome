@@ -17,6 +17,20 @@
     </nav>
 
     <div class="who">
+      <div class="langs" role="group" [attr.aria-label]="t('nav.language')">
+        @for (locale of locales; track locale.code) {
+          <button
+            class="lang"
+            type="button"
+            [class.active]="locale.code === activeLocale()"
+            [attr.aria-pressed]="locale.code === activeLocale()"
+            (click)="selectLocale(locale.code)"
+          >
+            {{ locale.label }}
+          </button>
+        }
+      </div>
+
       @if (user; as principal) {
         <span class="username">{{ principal.username }}</span>
       }

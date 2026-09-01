@@ -75,3 +75,24 @@
   flex: 1;
   padding: var(--spacing-gutter);
 }
+
+.langs {
+  display: inline-flex;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.lang {
+  padding: var(--spacing-inline) var(--spacing-tight);
+  border: none;
+  background: transparent;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  font-size: var(--text-2xs);
+}
+
+.lang.active {
+  background: var(--accent-strong);
+  color: var(--foreground-strong);
+}

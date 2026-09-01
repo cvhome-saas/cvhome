@@ -35,7 +35,13 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withInterceptors([apiErrorInterceptor])),
     provideTheme(),
     provideUiKit(
-      {apiUrl: environment.apiUrl, loginUrl: environment.loginUrl, logoutUrl: environment.logoutUrl},
+      {
+        apiUrl: environment.apiUrl,
+        loginUrl: environment.loginUrl,
+        logoutUrl: environment.logoutUrl,
+        // The console reaches uaa through store-core-gateway, whose forward route is `/uaa`.
+        uaaBasePath: '/uaa',
+      },
       withNotifications(ToastService),
       // REQUEST_CONTEXT defaults to adding no parameters, which is right for a console with no
       // stores and wrong for this one: the implementation reads the store list, so it lives in the

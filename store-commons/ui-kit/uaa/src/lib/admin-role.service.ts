@@ -1,7 +1,7 @@
 import {Injectable, inject} from '@angular/core';
 import {Observable} from 'rxjs';
 
-import {CrudService, type SpringPage} from '@cvhome-saas/ui-kit';
+import {CrudService, UI_KIT_CONFIG, type SpringPage} from '@cvhome-saas/ui-kit';
 
 /**
  * uaa's role registry — the names `AdminUserService.assignRoles` grants.
@@ -17,7 +17,7 @@ import {CrudService, type SpringPage} from '@cvhome-saas/ui-kit';
  * A role is a name and nothing else: `Role` is `{id, name}`, and both request records carry the
  * single field. Permissions are not modelled here — authorities are the role names themselves.
  */
-export const ADMIN_ROLE_API_BASE = '/uaa/api/v1/admin/roles';
+export const ADMIN_ROLE_API_PATH = '/api/v1/admin/roles';
 
 /** One role. `name` is the authority string, e.g. `ROLE_STORE_ADMIN`. */
 export interface RoleDto {
@@ -32,6 +32,8 @@ export interface RoleNameRequest {
 @Injectable({providedIn: 'root'})
 export class AdminRoleService {
   private readonly crudService = inject(CrudService);
+  /** `/uaa/…` behind the gateway, `/api/…` on uaa itself. See {@link UiKitConfig.uaaBasePath}. */
+  private readonly base = `${inject(UI_KIT_CONFIG).uaaBasePath}${ADMIN_ROLE_API_PATH}`;
 
   /**
    * A page of roles.
@@ -40,23 +42,23 @@ export class AdminRoleService {
    * service, so the platform-wide paging rename applies here too.
    */
   list(page: number, count: number): Observable<SpringPage<RoleDto>> {
-    return this.crudService.get(ADMIN_ROLE_API_BASE, {page, count});
+    return this.crudService.get(this.base, {page, count});
   }
 
   findOne(id: string): Observable<RoleDto> {
-    return this.crudService.get(`${ADMIN_ROLE_API_BASE}/${id}`);
+    return this.crudService.get(`${this.base}/${id}`);
   }
 
   create(request: RoleNameRequest): Observable<RoleDto> {
-    return this.crudService.post(ADMIN_ROLE_API_BASE, request);
+    return this.crudService.post(this.base, request);
   }
 
   /** `PUT /{id}` — note the leading slash on the controller's mapping, unlike its siblings. */
   update(id: string, request: RoleNameRequest): Observable<RoleDto> {
-    return this.crudService.put(`${ADMIN_ROLE_API_BASE}/${id}`, request);
+    return this.crudService.put(`${this.base}/${id}`, request);
   }
 
   delete(id: string): Observable<void> {
-    return this.crudService.delete(`${ADMIN_ROLE_API_BASE}/${id}`);
+    return this.crudService.delete(`${this.base}/${id}`);
   }
 }

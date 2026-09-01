@@ -29,7 +29,7 @@ public enum ClientAuthMethod {
             throw new IllegalArgumentException("Auth method cannot be null");
         }
         try {
-            return ClientAuthMethod.from(s.toUpperCase());
+            return ClientAuthMethod.valueOf(s.toUpperCase());
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException(String.format("Unknown client auth method: %s", s), e);
         }

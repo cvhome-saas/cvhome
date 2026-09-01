@@ -1,7 +1,7 @@
 import {Injectable, inject} from '@angular/core';
 import {Observable} from 'rxjs';
 
-import {CrudService, type SpringPage} from '@cvhome-saas/ui-kit';
+import {CrudService, UI_KIT_CONFIG, type SpringPage} from '@cvhome-saas/ui-kit';
 
 /**
  * uaa's OAuth2 client registry — the registered clients every other service authenticates as.
@@ -21,7 +21,7 @@ import {CrudService, type SpringPage} from '@cvhome-saas/ui-kit';
  * answers `void`, so the only moment a caller can show a secret is the one it supplied. That is a
  * property of the endpoint, not an omission here.
  */
-export const ADMIN_CLIENT_API_BASE = '/uaa/api/v1/admin/clients';
+export const ADMIN_CLIENT_API_PATH = '/api/v1/admin/clients';
 
 /** A row in the client list. All the list endpoint returns. */
 export interface ClientSummary {
@@ -84,35 +84,37 @@ export interface ClientOptions {
 @Injectable({providedIn: 'root'})
 export class AdminClientService {
   private readonly crudService = inject(CrudService);
+  /** `/uaa/…` behind the gateway, `/api/…` on uaa itself. See {@link UiKitConfig.uaaBasePath}. */
+  private readonly base = `${inject(UI_KIT_CONFIG).uaaBasePath}${ADMIN_CLIENT_API_PATH}`;
 
   /** `count`, not Spring's `size` — the platform-wide paging rename applies to uaa too. */
   list(page: number, count: number): Observable<SpringPage<ClientSummary>> {
-    return this.crudService.get(ADMIN_CLIENT_API_BASE, {page, count});
+    return this.crudService.get(this.base, {page, count});
   }
 
   findOne(id: string): Observable<ClientDetails> {
-    return this.crudService.get(`${ADMIN_CLIENT_API_BASE}/${id}`);
+    return this.crudService.get(`${this.base}/${id}`);
   }
 
   create(request: ClientDetails): Observable<ClientDetails> {
-    return this.crudService.post(ADMIN_CLIENT_API_BASE, request);
+    return this.crudService.post(this.base, request);
   }
 
   update(id: string, request: ClientDetails): Observable<ClientDetails> {
-    return this.crudService.put(`${ADMIN_CLIENT_API_BASE}/${id}`, request);
+    return this.crudService.put(`${this.base}/${id}`, request);
   }
 
   /** Answers `void`: the new secret is only ever known to the caller that set it. */
   resetSecret(id: string, newSecret: string): Observable<void> {
-    return this.crudService.post(`${ADMIN_CLIENT_API_BASE}/${id}/reset-secret`, {newSecret});
+    return this.crudService.post(`${this.base}/${id}/reset-secret`, {newSecret});
   }
 
   delete(id: string): Observable<void> {
-    return this.crudService.delete(`${ADMIN_CLIENT_API_BASE}/${id}`);
+    return this.crudService.delete(`${this.base}/${id}`);
   }
 
   /** The enum values a client form may offer. Cheap and static; fetch once per form. */
   options(): Observable<ClientOptions> {
-    return this.crudService.get(`${ADMIN_CLIENT_API_BASE}/options`);
+    return this.crudService.get(`${this.base}/options`);
   }
 }

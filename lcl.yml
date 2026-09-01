@@ -136,8 +136,10 @@ services:
     # src/main/resources/uaa-fe: Gradle owns that install. `node { download = true; nodeProjectDir = 'uaa-fe' }`
     # plus `processResources → copyAngularApp → npm_run_build → npmInstall` means bootRun installs and builds the
     # frontend itself, with a Node it downloaded — adding a bare `npm install` here would run a *different* npm
-    # over the same directory. (cua has no frontend at all to install: its login and register pages are
-    # server-rendered Thymeleaf, and it has no package.json.)
+    # over the same directory. That chain also builds @cvhome-saas/ui-kit first, because uaa's npmInstall
+    # dependsOn ':store-commons:ui-kit:build' — the app links the library's dist as a file: dependency.
+    # (cua has no frontend at all to install: its login and register pages are server-rendered Thymeleaf,
+    # and it has no package.json.)
     command: [./gradlew, ":store-core:uaa:bootRun", "--args=--spring.profiles.active=lcl,test-stores", "--project-cache-dir=${stack.dir}/gradle", --console=plain]
     ports: { http: 8001 }
     depends-on: [postgres]

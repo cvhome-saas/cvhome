@@ -3,6 +3,7 @@ import {RouterLink, RouterLinkActive, RouterOutlet} from '@angular/router';
 import {TranslocoDirective} from '@jsverse/transloco';
 
 import {AuthService} from '@cvhome-saas/ui-kit';
+import {LocaleService, type LocaleCode} from '@cvhome-saas/ui-kit/i18n';
 import {Icon, type IconName} from '@cvhome-saas/ui-kit/ui';
 
 interface NavItem {
@@ -26,6 +27,16 @@ interface NavItem {
 })
 export class AdminShell {
   private readonly auth = inject(AuthService);
+  private readonly locale = inject(LocaleService);
+
+  /*
+   * A plain toggle rather than the kit's `app-locale-switcher`: that control answers "which locales
+   * has this piece of content been written in", and takes a `filled` set to say so. This is the UI
+   * language, where both are always available. `LocaleService` is what puts `dir="rtl"` on the
+   * document, so Arabic mirrors the whole app rather than only translating it.
+   */
+  protected readonly locales = this.locale.locales;
+  protected readonly activeLocale = this.locale.current;
 
   protected readonly nav: readonly NavItem[] = [
     {path: '/users', icon: 'users', labelKey: 'nav.users'},
@@ -35,6 +46,10 @@ export class AdminShell {
 
   /** The signed-in operator, or `null` before `canAccessSecuredPages` has resolved one. */
   protected readonly user = this.auth.getCachedAuthUser() ?? null;
+
+  protected selectLocale(code: LocaleCode): void {
+    this.locale.select(code);
+  }
 
   protected logout(): void {
     this.auth.logout();

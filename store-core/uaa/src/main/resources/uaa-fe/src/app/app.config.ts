@@ -42,6 +42,9 @@ export const appConfig: ApplicationConfig = {
         apiUrl: environment.apiUrl,
         loginUrl: environment.loginUrl,
         logoutUrl: environment.logoutUrl,
+        // Empty: this app is served by uaa itself, so the admin API is at the root. `/uaa` is the
+        // gateway's forward route and would land on StaticController, which answers 200 with HTML.
+        uaaBasePath: '',
       },
       withNotifications(ToastService),
     ),

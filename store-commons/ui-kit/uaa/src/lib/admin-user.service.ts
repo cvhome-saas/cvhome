@@ -2,7 +2,7 @@
 import {Injectable, inject} from '@angular/core';
 import {Observable, concat, map, of, toArray} from 'rxjs';
 
-import {CrudService} from '@cvhome-saas/ui-kit';
+import {CrudService, UI_KIT_CONFIG} from '@cvhome-saas/ui-kit';
 import type {SpringPage} from '@cvhome-saas/ui-kit';
 import type {CreateUserRequest, ResetUserPasswordRequest, UpdateUserRequest, UserDto} from './uaa.models';
 
@@ -30,11 +30,13 @@ import type {CreateUserRequest, ResetUserPasswordRequest, UpdateUserRequest, Use
  * variable is declared `@PathVariable UUID id`, so a wrong-shaped id is a 400 at binding rather than
  * a 404.
  */
-export const ADMIN_USER_API_BASE = '/uaa/api/v1/admin/users';
+export const ADMIN_USER_API_PATH = '/api/v1/admin/users';
 
 @Injectable({providedIn: 'root'})
 export class AdminUserService {
   private readonly crudService = inject(CrudService);
+  /** `/uaa/…` behind the gateway, `/api/…` on uaa itself. See {@link UiKitConfig.uaaBasePath}. */
+  private readonly base = `${inject(UI_KIT_CONFIG).uaaBasePath}${ADMIN_USER_API_PATH}`;
 
   /**
    * A page of accounts, optionally narrowed by metadata.
@@ -56,17 +58,17 @@ export class AdminUserService {
         filters[`metadata[${key}]`] = value;
       }
     }
-    return this.crudService.get(ADMIN_USER_API_BASE, {page, count, ...filters});
+    return this.crudService.get(this.base, {page, count, ...filters});
   }
 
   /** One account by uaa id. */
   findOne(id: string): Observable<UserDto> {
-    return this.crudService.get(`${ADMIN_USER_API_BASE}/${id}`);
+    return this.crudService.get(`${this.base}/${id}`);
   }
 
   /** Whether a username is taken. Answers a bare `true`/`false`, not an envelope. */
   usernameExists(username: string): Observable<boolean> {
-    return this.crudService.get(`${ADMIN_USER_API_BASE}/exists`, {username});
+    return this.crudService.get(`${this.base}/exists`, {username});
   }
 
   /**
@@ -77,12 +79,12 @@ export class AdminUserService {
    * same non-atomicity. See lessons.md, "Users — creating a user is two calls".
    */
   create(request: CreateUserRequest): Observable<UserDto> {
-    return this.crudService.post(ADMIN_USER_API_BASE, request);
+    return this.crudService.post(this.base, request);
   }
 
   /** A partial update: every field on `UpdateUserRequest` is nullable and null means "leave it". */
   update(id: string, request: UpdateUserRequest): Observable<UserDto> {
-    return this.crudService.put(`${ADMIN_USER_API_BASE}/${id}`, request);
+    return this.crudService.put(`${this.base}/${id}`, request);
   }
 
   /**
@@ -93,17 +95,17 @@ export class AdminUserService {
    * uaa's configuration and not to this client.
    */
   enable(id: string): Observable<void> {
-    return this.crudService.post(`${ADMIN_USER_API_BASE}/${id}/enable`, null);
+    return this.crudService.post(`${this.base}/${id}/enable`, null);
   }
 
   /** Disables an account. Same super-admin refusal as {@link enable}. */
   disable(id: string): Observable<void> {
-    return this.crudService.post(`${ADMIN_USER_API_BASE}/${id}/disable`, null);
+    return this.crudService.post(`${this.base}/${id}/disable`, null);
   }
 
   /** Deletes an account. Same super-admin refusal; there is no undo and no soft delete. */
   delete(id: string): Observable<void> {
-    return this.crudService.delete(`${ADMIN_USER_API_BASE}/${id}`);
+    return this.crudService.delete(`${this.base}/${id}`);
   }
 
   /**
@@ -114,17 +116,17 @@ export class AdminUserService {
    */
   resetPassword(id: string, password: string): Observable<void> {
     const body: ResetUserPasswordRequest = {password};
-    return this.crudService.put(`${ADMIN_USER_API_BASE}/${id}/reset-password`, body);
+    return this.crudService.put(`${this.base}/${id}/reset-password`, body);
   }
 
   /** Grants roles. The body is a bare JSON array — `@RequestBody Set<String>`, not an object. */
   assignRoles(id: string, roles: readonly string[]): Observable<void> {
-    return this.crudService.post(`${ADMIN_USER_API_BASE}/${id}/roles`, roles);
+    return this.crudService.post(`${this.base}/${id}/roles`, roles);
   }
 
   /** Revokes roles. Same bare-array body, on its own path — a POST, not a DELETE. */
   removeRoles(id: string, roles: readonly string[]): Observable<void> {
-    return this.crudService.post(`${ADMIN_USER_API_BASE}/${id}/roles/remove`, roles);
+    return this.crudService.post(`${this.base}/${id}/roles/remove`, roles);
   }
 
   /**
@@ -135,7 +137,7 @@ export class AdminUserService {
    * assignable-roles offers SUPER_ADMIN to an org admin", which is about the *other* caller.
    */
   assignableRoles(): Observable<string[]> {
-    return this.crudService.get(`${ADMIN_USER_API_BASE}/assignable-roles`);
+    return this.crudService.get(`${this.base}/assignable-roles`);
   }
 
   /**
