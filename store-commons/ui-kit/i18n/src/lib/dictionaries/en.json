@@ -275,6 +275,32 @@
         "label": "Light",
         "hint": "White panels on cool grey"
       }
+    },
+    "userAdmin": {
+      "action": {
+        "delete": "Delete account",
+        "deleteNamed": "Delete {{name}}",
+        "disable": "Disable account",
+        "disableNamed": "Disable {{name}}",
+        "editRoles": "Edit roles",
+        "editRolesNamed": "Edit roles for {{name}}",
+        "enable": "Enable account",
+        "enableNamed": "Enable {{name}}",
+        "impersonateUnavailable": "Signing in as another account is not built yet",
+        "resetPassword": "Set password",
+        "resetPasswordNamed": "Set a password for {{name}}"
+      },
+      "column": {
+        "actions": "Actions",
+        "roles": "Roles",
+        "scope": "Organization",
+        "status": "Status",
+        "user": "Account"
+      },
+      "disabled": "Disabled",
+      "enabled": "Enabled",
+      "noOrg": "No organization",
+      "unnamed": "No name recorded"
     }
   },
   "errors": {

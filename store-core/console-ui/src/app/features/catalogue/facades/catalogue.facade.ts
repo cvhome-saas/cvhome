@@ -5,7 +5,7 @@ import {Observable} from 'rxjs';
 import {AbstractControl} from '@angular/forms';
 
 import {ApiErrorService, clearServerErrorsOnChange} from '@cvhome-saas/ui-kit';
-import {LocaleService} from '@core/i18n/locale.service';
+import {LocaleService} from '@cvhome-saas/ui-kit/i18n';
 import {ReferenceDataService, type ReferenceOption} from '@core/reference/reference-data.service';
 import {ConsoleShellFacade} from '@layouts/console-shell/facades/console-shell.facade';
 import {

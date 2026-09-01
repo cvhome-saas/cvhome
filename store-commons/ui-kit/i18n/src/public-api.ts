@@ -5,5 +5,8 @@
  * dictionaries live, and it is where `withKitCopy` is applied.
  */
 export * from './lib/calendar';
+export * from './lib/locale.service';
+export * from './lib/strict-missing.handler';
+export * from './lib/translated-title.strategy';
 export * from './lib/dictionaries';
 export * from './lib/transloco-testing';

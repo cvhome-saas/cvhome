@@ -1,0 +1,61 @@
+/*
+ * The console's design system, consumed rather than redefined.
+ *
+ * Tailwind first, then the kit's token layer: theme.css and theme-bridge.css are Tailwind v4
+ * `@theme`/`@utility` sources and have to be in the same PostCSS pass, which is why they are
+ * imported here rather than listed in angular.json's `styles`. Forest stays first among the
+ * identities — it also claims bare `:root`, so it is the base the others override.
+ *
+ * `@source` is not optional: several kit controls use real Tailwind utilities, ng-packagr does not
+ * run Tailwind over component CSS, and this build is the only thing that can emit them. Leave it out
+ * and everything still compiles with the utilities quietly missing.
+ */
+@import 'tailwindcss';
+@source '../node_modules/@cvhome-saas/ui-kit';
+
+@import '@cvhome-saas/ui-kit/theme/css/theme.css';
+@import '@cvhome-saas/ui-kit/theme/css/theme-forest.css';
+@import '@cvhome-saas/ui-kit/theme/css/theme-midnight.css';
+@import '@cvhome-saas/ui-kit/theme/css/theme-daylight.css';
+@import '@cvhome-saas/ui-kit/theme/css/theme-light.css';
+@import '@cvhome-saas/ui-kit/theme/css/theme-bridge.css';
+
+@custom-variant rtl (&:where([dir='rtl'], [dir='rtl'] *));
+
+:root {
+  scroll-behavior: smooth;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-width: 320px;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  min-height: 100vh;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}

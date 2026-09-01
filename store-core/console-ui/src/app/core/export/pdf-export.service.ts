@@ -2,7 +2,7 @@ import {inject, Injectable} from '@angular/core';
 import {TranslocoService} from '@jsverse/transloco';
 import {TranslocoLocaleService} from '@jsverse/transloco-locale';
 
-import {LocaleService} from '@core/i18n/locale.service';
+import {LocaleService} from '@cvhome-saas/ui-kit/i18n';
 import {THEME} from '@cvhome-saas/ui-kit/theme';
 
 export interface PdfExportRequest {

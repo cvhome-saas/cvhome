@@ -1,0 +1,77 @@
+.shell {
+  display: flex;
+  flex-direction: column;
+  min-block-size: 100vh;
+}
+
+.bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-gutter);
+  padding: var(--spacing-field) var(--spacing-gutter);
+  border-block-end: 1px solid var(--border);
+  background: var(--muted);
+}
+
+.brand {
+  color: var(--foreground-strong);
+  font-size: var(--text-base);
+  font-weight: 600;
+}
+
+.nav {
+  display: flex;
+  flex: 1;
+  gap: var(--spacing-tight);
+}
+
+.nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-tight);
+  padding: var(--spacing-tight) var(--spacing-field);
+  border-radius: var(--radius-md);
+  color: var(--muted-foreground);
+  font-size: var(--text-sm);
+}
+
+.nav-link:hover {
+  background: var(--accent);
+  color: var(--foreground);
+}
+
+.nav-link.active {
+  background: var(--accent-strong);
+  color: var(--foreground-strong);
+}
+
+.who {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-field);
+}
+
+.username {
+  color: var(--muted-foreground);
+  font-size: var(--text-xs);
+}
+
+.sign-out {
+  padding: var(--spacing-tight) var(--spacing-field);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--foreground);
+  cursor: pointer;
+  font-size: var(--text-xs);
+}
+
+.sign-out:hover {
+  border-color: var(--edge-strong);
+}
+
+.page {
+  flex: 1;
+  padding: var(--spacing-gutter);
+}

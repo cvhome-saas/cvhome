@@ -1,0 +1,40 @@
+.wrap {
+  display: grid;
+  place-items: center;
+  min-block-size: 100vh;
+  padding: var(--spacing-gutter);
+}
+
+.card {
+  inline-size: min(26rem, 100%);
+}
+
+.form {
+  display: grid;
+  gap: var(--spacing-group);
+}
+
+.failed {
+  margin: 0 0 var(--spacing-group);
+  padding: var(--spacing-field);
+  border: 1px solid var(--destructive);
+  border-radius: var(--radius-md);
+  color: var(--destructive);
+  font-size: var(--text-sm);
+}
+
+.submit {
+  padding: var(--spacing-field);
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  cursor: pointer;
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.submit:disabled {
+  cursor: progress;
+  opacity: 0.7;
+}

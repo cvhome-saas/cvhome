@@ -1,0 +1,186 @@
+<ng-container *transloco="let t">
+  <app-page-header [title]="t('clients.title')" [context]="t('clients.context')" />
+
+  @if (facade.error(); as failure) {
+    <app-load-error [message]="failure.message" (retry)="facade.reload()" />
+  }
+
+  <app-busy-overlay reserve="page" [busy]="facade.isLoading()" [label]="t('clients.loading')">
+    @if (!facade.isEmpty()) {
+      <div class="stack">
+        <!--
+          The one thing an operator must know before registering anything: uaa never gives a secret
+          back. Not a hint on the field, because by the time they are reading the field they have
+          already decided not to write it down.
+        -->
+        <app-notice-bar icon="lock" tone="amber" [message]="t('clients.notice.secret')" />
+
+        @if (facade.editing(); as target) {
+          <app-panel
+            padded
+            [title]="target === 'new' ? t('clients.form.createTitle') : t('clients.form.editTitle')"
+          >
+            <form class="form" [formGroup]="facade.form" (ngSubmit)="facade.save()">
+              <div class="split">
+                <app-form-field
+                  controlId="client-id"
+                  required
+                  [label]="t('clients.form.clientId')"
+                  [control]="facade.form.controls.clientId"
+                >
+                  <app-text-field formControlName="clientId" id="client-id" latin mono />
+                </app-form-field>
+
+                <app-form-field
+                  controlId="client-name"
+                  required
+                  [label]="t('clients.form.clientName')"
+                  [control]="facade.form.controls.clientName"
+                >
+                  <app-text-field formControlName="clientName" id="client-name" />
+                </app-form-field>
+              </div>
+
+              <app-form-field
+                controlId="grant-types"
+                wide
+                [label]="t('clients.form.grantTypes')"
+                [control]="facade.form.controls.authorizationGrantTypes"
+                [hint]="allowed(facade.options().authorizationGrantTypes)"
+              >
+                <app-text-field formControlName="authorizationGrantTypes" id="grant-types" latin mono />
+              </app-form-field>
+
+              <app-form-field
+                controlId="auth-methods"
+                wide
+                [label]="t('clients.form.authMethods')"
+                [control]="facade.form.controls.clientAuthenticationMethods"
+                [hint]="allowed(facade.options().clientAuthenticationMethods)"
+              >
+                <app-text-field formControlName="clientAuthenticationMethods" id="auth-methods" latin mono />
+              </app-form-field>
+
+              <app-form-field
+                controlId="scopes"
+                wide
+                [label]="t('clients.form.scopes')"
+                [control]="facade.form.controls.scopes"
+                [hint]="allowed(facade.options().scopes)"
+              >
+                <app-text-field formControlName="scopes" id="scopes" latin mono />
+              </app-form-field>
+
+              <app-form-field
+                controlId="redirect-uris"
+                wide
+                [label]="t('clients.form.redirectUris')"
+                [control]="facade.form.controls.redirectUris"
+                [hint]="t('clients.form.redirectUrisHint')"
+              >
+                <app-text-field formControlName="redirectUris" id="redirect-uris" latin mono />
+              </app-form-field>
+
+              <app-form-field
+                controlId="logout-uris"
+                wide
+                [label]="t('clients.form.postLogoutUris')"
+                [control]="facade.form.controls.postLogoutRedirectUris"
+                [hint]="t('clients.form.redirectUrisHint')"
+              >
+                <app-text-field formControlName="postLogoutRedirectUris" id="logout-uris" latin mono />
+              </app-form-field>
+
+              <div class="actions">
+                <button class="ghost" type="button" (click)="facade.dismiss()">
+                  {{ t('shared.actions.cancel') }}
+                </button>
+                <button class="primary" type="submit" [disabled]="facade.busy()">
+                  {{ facade.busy() ? t('clients.form.saving') : t('clients.form.save') }}
+                </button>
+              </div>
+            </form>
+          </app-panel>
+        }
+
+        <app-panel [title]="t('clients.panel.title')">
+          <button panelAction class="primary" type="button" (click)="facade.startCreate()">
+            {{ t('clients.action.register') }}
+          </button>
+
+          @if (facade.rows().length) {
+            <app-data-table [columns]="columns(t)" [label]="t('clients.panel.title')">
+              @for (client of facade.rows(); track client.id) {
+                <app-table-row>
+                  <span class="cell mono">{{ client.clientId }}</span>
+                  <span class="cell">{{ client.clientName }}</span>
+                  <span class="cell row-actions">
+                    <button class="ghost" type="button" (click)="facade.startEdit(client)">
+                      {{ t('clients.action.edit') }}
+                    </button>
+                    <button class="ghost" type="button" (click)="facade.rotating.set(client)">
+                      {{ t('clients.action.rotate') }}
+                    </button>
+                    <button class="ghost danger" type="button" (click)="facade.deleting.set(client)">
+                      {{ t('clients.action.delete') }}
+                    </button>
+                  </span>
+                </app-table-row>
+              }
+            </app-data-table>
+
+            <app-pagination
+              [page]="facade.pageIndex()"
+              [totalPages]="facade.totalPages()"
+              [totalElements]="facade.totalElements()"
+              [pageSize]="pageSize"
+              [unit]="t('clients.unit')"
+              [label]="t('clients.paginationLabel')"
+              (pageChange)="facade.goToPage($event)"
+            />
+          } @else {
+            <app-empty-state
+              icon="code"
+              [title]="t('clients.empty.title')"
+              [message]="t('clients.empty.message')"
+            />
+          }
+        </app-panel>
+      </div>
+    }
+  </app-busy-overlay>
+
+  <!--
+    The same dialog the console uses to hand over a password, for the same reason: the value is typed
+    once, confirmed once, and never readable again.
+  -->
+  <app-set-password-dialog
+    [open]="!!facade.rotating()"
+    [busy]="facade.busy()"
+    [title]="t('clients.rotate.title')"
+    [message]="t('clients.rotate.message', {clientId: facade.rotating()?.clientId ?? ''})"
+    [passwordLabel]="t('clients.rotate.secret')"
+    [repeatLabel]="t('clients.rotate.repeatSecret')"
+    [hint]="t('clients.rotate.hint')"
+    [handoverHint]="t('clients.rotate.handoverHint')"
+    [weakMessage]="t('clients.rotate.weak')"
+    [mismatchMessage]="t('clients.rotate.mismatch')"
+    [confirmLabel]="t('clients.rotate.confirm')"
+    [busyLabel]="t('clients.rotate.busy')"
+    [cancelLabel]="t('shared.actions.cancel')"
+    (submitted)="facade.rotateSecret($event)"
+    (dismissed)="facade.dismiss()"
+  />
+
+  <app-confirm-dialog
+    [open]="!!facade.deleting()"
+    [title]="t('clients.delete.title')"
+    [message]="t('clients.delete.message', {clientId: facade.deleting()?.clientId ?? ''})"
+    [confirmationText]="facade.deleting()?.clientId ?? null"
+    [confirmationLabel]="t('clients.delete.confirmationLabel')"
+    [confirmLabel]="t('clients.action.delete')"
+    [cancelLabel]="t('shared.actions.cancel')"
+    (confirmed)="facade.confirmDelete()"
+    (dismissed)="facade.dismiss()"
+  />
+</ng-container>

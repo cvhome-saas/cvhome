@@ -2456,35 +2456,14 @@
       "panel": {
         "title": "All accounts"
       },
-      "unnamed": "No name recorded",
-      "noOrg": "No organization",
-      "enabled": "Enabled",
-      "disabled": "Disabled",
       "unit": "accounts",
       "paginationLabel": "Account pages",
-      "column": {
-        "user": "Account",
-        "roles": "Roles",
-        "scope": "Organization",
-        "status": "Status",
-        "actions": "Actions"
-      },
       "filter": {
         "label": "Filter by organization",
         "allOrgs": "All organizations"
       },
       "action": {
-        "enable": "Enable account",
-        "enableNamed": "Enable {{name}}",
-        "disable": "Disable account",
-        "disableNamed": "Disable {{name}}",
-        "resetPassword": "Set password",
-        "resetPasswordNamed": "Set a password for {{name}}",
-        "editRoles": "Edit roles",
-        "editRolesNamed": "Edit roles for {{name}}",
-        "impersonateUnavailable": "Signing in as another account is not built yet",
-        "delete": "Delete account",
-        "deleteNamed": "Delete {{name}}"
+        "delete": "Delete account"
       },
       "empty": {
         "title": "No accounts",

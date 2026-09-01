@@ -2456,35 +2456,14 @@
       "panel": {
         "title": "كل الحسابات"
       },
-      "unnamed": "لا اسم مسجّل",
-      "noOrg": "بلا مؤسسة",
-      "enabled": "مفعّل",
-      "disabled": "معطّل",
       "unit": "حساب",
       "paginationLabel": "صفحات الحسابات",
-      "column": {
-        "user": "الحساب",
-        "roles": "الأدوار",
-        "scope": "المؤسسة",
-        "status": "الحالة",
-        "actions": "إجراءات"
-      },
       "filter": {
         "label": "تصفية حسب المؤسسة",
         "allOrgs": "كل المؤسسات"
       },
       "action": {
-        "enable": "تفعيل الحساب",
-        "enableNamed": "تفعيل {{name}}",
-        "disable": "تعطيل الحساب",
-        "disableNamed": "تعطيل {{name}}",
-        "resetPassword": "تعيين كلمة مرور",
-        "resetPasswordNamed": "تعيين كلمة مرور لـ {{name}}",
-        "editRoles": "تعديل الأدوار",
-        "editRolesNamed": "تعديل أدوار {{name}}",
-        "impersonateUnavailable": "الدخول بحساب آخر غير مبني بعد",
-        "delete": "حذف الحساب",
-        "deleteNamed": "حذف {{name}}"
+        "delete": "حذف الحساب"
       },
       "empty": {
         "title": "لا توجد حسابات",

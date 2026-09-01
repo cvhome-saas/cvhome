@@ -9,7 +9,7 @@ import {DOCUMENT} from '@angular/common';
 import {ConsoleShellFacade} from '@layouts/console-shell/facades/console-shell.facade';
 
 import {ApiErrorService, clearServerErrorsOnChange} from '@cvhome-saas/ui-kit';
-import {LocaleService} from '@core/i18n/locale.service';
+import {LocaleService} from '@cvhome-saas/ui-kit/i18n';
 import {
   SECTIONS,
   type DnsRecord,

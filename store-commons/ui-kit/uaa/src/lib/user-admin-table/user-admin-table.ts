@@ -12,10 +12,10 @@ export interface UserAdminIntent {
 
 /** The table's columns. Widths are grid tracks, read straight into the row layout. */
 const COLUMN_KEYS: readonly {key: string; labelKey: string; width: string}[] = [
-  {key: 'user', labelKey: 'platform.users.column.user', width: 'minmax(13rem, 2.2fr)'},
-  {key: 'roles', labelKey: 'platform.users.column.roles', width: 'minmax(9rem, 1.3fr)'},
-  {key: 'scope', labelKey: 'platform.users.column.scope', width: 'minmax(9rem, 1.2fr)'},
-  {key: 'status', labelKey: 'platform.users.column.status', width: 'minmax(5rem, 0.6fr)'},
+  {key: 'user', labelKey: 'shared.userAdmin.column.user', width: 'minmax(13rem, 2.2fr)'},
+  {key: 'roles', labelKey: 'shared.userAdmin.column.roles', width: 'minmax(9rem, 1.3fr)'},
+  {key: 'scope', labelKey: 'shared.userAdmin.column.scope', width: 'minmax(9rem, 1.2fr)'},
+  {key: 'status', labelKey: 'shared.userAdmin.column.status', width: 'minmax(5rem, 0.6fr)'},
   {key: 'actions', labelKey: '', width: '10rem'},
 ];
 

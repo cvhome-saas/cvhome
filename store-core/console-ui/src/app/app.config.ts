@@ -16,13 +16,11 @@ import {provideTranslocoMessageformat} from '@jsverse/transloco-messageformat';
 import {provideTranslocoPersistLang} from '@jsverse/transloco-persist-lang';
 
 import { routes } from './app.routes';
-import type {LocaleCode} from '@core/i18n/locale.service';
+import type {LocaleCode} from '@cvhome-saas/ui-kit/i18n';
 import {GlobalErrorHandler, apiErrorInterceptor, provideUiKit, withNotifications, withRequestContext} from '@cvhome-saas/ui-kit';
 import {SelectedStoreRequestContext} from '@api/tenancy/selected-store-request-context';
 import {BrowserLangStorage, LANG_COOKIE, LANG_STORAGE} from '@core/i18n/lang-storage';
-import {LocaleService} from '@core/i18n/locale.service';
-import {StrictMissingHandler} from '@core/i18n/strict-missing.handler';
-import {TranslatedTitleStrategy} from '@core/i18n/translated-title.strategy';
+import {LocaleService, StrictMissingHandler, TranslatedTitleStrategy} from '@cvhome-saas/ui-kit/i18n';
 import {TranslocoDictionaryLoader} from '@core/i18n/transloco.loader';
 import {provideTheme} from '@cvhome-saas/ui-kit/theme';
 import {ToastService} from '@cvhome-saas/ui-kit/ui';

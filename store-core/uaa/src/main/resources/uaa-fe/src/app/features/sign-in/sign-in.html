@@ -1,0 +1,33 @@
+<div class="wrap" *transloco="let t">
+  <app-panel class="card" padded [title]="t('signIn.title')" [subtitle]="t('signIn.subtitle')">
+    @if (failed) {
+      <p class="failed" role="alert">{{ t('signIn.failed') }}</p>
+    }
+
+    <form class="form" method="post" [action]="action" (submit)="onSubmit()">
+      <app-form-field controlId="username" required [label]="t('signIn.username')">
+        <app-text-field
+          autocomplete="username"
+          id="username"
+          latin
+          name="username"
+          [placeholder]="t('signIn.usernamePlaceholder')"
+        />
+      </app-form-field>
+
+      <app-form-field controlId="password" required [label]="t('signIn.password')">
+        <app-text-field
+          autocomplete="current-password"
+          id="password"
+          name="password"
+          type="password"
+          [placeholder]="t('signIn.passwordPlaceholder')"
+        />
+      </app-form-field>
+
+      <button class="submit" type="submit" [disabled]="submitting()">
+        {{ submitting() ? t('signIn.submitting') : t('signIn.submit') }}
+      </button>
+    </form>
+  </app-panel>
+</div>

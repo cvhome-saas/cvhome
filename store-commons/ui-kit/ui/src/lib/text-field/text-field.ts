@@ -71,6 +71,15 @@ export class TextField implements ControlValueAccessor {
   readonly disabled = input(false, {transform: booleanAttribute});
   /** The consumer's `control.invalid && touched`. Draws the error frame; does not block typing. */
   readonly invalid = input(false, {transform: booleanAttribute});
+  /**
+   * The form field name, for a control inside a native `<form>` that posts to the server.
+   *
+   * console-ui never needs it — every form there is reactive and submits through `CrudService` — but
+   * uaa's sign-in page is Spring Security's `formLogin`, a real form POST to `/login`, and a browser
+   * only submits inputs that have a `name`. Without this the page posts an empty body and the login
+   * fails with a bad-credentials redirect that looks like a wrong password.
+   */
+  readonly name = input<string | null>(null);
   readonly autocomplete = input<string | null>(null);
   readonly inputmode = input<string | null>(null);
   /** Shown before the value — a scheme, a currency, an `@`. Not part of the value. */

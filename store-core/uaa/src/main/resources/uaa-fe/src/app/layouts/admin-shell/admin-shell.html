@@ -1,0 +1,30 @@
+<div class="shell" *transloco="let t">
+  <header class="bar">
+    <span class="brand">{{ t('brand') }}</span>
+
+    <nav class="nav" [attr.aria-label]="t('nav.label')">
+      @for (item of nav; track item.path) {
+        <a
+          class="nav-link"
+          routerLinkActive="active"
+          [routerLink]="item.path"
+          [attr.aria-label]="t(item.labelKey)"
+        >
+          <app-icon [name]="item.icon" />
+          <span>{{ t(item.labelKey) }}</span>
+        </a>
+      }
+    </nav>
+
+    <div class="who">
+      @if (user; as principal) {
+        <span class="username">{{ principal.username }}</span>
+      }
+      <button class="sign-out" type="button" (click)="logout()">{{ t('nav.signOut') }}</button>
+    </div>
+  </header>
+
+  <main class="page">
+    <router-outlet />
+  </main>
+</div>

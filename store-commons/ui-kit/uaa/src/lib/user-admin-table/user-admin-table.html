@@ -1,50 +1,50 @@
 <app-data-table [columns]="columns()" [label]="label()" *transloco="let t">
   @for (row of rows(); track row.id) {
     <app-table-row>
-      <div class="cell-user" role="cell" [attr.data-label]="t('platform.users.column.user')">
+      <div class="cell-user" role="cell" [attr.data-label]="t('shared.userAdmin.column.user')">
         <span class="avatar" aria-hidden="true">{{ row.initials }}</span>
         <span class="identity">
           @if (row.name) {
             <strong>{{ row.name }}</strong>
           } @else {
             <!-- uaa allows both name columns to be null; the username is what identifies the row. -->
-            <strong class="unnamed">{{ t('platform.users.unnamed') }}</strong>
+            <strong class="unnamed">{{ t('shared.userAdmin.unnamed') }}</strong>
           }
           <span class="email" dir="auto">{{ row.email || row.username }}</span>
         </span>
       </div>
 
-      <span class="cell-roles" role="cell" [attr.data-label]="t('platform.users.column.roles')">
+      <span class="cell-roles" role="cell" [attr.data-label]="t('shared.userAdmin.column.roles')">
         {{ roleList()(row.roles) }}
       </span>
 
       @if (showScope()) {
-        <span class="cell-scope latin" role="cell" [attr.data-label]="t('platform.users.column.scope')">
+        <span class="cell-scope latin" role="cell" [attr.data-label]="t('shared.userAdmin.column.scope')">
           @if (row.org) {
             {{ orgLabel()(row.org) }}
           } @else {
             <!-- No `metadata.org` at all: a platform account rather than a tenant's. -->
-            <span class="unscoped">{{ t('platform.users.noOrg') }}</span>
+            <span class="unscoped">{{ t('shared.userAdmin.noOrg') }}</span>
           }
         </span>
       }
 
-      <span role="cell" [attr.data-label]="t('platform.users.column.status')">
+      <span role="cell" [attr.data-label]="t('shared.userAdmin.column.status')">
         <app-badge [tone]="row.enabled ? 'green' : 'slate'" shape="square">
-          {{ row.enabled ? t('platform.users.enabled') : t('platform.users.disabled') }}
+          {{ row.enabled ? t('shared.userAdmin.enabled') : t('shared.userAdmin.disabled') }}
         </app-badge>
       </span>
 
-      <div class="cell-actions" role="cell" [attr.data-label]="t('platform.users.column.actions')">
+      <div class="cell-actions" role="cell" [attr.data-label]="t('shared.userAdmin.column.actions')">
         <button
           class="icon-action"
           type="button"
           [disabled]="busy()"
-          [title]="row.enabled ? t('platform.users.action.disable') : t('platform.users.action.enable')"
+          [title]="row.enabled ? t('shared.userAdmin.action.disable') : t('shared.userAdmin.action.enable')"
           [attr.aria-label]="
             row.enabled
-              ? t('platform.users.action.disableNamed', {name: row.username})
-              : t('platform.users.action.enableNamed', {name: row.username})
+              ? t('shared.userAdmin.action.disableNamed', {name: row.username})
+              : t('shared.userAdmin.action.enableNamed', {name: row.username})
           "
           (click)="emit('toggleEnabled', row)"
         >
@@ -55,8 +55,8 @@
           class="icon-action"
           type="button"
           [disabled]="busy()"
-          [title]="t('platform.users.action.resetPassword')"
-          [attr.aria-label]="t('platform.users.action.resetPasswordNamed', {name: row.username})"
+          [title]="t('shared.userAdmin.action.resetPassword')"
+          [attr.aria-label]="t('shared.userAdmin.action.resetPasswordNamed', {name: row.username})"
           (click)="emit('resetPassword', row)"
         >
           <app-icon name="lock" />
@@ -66,8 +66,8 @@
           class="icon-action"
           type="button"
           [disabled]="busy()"
-          [title]="t('platform.users.action.editRoles')"
-          [attr.aria-label]="t('platform.users.action.editRolesNamed', {name: row.username})"
+          [title]="t('shared.userAdmin.action.editRoles')"
+          [attr.aria-label]="t('shared.userAdmin.action.editRolesNamed', {name: row.username})"
           (click)="emit('editRoles', row)"
         >
           <app-icon name="shield" />
@@ -83,8 +83,8 @@
           class="icon-action"
           type="button"
           disabled
-          [title]="t('platform.users.action.impersonateUnavailable')"
-          [attr.aria-label]="t('platform.users.action.impersonateUnavailable')"
+          [title]="t('shared.userAdmin.action.impersonateUnavailable')"
+          [attr.aria-label]="t('shared.userAdmin.action.impersonateUnavailable')"
         >
           <app-icon name="signIn" />
         </button>
@@ -93,8 +93,8 @@
           class="icon-action danger-action"
           type="button"
           [disabled]="busy()"
-          [title]="t('platform.users.action.delete')"
-          [attr.aria-label]="t('platform.users.action.deleteNamed', {name: row.username})"
+          [title]="t('shared.userAdmin.action.delete')"
+          [attr.aria-label]="t('shared.userAdmin.action.deleteNamed', {name: row.username})"
           (click)="emit('delete', row)"
         >
           <app-icon name="trash" />

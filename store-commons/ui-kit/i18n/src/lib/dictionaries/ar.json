@@ -275,6 +275,32 @@
         "label": "فاتح",
         "hint": "لوحات بيضاء على رمادي فاتح"
       }
+    },
+    "userAdmin": {
+      "action": {
+        "delete": "حذف الحساب",
+        "deleteNamed": "حذف {{name}}",
+        "disable": "تعطيل الحساب",
+        "disableNamed": "تعطيل {{name}}",
+        "editRoles": "تعديل الأدوار",
+        "editRolesNamed": "تعديل أدوار {{name}}",
+        "enable": "تفعيل الحساب",
+        "enableNamed": "تفعيل {{name}}",
+        "impersonateUnavailable": "الدخول بحساب آخر غير مبني بعد",
+        "resetPassword": "تعيين كلمة مرور",
+        "resetPasswordNamed": "تعيين كلمة مرور لـ {{name}}"
+      },
+      "column": {
+        "actions": "إجراءات",
+        "roles": "الأدوار",
+        "scope": "المؤسسة",
+        "status": "الحالة",
+        "user": "الحساب"
+      },
+      "disabled": "معطّل",
+      "enabled": "مفعّل",
+      "noOrg": "بلا مؤسسة",
+      "unnamed": "لا اسم مسجّل"
     }
   },
   "errors": {

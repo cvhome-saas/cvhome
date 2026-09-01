@@ -4,7 +4,7 @@ import {of, startWith, switchMap} from 'rxjs';
 import {ReactiveFormsModule} from '@angular/forms';
 import {TranslocoDirective} from '@jsverse/transloco';
 
-import {LocaleService} from '@core/i18n/locale.service';
+import {LocaleService} from '@cvhome-saas/ui-kit/i18n';
 import type {ReferenceOption} from '@core/reference/reference-data.service';
 import {DatePicker, FormField, LocaleSwitcher, TextField, TextareaField, Icon, NoticeBar, Panel, TagInput, RichText, Toggle, NumberField} from '@cvhome-saas/ui-kit/ui';
 import {ProductFormFacade} from '../../facades/product-form.facade';

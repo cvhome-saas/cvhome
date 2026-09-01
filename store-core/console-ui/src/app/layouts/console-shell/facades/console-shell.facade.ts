@@ -5,7 +5,7 @@ import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {translateSignal} from '@jsverse/transloco';
 import {filter, map, startWith} from 'rxjs';
 
-import {CONSOLE_LOCALES, LocaleCode, LocaleService} from '@core/i18n/locale.service';
+import {CONSOLE_LOCALES, LocaleCode, LocaleService} from '@cvhome-saas/ui-kit/i18n';
 import {SelectedStoreService} from '@api/tenancy/selected-store.service';
 import {THEME} from '@cvhome-saas/ui-kit/theme';
 import type {ConsoleNotification, ConsoleStore} from '@models/console';

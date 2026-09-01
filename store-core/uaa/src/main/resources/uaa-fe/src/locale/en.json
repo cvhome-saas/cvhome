@@ -1,0 +1,164 @@
+{
+  "brand": "cvhome identity",
+  "nav": {
+    "label": "Sections",
+    "users": "Users",
+    "roles": "Roles",
+    "clients": "Clients",
+    "signOut": "Sign out"
+  },
+  "route": {
+    "signIn": "Sign in",
+    "users": "Users",
+    "roles": "Roles",
+    "clients": "OAuth2 clients"
+  },
+  "signIn": {
+    "title": "Sign in",
+    "subtitle": "Use your platform account.",
+    "username": "Username",
+    "usernamePlaceholder": "your username",
+    "password": "Password",
+    "passwordPlaceholder": "your password",
+    "submit": "Sign in",
+    "submitting": "Signing in…",
+    "failed": "That username and password did not match an account."
+  },
+  "users": {
+    "title": "Users",
+    "context": "Every account on the platform",
+    "loading": "Loading accounts…",
+    "unit": "accounts",
+    "paginationLabel": "Account pages",
+    "panel": {"title": "Accounts"},
+    "notice": {
+      "noSearch": "uaa matches accounts on metadata equality and offers no text search, so this list is not filtered."
+    },
+    "empty": {
+      "title": "No accounts",
+      "message": "uaa has no accounts registered yet."
+    },
+    "reset": {
+      "title": "Set a new password",
+      "message": "Choose a new password for {{name}}. They will not be asked to change it at next sign-in.",
+      "password": "New password",
+      "repeatPassword": "Repeat password",
+      "hint": "At least twelve characters, mixing letters, digits and symbols.",
+      "handoverHint": "You will not be able to read this again — hand it over before you close the dialog.",
+      "weak": "That password is too easy to guess.",
+      "mismatch": "The two passwords do not match.",
+      "confirm": "Set password",
+      "busy": "Setting…"
+    },
+    "roles": {
+      "title": "Roles",
+      "message": "Choose the roles {{name}} should hold.",
+      "empty": "uaa offers no roles this account may be given.",
+      "confirm": "Save roles",
+      "busy": "Saving…"
+    },
+    "delete": {
+      "title": "Delete this account",
+      "message": "{{name}} will be removed from uaa. There is no undo and no soft delete.",
+      "confirmationLabel": "Type the username to confirm",
+      "confirm": "Delete account"
+    },
+    "toast": {
+      "enabled": "{{name}} can sign in again.",
+      "disabled": "{{name}} can no longer sign in.",
+      "passwordReset": "New password set for {{name}}.",
+      "rolesSaved": "Roles updated for {{name}}.",
+      "deleted": "{{name}} was deleted."
+    }
+  },
+  "roles": {
+    "title": "Roles",
+    "context": "The authorities uaa can grant",
+    "loading": "Loading roles…",
+    "unit": "roles",
+    "paginationLabel": "Role pages",
+    "panel": {"title": "Roles"},
+    "column": {"name": "Role", "id": "Id"},
+    "notice": {
+      "rename": "Renaming a role does not re-issue anyone's token: whoever is signed in keeps the old authority until they sign in again."
+    },
+    "empty": {
+      "title": "No roles",
+      "message": "uaa has no roles registered yet."
+    },
+    "action": {"create": "New role", "rename": "Rename", "delete": "Delete"},
+    "form": {
+      "createTitle": "New role",
+      "renameTitle": "Rename role",
+      "name": "Name",
+      "namePlaceholder": "ROLE_STORE_ADMIN",
+      "nameHint": "The authority string itself. Services match on it exactly.",
+      "save": "Save",
+      "saving": "Saving…"
+    },
+    "delete": {
+      "title": "Delete this role",
+      "message": "{{name}} will be removed, and every account holding it loses that authority.",
+      "confirmationLabel": "Type the role name to confirm"
+    },
+    "toast": {
+      "created": "{{name}} was created.",
+      "renamed": "{{name}} was saved.",
+      "deleted": "{{name}} was deleted."
+    }
+  },
+  "clients": {
+    "title": "OAuth2 clients",
+    "context": "The applications that authenticate against uaa",
+    "loading": "Loading clients…",
+    "unit": "clients",
+    "paginationLabel": "Client pages",
+    "panel": {"title": "Registered clients"},
+    "column": {"clientId": "Client id", "clientName": "Name"},
+    "notice": {
+      "secret": "uaa never returns a client secret. The only moment you can read one is the moment you set it — copy it before you close the dialog."
+    },
+    "empty": {
+      "title": "No clients",
+      "message": "No applications are registered against uaa yet."
+    },
+    "action": {"register": "Register client", "edit": "Edit", "rotate": "New secret", "delete": "Delete"},
+    "form": {
+      "createTitle": "Register a client",
+      "editTitle": "Edit client",
+      "clientId": "Client id",
+      "clientName": "Name",
+      "grantTypes": "Grant types",
+      "authMethods": "Authentication methods",
+      "scopes": "Scopes",
+      "redirectUris": "Redirect URIs",
+      "postLogoutUris": "Post-logout redirect URIs",
+      "redirectUrisHint": "Comma separated. Must match the application's callback exactly.",
+      "save": "Save",
+      "saving": "Saving…"
+    },
+    "rotate": {
+      "title": "Set a new secret",
+      "message": "Choose a new secret for {{clientId}}. The old one stops working immediately.",
+      "secret": "New secret",
+      "repeatSecret": "Repeat secret",
+      "hint": "At least twenty characters. Treat it like a password.",
+      "handoverHint": "uaa will not show this again — copy it into the application's configuration now.",
+      "weak": "That secret is too easy to guess.",
+      "mismatch": "The two secrets do not match.",
+      "confirm": "Set secret",
+      "busy": "Setting…"
+    },
+    "delete": {
+      "title": "Delete this client",
+      "message": "{{clientId}} will be removed, and any application using it can no longer obtain a token.",
+      "confirmationLabel": "Type the client id to confirm"
+    },
+    "toast": {
+      "created": "{{clientId}} was registered.",
+      "updated": "{{clientId}} was saved.",
+      "secretRotated": "A new secret was set for {{clientId}}.",
+      "deleted": "{{clientId}} was deleted."
+    }
+  }
+}

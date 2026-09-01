@@ -81,6 +81,16 @@ node {
     nodeProjectDir = file('src/main/resources/uaa-fe')
 }
 
+/*
+ * uaa-fe links the shared Angular library as a file: dependency, and npm reads that directory's
+ * package.json when it resolves one — so the kit has to be built before this module installs.
+ * Without this a clean checkout installs happily, writes a dangling symlink, and fails later with
+ * `Could not resolve "@cvhome-saas/ui-kit"`.
+ */
+tasks.named('npmInstall') {
+    dependsOn ':store-commons:ui-kit:build'
+}
+
 tasks.register('copyAngularApp', Copy) {
     dependsOn('npm_run_build')
     from("${projectDir}/src/main/resources/uaa-fe/dist/uaa-fe/browser")

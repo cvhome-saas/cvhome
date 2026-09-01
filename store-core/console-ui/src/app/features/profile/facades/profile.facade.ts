@@ -2,7 +2,7 @@ import {Injectable, computed, inject} from '@angular/core';
 import {TranslocoService} from '@jsverse/transloco';
 
 import {AuthService} from '@cvhome-saas/ui-kit';
-import {LocaleService, type ConsoleLocale, type LocaleCode} from '@core/i18n/locale.service';
+import {LocaleService, type ConsoleLocale, type LocaleCode} from '@cvhome-saas/ui-kit/i18n';
 import {ThemeService, type ThemeOption} from '@cvhome-saas/ui-kit/theme';
 import {RoleLabel} from '@shared/i18n/role-label';
 

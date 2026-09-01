@@ -3,7 +3,7 @@ import {TranslocoLoader, Translation} from '@jsverse/transloco';
 import {withKitCopy} from '@cvhome-saas/ui-kit/i18n';
 import {from} from 'rxjs';
 
-import type {LocaleCode} from './locale.service';
+import type {LocaleCode} from '@cvhome-saas/ui-kit/i18n';
 
 /**
  * Static imports rather than Transloco's default `HttpLoader`: the `HttpLoader` fetches a
