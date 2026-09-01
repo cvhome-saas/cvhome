@@ -1,5 +1,5 @@
 /** Console-native; not a port from seller-core. */
-import {ChangeDetectionStrategy, Component, computed, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, inject, signal} from '@angular/core';
 import {TranslocoDirective} from '@jsverse/transloco';
 
 import {Icon} from '@shared/ui/icon/icon';
@@ -33,7 +33,8 @@ import {BuilderFacade} from '../facades/builder.facade';
         <div class="grid">
           @for (preset of presets(); track preset.id) {
             <button type="button" class="tile" draggable="true"
-                    (dragstart)="dragPreset(preset, $event)" (dragend)="facade.endDrag()"
+                    [class.lifting]="liftedKey() === 'preset:' + preset.id"
+                    (dragstart)="dragPreset(preset, $event)" (dragend)="dragEnded()"
                     (click)="facade.addFromPreset(preset, facade.selectedId())">
               <app-icon [name]="icon(preset.kind)" [size]="18" />
               <span>{{ label(preset.label) }}</span>
@@ -48,7 +49,8 @@ import {BuilderFacade} from '../facades/builder.facade';
           @for (saved of facade.savedSections(); track saved.id) {
             <div class="tile saved">
               <button type="button" class="tile-main" draggable="true"
-                      (dragstart)="dragSaved(saved, $event)" (dragend)="facade.endDrag()"
+                      [class.lifting]="liftedKey() === 'saved:' + saved.id"
+                      (dragstart)="dragSaved(saved, $event)" (dragend)="dragEnded()"
                       (click)="facade.addSavedSection(saved, facade.selectedId())">
                 <app-icon [name]="icon(saved.kind)" [size]="18" />
                 <span>{{ saved.name }}</span>
@@ -83,6 +85,8 @@ import {BuilderFacade} from '../facades/builder.facade';
       cursor: pointer; font-size: 12px; font-weight: 600; text-align: start; color: var(--foreground);
     }
     .tile:hover { border-color: var(--primary); background: var(--primary-soft, var(--muted)); }
+    /* the picked-up tile stays behind as a dashed shadow of itself while its chip travels */
+    .lifting, .tile:has(.tile-main.lifting) { opacity: 0.45; border-style: dashed; }
     .tile.saved { padding: 0; flex-direction: row; align-items: stretch; }
     .tile-main {
       flex: 1; display: flex; flex-direction: column; align-items: flex-start; gap: 6px;
@@ -102,14 +106,38 @@ import {BuilderFacade} from '../facades/builder.facade';
 export class BuilderSectionLibrary {
   protected readonly facade = inject(BuilderFacade);
 
+  /** The tile currently being dragged, left dimmed in place while its chip travels with the cursor. */
+  protected readonly liftedKey = signal<string | null>(null);
+
   protected dragPreset(preset: ManifestPreset, event: DragEvent): void {
     event.dataTransfer?.setData('text/plain', preset.id);
+    this.dragChip(event, this.label(preset.label));
+    this.liftedKey.set(`preset:${preset.id}`);
     this.facade.startDrag({preset}, preset.kind, this.label(preset.label));
   }
 
   protected dragSaved(saved: SavedSection, event: DragEvent): void {
     event.dataTransfer?.setData('text/plain', String(saved.id));
+    this.dragChip(event, saved.name);
+    this.liftedKey.set(`saved:${saved.id}`);
     this.facade.startDrag({saved}, saved.kind, saved.name);
+  }
+
+  protected dragEnded(): void {
+    this.liftedKey.set(null);
+    this.facade.endDrag();
+  }
+
+  /** A compact labeled chip as the drag image, instead of the browser's washed-out tile snapshot. */
+  private dragChip(event: DragEvent, label: string): void {
+    const chip = document.createElement('div');
+    chip.textContent = label;
+    chip.style.cssText = 'position:fixed;top:-100px;inset-inline-start:0;padding:8px 16px;'
+      + 'border-radius:999px;background:var(--primary);color:var(--primary-foreground);'
+      + 'font:600 12px/1 system-ui;box-shadow:var(--lift);white-space:nowrap;';
+    document.body.appendChild(chip);
+    event.dataTransfer?.setDragImage(chip, 20, 16);
+    setTimeout(() => chip.remove());
   }
 
   protected readonly presets = computed(() => this.facade.manifest()?.presets ?? []);

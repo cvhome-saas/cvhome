@@ -31,6 +31,9 @@ type ToolbarAction = 'moveUp' | 'moveDown' | 'duplicate' | 'remove';
 
 const EDGE_BAND_PX = 48;
 
+/** How far sections part to make room at the insertion point — the gap the slot placeholder fills. */
+const MAKE_ROOM_PX = 56;
+
 const EDGE_SCROLL_STEP = 12;
 
 const humanize = (kind: string) => kind.charAt(0).toUpperCase() + kind.slice(1);
@@ -49,6 +52,8 @@ export function BuilderBridge() {
     const [drag, setDrag] = useState<{label: string} | null>(null);
     const [dropBefore, setDropBefore] = useState<string | null | undefined>(undefined);
     const [reordering, setReordering] = useState<string | null>(null);
+    /** A landed drop's boundary: the gap stays open with a settling slot until the reload. */
+    const [pendingDrop, setPendingDrop] = useState<string | null | undefined>(undefined);
     const [updating, setUpdating] = useState(false);
 
     /** Latest drag pointer Y (viewport coords) for the auto-scroll loop. */
@@ -100,6 +105,7 @@ export function BuilderBridge() {
                 case 'select':
                     setSelected(sectionId);
                     setUpdating(false);
+                    setPendingDrop(undefined);
                     break;
                 case 'hover':
                     setHovered(sectionId);
@@ -119,12 +125,19 @@ export function BuilderBridge() {
                 case 'dragState':
                     if (data.active === true) {
                         setDrag({label: typeof data.label === 'string' ? data.label : ''});
+                        setPendingDrop(undefined);
                         measure();
                     } else {
                         setDrag(null);
                         setDropBefore(undefined);
                         dragY.current = null;
                         lastDropTarget.current = undefined;
+                        if (data.dropped === true) {
+                            // the drop landed console-side; keep its gap open and shimmer until the
+                            // saved document reloads with the real section standing in it
+                            setPendingDrop(typeof data.beforeId === 'string' ? data.beforeId : null);
+                            setUpdating(true);
+                        }
                     }
                     break;
                 case 'dragOver': {
@@ -166,6 +179,11 @@ export function BuilderBridge() {
     useEffect(() => {
         if (!enabled) return;
         const onClick = (event: MouseEvent) => {
+            // the canvas is a selection surface, not a browsing session: swallow the page's own
+            // links and buttons (capture phase, before the theme's handlers) so a click can never
+            // navigate the draft away or mutate a cart from inside the builder
+            event.preventDefault();
+            event.stopPropagation();
             const section = (event.target as HTMLElement).closest<HTMLElement>('[data-section-id]');
             if (section?.dataset.sectionId) {
                 post({type: 'sectionClicked', sectionId: section.dataset.sectionId});
@@ -181,11 +199,11 @@ export function BuilderBridge() {
                 post({type: 'sectionHovered', sectionId: id});
             }
         };
-        document.addEventListener('click', onClick);
+        document.addEventListener('click', onClick, true);
         document.addEventListener('mouseover', onOver);
         post({type: 'ready'});
         return () => {
-            document.removeEventListener('click', onClick);
+            document.removeEventListener('click', onClick, true);
             document.removeEventListener('mouseover', onOver);
         };
     }, [enabled, post]);
@@ -291,12 +309,40 @@ export function BuilderBridge() {
         return () => cancelAnimationFrame(raf);
     }, []);
 
-    // a lost console answer must not leave the shimmer on forever
+    // a lost console answer must not leave the shimmer (or a settling slot) on forever
     useEffect(() => {
         if (!updating) return;
-        const timer = setTimeout(() => setUpdating(false), 8000);
+        const timer = setTimeout(() => {
+            setUpdating(false);
+            setPendingDrop(undefined);
+        }, 8000);
         return () => clearTimeout(timer);
     }, [updating]);
+
+    // ----------------------------------------------------------------------------------- make room
+    // While a drag hovers a boundary (or a drop is settling), the sections below it physically part
+    // by MAKE_ROOM_PX — the page itself shows where the new block will stand, not just a line.
+    const shiftBoundary = drag || reordering ? dropBefore : pendingDrop;
+    useEffect(() => {
+        if (!enabled) return;
+        const els = [...document.querySelectorAll<HTMLElement>('[data-section-id]')];
+        const active = shiftBoundary !== undefined;
+        const at = shiftBoundary === null
+            ? els.length
+            : els.findIndex(el => el.dataset.sectionId === shiftBoundary);
+        els.forEach((el, index) => {
+            el.style.transition = 'transform 0.18s ease, opacity 0.18s ease';
+            el.style.transform = active && at >= 0 && index >= at ? `translateY(${MAKE_ROOM_PX}px)` : '';
+            el.style.opacity = reordering && el.dataset.sectionId === reordering ? '0.35' : '';
+        });
+        return () => {
+            els.forEach(el => {
+                el.style.transform = '';
+                el.style.opacity = '';
+                el.style.transition = '';
+            });
+        };
+    }, [enabled, shiftBoundary, reordering]);
 
     if (!enabled || !mounted) return null;
 
@@ -310,7 +356,9 @@ export function BuilderBridge() {
         return box ? box.top : null;
     };
 
-    const insertionTop = drag || reordering ? lineTop(dropBefore) : null;
+    const slotTop = shiftBoundary !== undefined ? lineTop(shiftBoundary) : null;
+    const slotLabel = pendingDrop !== undefined ? '' : drag?.label
+        ?? (reordering ? humanize(boxes.find(b => b.id === reordering)?.kind ?? '') : '');
     const showZones = guides || !!drag;
     const docHeight = boxes.length > 0
         ? Math.max(...boxes.map(b => b.top + b.height))
@@ -327,7 +375,7 @@ export function BuilderBridge() {
     };
 
     return createPortal(
-        <div aria-hidden style={{position: 'absolute', insetInlineStart: 0, top: 0, width: '100%', height: docHeight, pointerEvents: 'none', zIndex: 50}}>
+        <div aria-hidden data-builder-overlay style={{position: 'absolute', insetInlineStart: 0, top: 0, width: '100%', height: docHeight, pointerEvents: 'none', zIndex: 50}}>
             {boxes.map(box => {
                 const isSelected = box.id === selected;
                 const isHovered = box.id === hovered;
@@ -340,6 +388,7 @@ export function BuilderBridge() {
                                 position: 'absolute', inset: 0,
                                 outline: isSelected ? '2px solid var(--color-primary, #10b981)' : '1px dashed var(--color-primary, #10b981)',
                                 outlineOffset: -2, opacity: isSelected ? 1 : 0.6,
+                                animation: isSelected ? 'builder-settle 0.35s ease' : undefined,
                             }}/>
                         )}
                         {(outlined || locked) && (
@@ -394,12 +443,19 @@ export function BuilderBridge() {
                 </button>
             ))}
 
-            {insertionTop != null && (
+            {slotTop != null && (
                 <div style={{
-                    position: 'absolute', top: insertionTop - 1, insetInlineStart: 0, width: '100%', height: 2,
-                    background: 'var(--color-primary, #10b981)',
-                    boxShadow: '0 0 0 1px color-mix(in srgb, var(--color-primary, #10b981) 40%, transparent)',
-                }}/>
+                    position: 'absolute', top: slotTop + 8, insetInlineStart: '4%', width: '92%',
+                    height: MAKE_ROOM_PX - 16, borderRadius: 10,
+                    border: '2px dashed var(--color-primary, #10b981)',
+                    background: 'color-mix(in srgb, var(--color-primary, #10b981) 8%, transparent)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                    color: 'var(--color-primary, #10b981)', fontSize: 11, fontWeight: 700,
+                    letterSpacing: '0.06em', textTransform: 'uppercase',
+                    animation: pendingDrop !== undefined ? 'builder-shimmer 1s linear infinite' : undefined,
+                }}>
+                    {slotLabel || '···'}
+                </div>
             )}
 
             {(drag || updating) && (
@@ -409,7 +465,9 @@ export function BuilderBridge() {
                     animation: updating ? 'builder-shimmer 1s linear infinite' : undefined,
                 }}/>
             )}
-            <style>{`@keyframes builder-shimmer { 0% {opacity: .35} 50% {opacity: .9} 100% {opacity: .35} }`}</style>
+            <style>{`@keyframes builder-shimmer { 0% {opacity: .35} 50% {opacity: .9} 100% {opacity: .35} }
+@keyframes builder-settle { from {opacity: 0; outline-offset: 6px} to {outline-offset: -2px} }
+@media (prefers-reduced-motion: reduce) { [data-builder-overlay] * { animation: none !important } }`}</style>
         </div>,
         document.body,
     );

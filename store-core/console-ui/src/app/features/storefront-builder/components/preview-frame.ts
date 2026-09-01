@@ -218,7 +218,15 @@ export class BuilderPreviewFrame {
     effect(() => this.post({type: 'locks', ids: this.facade.lockedIds()}));
     effect(() => {
       const drag = this.facade.dragging();
-      this.post({type: 'dragState', active: !!drag, label: drag?.label ?? ''});
+      if (drag) {
+        this.post({type: 'dragState', active: true, label: drag.label});
+      } else {
+        // if this deactivation is a landed drop, tell the bridge where: it holds the gap open with
+        // a settling slot until the saved document reloads with the real section in place
+        const dropped = this.facade.takeDropped();
+        this.post({type: 'dragState', active: false, label: '',
+                   dropped: dropped !== undefined, beforeId: dropped ?? null});
+      }
     });
   }
 

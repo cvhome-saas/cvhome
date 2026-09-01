@@ -372,12 +372,23 @@ export class BuilderFacade {
     this.dropBeforeId.set(undefined);
   }
 
+  /** Set by a landed drop and consumed once by the canvas, which holds the gap open until reload. */
+  private droppedBefore: string | null | undefined = undefined;
+
+  /** One-shot read of the just-landed drop's boundary; undefined when nothing dropped. */
+  takeDropped(): string | null | undefined {
+    const value = this.droppedBefore;
+    this.droppedBefore = undefined;
+    return value;
+  }
+
   /** The canvas drop: insert the pending drag's section at the bridge-reported boundary. */
   dropDraggedAt(beforeId: string | null | undefined): void {
     const payload = this.pendingDrag;
     if (!payload || beforeId === undefined) {
       return;
     }
+    this.droppedBefore = beforeId;
     this.insertTarget.set(beforeId);
     if (payload.preset) {
       this.addFromPreset(payload.preset);
