@@ -20,6 +20,15 @@
         ],
         "createdAt": "2026-08-31T22:07:42.531Z",
         "reason": "Detector matches a CSS comment explaining the transition was removed; no animated layout property remains"
+      },
+      {
+        "rule": "layout-transition",
+        "value": "*",
+        "files": [
+          "store-core/console-ui/src/app/features/storefront-builder/storefront-builder.css"
+        ],
+        "createdAt": "2026-09-01T12:19:42.397Z",
+        "reason": "deliberate pane collapse: the one honest width animation — content sits in a fixed-width shell so nothing reflows per frame, runs once per toggle at 280ms"
       }
     ]
   }
