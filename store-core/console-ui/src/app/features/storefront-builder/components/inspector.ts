@@ -127,6 +127,34 @@ export class BuilderInspector {
     }
   }
 
+  // ------------------------------------------------------------------------------------------- links
+
+  /** A `link` field's stored value; a legacy plain string reads as a URL link. */
+  protected linkOf(field: ManifestField, holder: FieldHolder): {type: string; value: string} {
+    const raw = holder.props[field.key];
+    if (raw && typeof raw === 'object') {
+      const link = raw as {type?: string; value?: string};
+      return {type: link.type ?? 'url', value: link.value ?? ''};
+    }
+    return {type: 'url', value: typeof raw === 'string' ? raw : ''};
+  }
+
+  /** An emptied value clears the whole link — the storefront treats a value-less link as "points nowhere". */
+  protected setLink(field: ManifestField, current: {type: string; value: string}, part: 'type' | 'value',
+                    value: string, itemId?: string): void {
+    const next = {...current, [part]: value};
+    this.setField(field, next.value ? next : null, itemId);
+  }
+
+  protected linkTypeOptions(): SelectOption[] {
+    return ['url', 'category', 'product'].map((key) =>
+      ({value: key, label: this.transloco.translate(`builder.link.${key}`)}));
+  }
+
+  protected linkValueHint(type: string): string {
+    return this.transloco.translate(`builder.link.${type}Hint`);
+  }
+
   // ------------------------------------------------------------------------------------------- media
 
   protected openMedia(key: string, itemId?: string): void {

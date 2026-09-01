@@ -3747,6 +3747,15 @@
       "publishFailed": "فشل النشر — لم تُنشر المسودة. حاول مرة أخرى.",
       "presetSaveFailed": "فشل حفظ القسم في مكتبتك.",
       "presetDeleteFailed": "فشل حذف القسم المحفوظ."
+    },
+    "link": {
+      "url": "رابط ويب",
+      "category": "فئة",
+      "product": "منتج",
+      "value": "الوجهة",
+      "urlHint": "sale/ أو …https://",
+      "categoryHint": "رمز الفئة",
+      "productHint": "معرّف المنتج أو رابطه"
     }
   }
 }

@@ -75,6 +75,18 @@
                   </button>
                 </div>
               }
+              @case ('link') {
+                @if (linkOf(field, sec); as link) {
+                  <app-form-field [label]="label(field.label)">
+                    <app-select [options]="linkTypeOptions()" [value]="link.type"
+                                (valueChange)="setLink(field, link, 'type', $event)" />
+                  </app-form-field>
+                  <app-form-field [label]="t('builder.link.value')">
+                    <app-text-field [value]="link.value" (valueChange)="setLink(field, link, 'value', $event)"
+                                    [placeholder]="linkValueHint(link.type)" latin />
+                  </app-form-field>
+                }
+              }
               @case ('textarea') {
                 <app-form-field [label]="labelWithLang(field)">
                   <app-textarea [value]="str(field, sec)" (valueChange)="setField(field, $event)" [rows]="3" />
@@ -131,6 +143,19 @@
                             <app-select [options]="selectOptions(field)" [value]="str(field, item)"
                                         (valueChange)="setField(field, $event, item.id)" clearable />
                           </app-form-field>
+                        }
+                        @case ('link') {
+                          @if (linkOf(field, item); as link) {
+                            <app-form-field [label]="label(field.label)">
+                              <app-select [options]="linkTypeOptions()" [value]="link.type"
+                                          (valueChange)="setLink(field, link, 'type', $event, item.id)" />
+                            </app-form-field>
+                            <app-form-field [label]="t('builder.link.value')">
+                              <app-text-field [value]="link.value"
+                                              (valueChange)="setLink(field, link, 'value', $event, item.id)"
+                                              [placeholder]="linkValueHint(link.type)" latin />
+                            </app-form-field>
+                          }
                         }
                         @case ('textarea') {
                           <app-form-field [label]="labelWithLang(field)">

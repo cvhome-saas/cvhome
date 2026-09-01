@@ -3747,6 +3747,15 @@
       "publishFailed": "Publishing failed — the draft was not published. Try again.",
       "presetSaveFailed": "Saving the section to your library failed.",
       "presetDeleteFailed": "Deleting the saved section failed."
+    },
+    "link": {
+      "url": "Web address",
+      "category": "Category",
+      "product": "Product",
+      "value": "Destination",
+      "urlHint": "/sale or https://…",
+      "categoryHint": "Category code",
+      "productHint": "Product id or slug"
     }
   }
 }
