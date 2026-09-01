@@ -2,7 +2,7 @@ import {getTranslations} from 'next-intl/server';
 import {Link} from '@store-front/i18n/navigation';
 import type {NotFoundKind} from '@store-front/theme';
 import {PageShell} from '../components/PageShell';
-import {TagButton} from '../components/TagButton';
+import {TagButton} from '../client';
 
 const KEYS: Record<NotFoundKind, [string, string]> = {
     product: ['PRODUCT_NOT_FOUND_TITLE', 'PRODUCT_NOT_FOUND_BODY'],

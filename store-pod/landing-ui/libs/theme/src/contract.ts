@@ -14,8 +14,13 @@ export type Dir = 'ltr' | 'rtl';
 /* Theme-level configuration                                                                         */
 /* ------------------------------------------------------------------------------------------------ */
 
+/**
+ * Exported by the theme's `fonts.ts` and consumed by its `ThemeFrame` (a client component inside the theme's lazily
+ * loaded chunk), never by the server-side definition: a `next/font` import in the server graph would put every
+ * theme's font CSS into the shared layout entry. See `scripts/theme-client-barrier.mjs`.
+ */
 export interface ThemeFonts {
-    /** Space-joined `next/font` `.variable` class names; the shell puts them on `<html>`. */
+    /** Space-joined `next/font` `.variable` class names; `ThemeFrame` puts them on `<html>`. */
     variables: string;
     /** Which CSS variables the theme's `tokens.css` maps onto those fonts (documentation + QA). */
     roles: { sans: string; display?: string; mono?: string };
@@ -258,9 +263,18 @@ export interface ThemeDefinition {
     /** Bump when DESIGN.md changes materially; surfaced in the HTML as `data-theme-version`. */
     version: string;
     description?: string;
-    fonts: ThemeFonts;
     tokens: ThemeTokenPolicy;
-    layout: { config: ThemeLayoutConfig; Root: ComponentType<RootLayoutProps> };
+    layout: {
+        config: ThemeLayoutConfig;
+        Root: ComponentType<RootLayoutProps>;
+        /**
+         * The theme's client frame, from `./client`: the shell renders it around `Root` on every page. It is the one
+         * component of the theme's lazily loaded client chunk that always mounts, and it owns the theme's fonts
+         * (`ThemeFrame.tsx`) and, through `client-bundle.ts`, its `tokens.css`. Fonts are deliberately NOT on this
+         * definition — see {@link ThemeFonts}.
+         */
+        Frame: ComponentType<{ children: ReactNode }>;
+    };
     pages: ThemePages;
     states: ThemeStates;
     /**

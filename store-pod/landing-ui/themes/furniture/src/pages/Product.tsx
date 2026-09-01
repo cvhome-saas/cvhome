@@ -8,9 +8,8 @@ import {cn} from '@store-front/ui/lib/utils';
 import {PageShell} from '../components/PageShell';
 import {Breadcrumbs} from '../components/Breadcrumbs';
 import {SectionHeading} from '../components/SectionHeading';
-import {BuyBox} from '../sections/BuyBox';
+import {BuyBox, ProductRail} from '../client';
 import {PlateKey, type KeyRow} from '../sections/PlateKey';
-import {ProductRail} from '../sections/ProductRail';
 
 /**
  * One piece, plated. The buy column sits beside the views; underneath, the maker's own facts are printed

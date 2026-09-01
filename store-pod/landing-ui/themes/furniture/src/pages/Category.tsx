@@ -4,7 +4,7 @@ import {CategoryService} from '@store-front/services/category-service';
 import {Link} from '@store-front/i18n/navigation';
 import {PageShell} from '../components/PageShell';
 import {Breadcrumbs} from '../components/Breadcrumbs';
-import {Listing} from '../sections/Listing';
+import {Listing} from '../client';
 import {findFloor} from '../components/floors';
 
 /**

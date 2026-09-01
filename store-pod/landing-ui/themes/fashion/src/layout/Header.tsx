@@ -1,11 +1,7 @@
 import {Link} from '@store-front/i18n/navigation';
 import type {LayoutData, PageContext} from '@store-front/theme';
 import {cn} from '@store-front/ui/lib/utils';
-import {Nav} from './Nav';
-import {MobileNav} from './MobileNav';
-import {HeaderActions} from './HeaderActions';
-import {SearchBox} from '../sections/SearchBox';
-import {Wordmark} from '../components/Wordmark';
+import {Nav, MobileNav, HeaderActions, SearchBox, Wordmark} from '../client';
 
 /** The top of the wall: wordmark strip · nav strips · search strip · language/account strips · day-glo cart stub. */
 export function Header({ctx, data}: { ctx: PageContext; data: LayoutData }) {

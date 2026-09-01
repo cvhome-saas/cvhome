@@ -1,6 +1,6 @@
 import {getTranslations} from 'next-intl/server';
 import type {Banner, Store} from '@store-front/types';
-import {Hero} from './Hero';
+import {Hero} from '../client';
 
 /**
  * The head of the sheet — deliberately short, because the menu has to be reachable without scrolling.

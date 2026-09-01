@@ -18,11 +18,12 @@ export function defineTheme(def: ThemeDefinition): ThemeDefinition {
     if (!ID.test(def.id)) missing.push(`id "${def.id}" must be kebab-case (it is the folder name and the data-theme value)`);
     if (!def.name) missing.push('name');
     if (!def.version) missing.push('version');
-    if (!def.fonts || typeof def.fonts.variables !== 'string') missing.push('fonts.variables');
     if (!def.tokens) missing.push('tokens');
     else if (!def.tokens.defaultColors?.background || !def.tokens.defaultColors?.primary) missing.push('tokens.defaultColors (generated src/colors.ts — see libs/types THEME_DEFAULTS)');
     if (!def.layout?.config) missing.push('layout.config');
     if (typeof def.layout?.Root !== 'function') missing.push('layout.Root');
+    // next/dynamic returns an object component (React.lazy-style), so accept any callable or object
+    if (!def.layout?.Frame || !['function', 'object'].includes(typeof def.layout.Frame)) missing.push('layout.Frame (ThemeFrame from ./client)');
     for (const p of PAGES) if (typeof def.pages?.[p] !== 'function') missing.push(`pages.${p}`);
     for (const s of SKELETONS) if (typeof def.states?.PageSkeleton?.[s] !== 'function') missing.push(`states.PageSkeleton.${s}`);
     for (const s of STATES) if (typeof def.states?.[s] !== 'function') missing.push(`states.${s}`);

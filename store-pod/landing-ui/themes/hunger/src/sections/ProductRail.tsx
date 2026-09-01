@@ -1,5 +1,5 @@
 import type {Product, StoreContext} from '@store-front/types';
-import {ProductCard} from '../components/ProductCard';
+import {ProductCard} from '../client';
 
 /**
  * A short printed list — "with this, people order" under a dish. Not a carousel: on a menu, a suggestion

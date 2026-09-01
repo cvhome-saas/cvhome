@@ -3,7 +3,7 @@ import type {CategoryData, PageProps} from '@store-front/theme';
 import {Link} from '@store-front/i18n/navigation';
 import {PageShell} from '../components/PageShell';
 import {Breadcrumbs} from '../components/Breadcrumbs';
-import {Listing} from '../sections/Listing';
+import {Listing} from '../client';
 
 /** A zone: its quoted name as the display headline, child zones as plates in a row, the listing below. */
 export async function Category({ctx, data}: PageProps<CategoryData>) {

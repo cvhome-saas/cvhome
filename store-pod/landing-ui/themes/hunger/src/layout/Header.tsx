@@ -2,10 +2,7 @@ import Image from 'next/image';
 import {Link} from '@store-front/i18n/navigation';
 import type {LayoutData, PageContext} from '@store-front/theme';
 import {cn} from '@store-front/ui/lib/utils';
-import {Nav} from './Nav';
-import {MobileNav} from './MobileNav';
-import {HeaderActions} from './HeaderActions';
-import {SearchBox} from '../sections/SearchBox';
+import {Nav, MobileNav, HeaderActions, SearchBox} from '../client';
 
 /**
  * The masthead band at the head of the sheet: the merchant's mark set in the printed voice, the standing

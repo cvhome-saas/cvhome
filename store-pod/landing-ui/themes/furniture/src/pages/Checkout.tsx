@@ -3,8 +3,7 @@ import type {CheckoutData, PageProps} from '@store-front/theme';
 import {PageShell} from '../components/PageShell';
 import {Breadcrumbs} from '../components/Breadcrumbs';
 import {PageHead} from '../components/PageHead';
-import {CheckoutForm} from '../sections/CheckoutForm';
-import {OrderSummary} from '../sections/OrderSummary';
+import {CheckoutForm, OrderSummary} from '../client';
 
 /** The delivery desk: where the goods go, how they are paid for, and the docket alongside. */
 export async function Checkout({ctx, data}: PageProps<CheckoutData>) {

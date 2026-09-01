@@ -5,8 +5,7 @@ import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from '@sto
 import {PageShell} from '../components/PageShell';
 import {Breadcrumbs} from '../components/Breadcrumbs';
 import {SectionHeading} from '../components/SectionHeading';
-import {BuyBox} from '../sections/BuyBox';
-import {ProductRail} from '../sections/ProductRail';
+import {BuyBox, ProductRail} from '../client';
 
 export async function Product({ctx, data}: PageProps<ProductData>) {
     const t = await getTranslations('PAGE.PRODUCT');

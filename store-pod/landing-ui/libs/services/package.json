@@ -20,15 +20,14 @@
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "clean": "rimraf dist"
+    "clean": "rimraf dist",
+    "test": "tsx --test test/*.test.ts"
   },
   "dependencies": {
     "@store-front/types": "0.0.0",
-    "html-entities": "^2.6.0",
-    "crypto-js": "^4.2.0"
+    "html-entities": "^2.6.0"
   },
   "devDependencies": {
-    "@types/crypto-js": "^4.2.2",
     "typescript": "~5.9.3"
   }
 }

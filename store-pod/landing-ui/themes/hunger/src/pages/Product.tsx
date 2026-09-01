@@ -4,7 +4,7 @@ import {parseDescription} from '@store-front/services/description-view-util';
 import {PageShell} from '../components/PageShell';
 import {Breadcrumbs} from '../components/Breadcrumbs';
 import {SectionHeading} from '../components/SectionHeading';
-import {BuyBox} from '../sections/BuyBox';
+import {BuyBox} from '../client';
 import {ProductRail} from '../sections/ProductRail';
 
 /**

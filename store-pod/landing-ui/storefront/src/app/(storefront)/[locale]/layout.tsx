@@ -77,13 +77,17 @@ export default async function StorefrontLayout({children, params}: { children: R
             data-theme-version={theme.version}
             data-color-scheme={merchant.scheme}
             data-color-theme={merchant.preset}
-            className={theme.fonts.variables}
             style={merchant.style}
+            // The theme's Frame (inside its lazily loaded client chunk) adds the next/font variable classes to
+            // <html> before first paint; rendering them here would pull every theme's font CSS into this entry.
+            suppressHydrationWarning
         >
         <body className="flex min-h-dvh flex-col">
         <NextIntlClientProvider>
             <ThemeClientStates states={{ErrorState: theme.states.ErrorState, EmptyState: theme.states.EmptyState, Redirecting: theme.states.Redirecting}}>
-                <theme.layout.Root ctx={ctx} data={data}>{children}</theme.layout.Root>
+                <theme.layout.Frame>
+                    <theme.layout.Root ctx={ctx} data={data}>{children}</theme.layout.Root>
+                </theme.layout.Frame>
             </ThemeClientStates>
         </NextIntlClientProvider>
         </body>

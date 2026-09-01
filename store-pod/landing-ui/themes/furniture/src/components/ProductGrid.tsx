@@ -1,7 +1,7 @@
 import type {Product, StoreContext} from '@store-front/types';
 import type {ThemeLayoutConfig} from '@store-front/theme';
 import {cn} from '@store-front/ui/lib/utils';
-import {ProductCard} from './ProductCard';
+import {ProductCard} from '../client';
 
 const COLS: Record<number, string> = {1: 'grid-cols-1', 2: 'grid-cols-2', 3: 'grid-cols-3', 4: 'grid-cols-4', 5: 'grid-cols-5', 6: 'grid-cols-6'};
 const SM: Record<number, string> = {1: 'sm:grid-cols-1', 2: 'sm:grid-cols-2', 3: 'sm:grid-cols-3', 4: 'sm:grid-cols-4'};

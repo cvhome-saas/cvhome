@@ -11,9 +11,10 @@ import type {ThemeFonts} from '@store-front/theme';
  *  - Tajawal carries Arabic on both roles; `:lang(ar)` leads with it, because next/font's metric fallback
  *    would otherwise swallow the Arabic glyphs before the stack ever reaches it.
  *
- * `preload: false` on every face: all themes' font CSS lands in the SAME layout entry, so a preload
- * here fires on every storefront whatever theme is active. @font-face still fetches the faces the page
- * actually uses; `display: swap` covers the extra hop.
+ * `preload: false` on every face: this module is imported by ThemeFrame.tsx inside the theme's lazily loaded
+ * client chunk (see scripts/theme-client-barrier.mjs), and next/font emits preload links from the layout
+ * entry's font manifest only, so the flag has nothing to act on here. @font-face still fetches the faces the
+ * page actually uses; `display: swap` covers the extra hop.
  */
 const sign = Archivo({
     subsets: ['latin', 'latin-ext'],

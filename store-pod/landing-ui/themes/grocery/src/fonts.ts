@@ -9,9 +9,10 @@ import type {ThemeFonts} from '@store-front/theme';
  * The Latin faces ship without next/font's metric-adjusted fallback: that fallback (Arial-based) carries
  * Arabic glyphs and would catch them before Almarai does.
  *
- * `preload: false` on every face: all themes' font CSS lands in the SAME layout entry, so a preload
- * here fires on every storefront whatever theme is active. @font-face still fetches the faces the page
- * actually uses; `display: swap` covers the extra hop.
+ * `preload: false` on every face: this module is imported by ThemeFrame.tsx inside the theme's lazily loaded
+ * client chunk (see scripts/theme-client-barrier.mjs), and next/font emits preload links from the layout
+ * entry's font manifest only, so the flag has nothing to act on here. @font-face still fetches the faces the
+ * page actually uses; `display: swap` covers the extra hop.
  */
 const sans = Manrope({subsets: ['latin', 'latin-ext', 'cyrillic'], display: 'swap', preload: false, variable: '--font-grocery-sans', adjustFontFallback: false});
 const display = Fira_Sans_Extra_Condensed({weight: ['700', '800'], subsets: ['latin', 'latin-ext', 'cyrillic', 'cyrillic-ext'], display: 'swap', preload: false, variable: '--font-grocery-display', adjustFontFallback: false});

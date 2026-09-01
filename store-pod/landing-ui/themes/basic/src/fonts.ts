@@ -10,9 +10,10 @@ import type {ThemeFonts} from '@store-front/theme';
  * metric-adjusted local fallback: that fallback (Arial-based) carries Arabic glyphs and would catch them before
  * Cairo does, so Arabic would render in Arial instead of Cairo.
  *
- * `preload: false` on every face: all themes' font CSS lands in the SAME layout entry, so a preload
- * here fires on every storefront whatever theme is active. @font-face still fetches the faces the page
- * actually uses; `display: swap` covers the extra hop.
+ * `preload: false` on every face: this module is imported by ThemeFrame.tsx inside the theme's lazily loaded
+ * client chunk (see scripts/theme-client-barrier.mjs), and next/font emits preload links from the layout
+ * entry's font manifest only, so the flag has nothing to act on here. @font-face still fetches the faces the
+ * page actually uses; `display: swap` covers the extra hop.
  */
 const sans = Sofia_Sans({subsets: ['latin', 'latin-ext', 'cyrillic'], display: 'swap', preload: false, variable: '--font-basic-sans', adjustFontFallback: false});
 const display = Sofia_Sans_Extra_Condensed({subsets: ['latin', 'latin-ext', 'cyrillic'], display: 'swap', preload: false, variable: '--font-basic-display', adjustFontFallback: false});

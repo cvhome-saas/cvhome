@@ -3,10 +3,7 @@ import {getTranslations} from 'next-intl/server';
 import {Link} from '@store-front/i18n/navigation';
 import type {LayoutData, PageContext} from '@store-front/theme';
 import {cn} from '@store-front/ui/lib/utils';
-import {Nav} from './Nav';
-import {MobileNav} from './MobileNav';
-import {HeaderActions} from './HeaderActions';
-import {SearchBox} from '../sections/SearchBox';
+import {Nav, MobileNav, HeaderActions, SearchBox} from '../client';
 
 /**
  * The entrance. From lg up it is two rows, the way a shop front is: a thin ink utility rail carrying the

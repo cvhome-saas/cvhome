@@ -2,7 +2,7 @@ import {getTranslations} from 'next-intl/server';
 import type {OrderData, PageProps} from '@store-front/theme';
 import {PageShell} from '../components/PageShell';
 import {Breadcrumbs} from '../components/Breadcrumbs';
-import {OrderDetails} from '../sections/OrderDetails';
+import {OrderDetails} from '../client';
 
 export async function Order({ctx, data}: PageProps<OrderData>) {
     const t = await getTranslations('PAGE.CUSTOMER');

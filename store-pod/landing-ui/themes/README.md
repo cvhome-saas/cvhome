@@ -36,10 +36,12 @@ state rendered; RTL + mobile first-class; merchant colour roles respected (the t
 default palette is the palette of its chosen visual world, seeded in the generator (never hand-written hex) so
 it passes the same contrast rules as the presets.
 
-**Fonts are a shared cost, not a private one.** Next collects every theme's `next/font` CSS into the *same*
-layout entry, so all twelve themes' `@font-face` rules are `<link>`ed on every storefront whatever theme is
-active — a face declared in `themes/<id>/src/fonts.ts` is bytes every other theme's merchants pay for. Hence
-two rules in `fonts.ts`: `preload: false` on every face (a preload would fire on all twelve storefronts), and
+**Fonts travel with the theme's client chunk, and only there.** `fonts.ts` is imported by `ThemeFrame.tsx`
+inside the theme's lazily loaded chunk (`client-bundle.ts`), never by `index.ts`: a `next/font` import in the
+server-side definition would put the face's CSS into the layout entry every storefront downloads, whatever
+theme is active (that was the case until the client barrier — see `themes/ARCHITECTURE.md` and
+`scripts/theme-client-barrier.mjs`). Two rules in `fonts.ts` remain: `preload: false` on every face (next/font
+only preloads from the layout entry, so the flag has nothing to act on in a lazy chunk), and
 prefer a family Google serves as named subsets. `subsets: [...]` does **not** shrink the CSS — it only picks
 what would be preloaded — so a family with CJK coverage ships ~120 numbered `unicode-range` slices per weight
 whatever you ask for. `storefront/scripts/prune-font-subsets.mjs` strips the CJK-only slices after every build
