@@ -6,7 +6,7 @@ domain for this store is beauté
 
 -- Insert into merchant.merchant_store`
 INSERT INTO merchant.merchant_store (store_merchant_id, currency_format_national, in_business_since, org, theme, color_theme, seizeunitcode, store_email, store_address, store_city, store_name, store_phone, store_postal_code, store_state_prov, use_cache, require_login_for_order_placement, weightunitcode, country_id, currency_id, language_code)
-VALUES ('65f020632bc46470c104b76f', false, '2024-03-31', '352023632b046970c104b76f', 'JEWELERY', 'DEFAULT', 'CM', -- Changed seizeunitcode to CM
+VALUES ('65f020632bc46470c104b76f', false, '2024-03-31', '352023632b046970c104b76f', 'BEAUTY', 'DEFAULT', 'CM', -- Changed seizeunitcode to CM
         'contact@beaute-elegante.fr', '15 Rue de la Paix', 'Paris', 'Beauté-Élégante-Paris', '+33 1 23 45 67 89', '75002', 'Île-de-France', false, true, 'KG', 'FR', 'EUR', 'fr') -- Changed weightunitcode to KG, set currency to EUR, first language to fr
 on conflict (store_merchant_id) do nothing;
 

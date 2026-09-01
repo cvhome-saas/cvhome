@@ -131,7 +131,7 @@ async function HeroSection({ctx, section}: SectionRenderProps) {
     const year = store.inBusinessSince ? new Date(store.inBusinessSince).getFullYear() : NaN;
     const facts = [store.address?.city, Number.isNaN(year) ? undefined : t('SINCE', {year})].filter(Boolean) as string[];
     return <Hero slides={slidesAsBanners(section.items)} storeName={model.heading ?? store.name} facts={facts}
-                 autoplay={model.autoplay ? model.interval : false}/>;
+                 cta={model.cta} autoplay={model.autoplay ? model.interval : false}/>;
 }
 
 function ProductsSection({ctx, section, data}: SectionRenderProps) {

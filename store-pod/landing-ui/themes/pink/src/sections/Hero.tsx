@@ -16,8 +16,10 @@ export type CoverLine = { id: string; title: string; count: number; href: string
  * Swiper needs `dir` explicitly (it does not read CSS direction) and is re-keyed on dir so a locale switch
  * re-initialises it.
  */
-export function Hero({slides, storeName, lines, actionHref, autoplay = 5}: {
+export function Hero({slides, storeName, lines, actionHref, actionLabel, autoplay = 5}: {
     slides: Banner[]; storeName: string; lines: CoverLine[]; actionHref?: string;
+    /** Overrides the default SHOP_NOW copy — the builder hero's own CTA label. */
+    actionLabel?: string;
     /** Seconds between slides, or `false` for a still cover — the builder's hero fields. */
     autoplay?: number | false;
 }) {
@@ -46,7 +48,7 @@ export function Hero({slides, storeName, lines, actionHref, autoplay = 5}: {
                     {actionHref && (
                         <a href={actionHref}
                            className="ink-field cover-line inline-flex w-fit items-center gap-2 rounded-control px-6 py-3 text-base transition-transform duration-(--motion-fast) hover:-translate-y-0.5">
-                            <StarMark className="size-3.5" aria-hidden/>{t('SHOP_NOW')}
+                            <StarMark className="size-3.5" aria-hidden/>{actionLabel ? <bdi dir="auto">{actionLabel}</bdi> : t('SHOP_NOW')}
                         </a>
                     )}
                 </div>

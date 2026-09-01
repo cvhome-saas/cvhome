@@ -132,6 +132,7 @@ const chrome: SectionChrome = {
 function HeroSection({ctx, section}: SectionRenderProps) {
     const model = heroModel(section);
     return <Hero slides={slidesAsBanners(section.items)} storeName={model.heading ?? ctx.store.name} lines={[]}
+                 actionHref={model.cta?.href} actionLabel={model.cta?.label}
                  autoplay={model.autoplay ? model.interval : false}/>;
 }
 

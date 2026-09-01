@@ -4,7 +4,7 @@ where languages=['ar','en'] and store_id='65f023632bc46470c104b76f' and country_
 domain for this store is fashion
 */
 INSERT INTO merchant.merchant_store (store_merchant_id, currency_format_national, in_business_since, org, theme, color_theme, seizeunitcode, store_email, store_address, store_city, store_name, store_phone, store_postal_code, store_state_prov, use_cache, require_login_for_order_placement, weightunitcode, country_id, currency_id, language_code)
-VALUES ('65f023632bc46470c104b76f', false, '2024-03-31', '21f023932bc66470c104b76f', 'BASIS', 'DEFAULT', 'CM', -- seizeunitcode for fashion
+VALUES ('65f023632bc46470c104b76f', false, '2024-03-31', '21f023932bc66470c104b76f', 'FASHION', 'DEFAULT', 'CM', -- seizeunitcode for fashion
         'info@riyadhfashion.sa', '123 Olaya Street', 'Riyadh', 'Riyadh-Fashion-Hub', '+966 50 123 4567', '11564', 'Riyadh Province', false, true, 'KG', 'SA', 'SAR', 'ar')
 on conflict (store_merchant_id) do nothing;
 

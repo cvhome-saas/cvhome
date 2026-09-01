@@ -131,10 +131,29 @@ const chrome: SectionChrome = {
 async function HeroSection({ctx, section}: SectionRenderProps) {
     const tc = await getTranslations('COMMON');
     const model = heroModel(section);
-    return (
-        <div className="min-h-[15rem]">
+    const hasCopy = Boolean(model.heading || model.subheading || model.cta);
+    const window_ = (
+        <div className="min-h-[15rem] min-w-0">
             <Hero slides={slidesAsBanners(section.items)} caption={model.heading ?? ctx.store.name}
                   planCaption={tc('DEPARTMENT')}/>
+        </div>
+    );
+    if (!hasCopy) return window_;
+    // The merchant's statement mounts as an enamel sign beside the window — the same pairing the
+    // directory board makes — so a heading, sub-line or CTA written in the builder always prints.
+    return (
+        <div className="mx-auto grid w-full max-w-(--container-wide) items-stretch gap-5 px-4 sm:px-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] lg:gap-8">
+            <div className="enamel-flat flex min-w-0 flex-col gap-4 p-6 sm:p-8">
+                {model.heading && <h1 className="sign-lg text-2xl sm:text-3xl"><bdi dir="auto">{model.heading}</bdi></h1>}
+                {model.subheading && <p className="copy text-sm opacity-90"><bdi dir="auto">{model.subheading}</bdi></p>}
+                {model.cta && (
+                    <a href={model.cta.href}
+                       className="sign mt-auto inline-flex w-fit items-center rounded-(--r-control) bg-background px-5 py-3 text-xs text-foreground shadow-sm transition-transform duration-(--motion-fast) hover:translate-y-px">
+                        <bdi dir="auto">{model.cta.label}</bdi>
+                    </a>
+                )}
+            </div>
+            {window_}
         </div>
     );
 }
