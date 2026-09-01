@@ -207,6 +207,7 @@ export const SECTION_CATALOG: readonly KindSpec[] = [
         itemLabel: l('Logo', 'شعار'), maxItems: 12,
         itemFields: [
             {key: 'mediaId', type: 'media', label: l('Logo', 'الشعار')},
+            {key: 'name', type: 'text', label: l('Name', 'الاسم'), localized: true},
             {key: 'link', type: 'link', label: l('Links to', 'الوجهة')},
         ],
     },

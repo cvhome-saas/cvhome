@@ -18,11 +18,22 @@ import {SectionHeading} from '../components/SectionHeading';
 const mediaUrl = (props: Record<string, unknown>): string | undefined =>
     typeof props.mediaUrl === 'string' ? props.mediaUrl : undefined;
 
-/** A slide's own CTA + link, as a pasted strip on the name sheet. */
+/**
+ * A slide's own CTA + link, as a pasted strip on the name sheet. A label the day-glo CTA already
+ * carries — or a repeat among the slides — is not pasted twice: two identical SHOP NOW papers on one
+ * sheet read as a print error, not emphasis.
+ */
 function stripActions(section: LayoutSectionData): WallAction[] {
-    return (section.items ?? [])
-        .map(item => ({label: item.text.cta ?? '', href: linkHref(item.props.link)}))
-        .filter(action => action.label && action.href !== '#');
+    const taken = new Set([section.text.cta?.trim().toLowerCase() ?? '']);
+    const strips: WallAction[] = [];
+    for (const item of section.items ?? []) {
+        const label = item.text.cta?.trim() ?? '';
+        const href = linkHref(item.props.link);
+        if (!label || href === '#' || taken.has(label.toLowerCase())) continue;
+        taken.add(label.toLowerCase());
+        strips.push({label, href});
+    }
+    return strips;
 }
 
 function HeroWall({ctx, section}: SectionRenderProps) {
@@ -204,10 +215,11 @@ function TestimonialSheets({section}: SectionRenderProps) {
             {section.text.title && <SectionHeading title={section.text.title}/>}
             <div className="wall grid gap-4 md:grid-cols-3">
                 {quotes.map(quote => (
-                    <figure key={quote.id} className="sheet sheen p-5">
-                        <blockquote className="text-sm leading-relaxed"><bdi dir="auto">“{quote.text.quote}”</bdi></blockquote>
+                    <figure key={quote.id} className="sheet sheen flex flex-col p-5">
+                        {/* the quote is set in the poster voice — a caption pasted on the wall, not body copy */}
+                        <blockquote className="font-display text-xl leading-snug"><bdi dir="auto">“{quote.text.quote}”</bdi></blockquote>
                         {quote.text.author && (
-                            <figcaption className="mt-3 text-xs uppercase tracking-wide text-muted-foreground">
+                            <figcaption className="mt-auto pt-3 text-xs uppercase tracking-[0.15em] text-muted-foreground">
                                 <bdi dir="auto">{quote.text.author}</bdi>
                             </figcaption>
                         )}
@@ -218,9 +230,10 @@ function TestimonialSheets({section}: SectionRenderProps) {
     );
 }
 
-/** Brand marks as small pasted labels. */
+/** Brand marks as small pasted labels: the logo on paper with the name printed under it, so a label
+ * still reads even before (or without) its artwork. */
 function BrandLabels({section}: SectionRenderProps) {
-    const logos = (section.items ?? []).filter(logo => mediaUrl(logo.props));
+    const logos = (section.items ?? []).filter(logo => mediaUrl(logo.props) || logo.text.name);
     if (logos.length === 0) return null;
     return (
         <section className="min-w-0">
@@ -228,11 +241,20 @@ function BrandLabels({section}: SectionRenderProps) {
             <div className="wall flex flex-wrap items-center justify-center gap-4">
                 {logos.map(logo => {
                     const href = linkHref(logo.props.link);
+                    const src = mediaUrl(logo.props);
+                    const name = logo.text.name;
                     const label = (
-                        <span className="sheet sheet-flat relative block h-16 w-32 p-3">
-                            <span className="relative block size-full">
-                                <Image src={mediaUrl(logo.props)!} alt="" fill className="object-contain"/>
-                            </span>
+                        <span className="sheet sheet-flat flex w-32 flex-col items-center gap-1.5 p-3">
+                            {src && (
+                                <span className="relative block h-10 w-full">
+                                    <Image src={src} alt={name ?? ''} fill className="object-contain"/>
+                                </span>
+                            )}
+                            {name && (
+                                <span className="font-display text-[0.65rem] uppercase tracking-[0.18em]">
+                                    <bdi dir="auto">{name}</bdi>
+                                </span>
+                            )}
                         </span>
                     );
                     return href === '#'
@@ -272,12 +294,17 @@ function VideoSheet({section}: SectionRenderProps) {
     return (
         <section className="mx-auto min-w-0 max-w-3xl">
             {section.text.title && <SectionHeading title={section.text.title}/>}
-            <div className="sheet sheen p-2 [--tilt:0.4deg]">
-                <div className="aspect-video w-full overflow-hidden bg-muted">
-                    <iframe src={src} title={section.text.title ?? 'Video'} className="size-full"
+            <div className="sheet sheen p-2 pb-1 [--tilt:0.4deg]">
+                {/* the striped typo-poster paper sits behind the player, so a slow or blocked embed
+                    still reads as a sheet on the wall rather than a blank hole */}
+                <div className="typo-poster relative aspect-video w-full overflow-hidden">
+                    <iframe src={src} title={section.text.title ?? 'Video'} className="absolute inset-0 size-full"
                             allow="accelerometer; encrypted-media; picture-in-picture" allowFullScreen
                             loading="lazy" referrerPolicy="no-referrer"/>
                 </div>
+                <p className="px-1 py-1.5 text-[0.65rem] uppercase tracking-[0.2em] text-muted-foreground">
+                    <bdi dir="auto">{section.text.title ?? 'Video'}</bdi>
+                </p>
             </div>
         </section>
     );
