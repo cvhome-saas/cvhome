@@ -138,13 +138,20 @@ export class BuilderPreviewFrame {
         return; // the handshake is versioned; anything unversioned is not the bridge speaking
       }
       switch (data.type) {
-        case 'ready':
+        case 'ready': {
           // every iframe reload re-handshakes: replay the whole canvas state
-          this.post({type: 'select', sectionId: this.facade.selectedId()});
+          const selectedId = this.facade.selectedId();
+          this.post({type: 'select', sectionId: selectedId});
           this.post({type: 'guides', on: this.facade.guides()});
           this.post({type: 'locks', ids: this.facade.lockedIds()});
           this.post({type: 'dragState', active: !!this.facade.dragging(), label: this.facade.dragging()?.label ?? ''});
+          if (selectedId) {
+            // a reload lands the fresh document at the top; re-focus the block being edited so a
+            // landed autosave (or a refresh) does not throw the merchant back to the page's start
+            this.post({type: 'scrollTo', sectionId: selectedId});
+          }
           break;
+        }
         case 'sectionClicked':
           if (data.sectionId) {
             this.facade.selectedId.set(data.sectionId);

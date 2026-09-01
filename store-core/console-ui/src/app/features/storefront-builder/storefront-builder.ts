@@ -1,6 +1,7 @@
 /** Console-native; not a port from seller-core. */
 import {
-  ChangeDetectionStrategy, Component, HostListener, type OnDestroy, type OnInit, computed, inject, signal,
+  ChangeDetectionStrategy, Component, HostListener, type OnDestroy, type OnInit, computed, effect, inject,
+  signal,
 } from '@angular/core';
 import {RouterLink} from '@angular/router';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
@@ -79,9 +80,19 @@ export class StorefrontBuilder implements ConfirmsLeave, OnInit, OnDestroy {
 
   protected readonly revisionsOpen = signal(false);
 
+  constructor() {
+    // The selected section rides in the URL fragment (#sec-…): a refresh or a shared link lands
+    // back on the same block, and replaceState keeps the browser's back button out of it.
+    effect(() => {
+      const id = this.facade.selectedId();
+      const base = `${window.location.pathname}${window.location.search}`;
+      window.history.replaceState(null, '', id ? `${base}#${id}` : base);
+    });
+  }
+
   ngOnInit(): void {
     this.facade.openLibrary = () => this.panel.set('library');
-    this.facade.load();
+    this.facade.load(window.location.hash.slice(1) || null);
   }
 
   protected toggleRevisions(): void {

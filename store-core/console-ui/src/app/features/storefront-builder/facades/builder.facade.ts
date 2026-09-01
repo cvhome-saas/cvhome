@@ -186,7 +186,13 @@ export class BuilderFacade {
 
   // -------------------------------------------------------------------------------------------- load
 
-  load(): void {
+  /**
+   * Loads (or reloads) the draft. The selection survives when the preferred section still exists —
+   * by default the current one, so a conflict reload or retry lands the merchant back on the block
+   * they were editing; the page passes the URL fragment on first mount for the same continuity
+   * across a browser refresh.
+   */
+  load(preferredId: string | null = this.selectedId()): void {
     this.cancelPendingSave();
     this.generation += 1;
     this.saveState.set('idle');
@@ -200,7 +206,9 @@ export class BuilderFacade {
         this.redoStack = [];
         this.undoDepth.set(0);
         this.redoDepth.set(0);
-        this.selectedId.set(layout.draft.sections[0]?.id ?? null);
+        const kept = preferredId && layout.draft.sections.some((section) => section.id === preferredId)
+          ? preferredId : layout.draft.sections[0]?.id ?? null;
+        this.selectedId.set(kept);
         this.mintPreviewToken();
       },
       error: () => {
