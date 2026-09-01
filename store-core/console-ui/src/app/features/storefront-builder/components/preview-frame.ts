@@ -33,6 +33,7 @@ import {BuilderFacade} from '../facades/builder.facade';
       <div
         class="canvas"
         [class]="'device-' + facade.device()"
+        [class.dragging]="!!facade.dragging()"
         (dragover)="onDragOver($event)"
         (drop)="onDrop($event)"
       >
@@ -55,6 +56,13 @@ import {BuilderFacade} from '../facades/builder.facade';
       /* no width transition: animating an iframe's width relayouts the embedded page every frame */
       width: 100%; height: 100%;
     }
+    /*
+     * While a library tile is being dragged, the iframe must not hit-test: a native drag over an
+     * iframe is delivered INTO the (cross-origin) document, where nothing accepts it — the wrapper's
+     * dragover/drop never fire and the browser shows no-drop. Pointer-transparent for the drag's
+     * duration, the wrapper receives the events and the bridge keeps drawing the insertion line.
+     */
+    .dragging iframe { pointer-events: none; }
     .device-tablet iframe { width: 768px; }
     .device-mobile iframe { width: 390px; }
     .placeholder {
