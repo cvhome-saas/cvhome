@@ -31,7 +31,7 @@
   justify-content: center;
   aspect-ratio: 1;
   overflow: hidden;
-  background: var(--muted);
+  background: var(--input);
   color: var(--foreground-quiet);
 }
 

@@ -21,7 +21,7 @@
 }
 
 .ranked-list li:hover {
-  background: var(--muted);
+  background: var(--input);
 }
 
 .ranked-rank {

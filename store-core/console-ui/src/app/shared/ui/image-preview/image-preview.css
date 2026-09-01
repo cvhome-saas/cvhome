@@ -98,7 +98,7 @@
   flex: none;
   padding: 0.15rem 0.45rem;
   border-radius: var(--radius-sm);
-  background: var(--muted);
+  background: var(--input);
   color: var(--foreground-subtle);
   font-size: var(--text-3xs);
   font-variant-numeric: tabular-nums;

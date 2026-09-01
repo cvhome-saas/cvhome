@@ -92,7 +92,7 @@ app-kpi-grid {
   min-width: 0;
   padding: 0.05rem 0.35rem;
   border-radius: var(--radius-sm);
-  background: var(--muted);
+  background: var(--input);
   color: var(--secondary-foreground);
   font-family: ui-monospace, monospace;
   font-size: var(--text-3xs);

@@ -16,6 +16,7 @@
 @import './styles/theme-forest.css';
 @import './styles/theme-midnight.css';
 @import './styles/theme-daylight.css';
+@import './styles/theme-light.css';
 @import './styles/theme-bridge.css';
 
 @custom-variant rtl (&:where([dir='rtl'], [dir='rtl'] *));
@@ -30,7 +31,19 @@ body { min-height: 100vh; }
 a { color: inherit; text-decoration: none; }
 button, input, textarea { font: inherit; }
 button, a { -webkit-tap-highlight-color: transparent; }
-::selection { background: color-mix(in srgb, var(--primary) 45%, var(--primary-foreground)); color: var(--primary-muted); }
+/*
+ * Selection had been built from `--primary` mixed toward `--primary-foreground`, inked with
+ * `--primary-muted`. That pairing only ever worked on Forest. On Midnight it is 1.23:1, on
+ * Daylight 1.03:1 — `--primary-muted` is emerald-800 there, and the mix lands on emerald-800 too,
+ * so selected text on both was very nearly invisible. It went unnoticed because Forest is the
+ * default and the one theme the pairing happens to suit.
+ *
+ * `--accent-strong` over `--foreground-strong` is the same decision every theme already makes for
+ * a selected row: the accent wash tints whatever is behind it, and the strongest ink always reads
+ * on it. 14:1 or better on all four, and on Light it resolves to the emerald-100 the
+ * console-template uses for exactly this.
+ */
+::selection { background: var(--accent-strong); color: var(--foreground-strong); }
 :focus-visible { outline: 3px solid var(--ring); outline-offset: 4px; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 

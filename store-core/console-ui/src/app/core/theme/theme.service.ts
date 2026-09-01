@@ -16,13 +16,17 @@ export interface ThemeOption {
  * The themes on offer. Each `id` matches a `[data-theme]` block in src/styles, and the
  * first entry is the default — it is the one that also claims bare `:root`.
  *
- * Adding a theme is two steps: a stylesheet beside theme-forest.css (imported after it in
- * styles.css) and an entry here, plus its `shell.theme.<id>.*` keys in the locale files.
+ * Adding a theme is three steps: a stylesheet beside theme-forest.css (imported after it in
+ * styles.css), an entry here, and the id in the `themes` array of the pre-paint script in
+ * index.html — that array is an allow-list, so a theme missing from it is stored correctly and
+ * then rejected on the next load, which reads as "my theme keeps resetting to Forest". Its
+ * `shell.theme.<id>.*` keys go in every locale file.
  */
 export const CONSOLE_THEMES: readonly ThemeOption[] = [
   {id: 'forest', labelKey: 'shell.theme.forest.label', hintKey: 'shell.theme.forest.hint', scheme: 'dark'},
   {id: 'midnight', labelKey: 'shell.theme.midnight.label', hintKey: 'shell.theme.midnight.hint', scheme: 'dark'},
   {id: 'daylight', labelKey: 'shell.theme.daylight.label', hintKey: 'shell.theme.daylight.hint', scheme: 'light'},
+  {id: 'light', labelKey: 'shell.theme.light.label', hintKey: 'shell.theme.light.hint', scheme: 'light'},
 ];
 
 const STORAGE_KEY = 'cvhome.console.theme';

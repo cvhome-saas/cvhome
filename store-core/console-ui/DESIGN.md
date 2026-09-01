@@ -1,7 +1,7 @@
 ---
-# Hand-written. The colours below are Forest, the default theme; Midnight and Daylight
-# reassign the same token names in theme-midnight.css / theme-daylight.css. Keep this in
-# step with src/styles/theme-forest.css. The design-review tooling reads this block.
+# Hand-written. The colours below are Forest, the default theme; Midnight, Daylight and Light
+# reassign the same token names in theme-midnight.css / theme-daylight.css / theme-light.css.
+# Keep this in step with src/styles/theme-forest.css. The design-review tooling reads this block.
 name: cvhome Console
 description: A controlled territory for operating multi-market commerce.
 colors:
@@ -270,9 +270,9 @@ The palette is a dark forest field punctuated by emerald signals and cool, desat
 
 **The Emerald Signal Rule.** Emerald communicates action, state, or deliberate emphasis. Keep most of every screen forest and neutral so the signal retains authority.
 
-**The Themed Surface Rule.** No component decides its own light or dark. A surface is built from the semantic tokens — `--background`, `--card`, `--border`, `--foreground` — and the active theme decides what those mean. Forest and Midnight are dark and stack translucent white over a deep field; Daylight is light and stacks translucent near-black over a pale one. A component that hardcodes `rgb(255 255 255 / 6%)` works in two themes and breaks in the third; a component that uses `--input` works in all of them, and in the next one.
+**The Themed Surface Rule.** No component decides its own light or dark. A surface is built from the semantic tokens — `--background`, `--card`, `--border`, `--foreground` — and the active theme decides what those mean. Forest and Midnight are dark and stack translucent white over a deep field; Daylight is light and stacks translucent near-black over a pale one; Light is lighter still and makes its panels *opaque*, brighter than the page they sit on. A component that hardcodes `rgb(255 255 255 / 6%)` works in two themes and breaks in the other two; a component that uses `--input` works in all of them, and in the next one.
 
-This replaces the former Dark Territory Rule, which held that the world was dark by construction. Two of the three themes still are, and Forest remains the default and the brand's face on marketing and authentication — but "dark" is now a property of a theme, not of the system.
+This replaces the former Dark Territory Rule, which held that the world was dark by construction. Two of the four themes still are, and Forest remains the default and the brand's face on marketing and authentication — but "dark" is now a property of a theme, not of the system.
 
 **The One-World Rule.** There is a single surface treatment *at a time*. Marketing, authentication, and the console share one canvas, one palette, and one focus ring; only density changes between them. Switching theme switches all of them together — the choice is stored per operator and applied to the document root, so signing out onto the marketing page does not change surface underneath them.
 
@@ -281,7 +281,7 @@ This replaces the former Dark Territory Rule, which held that the world was dark
 **The Token Rule.** Every colour, radius, shadow, spacing step, and type step is a token, and every token name is a standard Tailwind one. A literal hex value in a stylesheet is a defect — if a value is missing, add it to the theme. The system is three files:
 
 - `src/styles/theme.css` — primitives and scales on standard Tailwind keys (`--color-*`, `--text-*`, `--radius-*`, `--spacing-*`, `--breakpoint-*`). Tailwind's own palette is used as-is except for the brand steps, which are pinned; only the `forest` and `sage` ramps are authored outright.
-- `src/styles/theme-forest.css`, `-midnight.css`, `-daylight.css` — the identities, as semantic tokens in the shadcn/tweakcn vocabulary. **These are the only files that assign a colour to a role.**
+- `src/styles/theme-forest.css`, `-midnight.css`, `-daylight.css`, `-light.css` — the identities, as semantic tokens in the shadcn/tweakcn vocabulary. **These are the only files that assign a colour to a role.**
 - `src/styles/theme-bridge.css` — re-exports those into Tailwind's namespaces (`bg-background`, `border-border`) and composes the type roles.
 
 Components reference the semantic layer (`var(--border)`, `bg-muted`), never a primitive. TypeScript that must paint outside the DOM — echarts, jsPDF — reads the same tokens back off the document through `THEME`, so there is no second copy of the palette.
@@ -293,22 +293,27 @@ Components reference the semantic layer (`var(--border)`, `bg-muted`), never a p
 | **Forest** (default) | Deep green | Emerald | Dark |
 | **Midnight** | Slate | Indigo | Dark |
 | **Daylight** | Near-white | Emerald | Light |
+| **Light** | White on grey | Emerald | Light |
 
 A theme is exactly one `[data-theme='…']` block and nothing else. Forest also claims bare `:root`, which makes it the base every other theme overrides and the value any incomplete theme falls back to — so it must stay first in the cascade and must stay complete. `theme.service.spec.ts` fails the build if a theme leaves a token unset, which on Daylight would mean a dark colour on a light page.
 
-Adding one is two steps: a stylesheet imported after Forest in `styles.css`, and an entry in `CONSOLE_THEMES`. Nothing else in the app changes — components already speak only in semantic tokens, and `THEME` re-reads them on switch so canvas-drawn surfaces repaint themselves.
+Adding one is three steps: a stylesheet imported after Forest in `styles.css`, an entry in `CONSOLE_THEMES`, and the id added to the `themes` array in the pre-paint script in `index.html` — a theme missing from that array is stored correctly and then silently rejected on the next load, which renders as "my theme keeps resetting to Forest". Its `shell.theme.<id>.{label,hint}` keys go in every locale file. Nothing else in the app changes — components already speak only in semantic tokens, and `THEME` re-reads them on switch so canvas-drawn surfaces repaint themselves.
 
 The operator's choice is stored in `localStorage` and applied by an inline script in `index.html` before the first paint. It has to be inline and it has to be there rather than in Angular: the app boots after the document renders, so applying it in a service would show a frame of Forest first. The default is deliberately Forest rather than the operating system's `prefers-color-scheme` — Forest is the brand's face on marketing and authentication, and Daylight is a choice an operator makes rather than one their OS makes for them.
 
 Daylight is not an inversion of Forest. Alphas flip from white-over-dark to near-black-over-light *and* drop in strength; the categorical inks move four steps (`-300` → `-700`) because the -300s exist to glow on a dark field; the text ladder compresses from five steps to four, because on white everything below `sage-600` falls under 3:1. The one pairing that does not change is `--primary` with `--primary-foreground`: emerald with near-black ink, because emerald with white ink is 2.3:1 and because a control should not change colour based on where it lives.
 
+Light is not a re-hue of Daylight either; the two differ on the only question a light workspace really has, which plane is brightest. Daylight keeps the dark themes' structure and lightens it — the canvas is near-white and a panel is a tint *on top of* it, so panels sit fractionally darker and read as cards because of their edge. Light inverts that, following `store-core/console-template`: the canvas is grey, every panel is opaque white, and a card reads because it is *brighter* than its surroundings. That is why `--muted` is the one token in the system that is an opaque colour in one theme and an alpha in the other three — nothing stacked on a light field can come out lighter than the field, so a panel that must outrank its page cannot be translucent. Its neutral is slate throughout, Tailwind's stock ramp as shipped, exactly as Midnight uses it.
+
+Adopting the template did not mean copying it. It paints white on emerald-500 for primary buttons, which is 2.3:1; the `--primary`/`--primary-foreground` pairing above wins, and Light keeps near-black ink. Its lightest label ink, slate-400, is 2.8:1 on white; those jobs go to slate-500, the lightest step clearing 4.5:1, which compresses the ladder the same way Daylight's is compressed.
+
 ### Operational Palette
 
 The console draws from the same tokens as marketing. Its distinct character comes from density and from a small set of tokens intended for dense work:
 
-- **Muted** (`--muted`, white 2%): Cards, panels, the navigation rail. A card reads as a card because of its hairline edge, not because it is brighter.
-- **Input** (`--input`, white 6%): Hover fills, icon tiles, inset wells.
-- **Track** (`--track`, white 18%): The unfilled portion of a chart — donut remainder, bar baseline, progress track. Deliberately far above the hover fill because it has to read as data, not as an inset.
+- **Muted** (`--muted`, white 2% on the dark themes): Cards, panels, the navigation rail. A card reads as a card because of its hairline edge, not because it is brighter — except on Light, where the token is opaque white and brightness is exactly what it reads by.
+- **Input** (`--input`, white 6% on the dark themes): Hover fills, icon tiles, inset wells. **A tint stacked on a panel is always this, never `--muted`** — the two are a hair apart on Forest, so the distinction was easy to miss until Light made `--muted` opaque and every rule that had reached for the wrong one turned invisible.
+- **Track** (`--track`, white 18% on the dark themes): The unfilled portion of a chart — donut remainder, bar baseline, progress track. Deliberately far above the hover fill because it has to read as data, not as an inset.
 - **Compact radii** (`sm` 4px through `xl` 12px): The console's shape vocabulary, against marketing's `2xl`/`3xl` (16–20px).
 - **Categorical set** (`--chart-N` fill, `--chart-N-foreground` ink, `--chart-N-wash` backing): Six slots — emerald, blue, cyan, amber, red, violet — distinguish series or operational conditions. Always pair colour with a label, value, icon, or position — never colour alone.
 

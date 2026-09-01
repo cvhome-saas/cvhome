@@ -184,7 +184,7 @@ app-field-error {
   align-items: center;
   gap: 0.85rem;
   padding: 0.9rem 1rem;
-  background: var(--muted);
+  background: var(--input);
   --icon-size: 1.05rem;
 }
 
@@ -237,7 +237,7 @@ app-field-error {
  * is on record and offers the one action that can change it.
  */
 .secret {
-  background: var(--muted);
+  background: var(--input);
 }
 
 .secret .mask {

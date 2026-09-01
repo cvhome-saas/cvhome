@@ -242,7 +242,7 @@
 }
 
 .order:hover {
-  background: var(--muted);
+  background: var(--input);
 }
 
 .order:focus-visible {

@@ -1,13 +1,13 @@
 # console-ui
 
-The seller console. Angular 20 standalone + SSR, Tailwind v4 on a three-theme token layer,
+The seller console. Angular 20 standalone + SSR, Tailwind v4 on a four-theme token layer,
 Transloco (en/ar, RTL), served on port 8011 behind `console-ui.gateway.com`.
 
 ## Read first
 
 - **[`ARCHITECTURE.md`](./ARCHITECTURE.md)** — the tiers, the shape of a feature, the shared control
   catalogue, and the rules a new page is expected to follow. Start here.
-- **[`DESIGN.md`](./DESIGN.md)** — the visual system: tokens, the three themes, the named rules.
+- **[`DESIGN.md`](./DESIGN.md)** — the visual system: tokens, the four themes, the named rules.
 - **[`lessons.md`](./lessons.md)** — every capability the backend does not have yet, and what the
   console does instead. Append-only.
 - **[`Todos.md`](./Todos.md)** — known debt that is agreed and not yet done. Check it before starting
