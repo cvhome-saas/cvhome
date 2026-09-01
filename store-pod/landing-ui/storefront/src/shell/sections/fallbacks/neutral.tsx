@@ -22,10 +22,10 @@ export const neutralChrome: SectionChrome = {
     Badge: ({icon, title, body}) => {
         const Icon = ICONS[icon] ?? Sparkles;
         return (
-            <span className="flex max-w-52 flex-col items-center gap-1.5 p-3 text-center">
-                <Icon aria-hidden className="size-6 text-muted-foreground"/>
-                <span className="text-sm font-medium"><bdi dir="auto">{title}</bdi></span>
-                {body && <span className="text-xs text-muted-foreground"><bdi dir="auto">{body}</bdi></span>}
+            <span className="flex max-w-56 flex-col items-center gap-2 p-3 text-center">
+                <Icon aria-hidden className="size-7 text-muted-foreground"/>
+                <span className="text-base font-semibold"><bdi dir="auto">{title}</bdi></span>
+                {body && <span className="max-w-[26ch] text-sm leading-relaxed text-muted-foreground"><bdi dir="auto">{body}</bdi></span>}
             </span>
         );
     },

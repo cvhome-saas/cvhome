@@ -22,9 +22,9 @@ const chrome: SectionChrome = {
 
     // Flags are printed marks; the badge's icon name is deliberately not drawn.
     Badge: ({title, body}) => (
-        <span className="flex max-w-52 flex-col items-center gap-1.5 text-center">
+        <span className="flex max-w-56 flex-col items-center gap-2.5 text-center">
             <span className="flag"><bdi dir="auto">{title}</bdi></span>
-            {body && <span className="dim text-xs"><bdi dir="auto">{body}</bdi></span>}
+            {body && <span className="dim max-w-[26ch] text-sm leading-relaxed"><bdi dir="auto">{body}</bdi></span>}
         </span>
     ),
 

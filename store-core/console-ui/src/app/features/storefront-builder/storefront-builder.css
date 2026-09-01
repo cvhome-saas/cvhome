@@ -6,6 +6,32 @@
   background: var(--muted);
 }
 
+/*
+ * The entry: the workbench settles into place once — top bar first, then the panes in reading
+ * order, the canvas last so the storefront appears into an already-standing frame. Compact
+ * distances and the shared `rise` keyframe per the console's motion rule; the global
+ * prefers-reduced-motion guard collapses it to an instant appearance.
+ */
+.topbar {
+  --rise-from: 6px;
+  animation: rise 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.left {
+  --rise-from: 10px;
+  animation: rise 0.32s 0.06s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.right {
+  --rise-from: 10px;
+  animation: rise 0.32s 0.12s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.center {
+  --rise-from: 12px;
+  animation: rise 0.36s 0.16s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
 .topbar {
   display: flex;
   align-items: center;

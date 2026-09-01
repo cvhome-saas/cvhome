@@ -59,7 +59,7 @@ for (const file of walk(dst)) {
     writeFileSync(file, text);
 }
 writeFileSync(path.join(dst, 'DESIGN.md'), `# ${titleCase} — DESIGN.md\n\n_Not written yet._ DESIGN.md is produced at finish by the impeccable documenter from the built theme.\nUntil then this theme is a copy of \`starter\` and has no visual world of its own.\n`);
-writeFileSync(path.join(dst, 'README.md'), `# ${id} theme\n\nScaffolded from \`starter\` on ${new Date().toISOString().slice(0, 10)}.\nSee \`themes/README.md\` (direction catalog) and the theme guide in\n\`.agents/skills/project-structure/references/new-landing-ui-template.md\`.\n`);
+writeFileSync(path.join(dst, 'README.md'), `# ${id} theme\n\nScaffolded from \`starter\` on ${new Date().toISOString().slice(0, 10)}.\nRead \`themes/ARCHITECTURE.md\` (how a theme is built: contract, layout-section pipeline,\nmodels/composer/chrome), \`themes/README.md\` (direction catalog + section design rules) and the\ntheme guide in \`.agents/skills/project-structure/references/new-landing-ui-template.md\`.\n`);
 const pkgPath = path.join(dst, 'package.json');
 const pkg = JSON.parse(readFileSync(pkgPath, 'utf8'));
 pkg.name = `@store-front/theme-${id}`;
@@ -132,13 +132,23 @@ Next steps
      Every page in ThemePages is required except Search: a theme without pages/Search.tsx gets the
      shell's plain results page, built from tokens so it still looks like this theme. Copy
      themes/basic/src/{pages/Search.tsx,sections/SearchResults.tsx,states/skeletons/SearchSkeleton.tsx}
-     when you want a designed one, and register `search` in states.PageSkeleton alongside it.
+     when you want a designed one, and register \`search\` in states.PageSkeleton alongside it.
      Its default palette (ColorTheme DEFAULT) is generated into themes/${id}/src/colors.ts — edit the
      '${id}' seed in libs/types/scripts/build-color-schemas.mjs (THEME_DEFAULTS), then
      \`npm run gen:colors -w libs/types\`; never hand-edit colors.ts.
-  3. Run:  npm run dev   →  http://localhost:8110/en?theme=${id}&color=default   (or STOREFRONT_THEME=${id};
+  3. Builder sections (the home page — see themes/ARCHITECTURE.md): you inherited starter's
+     registry in src/sections/LayoutSections.tsx (bespoke hero + products on heroModel/productsModel;
+     every other kind renders in the shell's neutral voice). Once tokens.css has this theme's
+     vocabulary, write a SectionChrome from it and switch the registry to
+     sectionsFromChrome(chrome, {hero, products}) — every composable kind (usp, categories, promo,
+     faq, newsletter, richtext, testimonials, brands, image, video, posts) snaps into this theme's
+     voice at once. Any designed theme's sections/LayoutSections.tsx is the reference; the section
+     design rules in themes/README.md apply verbatim. QA the full 13-kind page with
+     \`?theme=${id}\` on the demo store, and open the store in the console's Home page builder to
+     check the inspector fields against what the renderers honor.
+  4. Run:  npm run dev   →  http://localhost:8110/en?theme=${id}&color=default   (or STOREFRONT_THEME=${id};
      \`?color=<PRESET>\` previews a merchant preset on top)
-  4. Backend (out of scope here): add ${enumName} to the Java Theme enum with implemented=true so
+  5. Backend (out of scope here): add ${enumName} to the Java Theme enum with implemented=true so
      merchants can pick it; until then map existing enum values to '${id}' in
      storefront/src/shell/theme/legacy-theme-map.ts.
 `);

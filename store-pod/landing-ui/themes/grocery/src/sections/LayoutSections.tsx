@@ -19,9 +19,9 @@ const chrome: SectionChrome = {
 
     // Stickers are typographic prints; the badge's icon name is deliberately not drawn.
     Badge: ({title, body}) => (
-        <span className="flex max-w-52 flex-col items-center gap-1.5 text-center">
+        <span className="flex max-w-56 flex-col items-center gap-2.5 text-center">
             <span className="sticker sticker-outline"><bdi dir="auto">{title}</bdi></span>
-            {body && <span className="text-xs text-muted-foreground"><bdi dir="auto">{body}</bdi></span>}
+            {body && <span className="max-w-[26ch] text-sm leading-relaxed text-muted-foreground"><bdi dir="auto">{body}</bdi></span>}
         </span>
     ),
 

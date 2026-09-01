@@ -80,11 +80,14 @@ export function sectionsFromChrome(chrome: SectionChrome,
     const Usp: Renderer = ({section, preview}) => {
         const badges = uspModel(section);
         if (badges.length === 0) return <EmptyOrHint preview={preview} label="Trust badges — add one"/>;
+        // Even columns, not a floating cluster: the row reads as a designed band at every count.
+        const columns = badges.length >= 4 ? 'sm:grid-cols-2 lg:grid-cols-4'
+            : badges.length === 3 ? 'sm:grid-cols-3' : 'sm:grid-cols-2';
         return (
             <section className="min-w-0">
                 {section.text.title && <Heading title={<bdi dir="auto">{section.text.title}</bdi>}/>}
-                <ul className="flex flex-wrap items-start justify-center gap-x-8 gap-y-4">
-                    {badges.map(badge => <li key={badge.id} className="min-w-0">{Badge(badge)}</li>)}
+                <ul className={`mx-auto grid max-w-4xl grid-cols-1 justify-items-center gap-x-8 gap-y-8 py-2 ${columns}`}>
+                    {badges.map(badge => <li key={badge.id} className="flex w-full min-w-0 justify-center">{Badge(badge)}</li>)}
                 </ul>
             </section>
         );

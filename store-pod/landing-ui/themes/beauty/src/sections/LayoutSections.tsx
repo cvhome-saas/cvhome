@@ -19,9 +19,9 @@ const chrome: SectionChrome = {
 
     // Plates are drawn boxes; the badge's icon name is deliberately not drawn.
     Badge: ({title, body}) => (
-        <span className="plate flex max-w-56 flex-col gap-1 px-4 py-3 text-center">
-            <span className="font-display text-sm uppercase tracking-wide"><bdi dir="auto">{title}</bdi></span>
-            {body && <span className="text-xs text-muted-foreground"><bdi dir="auto">{body}</bdi></span>}
+        <span className="plate flex max-w-64 flex-col gap-1.5 px-5 py-4 text-center">
+            <span className="font-display text-base uppercase tracking-wide"><bdi dir="auto">{title}</bdi></span>
+            {body && <span className="max-w-[26ch] text-sm leading-relaxed text-muted-foreground"><bdi dir="auto">{body}</bdi></span>}
         </span>
     ),
 
