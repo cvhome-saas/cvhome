@@ -179,6 +179,9 @@ export interface ProductVariant extends VariantPricing {
 export interface VariantPricing {
     quantity?: number
     canBePurchased?: boolean
+    /** The merchant's per-order floor and ceiling for this sku; `0` maximum means no limit. */
+    quantityOrderMinimum?: number
+    quantityOrderMaximum?: number
     /** Pre-formatted in the store currency, like the product-level pair. */
     finalPrice?: string
     originalPrice?: string

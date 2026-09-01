@@ -1,5 +1,8 @@
 package com.asrevo.cvhome.catalog.api.v2;
 
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,6 +63,11 @@ class ProductApiIntegrationTest {
     private static final String CATEGORY_QUERY = "categoryIds=%d";
 
     private static final String PRODUCTS = path(V2, "products");
+
+    /** The seeded Zara dress: colour x size, deliberately without the red/L combination. */
+    private static final long DRESS = 2L;
+
+    private static final String OPTION_VALUES_QUERY = "optionValueIds=%s";
 
     private static final String BY_NAME = path(V2, PRODUCT_SEGMENT, "name");
 
@@ -271,44 +279,47 @@ class ProductApiIntegrationTest {
                 HttpStatus.OK);
     }
 
+    /** Product ids on a listing page, so a filter can be asserted against a named product. */
+    private static Set<Long> ids(JsonNode listing) {
+        return listing.get(CONTENT).valueStream().map(product -> product.get(ID).asLong())
+                .collect(Collectors.toSet());
+    }
+
+    private Set<Long> filterBy(String values) {
+        return ids(json(api.get(scoped(query(PRODUCTS, OPTION_VALUES_QUERY.formatted(values)), STORE_A), null)));
+    }
+
     @Test
     void theListingFiltersByOptionValueAnchoredToOneVariant() {
         /*
          * The filter semantics the whole facet rail rests on: **OR within an option, AND across options, and
-         * both anchored to a SINGLE variant**. The seeded fashion store is built for exactly this — the Zara
-         * dress sells red/M, blue/M and blue/L, and deliberately not red/L.
+         * both anchored to a SINGLE variant**. The Zara dress (product 2) is built for exactly this — it
+         * sells red/M, blue/M and blue/L, and deliberately not red/L.
          *
-         * So red AND L must find nothing. If the AND were evaluated per *product* rather than per variant the
-         * dress would match — it owns a red variant and it owns an L variant — and a shopper filtering for a
-         * red L dress would be shown one that does not exist in that combination. That negative case is the
-         * point of this test; the positive ones only prove the query runs.
+         * So red AND L must not return the dress. If the AND were evaluated per *product* rather than per
+         * variant it would match — it owns a red variant and it owns an L variant — and a shopper filtering
+         * for a red L dress would be shown one that does not exist in that combination. That negative case is
+         * the point of this test; the positive ones only prove the query runs.
+         *
+         * Asserted against the dress by id rather than against an empty page: the store's other products sell
+         * red/L quite legitimately, so a store-wide zero would only hold while the seed stayed tiny.
          */
-        String red = "optionValueIds=1";
-        String blue = "optionValueIds=2";
-        String medium = "optionValueIds=3";
-        String large = "optionValueIds=4";
-
-        // one value: every product owning a variant with it
-        JsonNode inRed = json(api.get(scoped(query(PRODUCTS, red), STORE_A), null));
-        assertThat(inRed.get(CONTENT)).isNotEmpty();
+        Set<Long> inRed = filterBy("1");
+        assertThat(inRed).contains(DRESS);
 
         // two values of the SAME option are an OR — red or blue is at least as wide as red alone
-        JsonNode redOrBlue = json(api.get(scoped(query(PRODUCTS, "optionValueIds=1,2"), STORE_A), null));
-        assertThat(redOrBlue.get(TOTAL_ELEMENTS).asLong())
-                .isGreaterThanOrEqualTo(inRed.get(TOTAL_ELEMENTS).asLong());
+        assertThat(filterBy("1,2")).containsAll(inRed);
 
-        // across options it is an AND, and one variant must satisfy both: blue + M exists, red + L does not
-        JsonNode blueMedium = json(api.get(scoped(query(PRODUCTS, "optionValueIds=2,3"), STORE_A), null));
-        assertThat(blueMedium.get(CONTENT)).isNotEmpty();
+        // across options it is an AND, and one variant must satisfy both
+        assertThat(filterBy("2,3")).as("blue + M is a combination the dress sells").contains(DRESS);
+        assertThat(filterBy("1,4")).as("red + L is not, however many red and L variants it owns")
+                .doesNotContain(DRESS);
 
-        JsonNode redLarge = json(api.get(scoped(query(PRODUCTS, "optionValueIds=1,4"), STORE_A), null));
-        assertThat(redLarge.get(TOTAL_ELEMENTS).asLong()).isZero();
-
-        // and the two halves of that impossible pair are each non-empty on their own, so the zero above is
-        // the anchoring and not simply an empty catalogue
-        assertThat(json(api.get(scoped(query(PRODUCTS, blue), STORE_A), null)).get(CONTENT)).isNotEmpty();
-        assertThat(json(api.get(scoped(query(PRODUCTS, large), STORE_A), null)).get(CONTENT)).isNotEmpty();
-        assertThat(json(api.get(scoped(query(PRODUCTS, medium), STORE_A), null)).get(CONTENT)).isNotEmpty();
+        // and each half of that impossible pair finds the dress on its own, so the exclusion above is the
+        // anchoring and not simply an empty catalogue
+        assertThat(filterBy("2")).contains(DRESS);
+        assertThat(filterBy("4")).contains(DRESS);
+        assertThat(filterBy("3")).contains(DRESS);
     }
 
     @Test

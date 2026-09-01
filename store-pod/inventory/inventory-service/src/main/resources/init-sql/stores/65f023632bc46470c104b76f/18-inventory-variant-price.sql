@@ -1,63 +1,28 @@
--- Stock and price for the beauty store's combination variants.
+-- Stock and price for the fashion store's combination variants.
 --
 -- One row per combination sku beyond the default variant, whose row the base seed already
 -- carries. Prices differ per combination so a matrix shows real per-variant pricing, and a
 -- few combinations are deliberately out of stock — that is the greyed-chip case on the PDP.
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (510, '65f020632bc46470c104b76f', 46, 'SKU-YSL-MAKE-TEIPEN46-FAIR-50ML', 12, true, 1, 0)
+VALUES (501, '65f023632bc46470c104b76f', 1, 'SKU-NK-RUN-001-L', 12, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (510, '65f020632bc46470c104b76f', 510, 'base', true, 28.00)
+VALUES (501, '65f023632bc46470c104b76f', 501, 'base', true, 780.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (511, '65f020632bc46470c104b76f', 46, 'SKU-YSL-MAKE-TEIPEN46-MEDIUM-30ML', 10, true, 1, 0)
+VALUES (502, '65f023632bc46470c104b76f', 2, 'SKU-ZR-CL-DRS02-BL-M', 8, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (511, '65f020632bc46470c104b76f', 511, 'base', true, 21.00)
+VALUES (502, '65f023632bc46470c104b76f', 502, 'base', true, 365.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (512, '65f020632bc46470c104b76f', 46, 'SKU-YSL-MAKE-TEIPEN46-MEDIUM-50ML', 8, true, 1, 0)
+VALUES (503, '65f023632bc46470c104b76f', 2, 'SKU-ZR-CL-DRS02-BL-L', 0, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (512, '65f020632bc46470c104b76f', 512, 'base', true, 29.00)
-on conflict (product_price_id) do nothing;
-
-INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (513, '65f020632bc46470c104b76f', 46, 'SKU-YSL-MAKE-TEIPEN46-DEEP-30ML', 6, true, 1, 0)
-on conflict (product_avail_id) do nothing;
-INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (513, '65f020632bc46470c104b76f', 513, 'base', true, 22.00)
-on conflict (product_price_id) do nothing;
-
-INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (514, '65f020632bc46470c104b76f', 46, 'SKU-YSL-MAKE-TEIPEN46-DEEP-50ML', 0, true, 1, 0)
-on conflict (product_avail_id) do nothing;
-INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (514, '65f020632bc46470c104b76f', 514, 'base', true, 30.00)
-on conflict (product_price_id) do nothing;
-
-INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (515, '65f020632bc46470c104b76f', 47, 'SKU-GUER-SKIN-ARWOIL47-MEDIUM', 12, true, 1, 0)
-on conflict (product_avail_id) do nothing;
-INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (515, '65f020632bc46470c104b76f', 515, 'base', true, 22.50)
-on conflict (product_price_id) do nothing;
-
-INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (516, '65f020632bc46470c104b76f', 47, 'SKU-GUER-SKIN-ARWOIL47-DEEP', 10, true, 1, 0)
-on conflict (product_avail_id) do nothing;
-INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (516, '65f020632bc46470c104b76f', 516, 'base', true, 23.50)
-on conflict (product_price_id) do nothing;
-
-INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (517, '65f020632bc46470c104b76f', 48, 'SKU-SHIS-SKIN-ULTIMUNE48-50ML', 12, true, 1, 0)
-on conflict (product_avail_id) do nothing;
-INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (517, '65f020632bc46470c104b76f', 517, 'base', true, 31.00)
+VALUES (503, '65f023632bc46470c104b76f', 503, 'base', true, 380.00)
 on conflict (product_price_id) do nothing;
 
 -- ---------------------------------------------------------------------------------------------------------
@@ -71,561 +36,624 @@ on conflict (product_price_id) do nothing;
 -- ---------------------------------------------------------------------------------------------------------
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2001, '65f020632bc46470c104b76f', 49, 'SKU-NARS-MAKE-RCCONC49-MEDIUM', 14, true, 1, 0)
+VALUES (1001, '65f023632bc46470c104b76f', 5, 'SKU-GU-BG-MAR05-BLUE', 3, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2001, '65f020632bc46470c104b76f', 2001, 'base', true, 25.73)
+VALUES (1001, '65f023632bc46470c104b76f', 1001, 'base', true, 8925.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2002, '65f020632bc46470c104b76f', 49, 'SKU-NARS-MAKE-RCCONC49-DEEP', 9, true, 1, 0)
+VALUES (1002, '65f023632bc46470c104b76f', 6, 'SKU-CH-AC-SUN06-BLUE', 22, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2002, '65f020632bc46470c104b76f', 2002, 'base', true, 26.95)
+VALUES (1002, '65f023632bc46470c104b76f', 1002, 'base', true, 2205.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2003, '65f020632bc46470c104b76f', 50, 'SKU-LRP-SKIN-ANTHUV50-50ML', 9, true, 1, 0)
+VALUES (1003, '65f023632bc46470c104b76f', 6, 'SKU-CH-AC-SUN06-BLACK', 5, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2003, '65f020632bc46470c104b76f', 2003, 'base', true, 27.30)
+VALUES (1003, '65f023632bc46470c104b76f', 1003, 'base', true, 2310.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2004, '65f020632bc46470c104b76f', 52, 'SKU-YSL-FRAG-BLACKOPIUM52-50ML', 0, true, 1, 0)
+VALUES (1004, '65f023632bc46470c104b76f', 7, 'SKU-NK-CL-KHD07-M', 5, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2004, '65f020632bc46470c104b76f', 2004, 'base', true, 30.45)
+VALUES (1004, '65f023632bc46470c104b76f', 1004, 'base', true, 315.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2005, '65f020632bc46470c104b76f', 52, 'SKU-YSL-FRAG-BLACKOPIUM52-100ML', 11, true, 1, 0)
+VALUES (1005, '65f023632bc46470c104b76f', 7, 'SKU-NK-CL-KHD07-L', 18, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2005, '65f020632bc46470c104b76f', 2005, 'base', true, 31.90)
+VALUES (1005, '65f023632bc46470c104b76f', 1005, 'base', true, 330.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2006, '65f020632bc46470c104b76f', 53, 'SKU-GUER-MAKE-TERRACOTTA53-FAIR-50ML', 11, true, 1, 0)
+VALUES (1006, '65f023632bc46470c104b76f', 8, 'SKU-ZR-SH-SNK08-RED-M', 18, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2006, '65f020632bc46470c104b76f', 2006, 'base', true, 32.03)
+VALUES (1006, '65f023632bc46470c104b76f', 1006, 'base', true, 441.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2007, '65f020632bc46470c104b76f', 53, 'SKU-GUER-MAKE-TERRACOTTA53-MEDIUM-30ML', 7, true, 1, 0)
+VALUES (1007, '65f023632bc46470c104b76f', 8, 'SKU-ZR-SH-SNK08-BLUE-S', 14, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2007, '65f020632bc46470c104b76f', 2007, 'base', true, 33.55)
+VALUES (1007, '65f023632bc46470c104b76f', 1007, 'base', true, 462.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2008, '65f020632bc46470c104b76f', 53, 'SKU-GUER-MAKE-TERRACOTTA53-MEDIUM-50ML', 3, true, 1, 0)
+VALUES (1008, '65f023632bc46470c104b76f', 8, 'SKU-ZR-SH-SNK08-BLUE-M', 9, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2008, '65f020632bc46470c104b76f', 2008, 'base', true, 35.08)
+VALUES (1008, '65f023632bc46470c104b76f', 1008, 'base', true, 483.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2009, '65f020632bc46470c104b76f', 54, 'SKU-SHIS-SKIN-BENEFCR54-50ML', 7, true, 1, 0)
+VALUES (1009, '65f023632bc46470c104b76f', 9, 'SKU-AD-BG-BPK09-BLUE', 14, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2009, '65f020632bc46470c104b76f', 2009, 'base', true, 33.60)
+VALUES (1009, '65f023632bc46470c104b76f', 1009, 'base', true, 262.50)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2010, '65f020632bc46470c104b76f', 54, 'SKU-SHIS-SKIN-BENEFCR54-100ML', 3, true, 1, 0)
+VALUES (1010, '65f023632bc46470c104b76f', 9, 'SKU-AD-BG-BPK09-BLACK', 9, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2010, '65f020632bc46470c104b76f', 2010, 'base', true, 35.20)
+VALUES (1010, '65f023632bc46470c104b76f', 1010, 'base', true, 275.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2011, '65f020632bc46470c104b76f', 54, 'SKU-SHIS-SKIN-BENEFCR54-200ML', 22, true, 1, 0)
+VALUES (1011, '65f023632bc46470c104b76f', 9, 'SKU-AD-BG-BPK09-WHITE', 6, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2011, '65f020632bc46470c104b76f', 2011, 'base', true, 36.80)
+VALUES (1011, '65f023632bc46470c104b76f', 1011, 'base', true, 287.50)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2012, '65f020632bc46470c104b76f', 55, 'SKU-NARS-MAKE-ORGBLUSH55-MEDIUM', 3, true, 1, 0)
+VALUES (1012, '65f023632bc46470c104b76f', 10, 'SKU-HM-AC-BLT10-BLUE', 9, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2012, '65f020632bc46470c104b76f', 2012, 'base', true, 35.18)
+VALUES (1012, '65f023632bc46470c104b76f', 1012, 'base', true, 126.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2013, '65f020632bc46470c104b76f', 55, 'SKU-NARS-MAKE-ORGBLUSH55-DEEP', 22, true, 1, 0)
+VALUES (1013, '65f023632bc46470c104b76f', 10, 'SKU-HM-AC-BLT10-BLACK', 6, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2013, '65f020632bc46470c104b76f', 2013, 'base', true, 36.85)
+VALUES (1013, '65f023632bc46470c104b76f', 1013, 'base', true, 132.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2014, '65f020632bc46470c104b76f', 55, 'SKU-NARS-MAKE-ORGBLUSH55-ROSE', 5, true, 1, 0)
+VALUES (1014, '65f023632bc46470c104b76f', 12, 'SKU-CH-AC-CRD12-BLUE', 0, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2014, '65f020632bc46470c104b76f', 2014, 'base', true, 38.53)
+VALUES (1014, '65f023632bc46470c104b76f', 1014, 'base', true, 2520.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2015, '65f020632bc46470c104b76f', 57, 'SKU-KERA-HAIR-ELIXIR57-50ML', 5, true, 1, 0)
+VALUES (1015, '65f023632bc46470c104b76f', 13, 'SKU-NK-CL-LEG13-M', 11, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2015, '65f020632bc46470c104b76f', 2015, 'base', true, 38.33)
+VALUES (1015, '65f023632bc46470c104b76f', 1015, 'base', true, 399.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2016, '65f020632bc46470c104b76f', 57, 'SKU-KERA-HAIR-ELIXIR57-100ML', 18, true, 1, 0)
+VALUES (1016, '65f023632bc46470c104b76f', 13, 'SKU-NK-CL-LEG13-L', 7, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2016, '65f020632bc46470c104b76f', 2016, 'base', true, 40.15)
+VALUES (1016, '65f023632bc46470c104b76f', 1016, 'base', true, 418.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2017, '65f020632bc46470c104b76f', 58, 'SKU-YSL-FRAG-LIBREEDP58-50ML', 18, true, 1, 0)
+VALUES (1017, '65f023632bc46470c104b76f', 13, 'SKU-NK-CL-LEG13-XL', 3, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2017, '65f020632bc46470c104b76f', 2017, 'base', true, 39.90)
+VALUES (1017, '65f023632bc46470c104b76f', 1017, 'base', true, 437.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2018, '65f020632bc46470c104b76f', 59, 'SKU-GUER-MAKE-METEORITES59-FAIR-50ML', 14, true, 1, 0)
+VALUES (1018, '65f023632bc46470c104b76f', 14, 'SKU-ZR-CL-POL14-RED-M', 7, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2018, '65f020632bc46470c104b76f', 2018, 'base', true, 41.48)
+VALUES (1018, '65f023632bc46470c104b76f', 1018, 'base', true, 199.50)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2019, '65f020632bc46470c104b76f', 59, 'SKU-GUER-MAKE-METEORITES59-MEDIUM-30ML', 9, true, 1, 0)
+VALUES (1019, '65f023632bc46470c104b76f', 14, 'SKU-ZR-CL-POL14-BLUE-S', 3, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2019, '65f020632bc46470c104b76f', 2019, 'base', true, 43.45)
+VALUES (1019, '65f023632bc46470c104b76f', 1019, 'base', true, 209.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2020, '65f020632bc46470c104b76f', 59, 'SKU-GUER-MAKE-METEORITES59-MEDIUM-50ML', 6, true, 1, 0)
+VALUES (1020, '65f023632bc46470c104b76f', 14, 'SKU-ZR-CL-POL14-BLUE-M', 22, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2020, '65f020632bc46470c104b76f', 2020, 'base', true, 45.43)
+VALUES (1020, '65f023632bc46470c104b76f', 1020, 'base', true, 218.50)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2021, '65f020632bc46470c104b76f', 59, 'SKU-GUER-MAKE-METEORITES59-DEEP-30ML', 0, true, 1, 0)
+VALUES (1021, '65f023632bc46470c104b76f', 14, 'SKU-ZR-CL-POL14-BLACK-S', 5, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2021, '65f020632bc46470c104b76f', 2021, 'base', true, 47.40)
+VALUES (1021, '65f023632bc46470c104b76f', 1021, 'base', true, 228.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2022, '65f020632bc46470c104b76f', 59, 'SKU-GUER-MAKE-METEORITES59-DEEP-50ML', 11, true, 1, 0)
+VALUES (1022, '65f023632bc46470c104b76f', 14, 'SKU-ZR-CL-POL14-BLACK-M', 18, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2022, '65f020632bc46470c104b76f', 2022, 'base', true, 49.38)
+VALUES (1022, '65f023632bc46470c104b76f', 1022, 'base', true, 237.50)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2023, '65f020632bc46470c104b76f', 60, 'SKU-SHIS-MAKE-SYNCSKIN60-MEDIUM', 9, true, 1, 0)
+VALUES (1023, '65f023632bc46470c104b76f', 15, 'SKU-AD-SH-SND15-RED-M', 3, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2023, '65f020632bc46470c104b76f', 2023, 'base', true, 43.05)
+VALUES (1023, '65f023632bc46470c104b76f', 1023, 'base', true, 157.50)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2024, '65f020632bc46470c104b76f', 62, 'SKU-LRP-SKIN-HYALUB5-62-50ML', 0, true, 1, 0)
+VALUES (1024, '65f023632bc46470c104b76f', 15, 'SKU-AD-SH-SND15-RED-L', 22, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2024, '65f020632bc46470c104b76f', 2024, 'base', true, 46.20)
+VALUES (1024, '65f023632bc46470c104b76f', 1024, 'base', true, 165.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2025, '65f020632bc46470c104b76f', 62, 'SKU-LRP-SKIN-HYALUB5-62-100ML', 11, true, 1, 0)
+VALUES (1025, '65f023632bc46470c104b76f', 15, 'SKU-AD-SH-SND15-BLUE-S', 5, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2025, '65f020632bc46470c104b76f', 2025, 'base', true, 48.40)
+VALUES (1025, '65f023632bc46470c104b76f', 1025, 'base', true, 172.50)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2026, '65f020632bc46470c104b76f', 63, 'SKU-KERA-HAIR-BACICAFLASH63-50ML', 11, true, 1, 0)
+VALUES (1026, '65f023632bc46470c104b76f', 15, 'SKU-AD-SH-SND15-BLUE-M', 18, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2026, '65f020632bc46470c104b76f', 2026, 'base', true, 47.78)
+VALUES (1026, '65f023632bc46470c104b76f', 1026, 'base', true, 180.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2027, '65f020632bc46470c104b76f', 63, 'SKU-KERA-HAIR-BACICAFLASH63-100ML', 7, true, 1, 0)
+VALUES (1027, '65f023632bc46470c104b76f', 15, 'SKU-AD-SH-SND15-BLUE-L', 14, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2027, '65f020632bc46470c104b76f', 2027, 'base', true, 50.05)
+VALUES (1027, '65f023632bc46470c104b76f', 1027, 'base', true, 187.50)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2028, '65f020632bc46470c104b76f', 63, 'SKU-KERA-HAIR-BACICAFLASH63-200ML', 3, true, 1, 0)
+VALUES (1028, '65f023632bc46470c104b76f', 17, 'SKU-GU-AC-WAL17-BLUE', 5, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2028, '65f020632bc46470c104b76f', 2028, 'base', true, 52.33)
+VALUES (1028, '65f023632bc46470c104b76f', 1028, 'base', true, 1890.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2029, '65f020632bc46470c104b76f', 64, 'SKU-YSL-MAKE-RPCLIP64-FAIR-50ML', 7, true, 1, 0)
+VALUES (1029, '65f023632bc46470c104b76f', 17, 'SKU-GU-AC-WAL17-BLACK', 18, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2029, '65f020632bc46470c104b76f', 2029, 'base', true, 49.35)
+VALUES (1029, '65f023632bc46470c104b76f', 1029, 'base', true, 1980.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2030, '65f020632bc46470c104b76f', 64, 'SKU-YSL-MAKE-RPCLIP64-FAIR-100ML', 3, true, 1, 0)
+VALUES (1030, '65f023632bc46470c104b76f', 18, 'SKU-CH-AC-BRH18-BLUE', 18, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2030, '65f020632bc46470c104b76f', 2030, 'base', true, 51.70)
+VALUES (1030, '65f023632bc46470c104b76f', 1030, 'base', true, 2625.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2031, '65f020632bc46470c104b76f', 64, 'SKU-YSL-MAKE-RPCLIP64-MEDIUM-30ML', 22, true, 1, 0)
+VALUES (1031, '65f023632bc46470c104b76f', 18, 'SKU-CH-AC-BRH18-BLACK', 14, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2031, '65f020632bc46470c104b76f', 2031, 'base', true, 54.05)
+VALUES (1031, '65f023632bc46470c104b76f', 1031, 'base', true, 2750.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2032, '65f020632bc46470c104b76f', 64, 'SKU-YSL-MAKE-RPCLIP64-MEDIUM-50ML', 5, true, 1, 0)
+VALUES (1032, '65f023632bc46470c104b76f', 18, 'SKU-CH-AC-BRH18-WHITE', 9, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2032, '65f020632bc46470c104b76f', 2032, 'base', true, 56.40)
+VALUES (1032, '65f023632bc46470c104b76f', 1032, 'base', true, 2875.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2033, '65f020632bc46470c104b76f', 64, 'SKU-YSL-MAKE-RPCLIP64-MEDIUM-100ML', 18, true, 1, 0)
+VALUES (1033, '65f023632bc46470c104b76f', 19, 'SKU-NK-CL-BBS19-M', 14, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2033, '65f020632bc46470c104b76f', 2033, 'base', true, 58.75)
+VALUES (1033, '65f023632bc46470c104b76f', 1033, 'base', true, 294.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2034, '65f020632bc46470c104b76f', 65, 'SKU-GUER-FRAG-MONGUERLAIN65-50ML', 3, true, 1, 0)
+VALUES (1034, '65f023632bc46470c104b76f', 20, 'SKU-ZR-SH-SND20-M', 9, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2034, '65f020632bc46470c104b76f', 2034, 'base', true, 50.93)
+VALUES (1034, '65f023632bc46470c104b76f', 1034, 'base', true, 304.50)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2035, '65f020632bc46470c104b76f', 65, 'SKU-GUER-FRAG-MONGUERLAIN65-100ML', 22, true, 1, 0)
+VALUES (1035, '65f023632bc46470c104b76f', 20, 'SKU-ZR-SH-SND20-L', 6, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2035, '65f020632bc46470c104b76f', 2035, 'base', true, 53.35)
+VALUES (1035, '65f023632bc46470c104b76f', 1035, 'base', true, 319.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2036, '65f020632bc46470c104b76f', 67, 'SKU-NARS-MAKE-SHEERGLOW67-MEDIUM', 5, true, 1, 0)
+VALUES (1036, '65f023632bc46470c104b76f', 22, 'SKU-HM-CL-KTP22-RED-M', 0, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2036, '65f020632bc46470c104b76f', 2036, 'base', true, 54.08)
+VALUES (1036, '65f023632bc46470c104b76f', 1036, 'base', true, 262.50)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2037, '65f020632bc46470c104b76f', 67, 'SKU-NARS-MAKE-SHEERGLOW67-DEEP', 18, true, 1, 0)
+VALUES (1037, '65f023632bc46470c104b76f', 22, 'SKU-HM-CL-KTP22-BLUE-S', 11, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2037, '65f020632bc46470c104b76f', 2037, 'base', true, 56.65)
+VALUES (1037, '65f023632bc46470c104b76f', 1037, 'base', true, 275.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2038, '65f020632bc46470c104b76f', 68, 'SKU-LRP-SKIN-EFFADUO68-50ML', 18, true, 1, 0)
+VALUES (1038, '65f023632bc46470c104b76f', 22, 'SKU-HM-CL-KTP22-BLUE-M', 7, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2038, '65f020632bc46470c104b76f', 2038, 'base', true, 55.65)
+VALUES (1038, '65f023632bc46470c104b76f', 1038, 'base', true, 287.50)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2039, '65f020632bc46470c104b76f', 69, 'SKU-KERA-HAIR-CHRONOHUILE69-50ML', 14, true, 1, 0)
+VALUES (1039, '65f023632bc46470c104b76f', 23, 'SKU-GU-SH-SNK23-M', 11, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2039, '65f020632bc46470c104b76f', 2039, 'base', true, 57.23)
+VALUES (1039, '65f023632bc46470c104b76f', 1039, 'base', true, 3360.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2040, '65f020632bc46470c104b76f', 69, 'SKU-KERA-HAIR-CHRONOHUILE69-100ML', 9, true, 1, 0)
+VALUES (1040, '65f023632bc46470c104b76f', 23, 'SKU-GU-SH-SNK23-L', 7, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2040, '65f020632bc46470c104b76f', 2040, 'base', true, 59.95)
+VALUES (1040, '65f023632bc46470c104b76f', 1040, 'base', true, 3520.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2041, '65f020632bc46470c104b76f', 70, 'SKU-YSL-FRAG-MONPARIS70-50ML', 9, true, 1, 0)
+VALUES (1041, '65f023632bc46470c104b76f', 23, 'SKU-GU-SH-SNK23-XL', 3, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2041, '65f020632bc46470c104b76f', 2041, 'base', true, 58.80)
+VALUES (1041, '65f023632bc46470c104b76f', 1041, 'base', true, 3680.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2042, '65f020632bc46470c104b76f', 70, 'SKU-YSL-FRAG-MONPARIS70-100ML', 6, true, 1, 0)
+VALUES (1042, '65f023632bc46470c104b76f', 24, 'SKU-CH-SH-BAL24-RED-M', 7, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2042, '65f020632bc46470c104b76f', 2042, 'base', true, 61.60)
+VALUES (1042, '65f023632bc46470c104b76f', 1042, 'base', true, 3675.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2043, '65f020632bc46470c104b76f', 70, 'SKU-YSL-FRAG-MONPARIS70-200ML', 0, true, 1, 0)
+VALUES (1043, '65f023632bc46470c104b76f', 24, 'SKU-CH-SH-BAL24-BLUE-S', 3, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2043, '65f020632bc46470c104b76f', 2043, 'base', true, 64.40)
+VALUES (1043, '65f023632bc46470c104b76f', 1043, 'base', true, 3850.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2044, '65f020632bc46470c104b76f', 72, 'SKU-SHIS-MAKE-MINBLUSH72-FAIR-50ML', 0, true, 1, 0)
+VALUES (1044, '65f023632bc46470c104b76f', 24, 'SKU-CH-SH-BAL24-BLUE-M', 22, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2044, '65f020632bc46470c104b76f', 2044, 'base', true, 61.95)
+VALUES (1044, '65f023632bc46470c104b76f', 1044, 'base', true, 4025.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2045, '65f020632bc46470c104b76f', 72, 'SKU-SHIS-MAKE-MINBLUSH72-MEDIUM-30ML', 11, true, 1, 0)
+VALUES (1045, '65f023632bc46470c104b76f', 24, 'SKU-CH-SH-BAL24-BLACK-S', 5, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2045, '65f020632bc46470c104b76f', 2045, 'base', true, 64.90)
+VALUES (1045, '65f023632bc46470c104b76f', 1045, 'base', true, 4200.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2046, '65f020632bc46470c104b76f', 72, 'SKU-SHIS-MAKE-MINBLUSH72-MEDIUM-50ML', 7, true, 1, 0)
+VALUES (1046, '65f023632bc46470c104b76f', 24, 'SKU-CH-SH-BAL24-BLACK-M', 18, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2046, '65f020632bc46470c104b76f', 2046, 'base', true, 67.85)
+VALUES (1046, '65f023632bc46470c104b76f', 1046, 'base', true, 4375.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2047, '65f020632bc46470c104b76f', 73, 'SKU-NARS-MAKE-CLIMAXMASC73-MEDIUM', 11, true, 1, 0)
+VALUES (1047, '65f023632bc46470c104b76f', 25, 'SKU-NK-CL-TNK25-RED-M', 3, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2047, '65f020632bc46470c104b76f', 2047, 'base', true, 63.53)
+VALUES (1047, '65f023632bc46470c104b76f', 1047, 'base', true, 189.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2048, '65f020632bc46470c104b76f', 73, 'SKU-NARS-MAKE-CLIMAXMASC73-DEEP', 7, true, 1, 0)
+VALUES (1048, '65f023632bc46470c104b76f', 25, 'SKU-NK-CL-TNK25-RED-L', 22, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2048, '65f020632bc46470c104b76f', 2048, 'base', true, 66.55)
+VALUES (1048, '65f023632bc46470c104b76f', 1048, 'base', true, 198.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2049, '65f020632bc46470c104b76f', 73, 'SKU-NARS-MAKE-CLIMAXMASC73-ROSE', 3, true, 1, 0)
+VALUES (1049, '65f023632bc46470c104b76f', 25, 'SKU-NK-CL-TNK25-BLUE-S', 5, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2049, '65f020632bc46470c104b76f', 2049, 'base', true, 69.58)
+VALUES (1049, '65f023632bc46470c104b76f', 1049, 'base', true, 207.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2050, '65f020632bc46470c104b76f', 74, 'SKU-LRP-SKIN-TOLSENSCR74-50ML', 7, true, 1, 0)
+VALUES (1050, '65f023632bc46470c104b76f', 25, 'SKU-NK-CL-TNK25-BLUE-M', 18, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2050, '65f020632bc46470c104b76f', 2050, 'base', true, 65.10)
+VALUES (1050, '65f023632bc46470c104b76f', 1050, 'base', true, 216.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2051, '65f020632bc46470c104b76f', 74, 'SKU-LRP-SKIN-TOLSENSCR74-100ML', 3, true, 1, 0)
+VALUES (1051, '65f023632bc46470c104b76f', 25, 'SKU-NK-CL-TNK25-BLUE-L', 14, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2051, '65f020632bc46470c104b76f', 2051, 'base', true, 68.20)
+VALUES (1051, '65f023632bc46470c104b76f', 1051, 'base', true, 225.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2052, '65f020632bc46470c104b76f', 75, 'SKU-KERA-HAIR-CIMENTHERM75-50ML', 3, true, 1, 0)
+VALUES (1052, '65f023632bc46470c104b76f', 27, 'SKU-AD-CL-KTS27-M', 5, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2052, '65f020632bc46470c104b76f', 2052, 'base', true, 66.68)
+VALUES (1052, '65f023632bc46470c104b76f', 1052, 'base', true, 504.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2053, '65f020632bc46470c104b76f', 77, 'SKU-GUER-FRAG-AAMANDBAS77-50ML', 5, true, 1, 0)
+VALUES (1053, '65f023632bc46470c104b76f', 28, 'SKU-HM-AC-SCF28-BLUE', 18, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2053, '65f020632bc46470c104b76f', 2053, 'base', true, 69.83)
+VALUES (1053, '65f023632bc46470c104b76f', 1053, 'base', true, 157.50)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2054, '65f020632bc46470c104b76f', 77, 'SKU-GUER-FRAG-AAMANDBAS77-100ML', 18, true, 1, 0)
+VALUES (1054, '65f023632bc46470c104b76f', 28, 'SKU-HM-AC-SCF28-BLACK', 14, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2054, '65f020632bc46470c104b76f', 2054, 'base', true, 73.15)
+VALUES (1054, '65f023632bc46470c104b76f', 1054, 'base', true, 165.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2055, '65f020632bc46470c104b76f', 78, 'SKU-SHIS-HAIR-TSUBAKIMASK78-50ML', 18, true, 1, 0)
+VALUES (1055, '65f023632bc46470c104b76f', 29, 'SKU-GU-BG-BBG29-BLUE', 14, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2055, '65f020632bc46470c104b76f', 2055, 'base', true, 71.40)
+VALUES (1055, '65f023632bc46470c104b76f', 1055, 'base', true, 4725.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2056, '65f020632bc46470c104b76f', 78, 'SKU-SHIS-HAIR-TSUBAKIMASK78-100ML', 14, true, 1, 0)
+VALUES (1056, '65f023632bc46470c104b76f', 30, 'SKU-CH-SH-SNK30-M', 9, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2056, '65f020632bc46470c104b76f', 2056, 'base', true, 74.80)
+VALUES (1056, '65f023632bc46470c104b76f', 1056, 'base', true, 5775.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2057, '65f020632bc46470c104b76f', 78, 'SKU-SHIS-HAIR-TSUBAKIMASK78-200ML', 9, true, 1, 0)
+VALUES (1057, '65f023632bc46470c104b76f', 30, 'SKU-CH-SH-SNK30-L', 6, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2057, '65f020632bc46470c104b76f', 2057, 'base', true, 78.20)
+VALUES (1057, '65f023632bc46470c104b76f', 1057, 'base', true, 6050.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2058, '65f020632bc46470c104b76f', 79, 'SKU-NARS-MAKE-AFTERGLOWLB79-FAIR-50ML', 14, true, 1, 0)
+VALUES (1058, '65f023632bc46470c104b76f', 32, 'SKU-ZR-CL-JNS32-RED-M', 0, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2058, '65f020632bc46470c104b76f', 2058, 'base', true, 72.98)
+VALUES (1058, '65f023632bc46470c104b76f', 1058, 'base', true, 399.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2059, '65f020632bc46470c104b76f', 79, 'SKU-NARS-MAKE-AFTERGLOWLB79-MEDIUM-30ML', 9, true, 1, 0)
+VALUES (1059, '65f023632bc46470c104b76f', 32, 'SKU-ZR-CL-JNS32-BLUE-S', 11, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2059, '65f020632bc46470c104b76f', 2059, 'base', true, 76.45)
+VALUES (1059, '65f023632bc46470c104b76f', 1059, 'base', true, 418.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2060, '65f020632bc46470c104b76f', 79, 'SKU-NARS-MAKE-AFTERGLOWLB79-MEDIUM-50ML', 6, true, 1, 0)
+VALUES (1060, '65f023632bc46470c104b76f', 32, 'SKU-ZR-CL-JNS32-BLUE-M', 7, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2060, '65f020632bc46470c104b76f', 2060, 'base', true, 79.93)
+VALUES (1060, '65f023632bc46470c104b76f', 1060, 'base', true, 437.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2061, '65f020632bc46470c104b76f', 79, 'SKU-NARS-MAKE-AFTERGLOWLB79-DEEP-30ML', 0, true, 1, 0)
+VALUES (1061, '65f023632bc46470c104b76f', 33, 'SKU-AD-AC-CAP33-BLUE', 11, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2061, '65f020632bc46470c104b76f', 2061, 'base', true, 83.40)
+VALUES (1061, '65f023632bc46470c104b76f', 1061, 'base', true, 126.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2062, '65f020632bc46470c104b76f', 79, 'SKU-NARS-MAKE-AFTERGLOWLB79-DEEP-50ML', 11, true, 1, 0)
+VALUES (1062, '65f023632bc46470c104b76f', 33, 'SKU-AD-AC-CAP33-BLACK', 7, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2062, '65f020632bc46470c104b76f', 2062, 'base', true, 86.88)
+VALUES (1062, '65f023632bc46470c104b76f', 1062, 'base', true, 132.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2063, '65f020632bc46470c104b76f', 80, 'SKU-LRP-SKIN-LIPIAPM80-50ML', 9, true, 1, 0)
+VALUES (1063, '65f023632bc46470c104b76f', 34, 'SKU-HM-CL-KRJ34-M', 7, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2063, '65f020632bc46470c104b76f', 2063, 'base', true, 74.55)
+VALUES (1063, '65f023632bc46470c104b76f', 1063, 'base', true, 315.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2064, '65f020632bc46470c104b76f', 80, 'SKU-LRP-SKIN-LIPIAPM80-100ML', 6, true, 1, 0)
+VALUES (1064, '65f023632bc46470c104b76f', 34, 'SKU-HM-CL-KRJ34-L', 3, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2064, '65f020632bc46470c104b76f', 2064, 'base', true, 78.10)
+VALUES (1064, '65f023632bc46470c104b76f', 1064, 'base', true, 330.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2065, '65f020632bc46470c104b76f', 82, 'SKU-YSL-MAKE-ALLHOURSFND82-MEDIUM', 0, true, 1, 0)
+VALUES (1065, '65f023632bc46470c104b76f', 34, 'SKU-HM-CL-KRJ34-XL', 22, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2065, '65f020632bc46470c104b76f', 2065, 'base', true, 77.70)
+VALUES (1065, '65f023632bc46470c104b76f', 1065, 'base', true, 345.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2066, '65f020632bc46470c104b76f', 83, 'SKU-GUER-SKIN-SUPERAQUA83-50ML', 11, true, 1, 0)
+VALUES (1066, '65f023632bc46470c104b76f', 35, 'SKU-GU-AC-SCF35-BLUE', 3, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2066, '65f020632bc46470c104b76f', 2066, 'base', true, 79.28)
+VALUES (1066, '65f023632bc46470c104b76f', 1066, 'base', true, 2310.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2067, '65f020632bc46470c104b76f', 84, 'SKU-SHIS-FRAG-GINZAEDP84-50ML', 7, true, 1, 0)
+VALUES (1067, '65f023632bc46470c104b76f', 35, 'SKU-GU-AC-SCF35-BLACK', 22, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2067, '65f020632bc46470c104b76f', 2067, 'base', true, 80.85)
+VALUES (1067, '65f023632bc46470c104b76f', 1067, 'base', true, 2420.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2068, '65f020632bc46470c104b76f', 84, 'SKU-SHIS-FRAG-GINZAEDP84-100ML', 3, true, 1, 0)
+VALUES (1068, '65f023632bc46470c104b76f', 35, 'SKU-GU-AC-SCF35-WHITE', 5, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2068, '65f020632bc46470c104b76f', 2068, 'base', true, 84.70)
+VALUES (1068, '65f023632bc46470c104b76f', 1068, 'base', true, 2530.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2069, '65f020632bc46470c104b76f', 85, 'SKU-NARS-MAKE-LRSPWD85-FAIR-50ML', 3, true, 1, 0)
+VALUES (1069, '65f023632bc46470c104b76f', 37, 'SKU-NK-CL-WRS37-RED-M', 5, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2069, '65f020632bc46470c104b76f', 2069, 'base', true, 82.43)
+VALUES (1069, '65f023632bc46470c104b76f', 1069, 'base', true, 210.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2070, '65f020632bc46470c104b76f', 85, 'SKU-NARS-MAKE-LRSPWD85-FAIR-100ML', 22, true, 1, 0)
+VALUES (1070, '65f023632bc46470c104b76f', 37, 'SKU-NK-CL-WRS37-BLUE-S', 18, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2070, '65f020632bc46470c104b76f', 2070, 'base', true, 86.35)
+VALUES (1070, '65f023632bc46470c104b76f', 1070, 'base', true, 220.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2071, '65f020632bc46470c104b76f', 85, 'SKU-NARS-MAKE-LRSPWD85-MEDIUM-30ML', 5, true, 1, 0)
+VALUES (1071, '65f023632bc46470c104b76f', 37, 'SKU-NK-CL-WRS37-BLUE-M', 14, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2071, '65f020632bc46470c104b76f', 2071, 'base', true, 90.28)
+VALUES (1071, '65f023632bc46470c104b76f', 1071, 'base', true, 230.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2072, '65f020632bc46470c104b76f', 85, 'SKU-NARS-MAKE-LRSPWD85-MEDIUM-50ML', 18, true, 1, 0)
+VALUES (1072, '65f023632bc46470c104b76f', 37, 'SKU-NK-CL-WRS37-BLACK-S', 9, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2072, '65f020632bc46470c104b76f', 2072, 'base', true, 94.20)
+VALUES (1072, '65f023632bc46470c104b76f', 1072, 'base', true, 240.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2073, '65f020632bc46470c104b76f', 85, 'SKU-NARS-MAKE-LRSPWD85-MEDIUM-100ML', 14, true, 1, 0)
+VALUES (1073, '65f023632bc46470c104b76f', 37, 'SKU-NK-CL-WRS37-BLACK-M', 6, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2073, '65f020632bc46470c104b76f', 2073, 'base', true, 98.13)
+VALUES (1073, '65f023632bc46470c104b76f', 1073, 'base', true, 250.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2074, '65f020632bc46470c104b76f', 87, 'SKU-KERA-HAIR-DISCFLUID87-50ML', 5, true, 1, 0)
+VALUES (1074, '65f023632bc46470c104b76f', 38, 'SKU-ZR-CL-KSW38-RED-M', 18, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2074, '65f020632bc46470c104b76f', 2074, 'base', true, 85.58)
+VALUES (1074, '65f023632bc46470c104b76f', 1074, 'base', true, 231.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2075, '65f020632bc46470c104b76f', 87, 'SKU-KERA-HAIR-DISCFLUID87-100ML', 18, true, 1, 0)
+VALUES (1075, '65f023632bc46470c104b76f', 38, 'SKU-ZR-CL-KSW38-RED-L', 14, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2075, '65f020632bc46470c104b76f', 2075, 'base', true, 89.65)
+VALUES (1075, '65f023632bc46470c104b76f', 1075, 'base', true, 242.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2076, '65f020632bc46470c104b76f', 87, 'SKU-KERA-HAIR-DISCFLUID87-200ML', 14, true, 1, 0)
+VALUES (1076, '65f023632bc46470c104b76f', 38, 'SKU-ZR-CL-KSW38-BLUE-S', 9, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2076, '65f020632bc46470c104b76f', 2076, 'base', true, 93.73)
+VALUES (1076, '65f023632bc46470c104b76f', 1076, 'base', true, 253.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2077, '65f020632bc46470c104b76f', 88, 'SKU-YSL-FRAG-YEDP88-50ML', 18, true, 1, 0)
+VALUES (1077, '65f023632bc46470c104b76f', 38, 'SKU-ZR-CL-KSW38-BLUE-M', 6, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2077, '65f020632bc46470c104b76f', 2077, 'base', true, 87.15)
+VALUES (1077, '65f023632bc46470c104b76f', 1077, 'base', true, 264.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2078, '65f020632bc46470c104b76f', 88, 'SKU-YSL-FRAG-YEDP88-100ML', 14, true, 1, 0)
+VALUES (1078, '65f023632bc46470c104b76f', 38, 'SKU-ZR-CL-KSW38-BLUE-L', 0, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2078, '65f020632bc46470c104b76f', 2078, 'base', true, 91.30)
+VALUES (1078, '65f023632bc46470c104b76f', 1078, 'base', true, 275.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2079, '65f020632bc46470c104b76f', 89, 'SKU-GUER-MAKE-LESSENTIEL89-MEDIUM', 14, true, 1, 0)
+VALUES (1079, '65f023632bc46470c104b76f', 39, 'SKU-AD-AC-SCK39-BLUE', 14, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2079, '65f020632bc46470c104b76f', 2079, 'base', true, 88.73)
+VALUES (1079, '65f023632bc46470c104b76f', 1079, 'base', true, 84.00)
 on conflict (product_price_id) do nothing;
 
 INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
-VALUES (2080, '65f020632bc46470c104b76f', 89, 'SKU-GUER-MAKE-LESSENTIEL89-DEEP', 9, true, 1, 0)
+VALUES (1080, '65f023632bc46470c104b76f', 39, 'SKU-AD-AC-SCK39-BLACK', 9, true, 1, 0)
 on conflict (product_avail_id) do nothing;
 INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
-VALUES (2080, '65f020632bc46470c104b76f', 2080, 'base', true, 92.95)
+VALUES (1080, '65f023632bc46470c104b76f', 1080, 'base', true, 88.00)
+on conflict (product_price_id) do nothing;
+
+INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
+VALUES (1081, '65f023632bc46470c104b76f', 40, 'SKU-HM-CL-SWM40-M', 9, true, 1, 0)
+on conflict (product_avail_id) do nothing;
+INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
+VALUES (1081, '65f023632bc46470c104b76f', 1081, 'base', true, 199.50)
+on conflict (product_price_id) do nothing;
+
+INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
+VALUES (1082, '65f023632bc46470c104b76f', 42, 'SKU-CH-AC-EAR42-BLUE', 0, true, 1, 0)
+on conflict (product_avail_id) do nothing;
+INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
+VALUES (1082, '65f023632bc46470c104b76f', 1082, 'base', true, 2940.00)
+on conflict (product_price_id) do nothing;
+
+INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
+VALUES (1083, '65f023632bc46470c104b76f', 43, 'SKU-NK-BG-DUF43-BLUE', 11, true, 1, 0)
+on conflict (product_avail_id) do nothing;
+INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
+VALUES (1083, '65f023632bc46470c104b76f', 1083, 'base', true, 367.50)
+on conflict (product_price_id) do nothing;
+
+INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
+VALUES (1084, '65f023632bc46470c104b76f', 43, 'SKU-NK-BG-DUF43-BLACK', 7, true, 1, 0)
+on conflict (product_avail_id) do nothing;
+INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
+VALUES (1084, '65f023632bc46470c104b76f', 1084, 'base', true, 385.00)
+on conflict (product_price_id) do nothing;
+
+INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
+VALUES (1085, '65f023632bc46470c104b76f', 44, 'SKU-ZR-CL-BLS44-M', 7, true, 1, 0)
+on conflict (product_avail_id) do nothing;
+INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
+VALUES (1085, '65f023632bc46470c104b76f', 1085, 'base', true, 273.00)
+on conflict (product_price_id) do nothing;
+
+INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
+VALUES (1086, '65f023632bc46470c104b76f', 44, 'SKU-ZR-CL-BLS44-L', 3, true, 1, 0)
+on conflict (product_avail_id) do nothing;
+INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
+VALUES (1086, '65f023632bc46470c104b76f', 1086, 'base', true, 286.00)
+on conflict (product_price_id) do nothing;
+
+INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
+VALUES (1087, '65f023632bc46470c104b76f', 45, 'SKU-AD-SH-SLD45-RED-M', 3, true, 1, 0)
+on conflict (product_avail_id) do nothing;
+INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
+VALUES (1087, '65f023632bc46470c104b76f', 1087, 'base', true, 157.50)
+on conflict (product_price_id) do nothing;
+
+INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
+VALUES (1088, '65f023632bc46470c104b76f', 45, 'SKU-AD-SH-SLD45-BLUE-S', 22, true, 1, 0)
+on conflict (product_avail_id) do nothing;
+INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
+VALUES (1088, '65f023632bc46470c104b76f', 1088, 'base', true, 165.00)
+on conflict (product_price_id) do nothing;
+
+INSERT INTO inventory.product_availability (product_avail_id, store_merchant_id, product_id, sku, quantity, available, quantity_ord_min, quantity_ord_max)
+VALUES (1089, '65f023632bc46470c104b76f', 45, 'SKU-AD-SH-SLD45-BLUE-M', 5, true, 1, 0)
+on conflict (product_avail_id) do nothing;
+INSERT INTO inventory.product_price (product_price_id, store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount)
+VALUES (1089, '65f023632bc46470c104b76f', 1089, 'base', true, 172.50)
 on conflict (product_price_id) do nothing;

@@ -318,6 +318,7 @@
       "CATALOG_RESERVATION_EMPTY": "لا توجد عناصر في سلتك لحجزها.",
       "CHECKOUT_CART_NOT_FOUND": "لم نتمكن من العثور على سلتك. ربما انتهت صلاحيتها.",
       "CHECKOUT_CART_PRODUCT_NOT_PURCHASABLE": "لا يمكن شراء هذا المنتج في الوقت الحالي.",
+      "CHECKOUT_CART_QUANTITY_OUT_OF_RANGE": "يمكنك طلب {maximum, plural, =0 {{minimum} على الأقل من هذا المنتج} other {بين {minimum} و# من هذا المنتج}} — الكمية {quantity} غير مسموح بها.",
       "CHECKOUT_ORDER_NOT_FOUND": "لم نتمكن من العثور على هذا الطلب.",
       "CHECKOUT_ORDER_LOGIN_REQUIRED": "يرجى تسجيل الدخول لإتمام طلبك.",
       "CHECKOUT_ORDER_CLIENT_MISMATCH": "هذا الطلب يخص متجرًا آخر.",

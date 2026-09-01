@@ -7,11 +7,13 @@ import com.asrevo.cvhome.errors.ErrorPayload;
 import com.asrevo.cvhome.errors.OperationNotAllowedException;
 
 /**
- * The product cannot be added to a cart — it is unpublished, or has no inventory configured at all.
+ * The product cannot be added to a cart as asked.
  *
  * <p>
- * Distinct from catalog's {@code InsufficientInventoryException}, which means the stock ran out: this one says the
- * product was never sellable, so re-trying later will not help.
+ * Two refusals share the class and are told apart by their code. {@link CheckoutErrors#PRODUCT_NOT_PURCHASABLE}
+ * means the item is not sellable at all — unpublished, or with no inventory configured — so re-trying will not
+ * help; unlike catalog's {@code InsufficientInventoryException}, the stock is not what ran out.
+ * {@link CheckoutErrors#CART_QUANTITY_OUT_OF_RANGE} refuses only the amount, and buying fewer succeeds.
  * </p>
  */
 public class ProductNotPurchasableException extends OperationNotAllowedException {
@@ -33,11 +35,12 @@ public class ProductNotPurchasableException extends OperationNotAllowedException
     }
 
     /**
-     * The merchant's per-order quantity floor or ceiling refuses the requested amount.
+     * The merchant's per-order quantity floor or ceiling refuses the requested amount. The bounds travel as
+     * params because the shopper-facing message is only useful with the numbers in it.
      */
     public static ProductNotPurchasableException quantityOutOfRange(String sku, int quantity, int minimum,
                                                                     int maximum) {
-        return new ErrorBuilder<>(CheckoutErrors.PRODUCT_NOT_PURCHASABLE, ProductNotPurchasableException::new)
+        return new ErrorBuilder<>(CheckoutErrors.CART_QUANTITY_OUT_OF_RANGE, ProductNotPurchasableException::new)
                 .detail("Product %s sells between %d and %s per order; %d was asked.", sku, minimum,
                         maximum > 0 ? String.valueOf(maximum) : "unlimited", quantity)
                 .param(SKU, sku)

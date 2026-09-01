@@ -69,6 +69,26 @@ Tags: `[verified]` run end to end against the local stack · `[tests]` covered b
   `option_signature = 'DEFAULT'` and the sku the merchant typed.
 - **Result** — holds across all four demo stores.
 
+### MOD-04 — The demo stores are mostly multi-variant · high · [verified]
+
+The seeds started with two or three showcase products per store, which measured nothing: a listing where 43
+of 45 products carry one sku exercises none of the variant paths at page scale. The stores are now bulk data
+as well as demo data.
+
+- **Steps** — `extra/scripts/generate-demo-variants.py` regenerates the two seed 18 files per store; drop the
+  `catalog` and `inventory` schemas, restart both services, then count.
+- **Expect** — at least 75% of every store's products sell by more than one variant, with a spread of matrix
+  shapes and a deliberate optionless remainder.
+- **Result** — **36 of 45 (80%) per store**, 590 variants and 590 inventory rows in total (was 207), up to 6
+  per product, 34 option values across the four vocabularies. Nine products per store stay optionless as the
+  control case, including the two the tests pin: product 3 (`ProductVariantApiIntegrationTest` turns it
+  multi-variant and back) and product 4 (`ProductApiIntegrationTest`'s no-selection cart line). The curated
+  showcase products — 1, 2, 46–48, 91–93, 136–138 — are untouched, so SF-01's deliberately-missing red/L
+  combination still exists.
+- **Integrity, checked in SQL** — 0 variants without an inventory row · 0 `option_signature` values
+  disagreeing with the variant's own option-value rows · 0 variants whose option count differs from their
+  product's axis count · 0 products without a default variant · 0 duplicate signatures within a product.
+
 ### MOD-02 — A combination sku resolves to one product in search · [verified]
 
 - **Steps** — query the search index for `SKU-ZR-CL-DRS02-BL-L`.
@@ -145,6 +165,58 @@ Tags: `[verified]` run end to end against the local stack · `[tests]` covered b
 - Also confirmed on those cards: the variant product offers *view details* while the simple one offers
   quick-add, which is the card contract deriving `hasVariants` from `variantCount`.
 - Still not run: a suggestion carrying `matchedVariantSku` deep-linking the PDP with `?sku=`.
+
+---
+
+### SF-06 — The buy box respects the merchant's per-order limits · high · [verified]
+
+Reported from the running stack: adding 2 of the Zara dress answered 422 `Product SKU-ZR-CL-DRS02 sells
+between 1 and 1 per order; 2 was asked.`, and the storefront rendered "Failed to add product to cart."
+Two defects behind one symptom.
+
+- **The buy box ignored limits the API publishes.** `quantityOrderMinimum/Maximum` are per sku and reach the
+  storefront on every availability read, but `applyVariantInventory` dropped them and `useProductPurchase`
+  built its stepper from stock alone — so it offered a quantity the cart was always going to refuse. The
+  cart's own `requireQuantityInRange` even says "the storefront clamps client-side"; it did not.
+- **Fix** — the bounds ride on `VariantPricing` and enrichment copies them; the stepper's ceiling is
+  `min(stock, quantityOrderMaximum)` with `0` meaning no limit, its floor is `quantityOrderMinimum`, and
+  `isOutOfStock` covers a floor no stock can reach. `maxQty` deliberately keeps meaning **units on hand** —
+  the themes print it as "Only N left", and 8 in stock with a limit of 1 is not "only 1 left".
+- **Steps** — open `SKU-NK-RUN-001` (25 in stock, capped at 1 per order) and a generated variant product
+  (`SKU-NK-CL-KHD07`, uncapped).
+- **Result** — the capped product shows "In stock", quantity pinned at 1 with **both** stepper buttons
+  disabled; the uncapped one increments freely. Sizes render S · M · L in that order after the seed's
+  `sort_order` fix.
+
+### SF-07 — A refusal says what was actually refused · high · [verified]
+
+`locales/*.json` has carried a message per error `code` since the error contract landed, and **nothing read
+them**: every interactive failure notified one fixed string per action, so a quantity cap, an offline
+browser and a declined card were all "Failed to add product to cart" / "Failed to place order".
+
+- **Fix** — `useErrorMessage()` resolves code → the caller's own fallback → category → generic, interpolating
+  the problem's `params`; wired into add-to-cart (both hooks), cart quantity, remove and checkout.
+- **The code was wrong too.** The range refusal reused `CHECKOUT.CART.PRODUCT_NOT_PURCHASABLE`, whose
+  contract says the item is not sellable at all and retrying will not help — the opposite of "buy fewer and
+  it works". It now raises `CHECKOUT.CART.QUANTITY_OUT_OF_RANGE`, still 422, carrying `sku`, `quantity`,
+  `minimum` and `maximum` so the message can name the numbers. Pinned by
+  `ProductNotPurchasableExceptionTest`.
+- **Steps** — the cart drawer's stepper is deliberately server-guarded rather than clamped (a line's bounds
+  are not on the cart payload), so it is the reachable path: put the capped `SKU-NK-RUN-001` in the cart and
+  press +.
+- **Result** — `POST /api/v1/cart` answers `CHECKOUT.CART.QUANTITY_OUT_OF_RANGE`, and the toast reads **"You
+  can order between 1 and 1 of this item — 2 isn't allowed."** Translated in all five locales; the ICU
+  plural renders "at least {minimum}" when the maximum is the `0` no-limit sentinel.
+
+### SF-08 — The demo stores can actually sell more than one of something · [verified]
+
+The fashion and beauty seeds set `quantity_ord_max = 1` on every row, so with the limits now enforced client
+side every stepper in those stores would have been inert.
+
+- **Fix** — both stores get a spread (about half unlimited, the rest 2/3/5/10). Cars stays at 1 throughout,
+  which is right for a car and keeps a whole store exercising the cap; electronics was already 2–10.
+  `SKU-NK-RUN-001` keeps its cap of 1 deliberately as the fixture SF-06 and SF-07 test against.
+- **Result** — fashion 22 unlimited · 1 capped at 1 · the rest 2–10; beauty 23 unlimited and no row left at 1.
 
 ---
 
@@ -226,12 +298,16 @@ Tags: `[verified]` run end to end against the local stack · `[tests]` covered b
   `Manufacturer` and `ProductType` so their lazy proxies initialise in one query.
 - **Result** — 5 products → 12 statements, 20 → 15, 45 → 13. Flat; the variance is the background outbox
   poller. Roughly 9 statements belong to the request, each a bounded `IN` query.
+- **Re-measured after MOD-04 tripled the variant count** — the same 45-product listing issues **11**
+  statements and answers in 14–37 ms; a whole store's 137 skus priced in one availability call takes 39 ms.
+  Nothing about the query shape depends on how many variants the catalogue holds.
 
 ### PERF-02 — The PDP is flat in the number of variants · high · [verified]
 
 - **Steps** — same method, on a 3-variant product and a 6-variant one.
 - **Result** — **12 statements each**. Doubling the variants adds no queries: the PDP hydrates through one
-  fetch-join (`findByProductIdHydrated`) and the option values are batched.
+  fetch-join (`findByProductIdHydrated`) and the option values are batched. Re-measured on the expanded seed:
+  9 statements for a generated 3-variant product, 15 ms.
 
 ### PERF-03 — Cart and listing service-to-service calls · [tests]
 

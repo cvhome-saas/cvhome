@@ -6,6 +6,7 @@ import {Image, Product, ProductOption, ProductOptionValue, ProductVariant, Store
 import {getCartManager} from "@store-front/services/cart-manager";
 import {sortedImages} from "@store-front/services/product-presenter";
 import {notify} from "./notify";
+import {useErrorMessage} from "./use-error-message";
 
 export type PurchaseStatus = 'idle' | 'adding';
 
@@ -49,6 +50,7 @@ function selectionOf(v: ProductVariant, options: ProductOption[]): Record<number
  */
 export const useProductPurchase = (storeContext: StoreContext, product: Product) => {
     const t = useTranslations('PAGE.PRODUCT');
+    const messageFor = useErrorMessage();
     const searchParams = useSearchParams();
     const cartManager = useMemo(() => getCartManager(storeContext), [storeContext.store, storeContext.locale]);
     const options = useMemo(() => variantOptions(product), [product]);
@@ -78,9 +80,21 @@ export const useProductPurchase = (storeContext: StoreContext, product: Product)
     }, [allSelected, variants, options, selection]);
 
     const sku = variant?.sku ?? product.sku;
+    /** Units on hand for the resolved sku — what "Only 3 left" counts. */
     const maxQty = variant?.quantity ?? product.quantity ?? 0;
+    /*
+     * The merchant's per-order floor and ceiling, per sku — a combination may sell in different amounts
+     * than its siblings, so they come off the resolved variant and fall back to the product. The cart
+     * enforces them; the buy box has to agree, or the stepper offers an amount the server then refuses
+     * ("sells between 1 and 1 per order; 2 was asked"). A maximum of 0 means no limit, and the ceiling is
+     * kept apart from the stock count: 8 on the shelf with a limit of 1 is not "only 1 left".
+     */
+    const minOrderQty = Math.max(1, variant?.quantityOrderMinimum ?? product.quantityOrderMinimum ?? 1);
+    const orderCeiling = variant?.quantityOrderMaximum ?? product.quantityOrderMaximum ?? 0;
+    const maxOrderQty = orderCeiling > 0 ? Math.min(maxQty, orderCeiling) : maxQty;
     const purchasable = variant ? variant.canBePurchased !== false : product.canBePurchased;
-    const isOutOfStock = !product.available || !purchasable || maxQty < 1;
+    // Below the floor there is no buyable amount at all, whatever the shelf says.
+    const isOutOfStock = !product.available || !purchasable || maxOrderQty < minOrderQty;
     // Per-variant images are a later phase; the gallery is the product's, whatever is selected.
     const images: Image[] = sortedImages(product);
 
@@ -89,9 +103,9 @@ export const useProductPurchase = (storeContext: StoreContext, product: Product)
     const discounted = variant ? !!variant.discounted : !!product.productPrice?.discounted;
 
     useEffect(() => {
-        // clamp quantity to what is sellable for the current selection
-        setQuantity(q => Math.min(Math.max(1, q), Math.max(1, maxQty)));
-    }, [maxQty]);
+        // clamp quantity into what is sellable for the current selection, floor included
+        setQuantity(q => Math.min(Math.max(minOrderQty, q), Math.max(minOrderQty, maxOrderQty)));
+    }, [minOrderQty, maxOrderQty]);
 
     useEffect(() => {
         // The resolved variant is part of the page's address. Native history update, like the
@@ -133,11 +147,11 @@ export const useProductPurchase = (storeContext: StoreContext, product: Product)
         cartManager.addProductToCart(sku, quantity, (cart) => {
             setStatus('idle');
             if (cart) notify('success', t('SUCCESSFULLY_ADDED_PRODUCT_TO_CART'), storeContext.locale);
-        }, () => {
+        }, (error) => {
             setStatus('idle');
-            notify('error', t('FAILED_TO_ADD_PRODUCT_TO_CART'), storeContext.locale);
+            notify('error', messageFor(error, t('FAILED_TO_ADD_PRODUCT_TO_CART')), storeContext.locale);
         });
-    }, [canAdd, cartManager, sku, quantity, storeContext.locale, t]);
+    }, [canAdd, cartManager, messageFor, sku, quantity, storeContext.locale, t]);
 
     return {
         options,
@@ -151,10 +165,12 @@ export const useProductPurchase = (storeContext: StoreContext, product: Product)
         price: {finalPrice, originalPrice, discounted},
         quantity,
         maxQty,
-        canDecrease: quantity > 1,
-        canIncrease: quantity < maxQty,
-        incrementQuantity: () => setQuantity(q => Math.min(q + 1, Math.max(1, maxQty))),
-        decrementQuantity: () => setQuantity(q => Math.max(1, q - 1)),
+        minOrderQty,
+        maxOrderQty,
+        canDecrease: quantity > minOrderQty,
+        canIncrease: quantity < maxOrderQty,
+        incrementQuantity: () => setQuantity(q => Math.min(q + 1, Math.max(minOrderQty, maxOrderQty))),
+        decrementQuantity: () => setQuantity(q => Math.max(minOrderQty, q - 1)),
         isOutOfStock,
         inCartQuantity,
         canAdd,

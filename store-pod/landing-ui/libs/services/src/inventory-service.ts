@@ -153,6 +153,10 @@ export class InventoryService {
         }
         variant.quantity = inventory.quantity;
         variant.canBePurchased = inventory.canBePurchased;
+        // The per-order bounds are per sku, so a combination may sell in different amounts than its
+        // siblings. Dropping them here is what let the buy box offer a quantity the cart then refused.
+        variant.quantityOrderMinimum = inventory.quantityOrderMinimum;
+        variant.quantityOrderMaximum = inventory.quantityOrderMaximum;
         const price = inventory.price;
         if (!price) return;
         const fmt = (amount: number | undefined): string =>

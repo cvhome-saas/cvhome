@@ -266,8 +266,10 @@ after a catalog write that the gate refuses, so it is not reachable from the scr
 **An inventory row survives its product.** The console deletes it best-effort; by API, nothing does. Orphans
 are invisible to every reader (the bulk read is by sku and the listing never joins inventory) and cost a row.
 
-**`quantityOrderMaximum` is `0` for "no limit" and the seeds set it to `1`.** Nothing enforces either value
-today — checkout does not read the limits. Recorded so a future enforcement does not surprise anyone.
+**`quantityOrderMaximum` is `0` for "no limit".** Both bounds are enforced now, at both ends: the cart refuses
+an out-of-range quantity with `CHECKOUT.CART.QUANTITY_OUT_OF_RANGE`, and the storefront's buy box clamps its
+stepper to them so the refusal is not reachable by clicking (see `store-pod/landing-ui/qa/landing-ui-qa.md`).
+The seeds no longer cap every fashion and beauty row at 1.
 
 **Dropping the old catalog price/availability tables is manual** (INV-10). The boot migration copies; it never
 drops.
