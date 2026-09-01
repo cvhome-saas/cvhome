@@ -5,7 +5,7 @@ import {TranslocoDatePipe} from '@jsverse/transloco-locale';
 
 import type {PlatformUserRow} from '@models/platform';
 import {Badge, BusyOverlay, ConfirmDialog, CopyField, DataTable, type TableColumn, TableRow, EmptyState, Icon, LoadError, PageHeader, Pagination, Panel, RolesDialog, SectionNav, SetPasswordDialog, TabSwitcher, type TabItem, TextField} from '@cvhome-saas/ui-kit/ui';
-import {UserAdminTable, type UserAdminIntent} from '@shared/ui/user-admin-table/user-admin-table';
+import {UserAdminTable, type UserAdminIntent} from '@cvhome-saas/ui-kit/uaa';
 import {SuspendOrgDialog} from './components/suspend-org-dialog/suspend-org-dialog';
 import {ORG_SECTIONS, OrganizationDetailFacade, PAGE_SIZE, type OrgSection} from './facades/organization-detail.facade';
 

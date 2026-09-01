@@ -1,7 +1,7 @@
 import {Component, computed, inject, input, output} from '@angular/core';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 
-import type {PlatformUserRow} from '@models/platform';
+import type {PlatformUserRow} from '../user-row';
 import {Badge, DataTable, type TableColumn, TableRow, Icon} from '@cvhome-saas/ui-kit/ui';
 
 /** What a row action asks the host to do. The host owns the dialogs and the writes. */

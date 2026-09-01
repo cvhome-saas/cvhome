@@ -2,7 +2,7 @@ import {Injectable, inject} from '@angular/core';
 import {Observable, forkJoin, map} from 'rxjs';
 
 import {OrgService} from '@api/tenancy/org.service';
-import {AdminUserService, type AdminUserAction} from '@api/uaa/admin-user.service';
+import {AdminUserService, type AdminUserAction} from '@cvhome-saas/ui-kit/uaa';
 import {optionalOne} from '@cvhome-saas/ui-kit';
 import {toOrgRow, toPlatformUserRow, type PlatformUserRow} from '@models/platform';
 

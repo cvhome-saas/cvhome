@@ -2,7 +2,7 @@ import {Injectable, computed, inject, linkedSignal, signal} from '@angular/core'
 import {TranslocoService} from '@jsverse/transloco';
 import {TranslocoLocaleService} from '@jsverse/transloco-locale';
 
-import type {AdminUserAction} from '@api/uaa/admin-user.service';
+import type {AdminUserAction} from '@cvhome-saas/ui-kit/uaa';
 import {ApiErrorService, snapshot} from '@cvhome-saas/ui-kit';
 import {
   ORG_STATUS_TONE,

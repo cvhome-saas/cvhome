@@ -17,7 +17,8 @@
       "@cvhome-saas/ui-kit/ui": ["ui/src/public-api.ts"],
       "@cvhome-saas/ui-kit/theme": ["theme/src/public-api.ts"],
       "@cvhome-saas/ui-kit/i18n": ["i18n/src/public-api.ts"],
-      "@cvhome-saas/ui-kit/forms": ["forms/src/public-api.ts"]
+      "@cvhome-saas/ui-kit/forms": ["forms/src/public-api.ts"],
+      "@cvhome-saas/ui-kit/uaa": ["uaa/src/public-api.ts"]
     },
     "outDir": "./out-tsc",
     "resolveJsonModule": true,

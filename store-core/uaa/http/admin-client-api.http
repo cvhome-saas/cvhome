@@ -1,0 +1,94 @@
+# AdminClientController — com.asrevo.cvhome.uaa.web.admin
+#
+# The OAuth2 client registry: the registered clients every other service authenticates as. Addressed
+# through store-core-gateway, not uaa's own port — `/uaa/**` is a gateway forward route, and that is
+# what the console's AdminClientService calls.
+#
+# Behind SCOPE_super_admin / ROLE_SUPER_ADMIN, so SUPER_ADMIN_SESSION_ID throughout.
+#
+# Requires a running stack: lcl start -d
+
+### the options a client form may offer — 200
+# Built from ClientAuthMethod, OAuthGrantType and SignatureAlgorithm on the server, so a form driven
+# by this cannot offer a grant type uaa would reject. `scopes` is the one hand-written list.
+GET {{SELLER_UI_URL}}/uaa/api/v1/admin/clients/options
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+
+### list clients — 200 Page<ClientSummary>
+# The list is {id, clientId, clientName} only. Grant types and scopes need the detail endpoint, which
+# is why the console's table cannot show them without a fetch per row.
+GET {{SELLER_UI_URL}}/uaa/api/v1/admin/clients?page=0&count=20
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+
+> {%
+    client.test("listed", function () {
+        client.assert(response.status === 200, "status " + response.status);
+    });
+%}
+
+### register a client — 200 ClientDetails
+# @name createClient
+POST {{SELLER_UI_URL}}/uaa/api/v1/admin/clients
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{
+  "clientId": "http-demo-client",
+  "clientName": "HTTP demo client",
+  "clientAuthenticationMethods": ["client_secret_basic"],
+  "authorizationGrantTypes": ["authorization_code", "refresh_token"],
+  "redirectUris": ["http://gateway.com:8000/login/oauth2/code/demo"],
+  "postLogoutRedirectUris": [],
+  "scopes": ["openid", "profile"],
+  "clientSettings": {
+    "requireProofKey": false,
+    "requireAuthorizationConsent": true,
+    "customSettings": {}
+  },
+  "tokenSettings": {
+    "accessTokenTimeToLive": "PT30M",
+    "reuseRefreshTokens": false,
+    "x509CertificateBoundAccessTokens": false,
+    "customSettings": {}
+  }
+}
+
+> {%
+    client.test("registered", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        client.global.set("CLIENT_RECORD_ID", response.body.id);
+    });
+%}
+
+### read it back — 200 ClientDetails
+# The secret is NOT here, and never is: creation does not echo it and reset-secret answers void. The
+# only moment a caller can show a secret is the one it supplied.
+GET {{SELLER_UI_URL}}/uaa/api/v1/admin/clients/{{CLIENT_RECORD_ID}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+
+### rotate its secret — 200, empty body
+POST {{SELLER_UI_URL}}/uaa/api/v1/admin/clients/{{CLIENT_RECORD_ID}}/reset-secret
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{"newSecret": "http-demo-secret"}
+
+### an unknown id — 404 ClientNotFoundException
+# Ids here are plain strings, not UUIDs like the user and role APIs, so a wrong id reaches the
+# service and comes back as a typed not-found rather than a 400 at binding.
+GET {{SELLER_UI_URL}}/uaa/api/v1/admin/clients/no-such-client
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+
+### as a non-super-admin — 403
+GET {{SELLER_UI_URL}}/uaa/api/v1/admin/clients?page=0&count=20
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+> {%
+    client.test("forbidden", function () {
+        client.assert(response.status === 403, "status " + response.status);
+    });
+%}
+
+### delete it — 200
+DELETE {{SELLER_UI_URL}}/uaa/api/v1/admin/clients/{{CLIENT_RECORD_ID}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}

@@ -1,0 +1,112 @@
+# AdminUserController — com.asrevo.cvhome.uaa.web.admin
+#
+# uaa's platform-wide user administration, as console-ui's /platform/users calls it. Addressed
+# through store-core-gateway — `/uaa/**` is a gateway forward route — not uaa's own port.
+#
+# Why this and not tenancy's UserAccountApi: that one is store-scoped, so an org admin (stored with
+# no `store` metadata) appears in no store's list at all, including their own. This one is
+# platform-wide, which is what a platform operator needs.
+#
+# Behind SCOPE_super_admin / ROLE_SUPER_ADMIN, so SUPER_ADMIN_SESSION_ID throughout.
+#
+# Requires a running stack: lcl start -d
+
+### list accounts — 200 Page<UserDto>
+GET {{SELLER_UI_URL}}/uaa/api/v1/admin/users?page=0&count=20
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+
+> {%
+    client.test("listed", function () {
+        client.assert(response.status === 200, "status " + response.status);
+    });
+%}
+
+### narrow by organization — 200
+# Metadata equality is the ONLY filter there is: AdminService.getUsers reads every `metadata[<key>]`
+# parameter and matches on equality. There is no query over username, email or name, which is why
+# the console offers an organization filter and no search box.
+GET {{SELLER_UI_URL}}/uaa/api/v1/admin/users?page=0&count=20&metadata[org]={{ORG_ID}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+
+### the roles this caller may grant — 200 string[]
+GET {{SELLER_UI_URL}}/uaa/api/v1/admin/users/assignable-roles
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+
+### is a username taken — 200 boolean
+GET {{SELLER_UI_URL}}/uaa/api/v1/admin/users/username-exists?username=org1-admin
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+
+### create an account — 200 UserDto
+# @name createUser
+POST {{SELLER_UI_URL}}/uaa/api/v1/admin/users
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{
+  "username": "http-demo-user",
+  "email": "http-demo-user@example.com",
+  "firstName": "HTTP",
+  "lastName": "Demo",
+  "password": "Demo-Passw0rd!",
+  "enabled": true,
+  "roles": ["ROLE_STORE_ADMIN"],
+  "metadata": {"org": "{{ORG_ID}}"}
+}
+
+> {%
+    client.test("created", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        client.global.set("UAA_USER_ID", response.body.id);
+    });
+%}
+
+### grant roles — 200
+# The body is a bare JSON array (@RequestBody Set<String>), not an object.
+POST {{SELLER_UI_URL}}/uaa/api/v1/admin/users/{{UAA_USER_ID}}/roles
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+["ROLE_STORE_MODERATOR"]
+
+### revoke roles — 200
+# Same bare-array body, on its own path: a POST, not a DELETE. uaa has no "these are the roles now"
+# endpoint, which is why the console's roles dialog emits a diff rather than a set.
+POST {{SELLER_UI_URL}}/uaa/api/v1/admin/users/{{UAA_USER_ID}}/roles/remove
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+["ROLE_STORE_MODERATOR"]
+
+### disable, then re-enable — 200 each
+POST {{SELLER_UI_URL}}/uaa/api/v1/admin/users/{{UAA_USER_ID}}/disable
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+
+###
+POST {{SELLER_UI_URL}}/uaa/api/v1/admin/users/{{UAA_USER_ID}}/enable
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+
+### reset the password — 200
+POST {{SELLER_UI_URL}}/uaa/api/v1/admin/users/{{UAA_USER_ID}}/reset-password
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{"password": "Demo-Passw0rd!2"}
+
+### a malformed id — 400 at binding, not 404
+# Path variables here are declared UUID, unlike the client API's plain strings.
+GET {{SELLER_UI_URL}}/uaa/api/v1/admin/users/not-a-uuid
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+
+### as a non-super-admin — 403
+GET {{SELLER_UI_URL}}/uaa/api/v1/admin/users?page=0&count=20
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+> {%
+    client.test("forbidden", function () {
+        client.assert(response.status === 403, "status " + response.status);
+    });
+%}
+
+### delete it — 200
+DELETE {{SELLER_UI_URL}}/uaa/api/v1/admin/users/{{UAA_USER_ID}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}

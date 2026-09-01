@@ -4,7 +4,7 @@ import {TranslocoDirective} from '@jsverse/transloco';
 
 import type {PlatformUserRow} from '@models/platform';
 import {BusyOverlay, ConfirmDialog, EmptyState, LoadError, NoticeBar, PageHeader, Pagination, Panel, RolesDialog, Select, SetPasswordDialog} from '@cvhome-saas/ui-kit/ui';
-import {UserAdminTable, type UserAdminIntent} from '@shared/ui/user-admin-table/user-admin-table';
+import {UserAdminTable, type UserAdminIntent} from '@cvhome-saas/ui-kit/uaa';
 import {PAGE_SIZE, PlatformUsersFacade} from './facades/platform-users.facade';
 
 /**

@@ -4,7 +4,7 @@ import {Observable, concat, map, of, toArray} from 'rxjs';
 
 import {CrudService} from '@cvhome-saas/ui-kit';
 import type {SpringPage} from '@cvhome-saas/ui-kit';
-import type {CreateUserRequest, ResetUserPasswordRequest, UpdateUserRequest, UserDto} from '@models/uaa';
+import type {CreateUserRequest, ResetUserPasswordRequest, UpdateUserRequest, UserDto} from './uaa.models';
 
 /**
  * uaa's own user administration, addressed directly rather than through tenancy.

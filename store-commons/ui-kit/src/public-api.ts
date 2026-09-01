@@ -47,6 +47,9 @@ export * from './lib/routing/route-data';
 export * from './lib/routing/route-params';
 export * from './lib/state/snapshot';
 
+// -- spec support (imported only by *.spec.ts; tree-shaken out of an application build)
+export * from './lib/testing/api-harness';
+
 // -- the wire shapes the above are written in terms of
 export * from './lib/models/page';
 export * from './lib/models/ui';

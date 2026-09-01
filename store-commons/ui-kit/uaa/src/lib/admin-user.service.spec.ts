@@ -1,4 +1,4 @@
-import {TEST_STORE, apiHarness, verifyNoPendingRequests} from '@testing/api-harness';
+import {TEST_STORE, apiHarness, verifyNoPendingRequests} from '@cvhome-saas/ui-kit';
 import {AdminUserService} from './admin-user.service';
 
 /*

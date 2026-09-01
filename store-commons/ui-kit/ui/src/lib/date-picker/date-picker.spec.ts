@@ -2,8 +2,7 @@ import {ComponentFixture, TestBed, fakeAsync, tick} from '@angular/core/testing'
 import {FormControl, ReactiveFormsModule} from '@angular/forms';
 import {Component} from '@angular/core';
 
-import {dateKey} from '@cvhome-saas/ui-kit/i18n';
-import {kitTranslocoTesting} from '@cvhome-saas/ui-kit/i18n';
+import {dateKey, kitTranslocoTesting} from '@cvhome-saas/ui-kit/i18n';
 import {DatePicker} from './date-picker';
 
 /** Long enough to clear the post-commit dwell before the panel closes itself. */
