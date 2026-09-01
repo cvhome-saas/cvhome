@@ -1,6 +1,7 @@
 package com.asrevo.cvhome.content.api.v1.support;
 
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.time.Clock;
 import java.time.Duration;
@@ -56,7 +57,10 @@ public class PreviewTokens {
         } catch (IllegalArgumentException _) {
             return false;
         }
-        if (!sign(payload).equals(token.substring(dot + 1))) {
+        // constant-time comparison: String.equals short-circuits on the first differing byte, which would let
+        // an attacker time their way toward a valid signature
+        if (!MessageDigest.isEqual(sign(payload).getBytes(StandardCharsets.UTF_8),
+                token.substring(dot + 1).getBytes(StandardCharsets.UTF_8))) {
             return false;
         }
         String[] parts = payload.split("\\.");

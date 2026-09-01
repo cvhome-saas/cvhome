@@ -13,6 +13,7 @@ import com.asrevo.cvhome.content.model.layout.LayoutDocument;
 import com.asrevo.cvhome.content.model.layout.LayoutItem;
 import com.asrevo.cvhome.content.model.layout.LayoutKinds;
 import com.asrevo.cvhome.content.model.layout.LayoutSection;
+import com.asrevo.cvhome.content.support.HtmlSanitizer;
 import com.asrevo.cvhome.errors.FieldError;
 
 /**
@@ -27,6 +28,11 @@ public final class LayoutSupport {
 
     /** The one prop key that carries a media-library reference, on sections and items alike. */
     public static final String MEDIA_ID = "mediaId";
+
+    /** The one section kind whose copy the storefront injects as HTML rather than rendering as text. */
+    private static final String RICHTEXT = "richtext";
+
+    private static final String BODY = "body";
 
     private LayoutSupport() {
     }
@@ -82,6 +88,29 @@ public final class LayoutSupport {
                         String.format("Items of section %s need unique ids.", section.id()));
             }
         }
+    }
+
+    /**
+     * The document with every rich-text body run through the platform's HTML allow-list. The storefront injects
+     * those bodies as markup, so the write path owns making them safe — the same sanitised-on-write rule every
+     * CMS body already follows. All other layout copy renders as text and passes through untouched.
+     */
+    public static LayoutDocument sanitized(LayoutDocument document) {
+        List<LayoutSection> sections = document.sections().stream().map(LayoutSupport::sanitizedSection).toList();
+        return new LayoutDocument(document.schemaVersion(), document.page(), sections);
+    }
+
+    private static LayoutSection sanitizedSection(LayoutSection section) {
+        Map<String, String> body = section.text().get(BODY);
+        if (!RICHTEXT.equals(section.kind()) || body == null) {
+            return section;
+        }
+        Map<String, String> clean = new LinkedHashMap<>();
+        body.forEach((locale, html) -> clean.put(locale, HtmlSanitizer.clean(html)));
+        Map<String, Map<String, String>> text = new LinkedHashMap<>(section.text());
+        text.put(BODY, clean);
+        return new LayoutSection(section.id(), section.kind(), section.variant(), section.props(),
+                section.items(), text, section.style(), section.visibility(), section.anchor(), section.locked());
     }
 
     /**

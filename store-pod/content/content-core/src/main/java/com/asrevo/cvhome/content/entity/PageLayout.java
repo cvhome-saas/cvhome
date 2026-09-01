@@ -10,6 +10,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
@@ -55,6 +56,15 @@ public class PageLayout implements Serializable {
 
     @Column(name = "DRAFT_VERSION", nullable = false)
     private int draftVersion = 1;
+
+    /**
+     * Database-enforced companion to {@code draftVersion}: the service's read-then-check alone leaves a window
+     * where two concurrent saves both pass and the second silently clobbers the first. Hibernate's version guard
+     * turns that second commit into an optimistic-lock failure — a 409, never a lost update.
+     */
+    @Version
+    @Column(name = "LOCK_VERSION", nullable = false)
+    private long lockVersion;
 
     @Column(name = "PUBLISHED_VERSION")
     private Integer publishedVersion;

@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.content.service;
 
+import java.nio.charset.StandardCharsets;
 import java.time.Clock;
 import java.util.List;
 
@@ -27,6 +28,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SectionPresetService {
 
+    /** Enough for a real library, small enough that an automated loop cannot fill the table. */
+    private static final int MAX_PRESETS = 100;
+
     private final SectionPresetRepository presets;
 
     private final Clock clock;
@@ -45,11 +49,23 @@ public class SectionPresetService {
             throw InvalidContentRequestException.layoutInvalid(
                     String.format("Unknown section kind %s.", section.kind()));
         }
+        if (section.items().size() > LayoutSection.MAX_ITEMS) {
+            throw InvalidContentRequestException.layoutInvalid(
+                    String.format("A section holds at most %d items.", LayoutSection.MAX_ITEMS));
+        }
+        String snapshot = JsonCodec.write(section);
+        if (snapshot.getBytes(StandardCharsets.UTF_8).length > LayoutSupport.MAX_JSON_BYTES) {
+            throw InvalidContentRequestException.layoutInvalid("The section exceeds the size budget.");
+        }
+        if (presets.countByStoreMerchantId(store.getId()) >= MAX_PRESETS) {
+            throw InvalidContentRequestException.layoutInvalid(
+                    String.format("The section library holds at most %d presets.", MAX_PRESETS));
+        }
         SectionPreset entity = new SectionPreset();
         entity.setStoreMerchantId(store.getId());
         entity.setName(body.name());
         entity.setKind(section.kind());
-        entity.setSnapshot(JsonCodec.write(section));
+        entity.setSnapshot(snapshot);
         entity.setDateCreated(clock.instant());
         entity.setModifiedBy(actor);
         return readable(presets.save(entity));

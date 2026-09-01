@@ -6,6 +6,7 @@ import java.util.Map;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -43,6 +44,8 @@ public class DataIntegrityErrorHandler {
 
     private static final String DETAIL = "The request conflicts with data that already exists or is still in use.";
 
+    private static final String LOG_FORMAT = "{} [traceId={}]";
+
     private final ProblemDetailFactory factory;
 
     public DataIntegrityErrorHandler(ProblemDetailFactory factory) {
@@ -54,10 +57,24 @@ public class DataIntegrityErrorHandler {
         String traceId = factory.traceId();
         // Logged at warn with the stack trace: the constraint name lives in the driver's message and is the only way
         // to tell a duplicate key from a foreign-key reference after the fact.
-        log.warn("{} [traceId={}]", CommonErrors.DATA_INTEGRITY_VIOLATION.code(), traceId, exception);
+        log.warn(LOG_FORMAT, CommonErrors.DATA_INTEGRITY_VIOLATION.code(), traceId, exception);
 
         ProblemDetail problem = factory.create(CommonErrors.DATA_INTEGRITY_VIOLATION, DETAIL, Map.of(), List.of(),
                 traceId);
+        return ResponseEntity.status(problem.getStatus()).body(problem);
+    }
+
+    /**
+     * A {@code @Version} guard firing means the row changed under the caller between read and commit — the same
+     * "someone else got there first" a constraint violation reports, so it answers with the same 409 shape. The
+     * client's move is identical too: reload and retry on fresh state.
+     */
+    @ExceptionHandler(OptimisticLockingFailureException.class)
+    public ResponseEntity<ProblemDetail> handleOptimisticLockingFailure(OptimisticLockingFailureException exception) {
+        String traceId = factory.traceId();
+        log.warn(LOG_FORMAT, CommonErrors.DATA_INTEGRITY_VIOLATION.code(), traceId, exception);
+        ProblemDetail problem = factory.create(CommonErrors.DATA_INTEGRITY_VIOLATION,
+                "The resource was modified concurrently; reload and retry.", Map.of(), List.of(), traceId);
         return ResponseEntity.status(problem.getStatus()).body(problem);
     }
 

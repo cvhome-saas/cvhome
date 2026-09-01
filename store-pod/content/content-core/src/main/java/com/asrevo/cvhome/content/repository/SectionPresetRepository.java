@@ -13,4 +13,6 @@ public interface SectionPresetRepository extends JpaRepository<SectionPreset, Lo
 
     Optional<SectionPreset> findByIdAndStoreMerchantId(Long id, String storeMerchantId);
 
+    long countByStoreMerchantId(String storeMerchantId);
+
 }

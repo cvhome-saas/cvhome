@@ -66,9 +66,8 @@ alter table content.content add column if not exists meta           jsonb;
 alter table content.content drop constraint if exists content_status_check;
 alter table content.content add constraint content_status_check
     check (status in ('DRAFT', 'REVIEW', 'SCHEDULED', 'PUBLISHED', 'ARCHIVED'));
-alter table content.content drop constraint if exists content_placement_check;
-alter table content.content add constraint content_placement_check
-    check (placement is null or placement in ('COLLECTION', 'STRIP'));
+-- The narrowed placement check waits for the HERO/CAROUSEL purge below (after content_description
+-- exists), because postgres validates existing rows on `add constraint`.
 alter table content.content drop constraint if exists content_policy_type_check;
 alter table content.content add constraint content_policy_type_check
     check (policy_type is null or policy_type in ('TERMS', 'PRIVACY', 'RETURNS', 'SHIPPING', 'COOKIES', 'CUSTOM'));
@@ -120,6 +119,15 @@ create index if not exists content_description_content_idx on content.content_de
 delete from content.content_description where content_id in
     (select content_id from content.content where content_type in ('BOX', 'SECTION'));
 delete from content.content where content_type in ('BOX', 'SECTION');
+
+-- Same story for banners in the retired HERO/CAROUSEL placements: an upgraded database that still
+-- holds one would refuse the narrowed check below. The hero lives in the page_layout document now.
+delete from content.content_description where content_id in
+    (select content_id from content.content where placement in ('HERO', 'CAROUSEL'));
+delete from content.content where placement in ('HERO', 'CAROUSEL');
+alter table content.content drop constraint if exists content_placement_check;
+alter table content.content add constraint content_placement_check
+    check (placement is null or placement in ('COLLECTION', 'STRIP'));
 alter table content.content drop constraint if exists content_content_type_check;
 alter table content.content add constraint content_content_type_check
     check (content_type in ('PAGE', 'POST', 'BANNER', 'FAQ', 'POLICY'));
@@ -342,6 +350,7 @@ create table if not exists content.page_layout
     draft             jsonb        not null,
     published         jsonb,
     draft_version     integer      not null default 1,
+    lock_version      bigint       not null default 0,
     published_version integer,
     published_at      timestamp(6),
     date_created      timestamp(6),
@@ -349,6 +358,7 @@ create table if not exists content.page_layout
     modified_by       varchar(120),
     constraint page_layout_store_page_unique unique (store_merchant_id, page)
 );
+alter table content.page_layout add column if not exists lock_version bigint not null default 0;
 
 create table if not exists content.page_layout_revision
 (

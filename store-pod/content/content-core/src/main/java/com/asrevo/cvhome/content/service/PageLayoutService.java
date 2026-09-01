@@ -2,6 +2,7 @@ package com.asrevo.cvhome.content.service;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Clock;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -63,8 +64,9 @@ public class PageLayoutService {
     @Transactional
     public ReadableLayout save(StoreMerchantId store, PageKind page, PersistableLayout body, String actor)
             throws InvalidContentRequestException, ContentConflictException {
-        LayoutSupport.validate(body.document());
-        String json = JsonCodec.write(body.document());
+        LayoutDocument document = LayoutSupport.sanitized(body.document());
+        LayoutSupport.validate(document);
+        String json = JsonCodec.write(document);
         if (json.getBytes(StandardCharsets.UTF_8).length > LayoutSupport.MAX_JSON_BYTES) {
             throw InvalidContentRequestException.layoutInvalid("The document exceeds the size budget.");
         }
@@ -73,8 +75,7 @@ public class PageLayoutService {
         entity.setDraft(json);
         entity.setDraftVersion(entity.getDraftVersion() + 1);
         touch(entity, actor);
-        usage.replace(store, MediaOwnerKind.LAYOUT, ownerRef(entity), null, null, ownerTitle(page),
-                LayoutSupport.mediaReferences(body.document()));
+        reindex(store, entity, page);
         return readable(entity);
     }
 
@@ -89,6 +90,11 @@ public class PageLayoutService {
         PageLayout entity = loadOrCreate(store, page);
         requireVersion(entity, baseVersion);
         LayoutDocument draft = document(entity.getDraft());
+        if (Objects.equals(entity.getPublishedVersion(), entity.getDraftVersion())) {
+            // this exact draft version is already live: a double-click or client retry republishes nothing,
+            // instead of tripping the revision table's (layout, version) uniqueness
+            return new PublishedLayout(meta(entity), LayoutSupport.warnings(draft));
+        }
         requireMedia(store, entity, draft);
         entity.setPublished(entity.getDraft());
         entity.setPublishedVersion(entity.getDraftVersion());
@@ -101,6 +107,7 @@ public class PageLayoutService {
         revision.setPublishedBy(actor);
         revision.setDateCreated(clock.instant());
         revisions.save(revision);
+        reindex(store, entity, page);
         return new PublishedLayout(meta(entity), LayoutSupport.warnings(draft));
     }
 
@@ -115,8 +122,7 @@ public class PageLayoutService {
         entity.setDraft(base);
         entity.setDraftVersion(entity.getDraftVersion() + 1);
         touch(entity, actor);
-        usage.replace(store, MediaOwnerKind.LAYOUT, ownerRef(entity), null, null, ownerTitle(page),
-                LayoutSupport.mediaReferences(document(base)));
+        reindex(store, entity, page);
         return readable(entity);
     }
 
@@ -135,11 +141,11 @@ public class PageLayoutService {
         PageLayout entity = loadOrCreate(store, page);
         PageLayoutRevision revision = revisions.findByLayoutIdAndVersion(entity.getId(), version)
                 .orElseThrow(() -> ContentNotFoundException.byId((long) version, store.getId()));
-        entity.setDraft(revision.getSnapshot());
+        // re-sanitised on the way in: snapshots taken before the sanitiser covered layouts stay usable
+        entity.setDraft(JsonCodec.write(LayoutSupport.sanitized(document(revision.getSnapshot()))));
         entity.setDraftVersion(entity.getDraftVersion() + 1);
         touch(entity, actor);
-        usage.replace(store, MediaOwnerKind.LAYOUT, ownerRef(entity), null, null, ownerTitle(page),
-                LayoutSupport.mediaReferences(document(revision.getSnapshot())));
+        reindex(store, entity, page);
         return readable(entity);
     }
 
@@ -182,6 +188,25 @@ public class PageLayoutService {
         if (!missing.isEmpty()) {
             throw ContentRuleException.publishIncomplete(entity.getId(), missing);
         }
+    }
+
+    /**
+     * Rebuilds the usage index from <em>both</em> documents. Indexing only the draft would let the media library
+     * delete an asset the live page still renders the moment the merchant removes it from the draft; the union
+     * keeps every asset either copy shows accounted for. A published reference that differs from the draft's at
+     * the same spot is keyed under a {@code published/} prefix so neither entry shadows the other.
+     */
+    private void reindex(StoreMerchantId store, PageLayout entity, PageKind page) {
+        Map<String, Long> refs = new LinkedHashMap<>(
+                LayoutSupport.mediaReferences(document(entity.getDraft())));
+        if (entity.getPublished() != null) {
+            LayoutSupport.mediaReferences(document(entity.getPublished())).forEach((key, id) -> {
+                if (!id.equals(refs.get(key))) {
+                    refs.put(String.format("published/%s", key), id);
+                }
+            });
+        }
+        usage.replace(store, MediaOwnerKind.LAYOUT, ownerRef(entity), null, null, ownerTitle(page), refs);
     }
 
     private void touch(PageLayout entity, String actor) {

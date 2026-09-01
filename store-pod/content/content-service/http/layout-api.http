@@ -1,0 +1,88 @@
+### Page layouts (LayoutApi) — the storefront builder's write surface
+### One document per page, edited as a draft under an optimistic baseVersion and published whole.
+
+### The draft + meta (materializes the starter home on first touch)
+GET {{SELLER_UI_URL}}/spg/content/api/v1/private/content/layouts/HOME?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+
+### Save the draft (whole document; baseVersion is the draftVersion the GET returned)
+PUT {{SELLER_UI_URL}}/spg/content/api/v1/private/content/layouts/HOME?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Content-Type: application/json
+Cookie: SESSION={{SESSION_ID}}
+
+{
+  "baseVersion": 1,
+  "document": {
+    "schemaVersion": 1,
+    "page": "HOME",
+    "sections": [
+      {
+        "id": "sec-hero",
+        "kind": "hero",
+        "variant": "minimal",
+        "props": {"height": "md"},
+        "text": {"heading": {"en": "Welcome"}, "subheading": {"en": "The new season is here"}},
+        "style": {"spacing": "lg", "width": "full", "tone": "default"},
+        "visibility": {"hidden": false}
+      }
+    ]
+  }
+}
+
+### Save with a stale baseVersion — 409 CONTENT.VERSION_CONFLICT
+PUT {{SELLER_UI_URL}}/spg/content/api/v1/private/content/layouts/HOME?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Content-Type: application/json
+Cookie: SESSION={{SESSION_ID}}
+
+{"baseVersion": 999, "document": {"schemaVersion": 1, "page": "HOME", "sections": []}}
+
+### Save an unrenderable document — 400 (unknown kind)
+PUT {{SELLER_UI_URL}}/spg/content/api/v1/private/content/layouts/HOME?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Content-Type: application/json
+Cookie: SESSION={{SESSION_ID}}
+
+{"baseVersion": 1, "document": {"schemaVersion": 1, "page": "HOME", "sections": [{"id": "sec-x", "kind": "no-such-kind"}]}}
+
+### Publish the draft (422 CONTENT.PUBLISH_INCOMPLETE when a media reference is not in the library)
+POST {{SELLER_UI_URL}}/spg/content/api/v1/private/content/layouts/HOME/publish?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Content-Type: application/json
+Cookie: SESSION={{SESSION_ID}}
+
+{"baseVersion": 2}
+
+### Throw the draft away — published (or the starter default) becomes the draft again
+POST {{SELLER_UI_URL}}/spg/content/api/v1/private/content/layouts/HOME/discard?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Content-Type: application/json
+Cookie: SESSION={{SESSION_ID}}
+
+{"baseVersion": 2}
+
+### Revision history (every publish, newest first)
+GET {{SELLER_UI_URL}}/spg/content/api/v1/private/content/layouts/HOME/revisions?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+
+### Restore a past published version into the draft (publishing it again is a separate step)
+POST {{SELLER_UI_URL}}/spg/content/api/v1/private/content/layouts/HOME/revisions/1/restore?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+
+### Mint a 30-minute draft-preview token for the builder canvas / preview tab
+POST {{SELLER_UI_URL}}/spg/content/api/v1/private/content/layouts/HOME/preview-token?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+
+### My sections — merchant-saved presets (snapshots, re-idded on insert)
+GET {{SELLER_UI_URL}}/spg/content/api/v1/private/content/layouts/section-presets?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+
+### Save the selected section as a preset
+POST {{SELLER_UI_URL}}/spg/content/api/v1/private/content/layouts/section-presets?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Content-Type: application/json
+Cookie: SESSION={{SESSION_ID}}
+
+{
+  "name": "My hero",
+  "section": {"id": "sec-hero", "kind": "hero", "variant": "minimal", "props": {"height": "md"}, "text": {"heading": {"en": "Welcome"}}}
+}
+
+### Delete a preset
+DELETE {{SELLER_UI_URL}}/spg/content/api/v1/private/content/layouts/section-presets/1?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}

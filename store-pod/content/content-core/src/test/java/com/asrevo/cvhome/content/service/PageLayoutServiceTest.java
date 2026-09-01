@@ -32,6 +32,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -46,6 +47,10 @@ class PageLayoutServiceTest {
     private static final String IMAGE = "image";
     private static final String MEDIA_ID = "mediaId";
     private static final String SECRET_DRAFT = "secret draft";
+    private static final String OWNER_REF = "41";
+    private static final String BODY = "body";
+    private static final String EN = "en";
+    private static final String OLD = "old";
 
 
     private static final String ACTOR = "tester";
@@ -87,7 +92,7 @@ class PageLayoutServiceTest {
     private static LayoutDocument doc(String heading) {
         return new LayoutDocument(LayoutDocument.CURRENT_SCHEMA_VERSION, PageKind.HOME, List.of(
                 new LayoutSection("sec-1", "hero", "minimal", Map.of(), null,
-                        Map.of("heading", Map.of("en", heading)), null, null, null, null)));
+                        Map.of("heading", Map.of(EN, heading)), null, null, null, null)));
     }
 
     @Test
@@ -114,7 +119,7 @@ class PageLayoutServiceTest {
 
     @Test
     void aSaveBumpsTheVersionAndReindexesMediaUsage() throws Exception {
-        PageLayout row = existing(JsonCodec.write(doc("old")), null, 1);
+        PageLayout row = existing(JsonCodec.write(doc(OLD)), null, 1);
         LayoutDocument next = new LayoutDocument(LayoutDocument.CURRENT_SCHEMA_VERSION, PageKind.HOME, List.of(
                 new LayoutSection(SEC_IMG, IMAGE, "contained", Map.of(MEDIA_ID, 9), null, null, null,
                         null, null, null)));
@@ -124,7 +129,7 @@ class PageLayoutServiceTest {
 
         assertThat(saved.meta().draftVersion()).isEqualTo(2);
         assertThat(row.getModifiedBy()).isEqualTo(ACTOR);
-        verify(usage).replace(eq(ContentFixtures.STORE), eq(MediaOwnerKind.LAYOUT), eq("41"), any(), any(),
+        verify(usage).replace(eq(ContentFixtures.STORE), eq(MediaOwnerKind.LAYOUT), eq(OWNER_REF), any(), any(),
                 any(), eq(Map.of(SEC_IMG, 9L)));
     }
 
@@ -154,6 +159,46 @@ class PageLayoutServiceTest {
 
         assertThatThrownBy(() -> service.publish(ContentFixtures.STORE, PageKind.HOME, 1, ACTOR))
                 .isInstanceOf(ContentRuleException.class);
+    }
+
+    @Test
+    void aRepeatPublishOfTheSameDraftIsANoOpNotADuplicateRevision() throws Exception {
+        PageLayout row = existing(JsonCodec.write(doc(LIVE)), JsonCodec.write(doc(LIVE)), 3);
+        row.setPublishedVersion(3);
+
+        var result = service.publish(ContentFixtures.STORE, PageKind.HOME, 3, ACTOR);
+
+        assertThat(result.meta().publishedVersion()).isEqualTo(3);
+        verify(revisions, never()).save(any());
+    }
+
+    @Test
+    void theUsageIndexGuardsThePublishedDocumentTooNotJustTheDraft() throws Exception {
+        LayoutDocument live = new LayoutDocument(LayoutDocument.CURRENT_SCHEMA_VERSION, PageKind.HOME,
+                List.of(new LayoutSection(SEC_IMG, IMAGE, null, Map.of(MEDIA_ID, 7), null, null, null,
+                        null, null, null)));
+        existing(JsonCodec.write(doc(OLD)), JsonCodec.write(live), 1);
+
+        service.save(ContentFixtures.STORE, PageKind.HOME, new PersistableLayout(doc("no media"), 1), ACTOR);
+
+        // the draft dropped the image, but the live page still renders it — its reference must survive
+        verify(usage).replace(eq(ContentFixtures.STORE), eq(MediaOwnerKind.LAYOUT), eq(OWNER_REF), any(), any(),
+                any(), eq(Map.of(String.format("published/%s", SEC_IMG), 7L)));
+    }
+
+    @Test
+    void aRichtextBodyIsSanitizedOnSave() throws Exception {
+        existing(JsonCodec.write(doc(OLD)), null, 1);
+        LayoutDocument dirty = new LayoutDocument(LayoutDocument.CURRENT_SCHEMA_VERSION, PageKind.HOME, List.of(
+                new LayoutSection("sec-story", "richtext", "centered", Map.of(), null,
+                        Map.of(BODY, Map.of(EN, "<p>fine</p><script>alert(1)</script>")),
+                        null, null, null, null)));
+
+        ReadableLayout saved = service.save(ContentFixtures.STORE, PageKind.HOME,
+                new PersistableLayout(dirty, 1), ACTOR);
+
+        String body = saved.draft().sections().getFirst().text().get(BODY).get(EN);
+        assertThat(body).contains("<p>fine</p>").doesNotContain("script");
     }
 
     @Test
