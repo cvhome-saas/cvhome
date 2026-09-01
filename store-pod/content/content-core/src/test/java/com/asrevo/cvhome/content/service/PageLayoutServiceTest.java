@@ -51,6 +51,7 @@ class PageLayoutServiceTest {
     private static final String BODY = "body";
     private static final String EN = "en";
     private static final String OLD = "old";
+    private static final String THE_PAST = "the past";
 
 
     private static final String ACTOR = "tester";
@@ -209,6 +210,41 @@ class PageLayoutServiceTest {
 
         assertThat(JsonCodec.write(served)).doesNotContain(SECRET_DRAFT);
         assertThat(served.sections()).isNotEmpty();
+    }
+
+    @Test
+    void restoreMaterializesTheRevisionIntoTheDraft() throws Exception {
+        PageLayout row = existing(JsonCodec.write(doc("current")), JsonCodec.write(doc(LIVE)), 4);
+        PageLayoutRevision revision = new PageLayoutRevision();
+        revision.setLayoutId(41L);
+        revision.setVersion(2);
+        revision.setSnapshot(JsonCodec.write(doc(THE_PAST)));
+        when(revisions.findByLayoutIdAndVersion(41L, 2)).thenReturn(Optional.of(revision));
+
+        ReadableLayout restored = service.restore(ContentFixtures.STORE, PageKind.HOME, 2, ACTOR);
+
+        assertThat(restored.meta().draftVersion()).isEqualTo(5);
+        assertThat(row.getDraft()).contains(THE_PAST);
+        assertThat(restored.meta().dirty()).isTrue();
+    }
+
+    @Test
+    void restoreOfAMissingRevisionIsNotFound() {
+        existing(JsonCodec.write(doc(LIVE)), null, 1);
+        when(revisions.findByLayoutIdAndVersion(41L, 9)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.restore(ContentFixtures.STORE, PageKind.HOME, 9, ACTOR))
+                .isInstanceOf(com.asrevo.cvhome.content.errors.ContentNotFoundException.class);
+    }
+
+    @Test
+    void theBuilderPreviewServesTheDraftAndTheRevisionListReadsNewestFirst() {
+        existing(JsonCodec.write(doc(SECRET_DRAFT)), JsonCodec.write(doc(LIVE)), 2);
+        when(revisions.findByLayoutIdOrderByVersionDesc(41L)).thenReturn(List.of());
+
+        LayoutDocument draft = service.served(ContentFixtures.STORE, PageKind.HOME, true);
+        assertThat(JsonCodec.write(draft)).contains(SECRET_DRAFT);
+        assertThat(service.revisions(ContentFixtures.STORE, PageKind.HOME)).isEmpty();
     }
 
     @Test
