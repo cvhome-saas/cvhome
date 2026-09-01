@@ -116,18 +116,27 @@ What binds every change:
   second store, and confirm a principal without the token gets 403.
 - Java services run **on the host**, not in Docker. Profiles: `lcl`, `fargate`, `test-stores`. Ports, hosts
   and namespaces come from `common-config.yml` — never inline one.
-- **A QA script written for a human tester lives in `qa/<plan>.md` — one file per plan, never one per phase.**
-  Repo root, named after the plan it belongs to (`qa/billing-per-store-subscriptions.md`). A plan that ships in
-  ten PRs still produces **one** document, appended to as each phase lands: ten files covering one feature means
-  a tester cannot tell which to run, the setup drifts between copies, and later phases silently invalidate
-  earlier files. Markdown so it reviews in the PR and travels with the branch; in-repo so it ages with the code
-  that made it necessary. Never a rendered page or an attachment — those cannot be diffed, and a test plan
-  nobody can review is a test plan nobody trusts. Each case states its setup, its steps and what to expect, and
-  is tagged **[verified] / [unit only] / [not verified]**: a case nobody has executed is where the bugs are, and
-  marking it is more useful than implying otherwise. Say what is *expected to fail* too, so a tester does not
-  spend a morning re-finding a known gap. **The structure to copy is `qa/billing-per-store-subscriptions.md`,
-  and the rules are `references/qa-testing.md` §7 in the `project-structure` skill.** This is for people; the
-  machine-checkable path is `.http` blocks and tests, which it does not replace.
+- **A QA script written for a human tester lives with the service it tests: `<service>/qa/<module>-qa.md` —
+  one file per service, never one per plan or phase.** It sits beside that service's `http/` folder
+  (`store-core/tenancy/tenancy-service/qa/tenancy-qa.md`,
+  `store-pod/catalog/catalog-service/qa/catalog-qa.md`), so a tester opens the service directory and finds its
+  runnable requests and its test script together. Every runnable app has one — the thirteen Java services plus
+  `console-ui` and `landing-ui`; library modules do not, because QA is end to end. The single exception is
+  `qa/lcl-qa.md` at the repo root, which covers the stack itself and belongs to no service.
+  **A plan does not get its own QA file.** A feature that touches four services appends its cases to those four
+  files, in the section that theme belongs to, and a case lives with the service that owns the flow's *entry
+  point*, cross-referencing the others by path rather than being duplicated. Organising by plan is what this
+  replaced: cases for one service ended up scattered across eight documents named after changes nobody
+  remembers, and a tester had no way to know which to run.
+  Markdown so it reviews in the PR and travels with the branch; in-repo so it ages with the code that made it
+  necessary. Never a rendered page or an attachment — those cannot be diffed, and a test plan nobody can review
+  is a test plan nobody trusts. Each case states its setup, its steps and what to expect, and is tagged
+  **[verified] / [unit only] / [not verified]**: a case nobody has executed is where the bugs are, and marking
+  it is more useful than implying otherwise. Say what is *expected to fail* too, so a tester does not spend a
+  morning re-finding a known gap. **The structure to copy is
+  `store-core/billing/billing-service/qa/billing-qa.md`, and the rules are `references/qa-testing.md` §7 in the
+  `project-structure` skill.** This is for people; the machine-checkable path is `.http` blocks and tests, which
+  it does not replace.
 
 ## Working conventions
 

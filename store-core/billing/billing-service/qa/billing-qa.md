@@ -1,33 +1,40 @@
-# QA — per-store subscriptions on Stripe
+# QA — billing (`store-core/billing/billing-service`)
 
-Billing moved from one subscription per **org** to one per **store**, on a database-driven plan catalog, with
-Stripe doing the charging. This is what to try in order to believe it works — and, just as usefully, the things
-that were already broken once and could break again.
+Billing owns one subscription **per store** on a database-driven plan catalog, with Stripe doing the charging:
+the 14-day trial an org gets once, plan changes, renewals and lapses, the webhooks that carry all of it, and
+the blocked-store list the gateway enforces at the edge.
 
-- **Scope** — billing · control-plane · gateway · catalog · seller-ui
-- **Change** — PR #270, branch `feat/billing-subscription-service`, plan `.claude/plans/billing-subscription-service.md`
-- **Cases** — 54
+- **Scope** — the subscription lifecycle, the plan catalog and its entitlements, the Stripe webhook receiver,
+  the platform-wide admin endpoints, and the migration from the old per-org model
+- **Runs on** — `lcl start -d --stack <name>`; read the live port from `lcl urls`. Address it through the
+  gateway, never `:8021`
+- **Cases** — 40 (22 verified, 0 unit only, 18 not verified)
+- **Also see** — [gateway](../../../gateway/gateway-service/qa/gateway-qa.md) (the edge that refuses a lapsed
+  store), [catalog](../../../../store-pod/catalog/catalog-service/qa/catalog-qa.md) (the plan ceiling and the
+  write gate), [tenancy](../../../tenancy/tenancy-service/qa/tenancy-qa.md) (store creation, which billing
+  gates), [console-ui](../../../console-ui/qa/console-ui-qa.md) (the Subscription screen)
 - **Stripe** — test mode only. Never point this at a live key.
 
 Each case is tagged:
 
-- **[verified]** — run during the build and passed.
+- **[verified]** — run against a running stack and passed.
 - **[not verified]** — never run end to end by anyone. These are where a tester is most likely to find
   something, and they are called out rather than buried.
 
-Roughly half the cases are in each bucket. Sections [REG](#reg--regression-watchlist) and
-[99](#99--known-gaps) are the highest-value reading: one is defects that have already happened, the other is
-behaviour that looks wrong but is expected.
+Sections [REG](#reg--regression-watchlist) and [99](#99--known-gaps) are the highest-value reading: one is
+defects that have already happened, the other is behaviour that looks wrong and is expected.
 
 ---
 
 ## 00 — Before you start
 
-Most cases need the stack, a Stripe test account and a webhook listener. **Without the listener, payments
-appear to do nothing** — the money moves at Stripe and nothing reaches us.
+**Shared prerequisites** — starting the stack, the demo logins, the seeded org/store/pod ids and the `psql`
+idiom are in
+[`references/qa-testing.md`](../../../../.claude/skills/project-structure/references/qa-testing.md) §§1–5.
+Everything below is specific to billing, and **without the webhook listener payments appear to do nothing** —
+the money moves at Stripe and nothing reaches us.
 
 ```bash
-sudo ./extra/scripts/configure-domain.sh        # once per machine
 stripe login                                    # once per machine
 
 lcl start -d                                    # `stripe-billing-webhook` is one of the services it starts
@@ -38,11 +45,11 @@ COM_ASREVO_CVHOME_STRIPE_WEBHOOK_SIGNING_KEY=whsec_... lcl restart billing
 ```
 
 The listener follows the assigned port map, so it forwards to the right gateway on a shifted stack too. Store
-payment events are separate services, one per seeded store — `stripe-org1-store1-webhook` … `stripe-org2-store2-webhook`.
+payment events are separate services, one per seeded store — `stripe-org1-store1-webhook` …
+`stripe-org2-store2-webhook`.
 
-**Sign-in.** Seller console `http://gateway.com:8000` — `org1-admin` / `admin`. The console works on one store
-at a time; use the store switcher in the header, because every billing answer on the page belongs to the store
-selected there.
+The console works on one store at a time; use the store switcher in the header, because every billing answer on
+the page belongs to the store selected there.
 
 ### Cards worth knowing
 
@@ -68,6 +75,8 @@ docker exec cvhome-postgres-1 psql -U postgres -d cvhome -c \
 ... "select event_type, outcome, received_at
        from billing.processed_stripe_event order by received_at desc limit 20;"
 ```
+
+Logs: `.lcl/<stack>/logs/billing.log`.
 
 ---
 
@@ -106,19 +115,15 @@ Billing and pod provisioning are independent handlers on the same event; neither
 - **Expect** — the store still gets a billing subscription. `control.outbox_record` holds two rows for the one
   `StoreCreatedEvent` — billing's `COMPLETED`, the pod's still pending.
 
-### TRL-05 — Store creation is refused when billing is unreachable · high · [not verified]
-
-Deliberately the opposite of every other billing call: a store nobody is billed for is worse than an error you
-can retry.
-
-- **Steps** — stop `billing`, try to create a store.
-- **Expect** — creation **fails**, no store row left behind. Restart billing, retry, it works.
-
 ### TRL-06 — Stockpiling unpaid stores is refused · [not verified]
 
 - **Steps** — for one org, create unpaid stores until you have four.
 - **Expect** — the fourth is refused, citing too many unpaid stores. Limit is
   `com.asrevo.cvhome.billing.quota.max-pending-stores`, default 3. Paying for one should free a slot.
+
+---
+
+> TRL-05 (store creation is refused when billing is unreachable) asserts how **tenancy** behaves and moved to [tenancy-qa.md](../../../tenancy/tenancy-service/qa/tenancy-qa.md).
 
 ---
 
@@ -156,6 +161,8 @@ Billing details belong to the org; each store pays separately underneath them.
 
 - **Steps** — flip the Month/Year toggle, subscribe to Basic at the yearly price.
 - **Expect** — charged the yearly amount, renewal a year out — not a month.
+
+---
 
 ---
 
@@ -213,6 +220,8 @@ There is nothing at Stripe to change, so this must route to checkout rather than
 
 ---
 
+---
+
 ## LIF — Cancel, resume, lapse
 
 ### LIF-01 — Stopping renewal keeps the store working · critical · [verified]
@@ -266,6 +275,8 @@ The job runs every ten minutes, so allow for that rather than expecting it on th
 
 ---
 
+---
+
 ## HK — Webhooks
 
 Stripe repeats itself, delivers out of order, and retries anything not answered. All three are normal, and all
@@ -304,55 +315,6 @@ Stripe does not promise ordering. This was a real defect: the invoice was droppe
 - **Expect** — the store ends up Active with its invoice, with no manual repair.
 
 ---
-
-## ENF — Enforcement
-
-A store that has not paid cannot be *changed*. It can still be read, and its shopfront still sells — both
-deliberate.
-
-### ENF-01 — A lapsed store is refused at the edge · critical · [verified]
-
-- **Setup** — a store Not subscribed or Suspended. Allow a minute; the edge refreshes on a timer.
-- **Steps** — in the console for that store, create or edit a product.
-- **Expect** — **402 Payment Required** with a message about the subscription — not a permissions error, not a
-  404.
-
-### ENF-02 — Reading a lapsed store still works · critical · [verified]
-
-A seller has to see what they are being asked to pay for. This was wrong once and is worth re-checking.
-
-- **Steps** — on the same lapsed store, browse products, orders and settings.
-- **Expect** — everything lists normally. Only changes are refused.
-
-### ENF-03 — The shopfront of a lapsed store keeps selling · critical · [not verified]
-
-- **Steps** — open the storefront of a suspended store (`http://org1-store1.spg-507f1f77.gateway.com`) and place
-  an order.
-- **Expect** — browsing and checkout work. Shoppers are never punished for the merchant's billing.
-
-### ENF-04 — Nothing is blocked while billing is down · high · [verified]
-
-- **Steps** — with everything working, stop billing; then use a paying store normally — list stores, edit a
-  product.
-- **Expect** — work continues. The store list renders with billing standing shown as unknown rather than as an
-  error. An outage must not stop a paying merchant trading.
-
-### ENF-05 — The product ceiling refuses the one that would exceed it · high · [not verified]
-
-> **Expect this to be permissive today.** The catalog guard shipped only partly wired — see
-> [Known gaps](#99--known-gaps). If the limit is not enforced, that is the known state, not a new bug. Record
-> what you observe either way.
-
-- **Setup** — a store on Free, which allows 25 products.
-- **Steps** — create products up to 25, then attempt one more.
-- **Expect** — *if wired:* the 26th is refused with a message naming the limit and the current count, and
-  existing products stay editable. *If not:* it succeeds — log it against the known gap.
-
-### ENF-06 — Unlimited means unlimited · [not verified]
-
-Pro does not cap products. An absent limit must never behave as a limit of zero.
-
-- **Expect** — on Pro, product creation is never refused for a ceiling, however many exist.
 
 ---
 
@@ -397,63 +359,44 @@ Reading and paying are separate rights: spending is the org's money, not the sto
 
 ---
 
-## UI — Seller console
+---
 
-### UI-01 — The page follows the store switcher · high · [verified]
+## ENF — Where enforcement is asserted
 
-Subscriptions belong to stores now. Switching store must change what the page says.
+Billing decides who is blocked; it does not do the blocking. The six ENF cases went to the services that
+actually refuse the request:
 
-- **Steps** — with one store paying and another not, switch between them.
-- **Expect** — status, plan, renewal date and invoices all change with the store. No stale figures from the
-  previous one.
-
-### UI-02 — Every status reads correctly · high · [not verified]
-
-Walk one store through each state and check the wording and colour each time.
-
-| State | The page should say |
+| Case | Now in |
 |---|---|
-| Trial | Trial, with the date it ends |
-| Active | Active, with the next renewal date |
-| Renewal off | Still Active, plus "will not renew" and the date access ends |
-| Downgrade pending | The *old* plan, plus the new one and when it starts |
-| Payment failed | Payment failed, with the date it must be fixed by |
-| Suspended / not subscribed | A prompt to choose a plan |
+| ENF-01 — a lapsed store is refused at the edge | [gateway-qa.md](../../../gateway/gateway-service/qa/gateway-qa.md) |
+| ENF-04 — nothing is blocked while billing is down | gateway-qa.md |
+| ENF-02 — reading a lapsed store still works | [catalog-qa.md](../../../../store-pod/catalog/catalog-service/qa/catalog-qa.md) |
+| ENF-05 — the product ceiling refuses the one that would exceed it | catalog-qa.md |
+| ENF-06 — unlimited means unlimited | catalog-qa.md |
+| ENF-03 — the shopfront of a lapsed store keeps selling | [landing-ui-qa.md](../../../../store-pod/landing-ui/qa/landing-ui-qa.md) |
 
-### UI-03 — Plan cards compare like for like · [verified]
+---
 
-A more expensive plan showing *fewer* lines than a cheaper one was a real bug here.
+## SID — The merged store id, on billing's side
 
-- **Expect** — every card lists the same features in the same order, so values line up across columns. Pro shows
-  **∞** for products and orders rather than omitting those rows.
+_From `qa/unify-store-id-value-objects.md` §CNV, reformatted into the case shape used everywhere else._
 
-### UI-04 — The Month/Year toggle is honest · [verified]
+### SID-01 — Billing reads `store_subscription`, whose `@Id` **is** the store id · [verified]
 
-- **Expect** — yearly shows yearly prices. Free, sold monthly only, disappears from the yearly view rather than
-  showing a made-up figure.
+_Was C2._
 
-### UI-05 — Invoices link to Stripe's own documents · [verified]
+- **Steps** — provision a store, then `GET /billing/api/v1/subscription/current?store=<new id>`.
+- **Expect** — **200**, a TRIALING row, and the clearest single illustration of the wire format:
 
-- **Expect** — each paid invoice has a working PDF link and an amount matching what was charged. A store that
-  has never paid shows no invoice section — not an error.
+  ```json
+  {"store":"6a7c775e2479528beff8a4c2","status":"TRIALING",
+   "planPriceId":{"id":"6a7c754dcd4d53952a3244f1"}}
+  ```
 
-### UI-06 — All five languages, and Arabic right-to-left · high · [not verified]
+  The store id is a bare string; `planPriceId` is still an object. Both are intended.
 
-> **Known to be unchecked.** The Arabic strings are in, but the layout was never reviewed right-to-left. Treat
-> this as a real hunt.
-
-- **Steps** — switch through en, ar, es, fr, ru on the subscription page. In Arabic, check the plan cards,
-  status chips, alerts and the invoice table.
-- **Expect** — no raw keys such as `SUBSCRIPTION.RENEWS_ON` on screen. In Arabic the layout mirrors properly —
-  values, chips and the table read right-to-left rather than sitting on the wrong edge.
-
-### UI-07 — The public price list still works · [not verified]
-
-This page moved to a different backend in this change and was only checked by build, never on screen.
-
-- **Steps** — signed out (a private window is easiest), open the public site and find the pricing section.
-- **Expect** — plans and prices appear, matching the console exactly, with the free plan shown separately.
-  Monthly and yearly both work.
+> The gateway ↔ billing boundary — where the shape change actually crosses a network hop — is asserted from the
+> consumer's side, in gateway-qa.md SID-01 and SID-02.
 
 ---
 
@@ -491,13 +434,7 @@ them, so they would never renew and never be asked to pay.
 
 - **Expect** — the second run inserts nothing and changes nothing. Anything billing already knew is untouched.
 
-### MIG-05 — The old endpoints are gone and nothing still calls them · high · [verified]
-
-- **Steps** — call `/control-plane/api/v1/subscription-plan/public/tables` and
-  `/control-plane/api/v1/subscription/subscription-plan-details`; then click through the console — org
-  management, store management, the public pricing page — watching the browser's network tab for 404s.
-- **Expect** — the endpoints are gone, and **no screen calls them**. The second half matters more than the
-  first.
+> MIG-05 (the old endpoints are gone and nothing still calls them) is checked from the console's network tab and moved to [console-ui-qa.md](../../../console-ui/qa/console-ui-qa.md).
 
 ---
 
@@ -521,6 +458,8 @@ screen.
 | **Best plan looked worst** | Pro showed fewer feature lines than Basic, because unlimited items were omitted. | UI-03. |
 | **Free stores active forever** | Migrated trials that no job would ever examine. | MIG-02. |
 | **Values too long for their column** | Checkout failed with a database error on long provider identifiers. | Exercise checkout, upgrade, downgrade and cancel at least once each — each writes a different shape. |
+
+---
 
 ---
 
@@ -549,6 +488,6 @@ currently the whole safety net. Everything marked **[not verified]** has never b
 
 ---
 
-Raise anything unexpected against PR #270. When reporting, include the store id, the time, and the matching
-lines from `.lcl/default/logs/billing.log` — most of these paths are asynchronous, so the log is usually the only
+Raise anything unexpected against the billing PR. When reporting, include the store id, the time, and the matching
+lines from `.lcl/<stack>/logs/billing.log` — most of these paths are asynchronous, so the log is usually the only
 place the real cause appears.

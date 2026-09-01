@@ -1,13 +1,22 @@
-# QA — local stack lifecycle (`lcl`)
+# QA — the local stack (`lcl`)
 
 The public `@cvhome-saas/lcl` package owns local stack startup, shutdown, per-service recovery, health, logs,
 audit and isolation between named stacks. These cases prove it manages the full stack, single services, and
 several stacks at once (`--stack xxx`) without touching each other.
 
-- **Scope** — public `cvhome-saas/lcl` engine, `lcl.yml` (project), `docker-compose-lcl.yml`, `store-pod/spg/Caddyfile`
-  (`{$LCL_PORT_*}`), local Docker infra, Java services, frontends
+**This is the one QA document that does not live beside a service**, because it belongs to no service: it
+covers the CLI, `lcl.yml`, the Docker infra and the port sequences that every other QA document depends on.
+Every other file is `<service>/qa/<module>-qa.md` — see
+[`references/qa-testing.md`](../.claude/skills/project-structure/references/qa-testing.md) §7.
+
+- **Scope** — public `cvhome-saas/lcl` engine, `lcl.yml` (project), `docker-compose-lcl.yml`,
+  `store-pod/spg/Caddyfile` (`{$LCL_PORT_*}`), local Docker infra, Java services, frontends
 - **Change** — rewrite of the bash supervisor as a TypeScript multi-stack runner with dynamic port sequences
 - **Cases** — 14
+- **Also see** — [spg](../store-pod/spg/qa/spg-qa.md) (case 09's `X-Forwarded-Port` observation is asserted
+  there as HDR-01), [uaa](../store-core/uaa/qa/uaa-qa.md) (case 09's redirect patching is AUT-08),
+  [inventory](../store-pod/inventory/inventory-service/qa/inventory-qa.md) (case 06 is the fix for a
+  regression in its REG table)
 
 Each case is tagged **[verified]** (run against this runner and this `lcl.yml`, passed) or **[not verified]**.
 The verified runs were done on `feat/external-lcl-cli`, which carries the same runner and an equivalent

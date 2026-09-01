@@ -1,53 +1,40 @@
-# QA — the merchant service (store identity, branding, routing)
+# QA — merchant (`store-pod/merchant/merchant-service`)
 
-`store-pod/merchant` is what a *store* is. After the CMS moved out to `store-pod/content` it holds one thing
-and holds it for everybody: the store record — name, address, contact, currency, languages, theme, logo,
-banner, slider, social links — plus the **routing map** that turns a hostname into a store. Every other pod
-service asks it who a store is before it can answer anything, the storefront's edge asks it before it can serve
-a request at all, and the control plane calls it to bring a store into existence.
+Merchant is the pod's record of the store itself: its name, address, contact, currency, country, theme,
+supported languages, and the domains the edge routes on. It no longer owns appearance or media — those moved to
+[content](../../../content/content-service/qa/content-qa.md) — and it is the record four other services cache.
 
-That makes it small and disproportionately dangerous: a merchant outage is not a missing feature, it is a pod
-that cannot identify its tenants.
-
-- **Scope** — merchant · spg routing · tenancy provisioning · console-ui store management · landing-ui ·
-  the pod services that cache the store record (catalog, checkout, payment, cua)
-- **Change** — the service as it stands on PR #276, branch `feat/mirror-console-ui`. Its content ownership was
-  removed in PR #273 (`.agents/plans/split-merchant-content-services.md`); its console screens were rebuilt in
-  Module 5 of `.claude/plans/agents-requirments-console-ui-go-live-m-woolly-candy.md`.
-- **Cases** — 59 (8 verified, 4 covered by tests only, 47 never run end to end)
-- **Still current on PR #282** — merchant itself is untouched by the catalog/inventory split and rewrites; what changed
-  is who reads it: catalog reads the store's units of measure, inventory no longer reads it at all. The sibling file is
-  [`qa/catalog-and-inventory.md`](catalog-and-inventory.md).
-- **Supersedes** — the six-case `MER` follow-up section at the foot of
-  [`qa/split-merchant-content-services.md`](split-merchant-content-services.md). Those cases are folded in
-  here (STR-03, STR-04, UPD-02, SEC-04, BRD-05, ARC-01); run this file, not that section.
+- **Scope** — the canonical and compatibility store reads, the private update, the domain/router API that Caddy
+  calls on every storefront request, store creation as merchant sees it, and everything that depends on merchant
+  being up
+- **Runs on** — `lcl start -d --stack <name>`; read the live port from `lcl urls`. Address it through the
+  gateway, never `:8120`
+- **Cases** — 44 (5 verified, 4 unit only, 35 not verified)
+- **Also see** — [tenancy](../../../../store-core/tenancy/tenancy-service/qa/tenancy-qa.md) (which creates the
+  store and calls merchant off the outbox), [spg](../../../spg/qa/spg-qa.md) (the edge that calls the router),
+  [console-ui](../../../../store-core/console-ui/qa/console-ui-qa.md) (Store management),
+  content (which now owns the logo, banner, slider and social links)
 
 Each case is tagged:
 
-- **[verified]** — driven end to end against a running stack and passed.
-- **[unit only]** — covered by a named automated test, nobody drove it through the stack.
-- **[not verified]** — never run end to end by anyone. Most of this file. The upload endpoints in particular
-  have no runnable request file and no test.
+- **[verified]** — run against a running stack and passed.
+- **[unit only]** — covered by the named test; nobody drove it through the stack.
+- **[not verified]** — never run end to end by anyone.
 
 Sections [REG](#reg--regression-watchlist) and [99](#99--known-gaps) are the highest-value reading. This
-service has an unusually long list of things that are **missing by design and look like defects** — no way to
-remove a logo, a language you can add but not remove, a DNS check that runs in your browser and not on the
-platform. Read section 99 before filing anything.
+service has an unusually long list of things that are missing by design and look like defects — read 99 before
+raising anything.
 
 ---
 
 ## 00 — Before you start
 
-```bash
-sudo ./extra/scripts/configure-domain.sh        # once per machine
-lcl start -d             # stop later with `lcl stop`
-```
+**Shared prerequisites** — starting the stack, the demo logins, the seeded org/store/pod ids, gateway-vs-pod
+addressing and the `psql` idiom are in
+[`references/qa-testing.md`](../../../../.claude/skills/project-structure/references/qa-testing.md) §§1–5.
+Only what is specific to merchant is below.
 
-**Sign-in.** Console `http://gateway.com:8000` — `org1-admin` / `admin` (org owner), `org1-store1-admin` /
-`admin`, `org1-store1-moderator` / `admin` (the read-only case). Storefront
-`http://org1-store1.spg-507f1f77.gateway.com`.
-
-### The demo stores
+### The demo stores, with their seeded domains
 
 | Store | Id | Theme / colour | Locales | Domains seeded |
 |---|---|---|---|---|
@@ -56,10 +43,9 @@ lcl start -d             # stop later with `lcl stop`
 | org2-store1 | `65f020632bc46470c104b76f` | — | fr, en | `org2-store1`, `org2-store1.asrevo.com` |
 | org2-store2 | `65f023632bc26470c104b75f` | — | ar, fr | `org2-store2`, `org2-store2.asrevo.com` |
 
-org1-store1 and org1-store2 belong to the **same org**; org2-store1 is the one to use whenever a case says
-"another org". Only the four `.spg-507f1f77.gateway.com` subdomains are in `/etc/hosts` — the `.asrevo.com`
-custom domains are seeded in the routing table but do not resolve locally, which is exactly what makes them
-useful for the router cases (you drive those through the API, not the browser).
+Only the four `.spg-507f1f77.gateway.com` subdomains are in `/etc/hosts` — the `.asrevo.com` custom domains are
+seeded in the routing table but do not resolve locally, which is exactly what makes them useful for the router
+cases (you drive those through the API, not the browser).
 
 ### Addressing
 
@@ -68,10 +54,9 @@ http://gateway.com:8000/spg/merchant/api/v1/...?store=<id>&pod=507f1f77bcf86cd79
 http://spg-507f1f77.gateway.com/merchant/api/v1/...?store=<id>&lang=en                            # pod path
 ```
 
-**The platform gateway route predicates on `pod` as well as `store`** — a `/spg/**` URL carrying only `store`
-is a 404 that looks like a missing store. Runnable blocks live in `store-pod/merchant/merchant-service/http/`
-(`merchant-store-api.http`, `router-controller.http`, `external-merchant-store-api.http`); note that **none of
-the upload or social-link endpoints have a block there**, so those cases are browser or `curl` work.
+Runnable blocks live in `store-pod/merchant/merchant-service/http/` (`merchant-store-api.http`,
+`router-controller.http`, `external-merchant-store-api.http`); note that **none of the upload or social-link
+endpoints have a block there**, so those cases are browser or `curl` work.
 
 ### Looking at the truth underneath
 
@@ -82,20 +67,18 @@ docker exec cvhome-postgres-1 psql -U postgres -d cvhome -c \
 
 ... "select * from merchant.store_domains order by store_merchant_id;"
 ... "select * from merchant.merchant_language order by store_merchant_id;"
-... "select * from merchant.merchant_slider_images order by store_merchant_id, priority;"
 ... "select * from merchant.social_links order by store_merchant_id;"
 ```
 
-Logs: `.lcl/default/logs/merchant.log`. The router logs every edge lookup (`header lookup:` and `tls ask:`), which
-is the fastest way to see what hostname Caddy actually asked about.
+Logs: `.lcl/<stack>/logs/merchant.log`. The router logs every edge lookup (`header lookup:` and `tls ask:`),
+which is the fastest way to see what hostname Caddy actually asked about.
 
 ### The MinIO trap, before you test any image
 
 `docker-compose-lcl.yml` runs MinIO **without a volume**, and the seeds reference file *names* that were never
 uploaded. So on a fresh stack `logo.jpeg`, `banner.jpeg` and `slide-1..5.jpeg` are rows in the database with no
 objects behind them: the store record is correct and the storefront images are broken. That is the local stack.
-Upload your own image first if you need to see one render, and expect it to vanish on the next
-`docker compose down`.
+Content's `## 00` carries the recipe that repopulates it.
 
 ---
 
@@ -168,6 +151,8 @@ Nobody has audited this response against "what may a signed-out shopper see". Do
 
 ---
 
+---
+
 ## UPD — Updating a store
 
 `PUT /private/store` takes a whole store body. Three things about it a tester must know before judging what
@@ -237,7 +222,11 @@ Expected to fail in the removal direction. Record what you see; do not file it.
 
 ---
 
+---
+
 ## BRD — Logo, banner and slider images
+
+_BRD-02, BRD-03 and BRD-06 are client-side checks — no request is made — and moved to [console-ui-qa.md](../../../../store-core/console-ui/qa/console-ui-qa.md)._
 
 Three upload endpoints and one list-replace endpoint. The order matters: the file goes to object storage
 **first**, and only a successful upload writes the filename onto the store.
@@ -251,22 +240,6 @@ Three upload endpoints and one list-replace endpoint. The order matters: the fil
 - **Steps** — upload a square PNG on `/store-management/branding`; reload; upload a different one.
 - **Expect** — `merchant_store.store_logo` holds the new filename, the object is in MinIO under
   `files/<storeId>/LOGO/<filename>`, and the console preview and the storefront header both show it.
-
-### BRD-02 — The console refuses the wrong shape before it uploads · high · [verified]
-
-`accept=` is advisory in every browser, so type, weight and pixel dimensions are checked client-side and the
-refusal quotes the actual file.
-
-- **Steps** — drop a 1920×480 image on the **logo** well.
-- **Expect** — refused by name and shape ("that image is 1920 × 480, which is the wrong shape for this slot")
-  and **no request is made** — confirm in the network panel. Repeat on the banner well (4:1) and the slider
-  add-zone (2.5:1).
-
-### BRD-03 — An upload says it finished · [verified]
-
-- **Expect** — the well spins while the request is in flight and holds a tick afterwards, both floored to a
-  visible duration. A local upload round-trips faster than the eye, so without the floor a completed upload and
-  a missed click look identical.
 
 ### BRD-04 — Slider images reorder and delete by list replacement · high · [not verified]
 
@@ -285,17 +258,11 @@ Storage is ordered before persistence precisely so this holds. Nobody has inject
   error for a refused write), and `store_logo` **unchanged** in the database. The store must never end up
   naming a file that was never stored.
 
-### BRD-06 — There is no way to remove a logo, and the console says so · [not verified]
-
-Expected behaviour, not a defect.
-
-- **Expect** — no Remove button on the logo or banner; the card reads "uploading again replaces the current
-  image. The platform has no way to remove one once set." If a Remove button exists, it is a 404 waiting to
-  happen — file that.
-
 ---
 
 ## SOC — Social links
+
+_SOC-02 (a link must belong to the provider whose row it is in) has no server-side equivalent at all; it moved to console-ui-qa.md._
 
 `PUT /private/store/social-links` replaces the set. The body is store-shaped even though only `socialLinks` is
 read — that is the declared type, not a convenience.
@@ -307,20 +274,13 @@ read — that is the declared type, not a convenience.
   forever on a single missing translation key, with four of five rows unlabelled and an idle network — so a
   hung veil here is a known shape of failure, not a slow request.)
 
-### SOC-02 — A link must belong to the provider whose row it is in · high · [verified]
-
-Nothing server-side checks that a `SocialLink`'s provider and URL agree, so the console is the only place it
-can be enforced — and a TikTok URL under a Facebook mark sends shoppers somewhere else.
-
-- **Steps** — put a TikTok URL in the Facebook field; then a bare `facebook.com` with no profile after it.
-- **Expect** — both refused by name, with the expected shape spelled out. `twitter.com` and `fb.com` are
-  accepted deliberately (those companies still serve them), and subdomains count.
-
 ### SOC-03 — Removing a link removes it · [not verified]
 
 - **Steps** — clear one provider's field, save, reload, check the storefront footer.
 - **Expect** — the row is gone from `social_links` and the icon is gone from the storefront. A cleared field
   that comes back on reload is the same union-instead-of-replace shape as UPD-04 — worth checking for.
+
+---
 
 ---
 
@@ -407,7 +367,15 @@ filter and rely entirely on `@PreAuthorize`.
 
 ---
 
+> These are merchant's own endpoints, called by Caddy on every storefront request. The edge's side of the same
+> conversation — what spg does when merchant does not answer — is
+> [spg-qa.md](../../../spg/qa/spg-qa.md) DEP-04.
+
+---
+
 ## CRT — Creating a store
+
+_CRT-01, CRT-02 and CRT-04 are tenancy's: it owns creation, re-validates merchant's required fields so the caller can be told what is wrong, and records a refusal differently from a timeout. They moved to [tenancy-qa.md](../../../../store-core/tenancy/tenancy-service/qa/tenancy-qa.md)._
 
 A store is created by the control plane, not by the merchant directly: tenancy writes its own row, then calls
 `POST /private/store` on the pod **through the outbox**. Creation is therefore asynchronous, and the merchant
@@ -418,35 +386,10 @@ merchant's required fields up front** — deliberately duplicating part of merch
 name, email, phone, theme, colorTheme, currency, defaultLanguage, supportedLanguages, and address.{country,
 city, postalCode}.
 
-### CRT-01 — Creating a store from the console works end to end · critical · [not verified]
-
-- **Steps** — create a store through `/create-store`; watch `merchant.log` and `control.outbox_record`.
-- **Expect** — the row appears in `merchant.merchant_store` within seconds, with its `SUB_DOMAIN` allocated
-  from the store name, and the storefront answers on its hostname once `/etc/hosts` has the entry.
-
-### CRT-02 — An incomplete body is refused synchronously, with fields · critical · [not verified]
-
-The whole point of the duplicated validation. It has already been wrong once, in a way that produced a real
-FAILED store row.
-
-- **Steps** — post a create body missing `city`, then missing `postalCode`, then missing `phone`.
-- **Expect** — **400 with field errors** from tenancy, before any store row exists. A 200 followed minutes
-  later by a failed provisioning — or a **500** reading `COMMON.INTERNAL_ERROR` — is the regression.
-
 ### CRT-03 — A duplicate store id is a conflict · high · [not verified]
 
 - **Steps** — call `POST /private/store` directly with an id that already exists.
 - **Expect** — **409** `MERCHANT.STORE.DUPLICATE`, not a 400 and not a silent overwrite.
-
-### CRT-04 — A pod that refuses and a pod that never answers are recorded differently · high · [not verified]
-
-The client names these failures separately because the caller acts on the difference: a refusal is a verdict
-and is recorded as failed provisioning; a timeout decided nothing and must be left for the outbox to retry.
-
-- **Steps** — (a) stop `merchant`, create a store; (b) make merchant refuse (post a body it will reject).
-- **Expect** — (a) the outbox row stays pending and retries, and the store completes when merchant returns;
-  (b) the store is recorded as failed with the pod's own code. A timeout recorded as a rejection is the
-  regression this contract exists to prevent.
 
 ### CRT-05 — Reaching merchant directly with no default language · [not verified]
 
@@ -456,7 +399,11 @@ Known unguarded dereference; not reachable through the console any more.
 
 ---
 
+---
+
 ## DEP — Everything that depends on merchant
+
+_DEP-04 (the storefront edge with merchant down) moved to spg-qa.md. **DEP-02 is the single most valuable case in this file**: it asserts that four other services degrade rather than 500 when merchant is out._
 
 Catalog, checkout, payment and cua all resolve the store record through `ExternalMerchantStoreService`, each
 behind its own `@Cacheable("STORE")`. The cache is what makes a merchant blip survivable — and what makes a
@@ -485,13 +432,6 @@ The single most valuable case in this file, because merchant is the one service 
 - **Steps** — stop merchant, restart `catalog` (so its cache is empty), then load a product.
 - **Expect** — a defined failure the caller can act on — a typed remote-unavailable error, not a null
   dereference. This is the case the cache cannot cover for.
-
-### DEP-04 — The storefront edge with merchant down · critical · [not verified]
-
-- **Steps** — stop merchant and open a storefront hostname.
-- **Expect** — Caddy's `lookup-by-domain` fails, so the request cannot be identified. Confirm the shopper gets
-  a store-not-found or error page rather than a hanging request or another store's content. Then restart
-  merchant and confirm it recovers **without** clearing anything by hand.
 
 ---
 
@@ -545,90 +485,6 @@ because the store does not exist yet.
 
 ---
 
-## UI — The console's store management
-
-Eight sections behind one rail: details, branding, slider, social, domain, home, payments, social login. (The
-last two belong to payment-service and cua; they are listed here only because they share the page.)
-
-### UI-01 — The page follows the store switcher · critical · [verified]
-
-The bug worth the whole QA pass: switching stores left the page showing the **previous** store's settings — its
-domains, its landing copy, its gateway secrets — while the request context had already moved on, so the next
-save would have written one store's values onto the other.
-
-- **Steps** — open store management for org1-store1, note a distinctive value, switch to org1-store2 with the
-  rail, and look again. Then switch back and save something.
-- **Expect** — every section reloads for the new store. Nothing from the previous one survives on screen for
-  even a moment. This is the worst kind of wrong because it looks fine.
-
-### UI-02 — Fields the platform does not record are honest about it · high · [verified]
-
-Six designed fields (legal name, tax number, slug, category, timezone, short description) and both visibility
-switches have no counterpart anywhere on the platform.
-
-- **Expect** — they render **disabled** inside a "Not recorded by the platform" block with the reason beside
-  them, and they are disabled in the form service so they can never reach a request body. The header carries
-  **no** published/unpublished badge — a badge that always reads "Published" is an assertion, not a fact.
-
-### UI-03 — The home section writes the landing snippet · high · [not verified]
-
-This card was repointed at content-service's snippets API when the old box endpoints were deleted. Same screen,
-different backend.
-
-- **Steps** — edit the headline, body and search snippet; save; reload; check the storefront home.
-- **Expect** — it persists and renders. A 404 in the network panel means the repoint is wrong. Arabic copy
-  typed while the console is in English must render right-to-left (`dir="auto"`), not as reversed nonsense.
-
-### UI-04 — The custom-domain field refuses a domain that does not point here · high · [not verified]
-
-The server records whatever hostname it is given, so the client check is the only check there is.
-
-- **Steps** — type a domain with no CNAME at all; then one pointing elsewhere; then block `dns.google` (an
-  offline network or a blocker) and type a valid one.
-- **Expect** — the first two are refused with what the resolver found and Save stays out of reach; the third
-  **warns and allows**, because a resolver the browser could not reach says nothing about the operator's DNS.
-  An allocated domain shows a badge only once a re-check has actually run — never a "not checked" badge under a
-  domain the console itself required a passing lookup for.
-
-### UI-05 — The address section says where the store lives, or says it cannot · [not verified]
-
-The storefront hostname is assembled client-side from two calls on two tiers; either can be refused.
-
-- **Expect** — the default subdomain row and the CNAME target render for a healthy store. When either leg is
-  refused, the section reads "Address not available" and hides the DNS record block — never a half-built
-  hostname, which would send an operator to their registrar with a value that can never resolve.
-
-### UI-06 — Arabic, right to left, across all eight sections · high · [not verified]
-
-- **Steps** — switch the console to Arabic and walk every section, including the branding wells, the slider
-  rows, the domain panel and the settings rail folded to its icon strip.
-- **Expect** — no raw keys on screen, mirrored layout, and accessible names surviving the rail's fold. A
-  section stuck under its loading veil with an idle network is the known missing-key failure — `npm run lint`
-  now has `lint:i18n-missing` to catch it before it ships.
-
----
-
-## SF — The storefront
-
-### SF-01 — The store's identity renders · critical · [not verified]
-
-- **Steps** — open org1-store1's storefront.
-- **Expect** — store name, logo, banner, slider and social links come from the merchant record. Broken images
-  on a fresh stack are the MinIO gap; the *names* must still be right in the API response.
-
-### SF-02 — Arabic default language is honoured · high · [not verified]
-
-org1-store1's default language is `ar`.
-
-- **Steps** — open the storefront root with no locale in the path.
-- **Expect** — Arabic, right-to-left, with the Arabic font actually applied — a Latin fallback face silently
-  drops Arabic glyphs, so check the rendering, not just the direction.
-
-### SF-03 — A store with a custom domain serves the same content · [not verified]
-
-- **Steps** — add a hosts entry for a custom domain you allocated in DOM-05, then open it.
-- **Expect** — the same storefront as the subdomain, identified by the same `Store-Id` header.
-
 ---
 
 ## ARC — What the split left behind
@@ -659,6 +515,38 @@ semicolon inside seeded HTML had split a statement.
 
 ---
 
+---
+
+## APP — What the appearance move left here
+
+_From `qa/content-owns-appearance-and-media.md` — two negative assertions about merchant, kept on merchant's
+side because merchant is what they assert about._
+
+### APP-08 — Store management has no appearance left · [verified]
+
+- **Steps** — open **Store management**.
+- **Expect** — four sections: details, domains, payments, social login. No branding, home, slider or social
+  links. `POST …/private/store/marketing/logo` returns **404**.
+- **Note** — needs a signed-in session. Unauthenticated the removed routes answer **401**, because security runs
+  ahead of routing, so a curl without a token cannot tell "gone" from "not logged in". Easiest from the
+  console's own devtools: `fetch(path, {method:'POST'})` carries the session.
+- **Result** — four sections, and logo/banner/slider all **404** with a live session.
+- **Found** — `/store-management` still redirected to `/store-management/branding`, a section that no longer
+  exists, so the page opened on an empty pane. The redirect now goes to `domain`. Three dead form groups
+  (`branding`, `home`, `slider`) went with it — eslint could not see them because they were only referenced
+  within their own file.
+
+---
+
+### APP-09 — The store record carries no appearance · [verified]
+
+- **Steps** — `GET /spg/merchant/api/v1/store?store=…`.
+- **Expect** — no `logo`, `banner`, `sliderImages` or `socialLinks`.
+
+---
+
+---
+
 ## REG — Regression watchlist
 
 Every row was a real defect. Several were invisible from the screen.
@@ -676,6 +564,8 @@ Every row was a real defect. Several were invisible from the screen.
 | **An upload that ran and a click that missed looked identical** | A local upload round-trips faster than the eye registers a spinner. | BRD-03 |
 | **Arabic copy rendered left-to-right** | The home section is written in languages the console is not running in; without `dir="auto"` the text read as nonsense. | UI-03 |
 | **Buttons that had always 404'd** | seller-core's `removeStoreLogo`/`removeStoreBanner` posted to paths missing the `/spg/merchant/api` prefix and mapped by no controller. | BRD-06 — the Remove button must not exist |
+
+---
 
 ---
 
@@ -732,8 +622,8 @@ That is why so much of BRD, SOC and DOM is `[not verified]`.
 
 ---
 
-Raise anything unexpected against PR #276. Include the store id, the time, and the matching lines from
-`.lcl/default/logs/merchant.log` — for a routing problem the `header lookup:` / `tls ask:` lines say exactly what
+Raise anything unexpected against the merchant PR. Include the store id, the time, and the matching lines from
+`.lcl/<stack>/logs/merchant.log` — for a routing problem the `header lookup:` / `tls ask:` lines say exactly what
 hostname the edge asked about, which is usually the whole answer. For a console defect attach the browser
 console and the failing request: a 403 is a permission problem, a 400 with `MERCHANT.STORE.CONTEXT_MISMATCH` is
 a path/query disagreement, and a 404 through `/spg/**` is usually a missing `pod` parameter.

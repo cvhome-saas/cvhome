@@ -304,6 +304,7 @@ See `references/frontends.md`.
 | Write a new endpoint | take `StoreMerchantId merchantStore` + `LanguageCode language`, add `@PreAuthorize("hasPermission(...)")`, add its block to `<service>/http/<api-class>.http` |
 | Run an endpoint by hand | `<service>/http/<api-class>.http` — or write it there if it is missing |
 | QA a change / reproduce a UI bug / drive the app in a browser | `references/qa-testing.md` — start with `lcl start -d` |
+| Write or extend a QA script for a tester | `<service>/qa/<module>-qa.md` — one per service, rules in `references/qa-testing.md` §7 |
 | Bring the local stack up or shut it down | `references/qa-testing.md` §1 (`lcl start/stop/restart/status/logs/why`) |
 | Log in locally (seller or storefront) | `references/qa-testing.md` §2 — the `test-stores` demo accounts |
 | Add a new permission | a `case` in `CustomPermissionEvaluator` + a method on `PermissionAccessChecker` |
@@ -359,7 +360,8 @@ See `references/frontends.md`.
 - `references/events-outbox.md` — aggregate roots, `@OutboxEvent`/`@OutboxHandler`, when to use events vs. calls.
 
 **Running & QA**
-- `references/qa-testing.md` — **how QA is done here**: `lcl` and its commands, the seeded demo logins and
+- `references/qa-testing.md` — **how QA is done here**, including where a QA script lives
+  (`<service>/qa/<module>-qa.md`, one per service): `lcl` and its commands, the seeded demo logins and
   entry points, browser-driven QA with the Chrome tooling, API QA through the `.http` files, logs/traces/outbox
   as evidence, the known local gaps (no MinIO → broken images), the QA checklist, and where `unitTest` /
   `integrationTest` fit.

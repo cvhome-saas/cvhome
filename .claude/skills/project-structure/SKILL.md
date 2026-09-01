@@ -324,6 +324,7 @@ See `references/frontends.md`.
 | See coverage for a service | `./gradlew perServiceCoverage` → `build/reports/coverage/<service>/index.html` |
 | Share test infrastructure (containers, JWTs, HTTP helper) | `store-commons/test-support` — never copy it into a service |
 | QA a change / reproduce a UI bug / drive the app in a browser | `references/qa-testing.md` — start with `lcl start -d` |
+| Write or extend a QA script for a tester | `<service>/qa/<module>-qa.md` — one per service, rules in `references/qa-testing.md` §7 |
 | Bring the local stack up or shut it down | `references/qa-testing.md` §1 (`lcl start/stop/restart/status/logs/why`) |
 | Log in locally (seller or storefront) | `references/qa-testing.md` §2 — the `test-stores` demo accounts |
 | Add a new permission | a `case` in `CustomPermissionEvaluator` + a method on `PermissionAccessChecker` |
@@ -384,7 +385,8 @@ See `references/frontends.md`.
   and their declared deviations, and per-service / aggregate coverage with the soft ratcheted gate.
 
 **Running & QA**
-- `references/qa-testing.md` — **how QA is done here**: `lcl` and its commands, the seeded demo logins and
+- `references/qa-testing.md` — **how QA is done here**, including where a QA script lives
+  (`<service>/qa/<module>-qa.md`, one per service): `lcl` and its commands, the seeded demo logins and
   entry points, browser-driven QA with the Chrome tooling, API QA through the `.http` files, logs/traces/outbox
   as evidence, the known local gaps (no MinIO → broken images), the QA checklist, and where the
   automated suites fit.
