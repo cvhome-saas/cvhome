@@ -116,7 +116,7 @@ class RouterControllerIntegrationTest {
         expect(response, HttpStatus.OK);
         JsonNode headers = json(response);
         assertThat(headers.get(STORE_ID_HEADER).asString()).isEqualTo(STORE_1);
-        assertThat(headers.get("Theme").asString()).isEqualTo("BASIS");
+        assertThat(headers.get("Theme").asString()).isEqualTo("FASHION");
         assertThat(headers.get("Color-Theme").asString()).isEqualTo("DEFAULT");
         assertThat(headers.get("Default-Language").asString()).isEqualTo(ARABIC);
         assertThat(headers.get("Supported-Languages").asString()).contains(ARABIC).contains("en");
