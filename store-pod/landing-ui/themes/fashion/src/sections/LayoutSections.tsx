@@ -17,11 +17,14 @@ import {SectionHeading} from '../components/SectionHeading';
 const chrome: SectionChrome = {
     Heading: ({title, subtitle, meta}) => <SectionHeading title={title} meta={meta} action={subtitle}/>,
 
-    // Stamps are typographic overprints; the badge's icon name is deliberately not drawn.
+    // Stamps are typographic overprints; the badge's icon name is deliberately not drawn. The
+    // guarantee stamp prints a size up from the product-card scarcity stamp, and its supporting
+    // line is set in the wall's small-print voice — the same register as the facts and captions —
+    // so the pair reads as one printed unit, not two fonts fighting at the same size.
     Badge: ({title, body}) => (
-        <span className="flex max-w-56 flex-col items-center gap-2.5 text-center">
-            <span className="stamp"><bdi dir="auto">{title}</bdi></span>
-            {body && <span className="max-w-[26ch] text-sm leading-relaxed text-muted-foreground"><bdi dir="auto">{body}</bdi></span>}
+        <span className="flex max-w-56 flex-col items-center gap-3 text-center">
+            <span className="stamp stamp-lg"><bdi dir="auto">{title}</bdi></span>
+            {body && <span className="max-w-[28ch] text-xs uppercase leading-relaxed tracking-[0.15em] text-muted-foreground"><bdi dir="auto">{body}</bdi></span>}
         </span>
     ),
 
