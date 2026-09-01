@@ -1,4 +1,4 @@
-import {slidesAsBanners, type SectionRenderProps, type ThemeSectionRegistry} from '@store-front/theme';
+import {heroModel, slidesAsBanners, type SectionRenderProps, type ThemeSectionRegistry} from '@store-front/theme';
 import {Hero} from './Hero';
 import {ProductGrid} from '../components/ProductGrid';
 import {ProductRail} from './ProductRail';
@@ -12,9 +12,10 @@ import {SectionHeading} from '../components/SectionHeading';
  */
 
 function HeroSection({section}: SectionRenderProps) {
+    const model = heroModel(section);
     const slides = slidesAsBanners(section.items);
     if (slides.length === 0) return null;
-    return <Hero slides={slides}/>;
+    return <Hero slides={slides} autoplay={model.autoplay ? model.interval : false}/>;
 }
 
 function ProductsSection({ctx, section, data}: SectionRenderProps) {

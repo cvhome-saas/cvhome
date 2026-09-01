@@ -1,152 +1,159 @@
+import Image from 'next/image';
 import {getTranslations} from 'next-intl/server';
 import {Link} from '@store-front/i18n/navigation';
-import {linkHref, slidesAsBanners, type SectionRenderProps, type ThemeSectionRegistry} from '@store-front/theme';
+import {heroModel, productsModel, slidesAsBanners, type SectionRenderProps} from '@store-front/theme';
+import {sectionsFromChrome, type SectionChrome} from '@store-front/ui/sections/compose';
+import {cn} from '@store-front/ui/lib/utils';
 import {Hero} from './Hero';
-import {NewsletterSection} from './NewsletterSection';
 import {ProductGrid} from '../components/ProductGrid';
 import {ProductRail} from './ProductRail';
 import {SectionHeading} from '../components/SectionHeading';
 
 /**
- * pink's layout-section registry — the issue. The hero is the cover: the name set as the masthead with
- * the merchant's slider bleeding off the end edge. The old cover's contents lines were the group list;
- * they return once hero data can see the page's anchored sections — a hand-faked list would print dead
- * links and zero counts, worse than the quiet cover.
+ * pink's section chrome — the issue. Flags print state, the contents lines number the
+ * destinations, floods own whole regions, plates and cells rule the rest. The composer supplies
+ * structure and semantics; the cover hero and the feature spreads stay bespoke.
  */
+const chrome: SectionChrome = {
+    Heading: ({title, subtitle, meta}) => (
+        <SectionHeading title={title} subtitle={subtitle}
+                        action={meta !== undefined ? <span className="dim figure text-sm">{meta}</span> : undefined}/>
+    ),
+
+    // Flags are printed marks; the badge's icon name is deliberately not drawn.
+    Badge: ({title, body}) => (
+        <span className="flex max-w-52 flex-col items-center gap-1.5 text-center">
+            <span className="flag"><bdi dir="auto">{title}</bdi></span>
+            {body && <span className="dim text-xs"><bdi dir="auto">{body}</bdi></span>}
+        </span>
+    ),
+
+    // The issue's contents: every line carries its printed page number.
+    NavToken: ({label, count, href, index}) => (
+        <Link prefetch={false} href={href} className="group flex flex-wrap items-baseline gap-x-3 gap-y-1">
+            <span aria-hidden className="figure text-sm">{String(index + 1).padStart(2, '0')}</span>
+            <span className="display text-xl underline-offset-4 group-hover:underline sm:text-2xl"><bdi dir="auto">{label}</bdi></span>
+            {count !== undefined && <span className="figure dim text-sm">{count}</span>}
+        </Link>
+    ),
+    navLayout: 'list',
+
+    Band: ({message, action, backgroundSrc}) => (
+        <div className={cn('relative flex min-h-14 flex-wrap items-center justify-center gap-x-6 gap-y-2 overflow-hidden px-5 py-4 text-center',
+            backgroundSrc ? 'text-white' : 'flood tone')}>
+            {backgroundSrc && (
+                <>
+                    <Image src={backgroundSrc} alt="" fill className="object-cover"/>
+                    <span aria-hidden className="absolute inset-0 bg-black/45"/>
+                </>
+            )}
+            <span className="band-copy relative"><bdi dir="auto">{message}</bdi></span>
+            {action && (
+                <Link prefetch={false} href={action.href} className="relative text-sm font-bold underline underline-offset-4">
+                    <bdi dir="auto">{action.label}</bdi>
+                </Link>
+            )}
+        </div>
+    ),
+
+    // The featured surface is a flooded field; everything else ranges on a ruled plate.
+    Panel: ({children, center}) => (
+        <div className={center ? 'flood tone p-6 text-center sm:p-8' : 'plate grid-cols-1 [&>details]:cell [&>details]:border-0 [&>details]:px-4'}>
+            {children}
+        </div>
+    ),
+
+    Quote: ({quote, author}) => (
+        <figure className="cell flex h-full flex-col p-5">
+            <blockquote className="display text-xl leading-snug"><bdi dir="auto">“{quote}”</bdi></blockquote>
+            {author && (
+                <figcaption className="dim mt-auto pt-3 text-xs"><bdi dir="auto">{author}</bdi></figcaption>
+            )}
+        </figure>
+    ),
+
+    MediaFigure: ({src, alt, caption, href, contained}) => {
+        const figure = (
+            <figure className="hair overflow-hidden border">
+                <div className={`relative w-full ${contained ? 'aspect-[4/3]' : 'aspect-[21/9]'}`}>
+                    <Image src={src!} alt={alt} fill className={contained ? 'object-contain' : 'object-cover'}/>
+                </div>
+                {caption && (
+                    <figcaption className="dim px-4 py-2 text-sm"><bdi dir="auto">{caption}</bdi></figcaption>
+                )}
+            </figure>
+        );
+        return href ? <Link prefetch={false} href={href} className="block">{figure}</Link> : figure;
+    },
+
+    BrandLabel: ({src, name, href}) => {
+        const label = (
+            <span className="cell flex w-32 flex-col items-center gap-1.5 p-3">
+                {src && (
+                    <span className="relative block h-10 w-full">
+                        <Image src={src} alt={name ?? ''} fill className="object-contain"/>
+                    </span>
+                )}
+                {name && <span className="display text-sm"><bdi dir="auto">{name}</bdi></span>}
+            </span>
+        );
+        return href ? <Link prefetch={false} href={href} className="block">{label}</Link> : label;
+    },
+
+    VideoFrame: ({player}) => (
+        <div className="cell p-2">
+            <div className="relative aspect-video w-full overflow-hidden">{player}</div>
+        </div>
+    ),
+
+    PostCard: ({href, title, excerpt, imageSrc}) => (
+        <Link prefetch={false} href={href} className="cell group block h-full overflow-hidden">
+            {imageSrc && (
+                <span className="relative block aspect-[3/2] overflow-hidden bg-muted">
+                    <Image src={imageSrc} alt={title} fill className="object-cover"/>
+                </span>
+            )}
+            <span className="block p-4">
+                <span className="display text-lg leading-tight group-hover:underline group-hover:underline-offset-4"><bdi dir="auto">{title}</bdi></span>
+                {excerpt && <span className="dim mt-1 line-clamp-2 block text-sm"><bdi dir="auto">{excerpt}</bdi></span>}
+            </span>
+        </Link>
+    ),
+
+    form: {
+        input: 'h-11 min-w-0 flex-1 border border-transparent bg-background px-3 text-sm text-foreground outline-none focus-visible:border-foreground',
+        button: 'ink-field h-11 px-5 text-sm font-bold uppercase tracking-wide',
+    },
+    panelTitleClass: 'display text-2xl sm:text-3xl',
+    proseClass: 'prose-issue',
+    summaryClass: 'font-bold',
+};
 
 function HeroSection({ctx, section}: SectionRenderProps) {
-    const slides = slidesAsBanners(section.items);
-    return <Hero slides={slides} storeName={section.text.heading ?? ctx.store.name} lines={[]}/>;
+    const model = heroModel(section);
+    return <Hero slides={slidesAsBanners(section.items)} storeName={model.heading ?? ctx.store.name} lines={[]}
+                 autoplay={model.autoplay ? model.interval : false}/>;
 }
 
 async function ProductsSection({ctx, section, data}: SectionRenderProps) {
     const t = await getTranslations('PAGE.HOME');
-    const products = data?.products?.products ?? [];
-    if (products.length === 0) return null;
-    const title = section.text.title ?? data?.products?.title;
+    const model = productsModel(section, data);
+    if (model.count === 0) return null;
     const rail = section.variant === 'rail';
     return (
         <section className="min-w-0">
-            {title && (
-                <SectionHeading title={title} subtitle={section.text.subtitle}
-                                action={<span className="dim figure text-sm">{t('ITEMS_COUNT', {count: products.length})}</span>}/>
+            {model.title && (
+                <SectionHeading title={model.title} subtitle={model.subtitle}
+                                action={<span className="dim figure text-sm">{t('ITEMS_COUNT', {count: model.count})}</span>}/>
             )}
             {rail
-                ? <ProductRail products={products} storeContext={ctx.storeContext}/>
-                : <ProductGrid products={products} storeContext={ctx.storeContext} grid={ctx.layout.productGrid}/>}
+                ? <ProductRail products={model.products} storeContext={ctx.storeContext}/>
+                : <ProductGrid products={model.products} storeContext={ctx.storeContext} grid={ctx.layout.productGrid}/>}
         </section>
     );
 }
 
-/** Trust badges as the issue's printed flags. */
-function UspFlags({section}: SectionRenderProps) {
-    const badges = (section.items ?? []).filter(badge => badge.text.title);
-    if (badges.length === 0) return null;
-    return (
-        <section className="min-w-0">
-            {section.text.title && <SectionHeading title={section.text.title}/>}
-            <ul className="flex flex-wrap items-start justify-center gap-x-8 gap-y-4">
-                {badges.map(badge => (
-                    <li key={badge.id} className="flex max-w-52 flex-col items-center gap-1.5 text-center">
-                        <span className="flag"><bdi dir="auto">{badge.text.title}</bdi></span>
-                        {badge.text.body && (
-                            <span className="dim text-xs"><bdi dir="auto">{badge.text.body}</bdi></span>
-                        )}
-                    </li>
-                ))}
-            </ul>
-        </section>
-    );
-}
-
-/** Categories as the issue's contents: numbered lines, each the address of a department. */
-function CategoryContents({section, data}: SectionRenderProps) {
-    const categories = data?.categories ?? [];
-    if (categories.length === 0) return null;
-    return (
-        <section className="mx-auto min-w-0 max-w-2xl">
-            {section.text.title && <SectionHeading title={section.text.title}/>}
-            <ul className="flex flex-col gap-2.5">
-                {categories.map((category, index) => (
-                    <li key={category.id}>
-                        <Link prefetch={false} href={`/category/${category.description?.friendlyUrl ?? category.code}`}
-                              className="group flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                            <span aria-hidden className="figure text-sm">{String(index + 1).padStart(2, '0')}</span>
-                            <span className="display text-xl underline-offset-4 group-hover:underline sm:text-2xl">
-                                <bdi dir="auto">{category.description?.name ?? category.code}</bdi>
-                            </span>
-                            {typeof category.productCount === 'number' && category.productCount > 0 && (
-                                <span className="figure dim text-sm">{category.productCount}</span>
-                            )}
-                        </Link>
-                    </li>
-                ))}
-            </ul>
-        </section>
-    );
-}
-
-/** The promo as a flooded band — the field owns the region whole. */
-function PromoFlood({section}: SectionRenderProps) {
-    const message = section.text.message;
-    if (!message) return null;
-    const href = linkHref(section.props.link);
-    return (
-        <div className="flood tone flex min-h-14 flex-wrap items-center justify-center gap-x-6 gap-y-2 px-5 py-4 text-center">
-            <span className="band-copy"><bdi dir="auto">{message}</bdi></span>
-            {section.text.cta && href !== '#' && (
-                <Link prefetch={false} href={href} className="text-sm font-bold underline underline-offset-4">
-                    <bdi dir="auto">{section.text.cta}</bdi>
-                </Link>
-            )}
-        </div>
-    );
-}
-
-function FaqPlate({section, data}: SectionRenderProps) {
-    const limit = typeof section.props.limit === 'number' ? section.props.limit : 5;
-    const entries = (data?.faq?.groups ?? []).flatMap(group => group.entries).slice(0, limit);
-    if (entries.length === 0) return null;
-    return (
-        <section className="mx-auto min-w-0 max-w-2xl">
-            {section.text.title && <SectionHeading title={section.text.title}/>}
-            <div className="plate grid-cols-1">
-                {entries.map((entry, index) => (
-                    <details key={index} className="group cell border-0 px-4 py-3">
-                        <summary className="flex cursor-pointer list-none items-baseline justify-between gap-3 font-bold marker:hidden [&::-webkit-details-marker]:hidden">
-                            <bdi dir="auto">{entry.question}</bdi>
-                            <span aria-hidden className="dim transition-transform group-open:rotate-45">+</span>
-                        </summary>
-                        <div className="prose-issue pt-2 text-sm text-muted-foreground"
-                             dangerouslySetInnerHTML={{__html: entry.answer}}/>
-                    </details>
-                ))}
-            </div>
-        </section>
-    );
-}
-
-function RichTextSection({section}: SectionRenderProps) {
-    if (!section.text.body && !section.text.title) return null;
-    return (
-        <div className={section.variant === 'centered' ? 'mx-auto max-w-prose text-center' : 'max-w-prose'}>
-            {section.text.title && <SectionHeading title={section.text.title}/>}
-            {section.text.body && (
-                // CMS-authored HTML, sanitized by the content service on write.
-                <div className="prose-issue text-sm [&_a]:underline [&_a]:underline-offset-4"
-                     dangerouslySetInnerHTML={{__html: section.text.body}}/>
-            )}
-        </div>
-    );
-}
-
-export const layoutSections: ThemeSectionRegistry = {
-    usp: {row: UspFlags},
-    categories: {grid: CategoryContents, pills: CategoryContents},
-    promo: {strip: PromoFlood, card: PromoFlood},
-    faq: {accordion: FaqPlate},
-    newsletter: {inline: NewsletterSection, boxed: NewsletterSection},
-    richtext: {default: RichTextSection, centered: RichTextSection},
+export const layoutSections = sectionsFromChrome(chrome, {
     hero: {classic: HeroSection, carousel: HeroSection},
     products: {rail: ProductsSection, grid: ProductsSection},
-};
+});

@@ -65,8 +65,20 @@ beauty's `hero.editorial` is the proof. A theme with no registry at all still re
 
 ### Section design rules
 
-Every section renderer — a theme's or a shell fallback — honors these, so a merchant's layout reads
-as one page in one voice rather than a stack of widgets:
+**Consistency is by construction, not by convention.** Section *semantics* — which declared fields
+are honored, empty behavior, CTA dedupe, limits, link/media resolution — live once, in the shared
+models (`libs/theme/src/sections/models.ts`, unit-tested). Section *structure* lives once, in the
+composer (`libs/ui/src/sections/compose.tsx`): a theme supplies a `SectionChrome` — its Heading,
+Badge, NavToken, Band, Panel, Quote, MediaFigure, BrandLabel, VideoFrame, PostCard and a few class
+strings — and gets every composable kind in its own voice. The shell fallbacks are the same
+composer with the neutral chrome. Only `hero` and `products` (plus a rare signature piece like
+furniture's DirectoryBoard) are bespoke overrides — and they consume `heroModel`/`productsModel`,
+so their semantics stay centralized too. A theme that wants to ignore a model value (fashion's wall
+never autoplays; word-stamp badges don't draw the icon) does it *explicitly, with a comment* — never
+by silently not reading it.
+
+Every renderer — composed or override — honors these, so a merchant's layout reads as one page in
+one voice rather than a stack of widgets:
 
 - **Headings come from the theme's own `SectionHeading`.** One scale step for section titles across
   the page; the section's `text.title` is the heading, never a kicker above a second heading.

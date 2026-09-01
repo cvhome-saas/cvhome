@@ -24,8 +24,9 @@ export interface SectionChrome {
     /** One trust badge: stamp / sticker / flag / mark / state plate / chip. May deliberately not
      *  draw `icon` when the theme's badges are typographic. */
     Badge(props: {icon: string; title: string; body?: string}): ReactNode;
-    /** One navigation token: strip / aisle tile / contents line / menu band / index tab. */
-    NavToken(props: {label: string; count?: number; href: string}): ReactNode;
+    /** One navigation token: strip / aisle tile / contents line / menu band / index tab.
+     *  `index` is the token's position for chromes that number their lines. */
+    NavToken(props: {label: string; count?: number; href: string; index: number}): ReactNode;
     /** The promo band across the page. `backgroundSrc` is the merchant's optional artwork. */
     Band(props: PromoModel & {message: string}): ReactNode;
     /** The theme's boxed surface: sheet / crate / plate / enamel field / bordered card. */
@@ -96,9 +97,9 @@ export function sectionsFromChrome(chrome: SectionChrome,
             <section className={list ? 'mx-auto min-w-0 max-w-2xl' : 'min-w-0'}>
                 {section.text.title && <Heading title={<bdi dir="auto">{section.text.title}</bdi>}/>}
                 <ul className={list ? 'flex flex-col gap-2.5' : 'flex flex-wrap gap-3'}>
-                    {links.map(link => (
+                    {links.map((link, index) => (
                         <li key={link.id} className="min-w-0">
-                            {NavToken({label: link.name, count: link.count, href: link.href})}
+                            {NavToken({label: link.name, count: link.count, href: link.href, index})}
                         </li>
                     ))}
                 </ul>

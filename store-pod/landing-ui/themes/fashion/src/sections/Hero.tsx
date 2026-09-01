@@ -1,29 +1,25 @@
 import {Link} from '@store-front/i18n/navigation';
-import type {PageContext} from '@store-front/theme';
-import type {Banner} from '@store-front/types';
+import type {HeroSlide, PageContext, SectionAction} from '@store-front/theme';
 import {cn} from '@store-front/ui/lib/utils';
 import {PosterImage} from '../components/PosterImage';
 
 /**
- * A slider image pasted as a big peeling poster. No carousel: each of the merchant's images gets its own
+ * A slide pasted as a big peeling poster. No carousel: each of the merchant's images gets its own
  * place on the wall — the first one beside the name sheet, every further slide pasted under it.
  */
 export function SlidePoster({slide, index, total, storeName, priority, className, ratio = '4 / 3'}: {
-    slide: Banner; index: number; total: number; storeName: string; priority?: boolean; className?: string; ratio?: string;
+    slide: HeroSlide; index: number; total: number; storeName: string; priority?: boolean; className?: string; ratio?: string;
 }) {
     // the ratio rides a variable so a `lg:aspect-auto` on the same element can still win (an inline style could not be overridden)
-    return (
+    const figure = (
         <figure className={cn('sheet sheen peel relative min-w-0 overflow-hidden aspect-(--ratio)', className)} style={{'--ratio': ratio} as React.CSSProperties}>
-            <PosterImage src={slide.desktopUrl ?? ''} mobileSrc={slide.mobileUrl ?? undefined} alt={slide.altText ?? ''} title={storeName} tone="faint" meta={`${String(index + 1).padStart(2, '0')} / ${String(total).padStart(2, '0')}`}
+            <PosterImage src={slide.src} alt={slide.heading ?? ''} title={storeName} tone="faint" meta={`${String(index + 1).padStart(2, '0')} / ${String(total).padStart(2, '0')}`}
                          sizes="(max-width: 1024px) 100vw, 40vw" priority={priority}/>
         </figure>
     );
-}
-
-/** A pasted call to action: the day-glo primary, and paper strips for the secondary destinations. */
-export interface WallAction {
-    label: string;
-    href: string;
+    return slide.href
+        ? <Link prefetch={false} href={slide.href} className="block h-full min-w-0">{figure}</Link>
+        : figure;
 }
 
 /**
@@ -32,7 +28,7 @@ export interface WallAction {
  * it does not only announce.
  */
 export function HeadlineSheet({ctx, heading, subheading, cta, strips = [], className}: {
-    ctx: PageContext; heading?: string; subheading?: string; cta?: WallAction; strips?: WallAction[]; className?: string;
+    ctx: PageContext; heading?: string; subheading?: string; cta?: SectionAction; strips?: SectionAction[]; className?: string;
 }) {
     const {store} = ctx;
     const year = store.inBusinessSince ? new Date(store.inBusinessSince).getFullYear() : undefined;

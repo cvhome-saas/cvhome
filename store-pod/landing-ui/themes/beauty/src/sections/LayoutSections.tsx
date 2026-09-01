@@ -1,44 +1,164 @@
+import Image from 'next/image';
 import {Link} from '@store-front/i18n/navigation';
-import {linkHref, slidesAsBanners, type SectionRenderProps, type ThemeSectionRegistry} from '@store-front/theme';
-import {NewsletterSection} from './NewsletterSection';
+import {heroModel, productsModel, slidesAsBanners, type SectionRenderProps} from '@store-front/theme';
+import {sectionsFromChrome, type SectionChrome} from '@store-front/ui/sections/compose';
+import {cn} from '@store-front/ui/lib/utils';
 import {HeroFrame} from './Hero';
 import {ProductGrid} from '../components/ProductGrid';
 import {ProductRail} from './ProductRail';
 import {SectionHeading} from '../components/SectionHeading';
 
 /**
- * beauty's layout-section registry. Besides the catalogue variants it registers a theme-exclusive hero
- * variant, `editorial` — proof of the mechanism: the manifest offers it on beauty stores only, and a
- * store that later switches theme falls back to the kind's default variant instead of breaking.
+ * beauty's section chrome — the industrial lab. Structure is drawn with 1px ink plates and 45°
+ * hazard stripes; the zip-tie primary is the only colour spend; state is a mark, never a tint. The
+ * composer supplies structure and semantics; the hero keeps its frame plus the theme-exclusive
+ * `editorial` variant — proof a theme can extend the catalogue.
  */
+const chrome: SectionChrome = {
+    Heading: ({title, subtitle, meta}) => <SectionHeading title={title} meta={meta} action={subtitle}/>,
+
+    // Plates are drawn boxes; the badge's icon name is deliberately not drawn.
+    Badge: ({title, body}) => (
+        <span className="plate flex max-w-56 flex-col gap-1 px-4 py-3 text-center">
+            <span className="font-display text-sm uppercase tracking-wide"><bdi dir="auto">{title}</bdi></span>
+            {body && <span className="text-xs text-muted-foreground"><bdi dir="auto">{body}</bdi></span>}
+        </span>
+    ),
+
+    NavToken: ({label, count, href}) => (
+        <Link prefetch={false} href={href}
+              className="plate inline-flex items-center gap-2 px-4 py-2.5 font-display text-sm uppercase tracking-wide transition-colors hover:bg-foreground hover:text-background">
+            <bdi dir="auto">{label}</bdi>
+            {count !== undefined && <span className="text-xs tabular-nums opacity-70">{count}</span>}
+        </Link>
+    ),
+
+    // The taped-off band: the primary field between hazard stripes; artwork rides under an ink wash.
+    Band: ({message, action, backgroundSrc}) => (
+        <div className={cn(backgroundSrc ? 'relative overflow-hidden text-white' : 'bg-primary text-primary-foreground')}>
+            {backgroundSrc && (
+                <>
+                    <Image src={backgroundSrc} alt="" fill className="object-cover"/>
+                    <span aria-hidden className="absolute inset-0 bg-black/55"/>
+                </>
+            )}
+            <div aria-hidden className={cn('relative h-1.5 opacity-60', backgroundSrc ? 'hazard' : 'hazard-on-primary')}/>
+            <div className="relative flex min-h-11 flex-wrap items-center justify-center gap-x-6 gap-y-2 px-5 py-3 text-center">
+                <span className="font-display text-base uppercase tracking-wide"><bdi dir="auto">{message}</bdi></span>
+                {action && (
+                    <Link prefetch={false} href={action.href} className="text-sm underline underline-offset-4">
+                        <bdi dir="auto">{action.label}</bdi>
+                    </Link>
+                )}
+            </div>
+            <div aria-hidden className={cn('relative h-1.5 opacity-60', backgroundSrc ? 'hazard' : 'hazard-on-primary')}/>
+        </div>
+    ),
+
+    Panel: ({children, center}) => (
+        <div className={cn('plate', center ? 'p-6 text-center sm:p-8' : 'divide-y divide-foreground px-5 py-2')}>
+            {children}
+        </div>
+    ),
+
+    Quote: ({quote, author}) => (
+        <figure className="plate flex h-full flex-col p-5">
+            <blockquote className="font-display text-lg uppercase leading-snug tracking-wide"><bdi dir="auto">“{quote}”</bdi></blockquote>
+            {author && (
+                <figcaption className="mt-auto pt-3 text-xs text-muted-foreground"><bdi dir="auto">{author}</bdi></figcaption>
+            )}
+        </figure>
+    ),
+
+    MediaFigure: ({src, alt, caption, href, contained}) => {
+        const figure = (
+            <figure className="plate overflow-hidden p-1">
+                <div className={`relative w-full ${contained ? 'aspect-[4/3]' : 'aspect-[21/9]'}`}>
+                    <Image src={src!} alt={alt} fill className={contained ? 'object-contain' : 'object-cover'}/>
+                </div>
+                {caption && (
+                    <figcaption className="px-2 py-2 font-display text-[0.65rem] uppercase tracking-wide text-muted-foreground">
+                        <bdi dir="auto">{caption}</bdi>
+                    </figcaption>
+                )}
+            </figure>
+        );
+        return href ? <Link prefetch={false} href={href} className="block">{figure}</Link> : figure;
+    },
+
+    BrandLabel: ({src, name, href}) => {
+        const label = (
+            <span className="plate flex w-32 flex-col items-center gap-1.5 p-3">
+                {src && (
+                    <span className="relative block h-10 w-full">
+                        <Image src={src} alt={name ?? ''} fill className="object-contain"/>
+                    </span>
+                )}
+                {name && <span className="font-display text-[0.65rem] uppercase tracking-wide"><bdi dir="auto">{name}</bdi></span>}
+            </span>
+        );
+        return href ? <Link prefetch={false} href={href} className="block">{label}</Link> : label;
+    },
+
+    VideoFrame: ({player}) => (
+        <div className="plate p-1">
+            <div className="hazard-soft relative aspect-video w-full overflow-hidden">{player}</div>
+        </div>
+    ),
+
+    PostCard: ({href, title, excerpt, imageSrc}) => (
+        <Link prefetch={false} href={href} className="plate group block h-full overflow-hidden">
+            {imageSrc && (
+                <span className="relative block aspect-[3/2] overflow-hidden bg-muted">
+                    <Image src={imageSrc} alt={title} fill className="object-cover"/>
+                </span>
+            )}
+            <span className="block p-4">
+                <span className="font-display text-sm uppercase tracking-wide group-hover:underline"><bdi dir="auto">{title}</bdi></span>
+                {excerpt && <span className="mt-1 line-clamp-2 block text-sm text-muted-foreground"><bdi dir="auto">{excerpt}</bdi></span>}
+            </span>
+        </Link>
+    ),
+
+    form: {
+        input: 'h-11 min-w-0 flex-1 rounded-none border border-foreground bg-background px-3 text-sm outline-none focus-visible:border-primary',
+        button: 'h-11 bg-primary px-5 font-display text-sm uppercase tracking-wide text-primary-foreground',
+    },
+    panelTitleClass: 'font-display text-2xl uppercase tracking-wide',
+    proseClass: 'leading-relaxed [&_p+p]:mt-3',
+    summaryClass: 'font-display text-sm uppercase tracking-wide',
+};
 
 function HeroSection({section}: SectionRenderProps) {
+    const model = heroModel(section);
     const slides = slidesAsBanners(section.items);
     if (slides.length === 0) return null;
-    return <HeroFrame slides={slides}/>;
+    return <HeroFrame slides={slides} autoplay={model.autoplay ? model.interval : false}/>;
 }
 
 /** Exclusive: the first slide as a full plate with the copy set beside it, magazine-opening style. */
 function HeroEditorial({section}: SectionRenderProps) {
-    const slides = slidesAsBanners(section.items);
-    const lead = slides[0];
+    const model = heroModel(section);
+    const lead = model.slides[0];
     return (
         <div className="grid gap-6 lg:grid-cols-[3fr_2fr] lg:items-center">
-            {lead && (
+            {lead?.src && (
                 <div className="plate relative aspect-[4/3] overflow-hidden bg-muted">
-                    {/* eslint-disable-next-line @next/next/no-img-element -- single art-directed still, no srcset */}
-                    <img src={lead.desktopUrl ?? ''} alt={lead.altText ?? ''}
-                         className="absolute inset-0 size-full object-cover"/>
+                    <Image src={lead.src} alt={lead.heading ?? ''} fill className="object-cover"/>
                 </div>
             )}
             <div className="flex flex-col gap-3">
-                {section.text.heading && (
-                    <h2 className="font-display text-3xl leading-tight lg:text-5xl">
-                        <bdi dir="auto">{section.text.heading}</bdi>
-                    </h2>
+                {model.heading && (
+                    <h2 className="font-display text-3xl leading-tight lg:text-5xl"><bdi dir="auto">{model.heading}</bdi></h2>
                 )}
-                {section.text.subheading && (
-                    <p className="max-w-prose text-muted-foreground"><bdi dir="auto">{section.text.subheading}</bdi></p>
+                {model.subheading && (
+                    <p className="max-w-prose text-muted-foreground"><bdi dir="auto">{model.subheading}</bdi></p>
+                )}
+                {model.cta && (
+                    <Link prefetch={false} href={model.cta.href}
+                          className="mt-2 inline-flex w-fit bg-primary px-5 py-3 font-display text-sm uppercase tracking-wide text-primary-foreground">
+                        <bdi dir="auto">{model.cta.label}</bdi>
+                    </Link>
                 )}
             </div>
         </div>
@@ -46,130 +166,20 @@ function HeroEditorial({section}: SectionRenderProps) {
 }
 
 function ProductsSection({ctx, section, data}: SectionRenderProps) {
-    const products = data?.products?.products ?? [];
-    if (products.length === 0) return null;
-    const title = section.text.title ?? data?.products?.title;
+    const model = productsModel(section, data);
+    if (model.count === 0) return null;
     const rail = section.variant === 'rail';
     return (
-        <section>
-            {title && <SectionHeading title={title} className="mb-4"/>}
+        <section className="min-w-0">
+            {model.title && <SectionHeading title={model.title} meta={model.count}/>}
             {rail
-                ? <ProductRail products={products} storeContext={ctx.storeContext}/>
-                : <ProductGrid products={products} storeContext={ctx.storeContext} grid={ctx.layout.productGrid}/>}
+                ? <ProductRail products={model.products} storeContext={ctx.storeContext}/>
+                : <ProductGrid products={model.products} storeContext={ctx.storeContext} grid={ctx.layout.productGrid}/>}
         </section>
     );
 }
 
-
-/** Trust badges as inked plates — structure drawn, never tinted. */
-function UspPlates({section}: SectionRenderProps) {
-    const badges = (section.items ?? []).filter(badge => badge.text.title);
-    if (badges.length === 0) return null;
-    return (
-        <section className="min-w-0">
-            {section.text.title && <SectionHeading title={section.text.title}/>}
-            <ul className="flex flex-wrap items-stretch justify-center gap-3">
-                {badges.map(badge => (
-                    <li key={badge.id} className="plate flex max-w-56 flex-col gap-1 px-4 py-3 text-center">
-                        <span className="font-display text-sm uppercase tracking-wide"><bdi dir="auto">{badge.text.title}</bdi></span>
-                        {badge.text.body && (
-                            <span className="text-xs text-muted-foreground"><bdi dir="auto">{badge.text.body}</bdi></span>
-                        )}
-                    </li>
-                ))}
-            </ul>
-        </section>
-    );
-}
-
-/** Categories as plate links: ink boxes that invert on hover. */
-function CategoryPlates({section, data}: SectionRenderProps) {
-    const categories = data?.categories ?? [];
-    if (categories.length === 0) return null;
-    return (
-        <section className="min-w-0">
-            {section.text.title && <SectionHeading title={section.text.title}/>}
-            <div className="flex flex-wrap gap-3">
-                {categories.map(category => (
-                    <Link key={category.id} prefetch={false} href={`/category/${category.description?.friendlyUrl ?? category.code}`}
-                          className="plate inline-flex items-center gap-2 px-4 py-2.5 font-display text-sm uppercase tracking-wide transition-colors hover:bg-foreground hover:text-background">
-                        <bdi dir="auto">{category.description?.name ?? category.code}</bdi>
-                        {typeof category.productCount === 'number' && category.productCount > 0 && (
-                            <span className="text-xs tabular-nums opacity-70">{category.productCount}</span>
-                        )}
-                    </Link>
-                ))}
-            </div>
-        </section>
-    );
-}
-
-/** The promo as the taped-off band: primary field between hazard stripes. */
-function PromoBand({section}: SectionRenderProps) {
-    const message = section.text.message;
-    if (!message) return null;
-    const href = linkHref(section.props.link);
-    return (
-        <div className="bg-primary text-primary-foreground">
-            <div aria-hidden className="hazard-on-primary h-1.5 opacity-60"/>
-            <div className="flex min-h-11 flex-wrap items-center justify-center gap-x-6 gap-y-2 px-5 py-3 text-center">
-                <span className="font-display text-base uppercase tracking-wide"><bdi dir="auto">{message}</bdi></span>
-                {section.text.cta && href !== '#' && (
-                    <Link prefetch={false} href={href} className="text-sm underline underline-offset-4">
-                        <bdi dir="auto">{section.text.cta}</bdi>
-                    </Link>
-                )}
-            </div>
-            <div aria-hidden className="hazard-on-primary h-1.5 opacity-60"/>
-        </div>
-    );
-}
-
-function FaqPlate({section, data}: SectionRenderProps) {
-    const limit = typeof section.props.limit === 'number' ? section.props.limit : 5;
-    const entries = (data?.faq?.groups ?? []).flatMap(group => group.entries).slice(0, limit);
-    if (entries.length === 0) return null;
-    return (
-        <section className="mx-auto min-w-0 max-w-2xl">
-            {section.text.title && <SectionHeading title={section.text.title}/>}
-            <div className="plate divide-y divide-foreground px-5 py-2">
-                {entries.map((entry, index) => (
-                    <details key={index} className="group py-3">
-                        <summary className="flex cursor-pointer list-none items-baseline justify-between gap-3 font-display text-sm uppercase tracking-wide marker:hidden [&::-webkit-details-marker]:hidden">
-                            <bdi dir="auto">{entry.question}</bdi>
-                            <span aria-hidden className="text-muted-foreground transition-transform group-open:rotate-45">+</span>
-                        </summary>
-                        <div className="pt-2 text-sm leading-relaxed text-muted-foreground"
-                             dangerouslySetInnerHTML={{__html: entry.answer}}/>
-                    </details>
-                ))}
-            </div>
-        </section>
-    );
-}
-
-function RichTextSection({section}: SectionRenderProps) {
-    if (!section.text.body && !section.text.title) return null;
-    return (
-        <div className={section.variant === 'centered' ? 'mx-auto max-w-prose text-center' : 'max-w-prose'}>
-            {section.text.title && <SectionHeading title={section.text.title}/>}
-            {section.text.body && (
-                // CMS-authored HTML, sanitized by the content service on write.
-                <div className="text-sm leading-relaxed [&_a]:underline [&_a]:underline-offset-4 [&_p+p]:mt-3"
-                     dangerouslySetInnerHTML={{__html: section.text.body}}/>
-            )}
-        </div>
-    );
-}
-
-export const layoutSections: ThemeSectionRegistry = {
-    usp: {row: UspPlates},
-    categories: {grid: CategoryPlates, pills: CategoryPlates},
-    promo: {strip: PromoBand, card: PromoBand},
-    faq: {accordion: FaqPlate},
-    newsletter: {inline: NewsletterSection, boxed: NewsletterSection},
-    richtext: {default: RichTextSection, centered: RichTextSection},
-
+export const layoutSections = sectionsFromChrome(chrome, {
     hero: {classic: HeroSection, carousel: HeroSection, editorial: HeroEditorial},
     products: {rail: ProductsSection, grid: ProductsSection},
-};
+});

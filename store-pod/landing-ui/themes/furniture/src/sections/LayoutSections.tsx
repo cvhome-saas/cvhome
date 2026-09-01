@@ -1,8 +1,10 @@
+import Image from 'next/image';
 import {getTranslations} from 'next-intl/server';
 import {Link} from '@store-front/i18n/navigation';
-import {linkHref, slidesAsBanners, type SectionRenderProps, type ThemeSectionRegistry} from '@store-front/theme';
+import {heroModel, productsModel, slidesAsBanners, type SectionRenderProps} from '@store-front/theme';
+import {sectionsFromChrome, type SectionChrome} from '@store-front/ui/sections/compose';
+import {cn} from '@store-front/ui/lib/utils';
 import {Hero} from './Hero';
-import {NewsletterSection} from './NewsletterSection';
 import {DirectoryBoard, type Department} from '../components/DirectoryBoard';
 import {floors} from '../components/floors';
 import {ProductGrid} from '../components/ProductGrid';
@@ -10,18 +12,129 @@ import {ProductRail} from './ProductRail';
 import {SectionHeading} from '../components/SectionHeading';
 
 /**
- * furniture's layout-section registry — the building. The hero is the window onto the current floor;
- * `categories` sections are the building's directory board (the theme's signature piece), one row per
- * department in the merchant's own order; product sections are the numbered plates.
+ * furniture's section chrome — the home floor directory. State plates print state, enamel fields
+ * carry the signs, brass hairlines rule the plates. The composer supplies structure and semantics;
+ * the window hero, the numbered plates and the directory board stay bespoke.
  */
+const chrome: SectionChrome = {
+    Heading: ({title, subtitle, meta}) => <SectionHeading title={title} meta={meta} action={subtitle}/>,
+
+    // State plates are printed words; the badge's icon name is deliberately not drawn.
+    Badge: ({title, body}) => (
+        <span className="flex max-w-52 flex-col items-center gap-1.5 text-center">
+            <span className="state-plate"><bdi dir="auto">{title}</bdi></span>
+            {body && <span className="text-xs text-muted-foreground"><bdi dir="auto">{body}</bdi></span>}
+        </span>
+    ),
+
+    NavToken: ({label, count, href}) => (
+        <Link prefetch={false} href={href}
+              className="sign inline-flex items-center gap-2 rounded-(--r-control) border px-4 py-2.5 text-xs transition-colors hover:bg-secondary">
+            <bdi dir="auto">{label}</bdi>
+            {count !== undefined && <span className="figure text-muted-foreground">{count}</span>}
+        </Link>
+    ),
+
+    Band: ({message, action, backgroundSrc}) => (
+        <div className={cn('relative flex min-h-14 flex-wrap items-center justify-center gap-x-6 gap-y-2 overflow-hidden px-5 py-4 text-center',
+            backgroundSrc ? 'rounded-(--r-card) text-white' : 'enamel-flat')}>
+            {backgroundSrc && (
+                <>
+                    <Image src={backgroundSrc} alt="" fill className="object-cover"/>
+                    <span aria-hidden className="absolute inset-0 bg-black/50"/>
+                </>
+            )}
+            <span className="sign relative text-base"><bdi dir="auto">{message}</bdi></span>
+            {action && (
+                <Link prefetch={false} href={action.href} className="relative text-sm font-semibold underline underline-offset-4">
+                    <bdi dir="auto">{action.label}</bdi>
+                </Link>
+            )}
+        </div>
+    ),
+
+    // The featured surface is the enamel field; everything else is a brass-ruled plate.
+    Panel: ({children, center}) => (
+        <div className={center
+            ? 'enamel-flat p-6 text-center sm:p-8'
+            : 'rule-brass divide-y rounded-(--r-card) border px-5 py-2 [&>details]:border-inherit'}>
+            {children}
+        </div>
+    ),
+
+    Quote: ({quote, author}) => (
+        <figure className="rule-brass flex h-full flex-col rounded-(--r-card) border p-5">
+            <blockquote className="copy text-base leading-relaxed"><bdi dir="auto">“{quote}”</bdi></blockquote>
+            {author && (
+                <figcaption className="sign mt-auto pt-3 text-xs text-muted-foreground"><bdi dir="auto">{author}</bdi></figcaption>
+            )}
+        </figure>
+    ),
+
+    MediaFigure: ({src, alt, caption, href, contained}) => {
+        const figure = (
+            <figure className="rule-brass overflow-hidden rounded-(--r-card) border p-1">
+                <div className={`relative w-full ${contained ? 'aspect-[4/3]' : 'aspect-[21/9]'}`}>
+                    <Image src={src!} alt={alt} fill className={contained ? 'object-contain' : 'object-cover'}/>
+                </div>
+                {caption && (
+                    <figcaption className="sign px-2 py-2 text-[0.65rem] text-muted-foreground"><bdi dir="auto">{caption}</bdi></figcaption>
+                )}
+            </figure>
+        );
+        return href ? <Link prefetch={false} href={href} className="block">{figure}</Link> : figure;
+    },
+
+    BrandLabel: ({src, name, href}) => {
+        const label = (
+            <span className="rule-brass flex w-32 flex-col items-center gap-1.5 rounded-(--r-card) border p-3">
+                {src && (
+                    <span className="relative block h-10 w-full">
+                        <Image src={src} alt={name ?? ''} fill className="object-contain"/>
+                    </span>
+                )}
+                {name && <span className="sign text-[0.65rem]"><bdi dir="auto">{name}</bdi></span>}
+            </span>
+        );
+        return href ? <Link prefetch={false} href={href} className="block">{label}</Link> : label;
+    },
+
+    VideoFrame: ({player}) => (
+        <div className="rule-brass rounded-(--r-card) border p-1">
+            <div className="relative aspect-video w-full overflow-hidden rounded-[calc(var(--r-card)-4px)]">{player}</div>
+        </div>
+    ),
+
+    PostCard: ({href, title, excerpt, imageSrc}) => (
+        <Link prefetch={false} href={href} className="rule-brass group block h-full overflow-hidden rounded-(--r-card) border">
+            {imageSrc && (
+                <span className="relative block aspect-[3/2] overflow-hidden bg-muted">
+                    <Image src={imageSrc} alt={title} fill className="object-cover"/>
+                </span>
+            )}
+            <span className="block p-4">
+                <span className="sign text-sm group-hover:underline"><bdi dir="auto">{title}</bdi></span>
+                {excerpt && <span className="copy mt-1 line-clamp-2 block text-sm text-muted-foreground"><bdi dir="auto">{excerpt}</bdi></span>}
+            </span>
+        </Link>
+    ),
+
+    form: {
+        input: 'h-11 min-w-0 flex-1 rounded-(--r-control) border border-transparent bg-background px-3 text-sm text-foreground outline-none focus-visible:border-foreground',
+        button: 'sign h-11 rounded-(--r-control) bg-background px-5 text-xs text-foreground shadow-sm transition-transform duration-(--motion-fast) hover:translate-y-px',
+    },
+    panelTitleClass: 'sign text-xl sm:text-2xl',
+    proseClass: 'copy',
+    summaryClass: 'sign text-sm',
+};
 
 async function HeroSection({ctx, section}: SectionRenderProps) {
     const tc = await getTranslations('COMMON');
-    const slides = slidesAsBanners(section.items);
-    const caption = section.text.heading ?? ctx.store.name;
+    const model = heroModel(section);
     return (
         <div className="min-h-[15rem]">
-            <Hero slides={slides} caption={caption} planCaption={tc('DEPARTMENT')}/>
+            <Hero slides={slidesAsBanners(section.items)} caption={model.heading ?? ctx.store.name}
+                  planCaption={tc('DEPARTMENT')}/>
         </div>
     );
 }
@@ -47,103 +160,21 @@ async function CategoriesSection({ctx, section, data}: SectionRenderProps) {
 
 async function ProductsSection({ctx, section, data}: SectionRenderProps) {
     const t = await getTranslations('PAGE.HOME');
-    const products = data?.products?.products ?? [];
-    if (products.length === 0) return null;
-    const title = section.text.title ?? data?.products?.title;
+    const model = productsModel(section, data);
+    if (model.count === 0) return null;
     const rail = section.variant === 'rail';
     return (
         <section className="min-w-0">
-            {title && <SectionHeading title={title} meta={t('ITEMS_COUNT', {count: products.length})}/>}
+            {model.title && <SectionHeading title={model.title} meta={t('ITEMS_COUNT', {count: model.count})}/>}
             {rail
-                ? <ProductRail products={products} storeContext={ctx.storeContext}/>
-                : <ProductGrid products={products} storeContext={ctx.storeContext} grid={ctx.layout.productGrid}/>}
+                ? <ProductRail products={model.products} storeContext={ctx.storeContext}/>
+                : <ProductGrid products={model.products} storeContext={ctx.storeContext} grid={ctx.layout.productGrid}/>}
         </section>
     );
 }
 
-/** Trust badges as the building's printed state plates. */
-function UspPlates({section}: SectionRenderProps) {
-    const badges = (section.items ?? []).filter(badge => badge.text.title);
-    if (badges.length === 0) return null;
-    return (
-        <section className="min-w-0">
-            {section.text.title && <SectionHeading title={section.text.title}/>}
-            <ul className="flex flex-wrap items-start justify-center gap-x-8 gap-y-4">
-                {badges.map(badge => (
-                    <li key={badge.id} className="flex max-w-52 flex-col items-center gap-1.5 text-center">
-                        <span className="state-plate"><bdi dir="auto">{badge.text.title}</bdi></span>
-                        {badge.text.body && (
-                            <span className="text-xs text-muted-foreground"><bdi dir="auto">{badge.text.body}</bdi></span>
-                        )}
-                    </li>
-                ))}
-            </ul>
-        </section>
-    );
-}
-
-/** The promo as an enamel sign mounted across the landing. */
-function PromoSign({section}: SectionRenderProps) {
-    const message = section.text.message;
-    if (!message) return null;
-    const href = linkHref(section.props.link);
-    return (
-        <div className="enamel-flat flex min-h-14 flex-wrap items-center justify-center gap-x-6 gap-y-2 px-5 py-4 text-center">
-            <span className="sign text-base"><bdi dir="auto">{message}</bdi></span>
-            {section.text.cta && href !== '#' && (
-                <Link prefetch={false} href={href} className="text-sm font-semibold underline underline-offset-4">
-                    <bdi dir="auto">{section.text.cta}</bdi>
-                </Link>
-            )}
-        </div>
-    );
-}
-
-/** Questions on a ruled plate, brass hairlines between the rows. */
-function FaqPlate({section, data}: SectionRenderProps) {
-    const limit = typeof section.props.limit === 'number' ? section.props.limit : 5;
-    const entries = (data?.faq?.groups ?? []).flatMap(group => group.entries).slice(0, limit);
-    if (entries.length === 0) return null;
-    return (
-        <section className="mx-auto min-w-0 max-w-2xl">
-            {section.text.title && <SectionHeading title={section.text.title}/>}
-            <div className="rule-brass divide-y rounded-(--r-card) border px-5 py-2 [&>details]:border-inherit">
-                {entries.map((entry, index) => (
-                    <details key={index} className="group py-3">
-                        <summary className="sign flex cursor-pointer list-none items-baseline justify-between gap-3 text-sm marker:hidden [&::-webkit-details-marker]:hidden">
-                            <bdi dir="auto">{entry.question}</bdi>
-                            <span aria-hidden className="text-muted-foreground transition-transform group-open:rotate-45">+</span>
-                        </summary>
-                        <div className="copy pt-2 text-sm text-muted-foreground"
-                             dangerouslySetInnerHTML={{__html: entry.answer}}/>
-                    </details>
-                ))}
-            </div>
-        </section>
-    );
-}
-
-function RichTextSection({section}: SectionRenderProps) {
-    if (!section.text.body && !section.text.title) return null;
-    return (
-        <div className={section.variant === 'centered' ? 'mx-auto max-w-prose text-center' : 'max-w-prose'}>
-            {section.text.title && <SectionHeading title={section.text.title}/>}
-            {section.text.body && (
-                // CMS-authored HTML, sanitized by the content service on write.
-                <div className="copy text-sm [&_a]:underline [&_a]:underline-offset-4"
-                     dangerouslySetInnerHTML={{__html: section.text.body}}/>
-            )}
-        </div>
-    );
-}
-
-export const layoutSections: ThemeSectionRegistry = {
+export const layoutSections = sectionsFromChrome(chrome, {
     hero: {classic: HeroSection, carousel: HeroSection},
     categories: {grid: CategoriesSection, pills: CategoriesSection},
     products: {rail: ProductsSection, grid: ProductsSection},
-    usp: {row: UspPlates},
-    promo: {strip: PromoSign, card: PromoSign},
-    faq: {accordion: FaqPlate},
-    newsletter: {inline: NewsletterSection, boxed: NewsletterSection},
-    richtext: {default: RichTextSection, centered: RichTextSection},
-};
+});
