@@ -76,6 +76,9 @@ export const SECTION_CATALOG: readonly KindSpec[] = [
         fields: [
             {key: 'heading', type: 'text', label: l('Heading', 'العنوان الرئيسي'), localized: true},
             {key: 'subheading', type: 'text', label: l('Subheading', 'العنوان الفرعي'), localized: true},
+            // the section-level CTA heroModel already honors — declared so the inspector can set it
+            {key: 'cta', type: 'text', label: l('Button label', 'نص الزر'), localized: true},
+            {key: 'link', type: 'link', label: l('Button links to', 'وجهة الزر')},
             {key: 'height', type: 'select', label: l('Height', 'الارتفاع'), options: [
                 {value: 'sm', label: l('Short', 'قصير')}, {value: 'md', label: l('Medium', 'متوسط')},
                 {value: 'lg', label: l('Tall', 'طويل')}]},
@@ -127,7 +130,7 @@ export const SECTION_CATALOG: readonly KindSpec[] = [
         variants: [v('full', 'Full width', 'عرض كامل'), v('contained', 'Contained', 'محدود')],
         fields: [
             {key: 'mediaId', type: 'media', label: l('Image', 'الصورة')},
-            {key: 'alt', type: 'text', label: l('Alt text', 'النص البديل')},
+            {key: 'alt', type: 'text', label: l('Alt text', 'النص البديل'), localized: true},
             {key: 'caption', type: 'text', label: l('Caption', 'التسمية'), localized: true},
             {key: 'link', type: 'link', label: l('Links to', 'الوجهة')},
         ],
@@ -166,7 +169,8 @@ export const SECTION_CATALOG: readonly KindSpec[] = [
         itemFields: [
             {key: 'quote', type: 'textarea', label: l('Quote', 'الاقتباس'), localized: true},
             {key: 'author', type: 'text', label: l('Author', 'الكاتب'), localized: true},
-            {key: 'mediaId', type: 'media', label: l('Photo', 'الصورة')},
+            // no photo field: the quote surfaces are type-led in every theme, and a declared field
+            // no renderer draws would be a broken promise in the inspector
         ],
     },
     {

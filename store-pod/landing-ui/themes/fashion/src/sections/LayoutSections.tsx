@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import {Link} from '@store-front/i18n/navigation';
 import {heroModel, productsModel, type SectionRenderProps} from '@store-front/theme';
-import {sectionsFromChrome, type SectionChrome} from '@store-front/ui/sections/compose';
+import {EmptyOrHint, sectionsFromChrome, type SectionChrome} from '@store-front/ui/sections/compose';
 import {cn} from '@store-front/ui/lib/utils';
 import {HeadlineSheet, SlidePoster} from './Hero';
 import {ProductGrid} from '../components/ProductGrid';
@@ -176,9 +176,9 @@ function HeroWall({ctx, section}: SectionRenderProps) {
     );
 }
 
-function ProductsSection({ctx, section, data}: SectionRenderProps) {
+function ProductsSection({ctx, section, data, preview}: SectionRenderProps) {
     const model = productsModel(section, data);
-    if (model.count === 0) return null;
+    if (model.count === 0) return <EmptyOrHint preview={preview} label="Products — pick a source that has products"/>;
     const lead = section.variant === 'rail' && model.leadSrc && (
         <figure className="sheet sheen peel relative h-full min-h-64 min-w-0 overflow-hidden">
             <PosterImage src={model.leadSrc} alt={model.title ?? ''} title={ctx.store.name} tone="faint"

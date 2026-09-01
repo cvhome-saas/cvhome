@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import {Link} from '@store-front/i18n/navigation';
 import {heroModel, productsModel, slidesAsBanners, type SectionRenderProps} from '@store-front/theme';
-import {sectionsFromChrome, type SectionChrome} from '@store-front/ui/sections/compose';
+import {EmptyOrHint, sectionsFromChrome, type SectionChrome} from '@store-front/ui/sections/compose';
 import {cn} from '@store-front/ui/lib/utils';
 import {Hero} from './Hero';
 import {ProductGrid} from '../components/ProductGrid';
@@ -119,18 +119,18 @@ const chrome: SectionChrome = {
     summaryClass: 'font-display text-sm font-semibold uppercase tracking-wide',
 };
 
-function HeroSection({ctx, section}: SectionRenderProps) {
+function HeroSection({ctx, section, preview}: SectionRenderProps) {
     const model = heroModel(section);
     const slides = slidesAsBanners(section.items);
-    if (slides.length === 0 && !model.heading) return null;
+    if (slides.length === 0 && !model.heading) return <EmptyOrHint preview={preview} label="Hero — add a slide or a heading"/>;
     return <Hero slides={slides} banner={slides[0]} storeName={model.heading ?? ctx.store.name}
                  facts={[]} anchor={section.anchor ?? undefined}
                  autoplay={model.autoplay ? model.interval : false}/>;
 }
 
-function ProductsSection({ctx, section, data}: SectionRenderProps) {
+function ProductsSection({ctx, section, data, preview}: SectionRenderProps) {
     const model = productsModel(section, data);
-    if (model.count === 0) return null;
+    if (model.count === 0) return <EmptyOrHint preview={preview} label="Products — pick a source that has products"/>;
     const rail = section.variant === 'rail';
     return (
         <section>

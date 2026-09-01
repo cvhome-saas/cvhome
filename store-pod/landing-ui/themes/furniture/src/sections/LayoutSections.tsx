@@ -2,7 +2,7 @@ import Image from 'next/image';
 import {getTranslations} from 'next-intl/server';
 import {Link} from '@store-front/i18n/navigation';
 import {heroModel, productsModel, slidesAsBanners, type SectionRenderProps} from '@store-front/theme';
-import {sectionsFromChrome, type SectionChrome} from '@store-front/ui/sections/compose';
+import {EmptyOrHint, sectionsFromChrome, type SectionChrome} from '@store-front/ui/sections/compose';
 import {cn} from '@store-front/ui/lib/utils';
 import {Hero} from './Hero';
 import {DirectoryBoard, type Department} from '../components/DirectoryBoard';
@@ -158,12 +158,12 @@ async function HeroSection({ctx, section}: SectionRenderProps) {
     );
 }
 
-async function CategoriesSection({ctx, section, data}: SectionRenderProps) {
+async function CategoriesSection({ctx, section, data, preview}: SectionRenderProps) {
     const tc = await getTranslations('COMMON');
     const t = await getTranslations('PAGE.HOME');
     const departments: Department[] = floors(data?.categories ? [...data.categories] : undefined)
         .map(c => ({code: c.code, name: c.description.name, href: `/category/${c.description.friendlyUrl}`, count: c.productCount ?? 0}));
-    if (departments.length === 0) return null;
+    if (departments.length === 0) return <EmptyOrHint preview={preview} label="Categories — none to show yet"/>;
     const {store} = ctx;
     const year = store.inBusinessSince ? new Date(store.inBusinessSince).getFullYear() : NaN;
     const facts = [store.address?.city, Number.isNaN(year) ? undefined : t('SINCE', {year})].filter(Boolean) as string[];
@@ -177,10 +177,10 @@ async function CategoriesSection({ctx, section, data}: SectionRenderProps) {
     );
 }
 
-async function ProductsSection({ctx, section, data}: SectionRenderProps) {
+async function ProductsSection({ctx, section, data, preview}: SectionRenderProps) {
     const t = await getTranslations('PAGE.HOME');
     const model = productsModel(section, data);
-    if (model.count === 0) return null;
+    if (model.count === 0) return <EmptyOrHint preview={preview} label="Products — pick a source that has products"/>;
     const rail = section.variant === 'rail';
     return (
         <section className="min-w-0">

@@ -1,7 +1,9 @@
 import {strict as assert} from 'node:assert';
 import {test} from 'node:test';
 import type {LayoutSectionData} from '@store-front/types';
-import {brandsModel, embedUrl, faqModel, heroModel, imageModel, promoModel, uspModel} from '../src/sections/models';
+import {brandsModel, embedUrl, faqModel, heroModel, imageModel, newsletterModel, promoModel, testimonialsModel, uspModel} from '../src/sections/models';
+import {linkHref} from '../src/sections/links';
+import {slidesAsBanners} from '../src/sections/slides';
 
 const section = (over: Partial<LayoutSectionData>): LayoutSectionData => ({
     id: 's1', kind: 'hero', variant: null, props: {}, items: null, text: {},
@@ -94,4 +96,45 @@ test('embedUrl maps only YouTube and Vimeo page urls', () => {
     assert.equal(embedUrl('https://vimeo.com/12345'), 'https://player.vimeo.com/video/12345');
     assert.equal(embedUrl('https://example.com/watch?v=abc'), undefined);
     assert.equal(embedUrl('not a url'), undefined);
+});
+
+test('hero interval clamps to the declared 2–12s range', () => {
+    assert.equal(heroModel(section({props: {interval: 0}})).interval, 2);
+    assert.equal(heroModel(section({props: {interval: 99}})).interval, 12);
+    assert.equal(heroModel(section({props: {}})).interval, 5);
+});
+
+test('slides ride as banners with their link as a URL target and the heading as alt', () => {
+    const banners = slidesAsBanners([
+        {id: 'a', props: {mediaUrl: '/a.jpg', link: {type: 'category', value: 'sale'}}, text: {heading: 'Sale'}},
+        {id: 'b', props: {mediaUrl: '/b.jpg'}, text: {}},
+        {id: 'c', props: {}, text: {heading: 'no image, dropped'}},
+    ]);
+    assert.equal(banners.length, 2);
+    assert.deepEqual(banners[0].target, {kind: 'URL', value: '/category/sale'});
+    assert.equal(banners[0].altText, 'Sale');
+    assert.equal(banners[1].target, null);
+});
+
+test('a stored url link only reaches an anchor with a safe scheme', () => {
+    assert.equal(linkHref({type: 'url', value: '/sale'}), '/sale');
+    assert.equal(linkHref({type: 'url', value: 'https://x.example/a'}), 'https://x.example/a');
+    assert.equal(linkHref({type: 'url', value: 'mailto:hi@x.example'}), 'mailto:hi@x.example');
+    assert.equal(linkHref({type: 'url', value: 'javascript:alert(1)'}), '#');
+    assert.equal(linkHref({type: 'url', value: 'data:text/html,x'}), '#');
+});
+
+test('testimonials keep only entries with a quote', () => {
+    const quotes = testimonialsModel(section({
+        items: [
+            {id: 'a', props: {}, text: {quote: ' Great. ', author: 'Sara'}},
+            {id: 'b', props: {}, text: {author: 'No quote'}},
+        ],
+    }));
+    assert.deepEqual(quotes.map(q => q.quote), ['Great.']);
+});
+
+test('newsletter reads its variant as boxed', () => {
+    assert.equal(newsletterModel(section({variant: 'boxed'})).boxed, true);
+    assert.equal(newsletterModel(section({variant: 'inline'})).boxed, false);
 });

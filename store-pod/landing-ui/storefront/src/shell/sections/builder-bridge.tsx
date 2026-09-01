@@ -94,7 +94,7 @@ export function BuilderBridge() {
         const onMessage = (event: MessageEvent) => {
             if (!origins.includes(event.origin)) return;
             const data = (event.data ?? {}) as Record<string, unknown>;
-            if (data.v !== 2 && data.v !== undefined) return;
+            if (data.v !== 2) return; // versioned on both sides; anything unversioned is not the console
             const sectionId = typeof data.sectionId === 'string' ? data.sectionId : null;
             switch (data.type) {
                 case 'select':
@@ -212,20 +212,40 @@ export function BuilderBridge() {
 
     // -------------------------------------------------------------------------------- canvas reorder
 
+    /** Tears down the active reorder's window listeners; also runs on unmount so none can leak. */
+    const reorderCleanup = useRef<(() => void) | null>(null);
+    useEffect(() => () => reorderCleanup.current?.(), []);
+
     const startReorder = useCallback((sectionId: string, down: PointerEvent | ReactPointerEvent) => {
         down.preventDefault();
         setReordering(sectionId);
-        measure();
+        // the drag computes boundaries from this measurement, not the async state it also feeds
+        const fresh = measure();
+        const boundaryIn = (docY: number): string | null => {
+            for (const box of fresh) {
+                if (box.top + box.height / 2 > docY) return box.id;
+            }
+            return null;
+        };
+        // capture keeps move/up flowing to us even when the pointer leaves the iframe's viewport
+        const target = down.target as Element | null;
+        try {
+            target?.setPointerCapture?.(down.pointerId);
+        } catch {
+            // capture is an optimization; a target that refuses it still gets window-level events
+        }
         let before: string | null | undefined;
         const onMove = (move: PointerEvent) => {
             dragY.current = move.clientY;
-            before = boundaryFor(move.clientY + window.scrollY);
+            before = boundaryIn(move.clientY + window.scrollY);
             setDropBefore(before);
         };
         const finish = (commit: boolean) => {
             window.removeEventListener('pointermove', onMove);
             window.removeEventListener('pointerup', onUp);
+            window.removeEventListener('pointercancel', onCancel);
             window.removeEventListener('keydown', onKey);
+            reorderCleanup.current = null;
             setReordering(null);
             setDropBefore(undefined);
             dragY.current = null;
@@ -235,13 +255,17 @@ export function BuilderBridge() {
             }
         };
         const onUp = () => finish(true);
+        // a browser gesture (touch scroll) taking the pointer must not leave the drag stuck
+        const onCancel = () => finish(false);
         const onKey = (event: KeyboardEvent) => {
             if (event.key === 'Escape') finish(false);
         };
         window.addEventListener('pointermove', onMove);
         window.addEventListener('pointerup', onUp);
+        window.addEventListener('pointercancel', onCancel);
         window.addEventListener('keydown', onKey);
-    }, [boundaryFor, measure, post]);
+        reorderCleanup.current = () => finish(false);
+    }, [measure, post]);
 
     // reorder shares the edge auto-scroll with library drags
     useEffect(() => {
@@ -339,23 +363,23 @@ export function BuilderBridge() {
                     background: 'var(--color-foreground, #0f172a)', pointerEvents: 'auto',
                     boxShadow: '0 4px 12px rgb(0 0 0 / 0.25)',
                 }}>
-                    <button type="button" aria-label="Drag to reorder" title="Drag to reorder"
+                    <button type="button" tabIndex={-1} aria-label="Drag to reorder" title="Drag to reorder"
                             onPointerDown={e => startReorder(toolbarFor.id, e)}
                             style={toolbarButton('grab')}>⠿</button>
-                    <button type="button" aria-label="Move up" disabled={selectedIndex <= 0}
+                    <button type="button" tabIndex={-1} aria-label="Move up" disabled={selectedIndex <= 0}
                             onClick={() => act('moveUp')} style={toolbarButton()}>↑</button>
-                    <button type="button" aria-label="Move down" disabled={selectedIndex === boxes.length - 1}
+                    <button type="button" tabIndex={-1} aria-label="Move down" disabled={selectedIndex === boxes.length - 1}
                             onClick={() => act('moveDown')} style={toolbarButton()}>↓</button>
-                    <button type="button" aria-label="Duplicate" onClick={() => act('duplicate')}
+                    <button type="button" tabIndex={-1} aria-label="Duplicate" onClick={() => act('duplicate')}
                             style={toolbarButton()}>⧉</button>
-                    <button type="button" aria-label="Remove" onClick={() => act('remove')}
+                    <button type="button" tabIndex={-1} aria-label="Remove" onClick={() => act('remove')}
                             style={{...toolbarButton(), color: '#fca5a5'}}>✕</button>
                 </div>
             )}
 
             {showZones && [...boxes.map(b => ({key: b.id, beforeId: b.id as string | null, top: b.top})),
                 {key: '__end', beforeId: null, top: docHeight}].map(zone => (
-                <button key={zone.key} type="button"
+                <button key={zone.key} type="button" tabIndex={-1}
                         onClick={() => post({type: 'addHere', beforeId: zone.beforeId})}
                         style={{
                             position: 'absolute', top: zone.top - 10, insetInlineStart: '10%', width: '80%', height: 20,

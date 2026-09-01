@@ -1,63 +1,68 @@
 import Image from 'next/image';
 import {Link} from '@store-front/i18n/navigation';
-import type {SectionRenderProps} from '@store-front/theme';
-import type {SectionItem} from '@store-front/types';
-import {items, linkHref, mediaUrl} from '../support';
+import {heroModel, type HeroSlide, type SectionRenderProps} from '@store-front/theme';
 import {EmptyOrHint} from './shared';
 
 const HEIGHTS: Record<string, string> = {sm: 'min-h-[32vh]', md: 'min-h-[46vh]', lg: 'min-h-[60vh]'};
 
-function Slide({slide, tall, priority}: { slide: SectionItem; tall: string; priority?: boolean }) {
-    const src = mediaUrl(slide.props);
-    const href = linkHref(slide.props.link);
+function Slide({slide, tall, priority}: { slide: HeroSlide; tall: string; priority?: boolean }) {
     const body = (
         <div className={`relative flex w-full flex-col items-start justify-end overflow-hidden ${tall}`}>
-            {src && <Image src={src} alt={slide.text.heading ?? ''} fill priority={priority} className="object-cover"/>}
-            {src && <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"/>}
+            {slide.src && <Image src={slide.src} alt={slide.heading ?? ''} fill priority={priority} className="object-cover"/>}
+            {slide.src && <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"/>}
             <div className="relative z-10 p-6 lg:p-10">
-                {slide.text.heading && (
-                    <h2 className={`text-2xl font-semibold lg:text-4xl ${src ? 'text-white' : ''}`}>
-                        <bdi dir="auto">{slide.text.heading}</bdi>
+                {slide.heading && (
+                    <h2 className={`text-2xl font-semibold lg:text-4xl ${slide.src ? 'text-white' : ''}`}>
+                        <bdi dir="auto">{slide.heading}</bdi>
                     </h2>
                 )}
-                {slide.text.subheading && (
-                    <p className={`mt-2 max-w-prose ${src ? 'text-white/85' : 'text-muted-foreground'}`}>
-                        <bdi dir="auto">{slide.text.subheading}</bdi>
+                {slide.subheading && (
+                    <p className={`mt-2 max-w-prose ${slide.src ? 'text-white/85' : 'text-muted-foreground'}`}>
+                        <bdi dir="auto">{slide.subheading}</bdi>
                     </p>
                 )}
-                {slide.text.cta && (
+                {slide.cta && slide.href && (
                     <span className="mt-4 inline-flex rounded-md bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground">
-                        {slide.text.cta}
+                        <bdi dir="auto">{slide.cta}</bdi>
                     </span>
                 )}
             </div>
         </div>
     );
-    return href === '#' ? body : <Link href={href} className="block w-full">{body}</Link>;
+    return slide.href ? <Link href={slide.href} className="block w-full">{body}</Link> : body;
 }
 
-/** Slides side-scroll with CSS snap — honest multi-slide rendering with zero client JS. */
+/**
+ * Slides side-scroll with CSS snap — honest multi-slide rendering with zero client JS. Consumes
+ * {@link heroModel} like every themed hero, so the CTA-dedupe and link semantics cannot drift.
+ */
 function Slides({section, preview}: SectionRenderProps) {
-    const slides = items(section);
-    const tall = HEIGHTS[String(section.props.height)] ?? HEIGHTS.md;
-    if (slides.length === 0 && !section.text.heading) {
+    const model = heroModel(section);
+    const tall = HEIGHTS[model.height] ?? HEIGHTS.md;
+    if (model.slides.length === 0 && !model.heading) {
         return <EmptyOrHint preview={preview} label="Hero — add slides or a heading"/>;
     }
-    if (slides.length === 0) {
+    if (model.slides.length === 0) {
         return (
             <div className={`flex w-full flex-col items-center justify-center bg-muted px-6 text-center ${tall}`}>
-                <h1 className="text-3xl font-semibold lg:text-5xl"><bdi dir="auto">{section.text.heading}</bdi></h1>
-                {section.text.subheading && (
-                    <p className="mt-3 max-w-prose text-muted-foreground"><bdi dir="auto">{section.text.subheading}</bdi></p>
+                <h1 className="text-3xl font-semibold lg:text-5xl"><bdi dir="auto">{model.heading}</bdi></h1>
+                {model.subheading && (
+                    <p className="mt-3 max-w-prose text-muted-foreground"><bdi dir="auto">{model.subheading}</bdi></p>
+                )}
+                {model.cta && (
+                    <Link href={model.cta.href}
+                          className="mt-5 inline-flex rounded-md bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground">
+                        <bdi dir="auto">{model.cta.label}</bdi>
+                    </Link>
                 )}
             </div>
         );
     }
-    if (slides.length === 1) return <Slide slide={slides[0]} tall={tall} priority/>;
+    if (model.slides.length === 1) return <Slide slide={model.slides[0]} tall={tall} priority/>;
     return (
         <div className="flex w-full snap-x snap-mandatory overflow-x-auto">
-            {slides.map((slide, i) => (
-                <div key={slide.id} className="w-full flex-none snap-start">
+            {model.slides.map((slide, i) => (
+                <div key={i} className="w-full flex-none snap-start">
                     <Slide slide={slide} tall={tall} priority={i === 0}/>
                 </div>
             ))}

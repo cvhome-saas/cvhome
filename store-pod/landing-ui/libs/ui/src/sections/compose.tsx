@@ -142,15 +142,19 @@ export function sectionsFromChrome(chrome: SectionChrome,
     const Newsletter = async ({section}: SectionRenderProps) => {
         const t = await getTranslations('COMPONENTS.NEWSLETTER');
         const model = newsletterModel(section);
+        const copy = (
+            <>
+                <h2 className={chrome.panelTitleClass}><bdi dir="auto">{model.heading ?? t('HEADING')}</bdi></h2>
+                {/* inherits the surface's ink: a featured surface may be a primary field, where the
+                    muted role would fall under contrast */}
+                {model.body && <p className="mt-1 text-sm opacity-85"><bdi dir="auto">{model.body}</bdi></p>}
+                <NewsletterForm cta={model.cta} inputClassName={chrome.form.input} buttonClassName={chrome.form.button}/>
+            </>
+        );
+        // boxed sits on the theme's panel surface; inline is the same copy set open on the page
         return (
             <div className="mx-auto min-w-0 max-w-xl">
-                <Panel center>
-                    <h2 className={chrome.panelTitleClass}><bdi dir="auto">{model.heading ?? t('HEADING')}</bdi></h2>
-                    {/* inherits the panel's ink: a featured surface may be a primary field, where the
-                        muted role would fall under contrast */}
-                    {model.body && <p className="mt-1 text-sm opacity-85"><bdi dir="auto">{model.body}</bdi></p>}
-                    <NewsletterForm cta={model.cta} inputClassName={chrome.form.input} buttonClassName={chrome.form.button}/>
-                </Panel>
+                {model.boxed ? <Panel center>{copy}</Panel> : <div className="text-center">{copy}</div>}
             </div>
         );
     };

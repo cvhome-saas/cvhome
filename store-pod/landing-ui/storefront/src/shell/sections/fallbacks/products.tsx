@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import {Link} from '@store-front/i18n/navigation';
-import type {SectionRenderProps} from '@store-front/theme';
+import {productsModel, type SectionRenderProps} from '@store-front/theme';
 import type {Product} from '@store-front/types';
 import {primaryImage, productHref} from '@store-front/services/product-presenter';
 import {Price} from '@store-front/ui/price';
@@ -24,15 +24,17 @@ function Card({product}: { product: Product }) {
 }
 
 function Products({section, data, preview}: SectionRenderProps) {
-    const products = data?.products?.products ?? [];
-    const title = section.text.title ?? data?.products?.title;
-    if (products.length === 0) {
+    // through productsModel like every themed override, so the title fallback and trims cannot drift
+    const model = productsModel(section, data);
+    if (model.count === 0) {
         return <EmptyOrHint preview={preview} label="Products — no products in this source yet"/>;
     }
+    const products = model.products;
     const rail = section.variant === 'rail';
     return (
         <div>
-            <SectionHeading title={title} subtitle={section.text.subtitle}/>
+            <SectionHeading title={model.title && <bdi dir="auto">{model.title}</bdi>}
+                            subtitle={model.subtitle && <bdi dir="auto">{model.subtitle}</bdi>}/>
             {rail ? (
                 <div className="flex snap-x gap-4 overflow-x-auto pb-2">
                     {products.map(p => <div key={p.id} className="w-44 flex-none snap-start lg:w-56"><Card product={p}/></div>)}

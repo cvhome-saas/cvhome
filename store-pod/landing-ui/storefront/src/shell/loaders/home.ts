@@ -78,11 +78,22 @@ const resolveSection = async (ctx: Awaited<ReturnType<typeof getStoreContext>>, 
     }
 };
 
+/** The guard around every section's data: a failing source collapses that section, never the page. */
+const resolveSectionSafely = async (ctx: Awaited<ReturnType<typeof getStoreContext>>,
+                                    section: LayoutSectionData): Promise<SectionResolvedData | undefined> => {
+    try {
+        return await resolveSection(ctx, section);
+    } catch (error) {
+        console.warn('section data failed', section.kind, section.id, error);
+        return undefined;
+    }
+};
+
 export const loadHome = cache(async (previewToken?: string): Promise<HomeLayoutData> => {
     const ctx = await getStoreContext();
     const layout = await ContentService.getPageLayout(ctx, 'HOME', previewToken);
     const entries = await Promise.all(layout.sections.map(async section =>
-        [section.id, await resolveSection(ctx, section)] as const));
+        [section.id, await resolveSectionSafely(ctx, section)] as const));
     const resolved: Record<string, SectionResolvedData> = {};
     for (const [id, data] of entries) {
         if (data) {

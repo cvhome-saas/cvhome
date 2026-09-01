@@ -2,7 +2,7 @@ import Image from 'next/image';
 import {getTranslations} from 'next-intl/server';
 import {Link} from '@store-front/i18n/navigation';
 import {heroModel, productsModel, slidesAsBanners, type SectionRenderProps} from '@store-front/theme';
-import {sectionsFromChrome, type SectionChrome} from '@store-front/ui/sections/compose';
+import {EmptyOrHint, sectionsFromChrome, type SectionChrome} from '@store-front/ui/sections/compose';
 import {cn} from '@store-front/ui/lib/utils';
 import {Hero} from './Hero';
 import {ProductGrid} from '../components/ProductGrid';
@@ -136,10 +136,10 @@ function HeroSection({ctx, section}: SectionRenderProps) {
                  autoplay={model.autoplay ? model.interval : false}/>;
 }
 
-async function ProductsSection({ctx, section, data}: SectionRenderProps) {
+async function ProductsSection({ctx, section, data, preview}: SectionRenderProps) {
     const t = await getTranslations('PAGE.HOME');
     const model = productsModel(section, data);
-    if (model.count === 0) return null;
+    if (model.count === 0) return <EmptyOrHint preview={preview} label="Products — pick a source that has products"/>;
     const rail = section.variant === 'rail';
     return (
         <section className="min-w-0">

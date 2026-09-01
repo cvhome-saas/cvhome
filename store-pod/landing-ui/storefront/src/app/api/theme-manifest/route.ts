@@ -37,7 +37,10 @@ export async function GET() {
     });
     return NextResponse.json({themeId: theme.id, kinds, presets: SECTION_PRESETS}, {
         headers: {
-            'Cache-Control': 'public, max-age=60, stale-while-revalidate=60',
+            // private: the body varies on the spg-injected Theme header and the dev override cookie,
+            // which a shared cache keyed only on the URL would happily mix across stores
+            'Cache-Control': 'private, max-age=60, stale-while-revalidate=60',
+            'Vary': 'Theme, Cookie',
             'Access-Control-Allow-Origin': '*',
         },
     });

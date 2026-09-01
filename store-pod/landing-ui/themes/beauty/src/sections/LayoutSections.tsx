@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import {Link} from '@store-front/i18n/navigation';
 import {heroModel, productsModel, slidesAsBanners, type SectionRenderProps} from '@store-front/theme';
-import {sectionsFromChrome, type SectionChrome} from '@store-front/ui/sections/compose';
+import {EmptyOrHint, sectionsFromChrome, type SectionChrome} from '@store-front/ui/sections/compose';
 import {cn} from '@store-front/ui/lib/utils';
 import {HeroFrame} from './Hero';
 import {ProductGrid} from '../components/ProductGrid';
@@ -129,10 +129,10 @@ const chrome: SectionChrome = {
     summaryClass: 'font-display text-sm uppercase tracking-wide',
 };
 
-function HeroSection({section}: SectionRenderProps) {
+function HeroSection({section, preview}: SectionRenderProps) {
     const model = heroModel(section);
     const slides = slidesAsBanners(section.items);
-    if (slides.length === 0) return null;
+    if (slides.length === 0) return <EmptyOrHint preview={preview} label="Hero — add a slide"/>;
     return <HeroFrame slides={slides} autoplay={model.autoplay ? model.interval : false}/>;
 }
 
@@ -165,9 +165,9 @@ function HeroEditorial({section}: SectionRenderProps) {
     );
 }
 
-function ProductsSection({ctx, section, data}: SectionRenderProps) {
+function ProductsSection({ctx, section, data, preview}: SectionRenderProps) {
     const model = productsModel(section, data);
-    if (model.count === 0) return null;
+    if (model.count === 0) return <EmptyOrHint preview={preview} label="Products — pick a source that has products"/>;
     const rail = section.variant === 'rail';
     return (
         <section className="min-w-0">

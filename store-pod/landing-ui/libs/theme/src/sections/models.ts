@@ -88,7 +88,8 @@ export function heroModel(section: LayoutSectionData): HeroModel {
         cta,
         height: height === 'sm' || height === 'lg' ? height : 'md',
         autoplay: section.props.autoplay !== false,
-        interval: num(section.props.interval, 5),
+        // clamped to the catalogue's declared range: a stored 0 must not become a strobing hero
+        interval: Math.min(12, Math.max(2, num(section.props.interval, 5))),
         slides,
         strips,
     };
@@ -186,7 +187,9 @@ export function imageModel(section: LayoutSectionData): ImageModel {
     const href = linkHref(section.props.link);
     return {
         src: mediaUrl(section.props),
-        alt: (typeof section.props.alt === 'string' ? text(section.props.alt) : undefined)
+        // alt is localized copy (text map); older documents stored it as a plain prop — honor both
+        alt: text(section.text.alt)
+            ?? (typeof section.props.alt === 'string' ? text(section.props.alt) : undefined)
             ?? text(section.text.caption) ?? '',
         caption: text(section.text.caption),
         href: href === '#' ? undefined : href,

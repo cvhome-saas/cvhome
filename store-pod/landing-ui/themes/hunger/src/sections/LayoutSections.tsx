@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import {Link} from '@store-front/i18n/navigation';
 import {productsModel, slidesAsBanners, type SectionRenderProps} from '@store-front/theme';
-import {sectionsFromChrome, type SectionChrome} from '@store-front/ui/sections/compose';
+import {EmptyOrHint, sectionsFromChrome, type SectionChrome} from '@store-front/ui/sections/compose';
 import {cn} from '@store-front/ui/lib/utils';
 import {Masthead} from './Masthead';
 import {ProductGrid} from '../components/ProductGrid';
@@ -140,9 +140,9 @@ function HeroSection({ctx, section}: SectionRenderProps) {
     );
 }
 
-function ProductsSection({ctx, section, data}: SectionRenderProps) {
+function ProductsSection({ctx, section, data, preview}: SectionRenderProps) {
     const model = productsModel(section, data);
-    if (model.count === 0) return null;
+    if (model.count === 0) return <EmptyOrHint preview={preview} label="Products — pick a source that has products"/>;
     return (
         <section className="min-w-0">
             {model.title && <SectionHeading title={model.title} subtitle={model.subtitle}/>}
