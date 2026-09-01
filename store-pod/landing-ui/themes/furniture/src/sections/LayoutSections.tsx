@@ -174,7 +174,8 @@ async function ProductsSection({ctx, section, data}: SectionRenderProps) {
 }
 
 export const layoutSections = sectionsFromChrome(chrome, {
-    hero: {classic: HeroSection, carousel: HeroSection},
+    // The window shows the drawn plate without slides — the directory's own minimal.
+    hero: {classic: HeroSection, carousel: HeroSection, split: HeroSection, minimal: HeroSection},
     categories: {grid: CategoriesSection, pills: CategoriesSection},
     products: {rail: ProductsSection, grid: ProductsSection},
 });

@@ -155,6 +155,7 @@ function ProductsSection({ctx, section, data}: SectionRenderProps) {
 }
 
 export const layoutSections = sectionsFromChrome(chrome, {
-    hero: {classic: HeroSection, carousel: HeroSection},
+    // The masthead is already the menu's minimal print; every staging maps onto it.
+    hero: {classic: HeroSection, carousel: HeroSection, split: HeroSection, minimal: HeroSection},
     products: {rail: ProductsSection, grid: ProductsSection},
 });

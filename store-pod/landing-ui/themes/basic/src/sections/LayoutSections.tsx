@@ -143,6 +143,7 @@ function ProductsSection({ctx, section, data}: SectionRenderProps) {
 }
 
 export const layoutSections = sectionsFromChrome(chrome, {
-    hero: {classic: HeroSection, carousel: HeroSection},
+    // The stage renders name-plate-only without slides; every staging maps onto it.
+    hero: {classic: HeroSection, carousel: HeroSection, split: HeroSection, minimal: HeroSection},
     products: {rail: ProductsSection, grid: ProductsSection},
 });

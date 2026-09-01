@@ -149,6 +149,7 @@ function ProductsSection({ctx, section, data}: SectionRenderProps) {
 }
 
 export const layoutSections = sectionsFromChrome(chrome, {
-    hero: {classic: HeroSection, carousel: HeroSection},
+    // The entrance board handles every staging: no slides = the price board alone (minimal).
+    hero: {classic: HeroSection, carousel: HeroSection, split: HeroSection, minimal: HeroSection},
     products: {rail: ProductsSection, grid: ProductsSection},
 });

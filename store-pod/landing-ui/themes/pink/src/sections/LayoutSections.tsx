@@ -154,6 +154,7 @@ async function ProductsSection({ctx, section, data}: SectionRenderProps) {
 }
 
 export const layoutSections = sectionsFromChrome(chrome, {
-    hero: {classic: HeroSection, carousel: HeroSection},
+    // The cover absorbs every staging: without slides it is the type-only cover (minimal).
+    hero: {classic: HeroSection, carousel: HeroSection, split: HeroSection, minimal: HeroSection},
     products: {rail: ProductsSection, grid: ProductsSection},
 });

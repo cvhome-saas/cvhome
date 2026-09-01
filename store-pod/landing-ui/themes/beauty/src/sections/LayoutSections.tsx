@@ -180,6 +180,8 @@ function ProductsSection({ctx, section, data}: SectionRenderProps) {
 }
 
 export const layoutSections = sectionsFromChrome(chrome, {
-    hero: {classic: HeroSection, carousel: HeroSection, editorial: HeroEditorial},
+    // split/minimal ride the editorial plate: image beside copy when there is one, the drawn
+    // type column when there is not.
+    hero: {classic: HeroSection, carousel: HeroSection, split: HeroEditorial, minimal: HeroEditorial, editorial: HeroEditorial},
     products: {rail: ProductsSection, grid: ProductsSection},
 });

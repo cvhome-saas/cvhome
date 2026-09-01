@@ -194,6 +194,8 @@ function ProductsSection({ctx, section, data}: SectionRenderProps) {
 }
 
 export const layoutSections = sectionsFromChrome(chrome, {
-    hero: {classic: HeroWall, carousel: HeroWall, split: HeroWall},
+    // Every hero variant is the wall: without slides the sheet takes the full span (minimal),
+    // with them the posters fill the split — the paste-up absorbs all four stagings.
+    hero: {classic: HeroWall, carousel: HeroWall, split: HeroWall, minimal: HeroWall},
     products: {grid: ProductsSection, rail: ProductsSection},
 });
