@@ -186,7 +186,7 @@
 .left-tab.on {
   background: var(--background);
   color: var(--foreground);
-  box-shadow: 0 1px 2px rgb(0 0 0 / 0.1);
+  box-shadow: var(--lift-subtle);
 }
 
 .pane-body {

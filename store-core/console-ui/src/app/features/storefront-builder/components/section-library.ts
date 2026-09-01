@@ -87,7 +87,7 @@ import {BuilderFacade} from '../facades/builder.facade';
     }
     .tile:hover {
       border-color: var(--primary); background: var(--primary-soft, var(--muted));
-      transform: translateY(-1px); box-shadow: var(--lift, 0 2px 6px rgb(0 0 0 / 0.08));
+      transform: translateY(-1px); box-shadow: var(--lift-subtle);
     }
     .tile:active { transform: translateY(0); }
     /* the picked-up tile stays behind as a dashed shadow of itself while its chip travels */
