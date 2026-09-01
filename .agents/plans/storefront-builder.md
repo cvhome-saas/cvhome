@@ -466,3 +466,42 @@ sweep (landmarks, alt text, focus order, contrast) rides the same pass.
 Every real theme renders the 13-kind demo layout with no fallback-styled section standing out as
 foreign; ar/RTL correct on all of them; `npm run build && lint` green; before/after screenshots
 attached to the PR for each theme.
+
+## Phase 8 — deep code review (three parallel agents) and fixes
+
+Three review agents (backend Java, console-ui Angular, landing-ui Next) reviewed the whole branch
+against the repos' own conventions. Everything real was fixed on the branch:
+
+- **Backend**: schema.sql purges legacy HERO/CAROUSEL banners before narrowing the placement check
+  (upgraded DBs no longer fail to boot); `page_layout.lock_version` + `@Version` closes the
+  lost-update window (an optimistic-lock failure now maps to a 409 via the shared advice); publish is
+  idempotent (a repeat publish of the same draft version is a no-op, not a duplicate-revision 500);
+  the media-usage index covers draft ∪ published (and the four seeds register their usage rows);
+  richtext layout bodies pass `HtmlSanitizer` on save and restore (the storefront injects them as
+  HTML); section presets gained item/size/count caps; `PreviewTokens` compares HMACs constant-time;
+  `layout-api.http` added, stale `sections-api.http` deleted, storefront `.http` follows the new
+  layout endpoint; seed revision inserts are guarded on the layout insert having won.
+- **Console**: one autosave seam — a cancel-pending primitive plus a document generation counter, so
+  discard/restore/reload can never be resurrected by a stale debounce or in-flight save; undo/redo
+  respect the conflict freeze; the error bar's retry re-loads after a failed load; the preview token
+  re-mints every 20 minutes; the leave guard keys on *unsaved* (pending/saving) instead of
+  *unpublished*, with a matching `beforeunload`; the editing language follows the store default
+  reactively; publish/preset failures raise toasts; revision restore asks confirmation, resets undo,
+  and the drawer closes on Escape; `DatePipe` → `translocoDate`; bridge accepts only `v: 2`;
+  a11y labels/Space-key/sr-only warning text in the layer list; drop-target ids that vanished
+  append instead of jumping to index 0; range fields honor min/max; media picks no longer clobber a
+  shared `mediaUrl` key.
+- **Landing**: one failing section fetch can no longer 500 the home page (`resolveSection` is
+  guarded); `linkHref` allow-lists URL schemes; starter's hero consumes `heroModel` (text hero for
+  `hero-text`, slide copy/CTA overlay, slide links via the banner target `slidesAsBanners` now
+  carries); every bespoke override shows `EmptyOrHint` in the builder canvas instead of a zero-height
+  section; newsletter `inline`/`boxed` actually differ; the testimonials photo field is retired from
+  the catalogue (no renderer drew it); the hero declares its section-level CTA fields; image alt is
+  localized; hero interval clamps to 2–12s; the shell hero/products fallbacks consume the shared
+  models; the bridge reorder drag uses pointer capture + pointercancel + unmount cleanup and fresh
+  measurements; the theme-manifest response is `private` with `Vary`; +5 model tests (85 green).
+
+Deliberately not done (recorded): one-h1-per-page enforcement across themes (design decision),
+per-resource request dedup in the home fan-out (duplicate sections are rare), replica-stable preview
+token keys (single-instance content service today), `ref:*` inspector lookups (needs catalog search
+endpoints).
