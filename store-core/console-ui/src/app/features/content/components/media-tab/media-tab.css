@@ -202,7 +202,7 @@
 }
 
 .asset-row.selected {
-  background: var(--muted);
+  background: var(--input);
 }
 
 .row-thumb {

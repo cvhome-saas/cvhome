@@ -160,7 +160,7 @@
 }
 
 .rows li:nth-child(odd) {
-  background: var(--muted);
+  background: var(--input);
 }
 
 .row-lead {

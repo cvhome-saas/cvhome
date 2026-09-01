@@ -1,0 +1,151 @@
+/*
+ * Light — the console-template identity: white panels floating on a cool grey canvas.
+ *
+ * Daylight is also light, and this is not a second copy of it. The two differ in the one
+ * decision that gives a light workspace its character — which plane is brightest:
+ *
+ *   Daylight keeps the dark themes' structure and lightens it. The canvas is near-white
+ *   and a panel is a *tint on top of it*, so panels sit fractionally darker than the page
+ *   and read as cards because of their edge. That is Forest's logic, translated.
+ *
+ *   Light inverts it, as store-core/console-template does. The canvas is grey
+ *   (slate-100), every panel is opaque white, and a card reads because it is *brighter*
+ *   than what surrounds it. Elevation, not just outline, carries the hierarchy — which is
+ *   why `--muted` here is an opaque colour rather than an alpha: nothing stacked on a
+ *   light field can come out lighter than the field it sits on.
+ *
+ * The neutral is slate throughout — the template's ramp, and Tailwind's stock one, used
+ * as shipped exactly as Midnight uses it. Sage is Forest's green-cast neutral and would
+ * warm this theme away from the design it is reproducing.
+ *
+ * The text ladder compresses the same way Daylight's does and for the same reason: the
+ * template's lightest label ink, slate-400, is 2.8:1 on white. Its jobs go to slate-500,
+ * the lightest step that clears 4.5:1, so `--foreground-quiet` and `--muted-foreground`
+ * share a value rather than inventing an illegible one.
+ *
+ * Two deliberate departures from the template, both because the design system already
+ * settled the question:
+ *
+ *   Primary buttons keep near-black ink. The template paints white on emerald-500, which
+ *   is 2.3:1 — below every threshold. Per DESIGN.md the `--primary`/`--primary-foreground`
+ *   pairing does not change between themes, and near-black is the pairing that works.
+ *
+ *   The categorical scale is untouched, as in every other theme: `--chart-N` is a data
+ *   vocabulary, so only the inks move to stay legible on white.
+ */
+
+[data-theme='light'] {
+  color-scheme: light;
+
+  /* The canvas is the grey; slate-100 is the template's #eff3f8 to within a JND. */
+  --background: var(--color-slate-100);
+  --foreground: var(--color-slate-700);
+  --foreground-strong: var(--color-slate-900);
+  --foreground-subtle: var(--color-slate-600);
+  /* Lowest step that still clears 4.5:1 on white — see the ladder note above. */
+  --foreground-quiet: var(--color-slate-500);
+
+  --card: var(--color-white);
+  --card-foreground: var(--foreground-strong);
+
+  --popover: var(--color-white);
+  --popover-foreground: var(--color-slate-700);
+
+  --primary: var(--color-emerald-500);
+  --primary-foreground: var(--color-slate-950);
+
+  --secondary: --alpha(var(--color-slate-950) / 8%);
+  --secondary-foreground: var(--color-slate-600);
+
+  /*
+   * Opaque white, and the reason this theme is not a re-hue of Daylight. `--muted` is the
+   * console's panel surface — the rail, every `app-panel`, the resting face of a secondary
+   * button — and here every one of those is white on grey, exactly as the template draws
+   * them. An alpha would composite *downward* and put panels underneath their own page.
+   */
+  --muted: var(--color-white);
+  /*
+   * slate-600, not the slate-500 the panels could carry. This token's most exposed use is the
+   * page-header subtitle, which renders on the *canvas* rather than on a panel — and the canvas
+   * here is grey, so slate-500 lands at 4.35:1 there and fails AA while passing at 4.76:1 on
+   * white. It shares `--foreground-subtle`'s value as a result, the same compression Daylight
+   * makes for the same reason. `--foreground-quiet` stays a step lighter: every one of its uses
+   * is inside a panel (the rail, the toolbar, the popovers), where it clears 4.5:1.
+   */
+  --muted-foreground: var(--color-slate-600);
+
+  /* The template's #ecfdf5 selected-row wash, kept in the brand emerald rather than Tailwind's. */
+  --accent: --alpha(var(--color-emerald-500) / 10%);
+  --accent-foreground: var(--color-emerald-700);
+
+  --destructive: var(--color-red-600);
+  --destructive-foreground: var(--color-white);
+
+  /* Opaque hairlines, as the template draws them: one #e2e8f0 rule on white and on grey alike. */
+  --border: var(--color-slate-200);
+  /* Wells and hover fills. ~#f1f5f9 on white — the template's inset plane. */
+  --input: --alpha(var(--color-slate-950) / 5%);
+  --ring: var(--color-emerald-600);
+
+  /* Fills hold; inks step to the -700s to carry text on white. */
+  --chart-1: var(--color-emerald-500);
+  --chart-1-foreground: var(--color-emerald-700);
+  --chart-1-wash: --alpha(var(--color-emerald-500) / 16%);
+
+  --chart-2: var(--color-blue-500);
+  --chart-2-foreground: var(--color-blue-700);
+  --chart-2-wash: --alpha(var(--color-blue-500) / 16%);
+
+  --chart-3: var(--color-cyan-500);
+  --chart-3-foreground: var(--color-cyan-700);
+  --chart-3-wash: --alpha(var(--color-cyan-500) / 16%);
+
+  --chart-4: var(--color-amber-500);
+  --chart-4-foreground: var(--color-amber-700);
+  --chart-4-wash: --alpha(var(--color-amber-500) / 16%);
+
+  --chart-5: var(--color-red-500);
+  --chart-5-foreground: var(--color-red-700);
+  --chart-5-wash: --alpha(var(--color-red-500) / 16%);
+
+  --chart-6: var(--color-violet-500);
+  --chart-6-foreground: var(--color-violet-700);
+  --chart-6-wash: --alpha(var(--color-violet-500) / 16%);
+
+  /* The template's link and hover emeralds: #059669 rising, #047857 for selected ink. */
+  --primary-emphasis: var(--color-emerald-600);
+  --primary-soft: var(--color-emerald-700);
+  --primary-muted: var(--color-emerald-800);
+
+  /* The template's inner divider — a step quieter than the card edge, not a fainter alpha. */
+  --border-soft: var(--color-slate-100);
+  --edge: --alpha(var(--color-emerald-600) / 45%);
+  --edge-strong: --alpha(var(--color-emerald-600) / 60%);
+
+  /* Illustration fills, not text — they stay dark against the light page on purpose. */
+  --seat-1: var(--color-emerald-800);
+  --seat-2: var(--color-teal-900);
+  --seat-3: var(--color-slate-800);
+  --seat-3-foreground: var(--color-slate-200);
+
+  --accent-strong: --alpha(var(--color-emerald-500) / 18%);
+  --accent-veil: --alpha(var(--color-emerald-500) / 8%);
+
+  /* Data, so it sits well above the hover fill — the template's #e2e8f0 rails. */
+  --track: --alpha(var(--color-slate-950) / 12%);
+
+  --panel: --alpha(var(--color-white) / 75%);
+  --header-veil: --alpha(var(--color-slate-100) / 85%);
+  /* The scrim still darkens — dimming is a shadow, not an inversion. */
+  --scrim: --alpha(var(--color-slate-950) / 45%);
+
+  /*
+   * The template's own shadows, and the one place this theme leans on them harder than the
+   * others: on grey-and-white, elevation is doing hierarchy work that an edge does on dark.
+   */
+  --lift: 0 10px 30px rgb(18 18 23 / 12%);
+  --lift-primary: 0 4px 10px --alpha(var(--color-emerald-500) / 35%);
+  --lift-subtle: 0 1px 2px rgb(18 18 23 / 5%);
+
+  --glow-color: --alpha(var(--color-emerald-500) / 12%);
+}

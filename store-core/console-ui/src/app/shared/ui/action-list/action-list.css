@@ -27,7 +27,7 @@
 }
 
 .action-list li > button:hover {
-  background: var(--muted);
+  background: var(--input);
   transform: translateX(4px);
 }
 

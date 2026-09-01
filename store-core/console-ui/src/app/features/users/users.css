@@ -97,7 +97,7 @@ app-tab-switcher {
   flex: none;
   padding-inline: 0.35rem;
   border-radius: var(--radius-sm);
-  background: var(--muted);
+  background: var(--input);
   color: var(--muted-foreground);
   font-size: var(--text-2xs);
   font-weight: var(--font-weight-semibold);

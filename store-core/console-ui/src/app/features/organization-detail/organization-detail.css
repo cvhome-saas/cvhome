@@ -242,7 +242,7 @@
 }
 
 .billing-rows li:nth-child(odd) {
-  background: var(--muted);
+  background: var(--input);
 }
 
 .billing-lead {

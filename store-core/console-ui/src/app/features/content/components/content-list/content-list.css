@@ -21,7 +21,7 @@
   gap: var(--spacing-tight);
   padding: 0.6rem 1.25rem;
   border-block-end: 1px solid var(--border-soft);
-  background: var(--muted);
+  background: var(--input);
 }
 
 .bulk-count {

@@ -1219,6 +1219,10 @@
       "daylight": {
         "label": "Daylight",
         "hint": "Emerald on white"
+      },
+      "light": {
+        "label": "Light",
+        "hint": "White panels on cool grey"
       }
     },
     "nav": {
