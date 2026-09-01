@@ -63,6 +63,31 @@ registry to the console builder. A theme adopts designed sections kind by kind (
 `themes/starter/src/sections/LayoutSections.tsx`, the reference), and may add exclusive variants —
 beauty's `hero.editorial` is the proof. A theme with no registry at all still renders everything.
 
+### Section design rules
+
+Every section renderer — a theme's or a shell fallback — honors these, so a merchant's layout reads
+as one page in one voice rather than a stack of widgets:
+
+- **Headings come from the theme's own `SectionHeading`.** One scale step for section titles across
+  the page; the section's `text.title` is the heading, never a kicker above a second heading.
+- **Spacing belongs to the wrapper.** The shell applies `style.spacing`/`style.width`/`style.tone`
+  around the renderer; a renderer adds no outer margins of its own. The exception is a
+  typography-led hero (hunger's masthead, fashion's wall): at `width: full` it still keeps its own
+  interior gutters, because print never touches the trim edge.
+- **`tone` must survive.** Text and borders inside a section use token roles (`foreground`, `muted-
+  foreground`, `border`) so `muted` and `inverse` backgrounds keep AA contrast without per-tone code.
+- **Empty data collapses live, hints in preview.** Outside the builder an empty section renders
+  `null`; inside it, `EmptyOrHint` (or the theme's equivalent) names what to add. Never a grey box.
+- **Icons are drawn, not typed.** The `usp` icon names map to one stroke-weight icon set
+  (lucide in the fallbacks); emoji and unicode glyphs are not an icon system.
+- **Shopper-facing copy is translated.** Fallback strings ship in all five locales
+  (`locales/*.json`); builder-only hints may stay English. `<bdi dir="auto">` wraps merchant text so
+  mixed-direction content renders sanely in RTL.
+- **Slides are `Banner`s.** Hero renderers consume the layout's inline slides through
+  `slidesAsBanners` from `@store-front/theme` — one adapter, no per-theme slide types.
+- **Media may be absent.** Every image slot has a designed no-image state (theme plate, drawn mark,
+  or collapse) — a theme must look finished with a single image and with none.
+
 ## Directions
 
 | id | Target merchant · replaces enum values | Structural thesis (header · hero · card · PDP · listing · cart) | Colour strategy · density | Not a recolour because |

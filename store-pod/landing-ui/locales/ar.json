@@ -309,6 +309,12 @@
       "PRODUCTS": "المنتجات",
       "SUGGESTIONS_ONLY": "عرض الفئات والصفحات",
       "SEE_ALL": "عرض كل النتائج"
+    },
+    "NEWSLETTER": {
+      "HEADING": "ابقَ على اطلاع",
+      "EMAIL": "email@example.com",
+      "SUBSCRIBE": "اشترك",
+      "THANKS": "شكرًا — تم تسجيلك في القائمة."
     }
   },
   "ERRORS": {

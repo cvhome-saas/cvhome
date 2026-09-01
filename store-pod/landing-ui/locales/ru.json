@@ -309,6 +309,12 @@
       "PRODUCTS": "Товары",
       "SUGGESTIONS_ONLY": "Показаны категории и страницы",
       "SEE_ALL": "Показать все результаты"
+    },
+    "NEWSLETTER": {
+      "HEADING": "Будьте в курсе",
+      "EMAIL": "email@example.com",
+      "SUBSCRIBE": "Подписаться",
+      "THANKS": "Спасибо — вы в списке."
     }
   },
   "ERRORS": {

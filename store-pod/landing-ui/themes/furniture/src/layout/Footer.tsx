@@ -24,7 +24,7 @@ export async function Footer({data}: { ctx: PageContext; data: LayoutData }) {
     const info = data.pages;
     // Footer-menu entries that are not pages, then the live legal policies — all resolved server-side.
     const more = [
-        ...data.menus.footer.filter(n => n.kind !== 'PAGE' && n.href.startsWith('/')).map(n => ({key: n.href, href: n.href, label: n.label})),
+        ...data.menus.footer.filter(n => n.kind !== 'PAGE' && n.href.startsWith('/') && !n.href.startsWith('/policies/')).map(n => ({key: n.href, href: n.href, label: n.label})),
         ...data.policies.map(pl => ({key: pl.href, href: pl.href, label: pl.title})),
     ];
     const socials = data.socialLinks.filter(s => SOCIAL_ICONS[s.provider.toLowerCase()]);

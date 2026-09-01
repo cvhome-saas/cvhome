@@ -1,5 +1,4 @@
-import type {SectionRenderProps, ThemeSectionRegistry} from '@store-front/theme';
-import type {Banner, SectionItem} from '@store-front/types';
+import {slidesAsBanners, type SectionRenderProps, type ThemeSectionRegistry} from '@store-front/theme';
 import {HeroFrame} from './Hero';
 import {ProductGrid} from '../components/ProductGrid';
 import {ProductRail} from './ProductRail';
@@ -10,18 +9,6 @@ import {SectionHeading} from '../components/SectionHeading';
  * variant, `editorial` — proof of the mechanism: the manifest offers it on beauty stores only, and a
  * store that later switches theme falls back to the kind's default variant instead of breaking.
  */
-
-function slidesAsBanners(items: readonly SectionItem[] | null | undefined): Banner[] {
-    return (items ?? [])
-        .filter(item => typeof item.props.mediaUrl === 'string')
-        .map((item, index): Banner => ({
-            id: index, placement: 'CAROUSEL', position: index, servedLocale: null,
-            title: item.text.heading ?? null, subtitle: item.text.subheading ?? null, body: null,
-            ctaLabel: item.text.cta ?? null, target: null,
-            desktopUrl: item.props.mediaUrl as string, mobileUrl: null,
-            altText: item.text.heading ?? '', theme: null, startsAt: null, endsAt: null,
-        }));
-}
 
 function HeroSection({section}: SectionRenderProps) {
     const slides = slidesAsBanners(section.items);

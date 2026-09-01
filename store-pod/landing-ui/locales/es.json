@@ -309,6 +309,12 @@
       "PRODUCTS": "Productos",
       "SUGGESTIONS_ONLY": "Mostrando categorías y páginas",
       "SEE_ALL": "Ver todos los resultados"
+    },
+    "NEWSLETTER": {
+      "HEADING": "Mantente al tanto",
+      "EMAIL": "email@example.com",
+      "SUBSCRIBE": "Suscribirse",
+      "THANKS": "Gracias, ya estás en la lista."
     }
   },
   "ERRORS": {
