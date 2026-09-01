@@ -26,6 +26,8 @@
  */
 import {readFileSync, existsSync} from 'node:fs';
 import {execSync} from 'node:child_process';
+
+import {SOURCE_DIRS} from './sources.mjs';
 import {dirname, resolve, relative} from 'node:path';
 
 /** Shared vocabulary that is opt-in per component, and the file each is meant to come from. */
@@ -40,7 +42,7 @@ const VOCABULARY = {
   'required': 'app-form-field (use the component, or define your own)',
 };
 
-const files = execSync("find src/app -name '*.ts' -not -name '*.spec.ts'", {encoding: 'utf8'})
+const files = execSync(`find ${SOURCE_DIRS.join(' ')} -name '*.ts' -not -name '*.spec.ts'`, {encoding: 'utf8'})
   .trim().split('\n').filter(Boolean);
 
 const problems = [];

@@ -9,7 +9,7 @@
     "ui-kit": {
       "projectType": "library",
       "root": "",
-      "sourceRoot": "src",
+      "sourceRoot": "",
       "prefix": "app",
       "architect": {
         "build": {
@@ -35,7 +35,18 @@
               "zone.js/testing"
             ],
             "tsConfig": "tsconfig.spec.json",
-            "inlineStyleLanguage": "css"
+            "inlineStyleLanguage": "css",
+            "include": [
+              "src/**/*.spec.ts",
+              "ui/**/*.spec.ts",
+              "theme/**/*.spec.ts",
+              "i18n/**/*.spec.ts",
+              "forms/**/*.spec.ts",
+              "uaa/**/*.spec.ts"
+            ],
+            "styles": [
+              "theme/src/test-styles.css"
+            ]
           }
         }
       }

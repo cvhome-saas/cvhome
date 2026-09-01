@@ -18,9 +18,8 @@ import {INVOICE_STATUS_TONE} from '@models/platform-billing';
 import {Money} from '@shared/i18n/money';
 import {PlatformLabel} from '@shared/i18n/platform-label';
 import {RoleLabel} from '@shared/i18n/role-label';
-import type {NavSection} from '@shared/ui/section-nav/section-nav';
-import type {RoleChange, RoleOption} from '@shared/ui/roles-dialog/roles-dialog';
-import {ToastService} from '@shared/ui/toast/toast';
+import type {NavSection, RoleChange, RoleOption} from '@cvhome-saas/ui-kit/ui';
+import {ToastService} from '@cvhome-saas/ui-kit/ui';
 import {OrganizationDetailApi} from '../services/organization-detail.api.service';
 
 export const PAGE_SIZE = 20;

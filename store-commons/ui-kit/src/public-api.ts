@@ -52,3 +52,4 @@ export * from './lib/models/page';
 export * from './lib/models/ui';
 export * from './lib/models/locale';
 export * from './lib/models/auth';
+export * from './lib/models/reference';

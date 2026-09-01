@@ -19,8 +19,7 @@ import {
   TYPE_CODE_MAX,
   UNIQUENESS_DEBOUNCE_MS,
 } from '@models/taxonomy';
-import {uniqueAsync} from '@shared/forms/unique-async';
-import {CODE_PATTERN, slugify} from '@shared/validators/slug';
+import {uniqueAsync, CODE_PATTERN, slugify} from '@cvhome-saas/ui-kit/forms';
 import {CatalogueApi} from './catalogue.api.service';
 
 /** One value row of the option editor. */

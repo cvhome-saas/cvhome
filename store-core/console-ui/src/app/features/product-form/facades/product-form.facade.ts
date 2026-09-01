@@ -26,9 +26,8 @@ import {
   type VariantMatrixRow,
 } from '@models/products';
 import type {PersistableProductImage, PersistableVariantSet} from '@models/catalog';
-import type {AutocompleteOption} from '@shared/ui/autocomplete/autocomplete';
-import type {StepItem} from '@shared/ui/stepper/stepper';
-import {ToastService} from '@shared/ui/toast/toast';
+import type {AutocompleteOption, StepItem} from '@cvhome-saas/ui-kit/ui';
+import {ToastService} from '@cvhome-saas/ui-kit/ui';
 import {ProductsCache} from '@api/catalog/products-cache';
 import {ProductSearch} from '@api/catalog/product-search.service';
 import {

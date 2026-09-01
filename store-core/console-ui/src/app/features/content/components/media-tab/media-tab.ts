@@ -5,23 +5,8 @@ import {TranslocoLocaleService} from '@jsverse/transloco-locale';
 import {copyText} from '@cvhome-saas/ui-kit';
 import type {ReferenceOption} from '@core/reference/reference-data.service';
 import {MEDIA_KINDS, type MediaAsset, type MediaFolder, type MediaKind} from '@models/content';
-import {Badge} from '@shared/ui/badge/badge';
-import {BusyOverlay} from '@shared/ui/busy-overlay/busy-overlay';
-import {ConfirmDialog} from '@shared/ui/confirm-dialog/confirm-dialog';
-import {EmptyState} from '@shared/ui/empty-state/empty-state';
-import {FileDropZone} from '@shared/ui/file-drop-zone/file-drop-zone';
-import {Icon} from '@shared/ui/icon/icon';
-import type {IconName} from '@shared/ui/icon/icon-paths';
-import {ImagePreview} from '@shared/ui/image-preview/image-preview';
-import {LoadError} from '@shared/ui/load-error/load-error';
-import {Pagination} from '@shared/ui/pagination/pagination';
-import {Panel} from '@shared/ui/panel/panel';
-import {SearchBox} from '@shared/ui/search-box/search-box';
-import {Select, type SelectOption} from '@shared/ui/select/select';
-import {TagInput} from '@shared/ui/tag-input/tag-input';
-import {TextField} from '@shared/ui/text-field/text-field';
-import {ToastService} from '@shared/ui/toast/toast';
-import {Toggle} from '@shared/ui/toggle/toggle';
+import {Badge, BusyOverlay, ConfirmDialog, EmptyState, FileDropZone, Icon, ImagePreview, LoadError, Pagination, Panel, SearchBox, Select, type SelectOption, TagInput, TextField, ToastService, Toggle} from '@cvhome-saas/ui-kit/ui';
+import type {IconName} from '@cvhome-saas/ui-kit/ui';
 import {MEDIA_PAGE_SIZE, MediaLibraryFacade} from '../../facades/media-library.facade';
 
 const KIND_ICONS: Readonly<Record<MediaKind, IconName>> = {

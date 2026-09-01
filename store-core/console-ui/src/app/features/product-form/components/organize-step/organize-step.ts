@@ -2,13 +2,7 @@ import {Component, computed, inject, input} from '@angular/core';
 import {ReactiveFormsModule} from '@angular/forms';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 
-import {Autocomplete, type AutocompleteOption} from '@shared/ui/autocomplete/autocomplete';
-import {Checkbox} from '@shared/ui/checkbox/checkbox';
-import {Icon} from '@shared/ui/icon/icon';
-import {FormField} from '@shared/ui/form-field/form-field';
-import {NoticeBar} from '@shared/ui/notice-bar/notice-bar';
-import {Panel} from '@shared/ui/panel/panel';
-import {Select, type SelectOption} from '@shared/ui/select/select';
+import {Autocomplete, type AutocompleteOption, Checkbox, Icon, FormField, NoticeBar, Panel, Select, type SelectOption} from '@cvhome-saas/ui-kit/ui';
 import {ProductFormFacade} from '../../facades/product-form.facade';
 import type {ProductForm} from '../../services/product-draft-form.service';
 

@@ -3,13 +3,7 @@ import {ReactiveFormsModule} from '@angular/forms';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 
 import {DIMENSION_UNITS, WEIGHT_UNITS} from '@models/products';
-import {FormField} from '@shared/ui/form-field/form-field';
-import {NoticeBar} from '@shared/ui/notice-bar/notice-bar';
-import {Icon} from '@shared/ui/icon/icon';
-import {NumberField} from '@shared/ui/number-field/number-field';
-import {Panel} from '@shared/ui/panel/panel';
-import {Select, type SelectOption} from '@shared/ui/select/select';
-import {Toggle} from '@shared/ui/toggle/toggle';
+import {FormField, NoticeBar, Icon, NumberField, Panel, Select, type SelectOption, Toggle} from '@cvhome-saas/ui-kit/ui';
 import type {ProductForm} from '../../services/product-draft-form.service';
 
 /**

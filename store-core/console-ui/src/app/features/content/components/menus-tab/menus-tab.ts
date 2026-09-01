@@ -3,19 +3,7 @@ import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 
 import type {ReferenceOption} from '@core/reference/reference-data.service';
 import {MENU_TARGET_KINDS, type MenuHandle, type MenuTargetKind} from '@models/content';
-import {BusyOverlay} from '@shared/ui/busy-overlay/busy-overlay';
-import {EmptyState} from '@shared/ui/empty-state/empty-state';
-import {FormField} from '@shared/ui/form-field/form-field';
-import {Icon} from '@shared/ui/icon/icon';
-import {LoadError} from '@shared/ui/load-error/load-error';
-import {LocaleSwitcher} from '@shared/ui/locale-switcher/locale-switcher';
-import {NoticeBar} from '@shared/ui/notice-bar/notice-bar';
-import {Panel} from '@shared/ui/panel/panel';
-import {Select, type SelectOption} from '@shared/ui/select/select';
-import {TabSwitcher, type TabItem} from '@shared/ui/tab-switcher/tab-switcher';
-import {TextField} from '@shared/ui/text-field/text-field';
-import {Toggle} from '@shared/ui/toggle/toggle';
-import {Tree, type TreeMove, type TreeNode, type TreeNodeId} from '@shared/ui/tree/tree';
+import {BusyOverlay, EmptyState, FormField, Icon, LoadError, LocaleSwitcher, NoticeBar, Panel, Select, type SelectOption, TabSwitcher, type TabItem, TextField, Toggle, Tree, type TreeMove, type TreeNode, type TreeNodeId} from '@cvhome-saas/ui-kit/ui';
 import {
   MENU_MAX_DEPTH,
   MenusFacade,

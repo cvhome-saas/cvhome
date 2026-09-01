@@ -2,13 +2,7 @@ import {Component, ElementRef, effect, input, output, viewChild} from '@angular/
 import {ReactiveFormsModule} from '@angular/forms';
 import {TranslocoDirective} from '@jsverse/transloco';
 
-import {Badge} from '@shared/ui/badge/badge';
-import {Checkbox} from '@shared/ui/checkbox/checkbox';
-import {FieldError} from '@shared/ui/form-field/field-error';
-import {FormField} from '@shared/ui/form-field/form-field';
-import {Icon} from '@shared/ui/icon/icon';
-import {TextField} from '@shared/ui/text-field/text-field';
-import {Toggle} from '@shared/ui/toggle/toggle';
+import {Badge, Checkbox, FieldError, FormField, Icon, TextField, Toggle} from '@cvhome-saas/ui-kit/ui';
 import type {TeamRow} from '@models/team';
 import type {UserForm} from '../../services/user-form.service';
 

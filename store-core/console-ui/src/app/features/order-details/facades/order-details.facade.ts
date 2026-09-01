@@ -19,7 +19,7 @@ import type {Tone} from '@cvhome-saas/ui-kit';
 import {Money} from '@shared/i18n/money';
 import {StatusLabel} from '@shared/i18n/status-label';
 import {TotalLabel} from '@shared/i18n/total-label';
-import {ToastService} from '@shared/ui/toast/toast';
+import {ToastService} from '@cvhome-saas/ui-kit/ui';
 import {OrderDetailsApi} from '../services/order-details.api.service';
 
 /** One address, flattened into the lines a panel prints. */

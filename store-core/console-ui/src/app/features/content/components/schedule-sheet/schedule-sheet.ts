@@ -1,9 +1,7 @@
 import {Component, input, model, output} from '@angular/core';
 import {TranslocoDirective} from '@jsverse/transloco';
 
-import {DateTimeField} from '@shared/ui/date-time-field/date-time-field';
-import {Icon} from '@shared/ui/icon/icon';
-import {Panel} from '@shared/ui/panel/panel';
+import {DateTimeField, Icon, Panel} from '@cvhome-saas/ui-kit/ui';
 
 /** The "Schedule…" prompt every editor shows: a date-time and a confirm. */
 @Component({

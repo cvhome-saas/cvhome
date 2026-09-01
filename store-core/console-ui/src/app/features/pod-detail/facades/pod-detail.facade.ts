@@ -17,8 +17,8 @@ import {
 import type {EndpointType} from '@models/pod';
 import type {Tone} from '@cvhome-saas/ui-kit';
 import {PlatformLabel} from '@shared/i18n/platform-label';
-import type {SelectOption} from '@shared/ui/select/select';
-import {ToastService} from '@shared/ui/toast/toast';
+import type {SelectOption} from '@cvhome-saas/ui-kit/ui';
+import {ToastService} from '@cvhome-saas/ui-kit/ui';
 import {PodDetailApi, type OrgChoice} from '../services/pod-detail.api.service';
 import {PodFormService, type PodForm} from '../services/pod-form.service';
 

@@ -24,8 +24,8 @@ import {LocaleService} from '@core/i18n/locale.service';
 import {StrictMissingHandler} from '@core/i18n/strict-missing.handler';
 import {TranslatedTitleStrategy} from '@core/i18n/translated-title.strategy';
 import {TranslocoDictionaryLoader} from '@core/i18n/transloco.loader';
-import {provideTheme} from '@core/theme/theme.provider';
-import {ToastService} from '@shared/ui/toast/toast';
+import {provideTheme} from '@cvhome-saas/ui-kit/theme';
+import {ToastService} from '@cvhome-saas/ui-kit/ui';
 import {environment} from '@env/environment';
 
 export const appConfig: ApplicationConfig = {

@@ -20,10 +20,8 @@ import {
 } from '@models/transactions';
 import {Money} from '@shared/i18n/money';
 import {StatusLabel} from '@shared/i18n/status-label';
-import type {KpiDatum} from '@shared/ui/kpi-card/kpi-card';
-import type {TabItem} from '@shared/ui/tab-switcher/tab-switcher';
-import type {DateRangeValue} from '@shared/ui/date-range-picker/date-range-picker';
-import {ToastService} from '@shared/ui/toast/toast';
+import type {DateRangeValue, KpiDatum, TabItem} from '@cvhome-saas/ui-kit/ui';
+import {ToastService} from '@cvhome-saas/ui-kit/ui';
 import {PaymentsApi} from '../services/payments.api.service';
 
 export const PAGE_SIZE = 20;

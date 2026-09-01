@@ -3,25 +3,11 @@ import {Router} from '@angular/router';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 
 import {ImageBroken} from '@shared/directives/image-broken';
-import {Badge} from '@shared/ui/badge/badge';
-import {BusyOverlay} from '@shared/ui/busy-overlay/busy-overlay';
-import {ConfirmDialog} from '@shared/ui/confirm-dialog/confirm-dialog';
-import {DataTable, type TableColumn} from '@shared/ui/data-table/data-table';
+import {Badge, BusyOverlay, ConfirmDialog, DataTable, type TableColumn, TableRow, Icon, EmptyState, LoadError, PageHeader, Pagination, Panel, SearchBox, Select, type SelectOption, TabSwitcher, NumberField} from '@cvhome-saas/ui-kit/ui';
 import {ExportButton} from '@shared/ui/export-button/export-button';
-import {TableRow} from '@shared/ui/data-table/table-row';
-import {Icon} from '@shared/ui/icon/icon';
-import {EmptyState} from '@shared/ui/empty-state/empty-state';
-import {LoadError} from '@shared/ui/load-error/load-error';
-import {PageHeader} from '@shared/ui/page-header/page-header';
-import {Pagination} from '@shared/ui/pagination/pagination';
-import {Panel} from '@shared/ui/panel/panel';
-import {SearchBox} from '@shared/ui/search-box/search-box';
-import {Select, type SelectOption} from '@shared/ui/select/select';
-import {TabSwitcher} from '@shared/ui/tab-switcher/tab-switcher';
 import {TranslocoLocaleService} from '@jsverse/transloco-locale';
 
 import {Money} from '@shared/i18n/money';
-import {NumberField} from '@shared/ui/number-field/number-field';
 import type {InlineProductEdit, ProductRow, ProductTab} from '@models/products';
 import {PAGE_SIZE, ProductsFacade} from './facades/products.facade';
 

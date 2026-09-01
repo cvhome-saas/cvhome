@@ -3,7 +3,7 @@ import {provideRouter} from '@angular/router';
 
 import {AuthService} from '@cvhome-saas/ui-kit';
 import {LocaleService} from '@core/i18n/locale.service';
-import {ThemeService} from '@core/theme/theme.service';
+import {ThemeService} from '@cvhome-saas/ui-kit/theme';
 import {translocoTesting} from '@testing/transloco-testing';
 import {Profile} from './profile';
 

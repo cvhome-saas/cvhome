@@ -9,8 +9,8 @@ import type {InvitationStatus} from '@models/users';
 import {INVITATION_STATUSES, USERS_TABS, type InvitationRow, type IssuedInvitation, type TeamRow, type UsersTab} from '@models/team';
 import {RoleLabel} from '@shared/i18n/role-label';
 import {ConsolePermissions} from '@shared/auth/console-permissions';
-import type {TabItem} from '@shared/ui/tab-switcher/tab-switcher';
-import {ToastService} from '@shared/ui/toast/toast';
+import type {TabItem} from '@cvhome-saas/ui-kit/ui';
+import {ToastService} from '@cvhome-saas/ui-kit/ui';
 import {UsersApi} from '../services/users.api.service';
 import {UserFormService, type UserForm} from '../services/user-form.service';
 

@@ -11,8 +11,7 @@ import {ReferenceDataService, type ReferenceOption} from '@core/reference/refere
 import {ConsoleShellFacade} from '@layouts/console-shell/facades/console-shell.facade';
 import {CONTENT_TABS, type ContentSummary, type ContentTab} from '@models/content';
 import type {KpiDatum} from '@cvhome-saas/ui-kit';
-import type {NavSection} from '@shared/ui/section-nav/section-nav';
-import type {IconName} from '@shared/ui/icon/icon-paths';
+import type {IconName, NavSection} from '@cvhome-saas/ui-kit/ui';
 
 const TAB_ICONS: Readonly<Record<ContentTab, IconName>> = {
   pages: 'file',

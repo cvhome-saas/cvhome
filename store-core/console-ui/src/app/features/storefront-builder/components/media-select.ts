@@ -9,8 +9,7 @@ import {catchError, of} from 'rxjs';
 
 import {MediaService} from '@api/content/media.service';
 import type {MediaAsset} from '@models/content';
-import {Icon} from '@shared/ui/icon/icon';
-import {SearchBox} from '@shared/ui/search-box/search-box';
+import {Icon, SearchBox} from '@cvhome-saas/ui-kit/ui';
 
 /**
  * A small pick-from-the-library dialog for the builder's media fields. The content hub has a richer

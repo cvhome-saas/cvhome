@@ -11,7 +11,7 @@ import type {PersistableVariantSet} from '@models/catalog';
 import {CONSOLE_STORES_FAKE, FakeConsoleApi} from '@testing/console-api.fake';
 import {provideFakeProductSearch} from '@testing/product-search.fake';
 import {translocoTesting} from '@testing/transloco-testing';
-import {ToastService} from '@shared/ui/toast/toast';
+import {ToastService} from '@cvhome-saas/ui-kit/ui';
 import {ProductForm} from './product-form';
 import {
   ProductFormApi,

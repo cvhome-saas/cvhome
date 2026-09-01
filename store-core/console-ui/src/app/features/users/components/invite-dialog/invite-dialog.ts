@@ -1,8 +1,6 @@
 import {Component, ElementRef, computed, effect, input, output, signal, viewChild} from '@angular/core';
 
-import {FormField} from '@shared/ui/form-field/form-field';
-import {Select, type SelectOption} from '@shared/ui/select/select';
-import {TextField} from '@shared/ui/text-field/text-field';
+import {FormField, Select, type SelectOption, TextField} from '@cvhome-saas/ui-kit/ui';
 
 /** The server normalises the address to lowercase; this only has to reject what is not one. */
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;

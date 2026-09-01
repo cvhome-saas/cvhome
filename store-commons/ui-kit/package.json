@@ -6,6 +6,9 @@
   "exports": {
     "./theme/css/*": {
       "default": "./theme/css/*"
+    },
+    "./ui/styles/*": {
+      "default": "./ui/styles/*"
     }
   },
   "scripts": {
@@ -37,6 +40,8 @@
     "@angular/forms": "^20.3.0",
     "@angular/router": "^20.3.0",
     "@jsverse/transloco": "^8.4.0",
+    "@jsverse/transloco-locale": "^8.4.0",
+    "@jsverse/transloco-messageformat": "^8.4.0",
     "rxjs": "~7.8.0"
   },
   "dependencies": {
@@ -55,6 +60,9 @@
     "@angular/router": "^20.3.0",
     "@eslint/js": "^9.39.5",
     "@jsverse/transloco": "^8.4.0",
+    "@jsverse/transloco-locale": "^8.4.0",
+    "@jsverse/transloco-messageformat": "^8.4.0",
+    "@tailwindcss/postcss": "^4.3.3",
     "@types/jasmine": "~5.1.0",
     "angular-eslint": "^20.7.0",
     "eslint": "^9.39.5",
@@ -65,8 +73,10 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
     "ng-packagr": "^20.3.0",
+    "postcss": "^8.5.26",
     "rxjs": "~7.8.0",
     "stylelint": "^17.14.1",
+    "tailwindcss": "^4.3.3",
     "typescript": "~5.9.2",
     "typescript-eslint": "^8.67.0",
     "zone.js": "~0.15.0"

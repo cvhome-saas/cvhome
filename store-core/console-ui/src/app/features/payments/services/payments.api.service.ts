@@ -15,7 +15,7 @@ import {
 } from '@models/payment';
 import type {ReadableOrder} from '@models/checkout';
 import type {PaymentTab, TransactionRow, TransactionsSnapshot} from '@models/transactions';
-import type {DateRangeValue} from '@shared/ui/date-range-picker/date-range-picker';
+import type {DateRangeValue} from '@cvhome-saas/ui-kit/ui';
 
 /** The KPI row's four figures. `null` is "could not be read", which is not the same as zero. */
 export interface TransactionCounts {

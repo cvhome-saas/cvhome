@@ -1,7 +1,6 @@
 import {Component, ElementRef, computed, effect, input, output, signal, viewChild} from '@angular/core';
 
-import {FormField} from '@shared/ui/form-field/form-field';
-import {TextField} from '@shared/ui/text-field/text-field';
+import {FormField, TextField} from '@cvhome-saas/ui-kit/ui';
 
 /**
  * Confirms a payment against the external reference the operator has in front of them.

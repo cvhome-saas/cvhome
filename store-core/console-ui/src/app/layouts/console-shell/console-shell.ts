@@ -2,7 +2,7 @@ import {Component, computed, inject} from '@angular/core';
 import {RouterOutlet} from '@angular/router';
 import {TranslocoDirective} from '@jsverse/transloco';
 
-import {Icon} from '@shared/ui/icon/icon';
+import {Icon} from '@cvhome-saas/ui-kit/ui';
 import {ConsoleSidebar} from './components/console-sidebar/console-sidebar';
 import {ConsoleToolbar} from './components/console-toolbar/console-toolbar';
 import {PlanBanner} from './components/plan-banner/plan-banner';

@@ -1,14 +1,7 @@
 import {Component, ElementRef, effect, inject, input, output, viewChild} from '@angular/core';
 import {TranslocoDirective} from '@jsverse/transloco';
 
-import {Badge} from '@shared/ui/badge/badge';
-import {BusyOverlay} from '@shared/ui/busy-overlay/busy-overlay';
-import {ConfirmDialog} from '@shared/ui/confirm-dialog/confirm-dialog';
-import {EmptyState} from '@shared/ui/empty-state/empty-state';
-import {Icon} from '@shared/ui/icon/icon';
-import {LoadError} from '@shared/ui/load-error/load-error';
-import {NoticeBar} from '@shared/ui/notice-bar/notice-bar';
-import {Select} from '@shared/ui/select/select';
+import {Badge, BusyOverlay, ConfirmDialog, EmptyState, Icon, LoadError, NoticeBar, Select} from '@cvhome-saas/ui-kit/ui';
 import {StoreBillingFacade} from '../../facades/store-billing.facade';
 
 /**

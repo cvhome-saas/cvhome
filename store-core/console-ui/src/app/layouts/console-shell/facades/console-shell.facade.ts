@@ -7,7 +7,7 @@ import {filter, map, startWith} from 'rxjs';
 
 import {CONSOLE_LOCALES, LocaleCode, LocaleService} from '@core/i18n/locale.service';
 import {SelectedStoreService} from '@api/tenancy/selected-store.service';
-import {THEME} from '@core/theme/theme.provider';
+import {THEME} from '@cvhome-saas/ui-kit/theme';
 import type {ConsoleNotification, ConsoleStore} from '@models/console';
 import {ConsoleApi} from '../services/console.api.service';
 import {routeData} from '@cvhome-saas/ui-kit';

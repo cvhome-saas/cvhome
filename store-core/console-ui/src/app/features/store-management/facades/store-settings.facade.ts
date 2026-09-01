@@ -20,7 +20,7 @@ import {
   type StoreSettings,
 } from '@models/store-settings';
 import {ReferenceDataService, type ReferenceOption} from '@core/reference/reference-data.service';
-import {ToastService} from '@shared/ui/toast/toast';
+import {ToastService} from '@cvhome-saas/ui-kit/ui';
 import {StoreSettingsApi} from '../services/store-settings.api.service';
 import {
   StoreSettingsFormService,

@@ -16,8 +16,8 @@ import {
   type ProductTab,
   type ProductsSnapshot,
 } from '@models/products';
-import type {TabItem} from '@shared/ui/tab-switcher/tab-switcher';
-import {ToastService} from '@shared/ui/toast/toast';
+import type {TabItem} from '@cvhome-saas/ui-kit/ui';
+import {ToastService} from '@cvhome-saas/ui-kit/ui';
 import {ProductsApi, type ProductsQuery} from '../services/products.api.service';
 import {ProductsCache} from '@api/catalog/products-cache';
 

@@ -2,13 +2,7 @@ import {Component, computed, inject} from '@angular/core';
 import {ReactiveFormsModule} from '@angular/forms';
 import {TranslocoDirective} from '@jsverse/transloco';
 
-import {EmptyState} from '@shared/ui/empty-state/empty-state';
-import {FormField} from '@shared/ui/form-field/form-field';
-import {Icon} from '@shared/ui/icon/icon';
-import {LocaleSwitcher} from '@shared/ui/locale-switcher/locale-switcher';
-import {NoticeBar} from '@shared/ui/notice-bar/notice-bar';
-import {Panel} from '@shared/ui/panel/panel';
-import {TextField} from '@shared/ui/text-field/text-field';
+import {EmptyState, FormField, Icon, LocaleSwitcher, NoticeBar, Panel, TextField} from '@cvhome-saas/ui-kit/ui';
 import {CatalogueFacade} from '../../facades/catalogue.facade';
 
 /**

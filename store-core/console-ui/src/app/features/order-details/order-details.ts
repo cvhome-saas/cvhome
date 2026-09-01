@@ -6,16 +6,8 @@ import {TranslocoDatePipe, TranslocoDecimalPipe, TranslocoLocaleService} from '@
 
 import type {OrderStatus} from '@models/checkout';
 import {ConsoleShellFacade} from '@layouts/console-shell/facades/console-shell.facade';
-import {Badge} from '@shared/ui/badge/badge';
-import {BusyOverlay} from '@shared/ui/busy-overlay/busy-overlay';
-import {Icon} from '@shared/ui/icon/icon';
-import {EmptyState} from '@shared/ui/empty-state/empty-state';
-import {LoadError} from '@shared/ui/load-error/load-error';
-import {Select} from '@shared/ui/select/select';
-import {TextareaField} from '@shared/ui/textarea-field/textarea-field';
-import {Panel} from '@shared/ui/panel/panel';
+import {Badge, BusyOverlay, Icon, EmptyState, LoadError, Select, TextareaField, Panel, ToastService} from '@cvhome-saas/ui-kit/ui';
 import {PdfExportService} from '@core/export/pdf-export.service';
-import {ToastService} from '@shared/ui/toast/toast';
 import {OrderDetailsFacade} from './facades/order-details.facade';
 import {positiveIntParam} from '@cvhome-saas/ui-kit';
 

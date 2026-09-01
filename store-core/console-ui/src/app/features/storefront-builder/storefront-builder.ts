@@ -8,8 +8,8 @@ import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 import {TranslocoDatePipe} from '@jsverse/transloco-locale';
 
 import type {ConfirmsLeave} from '@cvhome-saas/ui-kit';
-import {Icon} from '@shared/ui/icon/icon';
-import type {IconName} from '@shared/ui/icon/icon-paths';
+import {Icon} from '@cvhome-saas/ui-kit/ui';
+import type {IconName} from '@cvhome-saas/ui-kit/ui';
 
 import {BuilderFacade, type BuilderDevice} from './facades/builder.facade';
 import {BuilderInspector} from './components/inspector';

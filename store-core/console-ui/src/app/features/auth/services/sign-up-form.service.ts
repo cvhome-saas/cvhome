@@ -1,8 +1,7 @@
 import {Injectable, inject} from '@angular/core';
 import {NonNullableFormBuilder, Validators} from '@angular/forms';
 
-import {notACommonPassword, passwordIsNotPersonal} from '@shared/validators/password-strength';
-import {passwordsMatch} from '@shared/validators/passwords-match';
+import {notACommonPassword, passwordIsNotPersonal, passwordsMatch} from '@cvhome-saas/ui-kit/forms';
 
 /**
  * The shortest password the console will submit.

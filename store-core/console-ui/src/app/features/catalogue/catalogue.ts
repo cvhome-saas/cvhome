@@ -2,12 +2,7 @@ import {Component, computed, effect, inject, input} from '@angular/core';
 import {Router} from '@angular/router';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 
-import {BusyOverlay} from '@shared/ui/busy-overlay/busy-overlay';
-import {ConfirmDialog} from '@shared/ui/confirm-dialog/confirm-dialog';
-import {Icon} from '@shared/ui/icon/icon';
-import {LoadError} from '@shared/ui/load-error/load-error';
-import {PageHeader} from '@shared/ui/page-header/page-header';
-import {TabSwitcher} from '@shared/ui/tab-switcher/tab-switcher';
+import {BusyOverlay, ConfirmDialog, Icon, LoadError, PageHeader, TabSwitcher} from '@cvhome-saas/ui-kit/ui';
 import {isCatalogueTab} from '@models/taxonomy';
 import {BrandTab} from './components/brand-tab/brand-tab';
 import {CategoryTab} from './components/category-tab/category-tab';

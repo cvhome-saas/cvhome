@@ -3,17 +3,7 @@ import {Router} from '@angular/router';
 import {TranslocoDirective} from '@jsverse/transloco';
 
 import type {PlatformUserRow} from '@models/platform';
-import {BusyOverlay} from '@shared/ui/busy-overlay/busy-overlay';
-import {ConfirmDialog} from '@shared/ui/confirm-dialog/confirm-dialog';
-import {EmptyState} from '@shared/ui/empty-state/empty-state';
-import {LoadError} from '@shared/ui/load-error/load-error';
-import {NoticeBar} from '@shared/ui/notice-bar/notice-bar';
-import {PageHeader} from '@shared/ui/page-header/page-header';
-import {Pagination} from '@shared/ui/pagination/pagination';
-import {Panel} from '@shared/ui/panel/panel';
-import {RolesDialog} from '@shared/ui/roles-dialog/roles-dialog';
-import {Select} from '@shared/ui/select/select';
-import {SetPasswordDialog} from '@shared/ui/set-password-dialog/set-password-dialog';
+import {BusyOverlay, ConfirmDialog, EmptyState, LoadError, NoticeBar, PageHeader, Pagination, Panel, RolesDialog, Select, SetPasswordDialog} from '@cvhome-saas/ui-kit/ui';
 import {UserAdminTable, type UserAdminIntent} from '@shared/ui/user-admin-table/user-admin-table';
 import {PAGE_SIZE, PlatformUsersFacade} from './facades/platform-users.facade';
 

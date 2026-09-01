@@ -4,19 +4,8 @@ import {Router, RouterLink} from '@angular/router';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 
 import {ConsoleShellFacade} from '@layouts/console-shell/facades/console-shell.facade';
-import {Badge} from '@shared/ui/badge/badge';
-import {Checkbox} from '@shared/ui/checkbox/checkbox';
-import {DatePicker} from '@shared/ui/date-picker/date-picker';
-import {FormField} from '@shared/ui/form-field/form-field';
-import {Select} from '@shared/ui/select/select';
-import {TextField} from '@shared/ui/text-field/text-field';
-import {Icon} from '@shared/ui/icon/icon';
-import {PageHeader} from '@shared/ui/page-header/page-header';
-import {Panel} from '@shared/ui/panel/panel';
-import {ProgressTrack} from '@shared/ui/progress-track/progress-track';
-import {Toggle} from '@shared/ui/toggle/toggle';
-import {ToastService} from '@shared/ui/toast/toast';
-import {dateKey} from '@core/i18n/calendar';
+import {Badge, Checkbox, DatePicker, FormField, Select, TextField, Icon, PageHeader, Panel, ProgressTrack, Toggle, ToastService} from '@cvhome-saas/ui-kit/ui';
+import {dateKey} from '@cvhome-saas/ui-kit/i18n';
 import type {NextStepLink} from '@models/create-store';
 import {CreateStoreFacade} from './facades/create-store.facade';
 

@@ -4,7 +4,7 @@ import {Observable, Subject, of, throwError} from 'rxjs';
 
 import {DnsCheckService, type CnameOutcome} from '@api/dns/dns-check.service';
 import {NOTIFICATION_PORT} from '@cvhome-saas/ui-kit';
-import {ToastService} from '@shared/ui/toast/toast';
+import {ToastService} from '@cvhome-saas/ui-kit/ui';
 import type {
   DomainStatus,
   SettingsSectionKey,

@@ -1,7 +1,6 @@
 import {Component, input} from '@angular/core';
 
-import {Icon} from '@shared/ui/icon/icon';
-import {Panel} from '@shared/ui/panel/panel';
+import {Icon, Panel} from '@cvhome-saas/ui-kit/ui';
 
 export interface ChecklistItem {
   readonly key: string;

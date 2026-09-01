@@ -20,10 +20,8 @@ import {
   type OptionCard,
   type TypeCard,
 } from '@models/taxonomy';
-import type {AutocompleteOption} from '@shared/ui/autocomplete/autocomplete';
-import type {TabItem} from '@shared/ui/tab-switcher/tab-switcher';
-import type {TreeMove, TreeNode, TreeNodeId} from '@shared/ui/tree/tree';
-import {ToastService} from '@shared/ui/toast/toast';
+import type {AutocompleteOption, TabItem, TreeMove, TreeNode, TreeNodeId} from '@cvhome-saas/ui-kit/ui';
+import {ToastService} from '@cvhome-saas/ui-kit/ui';
 import {ProductSearch} from '@api/catalog/product-search.service';
 import type {PersistableProductOption, ProductOptionDescription} from '@models/catalog';
 import {CatalogueApi} from '../services/catalogue.api.service';

@@ -8,12 +8,7 @@ import {ContentItemsService} from '@api/content/content-items.service';
 import {ConsoleShellFacade} from '@layouts/console-shell/facades/console-shell.facade';
 import type {PersistablePage, ReadablePage} from '@models/content';
 import {ConsolePermissions} from '@shared/auth/console-permissions';
-import {DateTimeField} from '@shared/ui/date-time-field/date-time-field';
-import {FormField} from '@shared/ui/form-field/form-field';
-import {Icon} from '@shared/ui/icon/icon';
-import {Panel} from '@shared/ui/panel/panel';
-import {Select, type SelectOption} from '@shared/ui/select/select';
-import {Toggle} from '@shared/ui/toggle/toggle';
+import {DateTimeField, FormField, Icon, Panel, Select, type SelectOption, Toggle} from '@cvhome-saas/ui-kit/ui';
 import {LocaleCopy, type CopyFields} from '../../components/locale-copy/locale-copy';
 import {
   PublishChecklist,

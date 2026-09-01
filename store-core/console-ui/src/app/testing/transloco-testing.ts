@@ -3,7 +3,11 @@ import {TranslocoTestingModule} from '@jsverse/transloco';
 import {provideTranslocoLocale} from '@jsverse/transloco-locale';
 import {provideTranslocoMessageformat} from '@jsverse/transloco-messageformat';
 
-import en from '@i18n/en.json';
+import {withKitCopy} from '@cvhome-saas/ui-kit/i18n';
+
+import enApp from '@i18n/en.json';
+
+const en = withKitCopy(enApp, 'en');
 
 /**
  * Every spec that touches something on the `TranslocoService` chain — directly, or through

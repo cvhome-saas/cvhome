@@ -1,14 +1,7 @@
 import {Component, computed, inject} from '@angular/core';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 
-import {BusyOverlay} from '@shared/ui/busy-overlay/busy-overlay';
-import {DataTable, type TableColumn} from '@shared/ui/data-table/data-table';
-import {TableRow} from '@shared/ui/data-table/table-row';
-import {EmptyState} from '@shared/ui/empty-state/empty-state';
-import {LoadError} from '@shared/ui/load-error/load-error';
-import {NoticeBar} from '@shared/ui/notice-bar/notice-bar';
-import {PageHeader} from '@shared/ui/page-header/page-header';
-import {Panel} from '@shared/ui/panel/panel';
+import {BusyOverlay, DataTable, type TableColumn, TableRow, EmptyState, LoadError, NoticeBar, PageHeader, Panel} from '@cvhome-saas/ui-kit/ui';
 import {PlatformPlansFacade} from './facades/platform-plans.facade';
 
 /**

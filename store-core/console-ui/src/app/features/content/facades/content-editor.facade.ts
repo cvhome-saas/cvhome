@@ -17,7 +17,7 @@ import type {
   ReadableContentMeta,
   TransitionAction,
 } from '@models/content';
-import {ToastService} from '@shared/ui/toast/toast';
+import {ToastService} from '@cvhome-saas/ui-kit/ui';
 import {
   ContentEditorFormService,
   type CommonForm,

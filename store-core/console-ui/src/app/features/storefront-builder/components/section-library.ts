@@ -2,8 +2,8 @@
 import {ChangeDetectionStrategy, Component, computed, inject, signal} from '@angular/core';
 import {TranslocoDirective} from '@jsverse/transloco';
 
-import {Icon} from '@shared/ui/icon/icon';
-import type {IconName} from '@shared/ui/icon/icon-paths';
+import {Icon} from '@cvhome-saas/ui-kit/ui';
+import type {IconName} from '@cvhome-saas/ui-kit/ui';
 
 import type {ManifestPreset, SavedSection} from '@models/layout';
 

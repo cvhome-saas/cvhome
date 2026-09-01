@@ -3,9 +3,8 @@ import {Component, inject, signal} from '@angular/core';
 import {RouterLink} from '@angular/router';
 import {TranslocoDirective} from '@jsverse/transloco';
 
-import {ThemeService} from '@core/theme/theme.service';
-import {Icon} from '@shared/ui/icon/icon';
-import {SearchBox} from '@shared/ui/search-box/search-box';
+import {ThemeService} from '@cvhome-saas/ui-kit/theme';
+import {Icon, SearchBox} from '@cvhome-saas/ui-kit/ui';
 import {ConsoleShellFacade} from '../../facades/console-shell.facade';
 
 /** Breadcrumb, search, and the notification / theme / language / profile menus. */

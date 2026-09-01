@@ -2,8 +2,7 @@ import {Component, ElementRef, effect, input, output, viewChild} from '@angular/
 import {TranslocoDatePipe} from '@jsverse/transloco-locale';
 
 import type {OrderSummary} from '@models/transactions';
-import {Badge} from '@shared/ui/badge/badge';
-import {Icon} from '@shared/ui/icon/icon';
+import {Badge, Icon} from '@cvhome-saas/ui-kit/ui';
 
 /**
  * The order behind a transaction, read without leaving the ledger.

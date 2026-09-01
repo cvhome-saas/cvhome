@@ -4,8 +4,7 @@ import {RouterLink} from '@angular/router';
 import {TranslocoDirective} from '@jsverse/transloco';
 
 import {clearServerErrorsOnChange} from '@cvhome-saas/ui-kit';
-import {FormField} from '@shared/ui/form-field/form-field';
-import {TextField} from '@shared/ui/text-field/text-field';
+import {FormField, TextField} from '@cvhome-saas/ui-kit/ui';
 import {AuthStory} from '../components/auth-story';
 import {AuthFacade} from '../facades/auth.facade';
 import {SignUpFormService} from '../services/sign-up-form.service';

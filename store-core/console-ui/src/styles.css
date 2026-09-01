@@ -3,6 +3,20 @@
 @import 'tailwindcss';
 
 /*
+ * The control catalogue lives in a package, and Tailwind only emits what it has seen. Several kit
+ * components use real utilities — badge, tag-input, tree and the chart legends between them want
+ * `inline-flex`, `gap-1`, `ring-1`, `bg-chart-3-wash`, `group-aria-expanded:rotate-180` — and
+ * ng-packagr does not run Tailwind over component CSS, so this build is the only thing that can
+ * emit them. Without this line everything still compiles and 2.6 kB of utilities quietly go
+ * missing, which reads as controls that are subtly mislaid rather than as an error.
+ *
+ * The installed package rather than `../../../store-commons/ui-kit/ui/src`: this is the path a
+ * consumer actually has, it is what uaa-fe will copy, and it turns out to be a superset of scanning
+ * the source tree.
+ */
+@source '../node_modules/@cvhome-saas/ui-kit';
+
+/*
  * The design system, in three layers:
  *   theme.css          primitives and scales, on standard Tailwind keys
  *   theme-*.css        the identities, selected by [data-theme] on <html>

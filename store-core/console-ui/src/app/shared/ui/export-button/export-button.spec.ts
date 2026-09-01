@@ -3,7 +3,7 @@ import {ComponentFixture, TestBed, fakeAsync, tick} from '@angular/core/testing'
 
 import {PdfExportService, type PdfExportRequest} from '@core/export/pdf-export.service';
 import {translocoTesting} from '@testing/transloco-testing';
-import {Panel} from '@shared/ui/panel/panel';
+import {Panel} from '@cvhome-saas/ui-kit/ui';
 import {ExportButton} from './export-button';
 
 class FakePdfExportService {

@@ -60,6 +60,19 @@ source, so a consumer `@import`s it from inside its own stylesheet, after `@impo
 never through `angular.json`'s `styles` array, which is a separate PostCSS pass where `@theme`
 quietly emits nothing.
 
-The controls need no Tailwind content-scanning: every component here styles itself with semantic
-class names and `var(--token)` in its own stylesheet, and uses no Tailwind utility classes in its
-template. A consumer needs Tailwind v4 to *emit the token layer*, not to style the controls.
+**A consumer must also add the kit to Tailwind's source scanning**, next to that import:
+
+```css
+@source '../node_modules/@cvhome-saas/ui-kit';
+```
+
+Most controls do style themselves with semantic class names over `var(--token)`, but not all of
+them: badges, the tag input, the tree and the chart legends use real utilities — `inline-flex`,
+`items-center`, `gap-1`, `ring-1`, `bg-chart-3-wash`, `group-aria-expanded:rotate-180`. Component
+CSS is compiled by ng-packagr, which does not run Tailwind, so those utilities can only be emitted
+by the *consumer's* Tailwind build, and it only emits what it has seen.
+
+Leave the `@source` out and nothing fails: the build is green, the specs pass, and roughly 2.6 kB of
+utilities are silently missing from the stylesheet, which shows up as controls that are subtly
+mislaid rather than as an error. Scan the installed package rather than the kit's source tree — that
+is the path a consumer actually has, and it turns out to be a superset.

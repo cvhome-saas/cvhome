@@ -3,7 +3,7 @@ import {ChangeDetectionStrategy, Component, computed, inject} from '@angular/cor
 import {CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList} from '@angular/cdk/drag-drop';
 import {TranslocoDirective} from '@jsverse/transloco';
 
-import {Icon} from '@shared/ui/icon/icon';
+import {Icon} from '@cvhome-saas/ui-kit/ui';
 
 import {BuilderFacade} from '../facades/builder.facade';
 

@@ -1,7 +1,7 @@
 import {Component, input, output} from '@angular/core';
 import {TranslocoDirective} from '@jsverse/transloco';
 
-import {Icon} from '@shared/ui/icon/icon';
+import {Icon} from '@cvhome-saas/ui-kit/ui';
 import type {ReferenceOption} from '@core/reference/reference-data.service';
 
 /**

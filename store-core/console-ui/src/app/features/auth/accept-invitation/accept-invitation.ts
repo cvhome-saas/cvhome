@@ -3,7 +3,7 @@ import {Router} from '@angular/router';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 
 import type {AuthStory as AuthStoryModel} from '@cvhome-saas/ui-kit';
-import {Icon} from '@shared/ui/icon/icon';
+import {Icon} from '@cvhome-saas/ui-kit/ui';
 import {AuthStory} from '../components/auth-story';
 import {AcceptInvitationFacade} from './facades/accept-invitation.facade';
 

@@ -20,7 +20,7 @@
 import {readFileSync} from 'node:fs';
 import {execSync} from 'node:child_process';
 
-import {SOURCE_DIRS} from './sources.mjs';
+import {SOURCE_DIRS, dictionary} from './sources.mjs';
 
 /** Both spellings a key can have in these files: nested, and flattened at any depth. */
 const resolvable = (tree) => {
@@ -39,8 +39,8 @@ const resolvable = (tree) => {
 };
 
 const locales = {
-  en: resolvable(JSON.parse(readFileSync('src/locale/en.json', 'utf8'))),
-  ar: resolvable(JSON.parse(readFileSync('src/locale/ar.json', 'utf8'))),
+  en: resolvable(dictionary('en')),
+  ar: resolvable(dictionary('ar')),
 };
 
 const files = execSync(

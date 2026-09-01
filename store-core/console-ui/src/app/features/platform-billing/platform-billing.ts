@@ -3,26 +3,10 @@ import {Router} from '@angular/router';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 
 import type {AuditRow, PlatformInvoiceRow, PlatformSubscriptionRow} from '@models/platform-billing';
-import {Badge} from '@shared/ui/badge/badge';
-import {BusyOverlay} from '@shared/ui/busy-overlay/busy-overlay';
+import {Badge, BusyOverlay, DataTable, type TableColumn, TableRow, DateRangePicker, EmptyState, Icon, KpiGrid, LoadError, PageHeader, Pagination, Panel, SearchBox, SectionNav, Select, TabSwitcher, type TabItem, Toggle} from '@cvhome-saas/ui-kit/ui';
 import {BarChart} from '@shared/ui/charts/bar-chart';
 import {DonutChart} from '@shared/ui/charts/donut-chart';
 import {TrendChart} from '@shared/ui/charts/trend-chart';
-import {DataTable, type TableColumn} from '@shared/ui/data-table/data-table';
-import {TableRow} from '@shared/ui/data-table/table-row';
-import {DateRangePicker} from '@shared/ui/date-range-picker/date-range-picker';
-import {EmptyState} from '@shared/ui/empty-state/empty-state';
-import {Icon} from '@shared/ui/icon/icon';
-import {KpiGrid} from '@shared/ui/kpi-grid/kpi-grid';
-import {LoadError} from '@shared/ui/load-error/load-error';
-import {PageHeader} from '@shared/ui/page-header/page-header';
-import {Pagination} from '@shared/ui/pagination/pagination';
-import {Panel} from '@shared/ui/panel/panel';
-import {SearchBox} from '@shared/ui/search-box/search-box';
-import {SectionNav} from '@shared/ui/section-nav/section-nav';
-import {Select} from '@shared/ui/select/select';
-import {TabSwitcher, type TabItem} from '@shared/ui/tab-switcher/tab-switcher';
-import {Toggle} from '@shared/ui/toggle/toggle';
 import {StoreBillingPanel} from './components/store-billing-panel/store-billing-panel';
 import {
   BILLING_SECTIONS,

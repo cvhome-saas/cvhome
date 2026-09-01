@@ -9,8 +9,8 @@ import {MenusService} from '@api/content/menus.service';
 import {ApiErrorService} from '@cvhome-saas/ui-kit';
 import {ConsoleShellFacade} from '@layouts/console-shell/facades/console-shell.facade';
 import type {ContentRow, Menu, MenuHandle, MenuItem, MenuTargetKind} from '@models/content';
-import type {TreeMove} from '@shared/ui/tree/tree';
-import {ToastService} from '@shared/ui/toast/toast';
+import type {TreeMove} from '@cvhome-saas/ui-kit/ui';
+import {ToastService} from '@cvhome-saas/ui-kit/ui';
 
 /** A menu node as the editor holds it: a stable local key, mutable fields, one level of children. */
 export interface MenuDraftItem {

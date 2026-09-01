@@ -13,14 +13,7 @@ import {PostCategoriesService} from '@api/content/post-categories.service';
 import {ConsoleShellFacade} from '@layouts/console-shell/facades/console-shell.facade';
 import type {MediaAsset, PersistablePost, PostCategory, ReadablePost} from '@models/content';
 import {ConsolePermissions} from '@shared/auth/console-permissions';
-import {Checkbox} from '@shared/ui/checkbox/checkbox';
-import {DateTimeField} from '@shared/ui/date-time-field/date-time-field';
-import {FormField} from '@shared/ui/form-field/form-field';
-import {Icon} from '@shared/ui/icon/icon';
-import {Panel} from '@shared/ui/panel/panel';
-import {TagInput} from '@shared/ui/tag-input/tag-input';
-import {TextField} from '@shared/ui/text-field/text-field';
-import {Toggle} from '@shared/ui/toggle/toggle';
+import {Checkbox, DateTimeField, FormField, Icon, Panel, TagInput, TextField, Toggle} from '@cvhome-saas/ui-kit/ui';
 import {LocaleCopy, type CopyFields} from '../../components/locale-copy/locale-copy';
 import {MediaPickerDialog} from '../../components/media-picker/media-picker-dialog';
 import {

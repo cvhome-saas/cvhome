@@ -4,18 +4,7 @@ import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 import {TranslocoDatePipe} from '@jsverse/transloco-locale';
 
 import type {OrgRow} from '@models/platform';
-import {Badge} from '@shared/ui/badge/badge';
-import {BusyOverlay} from '@shared/ui/busy-overlay/busy-overlay';
-import {DataTable, type TableColumn} from '@shared/ui/data-table/data-table';
-import {TableRow} from '@shared/ui/data-table/table-row';
-import {EmptyState} from '@shared/ui/empty-state/empty-state';
-import {Icon} from '@shared/ui/icon/icon';
-import {LoadError} from '@shared/ui/load-error/load-error';
-import {PageHeader} from '@shared/ui/page-header/page-header';
-import {Pagination} from '@shared/ui/pagination/pagination';
-import {Panel} from '@shared/ui/panel/panel';
-import {SearchBox} from '@shared/ui/search-box/search-box';
-import {Select} from '@shared/ui/select/select';
+import {Badge, BusyOverlay, DataTable, type TableColumn, TableRow, EmptyState, Icon, LoadError, PageHeader, Pagination, Panel, SearchBox, Select} from '@cvhome-saas/ui-kit/ui';
 import {CreateOrgDialog} from './components/create-org-dialog/create-org-dialog';
 import {OrganizationsFacade, PAGE_SIZE} from './facades/organizations.facade';
 

@@ -21,7 +21,7 @@ import {
   type LocalisedCopy,
 } from '@models/taxonomy';
 import {ProductFormApi} from './product-form.api.service';
-import {uniqueAsync} from '@shared/forms/unique-async';
+import {uniqueAsync} from '@cvhome-saas/ui-kit/forms';
 
 /** One language's copy on the product form. */
 export type ProductCopyForm = FormGroup<{

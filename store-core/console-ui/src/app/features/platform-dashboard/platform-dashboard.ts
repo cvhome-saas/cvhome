@@ -2,12 +2,8 @@ import {Component, inject} from '@angular/core';
 import {RouterLink} from '@angular/router';
 import {TranslocoDirective} from '@jsverse/transloco';
 
-import {BusyOverlay} from '@shared/ui/busy-overlay/busy-overlay';
+import {BusyOverlay, DateRangePicker, KpiGrid, LoadError, PageHeader} from '@cvhome-saas/ui-kit/ui';
 import {TrendChart} from '@shared/ui/charts/trend-chart';
-import {DateRangePicker} from '@shared/ui/date-range-picker/date-range-picker';
-import {KpiGrid} from '@shared/ui/kpi-grid/kpi-grid';
-import {LoadError} from '@shared/ui/load-error/load-error';
-import {PageHeader} from '@shared/ui/page-header/page-header';
 import {PlatformDashboardFacade} from './facades/platform-dashboard.facade';
 
 /**

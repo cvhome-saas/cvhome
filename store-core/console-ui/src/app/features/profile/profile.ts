@@ -1,11 +1,7 @@
 import {Component, inject} from '@angular/core';
 import {TranslocoDirective} from '@jsverse/transloco';
 
-import {Badge} from '@shared/ui/badge/badge';
-import {Icon} from '@shared/ui/icon/icon';
-import {NoticeBar} from '@shared/ui/notice-bar/notice-bar';
-import {PageHeader} from '@shared/ui/page-header/page-header';
-import {Panel} from '@shared/ui/panel/panel';
+import {Badge, Icon, NoticeBar, PageHeader, Panel} from '@cvhome-saas/ui-kit/ui';
 import {ProfileFacade} from './facades/profile.facade';
 
 /**

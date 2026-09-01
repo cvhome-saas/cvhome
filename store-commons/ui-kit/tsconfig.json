@@ -5,6 +5,20 @@
   "compileOnSave": false,
   "compilerOptions": {
     "baseUrl": "./",
+    /*
+     * The kit refers to its own entry points by package name — `@cvhome-saas/ui-kit/theme` from a
+     * control, not a relative path — because a relative path across that boundary makes ng-packagr
+     * claim the file for two entry points and a consumer then gets two copies of the same class.
+     * ng-packagr resolves those names from its own entry-point graph; `ng test` and the IDE do not,
+     * so they are mapped to source here.
+     */
+    "paths": {
+      "@cvhome-saas/ui-kit": ["src/public-api.ts"],
+      "@cvhome-saas/ui-kit/ui": ["ui/src/public-api.ts"],
+      "@cvhome-saas/ui-kit/theme": ["theme/src/public-api.ts"],
+      "@cvhome-saas/ui-kit/i18n": ["i18n/src/public-api.ts"],
+      "@cvhome-saas/ui-kit/forms": ["forms/src/public-api.ts"]
+    },
     "outDir": "./out-tsc",
     "resolveJsonModule": true,
     "strict": true,

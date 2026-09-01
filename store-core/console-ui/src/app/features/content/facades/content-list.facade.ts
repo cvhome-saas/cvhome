@@ -18,8 +18,8 @@ import {
   type ContentStatus,
   type TransitionAction,
 } from '@models/content';
-import type {TabItem} from '@shared/ui/tab-switcher/tab-switcher';
-import {ToastService} from '@shared/ui/toast/toast';
+import type {TabItem} from '@cvhome-saas/ui-kit/ui';
+import {ToastService} from '@cvhome-saas/ui-kit/ui';
 
 export const CONTENT_PAGE_SIZE = 25;
 

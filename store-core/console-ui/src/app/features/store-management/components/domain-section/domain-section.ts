@@ -2,12 +2,7 @@ import {Component, input, output} from '@angular/core';
 import {ReactiveFormsModule} from '@angular/forms';
 import {TranslocoDirective} from '@jsverse/transloco';
 
-import {Badge} from '@shared/ui/badge/badge';
-import {CopyField} from '@shared/ui/copy-field/copy-field';
-import {FormField} from '@shared/ui/form-field/form-field';
-import {TextField} from '@shared/ui/text-field/text-field';
-import {Icon} from '@shared/ui/icon/icon';
-import {Panel} from '@shared/ui/panel/panel';
+import {Badge, CopyField, FormField, TextField, Icon, Panel} from '@cvhome-saas/ui-kit/ui';
 import type {CnameOutcome} from '@api/dns/dns-check.service';
 import {
   DOMAIN_STATUS_COPY,

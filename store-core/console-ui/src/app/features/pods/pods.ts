@@ -3,19 +3,7 @@ import {Router, RouterLink} from '@angular/router';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 
 import type {PodRow} from '@models/platform';
-import {Badge} from '@shared/ui/badge/badge';
-import {BusyOverlay} from '@shared/ui/busy-overlay/busy-overlay';
-import {CopyField} from '@shared/ui/copy-field/copy-field';
-import {DataTable, type TableColumn} from '@shared/ui/data-table/data-table';
-import {TableRow} from '@shared/ui/data-table/table-row';
-import {EmptyState} from '@shared/ui/empty-state/empty-state';
-import {Icon} from '@shared/ui/icon/icon';
-import {LoadError} from '@shared/ui/load-error/load-error';
-import {NoticeBar} from '@shared/ui/notice-bar/notice-bar';
-import {PageHeader} from '@shared/ui/page-header/page-header';
-import {Pagination} from '@shared/ui/pagination/pagination';
-import {Panel} from '@shared/ui/panel/panel';
-import {SearchBox} from '@shared/ui/search-box/search-box';
+import {Badge, BusyOverlay, CopyField, DataTable, type TableColumn, TableRow, EmptyState, Icon, LoadError, NoticeBar, PageHeader, Pagination, Panel, SearchBox} from '@cvhome-saas/ui-kit/ui';
 import {PAGE_SIZE, PodsFacade} from './facades/pods.facade';
 
 /** The table's columns. Widths are grid tracks, read straight into the row layout. */

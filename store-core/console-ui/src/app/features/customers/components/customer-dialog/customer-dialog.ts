@@ -2,10 +2,7 @@ import {Component, ElementRef, effect, input, output, viewChild} from '@angular/
 import {TranslocoDirective} from '@jsverse/transloco';
 import {TranslocoDatePipe} from '@jsverse/transloco-locale';
 
-import {Badge} from '@shared/ui/badge/badge';
-import {EmptyState} from '@shared/ui/empty-state/empty-state';
-import {Icon} from '@shared/ui/icon/icon';
-import {LoadError} from '@shared/ui/load-error/load-error';
+import {Badge, EmptyState, Icon, LoadError} from '@cvhome-saas/ui-kit/ui';
 import type {CustomerOrderRow, CustomerRow} from '@models/customers';
 import type {Tone} from '@cvhome-saas/ui-kit';
 

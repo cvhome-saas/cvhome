@@ -6,9 +6,8 @@ import type {AdminUserAction} from '@api/uaa/admin-user.service';
 import {ApiErrorService, snapshot} from '@cvhome-saas/ui-kit';
 import type {PlatformUserRow} from '@models/platform';
 import {RoleLabel} from '@shared/i18n/role-label';
-import type {RoleChange, RoleOption} from '@shared/ui/roles-dialog/roles-dialog';
-import type {SelectOption} from '@shared/ui/select/select';
-import {ToastService} from '@shared/ui/toast/toast';
+import type {RoleChange, RoleOption, SelectOption} from '@cvhome-saas/ui-kit/ui';
+import {ToastService} from '@cvhome-saas/ui-kit/ui';
 import {PlatformUsersApi} from '../services/platform-users.api.service';
 
 export const PAGE_SIZE = 20;

@@ -6,18 +6,7 @@ import {TranslocoDirective} from '@jsverse/transloco';
 
 import {LocaleService} from '@core/i18n/locale.service';
 import type {ReferenceOption} from '@core/reference/reference-data.service';
-import {DatePicker} from '@shared/ui/date-picker/date-picker';
-import {FormField} from '@shared/ui/form-field/form-field';
-import {LocaleSwitcher} from '@shared/ui/locale-switcher/locale-switcher';
-import {TextField} from '@shared/ui/text-field/text-field';
-import {TextareaField} from '@shared/ui/textarea-field/textarea-field';
-import {Icon} from '@shared/ui/icon/icon';
-import {NoticeBar} from '@shared/ui/notice-bar/notice-bar';
-import {Panel} from '@shared/ui/panel/panel';
-import {TagInput} from '@shared/ui/tag-input/tag-input';
-import {RichText} from '@shared/ui/rich-text/rich-text';
-import {Toggle} from '@shared/ui/toggle/toggle';
-import {NumberField} from '@shared/ui/number-field/number-field';
+import {DatePicker, FormField, LocaleSwitcher, TextField, TextareaField, Icon, NoticeBar, Panel, TagInput, RichText, Toggle, NumberField} from '@cvhome-saas/ui-kit/ui';
 import {ProductFormFacade} from '../../facades/product-form.facade';
 import type {ProductForm} from '../../services/product-draft-form.service';
 

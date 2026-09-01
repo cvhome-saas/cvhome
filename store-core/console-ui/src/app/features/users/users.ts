@@ -6,24 +6,11 @@ import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 
 import {TranslocoDatePipe} from '@jsverse/transloco-locale';
 
-import {Badge} from '@shared/ui/badge/badge';
-import {BusyOverlay} from '@shared/ui/busy-overlay/busy-overlay';
-import {ConfirmDialog} from '@shared/ui/confirm-dialog/confirm-dialog';
-import {DataTable, type TableColumn} from '@shared/ui/data-table/data-table';
-import {TableRow} from '@shared/ui/data-table/table-row';
-import {EmptyState} from '@shared/ui/empty-state/empty-state';
+import {Badge, BusyOverlay, ConfirmDialog, DataTable, type TableColumn, TableRow, EmptyState, Icon, LoadError, PageHeader, Pagination, Panel, Select, type SelectOption, TabSwitcher, SetPasswordDialog} from '@cvhome-saas/ui-kit/ui';
 import {ExportButton} from '@shared/ui/export-button/export-button';
-import {Icon} from '@shared/ui/icon/icon';
-import {LoadError} from '@shared/ui/load-error/load-error';
-import {PageHeader} from '@shared/ui/page-header/page-header';
-import {Pagination} from '@shared/ui/pagination/pagination';
-import {Panel} from '@shared/ui/panel/panel';
-import {Select, type SelectOption} from '@shared/ui/select/select';
-import {TabSwitcher} from '@shared/ui/tab-switcher/tab-switcher';
 import {InvitationLinkDialog} from './components/invitation-link-dialog/invitation-link-dialog';
 import {InviteDialog} from './components/invite-dialog/invite-dialog';
 import {UserDialog} from './components/user-dialog/user-dialog';
-import {SetPasswordDialog} from '@shared/ui/set-password-dialog/set-password-dialog';
 import {PAGE_SIZE, UsersFacade} from './facades/users.facade';
 
 /** The team table's columns. Widths are grid tracks, read straight into the row layout. */

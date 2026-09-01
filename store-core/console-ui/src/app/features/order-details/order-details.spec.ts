@@ -3,7 +3,7 @@ import {provideRouter} from '@angular/router';
 import {Observable, of, throwError} from 'rxjs';
 
 import {NOTIFICATION_PORT} from '@cvhome-saas/ui-kit';
-import {ToastService} from '@shared/ui/toast/toast';
+import {ToastService} from '@cvhome-saas/ui-kit/ui';
 import type {OrderStatus, ReadableOrder} from '@models/checkout';
 import type {MerchantStore} from '@models/merchant';
 import {ConsoleApi} from '@layouts/console-shell/services/console.api.service';

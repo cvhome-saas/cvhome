@@ -16,14 +16,14 @@ import {ReferenceDataService, type ReferenceOption} from '@core/reference/refere
 import {ConsoleApi} from '@layouts/console-shell/services/console.api.service';
 import {ConsoleShellFacade} from '@layouts/console-shell/facades/console-shell.facade';
 import {defaultLanguageIsSupported} from '@shared/validators/default-language-is-supported';
-import {uniqueAsync} from '@shared/forms/unique-async';
+import {uniqueAsync} from '@cvhome-saas/ui-kit/forms';
 import {phoneNumber} from '@shared/validators/phone-number';
 import {PlatformLabel} from '@shared/i18n/platform-label';
 import {NEXT_STEPS, PROVISIONING_ARTIFACTS} from '../create-store.content';
 import type {CreateStorePhase} from '@models/create-store';
 import type {Pod} from '@models/pod';
 import type {CreateStoreRequest, ManagerStore, ProvisioningState} from '@models/tenancy';
-import type {SelectOption} from '@shared/ui/select/select';
+import type {SelectOption} from '@cvhome-saas/ui-kit/ui';
 
 /** How often the new store's row is re-read while it builds. */
 const POLL_MS = 2000;

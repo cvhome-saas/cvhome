@@ -2,17 +2,10 @@ import {Component, ElementRef, computed, inject, viewChild} from '@angular/core'
 import {TranslocoDirective} from '@jsverse/transloco';
 import {TranslocoLocaleService} from '@jsverse/transloco-locale';
 
-import {ActionList} from '@shared/ui/action-list/action-list';
-import {BusyOverlay} from '@shared/ui/busy-overlay/busy-overlay';
+import {ActionList, BusyOverlay, DateRangePicker, Icon, LoadError, KpiGrid, PageHeader, RankedList} from '@cvhome-saas/ui-kit/ui';
 import {BarChart} from '@shared/ui/charts/bar-chart';
 import {DonutChart} from '@shared/ui/charts/donut-chart';
 import {ExportButton} from '@shared/ui/export-button/export-button';
-import {DateRangePicker} from '@shared/ui/date-range-picker/date-range-picker';
-import {Icon} from '@shared/ui/icon/icon';
-import {LoadError} from '@shared/ui/load-error/load-error';
-import {KpiGrid} from '@shared/ui/kpi-grid/kpi-grid';
-import {PageHeader} from '@shared/ui/page-header/page-header';
-import {RankedList} from '@shared/ui/ranked-list/ranked-list';
 import {DashboardFacade} from './facades/dashboard.facade';
 
 /**

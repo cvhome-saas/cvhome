@@ -1,9 +1,8 @@
 import {Component, ElementRef, computed, effect, input, output, signal, viewChild} from '@angular/core';
 
 import type {CreateOrgUser} from '@api/tenancy/org.service';
-import {containsPersonalToken, isCommonPassword} from '@shared/validators/password-strength';
-import {FormField} from '@shared/ui/form-field/form-field';
-import {TextField} from '@shared/ui/text-field/text-field';
+import {containsPersonalToken, isCommonPassword} from '@cvhome-saas/ui-kit/forms';
+import {FormField, TextField} from '@cvhome-saas/ui-kit/ui';
 
 /** The server normalises the address to lowercase; this only has to reject what is not one. */
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;

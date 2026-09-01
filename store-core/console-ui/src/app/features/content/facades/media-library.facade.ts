@@ -7,7 +7,7 @@ import {MediaService, type MediaQuery} from '@api/content/media.service';
 import {ApiErrorService, ApiError, EMPTY_PAGE, type PageT} from '@cvhome-saas/ui-kit';
 import {ConsoleShellFacade} from '@layouts/console-shell/facades/console-shell.facade';
 import type {MediaAsset, MediaFolder, MediaKind, PersistableMediaAsset} from '@models/content';
-import {ToastService} from '@shared/ui/toast/toast';
+import {ToastService} from '@cvhome-saas/ui-kit/ui';
 
 export const MEDIA_PAGE_SIZE = 24;
 

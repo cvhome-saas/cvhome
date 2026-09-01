@@ -2,10 +2,7 @@ import {Component, computed, inject, input, output} from '@angular/core';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 
 import type {PlatformUserRow} from '@models/platform';
-import {Badge} from '@shared/ui/badge/badge';
-import {DataTable, type TableColumn} from '@shared/ui/data-table/data-table';
-import {TableRow} from '@shared/ui/data-table/table-row';
-import {Icon} from '@shared/ui/icon/icon';
+import {Badge, DataTable, type TableColumn, TableRow, Icon} from '@cvhome-saas/ui-kit/ui';
 
 /** What a row action asks the host to do. The host owns the dialogs and the writes. */
 export interface UserAdminIntent {

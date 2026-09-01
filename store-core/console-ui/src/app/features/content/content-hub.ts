@@ -9,12 +9,7 @@ import {
   type ContentTab,
 } from '@models/content';
 import {ConsolePermissions} from '@shared/auth/console-permissions';
-import {Icon} from '@shared/ui/icon/icon';
-import {KpiGrid} from '@shared/ui/kpi-grid/kpi-grid';
-import {LoadError} from '@shared/ui/load-error/load-error';
-import {PageHeader} from '@shared/ui/page-header/page-header';
-import {SectionNav} from '@shared/ui/section-nav/section-nav';
-import {TabSwitcher, type TabItem} from '@shared/ui/tab-switcher/tab-switcher';
+import {Icon, KpiGrid, LoadError, PageHeader, SectionNav, TabSwitcher, type TabItem} from '@cvhome-saas/ui-kit/ui';
 import {ContentList} from './components/content-list/content-list';
 import {MediaTab} from './components/media-tab/media-tab';
 import {BrandingTab} from './components/branding-tab/branding-tab';

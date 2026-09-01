@@ -3,7 +3,7 @@ import {TranslocoService} from '@jsverse/transloco';
 import {TranslocoLocaleService} from '@jsverse/transloco-locale';
 
 import {LocaleService} from '@core/i18n/locale.service';
-import {THEME} from '@core/theme/theme.provider';
+import {THEME} from '@cvhome-saas/ui-kit/theme';
 
 export interface PdfExportRequest {
   /** The element to capture. */
