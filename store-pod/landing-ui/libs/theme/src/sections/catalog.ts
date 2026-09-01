@@ -100,6 +100,8 @@ export const SECTION_CATALOG: readonly KindSpec[] = [
             {key: 'subtitle', type: 'text', label: l('Subtitle', 'وصف قصير'), localized: true},
             {key: 'source', type: 'product-source', label: l('Products come from', 'مصدر المنتجات')},
             {key: 'limit', type: 'range', label: l('Products shown', 'عدد المنتجات'), min: 2, max: 16, step: 1},
+            // A theme may spend this as a poster leading the grid (fashion's interleave); fallbacks ignore it.
+            {key: 'mediaId', type: 'media', label: l('Lead image', 'صورة بارزة')},
         ],
     },
     {
