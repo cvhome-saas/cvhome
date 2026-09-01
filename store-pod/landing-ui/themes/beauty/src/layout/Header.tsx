@@ -11,7 +11,8 @@ import {SearchBox} from '../sections/SearchBox';
 export function Header({ctx, data}: { ctx: PageContext; data: LayoutData }) {
     const {store} = data;
     return (
-        <header className={cn('z-40 border-b border-foreground bg-background', ctx.layout.header.sticky && 'sticky top-0')}>
+        // overflow-x-clip: whatever the rail holds, the header must never widen the page
+        <header className={cn('z-40 overflow-x-clip border-b border-foreground bg-background', ctx.layout.header.sticky && 'sticky top-0')}>
             <div className="mx-auto flex h-header max-w-wide items-stretch px-gutter lg:h-header-lg">
                 <MobileNav ctx={ctx} data={data}/>
                 <Link prefetch={false} href="/" aria-label={store.name} className="flex shrink-0 items-center gap-2 border-e border-foreground pe-4 ps-1 lg:pe-5">

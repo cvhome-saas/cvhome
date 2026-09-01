@@ -263,7 +263,8 @@
       "CART_WITH_COUNT": "السلة، {count, plural, =0 {فارغة} =1 {عنصر واحد} other {# عناصر}}",
       "VIEW_ALL_IN": "كل {name}",
       "ANNOUNCEMENT": "تنبيه",
-      "INDEX": "الفئات"
+      "INDEX": "الفئات",
+      "MORE": "المزيد"
     },
     "FOOTER": {
       "SOCIAL_FACEBOOK": "فيسبوك",

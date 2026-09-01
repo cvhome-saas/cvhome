@@ -263,7 +263,8 @@
       "CART_WITH_COUNT": "Cart, {count, plural, =0 {empty} =1 {1 item} other {# items}}",
       "VIEW_ALL_IN": "All {name}",
       "ANNOUNCEMENT": "Note",
-      "INDEX": "Categories"
+      "INDEX": "Categories",
+      "MORE": "More"
     },
     "FOOTER": {
       "SOCIAL_FACEBOOK": "Facebook",
