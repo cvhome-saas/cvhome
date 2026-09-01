@@ -107,7 +107,7 @@ public class ProductServiceImpl implements ProductService {
         Product product = productRepository.findByStoreAndFriendlyUrl(store, friendlyUrl, language)
                 .orElseThrow(() -> ProductNotFoundException.of(friendlyUrl, store));
         ReadableProduct readable = productMapper.toReadable(product, language);
-        List<ProductVariant> variants = variantRepository.findByProductIdHydrated(product.getId());
+        List<ProductVariant> variants = variantRepository.findByProductIdHydrated(store, product.getId());
         readable.setVariants(variants.stream().sorted(ProductVariantMapper.DISPLAY_ORDER)
                 .map(ProductVariantMapper::toReadable).toList());
         readable.setOptions(ProductVariantMapper.toOptions(product, variants, language));

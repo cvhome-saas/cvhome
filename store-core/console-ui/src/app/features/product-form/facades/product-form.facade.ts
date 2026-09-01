@@ -32,7 +32,13 @@ import type {StepItem} from '@shared/ui/stepper/stepper';
 import {ToastService} from '@shared/ui/toast/toast';
 import {ProductsCache} from '@api/catalog/products-cache';
 import {ProductSearch} from '@api/catalog/product-search.service';
-import {ProductFormApi, type CategoryOption, type ProductFormSnapshot, type ProductTypeOption} from '../services/product-form.api.service';
+import {
+  ProductFormApi,
+  type CategoryOption,
+  type PendingVariantInventory,
+  type ProductFormSnapshot,
+  type ProductTypeOption,
+} from '../services/product-form.api.service';
 import {ProductDraftFormService} from '../services/product-draft-form.service';
 
 /**
@@ -171,27 +177,18 @@ export class ProductFormFacade {
   /**
    * The options this product varies by, as full vocabulary entries in display order.
    *
-   * `linkedSignal` off the snapshot: the server's assignment is the baseline, and the operator's
-   * picks replace it until a save reloads the truth.
+   * Seeded from the snapshot once per product by {@link syncForm}, and re-seeded only when a
+   * variants save reloads the truth. It used to be a `linkedSignal` off `loaded`, which meant
+   * *any* assignment to `loaded` reset it — so pressing the header's Save draft with an unsaved
+   * matrix on screen silently discarded the whole thing and reported success.
    */
-  readonly variantAxes = linkedSignal<ProductFormSnapshot | undefined, readonly StoreOption[]>({
-    source: this.loaded,
-    computation: (snapshot) => {
-      if (!snapshot) {
-        return [];
-      }
-      const byId = new Map(snapshot.vocabulary.map((option) => [option.id, option]));
-      return snapshot.assignedOptionIds
-        .map((id) => byId.get(id))
-        .filter((option): option is StoreOption => option !== undefined);
-    },
-  });
+  readonly variantAxes = signal<readonly StoreOption[]>([]);
 
   /** The matrix — one row per combination the product sells, price/stock merged in. */
-  readonly variantRows = linkedSignal<ProductFormSnapshot | undefined, readonly VariantMatrixRow[]>({
-    source: this.loaded,
-    computation: (snapshot) => snapshot?.variants ?? [],
-  });
+  readonly variantRows = signal<readonly VariantMatrixRow[]>([]);
+
+  /** The product the matrix was last seeded for; `undefined` means never. */
+  private matrixSeededFor: number | null | undefined = undefined;
 
   /**
    * Whether this product varies by options — the switch the pricing step, the readiness list and
@@ -208,8 +205,26 @@ export class ProductFormFacade {
    */
   readonly variantInventoryPending = signal(false);
 
+  /** What that failed half was writing, so the retry replays the intent and not the screen. */
+  private readonly pendingInventory = signal<PendingVariantInventory | null>(null);
+
   /** Whether the server currently holds combination variants — what "Remove all options" undoes. */
   readonly hasSavedVariants = computed(() => (this.loaded()?.variants.length ?? 0) > 0);
+
+  /**
+   * The variant read failed, so what this product sells is unknown.
+   *
+   * Everything the step offers writes the *whole* set, so an empty matrix drawn over an unread one
+   * would replace real combinations with whatever the operator generated. Saving is refused while
+   * this holds, and the step says why.
+   */
+  readonly variantsUnavailable = computed(() => this.loaded()?.variantsUnavailable ?? false);
+
+  /** The axis picker could not be filled — not the same as the store having no options. */
+  readonly vocabularyUnavailable = computed(() => this.loaded()?.vocabularyUnavailable ?? false);
+
+  /** Whether the step may write at all. */
+  readonly canSaveVariants = computed(() => !this.variantsUnavailable() && !this.vocabularyUnavailable());
 
   /** Whether the form has been loaded from a draft yet — guards against binding an empty copy array. */
   private filledFor: number | null | undefined = undefined;
@@ -222,7 +237,12 @@ export class ProductFormFacade {
    */
   syncForm(): void {
     const snapshot = this.loaded();
-    if (!snapshot || this.filledFor === this.productId()) {
+    if (!snapshot) {
+      return;
+    }
+    // Guarded separately: the matrix re-seeds after a variants save, when the form must not.
+    this.seedMatrix(snapshot);
+    if (this.filledFor === this.productId()) {
       return;
     }
     this.filledFor = this.productId();
@@ -232,6 +252,38 @@ export class ProductFormFacade {
       // after the fact is not something this form offers.
       this.form.controls.sku.disable({emitEvent: false});
     }
+  }
+
+  /**
+   * Reload the snapshot and re-seed the matrix from it.
+   *
+   * Used only after a variants save that fully landed: that is the one moment the server's matrix
+   * is better than the operator's, because it carries the ids the new rows were given.
+   */
+  private reseedFromServer(): void {
+    this.matrixSeededFor = undefined;
+    this.snapshot.reload();
+  }
+
+  /**
+   * Seed the matrix from the server's truth — once per product, and again only when a variants
+   * save has reloaded it. `force` is that second case.
+   *
+   * Anything else (a draft save, a categories save) must leave the operator's unsaved matrix
+   * alone: the two are edited on the same screen and saved by different buttons.
+   */
+  private seedMatrix(snapshot: ProductFormSnapshot, force = false): void {
+    if (!force && this.matrixSeededFor === this.productId()) {
+      return;
+    }
+    this.matrixSeededFor = this.productId();
+    const byId = new Map(snapshot.vocabulary.map((option) => [option.id, option]));
+    this.variantAxes.set(
+      snapshot.assignedOptionIds
+        .map((id) => byId.get(id))
+        .filter((option): option is StoreOption => option !== undefined),
+    );
+    this.variantRows.set(snapshot.variants);
   }
 
   /* ---------------------------------------------------------------------- the rail ---- */
@@ -562,6 +614,7 @@ export class ProductFormFacade {
     const existing = new Map(
       this.variantRows().map((row) => [combinationSignature(row.optionValueIds), row]),
     );
+    const previous = this.variantRows();
     const fresh = existing.size === 0;
     const value = this.formValue();
     const rows: VariantMatrixRow[] = [];
@@ -573,10 +626,25 @@ export class ProductFormFacade {
       }
       const ids = combination.map((entry) => entry.id);
       const labels = combination.map((entry) => entry.name);
-      const kept = existing.get(combinationSignature(ids));
+      const kept = existing.get(combinationSignature(ids)) ?? overlapping(previous, ids);
       if (kept) {
-        // Re-projected onto the new axis order; everything the operator set survives.
-        rows.push({...kept, optionValueIds: ids, labels});
+        /*
+         * Re-projected onto the new combination; everything the operator set survives. An exact
+         * signature match covers a reorder; `overlapping` covers the axis set *changing*, which
+         * is the common edit — adding Size to a colour-only product used to null every price, id
+         * and quantity, and the save then deleted the old inventory rows and wrote nothing back
+         * because `applyVariantInventory` skips unpriced rows.
+         */
+        rows.push({
+          ...kept,
+          // Only the row that still *is* this combination keeps its catalog row and its sku.
+          id: kept.optionValueIds.length === ids.length ? kept.id : null,
+          sku: kept.optionValueIds.length === ids.length
+            ? kept.sku
+            : this.suggestVariantSku(combination, rows),
+          optionValueIds: ids,
+          labels,
+        });
         continue;
       }
       const seed = fresh && rows.length === 0;
@@ -641,6 +709,11 @@ export class ProductFormFacade {
     if (id === null) {
       return;
     }
+    if (!this.canSaveVariants()) {
+      // The write replaces the whole set, and we do not know what the set currently is.
+      this.toast.danger(this.transloco.translate('productForm.variants.unreadable'));
+      return;
+    }
     const axes = this.variantAxes();
     const rows = this.variantRows();
     if (axes.length > 0 && rows.length === 0) {
@@ -672,17 +745,24 @@ export class ProductFormFacade {
 
     this.saving.set(true);
     this.api.saveVariants(id, set, rows).subscribe({
-      next: ({inventoryApplied}) => {
+      next: ({inventoryApplied, pendingInventory}) => {
         this.saving.set(false);
         this.list.invalidate();
         this.variantInventoryPending.set(!inventoryApplied);
+        this.pendingInventory.set(pendingInventory);
         if (inventoryApplied) {
           this.toast.success(this.transloco.translate('productForm.variants.saved'));
-        } else {
-          // The catalog now says one thing and inventory another. Named, and retryable in place.
-          this.toast.warning(this.transloco.translate('productForm.variants.inventoryFailed'));
+          // Only now is the server's matrix the better truth — it carries the new rows' ids.
+          this.reseedFromServer();
+          return;
         }
-        this.snapshot.reload();
+        /*
+         * The catalog now says one thing and inventory another. Named, and retryable in place —
+         * and deliberately NOT reloaded: the reload would replace the prices the operator just
+         * typed with the ones the failed write never changed, and the banner would then be
+         * offering to "retry" writing the old numbers back.
+         */
+        this.toast.warning(this.transloco.translate('productForm.variants.inventoryFailed'));
       },
       error: (failure: unknown) => {
         this.saving.set(false);
@@ -697,14 +777,19 @@ export class ProductFormFacade {
     if (id === null) {
       return;
     }
+    const pending = this.pendingInventory();
+    if (!pending) {
+      return;
+    }
     this.saving.set(true);
-    this.api.applyVariantInventory(id, this.variantRows(), []).subscribe({
+    this.api.applyVariantInventory(id, pending.rows, pending.removedSkus).subscribe({
       next: (applied) => {
         this.saving.set(false);
         this.variantInventoryPending.set(!applied);
         if (applied) {
+          this.pendingInventory.set(null);
           this.toast.success(this.transloco.translate('productForm.variants.saved'));
-          this.snapshot.reload();
+          this.reseedFromServer();
         } else {
           this.toast.warning(this.transloco.translate('productForm.variants.inventoryFailed'));
         }
@@ -911,6 +996,26 @@ function cartesian(axes: readonly (readonly StoreOptionValue[])[]): readonly (re
 }
 
 /** Exactly one default per set — the DB enforces it, this keeps the radio honest before the save. */
+/**
+ * The previous row that best describes this combination, when the axis set has changed.
+ *
+ * Adding an axis widens every combination (Red -> Red/M, Red/L): the old Red row describes both,
+ * so its price and stock carry to both. Removing one narrows them (Red/M, Red/L -> Red): the first
+ * old row that still overlaps wins, which is the one the operator was last looking at. Matching is
+ * by value ids, so it survives a reorder of the axes as well.
+ */
+function overlapping(
+  previous: readonly VariantMatrixRow[],
+  ids: readonly number[],
+): VariantMatrixRow | undefined {
+  const wanted = new Set(ids);
+  return previous.find((row) => {
+    const held = row.optionValueIds;
+    return held.length > 0
+      && (held.every((id) => wanted.has(id)) || held.some((id) => wanted.has(id)));
+  });
+}
+
 function ensureOneDefault(rows: readonly VariantMatrixRow[]): readonly VariantMatrixRow[] {
   if (rows.length === 0 || rows.filter((row) => row.isDefault).length === 1) {
     return rows;

@@ -58,6 +58,15 @@ class ProductVariantApiIntegrationTest {
     private static final String BACK_TO_SIMPLE = """
             {"options":[],"variants":[{"sku":"%s"}]}""".formatted(ORIGINAL_SKU);
 
+    private static final String DEFAULT_VARIANT = "defaultVariant";
+
+    private static final String MOVE_DEFAULT = """
+            {"options":["color","size"],
+             "variants":[
+               {"id":%d,"sku":"%s","sortOrder":0,"defaultVariant":%b,"optionValueIds":[1,3]},
+               {"id":%d,"sku":"SKU-AD-CL-TPT03-BL-L","sortOrder":1,"defaultVariant":%b,"optionValueIds":[2,4]}]}""";
+
+
     @LocalServerPort
     private int port;
 
@@ -72,6 +81,11 @@ class ProductVariantApiIntegrationTest {
     void setUp() {
         api = new CatalogApiSupport(port, signer);
         admin = api.token(ADMIN, STORE_A);
+    }
+
+    /** The same two persisted rows, with the default on the first or on the second. */
+    private static String moveDefault(long firstId, long secondId, boolean onFirst) {
+        return MOVE_DEFAULT.formatted(firstId, ORIGINAL_SKU, onFirst, secondId, !onFirst);
     }
 
     private ResponseEntity<String> replace(String store, String token, long productId, String body) {
@@ -93,7 +107,7 @@ class ProductVariantApiIntegrationTest {
             JsonNode variants = list(PRODUCT);
             assertThat(variants).hasSize(2);
             assertThat(variants.get(0).get(SKU).asString()).isEqualTo(ORIGINAL_SKU);
-            assertThat(variants.get(0).get("defaultVariant").asBoolean()).isTrue();
+            assertThat(variants.get(0).get(DEFAULT_VARIANT).asBoolean()).isTrue();
             assertThat(variants.get(0).get(OPTION_VALUES)).hasSize(2);
             assertThat(variants.get(0).get(OPTION_VALUES).get(0).get("optionCode").asString())
                     .isEqualTo("color");
@@ -128,6 +142,37 @@ class ProductVariantApiIntegrationTest {
         assertThat(restored).hasSize(1);
         assertThat(restored.get(0).get(SKU).asString()).isEqualTo(ORIGINAL_SKU);
         assertThat(restored.get(0).get(OPTION_VALUES)).isEmpty();
+    }
+
+    @Test
+    void theDefaultCanMoveInEitherDirectionAcrossPersistedRows() {
+        /*
+         * Against the DB, because the hazard is the DB's: uk_product_variant_default is a partial unique
+         * INDEX, and Postgres never defers those. Flipping both flags in one dirty-checking pass left the
+         * two UPDATEs in persistence-context order, so promoting an EARLIER row emitted "set true" while
+         * the old default was still true and the save died on a duplicate key. The mocked unit test cannot
+         * see an index, and the round-trip above only ever added a non-default row — between them the 500
+         * was invisible. Both directions are asserted here; only one of them ever failed.
+         */
+        try {
+            expect(replace(STORE_A, admin, PRODUCT, COMBINATIONS), HttpStatus.OK);
+            JsonNode seeded = list(PRODUCT);
+            long firstId = seeded.get(0).get(ID).asLong();
+            long secondId = seeded.get(1).get(ID).asLong();
+            assertThat(seeded.get(0).get(DEFAULT_VARIANT).asBoolean()).isTrue();
+
+            // forward: promote the second (later) row — the direction that always worked
+            expect(replace(STORE_A, admin, PRODUCT, moveDefault(firstId, secondId, false)), HttpStatus.OK);
+            assertThat(list(PRODUCT).get(1).get(DEFAULT_VARIANT).asBoolean()).isTrue();
+
+            // backward: promote the first (earlier) row — the direction that 500'd
+            expect(replace(STORE_A, admin, PRODUCT, moveDefault(firstId, secondId, true)), HttpStatus.OK);
+            JsonNode after = list(PRODUCT);
+            assertThat(after.get(0).get(DEFAULT_VARIANT).asBoolean()).isTrue();
+            assertThat(after.get(1).get(DEFAULT_VARIANT).asBoolean()).isFalse();
+        } finally {
+            expect(replace(STORE_A, admin, PRODUCT, BACK_TO_SIMPLE), HttpStatus.OK);
+        }
     }
 
     @Test

@@ -27,7 +27,7 @@ public interface ProductOptionService {
     Long create(StoreMerchantId store, PersistableProductOption source) throws DuplicateProductOptionException;
 
     void update(StoreMerchantId store, Long id, PersistableProductOption source)
-            throws ProductOptionNotFoundException, DuplicateProductOptionException;
+            throws ProductOptionNotFoundException, DuplicateProductOptionException, ProductOptionInUseException;
 
     void delete(StoreMerchantId store, Long id) throws ProductOptionNotFoundException, ProductOptionInUseException;
 }

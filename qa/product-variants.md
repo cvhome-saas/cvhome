@@ -316,7 +316,69 @@ side every stepper in those stores would have been inert.
 
 ---
 
+### REV — what a three-way review caught after the pipeline was green · high · [tests]
+
+Console-ui, backend and landing-ui were reviewed independently before approval. Six blockers, none of which
+the 7/7 pipeline or the live QA above had found, because the destructive paths were the untested ones. All
+six are fixed and each now has a test that fails without the fix.
+
+**Console-ui — four ways to lose data in one click**
+
+- *Save draft wiped an unsaved matrix.* `variantAxes`/`variantRows` were `linkedSignal`s off the snapshot, so
+  every assignment to `loaded` reset them — and the same save passed `writeInventory = !hasOptions()`, so the
+  Pricing-step price went too. The matrix is now the operator's, seeded once per product and re-seeded only
+  when a variants save reloads the truth.
+- *"Retry prices and stock" wrote the server's stale numbers back* and passed no retired skus, orphaning
+  inventory rows that the products list then counts forever. The failure branch no longer reloads, and the
+  retry replays the payload the failed leg reported (`VariantSaveOutcome.pendingInventory`).
+- *Adding an axis nulled every price and id* — rows were kept only on an exact signature match, which only
+  survives a reorder — and the save then deleted the old inventory and wrote nothing back, because unpriced
+  rows are skipped. Rows now carry forward onto the wider or narrower combination.
+- *A failed variant read looked like "no variants"*, so the step invited a whole-set replace over combinations
+  it had never seen. The snapshot carries `variantsUnavailable` / `vocabularyUnavailable`, the step says so
+  with a retry, and `saveVariants` refuses.
+
+**Backend — a reachable 500 and an unguarded FK**
+
+- *Promoting an earlier row to default violated `uk_product_variant_default`.* It is a partial unique **index**
+  and Postgres never defers those, so the two `UPDATE`s in one dirty-checking pass could hit "set true" while
+  the old default was still true. Cleared and flushed before the new one is set. Promoting a *later* row
+  happened to succeed, which is exactly what CON-02 did — the direction that failed was never run.
+- *Editing an option could delete a value a variant still sells by*, answering a raw FK 500 where deleting the
+  option answers a named 409. `update` now diffs the dropped values and raises `PRODUCT_OPTION.IN_USE`.
+- The per-order quantity refusal moved to its own `CartQuantityOutOfRangeException`: sharing
+  `ProductNotPurchasableException` meant a caller wanting to retry smaller could not branch on the type.
+- `findByProductIdHydrated` is store-scoped, and an explicit `"optionValueIds": null` is a 400 rather than a 500.
+
+**Landing-ui — the wrong item in the cart**
+
+- *An unresolved combination fell back to the default variant.* `canAdd` never checked that a variant
+  resolved and `sku` fell back to `product.sku`, so on the seeded dress (SF-01) picking Red then the greyed L
+  showed "In stock" and Red/M's price, kept the button live, and added **Red/M**. All 12 themes rendered the
+  unavailable chip as a plain clickable button. Now `unresolved` blocks the add, the badge and button say
+  "Not available", and the chips carry `aria-disabled`.
+- *Two `ERRORS.CODE.*` keys were dead*: they said `CATALOG_RESERVATION_*` while the service emits
+  `INVENTORY.RESERVATION.*`, so the one refusal a shopper can act on ("Only 3 left of X") still fell through
+  to "Failed to place order" — the very defect SF-07 exists to fix. Renamed in all five locales.
+- `ReadableProductOption.name` was `null` for a language with no option description while the client types it
+  non-optional, giving an empty `<legend>`, an empty `aria-label` and "Please choose ". It falls back to the
+  code, like `ProductVariantMapper.label` already did.
+
 ## Known gaps
+
+- **`libs/types`, `libs/services` and `libs/hooks` are linted by nothing.** `npm run lint` covers
+  `storefront libs/ui libs/i18n libs/theme themes`, so the three tsc-built libs — including
+  `use-product-purchase.ts`, which carried two of this PR's blockers — are checked only by `tsc`. That is how
+  a `react-hooks/set-state-in-effect` **error** sat in the quantity clamp unnoticed (fixed by deriving during
+  render instead). Adding them to the script surfaces 54 pre-existing errors of unrelated origin, so the scope
+  change belongs in its own PR rather than buried here.
+
+- **`GET /api/v1/detailed-products?skus=` takes an uncapped sku list.** Its siblings cap (`AvailabilityQuery`
+  at 500, the inventory batch at 200) and it is on the anonymous path, so it should too — but the obvious
+  `@Validated` + `@Size` does not work here: `ExternalProductApi` implements `ExternalProductService`, so the
+  annotation makes Spring proxy the controller through the interface and every request to it 500s (caught by
+  `ProductApiIntegrationTest`, reverted). `InventoryApi.getByProducts` implements nothing and does carry the
+  cap. A fix for the catalog side needs an explicit in-method guard rather than bean validation.
 
 - **SF-05** (facet rail, `matchedVariantSku` deep link) is wired and type-checked but never run end to end.
 - **A suggestion's `matchedVariantSku` deep link** — the only interaction in this feature never driven end to

@@ -48,6 +48,6 @@ public interface ProductVariantRepository extends JpaRepository<ProductVariant, 
             left join fetch val.descriptions
             left join fetch val.option o
             left join fetch o.descriptions
-            where v.product.id = ?1""")
-    List<ProductVariant> findByProductIdHydrated(Long productId);
+            where v.product.id = ?2 and v.storeMerchantId = ?1""")
+    List<ProductVariant> findByProductIdHydrated(StoreMerchantId store, Long productId);
 }

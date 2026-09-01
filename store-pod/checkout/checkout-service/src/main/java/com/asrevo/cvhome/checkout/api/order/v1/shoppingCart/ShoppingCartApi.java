@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.asrevo.cvhome.checkout.errors.CartQuantityOutOfRangeException;
 import com.asrevo.cvhome.checkout.errors.ProductNotPurchasableException;
 import com.asrevo.cvhome.checkout.errors.ShoppingCartNotFoundException;
 import com.asrevo.cvhome.checkout.model.shoppingcart.PersistableShoppingCartItem;
@@ -58,7 +59,7 @@ public class ShoppingCartApi {
 
     public ReadableShoppingCart addToCart(@Valid @RequestBody PersistableShoppingCartItem shoppingCartItem,
                                           StoreMerchantId merchantStore, LanguageCode language)
-            throws ProductNotPurchasableException {
+            throws ProductNotPurchasableException, CartQuantityOutOfRangeException {
         return shoppingCartFacade.addToCart(shoppingCartItem, merchantStore, language);
     }
 
@@ -74,7 +75,7 @@ public class ShoppingCartApi {
                                                            @Valid @RequestBody PersistableShoppingCartItem shoppingCartItem,
                                                            StoreMerchantId merchantStore,
                                                            LanguageCode language)
-            throws ShoppingCartNotFoundException, ProductNotPurchasableException {
+            throws ShoppingCartNotFoundException, ProductNotPurchasableException, CartQuantityOutOfRangeException {
 
         ReadableShoppingCart cart = shoppingCartFacade.modifyCart(code, shoppingCartItem, merchantStore, language);
 

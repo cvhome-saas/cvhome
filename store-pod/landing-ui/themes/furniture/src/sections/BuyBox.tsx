@@ -2,7 +2,7 @@
 import type {ReactNode} from 'react';
 import {useTranslations} from 'next-intl';
 import type {Product, StoreContext} from '@store-front/types';
-import {useProductPurchase} from '@store-front/hooks/use-product-purchase';
+import {useProductPurchase, type ProductPurchase} from '@store-front/hooks/use-product-purchase';
 import {Button} from '@store-front/ui/button';
 import {QuantityStepper} from '@store-front/ui/quantity-stepper';
 import {cn} from '@store-front/ui/lib/utils';
@@ -17,6 +17,9 @@ import {Gallery} from './Gallery';
  * kicker, and the heading carries its own weight. Owns the gallery too, because the shown views follow
  * the selected variant.
  */
+/** The first axis with nothing chosen — what the "please choose" line names. */
+const unpicked = (p: ProductPurchase) => p.options.find(o => p.selection[o.id] === undefined);
+
 export function BuyBox({product, storeContext, layout = 'split', floorTag}: {
     product: Product; storeContext: StoreContext; layout?: 'split' | 'stacked';
     /** Which floor of the building this piece stands on — the same number the directory board gave it. */
@@ -45,7 +48,7 @@ export function BuyBox({product, storeContext, layout = 'split', floorTag}: {
 
                     <div className="rule-brass flex flex-wrap items-center gap-3 border-y py-3 text-sm">
                         {p.isOutOfStock
-                            ? <StatePlate tone="quiet">{t('OUT_OF_STOCK')}</StatePlate>
+                            ? <StatePlate tone="quiet">{t(p.unresolved ? 'UNAVAILABLE_COMBINATION' : 'OUT_OF_STOCK')}</StatePlate>
                             : p.maxQty <= 5
                                 ? <StatePlate tone="ink">{t('LOW_STOCK', {count: p.maxQty})}</StatePlate>
                                 : <StatePlate tone="ink">{t('IN_STOCK')}</StatePlate>}
@@ -67,10 +70,10 @@ export function BuyBox({product, storeContext, layout = 'split', floorTag}: {
                 {p.options.map(option => (
                     <fieldset key={option.id} className="flex flex-col gap-3">
                         <legend className="sign mb-1 text-[0.625rem] text-muted-foreground">
-                            {option.name}
-                            {p.selection[option.id] === undefined && <span className="ms-2 normal-case tracking-normal">— {t('SELECT_OPTION', {option: option.name})}</span>}
+                            {option.name || option.code}
+                            {p.selection[option.id] === undefined && <span className="ms-2 normal-case tracking-normal">— {t('SELECT_OPTION', {option: option.name || option.code})}</span>}
                         </legend>
-                        <div className="flex flex-wrap gap-2" role="radiogroup" aria-label={option.name}>
+                        <div className="flex flex-wrap gap-2" role="radiogroup" aria-label={option.name || option.code}>
                             {option.values.map(value => {
                                 const selected = p.selection[option.id] === value.id;
                                 const available = p.isValueAvailable(option, value);
@@ -78,6 +81,7 @@ export function BuyBox({product, storeContext, layout = 'split', floorTag}: {
                                 return (
                                     <button key={value.id} type="button" role="radio" aria-checked={selected} onClick={() => p.select(option.id, value.id)}
                                             aria-label={available ? label : `${label} — ${t('UNAVAILABLE_COMBINATION')}`}
+                                            aria-disabled={!available}
                                             className={cn('sign rule-brass min-w-11 rounded-control border px-3.5 py-2 text-[0.625rem] transition-colors duration-(--motion-fast)',
                                                 selected ? 'border-transparent bg-primary text-primary-foreground' : 'hover:bg-secondary',
                                                 !available && 'border-dashed text-muted-foreground line-through')}>
@@ -94,14 +98,14 @@ export function BuyBox({product, storeContext, layout = 'split', floorTag}: {
                                      canDecrement={p.canDecrease} canIncrement={p.canIncrease}
                                      decrementLabel={t('DECREASE_QUANTITY')} incrementLabel={t('INCREASE_QUANTITY')}/>
                     <Button size="lg" className="sign h-12 flex-1 text-[0.6875rem]" disabled={!p.canAdd} onClick={p.addToCart}>
-                        {p.status === 'adding' ? t('ADDING') : p.isOutOfStock ? t('OUT_OF_STOCK') : t('ADD_TO_CART')}
+                        {p.status === 'adding' ? t('ADDING') : p.isOutOfStock ? t(p.unresolved ? 'UNAVAILABLE_COMBINATION' : 'OUT_OF_STOCK') : t('ADD_TO_CART')}
                     </Button>
                 </div>
                 {p.inCartQuantity > 0 && (
                     <p className="text-sm text-muted-foreground" aria-live="polite">{t('IN_CART', {count: p.inCartQuantity})}</p>
                 )}
                 {!p.allSelected && !p.isOutOfStock && (
-                    <p className="text-sm text-muted-foreground">{t('OPTION_REQUIRED', {option: p.options.find(o => p.selection[o.id] === undefined)?.name ?? ''})}</p>
+                    <p className="text-sm text-muted-foreground">{t('OPTION_REQUIRED', {option: unpicked(p)?.name || unpicked(p)?.code || ''})}</p>
                 )}
                 {floorTag}
             </div>

@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import com.asrevo.cvhome.catalog.entity.Product;
 import com.asrevo.cvhome.catalog.entity.ProductOption;
@@ -61,7 +62,7 @@ public class ProductVariantServiceImpl implements ProductVariantService {
     public List<ReadableProductVariantDefinition> list(StoreMerchantId store, Long productId,
                                                        LanguageCode language) throws ProductNotFoundException {
         require(store, productId);
-        return variantRepository.findByProductIdHydrated(productId).stream()
+        return variantRepository.findByProductIdHydrated(store, productId).stream()
                 .sorted(ProductVariantMapper.DISPLAY_ORDER)
                 .map(variant -> ProductVariantMapper.toDefinition(variant, language)).toList();
     }
@@ -91,7 +92,7 @@ public class ProductVariantServiceImpl implements ProductVariantService {
     private void restoreDefaultVariant(StoreMerchantId store, Product product,
                                        List<PersistableProductVariant> variants)
             throws VariantOptionsInvalidException, DuplicateVariantSkuException {
-        if (variants.size() > 1 || variants.size() == 1 && !variants.getFirst().getOptionValueIds().isEmpty()) {
+        if (variants.size() > 1 || variants.size() == 1 && !CollectionUtils.isEmpty(variants.getFirst().getOptionValueIds())) {
             throw VariantOptionsInvalidException.of(variants.getFirst().getSku(),
                     "a product with no options owns exactly one variant with no option values");
         }
@@ -290,13 +291,30 @@ public class ProductVariantServiceImpl implements ProductVariantService {
     /**
      * Exactly one default, whatever the payload said: the first flagged one wins, and when none is flagged the
      * display-order first is promoted — the DB's partial unique index would reject anything else anyway.
+     *
+     * <p>
+     * Cleared and flushed before the new one is set, in two statements rather than one dirty-checking pass.
+     * {@code uk_product_variant_default} is a partial unique <em>index</em>, and Postgres never defers those:
+     * it is evaluated after each statement, not at commit. One pass left the order of the two {@code UPDATE}s
+     * to the persistence context's iteration order, so promoting an earlier row emitted "set true" while the
+     * old default was still true and the whole save died on a duplicate key — an opaque 500 that lost the
+     * merchant's entire matrix. Promoting a later row happened to succeed, which is why it went unnoticed.
+     * </p>
      */
     private void normalizeDefaultFlag(Product product) {
         List<ProductVariant> ordered = product.getVariants().stream()
                 .sorted(ProductVariantMapper.DISPLAY_ORDER).toList();
         ProductVariant chosen = ordered.stream().filter(ProductVariant::isDefaultVariant).findFirst()
                 .orElseGet(ordered::getFirst);
-        ordered.forEach(variant -> variant.setDefaultVariant(variant == chosen));
+        /*
+         * Unconditionally, even when the in-memory state already looks right: by the time this runs the
+         * callers above have set the flags from the payload, so what is in memory says nothing about what
+         * is still in the row. Skipping the pass on that basis put both UPDATEs back in one flush, in
+         * whatever order the persistence context happened to hold them.
+         */
+        ordered.forEach(variant -> variant.setDefaultVariant(false));
+        variantRepository.flush();
+        chosen.setDefaultVariant(true);
     }
 
     private Product require(StoreMerchantId store, Long id) throws ProductNotFoundException {

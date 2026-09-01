@@ -13,7 +13,11 @@ import {provideFakeProductSearch} from '@testing/product-search.fake';
 import {translocoTesting} from '@testing/transloco-testing';
 import {ToastService} from '@shared/ui/toast/toast';
 import {ProductForm} from './product-form';
-import {ProductFormApi, type ProductFormSnapshot} from './services/product-form.api.service';
+import {
+  ProductFormApi,
+  type ProductFormSnapshot,
+  type VariantSaveOutcome,
+} from './services/product-form.api.service';
 
 const LANGUAGES = ['en', 'ar'];
 
@@ -55,6 +59,8 @@ function snapshot(product: ProductDraft): ProductFormSnapshot {
     vocabulary: API_REF?.vocabulary ?? [],
     assignedOptionIds: API_REF?.assignedOptionIds ?? [],
     variants: API_REF?.variants ?? [],
+    variantsUnavailable: API_REF?.variantsUnavailable ?? false,
+    vocabularyUnavailable: API_REF?.vocabularyUnavailable ?? false,
   };
 }
 
@@ -86,21 +92,45 @@ class FakeProductFormApi {
   ];
   assignedOptionIds: readonly number[] = [];
   variants: ProductFormSnapshot['variants'] = [];
+  variantsUnavailable = false;
+  vocabularyUnavailable = false;
   /** Every variant-set replace the facade sent, so a spec can read the atomic body. */
   readonly variantSets: {set: PersistableVariantSet; rows: readonly VariantMatrixRow[]}[] = [];
   variantInventoryApplied = true;
+
+  /** What the failed inventory leg reported it was writing — the retry must replay exactly this. */
+  variantRemovedSkus: readonly string[] = [];
 
   saveVariants(
     _id: number,
     set: PersistableVariantSet,
     rows: readonly VariantMatrixRow[],
-  ): Observable<{variantsApplied: true; inventoryApplied: boolean}> {
+  ): Observable<VariantSaveOutcome> {
     this.variantSets.push({set, rows});
-    return of({variantsApplied: true, inventoryApplied: this.variantInventoryApplied});
+    return of({
+      variantsApplied: true,
+      inventoryApplied: this.variantInventoryApplied,
+      pendingInventory: this.variantInventoryApplied
+        ? null
+        : {rows, removedSkus: this.variantRemovedSkus},
+    });
   }
 
-  applyVariantInventory(): Observable<boolean> {
-    return of(true);
+  /**
+   * Declared with its real parameters on purpose: the fake used to take none, which is why the
+   * retry silently dropping `removedSkus` could not be caught by any test written against it.
+   */
+  readonly inventoryWrites: {rows: readonly VariantMatrixRow[]; removedSkus: readonly string[]}[] = [];
+
+  inventoryRetrySucceeds = true;
+
+  applyVariantInventory(
+    _id: number,
+    rows: readonly VariantMatrixRow[],
+    removedSkus: readonly string[],
+  ): Observable<boolean> {
+    this.inventoryWrites.push({rows, removedSkus});
+    return of(this.inventoryRetrySucceeds);
   }
   /** How many times the snapshot was actually fetched. See the request-storm spec below. */
   loads = 0;
@@ -495,6 +525,101 @@ describe('ProductForm', () => {
     expect(set.variants.map((variant) => variant.sortOrder)).toEqual([0, 1]);
     expect(set.variants.filter((variant) => variant.defaultVariant).length).toBe(1);
     expect(set.variants[1].optionValueIds).toEqual([92]);
+  }));
+
+  /*
+   * The four regressions below are the data-loss paths review found. Each was reachable in one
+   * click on a normal workflow, and each shipped because nothing here drove it.
+   */
+
+  it('keeps an unsaved matrix when the header saves the draft', fakeAsync(() => {
+    // The matrix and the definition are edited on one screen and saved by different buttons.
+    // While both signals were linked to the snapshot, `Save draft` reset the matrix to the
+    // server's and reported success — the operator lost the whole thing to a green toast.
+    load('7');
+    facade().addVariantAxis(9);
+    facade().updateVariantRow(0, {price: 11});
+    facade().updateVariantRow(1, {price: 22});
+
+    facade().saveDraft();
+    tick();
+
+    expect(facade().variantAxes().length).toBe(1);
+    expect(facade().variantRows().map((row) => row.price)).toEqual([11, 22]);
+  }));
+
+  it('carries price and stock onto the wider combinations when an axis is added', fakeAsync(() => {
+    /*
+     * Rows used to be kept only on an exact signature match, which can never hold when the axis
+     * SET changes — so adding Size to a priced colour-only product nulled every price, and the
+     * save then deleted the old inventory rows and wrote nothing back (unpriced rows are skipped).
+     */
+    load('7');
+    facade().addVariantAxis(9); // Color: red, blue
+    facade().updateVariantRow(0, {price: 10, quantity: 3});
+    facade().updateVariantRow(1, {price: 12, quantity: 4});
+
+    facade().addVariantAxis(10); // × Size: m, l
+
+    const rows = facade().variantRows();
+    expect(rows.length).toBe(4);
+    expect(rows.map((row) => row.price)).toEqual([10, 10, 12, 12]);
+    expect(rows.map((row) => row.quantity)).toEqual([3, 3, 4, 4]);
+    // Each is a genuinely new combination, so none of them claims an existing catalog row...
+    expect(rows.every((row) => row.id === null)).toBe(true);
+    // ...and each gets its own sku rather than four rows fighting over two.
+    expect(new Set(rows.map((row) => row.sku)).size).toBe(4);
+  }));
+
+  it('retries the inventory write it actually attempted, not whatever the screen holds', fakeAsync(() => {
+    /*
+     * The retry used to re-send `variantRows()` with no removed skus — and because the facade
+     * reloaded the snapshot on the failure branch, those rows had already reverted to the
+     * server's. So it wrote the old prices back and orphaned every retired sku's row for good.
+     */
+    load('7');
+    facade().addVariantAxis(9);
+    facade().updateVariantRow(0, {price: 99});
+    facade().updateVariantRow(1, {price: 77});
+    api.variantInventoryApplied = false;
+    api.variantRemovedSkus = ['ACM-7-OLD'];
+
+    facade().saveVariants();
+    tick();
+
+    expect(facade().variantInventoryPending()).toBe(true);
+    // The operator's numbers are still on screen; nothing reverted under the banner.
+    expect(facade().variantRows().map((row) => row.price)).toEqual([99, 77]);
+
+    api.inventoryRetrySucceeds = true;
+    facade().retryVariantInventory();
+    tick();
+
+    const [write] = api.inventoryWrites;
+    expect(write.rows.map((row) => row.price)).toEqual([99, 77]);
+    expect(write.removedSkus).toEqual(['ACM-7-OLD']);
+    expect(facade().variantInventoryPending()).toBe(false);
+  }));
+
+  it('refuses to replace a variant set it could not read', fakeAsync(() => {
+    /*
+     * `null` (the read failed) used to collapse into `[]` (this product sells as one sku), so the
+     * step invited a whole-set replace over combinations it had never seen — and retired none of
+     * their inventory rows either, because the loaded sku list was empty too.
+     */
+    api.variantsUnavailable = true;
+    const danger = spyOn(TestBed.inject(ToastService), 'danger');
+    load('7');
+
+    expect(facade().canSaveVariants()).toBe(false);
+
+    facade().addVariantAxis(9);
+    facade().saveVariants();
+    tick();
+
+    expect(api.variantSets.length).toBe(0);
+    // and the step says so rather than looking like it worked
+    expect(danger).toHaveBeenCalled();
   }));
 
   it('refuses a duplicate sku by name instead of letting the pod 409', fakeAsync(() => {

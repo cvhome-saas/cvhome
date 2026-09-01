@@ -65,7 +65,7 @@ export const useProductPurchase = (storeContext: StoreContext, product: Product)
             || variants[0];
         return preselected ? selectionOf(preselected, options) : {};
     });
-    const [quantity, setQuantity] = useState(1);
+    const [requestedQuantity, setQuantity] = useState(1);
     const [status, setStatus] = useState<PurchaseStatus>('idle');
 
     const allSelected = options.every(o => selection[o.id] !== undefined);
@@ -79,6 +79,15 @@ export const useProductPurchase = (storeContext: StoreContext, product: Product)
         return allSelected ? variants.find(v => variantMatches(v, options, selection)) : undefined;
     }, [allSelected, variants, options, selection]);
 
+    /*
+     * An unresolved combination must never fall back to the product's own sku.
+     *
+     * `allSelected` only says every axis has a value — the combination it names may not exist (the
+     * seeded dress sells Red/M, Blue/M and Blue/L, deliberately not Red/L). The fallbacks below
+     * then described the DEFAULT variant: the box said "In stock", showed Red/M's price, kept Add
+     * to Cart enabled, and adding put Red/M in the basket while the page showed Red and L picked.
+     */
+    const unresolved = options.length > 0 && !variant;
     const sku = variant?.sku ?? product.sku;
     /** Units on hand for the resolved sku — what "Only 3 left" counts. */
     const maxQty = variant?.quantity ?? product.quantity ?? 0;
@@ -94,7 +103,9 @@ export const useProductPurchase = (storeContext: StoreContext, product: Product)
     const maxOrderQty = orderCeiling > 0 ? Math.min(maxQty, orderCeiling) : maxQty;
     const purchasable = variant ? variant.canBePurchased !== false : product.canBePurchased;
     // Below the floor there is no buyable amount at all, whatever the shelf says.
-    const isOutOfStock = !product.available || !purchasable || maxOrderQty < minOrderQty;
+    // An unresolved combination is unbuyable, so it belongs here: every theme already keys its
+    // badge and its button off this one flag, and `unresolved` only chooses the wording.
+    const isOutOfStock = unresolved || !product.available || !purchasable || maxOrderQty < minOrderQty;
     // Per-variant images are a later phase; the gallery is the product's, whatever is selected.
     const images: Image[] = sortedImages(product);
 
@@ -102,10 +113,12 @@ export const useProductPurchase = (storeContext: StoreContext, product: Product)
     const originalPrice = variant?.originalPrice ?? product.productPrice?.originalPrice ?? product.originalPrice;
     const discounted = variant ? !!variant.discounted : !!product.productPrice?.discounted;
 
-    useEffect(() => {
-        // clamp quantity into what is sellable for the current selection, floor included
-        setQuantity(q => Math.min(Math.max(minOrderQty, q), Math.max(minOrderQty, maxOrderQty)));
-    }, [minOrderQty, maxOrderQty]);
+    /*
+     * Clamped during render rather than corrected by an effect. The effect version tripped the repo's
+     * `react-hooks/set-state-in-effect` rule and rendered one frame with the stale amount: switching to a
+     * combination that sells fewer showed the old number until the effect caught up.
+     */
+    const quantity = Math.min(Math.max(minOrderQty, requestedQuantity), Math.max(minOrderQty, maxOrderQty));
 
     useEffect(() => {
         // The resolved variant is part of the page's address. Native history update, like the
@@ -139,7 +152,7 @@ export const useProductPurchase = (storeContext: StoreContext, product: Product)
     }, [variants, selection]);
 
     const inCartQuantity = cartManager.getMatchedProductsInCart(product.id)?.quantity ?? 0;
-    const canAdd = !isOutOfStock && allSelected && status === 'idle';
+    const canAdd = !isOutOfStock && allSelected && !unresolved && status === 'idle';
 
     const addToCart = useCallback(async () => {
         if (!canAdd) return;
@@ -172,9 +185,14 @@ export const useProductPurchase = (storeContext: StoreContext, product: Product)
         incrementQuantity: () => setQuantity(q => Math.min(q + 1, Math.max(minOrderQty, maxOrderQty))),
         decrementQuantity: () => setQuantity(q => Math.max(minOrderQty, q - 1)),
         isOutOfStock,
+        /** Every axis is picked but no variant sells that combination — themes say so and disable Add. */
+        unresolved,
         inCartQuantity,
         canAdd,
         status,
         addToCart,
     };
 };
+
+/** What {@link useProductPurchase} hands a theme — named so a theme can take it as a parameter. */
+export type ProductPurchase = ReturnType<typeof useProductPurchase>;

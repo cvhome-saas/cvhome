@@ -9,10 +9,11 @@ import com.asrevo.cvhome.errors.ErrorCategory;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * The two refusals a cart line can meet, and why they must not share a code: the storefront picks the shopper's
- * message off the code alone, and "this cannot be bought" and "not this many" call for opposite advice.
+ * The two refusals a cart line can meet, and why they must not share a class or a code: the storefront picks the
+ * shopper's message off the code alone, a caller that wants to retry smaller branches on the type, and "this
+ * cannot be bought" and "not this many" call for opposite advice.
  */
-class ProductNotPurchasableExceptionTest {
+class CartRefusalErrorsTest {
 
     private static final String SKU = "SKU-ZR-CL-DRS02";
 
@@ -25,13 +26,16 @@ class ProductNotPurchasableExceptionTest {
     private static final String QUANTITY = "quantity";
 
     @Test
-    void bothRefusalsAre422ButCarryDistinctCodes() {
+    void bothRefusalsAre422ButAreDistinctTypesWithDistinctCodes() {
         assertThat(CheckoutErrors.PRODUCT_NOT_PURCHASABLE.code())
                 .isEqualTo("CHECKOUT.CART.PRODUCT_NOT_PURCHASABLE");
         assertThat(CheckoutErrors.CART_QUANTITY_OUT_OF_RANGE.code())
                 .isEqualTo("CHECKOUT.CART.QUANTITY_OUT_OF_RANGE");
         assertThat(CheckoutErrors.PRODUCT_NOT_PURCHASABLE.category()).isEqualTo(ErrorCategory.UNPROCESSABLE);
         assertThat(CheckoutErrors.CART_QUANTITY_OUT_OF_RANGE.category()).isEqualTo(ErrorCategory.UNPROCESSABLE);
+        // The split is the point: a caller retrying with a smaller amount catches one and not the other.
+        assertThat(CartQuantityOutOfRangeException.of(SKU, 2, 1, 1))
+                .isNotInstanceOf(ProductNotPurchasableException.class);
     }
 
     @Test
@@ -50,8 +54,7 @@ class ProductNotPurchasableExceptionTest {
          * {quantity} isn't allowed", so all four values are contract, not decoration. Without them the
          * shopper is told a number is wrong and never which number would be right.
          */
-        ProductNotPurchasableException failure =
-                ProductNotPurchasableException.quantityOutOfRange(SKU, 2, 1, 1);
+        CartQuantityOutOfRangeException failure = CartQuantityOutOfRangeException.of(SKU, 2, 1, 1);
 
         assertThat(failure.errorCode()).isEqualTo(CheckoutErrors.CART_QUANTITY_OUT_OF_RANGE);
         assertThat(failure.payload().params())
@@ -63,8 +66,7 @@ class ProductNotPurchasableExceptionTest {
     @Test
     void anUnlimitedCeilingReadsAsUnlimitedRatherThanZero() {
         // 0 is the "no limit" sentinel; a detail saying "between 3 and 0" would be nonsense.
-        ProductNotPurchasableException failure =
-                ProductNotPurchasableException.quantityOutOfRange(SKU, 1, 3, 0);
+        CartQuantityOutOfRangeException failure = CartQuantityOutOfRangeException.of(SKU, 1, 3, 0);
 
         assertThat(failure.payload().detail()).contains("unlimited");
         assertThat(failure.payload().params()).containsEntry(MAXIMUM, 0);

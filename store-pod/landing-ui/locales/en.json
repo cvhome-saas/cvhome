@@ -314,8 +314,8 @@
   "ERRORS": {
     "CODE": {
       "CATALOG_PRODUCT_NOT_FOUND": "This product is no longer available.",
-      "CATALOG_RESERVATION_INSUFFICIENT_INVENTORY": "Only {available} left of {sku}. Please reduce the quantity.",
-      "CATALOG_RESERVATION_EMPTY": "Your cart has no items to reserve.",
+      "INVENTORY_RESERVATION_INSUFFICIENT_INVENTORY": "Only {available} left of {sku}. Please reduce the quantity.",
+      "INVENTORY_RESERVATION_EMPTY": "Your cart has no items to reserve.",
       "CHECKOUT_CART_NOT_FOUND": "We couldn't find your cart. It may have expired.",
       "CHECKOUT_CART_PRODUCT_NOT_PURCHASABLE": "This product can't be purchased right now.",
       "CHECKOUT_CART_QUANTITY_OUT_OF_RANGE": "You can order {maximum, plural, =0 {at least {minimum} of this item} other {between {minimum} and # of this item}} — {quantity} isn't allowed.",

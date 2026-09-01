@@ -2,7 +2,7 @@
 import {useTranslations} from 'next-intl';
 import {ShoppingBagIcon} from 'lucide-react';
 import type {Product, StoreContext} from '@store-front/types';
-import {useProductPurchase} from '@store-front/hooks/use-product-purchase';
+import {useProductPurchase, type ProductPurchase} from '@store-front/hooks/use-product-purchase';
 import {QuantityStepper} from '@store-front/ui/quantity-stepper';
 import {cn} from '@store-front/ui/lib/utils';
 import {Gallery} from './Gallery';
@@ -14,6 +14,9 @@ import {useMounted} from '../components/use-mounted';
  * large, stock and SKU facts, option strips (the chosen one on day-glo), quantity and the day-glo ADD strip.
  * Owns the gallery because the shown images follow the selected variant.
  */
+/** The first axis with nothing chosen — what the "please choose" line names. */
+const unpicked = (p: ProductPurchase) => p.options.find(o => p.selection[o.id] === undefined);
+
 export function BuyBox({product, storeContext}: { product: Product; storeContext: StoreContext }) {
     const t = useTranslations('PAGE.PRODUCT');
     const p = useProductPurchase(storeContext, product);
@@ -43,10 +46,10 @@ export function BuyBox({product, storeContext}: { product: Product; storeContext
                 {p.options.map(option => (
                     <fieldset key={option.id} className="flex flex-col gap-2">
                         <legend className="mb-2 font-display text-sm uppercase tracking-wide">
-                            {option.name}
-                            {p.selection[option.id] === undefined && <span className="ms-2 font-sans text-xs normal-case tracking-normal text-muted-foreground">— {t('SELECT_OPTION', {option: option.name})}</span>}
+                            {option.name || option.code}
+                            {p.selection[option.id] === undefined && <span className="ms-2 font-sans text-xs normal-case tracking-normal text-muted-foreground">— {t('SELECT_OPTION', {option: option.name || option.code})}</span>}
                         </legend>
-                        <div className="flex flex-wrap gap-2" role="radiogroup" aria-label={option.name}>
+                        <div className="flex flex-wrap gap-2" role="radiogroup" aria-label={option.name || option.code}>
                             {option.values.map((value, i) => {
                                 const selected = p.selection[option.id] === value.id;
                                 const available = p.isValueAvailable(option, value);
@@ -54,6 +57,7 @@ export function BuyBox({product, storeContext}: { product: Product; storeContext
                                 return (
                                     <button key={value.id} type="button" role="radio" aria-checked={selected} onClick={() => p.select(option.id, value.id)}
                                             aria-label={available ? label : `${label} — ${t('UNAVAILABLE_COMBINATION')}`}
+                                            aria-disabled={!available}
                                             className={cn('strip min-w-10 justify-center text-sm', i % 2 ? '[--tilt:0.6deg]' : '[--tilt:-0.5deg]',
                                                 selected ? 'strip-on' : 'strip-hover',
                                                 !available && 'text-muted-foreground line-through opacity-70')}>
@@ -72,12 +76,12 @@ export function BuyBox({product, storeContext}: { product: Product; storeContext
                                      className="[&_button]:rounded-none [&_button]:border-foreground/40"/>
                     <button type="button" className="glo h-12 flex-1 px-6 text-base" disabled={!p.canAdd} onClick={p.addToCart}>
                         <ShoppingBagIcon className="size-5"/>
-                        {p.status === 'adding' ? t('ADDING') : p.isOutOfStock ? t('OUT_OF_STOCK') : t('ADD_TO_CART')}
+                        {p.status === 'adding' ? t('ADDING') : p.isOutOfStock ? t(p.unresolved ? 'UNAVAILABLE_COMBINATION' : 'OUT_OF_STOCK') : t('ADD_TO_CART')}
                     </button>
                 </div>
                 {mounted && p.inCartQuantity > 0 && <p className="text-sm text-muted-foreground" aria-live="polite">{t('IN_CART', {count: p.inCartQuantity})}</p>}
                 {!p.allSelected && !p.isOutOfStock && (
-                    <p className="text-sm text-muted-foreground">{t('OPTION_REQUIRED', {option: p.options.find(o => p.selection[o.id] === undefined)?.name ?? ''})}</p>
+                    <p className="text-sm text-muted-foreground">{t('OPTION_REQUIRED', {option: unpicked(p)?.name || unpicked(p)?.code || ''})}</p>
                 )}
             </div>
         </div>

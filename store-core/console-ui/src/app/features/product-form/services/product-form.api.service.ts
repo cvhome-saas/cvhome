@@ -66,6 +66,16 @@ export interface ProductFormSnapshot {
   readonly assignedOptionIds: readonly number[];
   /** The combination variants, price/stock merged in. Empty for a simple (default-variant) product. */
   readonly variants: readonly VariantMatrixRow[];
+  /**
+   * The variant read failed, so `variants` is unknown rather than empty.
+   *
+   * The two used to collapse into `[]`, which told the step "this product sells as one SKU" for a
+   * product that may own a dozen combinations — and the step's whole-set replace would then have
+   * destroyed them. The step renders the difference and refuses to save while it is true.
+   */
+  readonly variantsUnavailable: boolean;
+  /** Likewise for the axis picker: no options read is not the same as the store having none. */
+  readonly vocabularyUnavailable: boolean;
 }
 
 /** What a variant-set save ended up doing — the same honesty split as `CreateOutcome`. */
@@ -74,6 +84,21 @@ export interface VariantSaveOutcome {
   readonly variantsApplied: true;
   /** Whether every price/stock upsert and retired-sku cleanup landed. */
   readonly inventoryApplied: boolean;
+  /**
+   * Exactly what the inventory leg was trying to write when it did not land, or null when it did.
+   *
+   * The retry replays *this*, not whatever the matrix holds by then. It used to re-send
+   * `variantRows()` with no removed skus, and since the facade reloaded the snapshot on the
+   * failure branch those rows had already reverted to the server's — so the retry wrote the old
+   * prices back and left every retired sku's inventory row orphaned for good.
+   */
+  readonly pendingInventory: PendingVariantInventory | null;
+}
+
+/** The inventory half of a variant save, captured so a retry replays the same intent. */
+export interface PendingVariantInventory {
+  readonly rows: readonly VariantMatrixRow[];
+  readonly removedSkus: readonly string[];
 }
 
 /** A category as the Organize step's picker lists it: flat, with its depth kept for the indent. */
@@ -217,6 +242,9 @@ export class ProductFormApi {
           vocabulary: (vocabulary?.content ?? []).map(toStoreOption),
           assignedOptionIds: assignedOptions(combinationRows),
           variants: combinationRows.map((row) => toMatrixRow(row, bySku)),
+          // A new product has no variants to read; anything else answering null is a failed leg.
+          variantsUnavailable: productId !== null && variantRows === null,
+          vocabularyUnavailable: vocabulary === null,
           categories: flattenCategories(categories?.content ?? [], 0),
           brands: (brands?.content ?? []).map((brand) => ({
             code: brand.code,
@@ -384,7 +412,11 @@ export class ProductFormApi {
         const removed =
           after === null ? [] : this.loadedVariantSkus.filter((sku) => !keep.has(sku));
         return this.applyVariantInventory(productId, rows, removed).pipe(
-          map((inventoryApplied) => ({variantsApplied: true as const, inventoryApplied})),
+          map((inventoryApplied) => ({
+            variantsApplied: true as const,
+            inventoryApplied,
+            pendingInventory: inventoryApplied ? null : {rows, removedSkus: removed},
+          })),
         );
       }),
     );

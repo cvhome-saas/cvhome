@@ -314,8 +314,8 @@
   "ERRORS": {
     "CODE": {
       "CATALOG_PRODUCT_NOT_FOUND": "Этот товар больше не доступен.",
-      "CATALOG_RESERVATION_INSUFFICIENT_INVENTORY": "Осталось только {available} шт. товара {sku}. Уменьшите количество.",
-      "CATALOG_RESERVATION_EMPTY": "В корзине нет товаров для резервирования.",
+      "INVENTORY_RESERVATION_INSUFFICIENT_INVENTORY": "Осталось только {available} шт. товара {sku}. Уменьшите количество.",
+      "INVENTORY_RESERVATION_EMPTY": "В корзине нет товаров для резервирования.",
       "CHECKOUT_CART_NOT_FOUND": "Не удалось найти вашу корзину. Возможно, срок её действия истёк.",
       "CHECKOUT_CART_PRODUCT_NOT_PURCHASABLE": "Этот товар сейчас нельзя купить.",
       "CHECKOUT_CART_QUANTITY_OUT_OF_RANGE": "Вы можете заказать {maximum, plural, =0 {минимум {minimum} шт. этого товара} other {от {minimum} до # шт. этого товара}} — количество {quantity} недоступно.",

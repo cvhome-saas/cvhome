@@ -1,5 +1,7 @@
 package com.asrevo.cvhome.catalog.repositories;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -31,4 +33,14 @@ public interface ProductOptionRepository extends JpaRepository<ProductOption, Lo
 
     @Query("select count(x) > 0 from ProductVariantOptionValue x where x.optionValue.option.id = ?1")
     boolean isUsedByVariants(Long optionId);
+
+    /**
+     * The edit guard: which of these value ids some variant still sells by.
+     *
+     * An update replaces the whole value set, so a value the merchant drops is orphan-removed — and
+     * {@code fk_pvov_value} has no {@code ON DELETE}, so dropping one a variant still points at answered a raw
+     * FK violation (a 500) where the delete path answers a named 409. Same rule, both doors.
+     */
+    @Query("select distinct x.optionValue.id from ProductVariantOptionValue x where x.optionValue.id in ?1")
+    List<Long> valueIdsUsedByVariants(Collection<Long> valueIds);
 }

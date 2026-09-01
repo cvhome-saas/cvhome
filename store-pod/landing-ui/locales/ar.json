@@ -314,8 +314,8 @@
   "ERRORS": {
     "CODE": {
       "CATALOG_PRODUCT_NOT_FOUND": "هذا المنتج لم يعد متاحًا.",
-      "CATALOG_RESERVATION_INSUFFICIENT_INVENTORY": "لم يتبقَّ سوى {available} من {sku}. يرجى تقليل الكمية.",
-      "CATALOG_RESERVATION_EMPTY": "لا توجد عناصر في سلتك لحجزها.",
+      "INVENTORY_RESERVATION_INSUFFICIENT_INVENTORY": "لم يتبقَّ سوى {available} من {sku}. يرجى تقليل الكمية.",
+      "INVENTORY_RESERVATION_EMPTY": "لا توجد عناصر في سلتك لحجزها.",
       "CHECKOUT_CART_NOT_FOUND": "لم نتمكن من العثور على سلتك. ربما انتهت صلاحيتها.",
       "CHECKOUT_CART_PRODUCT_NOT_PURCHASABLE": "لا يمكن شراء هذا المنتج في الوقت الحالي.",
       "CHECKOUT_CART_QUANTITY_OUT_OF_RANGE": "يمكنك طلب {maximum, plural, =0 {{minimum} على الأقل من هذا المنتج} other {بين {minimum} و# من هذا المنتج}} — الكمية {quantity} غير مسموح بها.",

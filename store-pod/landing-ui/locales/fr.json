@@ -314,8 +314,8 @@
   "ERRORS": {
     "CODE": {
       "CATALOG_PRODUCT_NOT_FOUND": "Ce produit n'est plus disponible.",
-      "CATALOG_RESERVATION_INSUFFICIENT_INVENTORY": "Il ne reste que {available} de {sku}. Veuillez réduire la quantité.",
-      "CATALOG_RESERVATION_EMPTY": "Votre panier ne contient aucun article à réserver.",
+      "INVENTORY_RESERVATION_INSUFFICIENT_INVENTORY": "Il ne reste que {available} de {sku}. Veuillez réduire la quantité.",
+      "INVENTORY_RESERVATION_EMPTY": "Votre panier ne contient aucun article à réserver.",
       "CHECKOUT_CART_NOT_FOUND": "Nous n'avons pas trouvé votre panier. Il a peut-être expiré.",
       "CHECKOUT_CART_PRODUCT_NOT_PURCHASABLE": "Ce produit ne peut pas être acheté pour le moment.",
       "CHECKOUT_CART_QUANTITY_OUT_OF_RANGE": "Vous pouvez commander {maximum, plural, =0 {au moins {minimum} de cet article} other {entre {minimum} et # de cet article}} — {quantity} n'est pas autorisé.",

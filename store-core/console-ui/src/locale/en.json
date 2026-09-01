@@ -1940,6 +1940,8 @@
       "subtitle": "What this product varies by, and every combination it sells",
       "needsSave": "Save the draft first — variants attach to a saved product.",
       "noVocabulary": "This store has no options yet. Define them on the catalogue’s Options tab — Color, Size, whatever your products vary by — then pick them here.",
+      "unreadable": "We couldn't read what this product currently sells, so its variants can't be changed right now. Try again — saving now could replace combinations that are still there.",
+      "vocabularyUnreadable": "We couldn't load this store's options, so there is nothing to build a matrix from. Try again.",
       "explainer": "Pick the options this product varies by. Every combination becomes its own SKU with its own price and stock; remove the rows you do not sell.",
       "axesLabel": "Options this product varies by",
       "addOption": "Add option…",

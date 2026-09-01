@@ -3,8 +3,10 @@ package com.asrevo.cvhome.inventory.api.v1;
 import java.util.List;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Size;
 
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,6 +39,7 @@ import static com.asrevo.cvhome.commons.utils.DefaultStoresConstants.DEFAULT_ORG
 @RequestMapping("/api/v1/private/inventory")
 @Tag(name = "Inventory (stock and price per sku)")
 @RequiredArgsConstructor
+@Validated
 public class InventoryApi {
 
     private final InventoryService inventoryService;
@@ -49,7 +52,7 @@ public class InventoryApi {
     @GetMapping("/by-products")
     @Parameter(name = "store", schema = @Schema(type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.INVENTORY.*')")
-    public List<SkuInventory> getByProducts(@RequestParam List<Long> productIds, StoreMerchantId merchantStore) {
+    public List<SkuInventory> getByProducts(@RequestParam @Size(max = 200) List<Long> productIds, StoreMerchantId merchantStore) {
         return inventoryService.getByProductIds(merchantStore, productIds);
     }
 

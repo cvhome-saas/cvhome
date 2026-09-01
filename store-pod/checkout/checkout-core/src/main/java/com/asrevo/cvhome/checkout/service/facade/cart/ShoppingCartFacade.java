@@ -4,6 +4,7 @@
 package com.asrevo.cvhome.checkout.service.facade.cart;
 
 import com.asrevo.cvhome.checkout.entity.shoppingcart.ShoppingCart;
+import com.asrevo.cvhome.checkout.errors.CartQuantityOutOfRangeException;
 import com.asrevo.cvhome.checkout.errors.ProductNotPurchasableException;
 import com.asrevo.cvhome.checkout.errors.ShoppingCartNotFoundException;
 import com.asrevo.cvhome.checkout.model.shoppingcart.PersistableShoppingCartItem;
@@ -31,18 +32,20 @@ public interface ShoppingCartFacade {
      *
      * @throws ShoppingCartNotFoundException  no cart with that code in this store
      * @throws ProductNotPurchasableException the product cannot be bought
+     * @throws CartQuantityOutOfRangeException the amount is outside the merchant's per-order bounds
      */
     ReadableShoppingCart modifyCart(String cartCode, PersistableShoppingCartItem item, StoreMerchantId store,
                                     LanguageCode language)
-            throws ShoppingCartNotFoundException, ProductNotPurchasableException;
+            throws ShoppingCartNotFoundException, ProductNotPurchasableException, CartQuantityOutOfRangeException;
 
     /**
      * Add an item to a new shopping cart.
      *
      * @throws ProductNotPurchasableException the product cannot be bought
+     * @throws CartQuantityOutOfRangeException the amount is outside the merchant's per-order bounds
      */
     ReadableShoppingCart addToCart(PersistableShoppingCartItem item, StoreMerchantId store, LanguageCode language)
-            throws ProductNotPurchasableException;
+            throws ProductNotPurchasableException, CartQuantityOutOfRangeException;
 
     /**
      * Removes a shopping cart item.

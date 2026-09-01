@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import com.asrevo.cvhome.checkout.entity.shoppingcart.ShoppingCart;
 import com.asrevo.cvhome.checkout.entity.shoppingcart.ShoppingCartItem;
+import com.asrevo.cvhome.checkout.errors.CartQuantityOutOfRangeException;
 import com.asrevo.cvhome.checkout.errors.ProductNotPurchasableException;
 import com.asrevo.cvhome.checkout.errors.ShoppingCartNotFoundException;
 import com.asrevo.cvhome.checkout.model.shoppingcart.PersistableShoppingCartItem;
@@ -52,7 +53,7 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
 
     private ShoppingCartItem createCartItem(ShoppingCart cartModel, PersistableShoppingCartItem shoppingCartItem,
                                             StoreMerchantId store, LanguageCode language)
-            throws ProductNotPurchasableException {
+            throws ProductNotPurchasableException, CartQuantityOutOfRangeException {
 
         SkuInventory inventory = productDetailsComposer
                 .getDetailedProduct(store, shoppingCartItem.getProduct(), language).inventory();
@@ -78,14 +79,14 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
      * of {@code 0} passes through: it is the modify path's "remove this line" signal, not a purchase.
      */
     private static void requireQuantityInRange(SkuInventory inventory, int quantity)
-            throws ProductNotPurchasableException {
+            throws CartQuantityOutOfRangeException {
         if (quantity == 0) {
             return;
         }
         int minimum = Math.max(inventory.quantityOrderMinimum(), 1);
         int maximum = inventory.quantityOrderMaximum();
         if (quantity < minimum || maximum > 0 && quantity > maximum) {
-            throw ProductNotPurchasableException.quantityOutOfRange(inventory.sku(), quantity, minimum, maximum);
+            throw CartQuantityOutOfRangeException.of(inventory.sku(), quantity, minimum, maximum);
         }
     }
 
@@ -121,7 +122,8 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
     @Override
     // KEEP ** ENTRY POINT **
     public ReadableShoppingCart addToCart(PersistableShoppingCartItem item, StoreMerchantId store,
-                                          LanguageCode language) throws ProductNotPurchasableException {
+                                          LanguageCode language)
+            throws ProductNotPurchasableException, CartQuantityOutOfRangeException {
 
         ShoppingCart cartModel = new ShoppingCart();
         cartModel.setStoreMerchantId(store);
@@ -176,7 +178,7 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
     // KEEP
     private ReadableShoppingCart readableShoppingCart(ShoppingCart cartModel, PersistableShoppingCartItem item,
                                                       StoreMerchantId store, LanguageCode language)
-            throws ProductNotPurchasableException {
+            throws ProductNotPurchasableException, CartQuantityOutOfRangeException {
 
         ShoppingCartItem itemModel = createCartItem(cartModel, item, store, language);
 
@@ -189,7 +191,7 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
 
     private ReadableShoppingCart modifyCart(ShoppingCart cartModel, PersistableShoppingCartItem item,
                                             StoreMerchantId store, LanguageCode language)
-            throws ProductNotPurchasableException {
+            throws ProductNotPurchasableException, CartQuantityOutOfRangeException {
 
         ShoppingCartItem itemModel = createCartItem(cartModel, item, store, language);
 
@@ -263,7 +265,7 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
     // KEEP
     public ReadableShoppingCart modifyCart(String cartCode, PersistableShoppingCartItem item, StoreMerchantId store,
                                            LanguageCode language)
-            throws ShoppingCartNotFoundException, ProductNotPurchasableException {
+            throws ShoppingCartNotFoundException, ProductNotPurchasableException, CartQuantityOutOfRangeException {
 
         ShoppingCart cartModel = shoppingCartService.findCart(cartCode, store);
         if (cartModel == null) {

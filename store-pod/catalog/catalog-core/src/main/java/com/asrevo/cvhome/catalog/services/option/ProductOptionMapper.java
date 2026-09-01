@@ -27,8 +27,14 @@ public final class ProductOptionMapper {
         readable.setCode(option.getCode());
         readable.setSortOrder(option.getSortOrder());
         if (LanguageCode.isLanguage(language)) {
-            option.description(language).map(ProductOptionMapper::description)
-                    .ifPresent(d -> readable.setName(d.getName()));
+            /*
+             * Falls back to the code, like ProductVariantMapper.label does for the same pair. Left null,
+             * a store language with no option description rendered an empty legend and an empty
+             * aria-label on the storefront's chip rail — and the field is non-optional in the client's
+             * types, so nothing there could have caught it.
+             */
+            readable.setName(option.description(language).map(ProductOptionMapper::description)
+                    .map(d -> d.getName()).orElse(option.getCode()));
         }
         if (allLanguages) {
             readable.setDescriptions(option.getDescriptions().stream()

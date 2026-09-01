@@ -8,6 +8,23 @@
         @if (!saved()) {
           <!-- Unreachable through the rail (the step is disabled), kept for a direct landing. -->
           <app-notice-bar icon="info" tone="blue" [message]="t('productForm.variants.needsSave')" />
+        } @else if (!facade.canSaveVariants()) {
+          <!--
+            A read failed, so what this product sells is unknown. Everything below writes the WHOLE
+            set, so drawing an empty matrix here would invite replacing real combinations with it.
+          -->
+          <app-notice-bar
+            icon="alertCircle"
+            tone="amber"
+            [message]="
+              facade.variantsUnavailable()
+                ? t('productForm.variants.unreadable')
+                : t('productForm.variants.vocabularyUnreadable')
+            "
+          />
+          <button type="button" class="btn btn-secondary" (click)="facade.retry()">
+            {{ t('shared.actions.retry') }}
+          </button>
         } @else {
           @if (facade.vocabulary().length === 0) {
             <!-- The vocabulary is the catalogue's; this step only assigns from it. -->

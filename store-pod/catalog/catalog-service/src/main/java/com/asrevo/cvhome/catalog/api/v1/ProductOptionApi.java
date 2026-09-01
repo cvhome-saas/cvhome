@@ -87,7 +87,7 @@ public class ProductOptionApi {
     @PreAuthorize(MANAGE)
     public void update(@PathVariable Long id, @Valid @RequestBody PersistableProductOption option,
                        StoreMerchantId merchantStore)
-            throws ProductOptionNotFoundException, DuplicateProductOptionException {
+            throws ProductOptionNotFoundException, DuplicateProductOptionException, ProductOptionInUseException {
         productOptionService.update(merchantStore, id, option);
     }
 
