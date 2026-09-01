@@ -7,6 +7,7 @@ import {
   computed,
   effect,
   inject,
+  signal,
   viewChild,
 } from '@angular/core';
 import {DomSanitizer, type SafeResourceUrl} from '@angular/platform-browser';
@@ -31,6 +32,7 @@ import {BuilderFacade} from '../facades/builder.facade';
   template: `
     <ng-container *transloco="let t">
       <div
+        #canvas
         class="canvas"
         [class]="'device-' + facade.device()"
         [class.dragging]="!!facade.dragging()"
@@ -38,7 +40,16 @@ import {BuilderFacade} from '../facades/builder.facade';
         (drop)="onDrop($event)"
       >
         @if (url(); as src) {
-          <iframe #frame [src]="src" [title]="t('builder.canvas.title')"></iframe>
+          <div class="stage" [style.width.px]="deviceWidth() * scale()">
+            <iframe
+              #frame
+              [src]="src"
+              [title]="t('builder.canvas.title')"
+              [style.width.px]="deviceWidth()"
+              [style.transform]="'scale(' + scale() + ')'"
+              [style.height]="'calc(100% / ' + scale() + ')'"
+            ></iframe>
+          </div>
         } @else {
           <div class="placeholder">{{ t('builder.canvas.unavailable') }}</div>
         }
@@ -48,13 +59,22 @@ import {BuilderFacade} from '../facades/builder.facade';
   styles: `
     :host { display: block; height: 100%; min-height: 0; }
     .canvas {
-      height: 100%; display: flex; justify-content: center; overflow: auto;
+      height: 100%; display: flex; justify-content: center; overflow: hidden;
       background: var(--surface-canvas, var(--muted)); padding: 16px;
     }
+    /*
+     * The stage holds the iframe at the device's REAL width (a desktop canvas is 1440px, whatever the
+     * pane), scaled down to fit. Rendering at pane width would lie: content max-widths (~1344px) never
+     * engage below their breakpoint, so a merchant flipping a section from full to content would see
+     * nothing change. The stage's own box is the scaled size, keeping flex centering honest.
+     */
+    .stage { position: relative; flex: none; height: 100%; }
     iframe {
       border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--background);
-      /* no width transition: animating an iframe's width relayouts the embedded page every frame */
-      width: 100%; height: 100%;
+      /* no width transition: animating an iframe's width relayouts the embedded page every frame.
+         Scaling shrinks toward the stage's inline start, whose edge the iframe shares — the visual
+         box therefore fills the stage exactly in both directions. */
+      transform-origin: top left;
     }
     /*
      * While a library tile is being dragged, the iframe must not hit-test: a native drag over an
@@ -63,8 +83,6 @@ import {BuilderFacade} from '../facades/builder.facade';
      * duration, the wrapper receives the events and the bridge keeps drawing the insertion line.
      */
     .dragging iframe { pointer-events: none; }
-    .device-tablet iframe { width: 768px; }
-    .device-mobile iframe { width: 390px; }
     .placeholder {
       margin: auto; font-size: 13px; color: var(--muted-foreground); max-width: 40ch; text-align: center;
     }
@@ -75,6 +93,24 @@ export class BuilderPreviewFrame {
 
   private readonly sanitizer = inject(DomSanitizer);
   private readonly frame = viewChild<ElementRef<HTMLIFrameElement>>('frame');
+  private readonly canvas = viewChild<ElementRef<HTMLElement>>('canvas');
+
+  /** The real width each device class renders at; the canvas scales it to fit, never reflows it. */
+  private static readonly DEVICE_WIDTHS: Record<string, number> = {desktop: 1440, tablet: 768, mobile: 390};
+
+  private readonly paneWidth = signal(0);
+
+  protected readonly deviceWidth = computed(() =>
+    BuilderPreviewFrame.DEVICE_WIDTHS[this.facade.device()] ?? BuilderPreviewFrame.DEVICE_WIDTHS['desktop']);
+
+  /** Fit-to-pane scale, never above 1 — a phone canvas stays life-size. */
+  protected readonly scale = computed(() => {
+    const available = this.paneWidth() - 32; // the canvas padding
+    if (available <= 0) {
+      return 1;
+    }
+    return Math.min(1, available / this.deviceWidth());
+  });
 
   /**
    * `savedRevision` is deliberately part of the URL: a landed save bumps it, the query changes, and the
@@ -148,6 +184,19 @@ export class BuilderPreviewFrame {
     window.addEventListener('message', onMessage);
     destroyRef.onDestroy(() => window.removeEventListener('message', onMessage));
 
+    // the scale follows the pane: observed, not polled
+    const observer = new ResizeObserver((entries) => {
+      const width = entries[0]?.contentRect.width ?? 0;
+      this.paneWidth.set(width);
+    });
+    effect(() => {
+      const host = this.canvas()?.nativeElement;
+      if (host) {
+        observer.observe(host);
+      }
+    });
+    destroyRef.onDestroy(() => observer.disconnect());
+
     // selection changes flow into the canvas: outline + scroll to the block being edited
     effect(() => {
       const id = this.facade.selectedId();
@@ -178,7 +227,8 @@ export class BuilderPreviewFrame {
     }
     const rect = this.frame()?.nativeElement.getBoundingClientRect();
     if (rect) {
-      this.post({type: 'dragOver', y: event.clientY - rect.top});
+      // the iframe is visually scaled; the bridge thinks in the page's own pixels
+      this.post({type: 'dragOver', y: (event.clientY - rect.top) / this.scale()});
     }
   }
 
