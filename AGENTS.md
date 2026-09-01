@@ -148,6 +148,17 @@ What binds every change:
   the PR merges: `lcl stop --stack <short-name>`, then `git worktree remove` the directory and delete the
   branch. Tiny same-file follow-ups to an open PR may stay in that PR's existing worktree; anything new gets
   a new one.
+- **The worktree rule is enforced, not trusted.** `.claude/hooks/worktree-guard.mjs` runs as a
+  `PreToolUse` hook on every `Write`/`Edit`/`MultiEdit` and denies any path inside the primary
+  checkout, telling the agent to cut a worktree and how to move edits already stranded on `main`.
+  `.agents/plans/`, `.claude/plans/`, `.claude/hooks/` and `.claude/settings*.json` stay writable —
+  a plan is written before its worktree exists. `CVHOME_ALLOW_MAIN_WRITES=1` lifts it for a
+  deliberate hotfix; it is an env var rather than a flag so the decision stays with the person
+  running the session. The root
+  `CLAUDE.md` is one line, `@AGENTS.md`, because Claude Code auto-loads `CLAUDE.md` and this file
+  would otherwise never reach an agent's context. Changing the allow-list? Run
+  `node .claude/hooks/worktree-guard.test.mjs` — 20 cases, and it cuts a real worktree rather than
+  trusting a path that merely looks like one.
 - **`/go` ships the working tree** (branch if needed → commit → push → PR into `main`, template filled,
   changelog label) and **`/reset` returns to a clean `main`** without losing work. Both live in
   `.AGENTS/commands/`; prefer them over doing the sequence by hand. Run `/go` from the worktree being shipped.
