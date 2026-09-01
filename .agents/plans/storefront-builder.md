@@ -126,8 +126,11 @@ bar recovery, RTL chrome. The builder now runs shell-free at its own top-level r
 Phase 7 batch 1 done: registries for fashion (wall hero recaptured), grocery, pink, hunger,
 furniture (DirectoryBoard as `categories`); `slidesAsBanners` shared via @store-front/theme; fallback
 audit fixes (drawn usp icons, translated newsletter copy); duplicate policy links dropped from all 12
-footers; "Section design rules" contract in themes/README.md. Remaining: deeper per-theme DESIGN.md
-audits and the full screenshot matrix, then PR via /go.
+footers; "Section design rules" contract in themes/README.md. Phase 5's deferred retirements are now done too: BannerPlacement is COLLECTION+STRIP only (schema,
+seeds, tests, console, landing types), the seeded HOME_PAGE group is gone from all four catalog
+stores, and the builder route has a confirm-leave guard. Remaining: deeper per-theme DESIGN.md
+audits and the full screenshot matrix; the `manual` product source and newsletter list wiring stay
+future work; then PR via /go.
 
 ## Phase 0 — Worktree setup (per AGENTS.md worktree-per-feature rules)
 
