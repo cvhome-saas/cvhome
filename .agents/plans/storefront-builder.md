@@ -128,9 +128,10 @@ furniture (DirectoryBoard as `categories`); `slidesAsBanners` shared via @store-
 audit fixes (drawn usp icons, translated newsletter copy); duplicate policy links dropped from all 12
 footers; "Section design rules" contract in themes/README.md. Phase 5's deferred retirements are now done too: BannerPlacement is COLLECTION+STRIP only (schema,
 seeds, tests, console, landing types), the seeded HOME_PAGE group is gone from all four catalog
-stores, and the builder route has a confirm-leave guard. Remaining: deeper per-theme DESIGN.md
-audits and the full screenshot matrix; the `manual` product source and newsletter list wiring stay
-future work; then PR via /go.
+stores, and the builder route has a confirm-leave guard. Phase 7 verification complete: per-theme audit pass (registries delegate to each theme's own
+Named-Rules components) and the screenshot matrix — all five themes desktop+mobile en, fashion ar
+desktop, furniture ar mobile — clean, RTL fully mirrored. The `manual` product source and newsletter
+list wiring stay future work. The branch is ready for PR via /go.
 
 ## Phase 0 — Worktree setup (per AGENTS.md worktree-per-feature rules)
 
