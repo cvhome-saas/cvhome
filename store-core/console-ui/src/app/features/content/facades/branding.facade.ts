@@ -4,7 +4,7 @@ import {TranslocoService} from '@jsverse/transloco';
 
 import {SiteSettingsService} from '@api/content/site-settings.service';
 import {ManagerStoreService} from '@api/tenancy/manager-store.service';
-import {ApiErrorService} from '@core/errors/api-error.service';
+import {ApiErrorService} from '@cvhome-saas/ui-kit';
 import {ConsoleShellFacade} from '@layouts/console-shell/facades/console-shell.facade';
 import type {SiteBranding, SiteSettings, SocialLink} from '@models/content';
 import {socialLinkProblem} from '@models/social-links';

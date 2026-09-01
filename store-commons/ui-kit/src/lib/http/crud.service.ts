@@ -2,7 +2,7 @@ import {Injectable, inject} from '@angular/core';
 
 import {Observable} from 'rxjs';
 import {HttpClient, HttpEvent, HttpParams, HttpRequest} from '@angular/common/http';
-import {CONSOLE_CORE_CONFIG} from '../config/console-core.config';
+import {UI_KIT_CONFIG} from '../config/ui-kit.config';
 import {REQUEST_CONTEXT, RequestContextProvider} from './request-context';
 
 export type HttpParamsLike = Record<string, string | number | boolean | undefined>;
@@ -18,7 +18,7 @@ export interface RequestOptions {
 export class CrudService {
   private readonly http = inject(HttpClient);
   private readonly requestContext = inject<RequestContextProvider>(REQUEST_CONTEXT);
-  private readonly config = inject(CONSOLE_CORE_CONFIG);
+  private readonly config = inject(UI_KIT_CONFIG);
 
   url = this.config.apiUrl;
 

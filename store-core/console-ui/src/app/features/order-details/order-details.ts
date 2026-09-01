@@ -17,7 +17,7 @@ import {Panel} from '@shared/ui/panel/panel';
 import {PdfExportService} from '@core/export/pdf-export.service';
 import {ToastService} from '@shared/ui/toast/toast';
 import {OrderDetailsFacade} from './facades/order-details.facade';
-import {positiveIntParam} from '@core/routing/route-params';
+import {positiveIntParam} from '@cvhome-saas/ui-kit';
 
 /**
  * One order.

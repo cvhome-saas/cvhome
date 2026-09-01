@@ -1,5 +1,5 @@
 import type {InvitationStatus} from '@models/users';
-import type {Tone} from '@models/ui';
+import type {Tone} from '@cvhome-saas/ui-kit';
 
 /**
  * The user-management page's view models.

@@ -5,7 +5,7 @@ import {TranslocoService} from '@jsverse/transloco';
 
 // Declared in `@models/locale` so a model may name a locale without importing upward; re-exported
 // here because this is where the service that switches them lives and where callers look.
-import {CONSOLE_LOCALES, type ConsoleLocale, type LocaleCode} from '@models/locale';
+import {CONSOLE_LOCALES, type ConsoleLocale, type LocaleCode} from '@cvhome-saas/ui-kit';
 
 export type {ConsoleLocale, LocaleCode};
 export {CONSOLE_LOCALES};

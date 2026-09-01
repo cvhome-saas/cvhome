@@ -14,7 +14,7 @@
  * the seam that exists precisely so a page never has to know which is which.
  */
 import type {Identifier, InvoiceStatus, Money, SubscriptionStatus} from '@models/billing';
-import type {Tone} from '@models/ui';
+import type {Tone} from '@cvhome-saas/ui-kit';
 
 /* ------------------------------------------------------------------- the wire ---- */
 

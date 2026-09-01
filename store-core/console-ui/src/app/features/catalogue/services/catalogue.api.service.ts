@@ -9,7 +9,7 @@ import {ProductOptionService} from '@api/catalog/product-option.service';
 import {ProductService} from '@api/catalog/product.service';
 import {ProductTypeService} from '@api/catalog/product-type.service';
 import {MerchantStoreService} from '@api/merchant/store.service';
-import type {PageT} from '@core/table/table.types';
+import type {PageT} from '@cvhome-saas/ui-kit';
 import type {
   NamedDescription,
   PersistableCategory,

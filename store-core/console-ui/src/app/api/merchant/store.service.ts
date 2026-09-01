@@ -1,7 +1,7 @@
 import {Injectable, inject} from '@angular/core';
 import {Observable, map} from 'rxjs';
 
-import {CrudService} from '@core/http/crud.service';
+import {CrudService} from '@cvhome-saas/ui-kit';
 import type {
   PersistableMerchantStore,
   ReadableMerchantStore,

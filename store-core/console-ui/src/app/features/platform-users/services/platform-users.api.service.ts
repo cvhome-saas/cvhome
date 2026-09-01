@@ -3,7 +3,7 @@ import {Observable, forkJoin, map} from 'rxjs';
 
 import {OrgService} from '@api/tenancy/org.service';
 import {AdminUserService, type AdminUserAction} from '@api/uaa/admin-user.service';
-import {optionalOne} from '@core/http/optional';
+import {optionalOne} from '@cvhome-saas/ui-kit';
 import {toOrgRow, toPlatformUserRow, type PlatformUserRow} from '@models/platform';
 
 /** How many organizations the filter offers. See `pods.api.service.ts` for why there is a cap. */

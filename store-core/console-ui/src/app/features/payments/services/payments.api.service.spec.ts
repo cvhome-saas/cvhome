@@ -3,7 +3,7 @@ import {Observable, of, throwError} from 'rxjs';
 
 import {OrdersService} from '@api/orders/orders.service';
 import {PaymentService} from '@api/payment/payment.service';
-import type {PageT} from '@core/table/table.types';
+import type {PageT} from '@cvhome-saas/ui-kit';
 import type {PaymentApproval, PaymentStatus, PaymentTransaction, TransactionQuery} from '@models/payment';
 import type {ReadableOrder} from '@models/checkout';
 import type {TransactionsSnapshot} from '@models/transactions';

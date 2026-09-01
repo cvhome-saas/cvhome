@@ -8,8 +8,7 @@ import {DOCUMENT} from '@angular/common';
 
 import {ConsoleShellFacade} from '@layouts/console-shell/facades/console-shell.facade';
 
-import {ApiErrorService} from '@core/errors/api-error.service';
-import {clearServerErrorsOnChange} from '@core/errors/form-error.utils';
+import {ApiErrorService, clearServerErrorsOnChange} from '@cvhome-saas/ui-kit';
 import {LocaleService} from '@core/i18n/locale.service';
 import {
   SECTIONS,

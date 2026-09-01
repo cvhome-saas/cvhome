@@ -4,11 +4,9 @@ import {TranslocoService} from '@jsverse/transloco';
 
 import {ContentCache} from '@api/content/content-cache';
 import {MediaService, type MediaQuery} from '@api/content/media.service';
-import {ApiErrorService} from '@core/errors/api-error.service';
-import {ApiError} from '@core/errors/api-error';
+import {ApiErrorService, ApiError, EMPTY_PAGE, type PageT} from '@cvhome-saas/ui-kit';
 import {ConsoleShellFacade} from '@layouts/console-shell/facades/console-shell.facade';
 import type {MediaAsset, MediaFolder, MediaKind, PersistableMediaAsset} from '@models/content';
-import {EMPTY_PAGE, type PageT} from '@models/page';
 import {ToastService} from '@shared/ui/toast/toast';
 
 export const MEDIA_PAGE_SIZE = 24;

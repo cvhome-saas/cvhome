@@ -1,4 +1,4 @@
-import type {IconName} from '@models/ui';
+import type {IconName} from '@cvhome-saas/ui-kit';
 
 export type CreateStorePhase = 'form' | 'running';
 

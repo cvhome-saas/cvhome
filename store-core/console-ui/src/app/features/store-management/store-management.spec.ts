@@ -3,7 +3,7 @@ import {Router, provideRouter} from '@angular/router';
 import {Observable, Subject, of, throwError} from 'rxjs';
 
 import {DnsCheckService, type CnameOutcome} from '@api/dns/dns-check.service';
-import {NOTIFICATION_PORT} from '@core/errors/notification.port';
+import {NOTIFICATION_PORT} from '@cvhome-saas/ui-kit';
 import {ToastService} from '@shared/ui/toast/toast';
 import type {
   DomainStatus,

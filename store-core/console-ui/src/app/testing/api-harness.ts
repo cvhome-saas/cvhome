@@ -3,8 +3,7 @@ import {HttpTestingController, provideHttpClientTesting} from '@angular/common/h
 import {Provider, ProviderToken} from '@angular/core';
 import {TestBed} from '@angular/core/testing';
 
-import {CONSOLE_CORE_CONFIG} from '@core/config/console-core.config';
-import {REQUEST_CONTEXT} from '@core/http/request-context';
+import {UI_KIT_CONFIG, REQUEST_CONTEXT} from '@cvhome-saas/ui-kit';
 
 /** The store every ported service is scoped to, and the one these specs assert is stamped. */
 export const TEST_STORE = 'ORG1-STORE1';
@@ -34,7 +33,7 @@ export function apiHarness<T>(
     providers: [
       provideHttpClient(),
       provideHttpClientTesting(),
-      {provide: CONSOLE_CORE_CONFIG, useValue: {apiUrl: API_BASE, loginUrl: '', logoutUrl: ''}},
+      {provide: UI_KIT_CONFIG, useValue: {apiUrl: API_BASE, loginUrl: '', logoutUrl: ''}},
       /*
        * Mirrors `SelectedStoreRequestContext`: an explicit store wins over the open one. A fake
        * that ignored the argument made `storeInfo('ORG1-STORE2')` look like it queried the open

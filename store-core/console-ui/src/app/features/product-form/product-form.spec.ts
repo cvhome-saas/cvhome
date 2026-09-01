@@ -4,7 +4,7 @@ import {provideHttpClientTesting} from '@angular/common/http/testing';
 import {Router, provideRouter} from '@angular/router';
 import {Observable, of} from 'rxjs';
 
-import {NOTIFICATION_PORT} from '@core/errors/notification.port';
+import {NOTIFICATION_PORT} from '@cvhome-saas/ui-kit';
 import {ConsoleApi} from '@layouts/console-shell/services/console.api.service';
 import {emptyDraft, type ProductDraft, type ProductImageItem, type RelatedProduct, type VariantMatrixRow} from '@models/products';
 import type {PersistableVariantSet} from '@models/catalog';

@@ -3,8 +3,7 @@ import {Router} from '@angular/router';
 import {TranslocoService} from '@jsverse/transloco';
 import {TranslocoLocaleService} from '@jsverse/transloco-locale';
 
-import {ApiErrorService} from '@core/errors/api-error.service';
-import {clearServerErrorsOnChange} from '@core/errors/form-error.utils';
+import {ApiErrorService, clearServerErrorsOnChange, snapshot} from '@cvhome-saas/ui-kit';
 import {
   POD_HEALTH_TONE,
   POD_LIFECYCLE_TONE,
@@ -16,9 +15,8 @@ import {
   type PodDetail,
 } from '@models/platform';
 import type {EndpointType} from '@models/pod';
-import type {Tone} from '@models/ui';
+import type {Tone} from '@cvhome-saas/ui-kit';
 import {PlatformLabel} from '@shared/i18n/platform-label';
-import {snapshot} from '@shared/state/snapshot';
 import type {SelectOption} from '@shared/ui/select/select';
 import {ToastService} from '@shared/ui/toast/toast';
 import {PodDetailApi, type OrgChoice} from '../services/pod-detail.api.service';

@@ -1,6 +1,6 @@
 import {inject, Injectable, PLATFORM_ID} from '@angular/core';
 import {isPlatformBrowser} from '@angular/common';
-import {CONSOLE_CORE_CONFIG} from '../config/console-core.config';
+import {UI_KIT_CONFIG} from '../config/ui-kit.config';
 import {ApiError} from './api-error';
 
 /**
@@ -18,7 +18,7 @@ import {ApiError} from './api-error';
 export class SessionService {
 
   private readonly platformId = inject(PLATFORM_ID);
-  private readonly config = inject(CONSOLE_CORE_CONFIG);
+  private readonly config = inject(UI_KIT_CONFIG);
 
   private redirecting = false;
 

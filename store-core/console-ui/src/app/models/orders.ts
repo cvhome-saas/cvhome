@@ -1,7 +1,5 @@
-import type {PageT} from '@models/page';
+import type {KpiDatum, PageT, Tone} from '@cvhome-saas/ui-kit';
 import {INVENTORY_STATUSES, ORDER_STATUSES, PAYMENT_STATUSES, type OrderStatus} from '@models/checkout';
-import type {KpiDatum} from '@models/ui';
-import type {Tone} from '@models/ui';
 
 /**
  * The orders page's view models.

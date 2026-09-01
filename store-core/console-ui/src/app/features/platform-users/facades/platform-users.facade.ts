@@ -3,10 +3,9 @@ import {TranslocoService} from '@jsverse/transloco';
 import {TranslocoLocaleService} from '@jsverse/transloco-locale';
 
 import type {AdminUserAction} from '@api/uaa/admin-user.service';
-import {ApiErrorService} from '@core/errors/api-error.service';
+import {ApiErrorService, snapshot} from '@cvhome-saas/ui-kit';
 import type {PlatformUserRow} from '@models/platform';
 import {RoleLabel} from '@shared/i18n/role-label';
-import {snapshot} from '@shared/state/snapshot';
 import type {RoleChange, RoleOption} from '@shared/ui/roles-dialog/roles-dialog';
 import type {SelectOption} from '@shared/ui/select/select';
 import {ToastService} from '@shared/ui/toast/toast';

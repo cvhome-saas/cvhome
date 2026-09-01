@@ -2,7 +2,7 @@ import {Component, inject, input, signal} from '@angular/core';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 
 import {Icon} from '@shared/ui/icon/icon';
-import {copyText} from '@core/platform/clipboard';
+import {copyText} from '@cvhome-saas/ui-kit';
 import {ToastService} from '@shared/ui/toast/toast';
 
 /**

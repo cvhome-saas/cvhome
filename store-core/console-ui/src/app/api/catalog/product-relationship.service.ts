@@ -1,7 +1,7 @@
 import {Injectable, inject} from '@angular/core';
 import {Observable} from 'rxjs';
 
-import {CrudService} from '@core/http/crud.service';
+import {CrudService} from '@cvhome-saas/ui-kit';
 import type {ReadableProductGroup} from '@models/catalog';
 
 const CATALOG_API_BASE = '/spg/catalog/api/v1';

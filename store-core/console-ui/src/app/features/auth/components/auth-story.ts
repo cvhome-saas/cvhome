@@ -2,7 +2,7 @@ import {Component, input} from '@angular/core';
 import {RouterLink} from '@angular/router';
 import {TranslocoDirective} from '@jsverse/transloco';
 
-import {AuthStory as AuthStoryModel} from '@models/auth';
+import {AuthStory as AuthStoryModel} from '@cvhome-saas/ui-kit';
 import {Icon} from '@shared/ui/icon/icon';
 
 @Component({

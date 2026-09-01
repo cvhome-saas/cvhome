@@ -1,8 +1,8 @@
 import {Injectable, inject} from '@angular/core';
 import {Observable} from 'rxjs';
 
-import {CrudService} from '@core/http/crud.service';
-import type {SpringPage} from '@core/table/table.types';
+import {CrudService} from '@cvhome-saas/ui-kit';
+import type {SpringPage} from '@cvhome-saas/ui-kit';
 import type {ManagerOrgDto, ManagerStore} from '@models/tenancy';
 import type {ReadableUser} from '@models/users';
 

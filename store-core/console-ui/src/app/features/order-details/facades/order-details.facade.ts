@@ -1,9 +1,8 @@
-import {computed, inject, Injectable, signal} from '@angular/core';
+import {computed, inject, Injectable, signal, DestroyRef} from '@angular/core';
 import {rxResource, takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {DestroyRef} from '@angular/core';
 import {TranslocoService} from '@jsverse/transloco';
 
-import {ApiErrorService} from '@core/errors/api-error.service';
+import {ApiErrorService} from '@cvhome-saas/ui-kit';
 import {ConsoleShellFacade} from '@layouts/console-shell/facades/console-shell.facade';
 import {
   ORDER_STATUSES,
@@ -16,7 +15,7 @@ import {
 import {STATUS_TONE, humanizeStatus} from '@models/orders';
 import {PAYMENT_TYPE_LABEL_KEY, isPaymentType} from '@models/store-settings';
 import {TRANSACTION_TONE} from '@models/transactions';
-import type {Tone} from '@models/ui';
+import type {Tone} from '@cvhome-saas/ui-kit';
 import {Money} from '@shared/i18n/money';
 import {StatusLabel} from '@shared/i18n/status-label';
 import {TotalLabel} from '@shared/i18n/total-label';

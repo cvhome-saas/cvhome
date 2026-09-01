@@ -2,7 +2,7 @@ import {Component, booleanAttribute, computed, forwardRef, input, model, signal}
 import {ControlValueAccessor, NG_VALUE_ACCESSOR} from '@angular/forms';
 
 import {Icon} from '@shared/ui/icon/icon';
-import type {IconName} from '@models/ui';
+import type {IconName} from '@cvhome-saas/ui-kit';
 
 /** The types this covers. Anything numeric belongs in `app-number-field`, which is a different job. */
 export type TextFieldType = 'text' | 'email' | 'url' | 'tel' | 'search' | 'password';

@@ -20,6 +20,8 @@
 import {readFileSync} from 'node:fs';
 import {execSync} from 'node:child_process';
 
+import {SOURCE_DIRS} from './sources.mjs';
+
 /** Both spellings a key can have in these files: nested, and flattened at any depth. */
 const resolvable = (tree) => {
   const keys = new Set();
@@ -42,7 +44,7 @@ const locales = {
 };
 
 const files = execSync(
-  "find src/app -type f \\( -name '*.ts' -o -name '*.html' \\) ! -name '*.spec.ts'",
+  `find ${SOURCE_DIRS.join(' ')} -type f \\( -name '*.ts' -o -name '*.html' \\) ! -name '*.spec.ts'`,
   {encoding: 'utf8'},
 ).trim().split('\n').filter(Boolean);
 

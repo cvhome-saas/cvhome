@@ -7,7 +7,7 @@ import {ManufacturerService} from '@api/catalog/manufacturer.service';
 import {ProductTypeService} from '@api/catalog/product-type.service';
 import {MerchantStoreService} from '@api/merchant/store.service';
 import {SelectedStoreService} from '@api/tenancy/selected-store.service';
-import type {PageT} from '@core/table/table.types';
+import type {PageT} from '@cvhome-saas/ui-kit';
 import type {ReadableCategory, ReadableManufacturer, ReadableProductType} from '@models/catalog';
 import type {ReadableMerchantStore} from '@models/merchant';
 

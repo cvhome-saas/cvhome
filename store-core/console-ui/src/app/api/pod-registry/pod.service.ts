@@ -1,8 +1,8 @@
 import {Injectable, inject} from '@angular/core';
 import {Observable} from 'rxjs';
 
-import {CrudService} from '@core/http/crud.service';
-import type {SpringPage} from '@core/table/table.types';
+import {CrudService} from '@cvhome-saas/ui-kit';
+import type {SpringPage} from '@cvhome-saas/ui-kit';
 import type {Endpoint, Pod, PodView} from '@models/pod';
 
 export const POD_API_BASE = '/pod-registry/api/v1/pod';

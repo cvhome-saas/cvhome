@@ -2,7 +2,7 @@ import {Component, signal} from '@angular/core';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {FormControl, ReactiveFormsModule, Validators} from '@angular/forms';
 
-import {SERVER_ERROR_KEY} from '@core/errors/form-error.utils';
+import {SERVER_ERROR_KEY} from '@cvhome-saas/ui-kit';
 import {translocoTesting} from '@testing/transloco-testing';
 import {FormField} from './form-field';
 import {TextField} from '@shared/ui/text-field/text-field';

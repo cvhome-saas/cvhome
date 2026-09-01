@@ -2,7 +2,7 @@ import {ComponentFixture, TestBed, fakeAsync, tick} from '@angular/core/testing'
 import {Router, provideRouter} from '@angular/router';
 import {Observable, Subject, of, throwError} from 'rxjs';
 
-import {NOTIFICATION_PORT} from '@core/errors/notification.port';
+import {NOTIFICATION_PORT} from '@cvhome-saas/ui-kit';
 import {ConsoleApi} from '@layouts/console-shell/services/console.api.service';
 import type {CustomerOrdersSnapshot, CustomerRow} from '@models/customers';
 import {CONSOLE_STORES_FAKE, FakeConsoleApi} from '@testing/console-api.fake';

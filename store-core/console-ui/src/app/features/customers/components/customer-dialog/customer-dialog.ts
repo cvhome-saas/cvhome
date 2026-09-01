@@ -7,7 +7,7 @@ import {EmptyState} from '@shared/ui/empty-state/empty-state';
 import {Icon} from '@shared/ui/icon/icon';
 import {LoadError} from '@shared/ui/load-error/load-error';
 import type {CustomerOrderRow, CustomerRow} from '@models/customers';
-import type {Tone} from '@models/ui';
+import type {Tone} from '@cvhome-saas/ui-kit';
 
 /**
  * One customer — read, in a modal.

@@ -1,7 +1,7 @@
 import {ComponentFixture, TestBed, fakeAsync, tick} from '@angular/core/testing';
 import {provideRouter} from '@angular/router';
 
-import {AuthService} from '@core/auth/auth.service';
+import {AuthService} from '@cvhome-saas/ui-kit';
 import {LocaleService} from '@core/i18n/locale.service';
 import {ThemeService} from '@core/theme/theme.service';
 import {translocoTesting} from '@testing/transloco-testing';

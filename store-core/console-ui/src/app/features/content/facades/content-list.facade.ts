@@ -5,7 +5,7 @@ import {TranslocoLocaleService} from '@jsverse/transloco-locale';
 
 import {ContentCache} from '@api/content/content-cache';
 import {ContentItemsService} from '@api/content/content-items.service';
-import {ApiErrorService} from '@core/errors/api-error.service';
+import {ApiErrorService, EMPTY_PAGE} from '@cvhome-saas/ui-kit';
 import {ConsoleShellFacade} from '@layouts/console-shell/facades/console-shell.facade';
 import {
   CONTENT_STATUSES,
@@ -18,7 +18,6 @@ import {
   type ContentStatus,
   type TransitionAction,
 } from '@models/content';
-import {EMPTY_PAGE} from '@models/page';
 import type {TabItem} from '@shared/ui/tab-switcher/tab-switcher';
 import {ToastService} from '@shared/ui/toast/toast';
 

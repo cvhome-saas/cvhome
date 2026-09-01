@@ -26,19 +26,12 @@
  * fallback is a deliberate customisation hook and cannot silently resolve to nothing — which is
  * precisely the failure being hunted.
  */
-import {existsSync, readFileSync} from 'node:fs';
+import {readFileSync} from 'node:fs';
 import {execSync} from 'node:child_process';
 
-/*
- * The app, plus the library the token layer moved to. Both halves are needed and neither is
- * sufficient: `theme*.css` in the kit is where all 239 properties are *defined*, and `src` is where
- * most of them are *read*. Scanning only `src` after the move reported every token in the console as
- * undefined; scanning only the kit would stop checking the features that consume them.
- */
-const SOURCES = ['src', '../../store-commons/ui-kit/src', '../../store-commons/ui-kit/ui',
-                 '../../store-commons/ui-kit/theme', '../../store-commons/ui-kit/i18n',
-                 '../../store-commons/ui-kit/forms', '../../store-commons/ui-kit/uaa']
-  .filter((dir) => existsSync(dir));
+import {SOURCE_ROOTS} from './sources.mjs';
+
+const SOURCES = SOURCE_ROOTS;
 
 /**
  * The exact set Tailwind emits from its own default theme, read from the installed package so it

@@ -2,7 +2,7 @@ import {Injectable, computed, inject, signal} from '@angular/core';
 import {TranslocoService} from '@jsverse/transloco';
 
 import {OrgMemberService} from '@api/tenancy/org-member.service';
-import {ApiErrorService} from '@core/errors/api-error.service';
+import {ApiErrorService} from '@cvhome-saas/ui-kit';
 
 /** What the page is doing. */
 export type AcceptState = 'idle' | 'working' | 'joined' | 'refused';

@@ -2,8 +2,8 @@
 import {Injectable, inject} from '@angular/core';
 import {Observable, concat, map, of, toArray} from 'rxjs';
 
-import {CrudService} from '@core/http/crud.service';
-import type {SpringPage} from '@core/table/table.types';
+import {CrudService} from '@cvhome-saas/ui-kit';
+import type {SpringPage} from '@cvhome-saas/ui-kit';
 import type {CreateUserRequest, ResetUserPasswordRequest, UpdateUserRequest, UserDto} from '@models/uaa';
 
 /**

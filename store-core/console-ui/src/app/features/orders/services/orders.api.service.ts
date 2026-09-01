@@ -3,7 +3,7 @@ import {Observable, catchError, forkJoin, map, of} from 'rxjs';
 
 import {OrdersService, type OrderQuery} from '@api/orders/orders.service';
 import {StatisticService} from '@api/analytics/statistic.service';
-import type {PageRequest, PageT} from '@core/table/table.types';
+import type {PageRequest, PageT} from '@cvhome-saas/ui-kit';
 import {AWAITING_FULFILMENT, type OrderStatus, type ReadableOrder} from '@models/checkout';
 import type {OrderKpiSource, OrderRow, OrdersSnapshot, OrderTab} from '@models/orders';
 import type {StatisticList} from '@models/statistics';

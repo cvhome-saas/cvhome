@@ -2,7 +2,7 @@ import {ComponentFixture, TestBed, fakeAsync, tick} from '@angular/core/testing'
 import {provideRouter} from '@angular/router';
 import {Observable, of, throwError} from 'rxjs';
 
-import {NOTIFICATION_PORT} from '@core/errors/notification.port';
+import {NOTIFICATION_PORT} from '@cvhome-saas/ui-kit';
 import {ToastService} from '@shared/ui/toast/toast';
 import type {OrderStatus, ReadableOrder} from '@models/checkout';
 import type {MerchantStore} from '@models/merchant';

@@ -3,8 +3,8 @@ import {Observable, forkJoin, map} from 'rxjs';
 
 import {OrdersService} from '@api/orders/orders.service';
 import {PaymentService} from '@api/payment/payment.service';
-import {optionalOne} from '@core/http/optional';
-import type {PageRequest, PageT} from '@core/table/table.types';
+import {optionalOne} from '@cvhome-saas/ui-kit';
+import type {PageRequest, PageT} from '@cvhome-saas/ui-kit';
 import {
   MANUAL_TRANSFER,
   PENDING_APPROVAL,

@@ -2,7 +2,7 @@ import {TestBed} from '@angular/core/testing';
 import {Observable, of} from 'rxjs';
 
 import {ProductService} from '@api/catalog/product.service';
-import type {PageT} from '@core/table/table.types';
+import type {PageT} from '@cvhome-saas/ui-kit';
 import {SelectedStoreService} from '@api/tenancy/selected-store.service';
 import {ProductSearch} from '@api/catalog/product-search.service';
 

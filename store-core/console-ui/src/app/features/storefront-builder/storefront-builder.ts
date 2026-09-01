@@ -7,7 +7,7 @@ import {RouterLink} from '@angular/router';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 import {TranslocoDatePipe} from '@jsverse/transloco-locale';
 
-import type {ConfirmsLeave} from '@core/routing/confirm-leave.guard';
+import type {ConfirmsLeave} from '@cvhome-saas/ui-kit';
 import {Icon} from '@shared/ui/icon/icon';
 import type {IconName} from '@shared/ui/icon/icon-paths';
 

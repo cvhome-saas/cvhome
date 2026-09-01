@@ -4,8 +4,7 @@ import {Router} from '@angular/router';
 import {TranslocoService} from '@jsverse/transloco';
 import {map, startWith} from 'rxjs';
 
-import {ApiErrorService} from '@core/errors/api-error.service';
-import {clearServerErrorsOnChange} from '@core/errors/form-error.utils';
+import {ApiErrorService, clearServerErrorsOnChange} from '@cvhome-saas/ui-kit';
 import {ReferenceDataService, type ReferenceOption} from '@core/reference/reference-data.service';
 import {ConsoleShellFacade} from '@layouts/console-shell/facades/console-shell.facade';
 import {

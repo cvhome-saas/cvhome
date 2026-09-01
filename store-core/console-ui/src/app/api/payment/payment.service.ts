@@ -1,8 +1,8 @@
 import {Injectable, inject} from '@angular/core';
 import {Observable, map} from 'rxjs';
 
-import {CrudService} from '@core/http/crud.service';
-import type {PageT} from '@core/table/table.types';
+import {CrudService} from '@cvhome-saas/ui-kit';
+import type {PageT} from '@cvhome-saas/ui-kit';
 import {
   MANUAL_TRANSFER,
   PENDING_APPROVAL,

@@ -3,7 +3,7 @@ import {Title} from '@angular/platform-browser';
 import {RouterStateSnapshot, TitleStrategy} from '@angular/router';
 import {TranslocoService} from '@jsverse/transloco';
 
-import {routeData} from '@core/routing/route-data';
+import {routeData} from '@cvhome-saas/ui-kit';
 
 /**
  * Route `title` is a static string resolved once at navigation — it cannot follow a

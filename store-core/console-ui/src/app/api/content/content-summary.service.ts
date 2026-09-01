@@ -2,7 +2,7 @@
 import {Injectable, inject} from '@angular/core';
 import {Observable} from 'rxjs';
 
-import {CrudService} from '@core/http/crud.service';
+import {CrudService} from '@cvhome-saas/ui-kit';
 import type {ContentSummary, Redirect} from '@models/content';
 import {CONTENT_PRIVATE} from './content-api';
 

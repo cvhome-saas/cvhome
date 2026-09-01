@@ -5,7 +5,7 @@ import {Observable, of} from 'rxjs';
 import {ContentCache} from '@api/content/content-cache';
 import {ContentItemsService} from '@api/content/content-items.service';
 import {MenusService} from '@api/content/menus.service';
-import {NOTIFICATION_PORT} from '@core/errors/notification.port';
+import {NOTIFICATION_PORT} from '@cvhome-saas/ui-kit';
 import {ConsoleApi} from '@layouts/console-shell/services/console.api.service';
 import type {Menu, MenuHandle, MenuItem} from '@models/content';
 import {CONSOLE_STORES_FAKE, FakeConsoleApi} from '@testing/console-api.fake';

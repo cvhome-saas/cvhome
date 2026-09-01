@@ -2,7 +2,7 @@ import {Injectable, inject} from '@angular/core';
 import {Observable, map} from 'rxjs';
 
 import {OrgService, type CreateOrgUser} from '@api/tenancy/org.service';
-import type {PageRequest} from '@core/table/table.types';
+import type {PageRequest} from '@cvhome-saas/ui-kit';
 import {toOrgRow, type OrgRow} from '@models/platform';
 
 /** What the page asks the registry for: a page, a term and a status. */

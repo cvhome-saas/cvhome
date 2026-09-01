@@ -5,7 +5,7 @@ import {TranslocoLocaleService} from '@jsverse/transloco-locale';
 
 import {ConsoleShellFacade} from '@layouts/console-shell/facades/console-shell.facade';
 
-import type {PageT} from '@core/table/table.types';
+import type {PageT} from '@cvhome-saas/ui-kit';
 import {ORDER_STATUSES} from '@models/checkout';
 import type {OrderRow, OrderTab, OrdersSnapshot} from '@models/orders';
 import {StatusLabel} from '@shared/i18n/status-label';

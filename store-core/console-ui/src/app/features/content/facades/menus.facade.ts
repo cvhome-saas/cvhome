@@ -6,7 +6,7 @@ import {forkJoin, map} from 'rxjs';
 import {ContentCache} from '@api/content/content-cache';
 import {ContentItemsService} from '@api/content/content-items.service';
 import {MenusService} from '@api/content/menus.service';
-import {ApiErrorService} from '@core/errors/api-error.service';
+import {ApiErrorService} from '@cvhome-saas/ui-kit';
 import {ConsoleShellFacade} from '@layouts/console-shell/facades/console-shell.facade';
 import type {ContentRow, Menu, MenuHandle, MenuItem, MenuTargetKind} from '@models/content';
 import type {TreeMove} from '@shared/ui/tree/tree';

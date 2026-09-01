@@ -3,7 +3,7 @@ import {TranslocoService} from '@jsverse/transloco';
 import {TranslocoLocaleService} from '@jsverse/transloco-locale';
 
 import type {PodRow} from '@models/platform';
-import {snapshot} from '@shared/state/snapshot';
+import {snapshot} from '@cvhome-saas/ui-kit';
 import {PodsApi} from '../services/pods.api.service';
 
 export const PAGE_SIZE = 20;

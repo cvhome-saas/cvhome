@@ -2,13 +2,12 @@ import {Injectable, computed, inject, signal} from '@angular/core';
 import {TranslocoService} from '@jsverse/transloco';
 import {TranslocoLocaleService} from '@jsverse/transloco-locale';
 
-import {ApiErrorService} from '@core/errors/api-error.service';
+import {ApiErrorService, snapshot} from '@cvhome-saas/ui-kit';
 import type {Invoice, PlanView, SubscriptionStatus} from '@models/billing';
 import {SUBSCRIPTION_STATUS_TONE, type AuditRow} from '@models/platform-billing';
-import type {Tone} from '@models/ui';
+import type {Tone} from '@cvhome-saas/ui-kit';
 import {Money} from '@shared/i18n/money';
 import {PlatformLabel} from '@shared/i18n/platform-label';
-import {snapshot} from '@shared/state/snapshot';
 import type {SelectOption} from '@shared/ui/select/select';
 import {ToastService} from '@shared/ui/toast/toast';
 import {PlatformBillingApi} from '../services/platform-billing.api.service';

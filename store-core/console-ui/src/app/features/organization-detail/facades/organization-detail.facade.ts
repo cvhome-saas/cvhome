@@ -3,7 +3,7 @@ import {TranslocoService} from '@jsverse/transloco';
 import {TranslocoLocaleService} from '@jsverse/transloco-locale';
 
 import type {AdminUserAction} from '@api/uaa/admin-user.service';
-import {ApiErrorService} from '@core/errors/api-error.service';
+import {ApiErrorService, snapshot} from '@cvhome-saas/ui-kit';
 import {
   ORG_STATUS_TONE,
   PROVISIONING_STATE_TONE,
@@ -13,12 +13,11 @@ import {
   type PlatformStoreRow,
   type PlatformUserRow,
 } from '@models/platform';
-import type {Tone} from '@models/ui';
+import type {Tone} from '@cvhome-saas/ui-kit';
 import {INVOICE_STATUS_TONE} from '@models/platform-billing';
 import {Money} from '@shared/i18n/money';
 import {PlatformLabel} from '@shared/i18n/platform-label';
 import {RoleLabel} from '@shared/i18n/role-label';
-import {snapshot} from '@shared/state/snapshot';
 import type {NavSection} from '@shared/ui/section-nav/section-nav';
 import type {RoleChange, RoleOption} from '@shared/ui/roles-dialog/roles-dialog';
 import {ToastService} from '@shared/ui/toast/toast';

@@ -3,11 +3,10 @@ import {TranslocoService} from '@jsverse/transloco';
 import {TranslocoLocaleService} from '@jsverse/transloco-locale';
 
 import type {CreateOrgUser} from '@api/tenancy/org.service';
-import {ApiErrorService} from '@core/errors/api-error.service';
+import {ApiErrorService, snapshot} from '@cvhome-saas/ui-kit';
 import {ORG_STATUSES, ORG_STATUS_TONE, type OrgRow} from '@models/platform';
-import type {Tone} from '@models/ui';
+import type {Tone} from '@cvhome-saas/ui-kit';
 import {PlatformLabel} from '@shared/i18n/platform-label';
-import {snapshot} from '@shared/state/snapshot';
 import type {SelectOption} from '@shared/ui/select/select';
 import {ToastService} from '@shared/ui/toast/toast';
 import {OrganizationsApi} from '../services/organizations.api.service';

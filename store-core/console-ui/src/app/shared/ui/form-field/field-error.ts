@@ -2,8 +2,7 @@ import {Component, inject, input} from '@angular/core';
 import {AbstractControl} from '@angular/forms';
 import {TranslocoService} from '@jsverse/transloco';
 
-import {serverErrorOf} from '@core/errors/form-error.utils';
-import {fieldErrorMessage} from '@core/errors/problem-message';
+import {serverErrorOf, fieldErrorMessage} from '@cvhome-saas/ui-kit';
 import {validationMessage} from '@shared/forms/validation-messages';
 
 /**

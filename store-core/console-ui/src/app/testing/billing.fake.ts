@@ -1,6 +1,6 @@
 import {Observable, of} from 'rxjs';
 
-import {ApiError} from '@core/errors/api-error';
+import {ApiError} from '@cvhome-saas/ui-kit';
 import type {CheckoutSession, Invoice, PlanView, Subscription} from '@models/billing';
 
 /**

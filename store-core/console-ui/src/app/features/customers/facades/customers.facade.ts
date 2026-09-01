@@ -5,10 +5,10 @@ import {TranslocoLocaleService} from '@jsverse/transloco-locale';
 import {ConsoleShellFacade} from '@layouts/console-shell/facades/console-shell.facade';
 import {STATUS_TONE} from '@models/orders';
 import type {CustomerOrderRow, CustomerRow} from '@models/customers';
-import type {Tone} from '@models/ui';
+import type {Tone} from '@cvhome-saas/ui-kit';
 import {Money} from '@shared/i18n/money';
 import {StatusLabel} from '@shared/i18n/status-label';
-import {snapshot} from '@shared/state/snapshot';
+import {snapshot} from '@cvhome-saas/ui-kit';
 import {CustomersApi} from '../services/customers.api.service';
 
 export const PAGE_SIZE = 20;

@@ -4,8 +4,7 @@ import {Observable, of, throwError} from 'rxjs';
 
 import {ManagerStoreService} from '@api/tenancy/manager-store.service';
 import {PodService} from '@api/pod-registry/pod.service';
-import {ApiError} from '@core/errors/api-error';
-import {NOTIFICATION_PORT} from '@core/errors/notification.port';
+import {ApiError, NOTIFICATION_PORT} from '@cvhome-saas/ui-kit';
 import {ConsoleApi} from '@layouts/console-shell/services/console.api.service';
 import {ConsoleShellFacade} from '@layouts/console-shell/facades/console-shell.facade';
 import type {Pod} from '@models/pod';

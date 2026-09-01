@@ -11,7 +11,7 @@ import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 import {TranslocoLocaleService} from '@jsverse/transloco-locale';
 
 import {PoliciesService} from '@api/content/policies.service';
-import {ApiErrorService} from '@core/errors/api-error.service';
+import {ApiErrorService} from '@cvhome-saas/ui-kit';
 import {
   POLICY_TYPES,
   type PersistablePolicy,

@@ -19,7 +19,7 @@ import type {
   StoreStatus,
   SubscriptionStatus,
 } from '@models/tenancy';
-import type {Tone} from '@models/ui';
+import type {Tone} from '@cvhome-saas/ui-kit';
 
 /* ------------------------------------------------------------------ organizations ---- */
 

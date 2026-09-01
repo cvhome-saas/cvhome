@@ -16,7 +16,7 @@ import {OrganizeStep} from './components/organize-step/organize-step';
 import {PricingStep} from './components/pricing-step/pricing-step';
 import {VariantsStep} from './components/variants-step/variants-step';
 import {ProductFormFacade} from './facades/product-form.facade';
-import {positiveIntParam} from '@core/routing/route-params';
+import {positiveIntParam} from '@cvhome-saas/ui-kit';
 
 /**
  * The product wizard: five steps, a readiness checklist and a translations panel.

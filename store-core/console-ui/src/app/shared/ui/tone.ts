@@ -1,9 +1,9 @@
 import type {Theme} from '@core/theme/theme.provider';
-import type {Tone} from '@models/ui';
+import type {Tone} from '@cvhome-saas/ui-kit';
 
 // The union lives in `@models/ui` so a view model may name the tone it wants without importing
 // upward into the UI tier; the resolvers below stay here, because they read the document.
-export type {Tone} from '@models/ui';
+export type {Tone} from '@cvhome-saas/ui-kit';
 
 /** Tone to its slot in the `--chart-*` scale. `slate` is not a hue and has none. */
 const CHART_SLOT: Readonly<Record<Exclude<Tone, 'slate'>, number>> = {

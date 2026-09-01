@@ -10,7 +10,7 @@ import {SelectedStoreService} from '@api/tenancy/selected-store.service';
 import {THEME} from '@core/theme/theme.provider';
 import type {ConsoleNotification, ConsoleStore} from '@models/console';
 import {ConsoleApi} from '../services/console.api.service';
-import {routeData} from '@core/routing/route-data';
+import {routeData} from '@cvhome-saas/ui-kit';
 
 /** Which of the shell's popovers is open. Only one at a time. */
 export type ConsoleMenu = 'notifications' | 'language' | 'theme' | 'profile' | 'store';

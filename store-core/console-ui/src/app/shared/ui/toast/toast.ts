@@ -1,6 +1,6 @@
 import {Injectable, signal} from '@angular/core';
 
-import {NotificationPort} from '@core/errors/notification.port';
+import {NotificationPort} from '@cvhome-saas/ui-kit';
 
 export type ToastTone = 'success' | 'info' | 'warning' | 'danger';
 

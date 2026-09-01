@@ -2,7 +2,7 @@ import {DOCUMENT} from '@angular/common';
 import {Component, OnInit, inject} from '@angular/core';
 import {TranslocoDirective} from '@jsverse/transloco';
 
-import {CONSOLE_CORE_CONFIG} from '@core/config/console-core.config';
+import {UI_KIT_CONFIG} from '@cvhome-saas/ui-kit';
 
 /**
  * The logout bounce.
@@ -27,7 +27,7 @@ import {CONSOLE_CORE_CONFIG} from '@core/config/console-core.config';
 })
 export class ExternalLogoutLink implements OnInit {
   private readonly document = inject(DOCUMENT);
-  private readonly config = inject(CONSOLE_CORE_CONFIG);
+  private readonly config = inject(UI_KIT_CONFIG);
 
   ngOnInit(): void {
     const view = this.document.defaultView;

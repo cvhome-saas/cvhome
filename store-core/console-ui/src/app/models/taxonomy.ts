@@ -1,4 +1,4 @@
-import type {Tone} from '@models/ui';
+import type {Tone} from '@cvhome-saas/ui-kit';
 
 /**
  * The catalogue page's view models — categories, product types, brands and product groups.

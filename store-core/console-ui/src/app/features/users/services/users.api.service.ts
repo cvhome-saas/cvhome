@@ -3,8 +3,8 @@ import {Observable, forkJoin, map} from 'rxjs';
 
 import {OrgMemberService} from '@api/tenancy/org-member.service';
 import {UserAccountService} from '@api/tenancy/user-account.service';
-import {optionalList} from '@core/http/optional';
-import type {PageRequest} from '@core/table/table.types';
+import {optionalList} from '@cvhome-saas/ui-kit';
+import type {PageRequest} from '@cvhome-saas/ui-kit';
 import {INVITATION_TONE, OFFERABLE_ROLES, type InvitationRow, type TeamRow} from '@models/team';
 import type {Invitation, PersistableUser, ReadableUser} from '@models/users';
 

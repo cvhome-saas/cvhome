@@ -2,7 +2,7 @@ import {Component, computed, inject, input, signal} from '@angular/core';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 import {TranslocoLocaleService} from '@jsverse/transloco-locale';
 
-import {copyText} from '@core/platform/clipboard';
+import {copyText} from '@cvhome-saas/ui-kit';
 import type {ReferenceOption} from '@core/reference/reference-data.service';
 import {MEDIA_KINDS, type MediaAsset, type MediaFolder, type MediaKind} from '@models/content';
 import {Badge} from '@shared/ui/badge/badge';

@@ -8,7 +8,7 @@ import type {Tone} from '../tone';
 // The shape lives in `@models/ui`: a page's view model is what builds these, and
 // `models/orders.ts` was importing it from this component file — a wire-shape module depending on
 // a widget's template contract. Re-exported so existing call sites are unaffected.
-export type {KpiDatum} from '@models/ui';
+export type {KpiDatum} from '@cvhome-saas/ui-kit';
 
 /**
  * A single headline metric: label, figure, tone-carrying icon tile, and a footer that is

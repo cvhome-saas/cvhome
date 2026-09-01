@@ -6,7 +6,7 @@
  * `ReadableContentRow`, `ContentSummary`, `Snippet`, …) so a change on either side is a grep away.
  */
 
-import type {PageT} from '@models/page';
+import type {PageT} from '@cvhome-saas/ui-kit';
 
 /** The content types that have a workflow and a console list. */
 export type ContentListType = 'pages' | 'posts' | 'banners' | 'faq' | 'policies';

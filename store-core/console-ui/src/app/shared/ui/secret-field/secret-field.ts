@@ -2,7 +2,7 @@ import {Component, computed, inject, input, signal} from '@angular/core';
 import {TranslocoService} from '@jsverse/transloco';
 
 import {Icon} from '@shared/ui/icon/icon';
-import {copyText} from '@core/platform/clipboard';
+import {copyText} from '@cvhome-saas/ui-kit';
 
 /**
  * A stored credential: masked, revealable, copyable, editable.

@@ -1,4 +1,4 @@
-import type {IconName} from '@models/ui';
+import type {IconName} from '@cvhome-saas/ui-kit';
 
 // Re-exported so the fifty-odd call sites that import `IconName` from here keep working; the union
 // itself is declared in `@models/ui`, where a view model may name an icon without importing upward.
