@@ -221,6 +221,7 @@
 
   <app-builder-media-select
     [open]="mediaFieldOpen() !== null"
+    [currentId]="mediaCurrentId()"
     (picked)="mediaPicked($event)"
     (closed)="mediaFieldOpen.set(null)"
   />

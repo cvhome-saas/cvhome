@@ -161,6 +161,24 @@ export class BuilderInspector {
     this.mediaFieldOpen.set(itemId ? `item:${itemId}:${key}` : key);
   }
 
+  /** The asset id the open media field currently holds, so the picker can mark it. */
+  protected readonly mediaCurrentId = computed<number | null>(() => {
+    const target = this.mediaFieldOpen();
+    const section = this.facade.selected();
+    if (!target || !section) {
+      return null;
+    }
+    let holder: {props: Record<string, unknown>} | undefined = section;
+    let key = target;
+    if (target.startsWith('item:')) {
+      const [, itemId, fieldKey] = target.split(':');
+      holder = section.items?.find((item) => item.id === itemId);
+      key = fieldKey;
+    }
+    const value = holder?.props[key];
+    return typeof value === 'number' ? value : null;
+  });
+
   protected mediaPicked(asset: MediaAsset): void {
     const target = this.mediaFieldOpen();
     this.mediaFieldOpen.set(null);

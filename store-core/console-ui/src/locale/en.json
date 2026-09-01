@@ -3725,7 +3725,10 @@
     "media": {
       "title": "Media library",
       "close": "Close",
-      "empty": "No images in the library yet — upload some in Content → Media."
+      "empty": "No images in the library yet — upload some in Content → Media.",
+      "noMatches": "Nothing matches this search.",
+      "count": "{{count}} images",
+      "manage": "Manage in Content → Media"
     },
     "conflict": {
       "reload": "Reload draft",
