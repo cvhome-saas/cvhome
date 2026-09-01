@@ -133,6 +133,13 @@ Named-Rules components) and the screenshot matrix — all five themes desktop+mo
 desktop, furniture ar mobile — clean, RTL fully mirrored. The `manual` product source and newsletter
 list wiring stay future work. The branch is ready for PR via /go.
 
+Post-review addition — **the section alignment architecture** (user feedback: themes read
+inconsistent): section semantics moved into unit-tested models (`libs/theme/src/sections/models.ts`),
+structure into a composer (`libs/ui/src/sections/compose.tsx`), and each theme now supplies only a
+`SectionChrome` of voice primitives plus bespoke hero/products overrides on the models. The shell
+fallbacks run the same composer with a neutral chrome. All seven designed themes cover all 13 kinds;
+hero autoplay/interval, image alt/caption/link and promo background artwork are honored everywhere.
+
 ## Phase 0 — Worktree setup (per AGENTS.md worktree-per-feature rules)
 
 The current checkout sits on `feat/product-variants` with uncommitted work — none of this feature touches it. All work happens in a fresh worktree cut from up-to-date `main`:
