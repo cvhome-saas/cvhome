@@ -12,12 +12,12 @@
  * theme overrides. The rest are equal specificity, so order decides — append new themes
  * below, never above Forest.
  */
-@import './styles/theme.css';
-@import './styles/theme-forest.css';
-@import './styles/theme-midnight.css';
-@import './styles/theme-daylight.css';
-@import './styles/theme-light.css';
-@import './styles/theme-bridge.css';
+@import '@cvhome-saas/ui-kit/theme/css/theme.css';
+@import '@cvhome-saas/ui-kit/theme/css/theme-forest.css';
+@import '@cvhome-saas/ui-kit/theme/css/theme-midnight.css';
+@import '@cvhome-saas/ui-kit/theme/css/theme-daylight.css';
+@import '@cvhome-saas/ui-kit/theme/css/theme-light.css';
+@import '@cvhome-saas/ui-kit/theme/css/theme-bridge.css';
 
 @custom-variant rtl (&:where([dir='rtl'], [dir='rtl'] *));
 

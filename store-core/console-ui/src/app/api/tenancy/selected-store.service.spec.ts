@@ -1,7 +1,7 @@
 import {TestBed} from '@angular/core/testing';
 import {Observable, Subject, of} from 'rxjs';
 
-import {BrowserStorage} from '@core/platform/browser-storage';
+import {BrowserStorage} from '@cvhome-saas/ui-kit';
 import type {ManagerStore} from '@models/tenancy';
 import {ManagerStoreService} from './manager-store.service';
 import {SelectedStoreService} from './selected-store.service';

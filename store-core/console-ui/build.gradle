@@ -17,3 +17,12 @@ bootBuildImage {
 tasks.named('check') {
   dependsOn('npm_run_lint')
 }
+
+/*
+ * npm resolves `"@cvhome-saas/ui-kit": "file:…/dist/ui-kit"` by reading that directory's
+ * package.json, so the library has to be built before this module installs. Without this a clean
+ * checkout fails at `npmInstall` with an ENOENT naming a path no one recognises.
+ */
+tasks.named('npmInstall') {
+  dependsOn ':store-commons:ui-kit:build'
+}

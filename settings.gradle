@@ -35,6 +35,9 @@ include(
         'store-commons:secret-crypto:secret-crypto-caffeine',
         'store-commons:autoconfigure',
         'store-commons:test-support',
+        // The shared Angular library. An npm module in store-commons because it is shared across
+        // store-core and store-pod, the same reason the Java libraries beside it live here.
+        'store-commons:ui-kit',
 
         'store-pod:spg',
         'store-pod:commons:store-commons',

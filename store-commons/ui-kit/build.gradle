@@ -1,0 +1,33 @@
+/*
+ * The shared Angular library. Not `com.asrevo.ui-conventions`: that plugin applies
+ * `com.asrevo.docker-conventions` and registers a `bootRun`, both of which belong to a UI that is
+ * served. This one is packaged and linked into other builds, never run.
+ *
+ * Every consumer's `npmInstall` depends on this module's `build`, because npm reads the target's
+ * package.json when it resolves a `file:` dependency — so `dist/ui-kit` has to exist before an app
+ * can install. See README.md.
+ */
+plugins {
+    id 'base'
+    alias(libs.plugins.node)
+}
+
+node {
+    version = '23.8.0'
+    npmVersion = '11.6.1'
+    download = true
+}
+
+tasks.named('build') {
+    dependsOn('npm_run_build')
+}
+
+tasks.named('check') {
+    dependsOn('npm_run_lint')
+}
+
+tasks.named('clean') {
+    delete('dist')
+    delete('out-tsc')
+    delete('.angular')
+}

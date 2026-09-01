@@ -191,6 +191,11 @@ services:
     # that says nothing about why. Install once, only when they are missing, so an existing checkout pays
     # nothing. `npm install`, not `npm ci`: no package-lock.json is committed for this app.
     prepare:
+      # The shared Angular library first: console-ui links its build output as a file: dependency, and
+      # npm reads that directory's package.json at install time, so `dist/ui-kit` must already exist.
+      # The build is cheap (~1s) and idempotent, so it runs every time rather than being guarded.
+      - { cwd: store-commons/ui-kit, command: [sh, -c, "[ -d node_modules ] || npm install --no-audit --no-fund"] }
+      - { cwd: store-commons/ui-kit, command: [npm, run, build] }
       - { cwd: store-core/console-ui, command: [sh, -c, "[ -d node_modules ] || npm install --no-audit --no-fund"] }
     command: [npm, run, start, --, --port, "${port.console-ui.http}"]
     ports: { http: 8011 }

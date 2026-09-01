@@ -1,7 +1,7 @@
 import {DOCUMENT} from '@angular/common';
 import {Injectable, inject, signal} from '@angular/core';
 
-import {BrowserStorage} from '@core/platform/browser-storage';
+import {BrowserStorage} from '@cvhome-saas/ui-kit';
 import {THEME} from './theme.provider';
 
 export interface ThemeOption {
