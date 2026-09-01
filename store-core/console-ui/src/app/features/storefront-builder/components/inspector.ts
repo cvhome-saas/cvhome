@@ -139,14 +139,18 @@ export class BuilderInspector {
     if (!target) {
       return;
     }
+    // The resolved URL rides beside the id under a key derived from the field, so a kind with two media
+    // fields cannot have the second pick clobber the first's rendered URL. 'mediaId' keeps the storefront's
+    // established 'mediaUrl' name.
+    const urlKey = (key: string): string => (key === 'mediaId' ? 'mediaUrl' : `${key}Url`);
     if (target.startsWith('item:')) {
       const [, itemId, key] = target.split(':');
       this.facade.updateSelectedItem(itemId, (item) => {
-        item.props = {...item.props, [key]: asset.id, mediaUrl: asset.url};
+        item.props = {...item.props, [key]: asset.id, [urlKey(key)]: asset.url};
       });
     } else {
       this.facade.updateSelected((section) => {
-        section.props = {...section.props, [target]: asset.id, mediaUrl: asset.url};
+        section.props = {...section.props, [target]: asset.id, [urlKey(target)]: asset.url};
       });
     }
   }

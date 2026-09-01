@@ -2,9 +2,9 @@
 import {
   ChangeDetectionStrategy, Component, HostListener, type OnDestroy, type OnInit, computed, inject, signal,
 } from '@angular/core';
-import {DatePipe} from '@angular/common';
 import {RouterLink} from '@angular/router';
-import {TranslocoDirective} from '@jsverse/transloco';
+import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
+import {TranslocoDatePipe} from '@jsverse/transloco-locale';
 
 import type {ConfirmsLeave} from '@core/routing/confirm-leave.guard';
 import {Icon} from '@shared/ui/icon/icon';
@@ -29,18 +29,30 @@ import {BuilderSectionLibrary} from './components/section-library';
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [BuilderFacade],
   imports: [
-    BuilderInspector, BuilderLayerList, BuilderPreviewFrame, BuilderSectionLibrary, DatePipe, Icon, RouterLink,
-    TranslocoDirective,
+    BuilderInspector, BuilderLayerList, BuilderPreviewFrame, BuilderSectionLibrary, Icon, RouterLink,
+    TranslocoDatePipe, TranslocoDirective,
   ],
   templateUrl: './storefront-builder.html',
   styleUrl: './storefront-builder.css',
 })
 export class StorefrontBuilder implements ConfirmsLeave, OnInit, OnDestroy {
   protected readonly facade = inject(BuilderFacade);
+  private readonly transloco = inject(TranslocoService);
 
-  /** Unsaved edits (or a save in flight) ask before the route is left; see `confirmLeave`. */
+  /**
+   * Only edits not yet on the server ask before the route is left — an unpublished draft is fine to walk
+   * away from, the autosave holds it. `dirty` (draft ≠ published) is deliberately not consulted here.
+   */
   canLeave(): boolean {
-    return !this.facade.dirty() && this.facade.saveState() !== 'saving';
+    return !this.facade.unsaved();
+  }
+
+  /** The same protection for closing the tab, where the router guard never runs. */
+  @HostListener('window:beforeunload', ['$event'])
+  protected onBeforeUnload(event: BeforeUnloadEvent): void {
+    if (this.facade.unsaved()) {
+      event.preventDefault();
+    }
   }
 
   protected readonly panel = signal<'layers' | 'library'>('layers');
@@ -79,6 +91,13 @@ export class StorefrontBuilder implements ConfirmsLeave, OnInit, OnDestroy {
     }
   }
 
+  /** Restoring overwrites the current draft — worth one explicit yes. */
+  protected restoreRevision(version: number): void {
+    if (window.confirm(this.transloco.translate('builder.revisions.confirm'))) {
+      this.facade.restoreRevision(version);
+    }
+  }
+
   /** Leaving costs nothing — the draft autosaves — as long as the pending debounce is flushed first. */
   ngOnDestroy(): void {
     void this.facade.saveNow();
@@ -90,6 +109,10 @@ export class StorefrontBuilder implements ConfirmsLeave, OnInit, OnDestroy {
     if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) {
       return; // text fields keep their own undo and Delete
     }
+    if (event.key === 'Escape' && this.revisionsOpen()) {
+      this.revisionsOpen.set(false);
+      return;
+    }
     if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'z') {
       event.preventDefault();
       if (event.shiftKey) {
@@ -100,6 +123,9 @@ export class StorefrontBuilder implements ConfirmsLeave, OnInit, OnDestroy {
       return;
     }
     if (event.key === 'Delete' || event.key === 'Backspace') {
+      if (target?.closest('button')) {
+        return; // focus is on a control (a toggle, a select) — Backspace there must not eat a section
+      }
       const id = this.facade.selectedId();
       if (id) {
         event.preventDefault();

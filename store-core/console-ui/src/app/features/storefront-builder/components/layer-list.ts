@@ -30,6 +30,8 @@ import {BuilderFacade} from '../facades/builder.facade';
             [class.hidden-section]="section.visibility?.hidden"
             (click)="facade.selectedId.set(section.id)"
             (keyup.enter)="facade.selectedId.set(section.id)"
+            (keyup.space)="facade.selectedId.set(section.id)"
+            (keydown.space)="$event.preventDefault()"
             (keyup.alt.arrowup)="facade.moveById(section.id, -1)"
             (keyup.alt.arrowdown)="facade.moveById(section.id, 1)"
             (mouseenter)="facade.hoveredId.set(section.id)"
@@ -45,12 +47,13 @@ import {BuilderFacade} from '../facades/builder.facade';
               <span class="layer-kind">{{ section.variant || t('builder.layers.defaultVariant') }}</span>
             </span>
             @if (facade.warningFor(section.id); as warning) {
-              <span class="warn-dot" [title]="warning" aria-hidden="true"></span>
+              <span class="warn-dot" [title]="warning"><span class="sr-only">{{ warning }}</span></span>
             }
             <button
               type="button"
               class="eye"
               [title]="t(section.visibility?.hidden ? 'builder.layers.show' : 'builder.layers.hide')"
+              [attr.aria-label]="t(section.visibility?.hidden ? 'builder.layers.show' : 'builder.layers.hide')"
               (click)="$event.stopPropagation(); facade.toggleHidden(section.id)"
             >
               <app-icon [name]="section.visibility?.hidden ? 'eyeOff' : 'eye'" [size]="14" />

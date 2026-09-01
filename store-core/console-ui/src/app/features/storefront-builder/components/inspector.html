@@ -57,7 +57,7 @@
               @case ('range') {
                 <app-form-field [label]="label(field.label)">
                   <app-number-field [value]="numOf(field, sec)" (valueChange)="setField(field, $event)"
-                                    compact />
+                                    [min]="field.min ?? null" [max]="field.max ?? null" compact />
                 </app-form-field>
               }
               @case ('select') {

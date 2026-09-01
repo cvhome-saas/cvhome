@@ -3669,7 +3669,8 @@
       "deleteSaved": "Delete saved section",
       "noManifest": "The theme's section catalogue could not be loaded.",
       "noSaved": "Nothing saved yet — configure a section and use “Save as preset”.",
-      "insertingHere": "Inserting at the chosen spot — pick a section"
+      "insertingHere": "Inserting at the chosen spot — pick a section",
+      "cancelInsert": "Cancel inserting here"
     },
     "inspector": {
       "variant": "Layout variant",
@@ -3738,7 +3739,14 @@
     "revisions": {
       "title": "History",
       "restore": "Restore",
-      "empty": "No published versions yet."
+      "empty": "No published versions yet.",
+      "confirm": "Restoring replaces the current draft with this version. Continue?",
+      "close": "Close history"
+    },
+    "toast": {
+      "publishFailed": "Publishing failed — the draft was not published. Try again.",
+      "presetSaveFailed": "Saving the section to your library failed.",
+      "presetDeleteFailed": "Deleting the saved section failed."
     }
   }
 }

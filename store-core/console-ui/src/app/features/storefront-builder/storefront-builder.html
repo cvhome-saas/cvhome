@@ -25,7 +25,7 @@
       <div class="seg" role="group" [attr.aria-label]="t('builder.top.languages')">
         @for (code of facade.locales().codes; track code) {
           <button type="button" class="seg-btn lang" [class.on]="facade.lang() === code"
-                  (click)="facade.lang.set(code)">
+                  (click)="facade.pickLang(code)">
             {{ code }}
           </button>
         }
@@ -75,7 +75,7 @@
     } @else if (facade.saveState() === 'error') {
       <div class="conflict-bar">
         <span>{{ t('builder.top.error') }}</span>
-        <button type="button" class="secondary-action" (click)="facade.saveNow()">{{ t('builder.conflict.retry') }}</button>
+        <button type="button" class="secondary-action" (click)="facade.retry()">{{ t('builder.conflict.retry') }}</button>
       </div>
     }
 
@@ -127,17 +127,19 @@
         <aside class="revisions">
           <header class="revisions-head">
             <strong>{{ t('builder.revisions.title') }}</strong>
-            <button type="button" class="icon-action" [attr.aria-label]="t('builder.media.close')"
-                    (click)="revisionsOpen.set(false)">✕</button>
+            <button type="button" class="icon-action" [attr.aria-label]="t('builder.revisions.close')"
+                    [title]="t('builder.revisions.close')" (click)="revisionsOpen.set(false)">
+              <app-icon name="x" [size]="15" />
+            </button>
           </header>
           <div class="revisions-body">
             @for (row of facade.revisions() ?? []; track row.version) {
               <div class="revision-row">
                 <span class="revision-copy">
                   <strong>{{ 'v' + row.version }}</strong>
-                  <span class="revision-meta">{{ row.publishedBy }} · {{ row.publishedAt | date: 'short' }}</span>
+                  <span class="revision-meta">{{ row.publishedBy }}@if (row.publishedAt; as at) { · {{ at | translocoDate: {dateStyle: 'short', timeStyle: 'short'} }}}</span>
                 </span>
-                <button type="button" class="ghost-action" (click)="facade.restoreRevision(row.version)">
+                <button type="button" class="ghost-action" (click)="restoreRevision(row.version)">
                   {{ t('builder.revisions.restore') }}
                 </button>
               </div>

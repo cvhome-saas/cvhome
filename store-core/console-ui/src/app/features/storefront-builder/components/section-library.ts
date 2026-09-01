@@ -23,8 +23,10 @@ import {BuilderFacade} from '../facades/builder.facade';
         @if (facade.insertTarget() !== undefined) {
           <div class="target-banner">
             <span>{{ t('builder.library.insertingHere') }}</span>
-            <button type="button" class="icon-action" [attr.aria-label]="t('builder.media.close')"
-                    (click)="facade.insertTarget.set(undefined)">✕</button>
+            <button type="button" class="icon-action" [attr.aria-label]="t('builder.library.cancelInsert')"
+                    [title]="t('builder.library.cancelInsert')" (click)="facade.insertTarget.set(undefined)">
+              <app-icon name="x" [size]="14" />
+            </button>
           </div>
         }
         <h3>{{ t('builder.library.presets') }}</h3>
@@ -55,6 +57,7 @@ import {BuilderFacade} from '../facades/builder.facade';
                 type="button"
                 class="tile-delete"
                 [title]="t('builder.library.deleteSaved')"
+                [attr.aria-label]="t('builder.library.deleteSaved')"
                 (click)="facade.deleteSavedSection(saved.id)"
               >
                 <app-icon name="trash" [size]="13" />

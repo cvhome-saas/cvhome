@@ -98,8 +98,8 @@ export class BuilderPreviewFrame {
         return;
       }
       const data = (event.data ?? {}) as {v?: number; type?: string; sectionId?: string; beforeId?: string | null; action?: string};
-      if (data.v !== 2 && data.v !== undefined) {
-        return;
+      if (data.v !== 2) {
+        return; // the handshake is versioned; anything unversioned is not the bridge speaking
       }
       switch (data.type) {
         case 'ready':

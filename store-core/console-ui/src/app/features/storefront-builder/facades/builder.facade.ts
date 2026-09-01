@@ -1,10 +1,12 @@
 /** Console-native; not a port from seller-core. */
-import {Injectable, computed, inject, signal} from '@angular/core';
+import {DestroyRef, Injectable, computed, effect, inject, signal} from '@angular/core';
 import {rxResource} from '@angular/core/rxjs-interop';
+import {TranslocoService} from '@jsverse/transloco';
 import {catchError, map, of} from 'rxjs';
 
 import {LayoutsService} from '@api/content/layouts.service';
 import {MerchantStoreService} from '@api/merchant/store.service';
+import {ToastService} from '@shared/ui/toast/toast';
 import type {
   LayoutDocument,
   LayoutFieldError,
@@ -29,6 +31,9 @@ const MAX_UNDO = 50;
 
 const SAVE_DEBOUNCE_MS = 2_500;
 
+/** The preview token's server TTL is 30 minutes; re-mint with a comfortable margin. */
+const TOKEN_REFRESH_MS = 20 * 60 * 1_000;
+
 const clone = <T>(value: T): T => structuredClone(value);
 
 const newId = (prefix: string): string =>
@@ -45,6 +50,25 @@ export class BuilderFacade {
   private readonly stores = inject(MerchantStoreService);
   private readonly origins = inject(StorefrontOriginService);
   private readonly shell = inject(ConsoleShellFacade);
+  private readonly toast = inject(ToastService);
+  private readonly transloco = inject(TranslocoService);
+
+  constructor() {
+    // The store's languages land after load() has already run (the resource resolves asynchronously), so the
+    // editing language follows them reactively — until the user picks one themselves.
+    effect(() => {
+      const defaultCode = this.locales().defaultCode;
+      if (!this.langTouched() && defaultCode) {
+        this.lang.set(defaultCode);
+      }
+    });
+    inject(DestroyRef).onDestroy(() => {
+      this.cancelPendingSave();
+      if (this.tokenTimer) {
+        clearTimeout(this.tokenTimer);
+      }
+    });
+  }
 
   // ------------------------------------------------------------------------------------------ document
 
@@ -57,13 +81,26 @@ export class BuilderFacade {
   private undoStack: LayoutDocument[] = [];
   private redoStack: LayoutDocument[] = [];
   private saveTimer: ReturnType<typeof setTimeout> | null = null;
+  private tokenTimer: ReturnType<typeof setTimeout> | null = null;
   private saving = false;
+  /** The in-flight save, so a flush during one chains behind it instead of dead-dropping. */
+  private inFlight: Promise<boolean> | null = null;
+  /**
+   * Bumped by every operation that replaces the document wholesale (load, discard, restore). A save that was
+   * already in flight when the document changed under it must not write its stale result back.
+   */
+  private generation = 0;
+  /** True after a failed initial GET — retry must re-load, not re-save nothing. */
+  readonly loadFailed = signal(false);
+  private readonly langTouched = signal(false);
   private readonly undoDepth = signal(0);
   private readonly redoDepth = signal(0);
 
   readonly canUndo = computed(() => this.undoDepth() > 0);
   readonly canRedo = computed(() => this.redoDepth() > 0);
   readonly dirty = computed(() => this.meta()?.dirty ?? false);
+  /** Edits not yet on the server. Distinct from {@link dirty}, which means draft ≠ published. */
+  readonly unsaved = computed(() => this.saveState() === 'pending' || this.saveState() === 'saving');
 
   // ----------------------------------------------------------------------------------------- selection
 
@@ -150,9 +187,12 @@ export class BuilderFacade {
   // -------------------------------------------------------------------------------------------- load
 
   load(): void {
+    this.cancelPendingSave();
+    this.generation += 1;
     this.saveState.set('idle');
     this.layouts.get(PAGE).subscribe({
       next: (layout) => {
+        this.loadFailed.set(false);
         this.baseVersion = layout.meta.draftVersion;
         this.doc.set(layout.draft);
         this.meta.set(layout.meta);
@@ -163,17 +203,39 @@ export class BuilderFacade {
         this.selectedId.set(layout.draft.sections[0]?.id ?? null);
         this.mintPreviewToken();
       },
-      error: () => this.saveState.set('error'),
+      error: () => {
+        this.loadFailed.set(true);
+        this.saveState.set('error');
+      },
     });
-    const defaultCode = this.locales().defaultCode;
-    if (defaultCode) {
-      this.lang.set(defaultCode);
+  }
+
+  /** The error bar's one button: a failed load re-loads, anything else flushes the save. */
+  retry(): void {
+    if (this.loadFailed() || !this.doc()) {
+      this.load();
+    } else {
+      void this.saveNow();
     }
+  }
+
+  /** The user's own language pick wins over the store default from then on. */
+  pickLang(code: string): void {
+    this.langTouched.set(true);
+    this.lang.set(code);
   }
 
   mintPreviewToken(): void {
     this.layouts.previewToken(PAGE).subscribe({
-      next: ({token}) => this.previewToken.set(token),
+      next: ({token}) => {
+        this.previewToken.set(token);
+        // the token lives 30 minutes; a fresh one before that keeps a long editing session's canvas
+        // and preview tab on the draft instead of silently falling back to the published page
+        if (this.tokenTimer) {
+          clearTimeout(this.tokenTimer);
+        }
+        this.tokenTimer = setTimeout(() => this.mintPreviewToken(), TOKEN_REFRESH_MS);
+      },
       error: () => this.previewToken.set(null),
     });
   }
@@ -201,6 +263,9 @@ export class BuilderFacade {
   }
 
   undo(): void {
+    if (this.frozen()) {
+      return; // a conflict stands; mutating (and re-saving) would only 409 again
+    }
     const previous = this.undoStack.pop();
     const current = this.doc();
     if (!previous || !current) {
@@ -214,6 +279,9 @@ export class BuilderFacade {
   }
 
   redo(): void {
+    if (this.frozen()) {
+      return;
+    }
     const next = this.redoStack.pop();
     const current = this.doc();
     if (!next || !current) {
@@ -264,8 +332,9 @@ export class BuilderFacade {
     this.apply((doc) => {
       let at: number;
       if (target !== undefined) {
-        at = target === null ? doc.sections.length
-          : Math.max(0, doc.sections.findIndex((candidate) => candidate.id === target));
+        // a boundary that no longer exists (undone away mid-drag) appends rather than jumping to the top
+        const index = target === null ? -1 : doc.sections.findIndex((candidate) => candidate.id === target);
+        at = index < 0 ? doc.sections.length : index;
       } else {
         const anchor = afterId ? doc.sections.findIndex((candidate) => candidate.id === afterId) + 1 : 0;
         at = anchor > 0 ? anchor : doc.sections.length;
@@ -333,8 +402,8 @@ export class BuilderFacade {
         return;
       }
       const [section] = doc.sections.splice(from, 1);
-      const at = beforeId === null ? doc.sections.length
-        : Math.max(0, doc.sections.findIndex((candidate) => candidate.id === beforeId));
+      const index = beforeId === null ? -1 : doc.sections.findIndex((candidate) => candidate.id === beforeId);
+      const at = index < 0 ? doc.sections.length : index;
       doc.sections.splice(at, 0, section);
     });
   }
@@ -447,34 +516,45 @@ export class BuilderFacade {
 
   // ------------------------------------------------------------------------------------ persistence
 
-  private scheduleSave(): void {
-    this.saveState.set('pending');
+  /** Forgets the scheduled save; every operation that replaces the document calls this first. */
+  private cancelPendingSave(): void {
     if (this.saveTimer) {
       clearTimeout(this.saveTimer);
+      this.saveTimer = null;
     }
+  }
+
+  private scheduleSave(): void {
+    if (this.frozen()) {
+      return; // never let a mutation's 'pending' erase the conflict banner
+    }
+    this.saveState.set('pending');
+    this.cancelPendingSave();
     this.saveTimer = setTimeout(() => this.saveNow(), SAVE_DEBOUNCE_MS);
   }
 
   /** Flushes the debounce; resolves when the draft is on the server (or the save failed). */
   saveNow(): Promise<boolean> {
-    if (this.saveTimer) {
-      clearTimeout(this.saveTimer);
-      this.saveTimer = null;
-    }
+    this.cancelPendingSave();
     const doc = this.doc();
     if (!doc || this.saveState() === 'idle' || this.saveState() === 'saved') {
       return Promise.resolve(true);
     }
-    if (this.saving) {
-      // a save is in flight; the pending state re-queues after it lands
-      return Promise.resolve(false);
+    if (this.saving && this.inFlight) {
+      // chain behind the in-flight save, then flush whatever is still pending
+      return this.inFlight.then(() => this.saveNow());
     }
+    const generation = this.generation;
     this.saving = true;
     this.saveState.set('saving');
-    return new Promise((resolve) => {
+    this.inFlight = new Promise((resolve) => {
       this.layouts.save(PAGE, doc, this.baseVersion).subscribe({
         next: (layout) => {
           this.saving = false;
+          if (generation !== this.generation) {
+            resolve(false); // the document was replaced while this save flew; its result is history
+            return;
+          }
           this.baseVersion = layout.meta.draftVersion;
           this.meta.set(layout.meta);
           this.saveState.set('saved');
@@ -483,16 +563,22 @@ export class BuilderFacade {
         },
         error: (error: {status?: number}) => {
           this.saving = false;
+          if (generation !== this.generation) {
+            resolve(false);
+            return;
+          }
           this.saveState.set(error?.status === 409 ? 'conflict' : 'error');
           resolve(false);
         },
       });
     });
+    return this.inFlight;
   }
 
   async publish(): Promise<boolean> {
     const flushed = await this.saveNow();
     if (!flushed && this.saveState() !== 'saved') {
+      this.toast.danger(this.transloco.translate('builder.toast.publishFailed'));
       return false;
     }
     return new Promise((resolve) => {
@@ -504,6 +590,7 @@ export class BuilderFacade {
         },
         error: (error: {status?: number}) => {
           this.saveState.set(error?.status === 409 ? 'conflict' : 'error');
+          this.toast.danger(this.transloco.translate('builder.toast.publishFailed'));
           resolve(false);
         },
       });
@@ -511,6 +598,8 @@ export class BuilderFacade {
   }
 
   discard(): void {
+    this.cancelPendingSave();
+    this.generation += 1;
     this.layouts.discard(PAGE, this.baseVersion).subscribe({
       next: (layout) => {
         this.baseVersion = layout.meta.draftVersion;
@@ -542,13 +631,20 @@ export class BuilderFacade {
 
   /** Restores a published version into the draft; publishing it again stays an explicit step. */
   restoreRevision(version: number): void {
+    this.cancelPendingSave();
+    this.generation += 1;
     this.layouts.restore(PAGE, version).subscribe({
       next: (layout) => {
         this.baseVersion = layout.meta.draftVersion;
         this.doc.set(layout.draft);
         this.meta.set(layout.meta);
+        this.undoStack = [];
+        this.redoStack = [];
+        this.undoDepth.set(0);
+        this.redoDepth.set(0);
         this.saveState.set('idle');
         this.savedRevision.update((revision) => revision + 1);
+        this.selectedId.set(layout.draft.sections[0]?.id ?? null);
       },
       error: () => this.saveState.set('error'),
     });
@@ -568,12 +664,14 @@ export class BuilderFacade {
     }
     this.layouts.saveSectionPreset(name, section).subscribe({
       next: () => this.savedSectionsResource.reload(),
+      error: () => this.toast.danger(this.transloco.translate('builder.toast.presetSaveFailed')),
     });
   }
 
   deleteSavedSection(id: number): void {
     this.layouts.deleteSectionPreset(id).subscribe({
       next: () => this.savedSectionsResource.reload(),
+      error: () => this.toast.danger(this.transloco.translate('builder.toast.presetDeleteFailed')),
     });
   }
 }
