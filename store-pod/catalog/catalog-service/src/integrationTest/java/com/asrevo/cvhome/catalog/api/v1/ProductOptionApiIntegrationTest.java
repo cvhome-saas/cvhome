@@ -46,6 +46,8 @@ class ProductOptionApiIntegrationTest {
 
     private static final String VALUES = "values";
 
+    private static final String EN = "en";
+
     private static final String BODY = """
             {"code":"%s","sortOrder":0,
              "descriptions":[{"language":"en","name":"Color"},{"language":"fr","name":"Couleur"}],
@@ -100,7 +102,7 @@ class ProductOptionApiIntegrationTest {
         expect(api.send(HttpMethod.PUT, scoped(path(V1_PRIVATE, PRODUCT, OPTION, id), STORE_A), admin, edit),
                 HttpStatus.OK);
 
-        JsonNode edited = json(api.get(scoped(path(V1_PRIVATE, PRODUCT, OPTION, id), STORE_A, "en"), admin));
+        JsonNode edited = json(api.get(scoped(path(V1_PRIVATE, PRODUCT, OPTION, id), STORE_A, EN), admin));
         assertThat(edited.get(VALUES)).hasSize(2);
         assertThat(edited.get(VALUES).get(0).get(ID).asLong()).as("id-addressed value keeps its row")
                 .isEqualTo(redId);
@@ -148,6 +150,62 @@ class ProductOptionApiIntegrationTest {
         expect(refused, HttpStatus.CONFLICT);
 
         expect(api.get(scoped(path(V1_PRIVATE, PRODUCT, OPTION, 1L), STORE_A), admin), HttpStatus.OK);
+    }
+
+    @Test
+    void anEditThatDropsAValueAVariantSellsByIsRefusedTheSameWayADeleteIs() {
+        /*
+         * The other door onto the same rule. An update replaces the whole value set, so a value the merchant
+         * leaves out is orphan-removed — and `fk_pvov_value` carries no `ON DELETE`, so dropping one a variant
+         * still points at used to surface as a raw foreign-key 500 while the neighbouring DELETE answered a
+         * named 409. Store A's seed sells colour (option 1) by both red and blue, so re-sending it with only
+         * red is exactly that case.
+         */
+        String dropBlue = """
+                {"code":"color","sortOrder":0,
+                 "descriptions":[{"language":"en","name":"Color"}],
+                 "values":[{"id":1,"code":"red","sortOrder":0,
+                            "descriptions":[{"language":"en","name":"Red"}]}]}""";
+
+        expect(api.send(HttpMethod.PUT, scoped(path(V1_PRIVATE, PRODUCT, OPTION, 1L), STORE_A), admin,
+                dropBlue), HttpStatus.CONFLICT);
+
+        // and the value is still there to be sold by
+        JsonNode option = json(api.get(scoped(path(V1_PRIVATE, PRODUCT, OPTION, 1L), STORE_A), admin));
+        assertThat(option.get(VALUES).valueStream().map(value -> value.get(CODE).asString()).toList())
+                .contains("blue");
+    }
+
+    @Test
+    void resendingAnOptionsWholeValueSetIsAllowedEvenWhileVariantsSellThem() {
+        /*
+         * The other side of the edit guard: it must refuse only *removals*. Colour (option 1) is sold by the
+         * seeded variants, so if the guard keyed on "is this option in use" rather than "is this value being
+         * dropped", every in-use option would have become read-only.
+         *
+         * Re-sends the set exactly as seeded — five values, same codes, same names — so the case proves the
+         * write is allowed without renaming anything: the vocabulary is shared, and
+         * `ProductVariantApiIntegrationTest` asserts on "Red" by name.
+         */
+        JsonNode before = json(api.get(scoped(path(V1_PRIVATE, PRODUCT, OPTION, 1L), STORE_A, EN), admin));
+        assertThat(before.get(VALUES)).hasSize(5);
+
+        StringBuilder values = new StringBuilder();
+        for (JsonNode value : before.get(VALUES)) {
+            values.append(values.isEmpty() ? "" : ",")
+                    .append("{\"id\":%d,\"code\":\"%s\",\"sortOrder\":%d,\"descriptions\":[{\"language\":\"en\",\"name\":\"%s\"}]}"
+                            .formatted(value.get(ID).asLong(), value.get(CODE).asString(),
+                                    value.get("sortOrder").asInt(), value.get(NAME).asString()));
+        }
+        String resend = "{\"code\":\"color\",\"sortOrder\":0,\"descriptions\":[{\"language\":\"en\",\"name\":\"%s\"}],\"values\":[%s]}"
+                .formatted(before.get(NAME).asString(), values);
+
+        expect(api.send(HttpMethod.PUT, scoped(path(V1_PRIVATE, PRODUCT, OPTION, 1L), STORE_A), admin, resend),
+                HttpStatus.OK);
+
+        JsonNode after = json(api.get(scoped(path(V1_PRIVATE, PRODUCT, OPTION, 1L), STORE_A, EN), admin));
+        assertThat(after.get(VALUES)).hasSize(5);
+        assertThat(after.get(VALUES).get(0).get(NAME).asString()).isEqualTo("Red");
     }
 
     @Test

@@ -257,6 +257,21 @@ rather than split in half. Inventory's own gate cases are **INV-04** (cross-tena
 
 ---
 
+## VAR — inventory under the variant model
+
+Added by the variant rework (PR #306): inventory is keyed by the **variant's** sku now, one row per
+combination. The model itself is
+[catalog](../../../catalog/catalog-service/qa/catalog-qa.md#var--the-uniform-variant-model).
+
+### SCH-03 — Inventory reached its final shape too · [verified]
+
+- **Expect** — `product_availability` has no `product_variant` / `region` / `region_variant` columns,
+  `sku` is `NOT NULL`, and `uk_prd_avail_store_sku (store_merchant_id, sku)` exists.
+- **Result** — confirmed. `checkout.order_product_option` exists; `order_product_attribute` and
+  `shopping_cart_attr_item` are gone.
+
+---
+
 ## 99 — Known gaps
 
 **Inventory has no billing write gate.** `StoreBillingWriteGate` is catalog's; a store with a lapsed
@@ -278,3 +293,5 @@ drops.
 
 Raise anything unexpected against the catalog/inventory PR. Include the store id, the sku, the time, and the
 matching `Unhandled failure [traceId=…]` block from `.lcl/<stack>/logs/inventory.log`.
+
+---

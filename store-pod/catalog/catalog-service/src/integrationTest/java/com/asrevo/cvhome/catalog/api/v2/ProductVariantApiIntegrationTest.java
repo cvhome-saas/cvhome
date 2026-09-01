@@ -60,6 +60,10 @@ class ProductVariantApiIntegrationTest {
 
     private static final String DEFAULT_VARIANT = "defaultVariant";
 
+    /** The product's own sku, so exercising the null path leaves the seeded product exactly as it was. */
+    private static final String NULL_OPTION_VALUE_IDS = """
+            {"options":[],"variants":[{"sku":"%s","optionValueIds":null}]}""".formatted(ORIGINAL_SKU);
+
     private static final String MOVE_DEFAULT = """
             {"options":["color","size"],
              "variants":[
@@ -190,10 +194,21 @@ class ProductVariantApiIntegrationTest {
         expect(replace(STORE_A, admin, PRODUCT, """
                 {"options":["color"],"variants":[{"sku":"SKU-NK-RUN-001","optionValueIds":[1]}]}"""),
                 HttpStatus.CONFLICT);
+        // the same axis declared twice — a matrix cannot vary by one option along two dimensions
+        expect(replace(STORE_A, admin, PRODUCT, """
+                {"options":["color","color"],"variants":[{"sku":"TWICE","optionValueIds":[1]}]}"""),
+                HttpStatus.BAD_REQUEST);
+
         // an unknown option code
         expect(replace(STORE_A, admin, PRODUCT, """
                 {"options":["material"],"variants":[{"sku":"MAT","optionValueIds":[1]}]}"""),
                 HttpStatus.NOT_FOUND);
+        /*
+         * An explicit null where the field defaults to an empty list. Jackson overwrites the default, and the
+         * no-axes branch read it without a null check — a client sending the field as null got a 500 rather
+         * than being told what was wrong with the request.
+         */
+        expect(replace(STORE_A, admin, PRODUCT, NULL_OPTION_VALUE_IDS), HttpStatus.OK);
         // the seeded product is untouched by all of it
         assertThat(list(PRODUCT)).hasSize(1);
     }

@@ -207,6 +207,18 @@ dashboard.
 
 ---
 
+## VAR — variant lines through checkout
+
+Added by the variant rework (PR #306). The model is
+[catalog](../../../catalog/catalog-service/qa/catalog-qa.md#var--the-uniform-variant-model).
+
+### PERF-03 — Cart and listing service-to-service calls · [tests]
+
+- `ProductDetailsComposer` is batch-only: one catalog call and one inventory call per cart or order, whatever
+  the line count. Covered by `ProductDetailsComposerImplTest`; not re-measured on the running stack here.
+
+---
+
 ## 99 — Known gaps
 
 **Checkout has no `http/` directory.** Ten API classes and not one runnable block. That is the cheapest way to
@@ -230,3 +242,5 @@ services that gap affects, so SEC-03 may pass at the query layer and fail at the
 
 Raise anything unexpected against the checkout PR. Include the store id, the order id or cart ref, the time,
 and the matching `Unhandled failure [traceId=…]` block from `.lcl/<stack>/logs/checkout.log`.
+
+---
