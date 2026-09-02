@@ -12,7 +12,7 @@ text direction, behind the pod's edge.
 - **Runs on** — `lcl start -d --stack <name>` (`npm run dev` alone is not enough — it needs the backend).
   Always reach it through the edge at `http://<store>.spg-507f1f77.gateway.com`; read the live port from
   `lcl urls`
-- **Cases** — 27 (9 verified, 1 unit only, 17 not verified)
+- **Cases** — 27 (14 verified, 1 unit only, 12 not verified)
 - **Also see** — [spg](../../spg/qa/spg-qa.md) (the edge in front of it), content, catalog, inventory,
   [checkout](../../checkout/checkout-service/qa/checkout-qa.md),
   [cua](../../cua/qa/cua-qa.md) (shopper login)
@@ -382,7 +382,7 @@ cua renders no pages any more. `/{locale}/login` starts the OAuth2 flow; cua sen
 `/cua/login`. `/{locale}/register` calls cua's JSON endpoint and then starts the same flow. The server half is
 [cua-qa.md](../../cua/qa/cua-qa.md) LGN-01/06/07/08.
 
-### AUTH-01 — The login page is the theme's · critical · [not verified]
+### AUTH-01 — The login page is the theme's · critical · [verified]
 
 - **Steps** — on `http://org1-store1.spg-507f1f77.gateway.com/en?theme=starter` click the account icon, then
   repeat with `?theme=basic` (a theme without `pages.Login`).
@@ -390,19 +390,19 @@ cua renders no pages any more. `/{locale}/login` starts the OAuth2 flow; cua sen
   renders the shell's `default-login-page.tsx`, still in that theme's fonts, colours and radius. Both post to
   `/cua/login` with `client_id` and `lang` hidden inputs. No `/css/login.css` request anywhere (the bridge is gone).
 
-### AUTH-02 — The whole flow, and the deep link · critical · [not verified]
+### AUTH-02 — The whole flow, and the deep link · critical · [verified]
 
 - **Steps** — open `/en/customer` signed out.
 - **Expect** — `Redirecting…`, then the themed login page, then after `user` / `revo` the callback and finally
   `/en/customer` rendered signed in (`postLoginRedirect` survived the hand-off).
 
-### AUTH-03 — A wrong password shows the translated message · high · [not verified]
+### AUTH-03 — A wrong password shows the translated message · high · [verified]
 
 - **Steps** — submit `user` / `wrong`, then correct it. Repeat under `/ar/…`.
 - **Expect** — the page reloads as `/en/login?auth=1&error=invalid` with `PAGE.LOGIN.ERROR_INVALID` in the
   banner (Arabic under `/ar/`, right-to-left, form still aligned to the start edge); the second submit succeeds.
 
-### AUTH-04 — Registration, then straight into the store · critical · [not verified]
+### AUTH-04 — Registration, then straight into the store · critical · [verified] (from a signed-out browser — see 99)
 
 - **Steps** — `/en/register`: submit an empty form, then the seeded `user@mail.com`, then a fresh account.
 - **Expect** — the first shows the server's field errors under the fields (`FIELD_ERRORS.*`); the second puts
@@ -417,7 +417,7 @@ cua renders no pages any more. `/{locale}/login` starts the OAuth2 flow; cua sen
   session's); clicking one in the fresh browser is answered by cua with a redirect to the storefront login
   without the marker, because there is no saved request to resume. Never a 500.
 
-### AUTH-06 — All five locales, both pages · high · [not verified]
+### AUTH-06 — All five locales, both pages · high · [verified] (en, ar) / [not verified] (es, fr, ru)
 
 - **Steps** — open `/{en,ar,es,fr,ru}/login?auth=1` and `/{…}/register`.
 - **Expect** — every label, button and message translated; nothing falls back to a key or to English.
@@ -431,6 +431,11 @@ cua renders no pages any more. `/{locale}/login` starts the OAuth2 flow; cua sen
 
 ## 99 — Known gaps
 
+- **Registering while cua still holds a signed-in session keeps the old identity.** `useRegisterForm` calls
+  `login()` after the 201, and cua answers `prompt=login` from an authenticated session with a code for the
+  existing shopper rather than a fresh prompt — so a shopper signed in as A who creates account B stays A.
+  Pre-existing cua behaviour, now visible because registration is a storefront page. Sign out first, or see
+  [cua-qa.md](../../cua/qa/cua-qa.md) 99.
 - **`libs/types`, `libs/services` and `libs/hooks` are linted by nothing.** `npm run lint` covers
   `storefront libs/ui libs/i18n libs/theme themes`, so the three tsc-built libs — including
   `use-product-purchase.ts`, which carried two of the variant rework's blockers — are checked only by `tsc`.

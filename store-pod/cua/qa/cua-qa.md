@@ -11,7 +11,7 @@ ports rather than about tokens.
   login configuration (`SocialLoginConfigApi`), and the `/cua` path-prefix handling the edge depends on
 - **Runs on** — `lcl start -d --stack <name>`; reached only through the pod edge at
   `http://<store>.spg-507f1f77.gateway.com/cua/**`, never on `:8124` directly
-- **Cases** — 20 (0 verified, 6 unit only, 14 not verified)
+- **Cases** — 20 (5 verified, 4 unit only, 11 not verified)
 - **Also see** — [spg](../../spg/qa/spg-qa.md) (which keeps the `/cua` prefix and sets `X-Forwarded-Port` for
   exactly this service), [merchant](../../merchant/merchant-service/qa/merchant-qa.md) (the store record cua
   caches), [landing-ui](../../landing-ui/qa/landing-ui-qa.md) (the storefront that starts the login),
@@ -56,7 +56,7 @@ Logs: `.lcl/<stack>/logs/cua.log`.
 
 ## LGN — Shopper sign-in
 
-### LGN-01 — A shopper signs in through the store host · critical · [not verified]
+### LGN-01 — A shopper signs in through the store host · critical · [verified]
 
 - **Steps** — from `http://org1-store1.spg-507f1f77.gateway.com`, click the account icon. Watch the network
   tab: `GET /cua/oauth2/authorize?…&lang=en` → `302 /en/login?auth=1` (the storefront's page, themed), fill in
@@ -77,14 +77,14 @@ Logs: `.lcl/<stack>/logs/cua.log`.
 - **Expect** — not signed in. Two stores on one pod share the service and must not share shoppers; this is the
   single most important case in this file.
 
-### LGN-04 — Registration creates a shopper for **this** store only · critical · [unit only]
+### LGN-04 — Registration creates a shopper for **this** store only · critical · [verified]
 
 - **Steps** — register a new shopper on org1-store1 (`/en/register` in the browser, or the first block of
   `http/public-registration-controller.http`), then sign in with it on org1-store2.
 - **Expect** — it works on the first and not the second (`…/login?auth=1&error=invalid`), and the row carries
   the store it was created for. Covered by `LoginHandoffIntegrationTest.aShopperOfOneStoreIsNobodyOnAnother`.
 
-### LGN-05 — A duplicate registration is refused cleanly · high · [unit only]
+### LGN-05 — A duplicate registration is refused cleanly · high · [verified]
 
 - **Steps** — the 409 blocks of `http/public-registration-controller.http`: the seeded username, the seeded
   email, then the same username on `STORE_ID_2`.
@@ -99,14 +99,14 @@ Logs: `.lcl/<stack>/logs/cua.log`.
 - **Expect** — `http://org1-store1.spg-507f1f77.gateway.com:<spg-port>/en/login?auth=1` — the store's host
   **with** the port, the shopper's locale as the path prefix, never `/cua/login`. Same origin rule as CLI-02.
 
-### LGN-07 — A wrong password comes back to the form, and the form still works · high · [unit only]
+### LGN-07 — A wrong password comes back to the form, and the form still works · high · [verified]
 
 - **Steps** — on the storefront's login page submit `user` / `wrong`, then `user` / `revo`.
 - **Expect** — `302 /en/login?auth=1&error=invalid`, the page shows the translated message under the theme's
   styling, and the second submit completes the flow: the saved authorize request survived the failure.
   Covered by `LoginHandoffIntegrationTest`.
 
-### LGN-08 — Social buttons only appear while cua is waiting · high · [not verified]
+### LGN-08 — Social buttons only appear while cua is waiting · high · [verified] (rendering) / [not verified] (provider round-trip)
 
 - **Steps** — open `/en/login?auth=1` after starting a login (buttons present for the store's enabled
   providers), then open `/en/login` directly (no buttons: the page starts the flow instead).
@@ -155,7 +155,7 @@ Logs: `.lcl/<stack>/logs/cua.log`.
 - **Steps** — send an authorization request with a `Host` no store owns.
 - **Expect** — refused. It must **not** fall back to another store's client, and it must not 500.
 
-### CLI-05 — The session cookie is what carries the saved request across the hand-off · high · [unit only]
+### CLI-05 — The session cookie is what carries the saved request across the hand-off · high · [verified]
 
 - **Steps** — start a login and read the `Set-Cookie` on the `302` from `/cua/oauth2/authorize`, then the one on
   the `302` from `POST /cua/login`.
@@ -217,6 +217,12 @@ by `LoginHandoffIntegrationTest` rather than a request file.
 
 **cua's only prior coverage in the whole `qa/` tree was one case** (SID-01), reached incidentally by a
 store-id refactor. Nothing has ever exercised registration, social login or the dynamic client on purpose.
+
+**`prompt=login` does not re-prompt an already-authenticated cua session.** The storefront sends it on every
+`login()`, but a shopper whose cua session is still signed in as A who registers account B is handed straight
+to the callback as A — the new account exists but is not the one signed in (seen during QA; the same was true
+of the Thymeleaf pages). Signing out first (`/cua/connect/logout`) makes registration sign in as the new
+shopper. Either drop `prompt=login` from the storefront or have the register page sign out first.
 
 **CSRF is disabled in cua**, as it always was: the storefront's form posts to `/cua/login` without a token.
 The exposure is login-CSRF only (an attacker signing a victim into the attacker's shopper account); enabling it
