@@ -4,6 +4,7 @@ import {RouterLink} from '@angular/router';
 import {TranslocoDirective} from '@jsverse/transloco';
 
 import {
+  Badge,
   BusyOverlay,
   Checkbox,
   ConfirmDialog,
@@ -13,11 +14,12 @@ import {
   Icon,
   LoadError,
   NoticeBar,
+  OneTimeLinkDialog,
   PageHeader,
   Panel,
   Select,
-  SetPasswordDialog,
   TextField,
+  TextareaField,
   Toggle,
   type SelectOption,
 } from '@cvhome-saas/ui-kit/ui';
@@ -46,7 +48,9 @@ import {ClientFormFacade} from './facades/client-form.facade';
     DurationField,
     Icon,
     ConfirmDialog,
-    SetPasswordDialog,
+    OneTimeLinkDialog,
+    Badge,
+    TextareaField,
     UriList,
     PairList,
   ],
@@ -72,6 +76,10 @@ export class ClientForm {
    */
   protected optional(values: readonly string[], blankLabel: string): readonly SelectOption[] {
     return [{value: '', label: blankLabel}, ...values.map((value) => ({value, label: value}))];
+  }
+
+  protected when(value: string | null | undefined): string {
+    return value ? new Date(value).toLocaleString() : '—';
   }
 
   protected units(t: (key: string) => string): readonly SelectOption[] {

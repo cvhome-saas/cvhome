@@ -59,6 +59,12 @@ com:
           invitation-validity: P7D
           reset-validity: PT1H
           log-links: false
+        # Registered clients: the hosts a redirect URI may use over plain http. Everything else must be https.
+        # An entry starting with a dot matches every subdomain. Local slices add the stack's own hosts.
+        clients:
+          plain-http-hosts:
+            - localhost
+            - 127.0.0.1
       oauth2:
         clients:
           admin-sdk:

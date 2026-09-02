@@ -343,19 +343,24 @@
       "title": "Registered clients"
     },
     "column": {
-      "clientId": "Client id",
-      "clientName": "Name"
+      "client": "Client",
+      "type": "Type",
+      "grants": "Grant types",
+      "secret": "Secret expires",
+      "status": "Status"
     },
     "notice": {
-      "secret": "uaa never returns a client secret. The only moment you can read one is the moment you set it — copy it before you close the dialog."
+      "secret": "uaa shows a client secret exactly twice — when the client is registered and when its secret is rotated — and never again. Copy it before you close the dialog."
     },
     "empty": {
       "title": "No clients",
-      "message": "No applications are registered against uaa yet."
+      "message": "No applications are registered against uaa yet.",
+      "noMatch": "No matching clients",
+      "noMatchMessage": "Nothing matches that search and filter. Clear one or both."
     },
     "action": {
       "register": "Register client",
-      "rotate": "New secret",
+      "rotate": "Rotate secret",
       "delete": "Delete"
     },
     "form": {
@@ -372,16 +377,9 @@
       "refreshTtl": "Refresh token"
     },
     "rotate": {
-      "title": "Set a new secret",
-      "message": "Choose a new secret for {{clientId}}. The old one stops working immediately.",
-      "secret": "New secret",
-      "repeatSecret": "Repeat secret",
-      "hint": "At least twenty characters. Treat it like a password.",
-      "handoverHint": "uaa will not show this again — copy it into the application's configuration now.",
-      "weak": "That secret is too easy to guess.",
-      "mismatch": "The two secrets do not match.",
-      "confirm": "Set secret",
-      "busy": "Setting…"
+      "title": "Rotate this secret",
+      "message": "uaa will generate a new secret for {{clientId}} and show it once. The current secret keeps working for the realm’s grace window, so the application can be reconfigured without an outage.",
+      "confirm": "Rotate secret"
     },
     "delete": {
       "title": "Delete this client",
@@ -391,8 +389,59 @@
     "toast": {
       "created": "{{clientId}} was registered.",
       "updated": "{{clientId}} was saved.",
-      "secretRotated": "A new secret was set for {{clientId}}.",
-      "deleted": "{{clientId}} was deleted."
+      "secretRotated": "A new secret was issued for {{clientId}}.",
+      "deleted": "{{clientId}} was deleted.",
+      "enabled": "{{clientId}} can obtain tokens again.",
+      "disabled": "{{clientId}} is disabled and its tokens were revoked.",
+      "previousRevoked": "The previous secret of {{clientId}} no longer works."
+    },
+    "tiles": {
+      "label": "Client totals",
+      "total": "Registered clients",
+      "enabledOf": "{{count}} enabled",
+      "expiring": "Secrets expiring · 30d",
+      "expiringHint": "rotate before expiry",
+      "machine": "Machine clients",
+      "machineHint": "client_credentials only",
+      "publicClients": "Public clients",
+      "publicHint": "PKCE, no secret"
+    },
+    "filter": {
+      "label": "Filter clients",
+      "search": "Search by client id or name",
+      "clear": "Clear the search",
+      "ALL": "All",
+      "ENABLED": "Enabled",
+      "DISABLED": "Disabled",
+      "MACHINE": "Machine",
+      "CONFIDENTIAL": "Confidential",
+      "PUBLIC": "Public"
+    },
+    "type": {
+      "PUBLIC": "Public",
+      "MACHINE": "Machine",
+      "CONFIDENTIAL": "Confidential"
+    },
+    "status": {
+      "enabled": "Enabled",
+      "disabled": "Disabled"
+    },
+    "secret": {
+      "none": "none (PKCE)",
+      "never": "never"
+    },
+    "revokePrevious": {
+      "title": "End the grace window",
+      "message": "The previous secret of {{clientId}} stops working immediately. Only do this once the application uses the new one.",
+      "confirm": "Revoke previous secret"
+    },
+    "issued": {
+      "title": "Client secret for {{clientId}}",
+      "message": "Put this in the application’s configuration now. It expires {{expires}}.",
+      "messageWithGrace": "Put this in the application’s configuration now. It expires {{expires}}; the secret it replaces keeps working until {{previous}}.",
+      "linkLabel": "client secret",
+      "warning": "This is the only time the secret is shown. Only its hash is stored; the next time you need it, rotate.",
+      "done": "Done"
     }
   },
   "brandSub": "Single sign-on",
@@ -441,7 +490,9 @@
       "tokenSettings": "Token settings",
       "readiness": "Before you save",
       "summary": "Summary",
-      "danger": "Secret and removal"
+      "danger": "Secret and removal",
+      "status": "Status",
+      "secret": "Client secret"
     },
     "check": {
       "clientId": "Client id set, and in the accepted shape",
@@ -468,6 +519,26 @@
       "rowLabel": "{{label}} {{position}}",
       "invalid": "Enter an absolute URI, including its scheme.",
       "insecure": "Plain HTTP to a remote host — anything on the network path can read the code delivered here."
+    },
+    "description": "Description",
+    "descriptionHint": "What this application is, for the next operator.",
+    "status": {
+      "type": "Type",
+      "registered": "Registered",
+      "lastToken": "Last token",
+      "noToken": "never",
+      "disabledSince": "Disabled since",
+      "enabledLabel": "Client enabled",
+      "enabledHint": "Disabling revokes every token it holds and refuses new ones."
+    },
+    "secret": {
+      "expires": "Expires {{when}}.",
+      "neverExpires": "Never expires.",
+      "never": "never",
+      "previousUntil": "The previous secret still works until {{when}}.",
+      "revokePrevious": "Revoke it now",
+      "rotateHint": "The secret cannot be read back. Rotating issues a new one and shows it once.",
+      "publicNote": "A public client holds no secret: it authenticates with PKCE alone."
     }
   },
   "pairs": {
@@ -490,7 +561,8 @@
       "authentication": "Authentication",
       "sessions": "Sessions & tokens",
       "keys": "Signing keys",
-      "email": "Email"
+      "email": "Email",
+      "danger": "Danger zone"
     },
     "email": {
       "notBuilt": "Not built: the platform has no mail sender. Links are handed to an event a delivery service will subscribe to."
@@ -582,6 +654,18 @@
     "neverUpdated": "Never changed from the defaults.",
     "toast": {
       "saved": "Settings were saved."
+    },
+    "danger": {
+      "subtitle": "Actions for an incident, each with a cost the page states",
+      "rotateAll": "Rotate every client secret",
+      "rotateAllHint": "Every machine and confidential client gets a new secret. The old ones keep working for {{hours}} hours; every service must be reconfigured before then.",
+      "rotateAllAction": "Rotate all secrets",
+      "confirmTitle": "Rotate every client secret?",
+      "confirmMessage": "This is incident response. The new secrets are shown once, on the next screen, and every integration on the platform must be updated within the grace window.",
+      "confirmLabel": "Type ROTATE to confirm",
+      "rotatedTitle": "{{count}} new secret(s)",
+      "rotatedMessage": "Copy each into its application’s configuration. Closing this is the last time any of them is readable.",
+      "rotatedAll": "{{count}} client secret(s) rotated."
     }
   },
   "account": {

@@ -151,6 +151,9 @@ MFA" rather than "we cannot tell".
   detail endpoint, so a five-column table would be N+1 fetches to paint a list.
 - **Decision:** two columns; the rest appear in the detail pane, which fetches one client.
 - **Expected contract:** widen `ClientSummary`, or `GET /clients?expand=true`.
+- **Closed by feat/uaa-sso (phase 5):** `ClientSummary` carries the derived type, `enabled`, the grant
+  types, the secret's expiry and the last token, and the list takes `q`, `enabled` and `type`. The
+  table draws all five columns; the enable switch is a row action.
 
 ## Clients — no token metrics
 
@@ -161,6 +164,10 @@ MFA" rather than "we cannot tell".
   which the list already states.
 - **Expected contract:** counters on the authorization server, and `clientSecretExpiresAt` on the
   registration.
+- **Partly closed by feat/uaa-sso (phase 5):** `clientSecretExpiresAt` is set on every registration and
+  rotation, so the *Secrets expiring · 30d* tile is live from `GET /clients/stats`. The 24h token and
+  failure counters wait for phase 8's audit hooks; `lastTokenIssuedAt` exists on the row and is null
+  until then.
 
 ## Sign-in — one step, password only
 

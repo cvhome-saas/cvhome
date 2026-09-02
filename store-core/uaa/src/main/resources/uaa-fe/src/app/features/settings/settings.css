@@ -77,3 +77,37 @@
     overflow-x: auto;
   }
 }
+
+/* --- the danger zone ---------------------------------------------------------------------------------- */
+.danger-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-group);
+}
+
+.danger-title {
+  margin: 0;
+  color: var(--foreground-strong);
+  font-size: var(--text-xs);
+  font-weight: 600;
+}
+
+.danger-hint {
+  margin: 0;
+  color: var(--muted-foreground);
+  font-size: var(--text-3xs);
+}
+
+.secrets {
+  display: grid;
+  gap: var(--spacing-tight);
+}
+
+.secret-owner {
+  margin: 0 0 var(--spacing-tight);
+  color: var(--foreground-subtle);
+  font-family: var(--font-mono);
+  font-size: var(--text-4xs);
+}

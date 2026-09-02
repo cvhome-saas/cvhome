@@ -1,5 +1,9 @@
 package com.asrevo.cvhome.uaa.service;
 
+import java.time.Clock;
+import java.time.Instant;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.junit.jupiter.api.Test;
@@ -12,20 +16,53 @@ import org.springframework.security.oauth2.server.authorization.client.Registere
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 
 import com.asrevo.cvhome.uaa.audit.AuditService;
+import com.asrevo.cvhome.uaa.client.ClientType;
+import com.asrevo.cvhome.uaa.client.ClientsProperties;
+import com.asrevo.cvhome.uaa.client.RedirectUriRules;
+import com.asrevo.cvhome.uaa.domain.ClientSecretHistory;
 import com.asrevo.cvhome.uaa.dto.ClientDetails;
+import com.asrevo.cvhome.uaa.dto.ClientDetailsTokens;
+import com.asrevo.cvhome.uaa.dto.CreatedClient;
+import com.asrevo.cvhome.uaa.dto.RotatedSecret;
+import com.asrevo.cvhome.uaa.errors.ClientIdTakenException;
+import com.asrevo.cvhome.uaa.errors.ClientNotConfidentialException;
 import com.asrevo.cvhome.uaa.errors.ClientNotFoundException;
+import com.asrevo.cvhome.uaa.errors.ClientTokenTtlExceedsPolicyException;
+import com.asrevo.cvhome.uaa.errors.InvalidRedirectUriException;
+import com.asrevo.cvhome.uaa.repo.ClientExtensionRepository;
+import com.asrevo.cvhome.uaa.repo.ClientSecretHistoryRepository;
+import com.asrevo.cvhome.uaa.settings.RealmSettings;
+import com.asrevo.cvhome.uaa.settings.SettingsService;
+import com.asrevo.cvhome.uaa.token.TokenRevocationService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * The path decides which client an update writes; the body's own id is ignored.
+ * The path decides which client an update writes; the body's own id is ignored. A secret is answered once, and a
+ * rotation keeps the old hash alive for the realm's grace window.
  */
 class AdminClientServiceTest {
+
+    private static final Instant NOW = Instant.parse("2026-09-02T12:00:00Z");
+
+    private static final int GRACE_HOURS = 24;
+
+    private static final int VALIDITY_DAYS = 365;
+
+    private static final String CLIENT_A = "client-a";
+
+    private static final String B = "B";
+
+    private static final String NEW = "New";
+
+    private static final String CALLBACK = "https://app.example/cb";
 
     private static final String A = "A";
 
@@ -45,8 +82,25 @@ class AdminClientServiceTest {
 
     private final PasswordEncoder encoder = mock(PasswordEncoder.class);
 
+    private final ClientExtensionRepository extensions = mock(ClientExtensionRepository.class);
+
+    private final ClientSecretHistoryRepository history = mock(ClientSecretHistoryRepository.class);
+
+    private final SettingsService settings = mock(SettingsService.class);
+
+    private final RealmSettings realm = mock(RealmSettings.class);
+
     private final AdminClientService service = new AdminClientService(clients, encoder, mock(JdbcTemplate.class),
-            mock(AuditService.class));
+            mock(AuditService.class), extensions, history, settings,
+            new RedirectUriRules(new ClientsProperties(List.of("localhost"))), mock(TokenRevocationService.class),
+            Clock.fixed(NOW, java.time.ZoneOffset.UTC));
+
+    {
+        when(settings.current()).thenReturn(realm);
+        when(realm.tokens()).thenReturn(new RealmSettings.Tokens(3600, 900, 43200, VALIDITY_DAYS, GRACE_HOURS));
+        when(extensions.findById(anyString())).thenReturn(Optional.empty());
+        when(history.findByRegisteredClientIdAndRevokedAtIsNull(anyString())).thenReturn(List.of());
+    }
 
     private static RegisteredClient existing(String id) {
         return RegisteredClient.withId(id).clientId(String.format("client-%s", id)).clientName(id)
@@ -58,15 +112,21 @@ class AdminClientServiceTest {
     }
 
     private static ClientDetails details(String id, String name) {
-        return new ClientDetails(id, "client-a", name, Set.of(ClientAuthMethod.CLIENT_SECRET_BASIC),
-                Set.of(OAuthGrantType.CLIENT_CREDENTIALS), Set.of(), Set.of(), Set.of(SCOPE), null, null);
+        return new ClientDetails(id, CLIENT_A, name, Set.of(ClientAuthMethod.CLIENT_SECRET_BASIC),
+                Set.of(OAuthGrantType.CLIENT_CREDENTIALS), Set.of(), Set.of(), Set.of(SCOPE), null, null, null);
+    }
+
+    private static ClientDetails withRedirect(String uri) {
+        return new ClientDetails(A, "client-b", B, Set.of(ClientAuthMethod.NONE), Set.of(OAuthGrantType.AUTHORIZATION_CODE),
+                Set.of(uri), Set.of(), Set.of("openid"), null, null, null);
     }
 
     @Test
-    void updateWritesThePathClientWhateverTheBodyNames() throws ClientNotFoundException {
+    void updateWritesThePathClientWhateverTheBodyNames()
+            throws ClientNotFoundException, InvalidRedirectUriException, ClientTokenTtlExceedsPolicyException {
         when(clients.findById(A)).thenReturn(existing(A));
 
-        ClientDetails result = service.update(A, details("B", RENAMED));
+        ClientDetails result = service.update(A, details(B, RENAMED));
 
         ArgumentCaptor<RegisteredClient> saved = ArgumentCaptor.forClass(RegisteredClient.class);
         verify(clients).save(saved.capture());
@@ -85,16 +145,83 @@ class AdminClientServiceTest {
     }
 
     @Test
-    void createGeneratesAnIdAndASecret() {
+    void createGeneratesAnIdAndAnswersTheSecretOnce()
+            throws ClientIdTakenException, InvalidRedirectUriException, ClientTokenTtlExceedsPolicyException {
         when(encoder.encode(anyString())).thenReturn(GENERATED_SECRET);
 
-        ClientDetails result = service.create(details(IGNORED, "New"));
+        CreatedClient result = service.create(details(IGNORED, NEW));
 
         ArgumentCaptor<RegisteredClient> saved = ArgumentCaptor.forClass(RegisteredClient.class);
         verify(clients).save(saved.capture());
         assertThat(saved.getValue().getId()).isNotEqualTo(IGNORED);
         assertThat(saved.getValue().getClientSecret()).isEqualTo(GENERATED_SECRET);
-        assertThat(result.id()).isEqualTo(saved.getValue().getId());
+        assertThat(saved.getValue().getClientSecretExpiresAt()).isEqualTo(NOW.plus(VALIDITY_DAYS, java.time.temporal.ChronoUnit.DAYS));
+        assertThat(result.client().id()).isEqualTo(saved.getValue().getId());
+        assertThat(result.clientSecret()).isNotBlank().isNotEqualTo(GENERATED_SECRET);
+        assertThat(result.client().status().type()).isEqualTo(ClientType.MACHINE);
+        verify(extensions).save(any());
+    }
+
+    @Test
+    void aPublicClientGetsNoSecret()
+            throws ClientIdTakenException, InvalidRedirectUriException, ClientTokenTtlExceedsPolicyException {
+        CreatedClient result = service.create(withRedirect(CALLBACK));
+
+        assertThat(result.clientSecret()).isNull();
+        assertThat(result.client().status().type()).isEqualTo(ClientType.PUBLIC);
+        verify(encoder, never()).encode(anyString());
+    }
+
+    @Test
+    void aTakenClientIdIsAConflict() {
+        when(clients.findByClientId(CLIENT_A)).thenReturn(existing(A));
+
+        assertThatThrownBy(() -> service.create(details(IGNORED, NEW))).isInstanceOf(ClientIdTakenException.class);
+    }
+
+    @Test
+    void aWildcardRedirectIsRefused() {
+        assertThatThrownBy(() -> service.create(withRedirect("https://*.example/cb")))
+                .isInstanceOf(InvalidRedirectUriException.class);
+    }
+
+    @Test
+    void anAccessTokenLifetimeOverTheCeilingIsRefused() {
+        ClientDetailsTokens tokens = new ClientDetailsTokens(null, java.time.Duration.ofHours(2), null, null, false, null,
+                null, false, null);
+        ClientDetails details = new ClientDetails(IGNORED, "client-c", "C", Set.of(ClientAuthMethod.CLIENT_SECRET_BASIC),
+                Set.of(OAuthGrantType.CLIENT_CREDENTIALS), Set.of(), Set.of(), Set.of(SCOPE), null, tokens, null);
+
+        assertThatThrownBy(() -> service.create(details)).isInstanceOf(ClientTokenTtlExceedsPolicyException.class);
+    }
+
+    @Test
+    void rotationRetiresTheOldHashIntoTheGraceWindow() throws ClientNotFoundException, ClientNotConfidentialException {
+        when(clients.findById(A)).thenReturn(existing(A));
+        when(encoder.encode(anyString())).thenReturn(GENERATED_SECRET);
+
+        RotatedSecret rotated = service.rotateSecret(A);
+
+        ArgumentCaptor<ClientSecretHistory> retired = ArgumentCaptor.forClass(ClientSecretHistory.class);
+        verify(history).save(retired.capture());
+        assertThat(retired.getValue().getSecretHash()).isEqualTo(KEPT_SECRET);
+        assertThat(retired.getValue().getExpiresAt()).isEqualTo(NOW.plus(GRACE_HOURS, java.time.temporal.ChronoUnit.HOURS));
+        ArgumentCaptor<RegisteredClient> saved = ArgumentCaptor.forClass(RegisteredClient.class);
+        verify(clients).save(saved.capture());
+        assertThat(saved.getValue().getClientSecret()).isEqualTo(GENERATED_SECRET);
+        assertThat(rotated.clientSecret()).isNotBlank();
+        assertThat(rotated.previousSecretUntil()).isEqualTo(retired.getValue().getExpiresAt());
+    }
+
+    @Test
+    void aPublicClientHasNoSecretToRotate() {
+        RegisteredClient publicClient = RegisteredClient.withId(A).clientId(CLIENT_A).clientName(A)
+                .clientAuthenticationMethod(ClientAuthenticationMethod.NONE)
+                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE).redirectUri(CALLBACK)
+                .build();
+        when(clients.findById(A)).thenReturn(publicClient);
+
+        assertThatThrownBy(() -> service.rotateSecret(A)).isInstanceOf(ClientNotConfidentialException.class);
     }
 
 }

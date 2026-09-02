@@ -6,12 +6,15 @@
   }
 
   <app-busy-overlay reserve="page" [busy]="facade.isLoading()" [label]="t('clients.loading')">
-    @if (!facade.isEmpty()) {
+    @if (!facade.error()) {
       <div class="stack">
+        @if (facade.tiles().length) {
+          <app-kpi-grid [data]="facade.tiles()" [label]="t('clients.tiles.label')" [columns]="4" />
+        }
+
         <!--
-          The one thing an operator must know before registering anything: uaa never gives a secret
-          back. Not a hint on the field — by the time they are reading the field they have already
-          decided not to write it down.
+          The one thing an operator must know before registering anything: uaa shows a secret exactly
+          twice — at registration and at rotation — and never again.
         -->
         <app-notice-bar icon="lock" tone="amber" [message]="t('clients.notice.secret')" />
 
@@ -20,12 +23,53 @@
             {{ t('clients.action.register') }}
           </a>
 
+          <div class="toolbar">
+            <app-tab-switcher
+              [tabs]="facade.filterTabs()"
+              [active]="facade.filter()"
+              [label]="t('clients.filter.label')"
+              (activeChange)="facade.setFilter($event)"
+            />
+            <app-search-box
+              [value]="facade.query()"
+              [label]="t('clients.filter.search')"
+              [placeholder]="t('clients.filter.search')"
+              [clearLabel]="t('clients.filter.clear')"
+              width="16rem"
+              (valueChange)="facade.setQuery($event)"
+            />
+          </div>
+
           @if (facade.rows().length) {
             <app-data-table [columns]="columns(t)" [label]="t('clients.panel.title')">
               @for (client of facade.rows(); track client.id) {
-                <app-table-row class="row" [interactive]="true" (click)="open(client)">
-                  <span class="cell mono" [attr.data-label]="t('clients.column.clientId')">{{ client.clientId }}</span>
-                  <span class="cell" [attr.data-label]="t('clients.column.clientName')">{{ client.clientName }}</span>
+                <app-table-row class="row" [interactive]="true" [class.off]="!client.enabled" (click)="open($event, client)">
+                  <span class="cell client" [attr.data-label]="t('clients.column.client')">
+                    <span class="name">{{ client.clientName }}</span>
+                    <span class="mono">{{ client.clientId }}</span>
+                  </span>
+                  <span class="cell" [attr.data-label]="t('clients.column.type')">
+                    <app-badge [tone]="typeTone(client.type)">{{ t('clients.type.' + client.type) }}</app-badge>
+                  </span>
+                  <span class="cell grants" [attr.data-label]="t('clients.column.grants')">
+                    {{ client.grantTypes.join(', ') }}
+                  </span>
+                  <span class="cell" [attr.data-label]="t('clients.column.secret')">
+                    @if (client.type === 'PUBLIC') {
+                      <span class="muted">{{ t('clients.secret.none') }}</span>
+                    } @else if (client.clientSecretExpiresAt) {
+                      <app-badge [tone]="secretTone(client)" shape="square">{{ when(client.clientSecretExpiresAt) }}</app-badge>
+                    } @else {
+                      <span class="muted">{{ t('clients.secret.never') }}</span>
+                    }
+                  </span>
+                  <span class="cell status" [attr.data-label]="t('clients.column.status')">
+                    <app-toggle
+                      [checked]="client.enabled"
+                      [label]="t(client.enabled ? 'clients.status.enabled' : 'clients.status.disabled')"
+                      (checkedChange)="facade.toggleEnabled(client)"
+                    />
+                  </span>
                   <span class="cell go" aria-hidden="true"><app-icon name="chevronRight" [size]="15" /></span>
                 </app-table-row>
               }
@@ -40,11 +84,11 @@
               [label]="t('clients.paginationLabel')"
               (pageChange)="facade.goToPage($event)"
             />
-          } @else {
+          } @else if (!facade.isLoading()) {
             <app-empty-state
               icon="code"
-              [title]="t('clients.empty.title')"
-              [message]="t('clients.empty.message')"
+              [title]="t(facade.query() || facade.filter() !== 'ALL' ? 'clients.empty.noMatch' : 'clients.empty.title')"
+              [message]="t(facade.query() || facade.filter() !== 'ALL' ? 'clients.empty.noMatchMessage' : 'clients.empty.message')"
             />
           }
         </app-panel>

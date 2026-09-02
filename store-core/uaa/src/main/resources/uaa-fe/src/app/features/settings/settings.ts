@@ -13,6 +13,9 @@ import {
   Select,
   TextField,
   Toggle,
+  ConfirmDialog,
+  CopyField,
+  FormDialog,
 } from '@cvhome-saas/ui-kit/ui';
 import {SETTINGS_SECTIONS, SettingsFacade} from './facades/settings.facade';
 
@@ -37,6 +40,9 @@ import {SETTINGS_SECTIONS, SettingsFacade} from './facades/settings.facade';
     NumberField,
     Toggle,
     Select,
+    ConfirmDialog,
+    FormDialog,
+    CopyField,
   ],
   providers: [SettingsFacade],
   templateUrl: './settings.html',

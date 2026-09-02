@@ -5,10 +5,10 @@ import {TranslocoService} from '@jsverse/transloco';
 import {ApiErrorService, snapshot} from '@cvhome-saas/ui-kit';
 import {formDirty} from '@cvhome-saas/ui-kit/forms';
 import {ToastService} from '@cvhome-saas/ui-kit/ui';
-import {AdminSettingsService, type RealmSettings} from '@cvhome-saas/ui-kit/uaa';
+import {AdminClientService, AdminSettingsService, type RealmSettings, type RotatedSecret} from '@cvhome-saas/ui-kit/uaa';
 
 /** How the sections are grouped on the page; the `Email` section is not built (no mail sender). */
-export const SETTINGS_SECTIONS = ['general', 'authentication', 'sessions', 'keys'] as const;
+export const SETTINGS_SECTIONS = ['general', 'authentication', 'sessions', 'keys', 'danger'] as const;
 
 export type SettingsSection = (typeof SETTINGS_SECTIONS)[number];
 
@@ -33,12 +33,17 @@ function bool(initial: boolean): FormControl<boolean> {
 @Injectable()
 export class SettingsFacade {
   private readonly settings = inject(AdminSettingsService);
+  private readonly clients = inject(AdminClientService);
   private readonly apiErrors = inject(ApiErrorService);
   private readonly toast = inject(ToastService);
   private readonly transloco = inject(TranslocoService);
 
   readonly busy = signal(false);
   readonly section = signal<SettingsSection>('general');
+
+  /** The danger zone's confirmation, and what it answered: every new secret, shown once. */
+  readonly rotatingAll = signal(false);
+  readonly rotatedAll = signal<readonly RotatedSecret[] | null>(null);
 
   readonly form = new FormGroup({
     general: new FormGroup({
@@ -201,5 +206,27 @@ export class SettingsFacade {
     if (value) {
       this.form.reset(this.formValue(value));
     }
+  }
+
+  /**
+   * Every secret-holding client gets a new secret. Incident response: after this, every service on
+   * the platform must be reconfigured inside the grace window, and the list this answers is the only
+   * time the new secrets are readable.
+   */
+  rotateAllSecrets(): void {
+    this.busy.set(true);
+    this.clients.rotateAll().subscribe({
+      next: (rotated) => {
+        this.busy.set(false);
+        this.rotatingAll.set(false);
+        this.rotatedAll.set(rotated);
+        this.toast.success(this.transloco.translate('settings.danger.rotatedAll', {count: rotated.length}));
+      },
+      error: (failure: unknown) => {
+        this.busy.set(false);
+        this.rotatingAll.set(false);
+        this.apiErrors.notify(failure);
+      },
+    });
   }
 }

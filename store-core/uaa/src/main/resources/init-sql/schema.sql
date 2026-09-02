@@ -16,6 +16,34 @@ create table if not exists uaa.oauth2_registered_client
     token_settings                varchar(2000) not null
 );
 
+-- What uaa knows about a registered client beyond what Spring's table holds: whether it may authenticate at all, a
+-- description, and when it last obtained a token. One row per registration, created with it.
+create table if not exists uaa.client_extension
+(
+    registered_client_id varchar(100) primary key references uaa.oauth2_registered_client (id) on delete cascade,
+    enabled              boolean     not null default true,
+    description          varchar(500),
+    disabled_at          timestamptz,
+    disabled_by          varchar(200),
+    last_token_issued_at timestamptz,
+    created_at           timestamptz not null default now(),
+    updated_at           timestamptz not null default now()
+);
+
+-- A rotated-out secret that still authenticates for a grace window, so an integration can pick up the new one
+-- without an outage. Hashed like the live secret; revoked early by an operator or retired by expiry.
+create table if not exists uaa.client_secret_history
+(
+    id                   uuid primary key,
+    registered_client_id varchar(100) not null references uaa.oauth2_registered_client (id) on delete cascade,
+    secret_hash          varchar(200) not null,
+    created_at           timestamptz  not null,
+    expires_at           timestamptz  not null,
+    revoked_at           timestamptz
+);
+
+create index if not exists idx_client_secret_history_client on uaa.client_secret_history (registered_client_id);
+
 -- oauth2_authorization
 -- Spring Authorization Server's own table, in its Postgres shape: token values and metadata are text (the shipped
 -- schema's blob), instants are timestamptz, and the device-flow columns are present because the JDBC service

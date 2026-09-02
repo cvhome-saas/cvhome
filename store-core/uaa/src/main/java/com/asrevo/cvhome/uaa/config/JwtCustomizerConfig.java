@@ -1,5 +1,8 @@
 package com.asrevo.cvhome.uaa.config;
 
+import java.time.Clock;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -16,6 +19,7 @@ import com.asrevo.cvhome.commons.domain.Permission;
 import com.asrevo.cvhome.uaa.domain.Role;
 import com.asrevo.cvhome.uaa.domain.User;
 import com.asrevo.cvhome.uaa.repo.UserRepository;
+import com.asrevo.cvhome.uaa.settings.SettingsService;
 
 /**
  * What uaa puts into the tokens it mints.
@@ -32,6 +36,12 @@ import com.asrevo.cvhome.uaa.repo.UserRepository;
  * <p>
  * A registered client's <em>custom</em> settings become claims only under the {@code cvhome.} prefix, plus the one
  * legacy key {@code resource} that the pods read to check a service token belongs to their pod.
+ * </p>
+ *
+ * <p>
+ * <strong>An access token never outlives the realm's ceiling.</strong> A client's own lifetime is validated at
+ * registration, but the setting can be lowered afterwards; clamping {@code exp} here is what makes the new ceiling
+ * apply to every client at the next token rather than only to the ones re-saved.
  * </p>
  *
  * <p>
@@ -57,20 +67,36 @@ public class JwtCustomizerConfig {
 
     private final UserRepository userRepository;
 
-    public JwtCustomizerConfig(UserRepository userRepository) {
+    private final SettingsService settings;
+
+    private final Clock clock;
+
+    public JwtCustomizerConfig(UserRepository userRepository, SettingsService settings, Clock clock) {
         this.userRepository = userRepository;
+        this.settings = settings;
+        this.clock = clock;
     }
 
     @Bean
     OAuth2TokenCustomizer<JwtEncodingContext> oauth2TokenCustomizer() {
         return context -> {
             if (OAuth2TokenType.ACCESS_TOKEN.equals(context.getTokenType())) {
+                clampLifetime(context);
                 addClientSettingClaims(context);
                 addUserClaims(context, false);
             } else if (OidcParameterNames.ID_TOKEN.equals(context.getTokenType().getValue())) {
                 addUserClaims(context, true);
             }
         };
+    }
+
+    private void clampLifetime(JwtEncodingContext context) {
+        int maxSeconds = settings.current().tokens().maxAccessTokenTtlSeconds();
+        Duration clientTtl = context.getRegisteredClient().getTokenSettings().getAccessTokenTimeToLive();
+        if (maxSeconds > 0 && clientTtl.compareTo(Duration.ofSeconds(maxSeconds)) > 0) {
+            Instant now = clock.instant();
+            context.getClaims().issuedAt(now).expiresAt(now.plusSeconds(maxSeconds));
+        }
     }
 
     private static void addClientSettingClaims(JwtEncodingContext context) {

@@ -180,3 +180,65 @@
   border-block-start: 1px solid var(--border);
 }
 
+/* --- the status facts and the secret card ------------------------------------------------------------ */
+.facts {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.3rem var(--spacing-group);
+  margin: 0 0 var(--spacing-group);
+  font-size: var(--text-3xs);
+}
+
+.facts dt {
+  color: var(--foreground-subtle);
+}
+
+.facts dd {
+  margin: 0;
+  color: var(--foreground-strong);
+}
+
+.secret {
+  display: grid;
+  gap: var(--spacing-tight);
+  justify-items: start;
+}
+
+.masked {
+  padding: 0.35rem 0.6rem;
+  border-radius: var(--radius-md);
+  background: var(--muted);
+  color: var(--muted-foreground);
+  font-family: var(--font-mono);
+  letter-spacing: 0.1em;
+}
+
+.secret-line {
+  margin: 0;
+  color: var(--muted-foreground);
+  font-size: var(--text-3xs);
+}
+
+.secret-line.grace {
+  color: var(--chart-4-foreground);
+}
+
+.readonly-note {
+  margin: 0;
+  color: var(--foreground-subtle);
+  font-size: var(--text-3xs);
+}
+
+.link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--primary);
+  font: inherit;
+  font-size: var(--text-3xs);
+  cursor: pointer;
+}
+
+.link.danger {
+  color: var(--destructive);
+}

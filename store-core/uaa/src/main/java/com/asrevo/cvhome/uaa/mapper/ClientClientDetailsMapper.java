@@ -48,7 +48,7 @@ public final class ClientClientDetailsMapper {
         return new ClientDetails(client.getId(), client.getClientId(), client.getClientName(),
                 clientAuthenticationMethods, authorizationGrantTypes, client.getRedirectUris(),
                 client.getPostLogoutRedirectUris(), client.getScopes(), toClientSetting(client.getClientSettings()),
-                toTokenSetting(client.getTokenSettings()));
+                toTokenSetting(client.getTokenSettings()), null);
     }
 
     private static ClientDetailsTokens toTokenSetting(TokenSettings settings) {
@@ -88,7 +88,9 @@ public final class ClientClientDetailsMapper {
                 .clientName(details.clientName());
 
         if (existingClient != null) {
-            builder.clientSecret(existingClient.getClientSecret());
+            builder.clientSecret(existingClient.getClientSecret())
+                    .clientIdIssuedAt(existingClient.getClientIdIssuedAt())
+                    .clientSecretExpiresAt(existingClient.getClientSecretExpiresAt());
         }
 
         builder.clientAuthenticationMethods(clientAuthenticationMethods -> {

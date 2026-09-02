@@ -142,8 +142,52 @@
               }
             </p>
           </app-panel>
+
+          <!-- Incident response. Nothing here is undoable, and each action says what it costs. -->
+          <app-panel id="settings-danger" padded [title]="t('settings.section.danger')" [subtitle]="t('settings.danger.subtitle')">
+            <div class="danger-row">
+              <div>
+                <p class="danger-title">{{ t('settings.danger.rotateAll') }}</p>
+                <p class="danger-hint">{{ t('settings.danger.rotateAllHint', {hours: facade.form.controls.tokens.controls.clientSecretGraceHours.value}) }}</p>
+              </div>
+              <button class="danger-action" type="button" [disabled]="facade.busy()" (click)="facade.rotatingAll.set(true)">
+                {{ t('settings.danger.rotateAllAction') }}
+              </button>
+            </div>
+          </app-panel>
         </div>
       </form>
     }
   </app-busy-overlay>
+
+  <app-confirm-dialog
+    [open]="facade.rotatingAll()"
+    [title]="t('settings.danger.confirmTitle')"
+    [message]="t('settings.danger.confirmMessage')"
+    confirmationText="ROTATE"
+    [confirmationLabel]="t('settings.danger.confirmLabel')"
+    [confirmLabel]="t('settings.danger.rotateAllAction')"
+    [cancelLabel]="t('shared.actions.cancel')"
+    (confirmed)="facade.rotateAllSecrets()"
+    (dismissed)="facade.rotatingAll.set(false)"
+  />
+
+  <!-- The new secrets, once. Closing this is the last time any of them is readable. -->
+  @if (facade.rotatedAll(); as rotated) {
+    <app-form-dialog
+      open
+      wide
+      [title]="t('settings.danger.rotatedTitle', {count: rotated.length})"
+      [description]="t('settings.danger.rotatedMessage')"
+      [closeLabel]="t('shared.actions.close')"
+      (dismissed)="facade.rotatedAll.set(null)"
+    >
+      <div class="secrets">
+        @for (item of rotated; track item.id) {
+          <app-copy-field [value]="item.clientSecret" [label]="item.clientId" />
+          <p class="secret-owner">{{ item.clientId }}</p>
+        }
+      </div>
+    </app-form-dialog>
+  }
 </ng-container>

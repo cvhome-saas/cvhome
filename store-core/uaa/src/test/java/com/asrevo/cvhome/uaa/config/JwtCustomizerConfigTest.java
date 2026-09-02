@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.uaa.config;
 
+import java.time.Clock;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -20,6 +21,8 @@ import org.springframework.security.oauth2.server.authorization.token.JwtEncodin
 import com.asrevo.cvhome.uaa.domain.Role;
 import com.asrevo.cvhome.uaa.domain.User;
 import com.asrevo.cvhome.uaa.repo.UserRepository;
+import com.asrevo.cvhome.uaa.settings.RealmSettings;
+import com.asrevo.cvhome.uaa.settings.SettingsService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -72,7 +75,16 @@ class JwtCustomizerConfigTest {
 
     private final UserRepository users = mock(UserRepository.class);
 
-    private final JwtCustomizerConfig config = new JwtCustomizerConfig(users);
+    private final SettingsService settings = mock(SettingsService.class);
+
+    private final RealmSettings realm = mock(RealmSettings.class);
+
+    private final JwtCustomizerConfig config = new JwtCustomizerConfig(users, settings, Clock.systemUTC());
+
+    {
+        when(settings.current()).thenReturn(realm);
+        when(realm.tokens()).thenReturn(new RealmSettings.Tokens(3600, 900, 43200, 365, 24));
+    }
 
     private static User user(Map<String, Object> metadata, String... roles) {
         User user = new User();

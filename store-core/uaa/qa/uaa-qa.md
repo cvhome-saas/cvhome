@@ -11,7 +11,7 @@ somewhere else entirely — that is [cua](../../../store-pod/cua/qa/cua-qa.md).
   is where the platform's sign-in page lives
 - **Runs on** — `lcl start -d --stack <name>`; uaa is `http://uaa.gateway.com:8001` and is the **first**
   service the stack brings up, because it issues the tokens. Read the live port from `lcl urls`
-- **Cases** — 103 (81 verified, 8 unit only, 14 not verified)
+- **Cases** — 111 (87 verified, 9 unit only, 15 not verified)
 - **Also see** — [gateway](../../gateway/gateway-service/qa/gateway-qa.md) (which relays the token and holds
   the session), [tenancy](../../tenancy/tenancy-service/qa/tenancy-qa.md) (which owns the *store-scoped*
   accounts and calls uaa to create them),
@@ -1105,6 +1105,95 @@ are `/accept-invitation?token=` and `/reset-password?token=`, served by uaa itse
 
 ---
 
+## CLI — Registered clients
+
+A registration is Spring's `oauth2_registered_client` row plus uaa's `client_extension` (enabled, description, last
+token) and `client_secret_history` (the grace window). The **type** — `PUBLIC` (auth method `none` alone), `MACHINE`
+(`client_credentials` only) or `CONFIDENTIAL` — is derived on every read, never stored. A secret is answered exactly
+twice, at registration and at rotation, and can never be read back; the realm's *Sessions & tokens* settings decide
+how long a new secret lives (`clientSecretValidityDays`) and how long the one it replaced keeps working
+(`clientSecretGraceHours`). `http/admin-client-api.http` runs every call below.
+
+### CLI-01 — Registration answers the secret once · critical · [verified]
+
+- **Steps** — uaa console → Clients → *Register client*: id `qa-machine`, name, description, `client_secret_basic`
+  + `client_credentials`, scope `store_core`, Save. Copy the secret from the dialog; *Done* lands on the client's page.
+  Mint a token with it (`POST /oauth2/token`, basic auth, `grant_type=client_credentials&scope=store_core`).
+- **Expect** — **201** `{client, clientSecret}`; the page shows type *Machine*, *Registered* now, the secret card with
+  *Expires* a year out; `GET /clients/{id}` and the list never carry `"clientSecret"`; the token endpoint answers 200.
+  A client registered with `none` alone gets `clientSecret: null` and no secret card.
+- **Also** — `AdminClientApiIntegrationTest`.
+
+### CLI-02 — The list carries type and status, and filters on the server · high · [verified]
+
+- **Steps** — Clients: the four tiles; segments *All / Enabled / Disabled / Machine / Confidential / Public*; search
+  `store`; `GET /clients?q=store&enabled=true&type=MACHINE`; `GET /clients/stats`.
+- **Expect** — every row shows client + id, a type badge, the grant types, when the secret expires (amber inside
+  thirty days, red past it, *none (PKCE)* for a public client) and an enable switch. The segments carry counts from
+  `/stats`; `active + …` add up. The seed answers `total 4, enabled 4, machine 3, confidential 1`.
+
+### CLI-03 — Rotation keeps the old secret alive for the grace window · critical · [verified]
+
+- **Steps** — on `qa-machine`: *Rotate secret*, confirm; copy the new secret. Mint a token with the **old** secret,
+  then with the new one. Then *Revoke it now* on the *previous secret still works until …* line, confirm, and mint
+  with the old secret again.
+- **Expect** — the dialog says both dates: the new secret's expiry and *the secret it replaces keeps working until*
+  (now + `clientSecretGraceHours`). Old → 200, new → 200, wrong → 401. After the revocation old → **401**
+  `invalid_client`, new → 200; a second revocation answers **404** `UAA.CLIENT.NO_PREVIOUS_SECRET`. Audit
+  `client.secret.rotated` twice, the second with detail *previous secret revoked early*.
+- **Mechanism** — `GraceAwareClientSecretAuthenticationProvider` hands Spring's own provider a one-client view carrying
+  the retired hash; nothing about Spring's checks is re-implemented. `ClientSecretRotationIntegrationTest`.
+- **Watch for** — `bcrypt` strength upgrades: Spring re-encodes and *saves* a hash whose strength is below the
+  encoder's. On the grace view that save is a no-op on purpose (it would write the old hash back onto the
+  registration).
+
+### CLI-04 — Disable revokes and refuses; enable restores · critical · [verified]
+
+- **Steps** — with a live token for `qa-machine`, switch it off in the list (or the Status card). Mint again. Read the
+  client. Switch it on. Mint again.
+- **Expect** — the toast says the tokens were revoked; `oauth2_authorization` has no rows for the client; the token
+  endpoint answers **401** `invalid_client`; `GET /clients/{id}` still answers 200 (an operator can read and re-enable
+  it: `findById` is not filtered, only `findByClientId` is); after enabling the token endpoint answers 200. Audit
+  `client.disabled` with the revoked count, then `client.enabled`.
+- **Also** — `ClientDisableIntegrationTest`, `EnabledAwareRegisteredClientRepositoryTest`.
+
+### CLI-05 — Registration rules answer typed problems · high · [verified]
+
+- **Steps** — register with client id `admin-sdk`; with redirect `http://evil.example/cb`; with access-token lifetime
+  `PT48H` while the realm's ceiling is 3600 s; with a wildcard redirect.
+- **Expect** — **409** `UAA.CLIENT.ID_TAKEN` with `fieldErrors[0].field == clientId`; **400**
+  `UAA.CLIENT.INVALID_REDIRECT_URI` with `params.reason` `PLAIN_HTTP` (`WILDCARD`, `FRAGMENT`, `NOT_ABSOLUTE` for the
+  others); **400** `UAA.CLIENT.TOKEN_TTL_EXCEEDS_POLICY` on `tokenSettings.accessTokenTimeToLive`. Under `lcl`,
+  `gateway.com` and `*.gateway.com` are allowed over plain http (`com.asrevo.cvhome.uaa.clients.plain-http-hosts`);
+  `localhost` always is; a native `com.example.app:/cb` passes.
+- **Also** — `RedirectUriRulesTest`, `AdminClientServiceTest`.
+
+### CLI-06 — The realm's ceiling clamps every token · high · [unit only]
+
+- **Steps** — Settings → *Sessions & tokens* → max access-token lifetime 60 s, Save. Mint a token for `admin-sdk`
+  (whose own setting is 900 s). Decode `exp - iat`.
+- **Expect** — 60. Lowering the ceiling applies at the next token for every client, not only the ones re-saved.
+  Mechanism: `JwtCustomizerConfig.clampLifetime`.
+
+### CLI-07 — Rotate every secret · critical · [not verified]
+
+- **Steps** — Settings → *Danger zone* → *Rotate all secrets*, type `ROTATE`, confirm. Copy every secret from the
+  dialog into `application-lcl.yml`'s `UAA_*_SECRET` values (or the stack's env) and restart the services.
+- **Expect** — one new secret per machine and confidential client, shown once; every service on the stack keeps
+  working for `clientSecretGraceHours`, then fails with `invalid_client` unless reconfigured. `POST /rotate-all` as a
+  `store_core` token is **403**.
+- **Why not verified** — it invalidates the shared local secret for every service on the stack after the grace
+  window; run it on a throw-away stack.
+
+### CLI-08 — Delete revokes first · [verified]
+
+- **Steps** — delete `qa-machine` from its page, typing the id.
+- **Expect** — its authorizations are gone before the row is; `GET /clients/{id}` → 404. `reset-secret` (the SDK's
+  alias) still works and sets a chosen secret with no grace window; on a public client it answers **422**
+  `UAA.CLIENT.NOT_CONFIDENTIAL`.
+
+---
+
 ## SID — The `"*"` wildcard
 
 _From `qa/unify-store-id-value-objects.md` §EDGE, reformatted into the case shape used everywhere else._
@@ -1154,6 +1243,8 @@ clients and accounts. Nothing in uaa carries an `alter table`.
 | The accept page's mismatch check was a `computed` over a reactive form | two different passwords submitted with no message, then the server's 400 | INV-05 |
 | The Users tiles and tabs translated once and never again | switching to Arabic left *ACCOUNTS* / *All 12* in English | CON-05 (the `computed`s read `activeLang()` first) |
 | The Users panel rendered its empty state under a 403 | a `USER`-role session saw *No accounts* beneath the error bar | CON-06 |
+| The grace-aware client-secret provider was a bean | Spring adopted the lone `AuthenticationProvider` bean as the global manager's provider: every form login failed and lockout stopped counting | AUT-02, LCK-01 (the provider is built inside the SAS chain, never a bean) |
+| Spring's provider saves an upgraded hash through the registry it was given | `UnsupportedOperationException` from the grace view's read-only `save` on the first token with a `{bcrypt}` strength-10 seed | CLI-03 (`SingleClientRepository.save` is a no-op) |
 
 ---
 

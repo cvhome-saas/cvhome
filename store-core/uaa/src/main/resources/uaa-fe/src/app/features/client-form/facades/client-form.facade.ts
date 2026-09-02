@@ -15,7 +15,16 @@ import {
   type ClientOptions,
   type ClientSettings,
   type ClientTokenSettings,
+  type RotatedSecret,
 } from '@cvhome-saas/ui-kit/uaa';
+
+/** A secret the console has just been handed and will never see again once the dialog closes. */
+export interface ShownSecret {
+  readonly clientId: string;
+  readonly secret: string;
+  readonly expiresAt: string | null;
+  readonly previousUntil: string | null;
+}
 
 /** What uaa will accept as a client id, and what `Generate` produces. */
 export const CLIENT_ID_PATTERN = /^[a-z0-9][a-z0-9-]{2,}$/;
@@ -33,6 +42,7 @@ const EMPTY_OPTIONS: ClientOptions = {
   idTokenSignatureAlgorithm: [],
   tokenEndpointAuthenticationSigningAlgorithm: [],
   accessTokenFormat: [],
+  clientTypes: [],
 };
 
 /** One line of the readiness panel: a rule, whether it is met, and why it applies right now. */
@@ -76,6 +86,9 @@ export class ClientFormFacade {
   readonly busy = signal(false);
   readonly rotating = signal(false);
   readonly deleting = signal(false);
+  readonly revokingPrevious = signal(false);
+  /** The secret just issued — by registration or rotation — shown once. */
+  readonly shownSecret = signal<ShownSecret | null>(null);
 
   /**
    * The route's `:id`, or `null` on `/clients/new`.
@@ -97,6 +110,7 @@ export class ClientFormFacade {
         validators: [Validators.required, Validators.pattern(CLIENT_ID_PATTERN)],
       }),
       clientName: new FormControl('', {nonNullable: true, validators: [Validators.required]}),
+      description: new FormControl('', {nonNullable: true, validators: [Validators.maxLength(500)]}),
       clientAuthenticationMethods: new FormControl<readonly string[]>([], {
         nonNullable: true,
         validators: [nonEmptyList],
@@ -149,6 +163,8 @@ export class ClientFormFacade {
   readonly reload = () => this.loaded.reload();
   readonly options = computed(() => this.loaded.value()?.options ?? EMPTY_OPTIONS);
   readonly isNew = computed(() => this.currentId() === null);
+  /** uaa's status of the loaded client: type, enabled, the secret's lifetimes. Null while creating. */
+  readonly status = computed(() => this.loadedClient()?.status ?? null);
 
   /** Bumped by every edit, so the readiness panel recomputes without polling the form. */
   private readonly revision = toSignal(this.form.valueChanges, {initialValue: null});
@@ -263,42 +279,125 @@ export class ClientFormFacade {
     const base = this.loadedClient();
     const body = this.toRequest(base);
     this.busy.set(true);
-    const call = base ? this.clients.update(base.id, body) : this.clients.create(body);
-    call.subscribe({
-      next: (saved) => {
-        this.busy.set(false);
-        this.toast.success(
-          this.transloco.translate(base ? 'clients.toast.updated' : 'clients.toast.created', {
-            clientId: body.clientId,
-          }),
-        );
-        this.form.markAsPristine();
-        if (base) {
+    if (base) {
+      this.clients.update(base.id, body).subscribe({
+        next: (saved) => {
+          this.busy.set(false);
+          this.toast.success(this.transloco.translate('clients.toast.updated', {clientId: body.clientId}));
+          this.form.markAsPristine();
           this.loadedClient.set(saved);
+        },
+        error: (failure: unknown) => this.failed(failure),
+      });
+      return;
+    }
+    /*
+     * Registration answers the generated secret exactly once. It is shown before the page moves to
+     * the new client's route, and moving is what closing the dialog does — so the secret cannot be
+     * lost behind a navigation the operator did not see.
+     */
+    this.clients.create(body).subscribe({
+      next: (created) => {
+        this.busy.set(false);
+        this.form.markAsPristine();
+        this.toast.success(this.transloco.translate('clients.toast.created', {clientId: body.clientId}));
+        this.loadedClient.set(created.client);
+        if (created.clientSecret) {
+          this.shownSecret.set({
+            clientId: created.client.clientId,
+            secret: created.clientSecret,
+            expiresAt: created.client.status?.clientSecretExpiresAt ?? null,
+            previousUntil: null,
+          });
         } else {
-          void this.router.navigate(['/clients', saved.id]);
+          void this.router.navigate(['/clients', created.client.id]);
         }
       },
       error: (failure: unknown) => this.failed(failure),
     });
   }
 
-  rotateSecret(secret: string): void {
+  /** Closing the secret dialog after a registration lands on the new client's page. */
+  dismissSecret(): void {
+    const shown = this.shownSecret();
+    this.shownSecret.set(null);
+    const base = this.loadedClient();
+    if (shown && base && this.currentId() === null) {
+      void this.router.navigate(['/clients', base.id]);
+    }
+  }
+
+  /**
+   * A new random secret with a grace window for the old one. The console does not choose the secret:
+   * uaa generates it, and this is the one moment it is readable.
+   */
+  rotateSecret(): void {
     const base = this.loadedClient();
     if (!base) {
       return;
     }
     this.busy.set(true);
-    this.clients.resetSecret(base.id, secret).subscribe({
-      next: () => {
+    this.clients.rotateSecret(base.id).subscribe({
+      next: (rotated: RotatedSecret) => {
         this.busy.set(false);
         this.rotating.set(false);
+        this.toast.success(this.transloco.translate('clients.toast.secretRotated', {clientId: base.clientId}));
+        this.shownSecret.set({
+          clientId: rotated.clientId,
+          secret: rotated.clientSecret,
+          expiresAt: rotated.clientSecretExpiresAt,
+          previousUntil: rotated.previousSecretUntil,
+        });
+        this.refresh(base.id);
+      },
+      error: (failure: unknown) => this.failed(failure),
+    });
+  }
+
+  /** Ends the grace window: the previous secret stops authenticating now. */
+  revokePreviousSecret(): void {
+    const base = this.loadedClient();
+    if (!base) {
+      return;
+    }
+    this.busy.set(true);
+    this.clients.revokePreviousSecret(base.id).subscribe({
+      next: () => {
+        this.busy.set(false);
+        this.revokingPrevious.set(false);
+        this.toast.success(this.transloco.translate('clients.toast.previousRevoked', {clientId: base.clientId}));
+        this.refresh(base.id);
+      },
+      error: (failure: unknown) => this.failed(failure),
+    });
+  }
+
+  /** Disabling revokes every token the client holds; enabling puts it back at the token endpoint. */
+  toggleEnabled(): void {
+    const base = this.loadedClient();
+    const status = this.status();
+    if (!base || !status) {
+      return;
+    }
+    this.busy.set(true);
+    const call = status.enabled ? this.clients.disable(base.id) : this.clients.enable(base.id);
+    call.subscribe({
+      next: (saved) => {
+        this.busy.set(false);
+        this.loadedClient.set(saved);
         this.toast.success(
-          this.transloco.translate('clients.toast.secretRotated', {clientId: base.clientId}),
+          this.transloco.translate(status.enabled ? 'clients.toast.disabled' : 'clients.toast.enabled', {
+            clientId: base.clientId,
+          }),
         );
       },
       error: (failure: unknown) => this.failed(failure),
     });
+  }
+
+  /** Re-reads the status after a write that does not answer the whole client. */
+  private refresh(id: string): void {
+    this.clients.findOne(id).subscribe({next: (client) => this.loadedClient.set(client)});
   }
 
   confirmDelete(): void {
@@ -329,6 +428,7 @@ export class ClientFormFacade {
     this.form.patchValue({
       clientId: client?.clientId ?? '',
       clientName: client?.clientName ?? '',
+      description: client?.status?.description ?? '',
       clientAuthenticationMethods: client?.clientAuthenticationMethods ?? ['client_secret_basic'],
       authorizationGrantTypes: client?.authorizationGrantTypes ?? ['authorization_code', 'refresh_token'],
       scopes: client?.scopes ?? ['openid'],
@@ -395,6 +495,20 @@ export class ClientFormFacade {
       scopes: raw.scopes,
       clientSettings,
       tokenSettings,
+      // Only the description is writable here; the rest of the status is the server's.
+      status: base?.status
+        ? {...base.status, description: blankToNull(raw.description)}
+        : {
+            description: blankToNull(raw.description),
+            enabled: true,
+            type: 'CONFIDENTIAL',
+            clientIdIssuedAt: null,
+            clientSecretExpiresAt: null,
+            lastTokenIssuedAt: null,
+            disabledAt: null,
+            disabledBy: null,
+            previousSecretUntil: null,
+          },
     };
   }
 

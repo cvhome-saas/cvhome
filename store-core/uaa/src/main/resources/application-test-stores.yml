@@ -23,6 +23,13 @@ com:
           public-api: { limit: 1000, window: 1m }
         links:
           log-links: true
+        # The stack's console and pods answer on plain http under *.gateway.com.
+        clients:
+          plain-http-hosts:
+            - localhost
+            - 127.0.0.1
+            - gateway.com
+            - .gateway.com
       test-store:
         users:
           - id: 65D8419C-8765-4B8B-A15F-910DCE959931

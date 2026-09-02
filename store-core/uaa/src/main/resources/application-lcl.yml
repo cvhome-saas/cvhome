@@ -28,3 +28,10 @@ com:
         # Locally the log is the delivery channel: the link an invitation produced is printed so a tester can open it.
         links:
           log-links: true
+        # The stack's console and pods answer on plain http under *.gateway.com.
+        clients:
+          plain-http-hosts:
+            - localhost
+            - 127.0.0.1
+            - gateway.com
+            - .gateway.com

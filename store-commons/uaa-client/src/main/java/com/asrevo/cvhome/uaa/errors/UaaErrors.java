@@ -25,6 +25,21 @@ public enum UaaErrors implements ErrorCode {
     /** No OAuth2 registered client exists with the given id. */
     CLIENT_NOT_FOUND("UAA.CLIENT.NOT_FOUND", ErrorCategory.NOT_FOUND),
 
+    /** Another registration already uses that {@code client_id}. */
+    CLIENT_ID_TAKEN("UAA.CLIENT.ID_TAKEN", ErrorCategory.CONFLICT),
+
+    /** The operation needs a client that holds a secret; a public client has none to rotate. */
+    CLIENT_NOT_CONFIDENTIAL("UAA.CLIENT.NOT_CONFIDENTIAL", ErrorCategory.UNPROCESSABLE),
+
+    /** The requested access-token lifetime is longer than the realm allows. */
+    CLIENT_TOKEN_TTL_EXCEEDS_POLICY("UAA.CLIENT.TOKEN_TTL_EXCEEDS_POLICY", ErrorCategory.VALIDATION),
+
+    /** A redirect URI is not absolute, carries a fragment or a wildcard, or is plain HTTP on a host that is not local. */
+    INVALID_REDIRECT_URI("UAA.CLIENT.INVALID_REDIRECT_URI", ErrorCategory.VALIDATION),
+
+    /** No previous secret is still inside its grace window, so there is nothing to revoke. */
+    CLIENT_NO_PREVIOUS_SECRET("UAA.CLIENT.NO_PREVIOUS_SECRET", ErrorCategory.NOT_FOUND),
+
     /**
      * The target of the mutation is the built-in super administrator.
      *
