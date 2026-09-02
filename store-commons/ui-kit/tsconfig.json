@@ -1,0 +1,44 @@
+/* Mirrors store-core/console-ui/tsconfig.json. The code in this library came out of that app and is
+   held to the same strictness — a library that compiles looser than its consumer is a library that
+   fails in the consumer. */
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "baseUrl": "./",
+    /*
+     * The kit refers to its own entry points by package name — `@cvhome-saas/ui-kit/theme` from a
+     * control, not a relative path — because a relative path across that boundary makes ng-packagr
+     * claim the file for two entry points and a consumer then gets two copies of the same class.
+     * ng-packagr resolves those names from its own entry-point graph; `ng test` and the IDE do not,
+     * so they are mapped to source here.
+     */
+    "paths": {
+      "@cvhome-saas/ui-kit": ["src/public-api.ts"],
+      "@cvhome-saas/ui-kit/ui": ["ui/src/public-api.ts"],
+      "@cvhome-saas/ui-kit/theme": ["theme/src/public-api.ts"],
+      "@cvhome-saas/ui-kit/i18n": ["i18n/src/public-api.ts"],
+      "@cvhome-saas/ui-kit/forms": ["forms/src/public-api.ts"],
+      "@cvhome-saas/ui-kit/uaa": ["uaa/src/public-api.ts"]
+    },
+    "outDir": "./out-tsc",
+    "resolveJsonModule": true,
+    "strict": true,
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "skipLibCheck": true,
+    "isolatedModules": true,
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "target": "ES2022",
+    "module": "preserve"
+  },
+  "angularCompilerOptions": {
+    "enableI18nLegacyMessageIdFormat": false,
+    "strictInjectionParameters": true,
+    "strictInputAccessModifiers": true,
+    "typeCheckHostBindings": true,
+    "strictTemplates": true
+  }
+}

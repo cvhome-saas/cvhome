@@ -2,14 +2,7 @@ import {Component, input} from '@angular/core';
 import {FormControl, ReactiveFormsModule} from '@angular/forms';
 import {TranslocoDirective} from '@jsverse/transloco';
 
-import {Badge} from '@shared/ui/badge/badge';
-import {CopyField} from '@shared/ui/copy-field/copy-field';
-import {Icon} from '@shared/ui/icon/icon';
-import {Panel} from '@shared/ui/panel/panel';
-import {FormField} from '@shared/ui/form-field/form-field';
-import {SecretField} from '@shared/ui/secret-field/secret-field';
-import {TextField} from '@shared/ui/text-field/text-field';
-import {Toggle} from '@shared/ui/toggle/toggle';
+import {Badge, CopyField, Icon, Panel, FormField, SecretField, TextField, Toggle} from '@cvhome-saas/ui-kit/ui';
 import {
   LOGIN_PROVIDER_LABEL_KEY,
   LOGIN_STATE_TAG,

@@ -1,0 +1,68 @@
+# AdminRoleController — com.asrevo.cvhome.uaa.web.admin
+#
+# Addressed through store-core-gateway, not uaa's own port: `/uaa/**` is a gateway forward route, and
+# that is what the console's AdminRoleService calls. Env vars come from the repo-root
+# http-client.env.json; the session id from http-client.private.env.json (gitignored).
+#
+# Everything here is behind SCOPE_super_admin / ROLE_SUPER_ADMIN, enforced by uaa's own filter chain
+# and repeated on every method — so SUPER_ADMIN_SESSION_ID, not ORG_ADMIN_SESSION_ID.
+#
+# Requires a running stack: lcl start -d
+
+### list roles — 200 Page<Role>
+# `count`, not Spring's `size`: uaa depends on store-commons:autoconfigure like every other service.
+GET {{SELLER_UI_URL}}/uaa/api/v1/admin/roles?page=0&count=20
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+
+> {%
+    client.test("listed", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        client.assert(response.body.content !== undefined, "no content array");
+    });
+%}
+
+### create a role — 200 Role
+# @name createRole
+POST {{SELLER_UI_URL}}/uaa/api/v1/admin/roles
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{"name": "ROLE_HTTP_DEMO"}
+
+> {%
+    client.test("created", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        client.global.set("ROLE_ID", response.body.id);
+    });
+%}
+
+### read one — 200
+GET {{SELLER_UI_URL}}/uaa/api/v1/admin/roles/{{ROLE_ID}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+
+### rename it — 200
+# Note the leading slash on the controller's @PutMapping("/{id}"), unlike its siblings.
+PUT {{SELLER_UI_URL}}/uaa/api/v1/admin/roles/{{ROLE_ID}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{"name": "ROLE_HTTP_DEMO_RENAMED"}
+
+### a malformed id — 400 at binding, not 404
+# Every path variable is declared UUID, so a wrong-shaped id never reaches the service.
+GET {{SELLER_UI_URL}}/uaa/api/v1/admin/roles/not-a-uuid
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+
+### as a non-super-admin — 403
+GET {{SELLER_UI_URL}}/uaa/api/v1/admin/roles?page=0&count=20
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+> {%
+    client.test("forbidden", function () {
+        client.assert(response.status === 403, "status " + response.status);
+    });
+%}
+
+### delete it — 200
+DELETE {{SELLER_UI_URL}}/uaa/api/v1/admin/roles/{{ROLE_ID}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}

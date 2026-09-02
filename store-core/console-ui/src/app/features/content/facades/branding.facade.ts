@@ -4,11 +4,11 @@ import {TranslocoService} from '@jsverse/transloco';
 
 import {SiteSettingsService} from '@api/content/site-settings.service';
 import {ManagerStoreService} from '@api/tenancy/manager-store.service';
-import {ApiErrorService} from '@core/errors/api-error.service';
+import {ApiErrorService} from '@cvhome-saas/ui-kit';
 import {ConsoleShellFacade} from '@layouts/console-shell/facades/console-shell.facade';
 import type {SiteBranding, SiteSettings, SocialLink} from '@models/content';
 import {socialLinkProblem} from '@models/social-links';
-import {ToastService} from '@shared/ui/toast/toast';
+import {ToastService} from '@cvhome-saas/ui-kit/ui';
 
 /** The SEO fields the store writes about itself, in the order the form shows them. */
 export const SEO_FIELDS = ['metaTitle', 'metaDescription'] as const;

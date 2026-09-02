@@ -1,7 +1,6 @@
 import {Component, ElementRef, effect, input, output, signal, viewChild} from '@angular/core';
 
-import {FormField} from '@shared/ui/form-field/form-field';
-import {TextareaField} from '@shared/ui/textarea-field/textarea-field';
+import {FormField, TextareaField} from '@cvhome-saas/ui-kit/ui';
 
 /**
  * Suspends an organization, and records why.

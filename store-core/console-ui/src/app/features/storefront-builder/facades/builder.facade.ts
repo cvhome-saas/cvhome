@@ -6,7 +6,7 @@ import {catchError, map, of} from 'rxjs';
 
 import {LayoutsService} from '@api/content/layouts.service';
 import {MerchantStoreService} from '@api/merchant/store.service';
-import {ToastService} from '@shared/ui/toast/toast';
+import {ToastService} from '@cvhome-saas/ui-kit/ui';
 import type {
   LayoutDocument,
   LayoutFieldError,

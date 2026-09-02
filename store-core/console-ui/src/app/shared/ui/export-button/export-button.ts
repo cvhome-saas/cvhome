@@ -2,7 +2,7 @@ import {Component, ElementRef, inject, input, output, signal} from '@angular/cor
 import {TranslocoService} from '@jsverse/transloco';
 
 import {PdfExportService} from '@core/export/pdf-export.service';
-import {Icon} from '@shared/ui/icon/icon';
+import {Icon} from '@cvhome-saas/ui-kit/ui';
 
 /**
  * Exports a region of the page to PDF.

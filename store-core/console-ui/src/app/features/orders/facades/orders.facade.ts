@@ -5,13 +5,11 @@ import {TranslocoLocaleService} from '@jsverse/transloco-locale';
 
 import {ConsoleShellFacade} from '@layouts/console-shell/facades/console-shell.facade';
 
-import type {PageT} from '@core/table/table.types';
+import type {PageT} from '@cvhome-saas/ui-kit';
 import {ORDER_STATUSES} from '@models/checkout';
 import type {OrderRow, OrderTab, OrdersSnapshot} from '@models/orders';
 import {StatusLabel} from '@shared/i18n/status-label';
-import type {KpiDatum} from '@shared/ui/kpi-card/kpi-card';
-import type {TabItem} from '@shared/ui/tab-switcher/tab-switcher';
-import type {DateRangeValue} from '@shared/ui/date-range-picker/date-range-picker';
+import type {DateRangeValue, KpiDatum, TabItem} from '@cvhome-saas/ui-kit/ui';
 import {OrdersApi} from '../services/orders.api.service';
 
 /** How far back the page looks when it opens. */

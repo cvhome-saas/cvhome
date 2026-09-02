@@ -1,12 +1,11 @@
-import {Injectable, computed, inject, signal} from '@angular/core';
+import {Injectable, computed, inject, signal, DestroyRef} from '@angular/core';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {DestroyRef} from '@angular/core';
 import {TranslocoService} from '@jsverse/transloco';
 
 import {BillingApi} from '../services/billing.api.service';
-import {ApiErrorService} from '@core/errors/api-error.service';
+import {ApiErrorService} from '@cvhome-saas/ui-kit';
 import {SubscriptionFacade} from '@layouts/console-shell/billing/subscription.facade';
-import {ToastService} from '@shared/ui/toast/toast';
+import {ToastService} from '@cvhome-saas/ui-kit/ui';
 import type {EntitlementKey, EntitlementValue} from '@models/billing';
 
 /** The entitlements shown as the plan's allowances, in the order the catalogue lists them. */

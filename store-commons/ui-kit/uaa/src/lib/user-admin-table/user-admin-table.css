@@ -1,0 +1,100 @@
+:host {
+  display: block;
+}
+
+.cell-user {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-field);
+  min-inline-size: 0;
+}
+
+.avatar {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  inline-size: 2.25rem;
+  block-size: 2.25rem;
+  border-radius: var(--radius-full);
+  background: var(--accent-strong);
+  color: var(--accent-foreground);
+  font-size: var(--text-2xs);
+  font-weight: var(--font-weight-bold);
+}
+
+.identity {
+  display: grid;
+  gap: 0.15rem;
+  min-inline-size: 0;
+}
+
+.identity strong {
+  overflow: hidden;
+  color: var(--foreground-strong);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* An account with no name says so, rather than leaving the line blank. */
+.unnamed {
+  color: var(--muted-foreground);
+  font-style: italic;
+  font-weight: var(--font-weight-normal);
+}
+
+.email {
+  overflow: hidden;
+  color: var(--secondary-foreground);
+  font-size: var(--text-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  /* Latin data inside a page that may be right-to-left. */
+  unicode-bidi: plaintext;
+}
+
+.cell-roles {
+  overflow: hidden;
+  color: var(--secondary-foreground);
+  font-size: var(--text-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cell-scope {
+  overflow: hidden;
+  color: var(--secondary-foreground);
+  font-size: var(--text-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.latin {
+  unicode-bidi: plaintext;
+}
+
+/* "Not in any organization" is a state, not a value, so it reads as one. */
+.unscoped {
+  color: var(--muted-foreground);
+  font-style: italic;
+}
+
+.cell-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/*
+ * The selected row, when the table is being used as a selector. The marker sits on the inline-start
+ * edge so it mirrors with the document rather than staying on the left under RTL.
+ */
+app-table-row.selected {
+  background: var(--accent-veil);
+  box-shadow: inset 2px 0 0 var(--primary);
+}
+
+[dir='rtl'] app-table-row.selected {
+  box-shadow: inset -2px 0 0 var(--primary);
+}

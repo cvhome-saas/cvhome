@@ -1,0 +1,349 @@
+{
+  "shared": {
+    "actions": {
+      "cancel": "Cancel",
+      "retry": "Try again"
+    },
+    "autocomplete": {
+      "searching": "Searching…",
+      "noMatches": "No matches."
+    },
+    "copyField": {
+      "defaultLabel": "value",
+      "copy": "Copy {what}",
+      "failed": "{what} could not be copied. Select it and copy by hand."
+    },
+    "datePicker": {
+      "selectDate": "Select a date",
+      "dialogLabel": "Choose a date",
+      "previousMonth": "Previous month",
+      "nextMonth": "Next month",
+      "today": "Today",
+      "clear": "Clear",
+      "applied": "Date set to {date}",
+      "cleared": "Date cleared."
+    },
+    "dateRangePicker": {
+      "selectRange": "Select date range",
+      "rangeLabel": "{from} to {to}",
+      "rangeLabelOpen": "{from} to ...",
+      "dialogLabel": "Select date range",
+      "previousMonth": "Previous month",
+      "nextMonth": "Next month",
+      "pickEndDate": "pick an end date",
+      "pickStartDate": "Pick a start date",
+      "rangeApplied": "Range applied: {from} to {to}"
+    },
+    "export": {
+      "generatedAt": "Generated {date}",
+      "pageOfPages": "{page} / {pages}"
+    },
+    "exportButton": {
+      "export": "Export",
+      "preparing": "Preparing…",
+      "preparingAnnouncement": "Preparing the export.",
+      "readyAnnouncement": "Export ready. The download has started.",
+      "failedFallback": "The export failed.",
+      "canvasUnavailable": "Unable to prepare the export canvas.",
+      "failedAnnouncement": "Export failed. {message}"
+    },
+    "imagePicker": {
+      "choose": "Choose {field}",
+      "constraints": "{formats} · at least {width}×{height} · up to {size}",
+      "peek": "View {field} full size",
+      "replace": "Replace",
+      "saved": "Saved",
+      "stored": "Stored: {name}",
+      "tooHeavy": "That file is {actual}. The limit is {limit} — export it smaller and try again.",
+      "tooSmall": "That image is {actual}. It needs to be at least {width}×{height} to stay sharp.",
+      "unreadable": "That file could not be read as an image. Check it opens, then try again.",
+      "uploading": "Uploading…",
+      "wrongShape": "That image is {actual}, which is the wrong shape for this slot. Aim for {wanted} or the same proportions.",
+      "wrongType": "That is not a {formats} file."
+    },
+    "imagePreview": {
+      "close": "Close"
+    },
+    "kpiCard": {
+      "vsLastPeriod": "vs last period"
+    },
+    "localeSwitcher": {
+      "translatedIn": "Translated in {language}",
+      "notTranslatedIn": "Not translated in {language}"
+    },
+    "pagination": {
+      "previousPage": "Previous page",
+      "nextPage": "Next page",
+      "pageN": "Page {n}",
+      "label": "Pagination",
+      "records": "records",
+      "noRecords": "No {unit}",
+      "summary": "Showing {first}–{last} of {total} {unit}"
+    },
+    "richText": {
+      "defaultLabel": "Formatted text",
+      "toolbarLabel": "Text formatting",
+      "heading2": "Heading",
+      "heading3": "Subheading",
+      "bold": "Bold",
+      "italic": "Italic",
+      "bulletList": "Bulleted list",
+      "numberList": "Numbered list",
+      "link": "Link",
+      "clear": "Clear formatting",
+      "sourceLabel": "Edit HTML source",
+      "sourceFieldLabel": "HTML source of {field}",
+      "sourceOn": "HTML source shown. Undo history starts again from here.",
+      "sourceOff": "Formatted view shown. Undo history starts again from here.",
+      "linkUrl": "Link address",
+      "linkPlaceholder": "https://example.com",
+      "linkApply": "Add link",
+      "linkRefused": "That address cannot be used in a link.",
+      "keys": {
+        "heading2": "Ctrl+Alt+2",
+        "heading3": "Ctrl+Alt+3",
+        "bold": "Ctrl+B",
+        "italic": "Ctrl+I",
+        "bulletList": "Ctrl+Shift+8",
+        "numberList": "Ctrl+Shift+7",
+        "link": "Ctrl+K",
+        "clear": "Ctrl+\\"
+      }
+    },
+    "secretField": {
+      "copy": "Copy {field}",
+      "hide": "Hide {field}",
+      "notSet": "Not set",
+      "reveal": "Show {field}"
+    },
+    "sectionNav": {
+      "ariaLabel": "Sections",
+      "heading": "Sections",
+      "collapse": "Collapse sections",
+      "expand": "Expand sections",
+      "needsAttention": "Needs attention"
+    },
+    "stepper": {
+      "complete": "Complete"
+    },
+    "tagInput": {
+      "defaultLabel": "Tags",
+      "defaultPlaceholder": "Add tag…",
+      "removeTag": "Remove {tag}"
+    },
+    "toast": {
+      "regionLabel": "Notifications",
+      "dismiss": "Dismiss notification",
+      "tone": {
+        "success": "Success:",
+        "info": "Info:",
+        "warning": "Warning:",
+        "danger": "Error:"
+      }
+    },
+    "tree": {
+      "expand": "Expand {name}",
+      "collapse": "Collapse {name}",
+      "toggleVisibility": "Show or hide {name} in the storefront",
+      "visible": "Shown in the storefront",
+      "hidden": "Hidden from the storefront",
+      "nest": "Move {name} into the row above it",
+      "nestShort": "Move into the row above",
+      "unnest": "Move {name} out of its parent",
+      "unnestShort": "Move out",
+      "addChild": "Add a {noun} inside {name}",
+      "addChildShort": "Add {noun} inside",
+      "empty": "Nothing here yet.",
+      "actions": "Actions for {name}",
+      "keyboardHint": "Use Alt with the left and right arrows to move a {noun} in or out. Press Shift F10 for more actions.",
+      "visibilityShort": "Show in the storefront",
+      "keys": {
+        "nest": "Alt+→",
+        "unnest": "Alt+←",
+        "visibility": "Alt+V",
+        "addChild": "Alt+N",
+        "moveUp": "Alt+↑",
+        "moveDown": "Alt+↓"
+      },
+      "announce": {
+        "nesting": "Moving {name} in",
+        "unnesting": "Moving {name} out",
+        "hiding": "Hiding {name} from the storefront",
+        "showing": "Showing {name} in the storefront",
+        "settled": "{name}, level {level}, {position} of {size}",
+        "movingUp": "Moving {name} up",
+        "movingDown": "Moving {name} down"
+      },
+      "keyboardHintReorder": "Use Alt with the up and down arrows to reorder a {noun}, and with the left and right arrows to move it in or out. Press Shift F10 for more actions.",
+      "moveUp": "Move {name} up among its siblings",
+      "moveDown": "Move {name} down among its siblings",
+      "moveUpShort": "Move up",
+      "moveDownShort": "Move down"
+    },
+    "validation": {
+      "required": "This field is required.",
+      "email": "Enter a valid email address.",
+      "minLength": "Use at least {requiredLength} characters.",
+      "maxLength": "Use at most {requiredLength} characters.",
+      "weakPassword": "This is one of the most common passwords. Choose something harder to guess.",
+      "min": "Enter {min} or more.",
+      "max": "Enter {max} or less.",
+      "pattern": "This is not a valid value.",
+      "url": "Enter a valid web address.",
+      "phone": "Enter a valid phone number.",
+      "taken": "This is already in use.",
+      "mismatch": "These two do not match."
+    },
+    "listSeparator": ", ",
+    "storeStatus": {
+      "ACTIVE": "Active",
+      "SUSPENDED": "Suspended",
+      "ARCHIVED": "Archived",
+      "DELETED": "Deleted"
+    },
+    "provisioningState": {
+      "NOT_STARTED_PROVISIONING": "Queued",
+      "IN_PROGRESS_PROVISIONING": "Building",
+      "SUCCESSFULLY_PROVISIONING": "Ready",
+      "FAILED_PROVISIONING": "Failed"
+    },
+    "subscriptionStatus": {
+      "PENDING": "Pending",
+      "TRIALING": "Trial",
+      "ACTIVE": "Active",
+      "PAST_DUE": "Payment failed",
+      "SUSPENDED": "Suspended",
+      "CANCELED": "Cancelled"
+    },
+    "allowance": {
+      "unlimited": "Unlimited",
+      "included": "Included",
+      "notIncluded": "Not included",
+      "megabytes": "{{size}} MB"
+    },
+    "entitlement": {
+      "MAX_PRODUCTS": {
+        "limit": "Up to {count} products",
+        "unlimited": "Unlimited products",
+        "granted": "Product catalog"
+      },
+      "MAX_ORDERS_MONTH": {
+        "limit": "Up to {count} orders a month",
+        "unlimited": "Unlimited orders",
+        "granted": "Order processing"
+      },
+      "MAX_ACCOUNTS": {
+        "limit": "Up to {count} staff accounts",
+        "unlimited": "Unlimited staff accounts",
+        "granted": "Staff accounts"
+      },
+      "MAX_STORAGE_MB": {
+        "limit": "{count} MB of media storage",
+        "unlimited": "Unlimited media storage",
+        "granted": "Media storage"
+      },
+      "CUSTOM_DOMAIN": {
+        "limit": "Custom domain",
+        "unlimited": "Custom domain",
+        "granted": "Custom domain"
+      },
+      "ANALYTICS": {
+        "limit": "Analytics dashboards",
+        "unlimited": "Analytics dashboards",
+        "granted": "Analytics dashboards"
+      },
+      "PRIORITY_SUPPORT": {
+        "limit": "Priority support",
+        "unlimited": "Priority support",
+        "granted": "Priority support"
+      }
+    },
+    "theme": {
+      "forest": {
+        "label": "Forest",
+        "hint": "Emerald on deep green"
+      },
+      "midnight": {
+        "label": "Midnight",
+        "hint": "Indigo on slate"
+      },
+      "daylight": {
+        "label": "Daylight",
+        "hint": "Emerald on white"
+      },
+      "light": {
+        "label": "Light",
+        "hint": "White panels on cool grey"
+      }
+    },
+    "userAdmin": {
+      "action": {
+        "delete": "Delete account",
+        "disable": "Disable account",
+        "editRoles": "Edit roles",
+        "enable": "Enable account",
+        "impersonateUnavailable": "Signing in as another account is not built yet",
+        "resetPassword": "Set password",
+        "menuFor": "Actions for {{name}}"
+      },
+      "column": {
+        "actions": "Actions",
+        "roles": "Roles",
+        "scope": "Organization",
+        "status": "Status",
+        "user": "Account"
+      },
+      "disabled": "Disabled",
+      "enabled": "Enabled",
+      "noOrg": "No organization",
+      "unnamed": "No name recorded"
+    }
+  },
+  "errors": {
+    "generic": "Something went wrong. Try again, or contact support if it continues.",
+    "trace": "Support reference:",
+    "category": {
+      "validation": "Check the highlighted fields and try again.",
+      "unauthenticated": "Your session has expired. Sign in again.",
+      "forbidden": "You do not have permission to do that.",
+      "notFound": "That record could not be found.",
+      "conflict": "This changed somewhere else. Refresh and try again.",
+      "remote": "The service did not answer in time. Try again.",
+      "internal": "We could not complete that request. Try again."
+    },
+    "code": {
+      "clientSessionMissing": "Sign in to continue.",
+      "CONTENT_NOT_FOUND": "That content no longer exists. It may have been deleted.",
+      "CONTENT_SLUG_DUPLICATE": "Another item already uses this URL. Pick a different slug.",
+      "CONTENT_CODE_DUPLICATE": "Another item already uses this code.",
+      "CONTENT_VERSION_CONFLICT": "Someone else saved this while you were editing. Reload to see their version.",
+      "CONTENT_STATUS_TRANSITION_NOT_ALLOWED": "That status change is not allowed from here.",
+      "CONTENT_PUBLISH_INCOMPLETE": "Write the title and body in the source language before publishing.",
+      "CONTENT_SCHEDULE_INVALID": "Pick a publish date in the future.",
+      "CONTENT_PAGE_REFERENCED": "This page is used in a navigation menu. Remove it from the menu first.",
+      "CONTENT_BANNER_CAPACITY_EXCEEDED": "That placement is full. Unpublish another banner first.",
+      "CONTENT_MENU_DEPTH_EXCEEDED": "Menus go two levels deep at most.",
+      "CONTENT_MENU_TARGET_INVALID": "That menu link points at something that no longer exists.",
+      "CONTENT_POLICY_VERSION_IMMUTABLE": "A published policy version cannot be changed. Publish a new version instead.",
+      "CONTENT_POLICY_TYPE_ACTIVE_EXISTS": "A live policy of this type already exists.",
+      "CONTENT_FAQ_GROUP_NOT_FOUND": "That FAQ group no longer exists.",
+      "CONTENT_BULK_TOO_LARGE": "Select fewer items and try again.",
+      "MEDIA_NOT_FOUND": "That file is no longer in the library.",
+      "MEDIA_TYPE_NOT_ALLOWED": "That file type is not accepted.",
+      "MEDIA_TOO_LARGE": "That file is too large.",
+      "MEDIA_QUOTA_EXCEEDED": "Your media storage is full. Delete some files first.",
+      "MEDIA_REFERENCED": "This file is used by published content. Remove it there first.",
+      "MEDIA_FOLDER_NOT_EMPTY": "Empty the folder before deleting it.",
+      "MEDIA_UNREADABLE": "That file could not be read.",
+      "MEDIA_STORAGE_FAILED": "The file could not be stored. Try again.",
+      "CONTROL_PLANE_SIGNUP_EMAIL_TAKEN": "An account already uses this email address. Sign in instead, or use another address.",
+      "CATALOG_PRODUCT_OPTION_NOT_FOUND": "That option no longer exists. It may have been deleted.",
+      "CATALOG_PRODUCT_OPTION_DUPLICATE": "Another option already uses this code.",
+      "CATALOG_PRODUCT_OPTION_IN_USE": "This option is still used by a product or one of its variants. Remove it from every product first.",
+      "CATALOG_PRODUCT_VARIANT_DUPLICATE_SKU": "Another product or variant already uses one of these SKUs.",
+      "CATALOG_PRODUCT_VARIANT_DUPLICATE_COMBINATION": "Two variants describe the same combination of values.",
+      "CATALOG_PRODUCT_VARIANT_OPTIONS_INVALID": "Every variant must pick exactly one value of each chosen option.",
+      "CATALOG_PRODUCT_VARIANT_LIMIT_EXCEEDED": "A product can vary by at most 4 options and sell at most 100 variants."
+    }
+  }
+}

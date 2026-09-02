@@ -1,6 +1,6 @@
 import {Injectable, inject} from '@angular/core';
 
-import {AuthService} from '@core/auth/auth.service';
+import {AuthService} from '@cvhome-saas/ui-kit';
 
 /**
  * What the signed-in operator may do, as the console understands it.

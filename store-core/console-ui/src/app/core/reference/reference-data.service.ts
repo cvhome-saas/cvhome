@@ -1,11 +1,14 @@
 import {Injectable, computed, inject} from '@angular/core';
 import {TranslocoService} from '@jsverse/transloco';
 
-/** A code the server stores, with the name a reader sees. The code is the value; the label is prose. */
-export interface ReferenceOption {
-  readonly code: string;
-  readonly label: string;
-}
+import type {ReferenceOption} from '@cvhome-saas/ui-kit';
+
+/**
+ * Re-exported so the call sites that already import it from here keep working. The shape itself
+ * moved to the kit, where `app-locale-switcher` names it; the fetching stays here, because which
+ * countries and currencies exist is an application concern.
+ */
+export type {ReferenceOption};
 
 /**
  * Every ISO 3166-1 alpha-2 code currently assigned — 249 of them.

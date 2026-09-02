@@ -4,7 +4,7 @@ import {Observable, forkJoin, map, of} from 'rxjs';
 import {PodService, type NewPod} from '@api/pod-registry/pod.service';
 import {ManagerStoreService} from '@api/tenancy/manager-store.service';
 import {OrgService} from '@api/tenancy/org.service';
-import {optionalOne} from '@core/http/optional';
+import {optionalOne} from '@cvhome-saas/ui-kit';
 import {toOrgRow, toPlatformStoreRow, toPodDetail, type PlatformStoreRow, type PodDetail} from '@models/platform';
 import type {Endpoint} from '@models/pod';
 

@@ -4,10 +4,9 @@ import {AbstractControl} from '@angular/forms';
 import {Router} from '@angular/router';
 import {TranslocoService} from '@jsverse/transloco';
 
-import {ApiErrorService} from '@core/errors/api-error.service';
-import {AuthStory} from '@models/auth';
+import {ApiErrorService, AuthStory} from '@cvhome-saas/ui-kit';
 import type {CreateOrgRequest} from '@models/signup';
-import {ToastService} from '@shared/ui/toast/toast';
+import {ToastService} from '@cvhome-saas/ui-kit/ui';
 import {ConsoleAuthApi} from '../services/auth.api.service';
 
 /**

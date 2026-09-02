@@ -1,5 +1,4 @@
-import type {IconName} from '@models/ui';
-import type {Tone} from '@models/ui';
+import type {IconName, Tone} from '@cvhome-saas/ui-kit';
 
 /**
  * The dashboard speaks the shared categorical vocabulary; aliased so existing call sites

@@ -3,7 +3,7 @@ import {CanActivateFn, Router, UrlTree} from '@angular/router';
 import {Observable, catchError, combineLatest, map, of} from 'rxjs';
 
 import {SelectedStoreService} from '@api/tenancy/selected-store.service';
-import {AuthService} from '@core/auth/auth.service';
+import {AuthService} from '@cvhome-saas/ui-kit';
 import {ConsolePermissions} from '@shared/auth/console-permissions';
 
 /** Where a store-less operator is held until they have provisioned one. */

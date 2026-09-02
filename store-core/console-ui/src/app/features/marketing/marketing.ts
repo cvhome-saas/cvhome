@@ -4,10 +4,7 @@ import {ReactiveFormsModule} from '@angular/forms';
 import {TranslocoDirective} from '@jsverse/transloco';
 
 import type {ContactTopicId} from '@models/marketing';
-import {Icon} from '@shared/ui/icon/icon';
-import {FormField} from '@shared/ui/form-field/form-field';
-import {TextField} from '@shared/ui/text-field/text-field';
-import {TextareaField} from '@shared/ui/textarea-field/textarea-field';
+import {Icon, FormField, TextField, TextareaField} from '@cvhome-saas/ui-kit/ui';
 import {ContactFormService} from './services/contact-form.service';
 import {MarketingFacade} from './facades/marketing.facade';
 

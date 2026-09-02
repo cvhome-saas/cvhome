@@ -4,24 +4,8 @@ import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 import {TranslocoDatePipe} from '@jsverse/transloco-locale';
 
 import type {PlatformUserRow} from '@models/platform';
-import {Badge} from '@shared/ui/badge/badge';
-import {BusyOverlay} from '@shared/ui/busy-overlay/busy-overlay';
-import {ConfirmDialog} from '@shared/ui/confirm-dialog/confirm-dialog';
-import {CopyField} from '@shared/ui/copy-field/copy-field';
-import {DataTable, type TableColumn} from '@shared/ui/data-table/data-table';
-import {TableRow} from '@shared/ui/data-table/table-row';
-import {EmptyState} from '@shared/ui/empty-state/empty-state';
-import {Icon} from '@shared/ui/icon/icon';
-import {LoadError} from '@shared/ui/load-error/load-error';
-import {PageHeader} from '@shared/ui/page-header/page-header';
-import {Pagination} from '@shared/ui/pagination/pagination';
-import {Panel} from '@shared/ui/panel/panel';
-import {RolesDialog} from '@shared/ui/roles-dialog/roles-dialog';
-import {SectionNav} from '@shared/ui/section-nav/section-nav';
-import {SetPasswordDialog} from '@shared/ui/set-password-dialog/set-password-dialog';
-import {TabSwitcher, type TabItem} from '@shared/ui/tab-switcher/tab-switcher';
-import {TextField} from '@shared/ui/text-field/text-field';
-import {UserAdminTable, type UserAdminIntent} from '@shared/ui/user-admin-table/user-admin-table';
+import {Badge, BusyOverlay, ConfirmDialog, CopyField, DataTable, type TableColumn, TableRow, EmptyState, Icon, LoadError, PageHeader, Pagination, Panel, RolesDialog, SectionNav, SetPasswordDialog, TabSwitcher, type TabItem, TextField} from '@cvhome-saas/ui-kit/ui';
+import {UserAdminTable, type UserAdminIntent} from '@cvhome-saas/ui-kit/uaa';
 import {SuspendOrgDialog} from './components/suspend-org-dialog/suspend-org-dialog';
 import {ORG_SECTIONS, OrganizationDetailFacade, PAGE_SIZE, type OrgSection} from './facades/organization-detail.facade';
 

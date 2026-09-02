@@ -4,11 +4,7 @@ import {ReactiveFormsModule, type FormControl, type FormGroup} from '@angular/fo
 import {TranslocoDirective} from '@jsverse/transloco';
 import {startWith, switchMap} from 'rxjs';
 
-import {FormField} from '@shared/ui/form-field/form-field';
-import {Icon} from '@shared/ui/icon/icon';
-import {RichText} from '@shared/ui/rich-text/rich-text';
-import {TextField} from '@shared/ui/text-field/text-field';
-import {TextareaField} from '@shared/ui/textarea-field/textarea-field';
+import {FormField, Icon, RichText, TextField, TextareaField} from '@cvhome-saas/ui-kit/ui';
 import {SEO_DESCRIPTION_LIMIT, SEO_TITLE_LIMIT} from '@models/taxonomy';
 
 /** The copy `FormGroup` every catalogue editor carries. */

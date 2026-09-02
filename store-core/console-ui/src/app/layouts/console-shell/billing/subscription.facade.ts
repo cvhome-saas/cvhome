@@ -5,7 +5,7 @@ import {TranslocoLocaleService} from '@jsverse/transloco-locale';
 import {EMPTY, catchError, of} from 'rxjs';
 
 import {SubscriptionService} from '@api/billing/subscription.service';
-import {ApiError} from '@core/errors/api-error';
+import {ApiError} from '@cvhome-saas/ui-kit';
 import {ConsoleShellFacade} from '@layouts/console-shell/facades/console-shell.facade';
 import {PlanLabel} from '@shared/billing/plan-label';
 import type {Invoice, Subscription, SubscriptionStatus} from '@models/billing';

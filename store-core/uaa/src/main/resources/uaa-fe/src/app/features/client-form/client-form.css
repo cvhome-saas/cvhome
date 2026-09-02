@@ -1,0 +1,182 @@
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-block-end: var(--spacing-inline);
+  color: var(--muted-foreground);
+  font-size: var(--text-2xs);
+  font-weight: 600;
+}
+
+.back:hover {
+  color: var(--primary);
+}
+
+/* The arrow points back the way the document runs. */
+[dir='rtl'] .back app-icon {
+  transform: scaleX(-1);
+}
+
+.page {
+  display: grid;
+  gap: var(--spacing-section);
+}
+
+/*
+ * Sections beside the readiness panel. The panel is the reason this is a page and not a pane: it
+ * has to be visible while the fields it judges are being filled in.
+ */
+.layout {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-section);
+}
+
+.sections {
+  flex: 1;
+  min-inline-size: 0;
+  display: grid;
+  gap: var(--spacing-section);
+}
+
+.side {
+  position: sticky;
+  inset-block-start: var(--spacing-section);
+  flex: none;
+  inline-size: 17rem;
+  display: grid;
+  gap: var(--spacing-section);
+}
+
+@media (width < 1100px) {
+  .layout {
+    flex-direction: column;
+  }
+
+  .side {
+    position: static;
+    inline-size: 100%;
+  }
+}
+
+.fields,
+.groups {
+  display: grid;
+  gap: var(--spacing-group);
+}
+
+/*
+ * The four token lifetimes, two-up.
+ *
+ * Stacked full width they read as four identical bars and the eye has to check each label; paired,
+ * the access/refresh and code/device relationships are visible at a glance. `auto-fit` rather than
+ * a fixed two columns, because this panel is also what a 1100px window narrows to one.
+ */
+.ttl-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: var(--spacing-group);
+}
+
+/* The field and the button that fills it in, on one line. */
+.with-action {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--spacing-tight);
+  align-items: center;
+}
+
+.pick-group {
+  display: grid;
+  gap: var(--spacing-inline);
+}
+
+.group-label {
+  color: var(--foreground-subtle);
+  font-size: var(--text-4xs);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/*
+ * A wrapping set of picks. They are checkboxes, not chips: these are selections from a closed set,
+ * and a screen reader saying "switch, client_secret_basic, on" would be describing the wrong control.
+ */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-tight) var(--spacing-field);
+}
+
+.checks {
+  display: grid;
+  gap: var(--spacing-inline);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.check {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--spacing-tight);
+  align-items: start;
+  color: var(--muted-foreground);
+  font-size: var(--text-3xs);
+  line-height: 1.5;
+}
+
+.check.met {
+  color: var(--foreground);
+}
+
+.check app-icon {
+  color: var(--foreground-subtle);
+}
+
+.check.met app-icon {
+  color: var(--primary);
+}
+
+.summary {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.35rem var(--spacing-field);
+  margin: 0;
+}
+
+.summary dt {
+  color: var(--foreground-subtle);
+  font-family: var(--font-mono);
+  font-size: var(--text-4xs);
+}
+
+.summary dd {
+  overflow-wrap: anywhere;
+  margin: 0;
+  color: var(--foreground);
+  font-family: var(--font-mono);
+  font-size: var(--text-3xs);
+  unicode-bidi: plaintext;
+}
+
+.danger-zone {
+  display: grid;
+  gap: var(--spacing-inline);
+}
+
+/* The two actions fill the narrow panel rather than floating in the middle of it. */
+.danger-zone > button {
+  inline-size: 100%;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--spacing-tight);
+  padding-block-start: var(--spacing-inline);
+  border-block-start: 1px solid var(--border);
+}
+

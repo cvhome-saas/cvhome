@@ -5,7 +5,7 @@ import {TranslocoDirective} from '@jsverse/transloco';
 import {map} from 'rxjs';
 
 import {SubscriptionFacade} from '@layouts/console-shell/billing/subscription.facade';
-import {Icon} from '@shared/ui/icon/icon';
+import {Icon} from '@cvhome-saas/ui-kit/ui';
 
 /**
  * Where the hosted checkout sends the browser back to.

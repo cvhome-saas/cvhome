@@ -1,0 +1,21 @@
+/*
+ * The token layer, for the kit's own specs.
+ *
+ * `theme.service.spec.ts` asserts that all four themes define every themed token, and it does that
+ * by reading computed values off `document.documentElement` — so the stylesheet has to be in the
+ * karma page or the parity check has nothing to look at and reports all 60 tokens missing.
+ *
+ * Tailwind first: theme.css and theme-bridge.css are `@theme`/`@utility` sources and need its
+ * PostCSS pass. Forest first among the identities, because it also claims bare `:root`.
+ *
+ * Not shipped — this file exists only for `ng test`. Consumers import from
+ * `@cvhome-saas/ui-kit/theme/css/` and choose their own order.
+ */
+@import 'tailwindcss';
+
+@import '../css/theme.css';
+@import '../css/theme-forest.css';
+@import '../css/theme-midnight.css';
+@import '../css/theme-daylight.css';
+@import '../css/theme-light.css';
+@import '../css/theme-bridge.css';

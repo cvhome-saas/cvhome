@@ -14,9 +14,7 @@ import {TranslocoDirective} from '@jsverse/transloco';
 
 import {MediaService} from '@api/content/media.service';
 import type {MediaAsset, MediaKind} from '@models/content';
-import {FileDropZone} from '@shared/ui/file-drop-zone/file-drop-zone';
-import {Icon} from '@shared/ui/icon/icon';
-import {SearchBox} from '@shared/ui/search-box/search-box';
+import {FileDropZone, Icon, SearchBox} from '@cvhome-saas/ui-kit/ui';
 
 /**
  * "Choose from the media library" — a modal grid of the store's assets of one kind, with a search

@@ -3,7 +3,7 @@ import {provideRouter} from '@angular/router';
 import {Observable, Subject, of, throwError} from 'rxjs';
 
 import type {DashboardSnapshot} from '@models/dashboard';
-import type {DateRangeValue} from '@shared/ui/date-range-picker/date-range-picker';
+import type {DateRangeValue} from '@cvhome-saas/ui-kit/ui';
 import {ConsoleShellFacade} from '@layouts/console-shell/facades/console-shell.facade';
 import {ConsoleApi} from '@layouts/console-shell/services/console.api.service';
 import {CONSOLE_STORES_FAKE, FakeConsoleApi} from '@testing/console-api.fake';

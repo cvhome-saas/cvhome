@@ -1,6 +1,5 @@
-import type {PageT} from '@models/page';
+import type {KpiDatum, PageT, Tone} from '@cvhome-saas/ui-kit';
 import type {PaymentStatus} from '@models/payment';
-import type {KpiDatum, Tone} from '@models/ui';
 
 /**
  * The payments ledger's view models.

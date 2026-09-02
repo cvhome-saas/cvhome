@@ -1,0 +1,211 @@
+<ng-container *transloco="let t">
+  <app-page-header [title]="t('users.title')" [context]="t('users.context')" />
+
+  @if (facade.error(); as failure) {
+    <app-load-error [message]="failure.message" (retry)="facade.reload()" />
+  }
+
+  <app-busy-overlay reserve="page" [busy]="facade.isLoading()" [label]="t('users.loading')">
+    @if (!facade.isEmpty()) {
+      <div class="stack">
+        <!--
+          Said once at the top rather than as a search box that would narrow nothing: uaa's admin
+          list matches metadata equality and has no text query at all.
+        -->
+        <app-notice-bar icon="info" tone="blue" [message]="t('users.notice.noSearch')" />
+
+        <app-panel [title]="t('users.panel.title')">
+          <button panelAction class="primary-action" type="button" (click)="facade.startCreate()">
+            {{ t('users.action.create') }}
+          </button>
+
+          @if (facade.rows().length) {
+            <app-user-admin-table
+              [rows]="facade.rows()"
+              [label]="t('users.panel.title')"
+              [busy]="facade.busy()"
+              [roleList]="roleList"
+              [selectable]="true"
+              (picked)="facade.select($event)"
+              (act)="onAction($event)"
+            />
+
+            <app-pagination
+              [page]="facade.pageIndex()"
+              [totalPages]="facade.totalPages()"
+              [totalElements]="facade.totalElements()"
+              [pageSize]="pageSize"
+              [unit]="t('users.unit')"
+              [label]="t('users.paginationLabel')"
+              (pageChange)="facade.goToPage($event)"
+            />
+          } @else {
+            <app-empty-state
+              icon="users"
+              [title]="t('users.empty.title')"
+              [message]="t('users.empty.message')"
+            />
+          }
+        </app-panel>
+      </div>
+    }
+  </app-busy-overlay>
+
+  @if (facade.editing(); as target) {
+    <app-form-dialog
+      open
+      wide
+      [title]="target === 'new' ? t('users.detail.createTitle') : t('users.detail.editTitle')"
+      [description]="target === 'new' ? t('users.detail.createHint') : target.username"
+      [closeLabel]="t('shared.actions.cancel')"
+      (dismissed)="facade.dismiss()"
+    >
+      <form class="form" [formGroup]="facade.form" (ngSubmit)="facade.save()">
+        @if (target === 'new') {
+          <div class="pair">
+            <app-form-field
+              controlId="username"
+              required
+              [label]="t('users.detail.username')"
+              [control]="facade.form.controls.username"
+              [hint]="t('users.detail.usernameHint')"
+            >
+              <app-text-field formControlName="username" id="username" latin mono />
+            </app-form-field>
+
+            <app-form-field
+              controlId="email"
+              [label]="t('users.detail.email')"
+              [control]="facade.form.controls.email"
+            >
+              <app-text-field formControlName="email" id="email" latin />
+            </app-form-field>
+          </div>
+        }
+
+        <div class="pair">
+          <app-form-field
+            controlId="first-name"
+            [label]="t('users.detail.firstName')"
+            [control]="facade.form.controls.firstName"
+          >
+            <app-text-field formControlName="firstName" id="first-name" />
+          </app-form-field>
+
+          <app-form-field
+            controlId="last-name"
+            [label]="t('users.detail.lastName')"
+            [control]="facade.form.controls.lastName"
+          >
+            <app-text-field formControlName="lastName" id="last-name" />
+          </app-form-field>
+        </div>
+
+        @if (target !== 'new') {
+          <!--
+            Read-only, and said so. `UpdateUserRequest` carries neither: the username is the identity
+            a JWT `sub` holds, and uaa exposes no way to change an email here. Rendering them as
+            fields that silently fail to save would be worse than not rendering them. See
+            lessons.md, "Users — email and username cannot be changed here".
+          -->
+          <div class="readonly">
+            <div class="meta">
+              <span class="meta-label">{{ t('users.detail.username') }}</span>
+              <span class="meta-value">{{ target.username }}</span>
+            </div>
+            <div class="meta">
+              <span class="meta-label">{{ t('users.detail.email') }}</span>
+              <span class="meta-value">{{ target.email || '—' }}</span>
+            </div>
+            <p class="readonly-note">{{ t('users.detail.readOnlyNote') }}</p>
+          </div>
+
+          <app-toggle
+            formControlName="enabled"
+            [label]="t('users.detail.enabledLabel')"
+            [description]="t('users.detail.enabledHint')"
+          />
+        }
+
+        <div class="roles">
+          <p class="group-label">{{ t('users.detail.roles') }}</p>
+          <div class="chips">
+            @for (role of facade.roleOptions(); track role.value) {
+              <app-checkbox
+                [checked]="facade.draftRoles().includes(role.value)"
+                [label]="role.label"
+                (checkedChange)="facade.toggleRole(role.value)"
+              />
+            } @empty {
+              <p class="readonly-note">{{ t('users.roles.empty') }}</p>
+            }
+          </div>
+        </div>
+
+        <app-pair-list
+          [array]="facade.form.controls.metadata"
+          [label]="t('users.detail.metadata')"
+          [lockedKeys]="facade.lockedMetadataKeys()"
+          [lockedHint]="t('users.detail.metadataLocked')"
+          (add)="facade.addMetadata()"
+          (remove)="facade.removeMetadata($event)"
+        />
+        <p class="readonly-note">{{ t('users.detail.metadataHint') }}</p>
+
+        <div class="actions">
+          @if (target !== 'new') {
+            <button class="secondary-action" type="button" (click)="facade.askReset(target)">
+              {{ t('users.detail.setPassword') }}
+            </button>
+            <div class="grow"></div>
+            <button class="danger-action" type="button" (click)="facade.askDelete(target)">
+              {{ t('users.delete.confirm') }}
+            </button>
+          } @else {
+            <div class="grow"></div>
+          }
+          <button class="secondary-action" type="button" (click)="facade.dismiss()">
+            {{ t('shared.actions.cancel') }}
+          </button>
+          <button class="primary-action" type="submit" [disabled]="facade.busy()">
+            {{ facade.busy() ? t('users.detail.saving') : t('users.detail.save') }}
+          </button>
+        </div>
+      </form>
+    </app-form-dialog>
+  }
+
+  <app-set-password-dialog
+    [open]="!!facade.resetting()"
+    [busy]="facade.busy()"
+    [title]="t('users.reset.title')"
+    [message]="t('users.reset.message', {name: facade.resetting()?.username ?? ''})"
+    [passwordLabel]="t('users.reset.password')"
+    [repeatLabel]="t('users.reset.repeatPassword')"
+    [hint]="t('users.reset.hint')"
+    [handoverHint]="t('users.reset.handoverHint')"
+    [weakMessage]="t('users.reset.weak')"
+    [mismatchMessage]="t('users.reset.mismatch')"
+    [confirmLabel]="t('users.reset.confirm')"
+    [busyLabel]="t('users.reset.busy')"
+    [cancelLabel]="t('shared.actions.cancel')"
+    (submitted)="facade.confirmReset($event)"
+    (dismissed)="facade.dismiss()"
+  />
+
+  <!--
+    Typed confirmation: there is no undo and no soft delete. uaa refuses outright when the target is
+    the platform's own super admin, and that refusal is shown rather than predicted.
+  -->
+  <app-confirm-dialog
+    [open]="!!facade.deleting()"
+    [title]="t('users.delete.title')"
+    [message]="t('users.delete.message', {name: facade.deleting()?.username ?? ''})"
+    [confirmationText]="facade.deleting()?.username ?? null"
+    [confirmationLabel]="t('users.delete.confirmationLabel')"
+    [confirmLabel]="t('users.delete.confirm')"
+    [cancelLabel]="t('shared.actions.cancel')"
+    (confirmed)="facade.confirmDelete()"
+    (dismissed)="facade.dismiss()"
+  />
+</ng-container>

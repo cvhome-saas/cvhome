@@ -4,7 +4,7 @@ import {Observable, catchError, forkJoin, map, of, switchMap} from 'rxjs';
 import {CatalogReference} from '@api/catalog/catalog-reference.service';
 import {ProductService, type ProductQuery} from '@api/catalog/product.service';
 import {InventoryService} from '@api/inventory/inventory.service';
-import type {PageRequest} from '@core/table/table.types';
+import type {PageRequest} from '@cvhome-saas/ui-kit';
 import type {ReadableCategory, ReadableProduct, SkuInventory} from '@models/catalog';
 import type {
   InlineProductEdit,

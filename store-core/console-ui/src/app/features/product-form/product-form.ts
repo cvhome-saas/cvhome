@@ -2,13 +2,7 @@ import {Component, computed, effect, inject, input} from '@angular/core';
 import {Router} from '@angular/router';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 
-import {BusyOverlay} from '@shared/ui/busy-overlay/busy-overlay';
-import {Icon} from '@shared/ui/icon/icon';
-import {LoadError} from '@shared/ui/load-error/load-error';
-import {PageHeader} from '@shared/ui/page-header/page-header';
-import {Panel} from '@shared/ui/panel/panel';
-import {ProgressTrack} from '@shared/ui/progress-track/progress-track';
-import {Stepper} from '@shared/ui/stepper/stepper';
+import {BusyOverlay, Icon, LoadError, PageHeader, Panel, ProgressTrack, Stepper} from '@cvhome-saas/ui-kit/ui';
 import {isProductStep, type ProductStep} from '@models/products';
 import {EssentialsStep} from './components/essentials-step/essentials-step';
 import {MediaStep} from './components/media-step/media-step';
@@ -16,7 +10,7 @@ import {OrganizeStep} from './components/organize-step/organize-step';
 import {PricingStep} from './components/pricing-step/pricing-step';
 import {VariantsStep} from './components/variants-step/variants-step';
 import {ProductFormFacade} from './facades/product-form.facade';
-import {positiveIntParam} from '@core/routing/route-params';
+import {positiveIntParam} from '@cvhome-saas/ui-kit';
 
 /**
  * The product wizard: five steps, a readiness checklist and a translations panel.

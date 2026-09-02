@@ -1,6 +1,4 @@
-import type {ConsoleLocale} from '@models/locale';
-import type {IconName} from '@models/ui';
-import type {Tone} from '@models/ui';
+import type {ConsoleLocale, IconName, Tone} from '@cvhome-saas/ui-kit';
 
 /**
  * The store's settings surface.

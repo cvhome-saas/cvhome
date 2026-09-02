@@ -1,7 +1,7 @@
 import {Injectable, inject} from '@angular/core';
 import {FormControl, FormGroup, NonNullableFormBuilder, Validators} from '@angular/forms';
 
-import {passwordsMatch} from '@shared/validators/passwords-match';
+import {passwordsMatch} from '@cvhome-saas/ui-kit/forms';
 import type {TeamRow} from '@models/team';
 
 /**

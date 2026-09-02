@@ -4,7 +4,7 @@ import {provideRouter} from '@angular/router';
 
 import {SubscriptionService} from '@api/billing/subscription.service';
 import {ConsoleApi} from '@layouts/console-shell/services/console.api.service';
-import {NOTIFICATION_PORT} from '@core/errors/notification.port';
+import {NOTIFICATION_PORT} from '@cvhome-saas/ui-kit';
 import {
   FakeSubscriptionService,
   activeSubscription,

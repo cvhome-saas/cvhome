@@ -1,8 +1,8 @@
 import {Injectable, inject} from '@angular/core';
 import {Observable} from 'rxjs';
 
-import {CrudService} from '@core/http/crud.service';
-import type {PageRequest, PageT} from '@core/table/table.types';
+import {CrudService} from '@cvhome-saas/ui-kit';
+import type {PageRequest, PageT} from '@cvhome-saas/ui-kit';
 import type {
   CreatedEntity,
   EntityExists,

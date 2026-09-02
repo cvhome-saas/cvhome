@@ -3,8 +3,8 @@ import {HttpEventType, type HttpEvent} from '@angular/common/http';
 import {Injectable, inject} from '@angular/core';
 import {Observable, filter, map} from 'rxjs';
 
-import {CrudService} from '@core/http/crud.service';
-import type {PageT} from '@models/page';
+import {CrudService} from '@cvhome-saas/ui-kit';
+import type {PageT} from '@cvhome-saas/ui-kit';
 import type {
   MediaAsset,
   MediaFolder,

@@ -3,8 +3,7 @@ import {Component, inject} from '@angular/core';
 import {RouterLink, RouterLinkActive} from '@angular/router';
 import {TranslocoDirective, TranslocoPipe} from '@jsverse/transloco';
 
-import {Icon} from '@shared/ui/icon/icon';
-import {IconName} from '@shared/ui/icon/icon-paths';
+import {Icon, IconName} from '@cvhome-saas/ui-kit/ui';
 import {ConsoleShellFacade} from '../../facades/console-shell.facade';
 import {StoreSwitcher} from '../store-switcher/store-switcher';
 

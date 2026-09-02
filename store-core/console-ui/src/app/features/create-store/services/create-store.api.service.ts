@@ -3,7 +3,7 @@ import {EMPTY, Observable, catchError, forkJoin} from 'rxjs';
 
 import {PodService} from '@api/pod-registry/pod.service';
 import {ManagerStoreService} from '@api/tenancy/manager-store.service';
-import {optionalList} from '@core/http/optional';
+import {optionalList} from '@cvhome-saas/ui-kit';
 import type {Pod} from '@models/pod';
 import type {CreateStoreRequest, ManagerStore} from '@models/tenancy';
 

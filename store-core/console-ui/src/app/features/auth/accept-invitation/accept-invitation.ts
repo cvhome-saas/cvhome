@@ -1,10 +1,9 @@
-import {Component, effect, inject, input} from '@angular/core';
+import {Component, effect, inject, input, computed} from '@angular/core';
 import {Router} from '@angular/router';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
-import {computed} from '@angular/core';
 
-import type {AuthStory as AuthStoryModel} from '@models/auth';
-import {Icon} from '@shared/ui/icon/icon';
+import type {AuthStory as AuthStoryModel} from '@cvhome-saas/ui-kit';
+import {Icon} from '@cvhome-saas/ui-kit/ui';
 import {AuthStory} from '../components/auth-story';
 import {AcceptInvitationFacade} from './facades/accept-invitation.facade';
 

@@ -4,9 +4,8 @@ import {TranslocoService} from '@jsverse/transloco';
 import {Observable} from 'rxjs';
 import {AbstractControl} from '@angular/forms';
 
-import {ApiErrorService} from '@core/errors/api-error.service';
-import {clearServerErrorsOnChange} from '@core/errors/form-error.utils';
-import {LocaleService} from '@core/i18n/locale.service';
+import {ApiErrorService, clearServerErrorsOnChange} from '@cvhome-saas/ui-kit';
+import {LocaleService} from '@cvhome-saas/ui-kit/i18n';
 import {ReferenceDataService, type ReferenceOption} from '@core/reference/reference-data.service';
 import {ConsoleShellFacade} from '@layouts/console-shell/facades/console-shell.facade';
 import {
@@ -21,10 +20,8 @@ import {
   type OptionCard,
   type TypeCard,
 } from '@models/taxonomy';
-import type {AutocompleteOption} from '@shared/ui/autocomplete/autocomplete';
-import type {TabItem} from '@shared/ui/tab-switcher/tab-switcher';
-import type {TreeMove, TreeNode, TreeNodeId} from '@shared/ui/tree/tree';
-import {ToastService} from '@shared/ui/toast/toast';
+import type {AutocompleteOption, TabItem, TreeMove, TreeNode, TreeNodeId} from '@cvhome-saas/ui-kit/ui';
+import {ToastService} from '@cvhome-saas/ui-kit/ui';
 import {ProductSearch} from '@api/catalog/product-search.service';
 import type {PersistableProductOption, ProductOptionDescription} from '@models/catalog';
 import {CatalogueApi} from '../services/catalogue.api.service';

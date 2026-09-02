@@ -2,13 +2,7 @@ import {Component, computed, inject, input, signal} from '@angular/core';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 
 import {MAX_VARIANTS, MAX_VARIANT_OPTIONS} from '@models/products';
-import {Icon} from '@shared/ui/icon/icon';
-import {NoticeBar} from '@shared/ui/notice-bar/notice-bar';
-import {NumberField} from '@shared/ui/number-field/number-field';
-import {Panel} from '@shared/ui/panel/panel';
-import {Select, type SelectOption} from '@shared/ui/select/select';
-import {TextField} from '@shared/ui/text-field/text-field';
-import {Toggle} from '@shared/ui/toggle/toggle';
+import {Icon, NoticeBar, NumberField, Panel, Select, type SelectOption, TextField, Toggle} from '@cvhome-saas/ui-kit/ui';
 import {ProductFormFacade} from '../../facades/product-form.facade';
 
 /**

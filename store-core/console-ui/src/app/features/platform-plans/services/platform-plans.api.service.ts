@@ -3,7 +3,7 @@ import {Observable, forkJoin, map} from 'rxjs';
 
 import {PlatformBillingService} from '@api/billing/platform-billing.service';
 import {SubscriptionService} from '@api/billing/subscription.service';
-import {optionalOne} from '@core/http/optional';
+import {optionalOne} from '@cvhome-saas/ui-kit';
 import type {PlanView} from '@models/billing';
 import type {PlanStatisticDto} from '@models/platform-billing';
 

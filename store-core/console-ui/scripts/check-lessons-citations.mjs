@@ -13,8 +13,10 @@
 import {readFileSync} from 'node:fs';
 import {execSync} from 'node:child_process';
 
+import {SOURCE_ROOTS} from './sources.mjs';
+
 const LESSONS = 'lessons.md';
-const SOURCE_GLOB = 'src';
+const SOURCE_GLOB = SOURCE_ROOTS.join(' ');
 
 const headings = new Set(
   readFileSync(LESSONS, 'utf8')

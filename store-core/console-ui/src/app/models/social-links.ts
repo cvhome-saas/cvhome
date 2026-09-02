@@ -1,4 +1,4 @@
-import type {IconName} from '@models/ui';
+import type {IconName} from '@cvhome-saas/ui-kit';
 
 /**
  * What the console knows about the social providers a storefront footer links to.

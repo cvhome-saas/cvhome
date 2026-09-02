@@ -1,4 +1,4 @@
-import type {PageT} from '@models/page';
+import type {PageT} from '@cvhome-saas/ui-kit';
 import type {LocalisedCopy} from '@models/taxonomy';
 
 /**

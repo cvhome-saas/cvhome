@@ -1,11 +1,7 @@
 import {Component, ElementRef, effect, input, output, viewChild} from '@angular/core';
 import {ReactiveFormsModule} from '@angular/forms';
 
-import {FieldError} from '@shared/ui/form-field/field-error';
-import {FormField} from '@shared/ui/form-field/form-field';
-import {NoticeBar} from '@shared/ui/notice-bar/notice-bar';
-import {Select, type SelectOption} from '@shared/ui/select/select';
-import {TextField} from '@shared/ui/text-field/text-field';
+import {FieldError, FormField, NoticeBar, Select, type SelectOption, TextField} from '@cvhome-saas/ui-kit/ui';
 import type {PodForm} from '../../services/pod-form.service';
 
 /**

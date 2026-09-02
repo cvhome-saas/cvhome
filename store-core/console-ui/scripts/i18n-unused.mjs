@@ -16,16 +16,18 @@
 import {readFileSync} from 'node:fs';
 import {execSync} from 'node:child_process';
 
+import {SOURCE_DIRS, dictionary} from './sources.mjs';
+
 const flatten = (node, prefix = '') =>
   Object.entries(node).flatMap(([key, value]) => {
     const path = prefix ? `${prefix}.${key}` : key;
     return value && typeof value === 'object' ? flatten(value, path) : [path];
   });
 
-const keys = flatten(JSON.parse(readFileSync('src/locale/en.json', 'utf8')));
+const keys = flatten(dictionary('en'));
 
 const source = execSync(
-  "find src/app -type f \\( -name '*.ts' -o -name '*.html' \\) -exec cat {} +",
+  `find ${SOURCE_DIRS.join(' ')} -type f \\( -name '*.ts' -o -name '*.html' \\) -exec cat {} +`,
   {encoding: 'utf8', maxBuffer: 64 * 1024 * 1024},
 );
 

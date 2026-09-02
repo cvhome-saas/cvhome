@@ -10,23 +10,8 @@ import type {
   ContentStatus,
   TransitionAction,
 } from '@models/content';
-import {ActionMenu, type MenuAction} from '@shared/ui/action-menu/action-menu';
-import {Badge} from '@shared/ui/badge/badge';
-import type {BadgeTone} from '@shared/ui/badge/badge';
-import {BusyOverlay} from '@shared/ui/busy-overlay/busy-overlay';
-import {Checkbox} from '@shared/ui/checkbox/checkbox';
-import {ConfirmDialog} from '@shared/ui/confirm-dialog/confirm-dialog';
-import {DataTable, type TableColumn} from '@shared/ui/data-table/data-table';
-import {TableRow} from '@shared/ui/data-table/table-row';
-import {EmptyState} from '@shared/ui/empty-state/empty-state';
-import {Icon} from '@shared/ui/icon/icon';
-import type {IconName} from '@shared/ui/icon/icon-paths';
-import {LoadError} from '@shared/ui/load-error/load-error';
-import {Pagination} from '@shared/ui/pagination/pagination';
-import {Panel} from '@shared/ui/panel/panel';
-import {SearchBox} from '@shared/ui/search-box/search-box';
-import {Select, type SelectOption} from '@shared/ui/select/select';
-import {TabSwitcher} from '@shared/ui/tab-switcher/tab-switcher';
+import {ActionMenu, type MenuAction, Badge, BusyOverlay, Checkbox, ConfirmDialog, DataTable, type TableColumn, TableRow, EmptyState, Icon, LoadError, Pagination, Panel, SearchBox, Select, type SelectOption, TabSwitcher} from '@cvhome-saas/ui-kit/ui';
+import type {BadgeTone, IconName} from '@cvhome-saas/ui-kit/ui';
 import {
   CONTENT_PAGE_SIZE,
   ContentListFacade,

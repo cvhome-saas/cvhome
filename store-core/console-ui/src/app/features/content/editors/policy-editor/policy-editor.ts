@@ -11,7 +11,7 @@ import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 import {TranslocoLocaleService} from '@jsverse/transloco-locale';
 
 import {PoliciesService} from '@api/content/policies.service';
-import {ApiErrorService} from '@core/errors/api-error.service';
+import {ApiErrorService} from '@cvhome-saas/ui-kit';
 import {
   POLICY_TYPES,
   type PersistablePolicy,
@@ -20,13 +20,7 @@ import {
   type ReadablePolicyVersion,
 } from '@models/content';
 import {ConsolePermissions} from '@shared/auth/console-permissions';
-import {Badge} from '@shared/ui/badge/badge';
-import {DateTimeField} from '@shared/ui/date-time-field/date-time-field';
-import {FormField} from '@shared/ui/form-field/form-field';
-import {Panel} from '@shared/ui/panel/panel';
-import {TextField} from '@shared/ui/text-field/text-field';
-import {ToastService} from '@shared/ui/toast/toast';
-import {Toggle} from '@shared/ui/toggle/toggle';
+import {Badge, DateTimeField, FormField, Panel, TextField, ToastService, Toggle} from '@cvhome-saas/ui-kit/ui';
 import {LocaleCopy, type CopyFields} from '../../components/locale-copy/locale-copy';
 import {
   PublishChecklist,

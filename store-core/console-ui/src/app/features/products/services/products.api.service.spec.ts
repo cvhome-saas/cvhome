@@ -6,17 +6,11 @@ import {ManufacturerService} from '@api/catalog/manufacturer.service';
 import {ProductService, type ProductQuery} from '@api/catalog/product.service';
 import {ProductTypeService} from '@api/catalog/product-type.service';
 import {MerchantStoreService} from '@api/merchant/store.service';
-import type {PageT} from '@core/table/table.types';
-import type {
-  LightPersistableProduct,
-  ReadableCategory,
-  ReadableManufacturer,
-  ReadableProduct,
-} from '@models/catalog';
+import type {PageT} from '@cvhome-saas/ui-kit';
+import type {LightPersistableProduct, ReadableCategory, ReadableManufacturer, ReadableProduct, SkuInventory} from '@models/catalog';
 import type {ReadableMerchantStore} from '@models/merchant';
 import {NO_FILTERS} from '@models/products';
 import {InventoryService} from '@api/inventory/inventory.service';
-import type {SkuInventory} from '@models/catalog';
 import {ProductsApi, type ProductsQuery} from './products.api.service';
 
 /** One product shaped as `GET /api/v2/private/base-products` actually sends it. */

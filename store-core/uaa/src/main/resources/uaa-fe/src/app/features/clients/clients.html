@@ -1,0 +1,54 @@
+<ng-container *transloco="let t">
+  <app-page-header [title]="t('clients.title')" [context]="t('clients.context')" />
+
+  @if (facade.error(); as failure) {
+    <app-load-error [message]="failure.message" (retry)="facade.reload()" />
+  }
+
+  <app-busy-overlay reserve="page" [busy]="facade.isLoading()" [label]="t('clients.loading')">
+    @if (!facade.isEmpty()) {
+      <div class="stack">
+        <!--
+          The one thing an operator must know before registering anything: uaa never gives a secret
+          back. Not a hint on the field — by the time they are reading the field they have already
+          decided not to write it down.
+        -->
+        <app-notice-bar icon="lock" tone="amber" [message]="t('clients.notice.secret')" />
+
+        <app-panel [title]="t('clients.panel.title')">
+          <a panelAction class="primary-action" routerLink="/clients/new">
+            {{ t('clients.action.register') }}
+          </a>
+
+          @if (facade.rows().length) {
+            <app-data-table [columns]="columns(t)" [label]="t('clients.panel.title')">
+              @for (client of facade.rows(); track client.id) {
+                <app-table-row class="row" [interactive]="true" (click)="open(client)">
+                  <span class="cell mono" [attr.data-label]="t('clients.column.clientId')">{{ client.clientId }}</span>
+                  <span class="cell" [attr.data-label]="t('clients.column.clientName')">{{ client.clientName }}</span>
+                  <span class="cell go" aria-hidden="true"><app-icon name="chevronRight" [size]="15" /></span>
+                </app-table-row>
+              }
+            </app-data-table>
+
+            <app-pagination
+              [page]="facade.pageIndex()"
+              [totalPages]="facade.totalPages()"
+              [totalElements]="facade.totalElements()"
+              [pageSize]="pageSize"
+              [unit]="t('clients.unit')"
+              [label]="t('clients.paginationLabel')"
+              (pageChange)="facade.goToPage($event)"
+            />
+          } @else {
+            <app-empty-state
+              icon="code"
+              [title]="t('clients.empty.title')"
+              [message]="t('clients.empty.message')"
+            />
+          }
+        </app-panel>
+      </div>
+    }
+  </app-busy-overlay>
+</ng-container>

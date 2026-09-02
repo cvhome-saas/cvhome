@@ -3,7 +3,7 @@ import {Observable, of, throwError} from 'rxjs';
 
 import {OrgMemberService} from '@api/tenancy/org-member.service';
 import {UserAccountService} from '@api/tenancy/user-account.service';
-import type {SpringPage} from '@core/table/table.types';
+import type {SpringPage} from '@cvhome-saas/ui-kit';
 import type {Invitation, PersistableUser, ReadableUser, UserPassword} from '@models/users';
 import {UsersApi} from './users.api.service';
 

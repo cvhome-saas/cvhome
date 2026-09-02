@@ -2,11 +2,11 @@ import {Injectable, computed, inject, signal} from '@angular/core';
 import {TranslocoService} from '@jsverse/transloco';
 import {TranslocoLocaleService} from '@jsverse/transloco-locale';
 
-import type {KpiDatum} from '@models/ui';
+import type {KpiDatum} from '@cvhome-saas/ui-kit';
 import {Money} from '@shared/i18n/money';
-import {snapshot} from '@shared/state/snapshot';
+import {snapshot} from '@cvhome-saas/ui-kit';
 import type {TrendPoint as ChartPoint} from '@shared/ui/charts/trend-chart';
-import type {DateRangeValue} from '@shared/ui/date-range-picker/date-range-picker';
+import type {DateRangeValue} from '@cvhome-saas/ui-kit/ui';
 import {PlatformDashboardApi, type CompleteRange} from '../services/platform-dashboard.api.service';
 
 /** How far back the dashboard looks when the page opens. */

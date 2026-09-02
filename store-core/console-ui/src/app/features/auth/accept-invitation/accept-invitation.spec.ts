@@ -3,7 +3,7 @@ import {provideRouter} from '@angular/router';
 import {Observable, of, throwError} from 'rxjs';
 
 import {OrgMemberService} from '@api/tenancy/org-member.service';
-import {NOTIFICATION_PORT} from '@core/errors/notification.port';
+import {NOTIFICATION_PORT} from '@cvhome-saas/ui-kit';
 import type {Invitation} from '@models/users';
 import {translocoTesting} from '@testing/transloco-testing';
 import {AcceptInvitation} from './accept-invitation';

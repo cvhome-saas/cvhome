@@ -2,11 +2,7 @@ import {Component, computed, inject, input} from '@angular/core';
 import {ReactiveFormsModule} from '@angular/forms';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 
-import {FormField} from '@shared/ui/form-field/form-field';
-import {Panel} from '@shared/ui/panel/panel';
-import {TextField} from '@shared/ui/text-field/text-field';
-import {TextareaField} from '@shared/ui/textarea-field/textarea-field';
-import {Toggle} from '@shared/ui/toggle/toggle';
+import {FormField, Panel, TextField, TextareaField, Toggle} from '@cvhome-saas/ui-kit/ui';
 import type {CommonForm, TranslationForm} from '../../services/content-editor-form.service';
 
 /**

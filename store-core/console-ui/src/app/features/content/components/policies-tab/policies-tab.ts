@@ -6,11 +6,8 @@ import {ContentCache} from '@api/content/content-cache';
 import {PoliciesService} from '@api/content/policies.service';
 import {ConsoleShellFacade} from '@layouts/console-shell/facades/console-shell.facade';
 import type {PolicyCompliance} from '@models/content';
-import {Badge} from '@shared/ui/badge/badge';
-import type {BadgeTone} from '@shared/ui/badge/badge';
-import {Icon} from '@shared/ui/icon/icon';
-import type {IconName} from '@shared/ui/icon/icon-paths';
-import {Panel} from '@shared/ui/panel/panel';
+import {Badge, Icon, Panel} from '@cvhome-saas/ui-kit/ui';
+import type {BadgeTone, IconName} from '@cvhome-saas/ui-kit/ui';
 import {STATUS_TONES} from '../content-list/content-list';
 
 const ICONS: Readonly<Record<string, IconName>> = {

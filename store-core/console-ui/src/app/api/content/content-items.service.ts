@@ -2,8 +2,8 @@
 import {Injectable, inject} from '@angular/core';
 import {Observable} from 'rxjs';
 
-import {CrudService} from '@core/http/crud.service';
-import type {PageRequest} from '@models/page';
+import {CrudService} from '@cvhome-saas/ui-kit';
+import type {PageRequest} from '@cvhome-saas/ui-kit';
 import type {
   BulkAction,
   BulkResult,

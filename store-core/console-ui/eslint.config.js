@@ -35,16 +35,22 @@ module.exports = tseslint.config(
   },
   {
     /*
-     * Dependency direction: features -> layouts -> shared -> api -> core -> models.
+     * Dependency direction: features -> layouts -> shared -> api -> core -> models -> @cvhome-saas/ui-kit.
      *
-     * `api/` holds the HTTP tier ported from seller-core; only features may reach it, and it must
-     * never reach back up. Enforced here because the mistake it prevents — a shared component
-     * fetching its own data — is the one that made seller-ui's pages untestable.
+     * The kit is now the floor, below `models/`. It holds the design system, the error stack, the
+     * HTTP client and the wire shapes those are written in terms of, and it is compiler-enforced
+     * rather than convention-enforced: it is a package, so it *cannot* import back into this app.
+     * That is the point of extracting it — the boundary between domain and view logic used to be
+     * upheld by these rules alone.
      *
-     * `models/` is the floor and gets its own block below: this one omitted `@shared` and `@core`,
-     * and eight model files had quietly grown imports of `Tone`, `IconName`, `PageT`, `ConsoleLocale`
-     * and — worst — `KpiDatum` from a *component file*, so a wire shape depended on a widget's
-     * template contract. Those types now live in `@models/ui`, `@models/page` and `@models/locale`.
+     * `api/` holds the HTTP tier; only features may reach it, and it must never reach back up.
+     * Enforced here because the mistake it prevents — a shared component fetching its own data — is
+     * the one that made seller-ui's pages untestable.
+     *
+     * `models/` gets its own block below: this one omitted `@shared` and `@core`, and eight model
+     * files had quietly grown imports of `Tone`, `IconName`, `PageT`, `ConsoleLocale` and — worst —
+     * `KpiDatum` from a *component file*, so a wire shape depended on a widget's template contract.
+     * Those three types now live in the kit, which is where a model may read them from.
      */
     files: ['src/app/core/**/*.ts', 'src/app/shared/**/*.ts'],
     rules: {
@@ -61,7 +67,13 @@ module.exports = tseslint.config(
     },
   },
   {
-    // The floor. A model describes a shape; it may not know that anything renders it.
+    /*
+     * A model describes a shape; it may not know that anything renders it.
+     *
+     * No longer quite the floor: `@cvhome-saas/ui-kit` sits beneath it, and a model may name a type
+     * from there — `PageT`, `Tone`, `IconName` — because those are the shared vocabulary the whole
+     * repository agrees on rather than one screen's contract. Everything in this app stays banned.
+     */
     files: ['src/app/models/**/*.ts'],
     rules: {
       'no-restricted-imports': [
@@ -70,7 +82,8 @@ module.exports = tseslint.config(
           patterns: [
             {
               group: ['@api/*', '@features/*', '@layouts/*', '@shared/*', '@core/*'],
-              message: 'models/ is the bottom tier and must import nothing but other models.',
+              message:
+                'models/ is the bottom tier of this app: it may import other models and @cvhome-saas/ui-kit, nothing else.',
             },
           ],
         },

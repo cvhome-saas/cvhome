@@ -2,7 +2,7 @@ import {Injectable, inject} from '@angular/core';
 import {Observable, forkJoin, map} from 'rxjs';
 
 import {StatisticService} from '@api/analytics/statistic.service';
-import {optionalOne} from '@core/http/optional';
+import {optionalOne} from '@cvhome-saas/ui-kit';
 import type {TrendPoint} from '@models/platform';
 import type {StatisticList, StatisticRange} from '@models/statistics';
 

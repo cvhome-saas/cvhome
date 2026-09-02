@@ -1,6 +1,6 @@
 import {Component, ElementRef, effect, input, output, viewChild} from '@angular/core';
 
-import {CopyField} from '@shared/ui/copy-field/copy-field';
+import {CopyField} from '@cvhome-saas/ui-kit/ui';
 
 /**
  * The link to an invitation, shown once because it exists once.

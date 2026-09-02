@@ -10,20 +10,11 @@ import {ProductService} from '@api/catalog/product.service';
 import {ProductTypeService} from '@api/catalog/product-type.service';
 import {ProductVariantService} from '@api/catalog/product-variant.service';
 import {MerchantStoreService} from '@api/merchant/store.service';
-import type {PageT} from '@core/table/table.types';
-import type {
-  PersistableProductDefinition,
-  ReadableCategory,
-  PersistableProductImage,
-  ReadableImage,
-  ReadableManufacturer,
-  ReadableProductDefinition,
-  ReadableProductType,
-} from '@models/catalog';
+import type {PageT} from '@cvhome-saas/ui-kit';
+import type {PersistableProductDefinition, PersistableProductImage, ReadableCategory, ReadableImage, ReadableManufacturer, ReadableProductDefinition, ReadableProductType, ReadableProductVariantDefinition, SkuInventory} from '@models/catalog';
 import type {ReadableMerchantStore} from '@models/merchant';
 import {emptyDraft, type ProductDraft} from '@models/products';
 import {InventoryService} from '@api/inventory/inventory.service';
-import type {ReadableProductVariantDefinition, SkuInventory} from '@models/catalog';
 import {ProductFormApi} from './product-form.api.service';
 
 function page<T>(content: T[]): PageT<T> {

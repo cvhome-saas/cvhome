@@ -2,17 +2,11 @@ import {Component, computed, effect, inject, input, signal} from '@angular/core'
 import {Router, RouterLink} from '@angular/router';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 
-import {BusyOverlay} from '@shared/ui/busy-overlay/busy-overlay';
-import {Icon} from '@shared/ui/icon/icon';
-import {LoadError} from '@shared/ui/load-error/load-error';
-import {PageHeader} from '@shared/ui/page-header/page-header';
-import {TabSwitcher, type TabItem} from '@shared/ui/tab-switcher/tab-switcher';
-import {ToastService} from '@shared/ui/toast/toast';
+import {BusyOverlay, Icon, LoadError, PageHeader, TabSwitcher, type TabItem, ToastService, SectionNav} from '@cvhome-saas/ui-kit/ui';
 import type {SettingsSectionKey} from '@models/store-settings';
 import {DetailsSection} from './components/details-section/details-section';
 import {DomainSection} from './components/domain-section/domain-section';
 import {PaymentsSection} from './components/payments-section/payments-section';
-import {SectionNav} from '@shared/ui/section-nav/section-nav';
 import {SocialLoginSection} from './components/social-login-section/social-login-section';
 import {StoreSettingsFacade} from './facades/store-settings.facade';
 

@@ -2,8 +2,7 @@ import {ComponentFixture, TestBed, fakeAsync, tick} from '@angular/core/testing'
 import {provideRouter} from '@angular/router';
 import {Observable, Subject, of, throwError} from 'rxjs';
 
-import {AuthService} from '@core/auth/auth.service';
-import {NOTIFICATION_PORT} from '@core/errors/notification.port';
+import {AuthService, NOTIFICATION_PORT} from '@cvhome-saas/ui-kit';
 import {ConsoleApi} from '@layouts/console-shell/services/console.api.service';
 import type {TeamRow} from '@models/team';
 import {CONSOLE_STORES_FAKE, FakeConsoleApi} from '@testing/console-api.fake';

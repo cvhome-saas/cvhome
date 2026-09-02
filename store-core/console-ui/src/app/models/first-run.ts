@@ -1,4 +1,4 @@
-import type {IconName} from '@models/ui';
+import type {IconName} from '@cvhome-saas/ui-kit';
 
 /**
  * The getting-started page: what an operator sees before their first store exists.

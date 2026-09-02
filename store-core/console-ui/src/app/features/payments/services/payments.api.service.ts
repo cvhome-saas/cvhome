@@ -3,8 +3,8 @@ import {Observable, forkJoin, map} from 'rxjs';
 
 import {OrdersService} from '@api/orders/orders.service';
 import {PaymentService} from '@api/payment/payment.service';
-import {optionalOne} from '@core/http/optional';
-import type {PageRequest, PageT} from '@core/table/table.types';
+import {optionalOne} from '@cvhome-saas/ui-kit';
+import type {PageRequest, PageT} from '@cvhome-saas/ui-kit';
 import {
   MANUAL_TRANSFER,
   PENDING_APPROVAL,
@@ -15,7 +15,7 @@ import {
 } from '@models/payment';
 import type {ReadableOrder} from '@models/checkout';
 import type {PaymentTab, TransactionRow, TransactionsSnapshot} from '@models/transactions';
-import type {DateRangeValue} from '@shared/ui/date-range-picker/date-range-picker';
+import type {DateRangeValue} from '@cvhome-saas/ui-kit/ui';
 
 /** The KPI row's four figures. `null` is "could not be read", which is not the same as zero. */
 export interface TransactionCounts {

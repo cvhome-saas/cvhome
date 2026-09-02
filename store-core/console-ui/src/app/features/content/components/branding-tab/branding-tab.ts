@@ -10,13 +10,7 @@ import {
   socialLinkIcon,
   socialLinkProblem,
 } from '@models/social-links';
-import {BusyOverlay} from '@shared/ui/busy-overlay/busy-overlay';
-import {FormField} from '@shared/ui/form-field/form-field';
-import {Icon} from '@shared/ui/icon/icon';
-import {LoadError} from '@shared/ui/load-error/load-error';
-import {LocaleSwitcher} from '@shared/ui/locale-switcher/locale-switcher';
-import {Panel} from '@shared/ui/panel/panel';
-import {TextField} from '@shared/ui/text-field/text-field';
+import {BusyOverlay, FormField, Icon, LoadError, LocaleSwitcher, Panel, TextField} from '@cvhome-saas/ui-kit/ui';
 import {
   BRANDING_SLOTS,
   BrandingFacade,

@@ -1,8 +1,9 @@
 import {Injectable} from '@angular/core';
 import {TranslocoLoader, Translation} from '@jsverse/transloco';
+import {withKitCopy} from '@cvhome-saas/ui-kit/i18n';
 import {from} from 'rxjs';
 
-import type {LocaleCode} from './locale.service';
+import type {LocaleCode} from '@cvhome-saas/ui-kit/i18n';
 
 /**
  * Static imports rather than Transloco's default `HttpLoader`: the `HttpLoader` fetches a
@@ -19,6 +20,9 @@ const DICTIONARIES: Record<LocaleCode, () => Promise<{default: Translation}>> = 
 export class TranslocoDictionaryLoader implements TranslocoLoader {
   getTranslation(lang: string) {
     const load = DICTIONARIES[lang as LocaleCode] ?? DICTIONARIES.en;
-    return from(load().then((module) => module.default));
+    // The kit's own copy underneath, this app's on top. `shared.*` and `errors.*` are read by code
+    // that now lives in the library, so the strings ship with it; anything here of the same name
+    // wins, which is how the console can override one message without forking a namespace.
+    return from(load().then((module) => withKitCopy(module.default, lang)));
   }
 }

@@ -2,7 +2,7 @@ import {Injectable, inject} from '@angular/core';
 import {Observable, map, of} from 'rxjs';
 
 import {ManagerStoreService} from '@api/tenancy/manager-store.service';
-import {AuthService} from '@core/auth/auth.service';
+import {AuthService} from '@cvhome-saas/ui-kit';
 import {ConsolePermissions} from '@shared/auth/console-permissions';
 import {SelectedStoreService} from '@api/tenancy/selected-store.service';
 import {CONSOLE_NAVIGATION} from '../console-navigation';

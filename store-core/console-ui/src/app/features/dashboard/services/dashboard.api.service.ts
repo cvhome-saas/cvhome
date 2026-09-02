@@ -12,7 +12,7 @@ import type {
   Product,
 } from '@models/dashboard';
 import type {StatisticEntry, StatisticList, StatisticRange} from '@models/statistics';
-import type {Tone} from '@shared/ui/tone';
+import type {Tone} from '@cvhome-saas/ui-kit/ui';
 
 /**
  * A range with both ends chosen.

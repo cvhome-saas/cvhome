@@ -36,7 +36,7 @@ catalog). See `references/build-system.md`.
 
 | Service | Category | Port | Purpose |
 |---|---|---|---|
-| `store-core/uaa` | **BE+FE** | 8001 | OAuth2 **Authorization Server** + OIDC provider for staff/admin identity. Issues tokens for all other services. Serves an **embedded Angular admin SPA** (`uaa-fe`) from its own `static/` folder, plus Thymeleaf login pages. Controllers: `AuthController`, `AdminUserController`, `AdminClientController`, `AdminRoleController`, `UserInfoController`. |
+| `store-core/uaa` | **BE+FE** | 8001 | OAuth2 **Authorization Server** + OIDC provider for staff/admin identity. Issues tokens for all other services. Serves an **embedded Angular admin SPA** (`uaa-fe`) from its own `static/` folder — sign-in, users, roles and clients, built on `@cvhome-saas/ui-kit` — plus a Thymeleaf consent page. Controllers: `AuthController`, `AdminUserController`, `AdminClientController`, `AdminRoleController`, `UserInfoController`. |
 | `store-core/gateway/gateway-service` | **BE** | 8000 | Spring Cloud **Gateway** (WebFlux, reactive) for the platform layer. Terminates the browser OAuth2 login session, exchanges it for tokens, and proxies to `tenancy` / `console-ui`. Key classes: `GatewayRouteLocatorImpl`, `SecurityConfig`, `RedirectingServerAuthenticationSuccessHandler`, `PodClient`. |
 | `store-core/tenancy/tenancy-service` | **BE** | 8020 | The **SaaS control plane**: organizations, store provisioning, subscription plans, Stripe billing, usage statistics. Controllers: `PodController`, `StoreManagerController`, `OrgManagerController`, `SubscriptionController`, `StripeWebhookController`, `SignUpController`, `StoreStatisticApi`. |
 | `store-core/console-ui` | **FE** | 8011 | Angular 20 (SSR) **seller/admin console** — the UI merchants and platform admins use. Feature areas under `src/app/features/`: dashboard, orders, catalogue, products, payments, customers, users, profile, store-management, content, billing, plus the platform-admin set. Logs in via `/oauth2/authorization/uaa`. |
@@ -367,7 +367,7 @@ See `references/frontends.md`.
   `integrationTest` fit.
 
 **Frontend & build**
-- `references/frontends.md` — console-ui, the embedded `uaa-fe` build flow, `ui-conventions`.
+- `references/frontends.md` — console-ui, the embedded `uaa-fe` build flow, `@cvhome-saas/ui-kit`, `ui-conventions`.
 - `references/landing-ui.md` — landing-ui workspace layout and the template/theme system.
 - `references/new-landing-ui-template.md` — **step-by-step procedure + checklist for adding a storefront theme.**
 - `references/build-system.md` — version catalog, convention plugins, build commands.

@@ -3,16 +3,7 @@ import {RouterLink} from '@angular/router';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 
 import {PlanDialog} from '@layouts/console-shell/billing/plan-dialog/plan-dialog';
-import {Badge} from '@shared/ui/badge/badge';
-import {BusyOverlay} from '@shared/ui/busy-overlay/busy-overlay';
-import {Icon} from '@shared/ui/icon/icon';
-import {LoadError} from '@shared/ui/load-error/load-error';
-import {NoticeBar} from '@shared/ui/notice-bar/notice-bar';
-import {PageHeader} from '@shared/ui/page-header/page-header';
-import {Panel} from '@shared/ui/panel/panel';
-import {ProgressTrack} from '@shared/ui/progress-track/progress-track';
-import {ToastService} from '@shared/ui/toast/toast';
-import {VideoDialog} from '@shared/ui/video-dialog/video-dialog';
+import {Badge, BusyOverlay, Icon, LoadError, NoticeBar, PageHeader, Panel, ProgressTrack, ToastService, VideoDialog} from '@cvhome-saas/ui-kit/ui';
 import {FirstRunFacade} from './facades/first-run.facade';
 
 /**

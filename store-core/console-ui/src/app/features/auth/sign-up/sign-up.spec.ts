@@ -2,8 +2,7 @@ import {ComponentFixture, TestBed, fakeAsync, tick} from '@angular/core/testing'
 import {Router, provideRouter} from '@angular/router';
 import {Observable, Subject, of, throwError} from 'rxjs';
 
-import {ApiError} from '@core/errors/api-error';
-import {NOTIFICATION_PORT} from '@core/errors/notification.port';
+import {ApiError, NOTIFICATION_PORT} from '@cvhome-saas/ui-kit';
 import type {CreateOrgRequest, ReadableUser} from '@models/signup';
 import {translocoTesting} from '@testing/transloco-testing';
 import {ConsoleAuthApi} from '../services/auth.api.service';

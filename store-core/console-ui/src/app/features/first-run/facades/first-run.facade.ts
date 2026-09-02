@@ -3,10 +3,9 @@ import {rxResource} from '@angular/core/rxjs-interop';
 import {TranslocoService} from '@jsverse/transloco';
 
 import {docsUrl} from '@core/config/docs';
-import {BrowserStorage} from '@core/platform/browser-storage';
+import {BrowserStorage} from '@cvhome-saas/ui-kit';
 import type {FirstRunSnapshot} from '@models/first-run';
-import type {IconName} from '@shared/ui/icon/icon-paths';
-import type {Tone} from '@shared/ui/tone';
+import type {IconName, Tone} from '@cvhome-saas/ui-kit/ui';
 import {FirstRunApi} from '../services/first-run.api.service';
 
 const TRIAL_KEY = 'cvhome.console.trialStarted';

@@ -16,16 +16,14 @@ import {
   type PlatformInvoiceRow,
   type PlatformSubscriptionRow,
 } from '@models/platform-billing';
-import type {KpiDatum, Tone} from '@models/ui';
+import type {KpiDatum, Tone} from '@cvhome-saas/ui-kit';
 import {Money} from '@shared/i18n/money';
 import {PlatformLabel} from '@shared/i18n/platform-label';
-import {snapshot} from '@shared/state/snapshot';
+import {snapshot} from '@cvhome-saas/ui-kit';
 import type {BarDatum} from '@shared/ui/charts/bar-chart';
 import type {DonutSlice} from '@shared/ui/charts/donut-chart';
 import type {TrendPoint as ChartPoint} from '@shared/ui/charts/trend-chart';
-import type {DateRangeValue} from '@shared/ui/date-range-picker/date-range-picker';
-import type {NavSection} from '@shared/ui/section-nav/section-nav';
-import type {SelectOption} from '@shared/ui/select/select';
+import type {DateRangeValue, NavSection, SelectOption} from '@cvhome-saas/ui-kit/ui';
 import {PlatformBillingApi, type CompleteRange} from '../services/platform-billing.api.service';
 
 export const PAGE_SIZE = 20;

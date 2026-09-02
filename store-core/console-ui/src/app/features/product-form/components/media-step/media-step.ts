@@ -2,12 +2,8 @@ import {Component, inject, input, signal} from '@angular/core';
 import {TranslocoDirective} from '@jsverse/transloco';
 
 import {ImageBroken} from '@shared/directives/image-broken';
-import {ConfirmDialog} from '@shared/ui/confirm-dialog/confirm-dialog';
-import {Icon} from '@shared/ui/icon/icon';
+import {ConfirmDialog, Icon, ImagePreview, NoticeBar, Panel} from '@cvhome-saas/ui-kit/ui';
 import {MediaPickerDialog} from '../../../content/components/media-picker/media-picker-dialog';
-import {ImagePreview} from '@shared/ui/image-preview/image-preview';
-import {NoticeBar} from '@shared/ui/notice-bar/notice-bar';
-import {Panel} from '@shared/ui/panel/panel';
 import type {MediaAsset} from '@models/content';
 import type {ProductImageItem} from '@models/products';
 import {ProductFormFacade} from '../../facades/product-form.facade';

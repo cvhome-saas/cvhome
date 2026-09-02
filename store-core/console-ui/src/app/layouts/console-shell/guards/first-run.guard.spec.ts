@@ -4,7 +4,7 @@ import {Router, provideRouter} from '@angular/router';
 import {Observable, defer, of} from 'rxjs';
 
 import {SelectedStoreService} from '@api/tenancy/selected-store.service';
-import {AuthService} from '@core/auth/auth.service';
+import {AuthService} from '@cvhome-saas/ui-kit';
 import {ConsolePermissions} from '@shared/auth/console-permissions';
 import type {ManagerStore} from '@models/tenancy';
 import {firstRunOnly, merchantOnly, platformOnly, requiresStore} from './first-run.guard';

@@ -1,7 +1,6 @@
 import type {ProvisioningState, StoreStatus} from '@models/tenancy';
 
-import type {IconName} from '@models/ui';
-import type {Tone} from '@models/ui';
+import type {IconName, Tone} from '@cvhome-saas/ui-kit';
 
 /**
  * The console chrome — navigation, stores, notifications and identity. Shared by every

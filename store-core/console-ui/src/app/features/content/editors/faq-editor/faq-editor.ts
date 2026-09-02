@@ -7,13 +7,7 @@ import {FaqService} from '@api/content/faq.service';
 import {ConsoleShellFacade} from '@layouts/console-shell/facades/console-shell.facade';
 import type {FaqGroup, PersistableFaq, ReadableFaq} from '@models/content';
 import {ConsolePermissions} from '@shared/auth/console-permissions';
-import {FormField} from '@shared/ui/form-field/form-field';
-import {Icon} from '@shared/ui/icon/icon';
-import {NumberField} from '@shared/ui/number-field/number-field';
-import {Panel} from '@shared/ui/panel/panel';
-import {TagInput} from '@shared/ui/tag-input/tag-input';
-import {TextField} from '@shared/ui/text-field/text-field';
-import {Toggle} from '@shared/ui/toggle/toggle';
+import {FormField, Icon, NumberField, Panel, TagInput, TextField, Toggle} from '@cvhome-saas/ui-kit/ui';
 import {LocaleCopy, type CopyFields} from '../../components/locale-copy/locale-copy';
 import {
   PublishChecklist,

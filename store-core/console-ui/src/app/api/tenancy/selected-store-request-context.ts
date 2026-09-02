@@ -2,7 +2,7 @@
 import {isPlatformServer} from '@angular/common';
 import {Injectable, PLATFORM_ID, inject} from '@angular/core';
 
-import type {RequestContextProvider} from '@core/http/request-context';
+import type {RequestContextProvider} from '@cvhome-saas/ui-kit';
 import {SelectedStoreService} from '@api/tenancy/selected-store.service';
 
 /**

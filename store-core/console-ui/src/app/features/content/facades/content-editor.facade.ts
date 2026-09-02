@@ -8,8 +8,7 @@ import {Subscription, merge, of, startWith, switchMap} from 'rxjs';
 
 import {ContentCache} from '@api/content/content-cache';
 import {ContentItemsService} from '@api/content/content-items.service';
-import {ApiError} from '@core/errors/api-error';
-import {ApiErrorService} from '@core/errors/api-error.service';
+import {ApiError, ApiErrorService} from '@cvhome-saas/ui-kit';
 import type {
   ContentListType,
   ContentStatus,
@@ -18,7 +17,7 @@ import type {
   ReadableContentMeta,
   TransitionAction,
 } from '@models/content';
-import {ToastService} from '@shared/ui/toast/toast';
+import {ToastService} from '@cvhome-saas/ui-kit/ui';
 import {
   ContentEditorFormService,
   type CommonForm,

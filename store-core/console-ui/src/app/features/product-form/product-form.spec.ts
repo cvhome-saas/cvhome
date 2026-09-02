@@ -4,14 +4,14 @@ import {provideHttpClientTesting} from '@angular/common/http/testing';
 import {Router, provideRouter} from '@angular/router';
 import {Observable, of} from 'rxjs';
 
-import {NOTIFICATION_PORT} from '@core/errors/notification.port';
+import {NOTIFICATION_PORT} from '@cvhome-saas/ui-kit';
 import {ConsoleApi} from '@layouts/console-shell/services/console.api.service';
 import {emptyDraft, type ProductDraft, type ProductImageItem, type RelatedProduct, type VariantMatrixRow} from '@models/products';
 import type {PersistableVariantSet} from '@models/catalog';
 import {CONSOLE_STORES_FAKE, FakeConsoleApi} from '@testing/console-api.fake';
 import {provideFakeProductSearch} from '@testing/product-search.fake';
 import {translocoTesting} from '@testing/transloco-testing';
-import {ToastService} from '@shared/ui/toast/toast';
+import {ToastService} from '@cvhome-saas/ui-kit/ui';
 import {ProductForm} from './product-form';
 import {
   ProductFormApi,

@@ -3,7 +3,7 @@ import {Injectable, Injector, inject} from '@angular/core';
 import {Observable, shareReplay, tap} from 'rxjs';
 
 import {ManagerStoreService} from '@api/tenancy/manager-store.service';
-import {BrowserStorage} from '@core/platform/browser-storage';
+import {BrowserStorage} from '@cvhome-saas/ui-kit';
 import type {ManagerStore} from '@models/tenancy';
 
 /** Which store the console is working in. Per-browser on purpose — see `select`. */

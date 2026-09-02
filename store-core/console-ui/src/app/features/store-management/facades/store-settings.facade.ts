@@ -8,9 +8,8 @@ import {DOCUMENT} from '@angular/common';
 
 import {ConsoleShellFacade} from '@layouts/console-shell/facades/console-shell.facade';
 
-import {ApiErrorService} from '@core/errors/api-error.service';
-import {clearServerErrorsOnChange} from '@core/errors/form-error.utils';
-import {LocaleService} from '@core/i18n/locale.service';
+import {ApiErrorService, clearServerErrorsOnChange} from '@cvhome-saas/ui-kit';
+import {LocaleService} from '@cvhome-saas/ui-kit/i18n';
 import {
   SECTIONS,
   type DnsRecord,
@@ -21,7 +20,7 @@ import {
   type StoreSettings,
 } from '@models/store-settings';
 import {ReferenceDataService, type ReferenceOption} from '@core/reference/reference-data.service';
-import {ToastService} from '@shared/ui/toast/toast';
+import {ToastService} from '@cvhome-saas/ui-kit/ui';
 import {StoreSettingsApi} from '../services/store-settings.api.service';
 import {
   StoreSettingsFormService,

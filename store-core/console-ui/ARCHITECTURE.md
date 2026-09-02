@@ -12,11 +12,20 @@ exists because something went wrong, the entry says what.
 ## 1. Tiers
 
 ```
-features → layouts → shared → api → core → models
+features → layouts → shared → api → core → models → @cvhome-saas/ui-kit
 ```
 
 A tier may use anything below it and nothing above it. Enforced by `no-restricted-imports` blocks in
 `eslint.config.js`, one per tier.
+
+**The kit is the floor**, and it is the only boundary here that the compiler enforces rather than a lint
+rule: it is a package, so it *cannot* import back into this app. It holds the control catalogue
+(`@cvhome-saas/ui-kit/ui`), the four-theme token layer (`/theme`), the error stack, `CrudService`,
+`snapshot()` and the routing helpers (the primary entry point), the Transloco plumbing (`/i18n`), the
+generic validators (`/forms`), and the clients for uaa's admin API that both consoles call (`/uaa`).
+`store-core/uaa`'s console is built on the same library. What stays in `shared/` and `core/` here is what
+only this console needs — the charts, the PDF export, the reference-data service, the billing and label
+helpers.
 
 | Tier | Holds | May not |
 |---|---|---|

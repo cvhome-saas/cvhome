@@ -5,13 +5,7 @@ import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 
 import type {LayoutItem, LayoutSection, ManifestField, ManifestKind, ManifestLabel} from '@models/layout';
 import type {MediaAsset} from '@models/content';
-import {FormField} from '@shared/ui/form-field/form-field';
-import {Icon} from '@shared/ui/icon/icon';
-import {NumberField} from '@shared/ui/number-field/number-field';
-import {Select, type SelectOption} from '@shared/ui/select/select';
-import {TextField} from '@shared/ui/text-field/text-field';
-import {TextareaField} from '@shared/ui/textarea-field/textarea-field';
-import {Toggle} from '@shared/ui/toggle/toggle';
+import {FormField, Icon, NumberField, Select, type SelectOption, TextField, TextareaField, Toggle} from '@cvhome-saas/ui-kit/ui';
 import {BuilderMediaSelect} from './media-select';
 
 import {BuilderFacade} from '../facades/builder.facade';

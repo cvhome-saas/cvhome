@@ -3,8 +3,8 @@ import {rxResource} from '@angular/core/rxjs-interop';
 import {TranslocoService} from '@jsverse/transloco';
 import {TranslocoLocaleService} from '@jsverse/transloco-locale';
 
-import {ApiErrorService} from '@core/errors/api-error.service';
-import type {PageT} from '@core/table/table.types';
+import {ApiErrorService} from '@cvhome-saas/ui-kit';
+import type {PageT} from '@cvhome-saas/ui-kit';
 import {ConsoleShellFacade} from '@layouts/console-shell/facades/console-shell.facade';
 import {
   NO_FILTERS,
@@ -16,8 +16,8 @@ import {
   type ProductTab,
   type ProductsSnapshot,
 } from '@models/products';
-import type {TabItem} from '@shared/ui/tab-switcher/tab-switcher';
-import {ToastService} from '@shared/ui/toast/toast';
+import type {TabItem} from '@cvhome-saas/ui-kit/ui';
+import {ToastService} from '@cvhome-saas/ui-kit/ui';
 import {ProductsApi, type ProductsQuery} from '../services/products.api.service';
 import {ProductsCache} from '@api/catalog/products-cache';
 

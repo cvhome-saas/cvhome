@@ -2,18 +2,15 @@ import {DestroyRef, Injectable, computed, inject, linkedSignal, signal} from '@a
 import {TranslocoService} from '@jsverse/transloco';
 import {TranslocoLocaleService} from '@jsverse/transloco-locale';
 
-import {ApiErrorService} from '@core/errors/api-error.service';
-import {clearServerErrorsOnChange} from '@core/errors/form-error.utils';
-import {AuthService} from '@core/auth/auth.service';
+import {ApiErrorService, clearServerErrorsOnChange, AuthService, snapshot} from '@cvhome-saas/ui-kit';
 import {ConsoleShellFacade} from '@layouts/console-shell/facades/console-shell.facade';
 import {humanizeStatus} from '@models/orders';
 import type {InvitationStatus} from '@models/users';
 import {INVITATION_STATUSES, USERS_TABS, type InvitationRow, type IssuedInvitation, type TeamRow, type UsersTab} from '@models/team';
 import {RoleLabel} from '@shared/i18n/role-label';
 import {ConsolePermissions} from '@shared/auth/console-permissions';
-import {snapshot} from '@shared/state/snapshot';
-import type {TabItem} from '@shared/ui/tab-switcher/tab-switcher';
-import {ToastService} from '@shared/ui/toast/toast';
+import type {TabItem} from '@cvhome-saas/ui-kit/ui';
+import {ToastService} from '@cvhome-saas/ui-kit/ui';
 import {UsersApi} from '../services/users.api.service';
 import {UserFormService, type UserForm} from '../services/user-form.service';
 

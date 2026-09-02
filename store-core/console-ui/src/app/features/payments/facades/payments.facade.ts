@@ -2,13 +2,12 @@ import {Injectable, computed, inject, linkedSignal, signal} from '@angular/core'
 import {TranslocoService} from '@jsverse/transloco';
 import {TranslocoLocaleService} from '@jsverse/transloco-locale';
 
-import type {PageT} from '@core/table/table.types';
-import {ApiErrorService} from '@core/errors/api-error.service';
+import type {PageT} from '@cvhome-saas/ui-kit';
+import {ApiErrorService, snapshot} from '@cvhome-saas/ui-kit';
 import {ConsoleShellFacade} from '@layouts/console-shell/facades/console-shell.facade';
-import {humanizeStatus} from '@models/orders';
+import {humanizeStatus, STATUS_TONE} from '@models/orders';
 import type {PaymentStatus} from '@models/payment';
 import {PAYMENT_TYPE_LABEL_KEY, isPaymentType} from '@models/store-settings';
-import {STATUS_TONE} from '@models/orders';
 import {parseAmount, type ReadableOrder} from '@models/checkout';
 import {
   PAYMENT_TABS,
@@ -21,11 +20,8 @@ import {
 } from '@models/transactions';
 import {Money} from '@shared/i18n/money';
 import {StatusLabel} from '@shared/i18n/status-label';
-import {snapshot} from '@shared/state/snapshot';
-import type {KpiDatum} from '@shared/ui/kpi-card/kpi-card';
-import type {TabItem} from '@shared/ui/tab-switcher/tab-switcher';
-import type {DateRangeValue} from '@shared/ui/date-range-picker/date-range-picker';
-import {ToastService} from '@shared/ui/toast/toast';
+import type {DateRangeValue, KpiDatum, TabItem} from '@cvhome-saas/ui-kit/ui';
+import {ToastService} from '@cvhome-saas/ui-kit/ui';
 import {PaymentsApi} from '../services/payments.api.service';
 
 export const PAGE_SIZE = 20;

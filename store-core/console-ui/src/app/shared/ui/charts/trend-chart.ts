@@ -1,9 +1,8 @@
 import {Component, computed, inject, input} from '@angular/core';
 
-import {THEME} from '@core/theme/theme.provider';
-import {Panel} from '@shared/ui/panel/panel';
+import {THEME} from '@cvhome-saas/ui-kit/theme';
+import {Panel, toneColor, type Tone} from '@cvhome-saas/ui-kit/ui';
 import {EChart} from './echart';
-import {toneColor, type Tone} from '../tone';
 import type {EChartsCoreOption} from './echarts-setup';
 
 /** One point on the line: a day, a count, and the day as the reader writes it. */

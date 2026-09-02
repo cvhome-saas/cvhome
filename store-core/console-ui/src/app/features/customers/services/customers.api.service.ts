@@ -3,8 +3,8 @@ import {Observable, forkJoin, map} from 'rxjs';
 
 import {CustomersService, type CustomerQuery} from '@api/customers/customers.service';
 import {OrdersService} from '@api/orders/orders.service';
-import {optionalList} from '@core/http/optional';
-import type {PageRequest} from '@core/table/table.types';
+import {optionalList} from '@cvhome-saas/ui-kit';
+import type {PageRequest} from '@cvhome-saas/ui-kit';
 import type {CustomerAddress, ReadableCustomer, ReadableOrder} from '@models/checkout';
 import type {
   CustomerAddressView,

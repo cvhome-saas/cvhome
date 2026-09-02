@@ -4,12 +4,9 @@ import {TranslocoService} from '@jsverse/transloco';
 import {TranslocoLocaleService} from '@jsverse/transloco-locale';
 
 import {ConsoleShellFacade} from '@layouts/console-shell/facades/console-shell.facade';
-import type {ActionItem} from '@shared/ui/action-list/action-list';
+import type {ActionItem, DateRangeValue, KpiDatum, RankedItem} from '@cvhome-saas/ui-kit/ui';
 import type {DonutSlice} from '@shared/ui/charts/donut-chart';
-import type {KpiDatum} from '@shared/ui/kpi-card/kpi-card';
 import type {DashboardSnapshot} from '@models/dashboard';
-import type {RankedItem} from '@shared/ui/ranked-list/ranked-list';
-import type {DateRangeValue} from '@shared/ui/date-range-picker/date-range-picker';
 import {DashboardApi, type CompleteRange} from '../services/dashboard.api.service';
 
 /** How far back the dashboard looks when the page opens. */

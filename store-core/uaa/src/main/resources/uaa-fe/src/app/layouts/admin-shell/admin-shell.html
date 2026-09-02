@@ -1,0 +1,85 @@
+<div class="shell" *transloco="let t">
+  <!--
+    Opens the rail as an off-canvas drawer on narrow screens. Only ever visible there, so it is not
+    a second way to do the same thing on a desktop.
+  -->
+  <button
+    class="drawer-toggle"
+    type="button"
+    [attr.aria-expanded]="mobileNavOpen()"
+    [attr.aria-label]="t('nav.open')"
+    (click)="mobileNavOpen.set(true)"
+  >
+    <app-icon name="menu" />
+  </button>
+
+  @if (mobileNavOpen()) {
+    <button class="scrim" type="button" [attr.aria-label]="t('nav.close')" (click)="mobileNavOpen.set(false)"></button>
+  }
+
+  <div class="rail" [class.open]="mobileNavOpen()" [class.collapsed]="collapsed()">
+    <div class="brand">
+      <span class="mark"><app-icon name="shield" /></span>
+      <span class="brand-copy">
+        <span class="brand-name">{{ t('brand') }}</span>
+        <span class="brand-sub">{{ t('brandSub') }}</span>
+      </span>
+    </div>
+
+    <app-section-nav
+      basePath="/"
+      [flat]="true"
+      [sections]="sections"
+      [active]="active()"
+      [(collapsed)]="collapsed"
+      heading=""
+      [label]="t('nav.label')"
+    />
+  </div>
+
+  <main class="workspace">
+    <header class="topbar">
+      <nav class="crumbs" [attr.aria-label]="t('nav.breadcrumb')">
+        <app-icon name="shield" />
+        <span>{{ t('brand') }}</span>
+        <app-icon name="chevronRight" />
+        <span class="crumb-current">{{ t(currentLabelKey()) }}</span>
+      </nav>
+
+      <div class="spacer"></div>
+
+      <div class="langs" role="group" [attr.aria-label]="t('nav.language')">
+        @for (locale of locales; track locale.code) {
+          <button
+            class="lang"
+            type="button"
+            [class.active]="locale.code === activeLocale()"
+            [attr.aria-pressed]="locale.code === activeLocale()"
+            (click)="selectLocale(locale.code)"
+          >
+            {{ locale.label }}
+          </button>
+        }
+      </div>
+
+      @if (user; as principal) {
+        <div class="who">
+          <span class="avatar" aria-hidden="true">{{ principal.username.slice(0, 2).toUpperCase() }}</span>
+          <span class="who-copy">
+            <span class="who-name">{{ principal.username }}</span>
+            <span class="who-role">{{ t('nav.signedIn') }}</span>
+          </span>
+        </div>
+      }
+
+      <button class="sign-out" type="button" (click)="logout()">
+        <app-icon name="signOut" />
+        <span>{{ t('nav.signOut') }}</span>
+      </button>
+    </header>
+
+    <div class="page">
+      <router-outlet />
+    </div>
+  </main>
+</div>

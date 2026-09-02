@@ -2,13 +2,7 @@ import {Component, computed, inject, input, output} from '@angular/core';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 
 import type {ContentStatus, TransitionAction} from '@models/content';
-import {ActionMenu, type MenuAction} from '@shared/ui/action-menu/action-menu';
-import {Badge} from '@shared/ui/badge/badge';
-import {BusyOverlay} from '@shared/ui/busy-overlay/busy-overlay';
-import {ConfirmDialog} from '@shared/ui/confirm-dialog/confirm-dialog';
-import {Icon} from '@shared/ui/icon/icon';
-import {LoadError} from '@shared/ui/load-error/load-error';
-import {PageHeader} from '@shared/ui/page-header/page-header';
+import {ActionMenu, type MenuAction, Badge, BusyOverlay, ConfirmDialog, Icon, LoadError, PageHeader} from '@cvhome-saas/ui-kit/ui';
 import {STATUS_TONES} from '../../components/content-list/content-list';
 
 /** What the header's menu may offer; `schedule` opens the date prompt, `delete` the confirm. */

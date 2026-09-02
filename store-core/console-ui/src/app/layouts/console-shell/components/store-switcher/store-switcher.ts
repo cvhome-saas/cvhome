@@ -2,7 +2,7 @@ import {Component, inject} from '@angular/core';
 import {RouterLink} from '@angular/router';
 import {TranslocoDirective} from '@jsverse/transloco';
 
-import {Icon} from '@shared/ui/icon/icon';
+import {Icon} from '@cvhome-saas/ui-kit/ui';
 import {ConsoleShellFacade} from '../../facades/console-shell.facade';
 
 /** Store picker at the foot of the sidebar. */

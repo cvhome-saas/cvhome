@@ -9,7 +9,7 @@ import {
   type SubscriptionQuery,
 } from '@api/billing/platform-billing.service';
 import {SubscriptionService} from '@api/billing/subscription.service';
-import {optionalOne} from '@core/http/optional';
+import {optionalOne} from '@cvhome-saas/ui-kit';
 import type {Invoice, PlanView, Subscription} from '@models/billing';
 import {
   toAuditRow,

@@ -1,0 +1,53 @@
+<app-data-table [columns]="columns()" [label]="label()" *transloco="let t">
+  @for (row of rows(); track row.id) {
+    <app-table-row
+      [interactive]="selectable()"
+      [class.selected]="selectable() && row.id === selectedId()"
+      [attr.aria-current]="selectable() && row.id === selectedId() ? 'true' : null"
+      (click)="onRowClick($event, row)"
+    >
+      <div class="cell-user" role="cell" [attr.data-label]="t('shared.userAdmin.column.user')">
+        <span class="avatar" aria-hidden="true">{{ row.initials }}</span>
+        <span class="identity">
+          @if (row.name) {
+            <strong>{{ row.name }}</strong>
+          } @else {
+            <!-- uaa allows both name columns to be null; the username is what identifies the row. -->
+            <strong class="unnamed">{{ t('shared.userAdmin.unnamed') }}</strong>
+          }
+          <span class="email" dir="auto">{{ row.email || row.username }}</span>
+        </span>
+      </div>
+
+      <span class="cell-roles" role="cell" [attr.data-label]="t('shared.userAdmin.column.roles')">
+        {{ roleList()(row.roles) }}
+      </span>
+
+      @if (showScope()) {
+        <span class="cell-scope latin" role="cell" [attr.data-label]="t('shared.userAdmin.column.scope')">
+          @if (row.org) {
+            {{ orgLabel()(row.org) }}
+          } @else {
+            <!-- No `metadata.org` at all: a platform account rather than a tenant's. -->
+            <span class="unscoped">{{ t('shared.userAdmin.noOrg') }}</span>
+          }
+        </span>
+      }
+
+      <span role="cell" [attr.data-label]="t('shared.userAdmin.column.status')">
+        <app-badge [tone]="row.enabled ? 'green' : 'slate'" shape="square">
+          {{ row.enabled ? t('shared.userAdmin.enabled') : t('shared.userAdmin.disabled') }}
+        </app-badge>
+      </span>
+
+      <div class="cell-actions" role="cell" [attr.data-label]="t('shared.userAdmin.column.actions')">
+        <app-action-menu
+          [actions]="actionsFor(row)"
+          [disabled]="busy()"
+          [ariaLabel]="t('shared.userAdmin.action.menuFor', {name: row.username})"
+          (picked)="onPick($event, row)"
+        />
+      </div>
+    </app-table-row>
+  }
+</app-data-table>

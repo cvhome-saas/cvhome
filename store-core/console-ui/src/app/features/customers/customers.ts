@@ -3,17 +3,8 @@ import {Router} from '@angular/router';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 
 import type {CustomerOrderRow} from '@models/customers';
-import {BusyOverlay} from '@shared/ui/busy-overlay/busy-overlay';
-import {DataTable, type TableColumn} from '@shared/ui/data-table/data-table';
-import {TableRow} from '@shared/ui/data-table/table-row';
-import {EmptyState} from '@shared/ui/empty-state/empty-state';
+import {BusyOverlay, DataTable, type TableColumn, TableRow, EmptyState, Icon, LoadError, PageHeader, Pagination, Panel, SearchBox} from '@cvhome-saas/ui-kit/ui';
 import {ExportButton} from '@shared/ui/export-button/export-button';
-import {Icon} from '@shared/ui/icon/icon';
-import {LoadError} from '@shared/ui/load-error/load-error';
-import {PageHeader} from '@shared/ui/page-header/page-header';
-import {Pagination} from '@shared/ui/pagination/pagination';
-import {Panel} from '@shared/ui/panel/panel';
-import {SearchBox} from '@shared/ui/search-box/search-box';
 import {CustomerDialog} from './components/customer-dialog/customer-dialog';
 import {CustomersFacade, PAGE_SIZE} from './facades/customers.facade';
 

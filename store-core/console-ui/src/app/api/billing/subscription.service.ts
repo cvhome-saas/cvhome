@@ -1,8 +1,8 @@
 import {Injectable, inject} from '@angular/core';
 import {Observable, map} from 'rxjs';
 
-import {CrudService} from '@core/http/crud.service';
-import type {SpringPage} from '@core/table/table.types';
+import {CrudService} from '@cvhome-saas/ui-kit';
+import type {SpringPage} from '@cvhome-saas/ui-kit';
 import type {CheckoutSession, Invoice, PlanView, Subscription} from '@models/billing';
 
 const SUBSCRIPTION_API_BASE = '/billing/api/v1/subscription';

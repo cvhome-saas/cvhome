@@ -1,6 +1,6 @@
 import {Route} from '@angular/router';
 
-import {canAccessSecuredPages} from '@core/auth/auth-guard.service';
+import {canAccessSecuredPages} from '@cvhome-saas/ui-kit';
 import {
   consoleContext,
   merchantOnly,

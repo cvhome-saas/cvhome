@@ -4,17 +4,9 @@ import {ReactiveFormsModule} from '@angular/forms';
 import {switchMap} from 'rxjs';
 import {TranslocoDirective} from '@jsverse/transloco';
 
-import {dateKey} from '@core/i18n/calendar';
+import {dateKey} from '@cvhome-saas/ui-kit/i18n';
 import {ReferenceDataService, STOREFRONT_LANGUAGES} from '@core/reference/reference-data.service';
-import {Checkbox} from '@shared/ui/checkbox/checkbox';
-import {ConfirmDialog} from '@shared/ui/confirm-dialog/confirm-dialog';
-import {DatePicker} from '@shared/ui/date-picker/date-picker';
-import {FormField} from '@shared/ui/form-field/form-field';
-import {Icon} from '@shared/ui/icon/icon';
-import {Panel} from '@shared/ui/panel/panel';
-import {Select, type SelectOption} from '@shared/ui/select/select';
-import {TextField} from '@shared/ui/text-field/text-field';
-import {Toggle} from '@shared/ui/toggle/toggle';
+import {Checkbox, ConfirmDialog, DatePicker, FormField, Icon, Panel, Select, type SelectOption, TextField, Toggle} from '@cvhome-saas/ui-kit/ui';
 import {SHORT_DESCRIPTION_MAX, type SettingsChoices} from '@models/store-settings';
 import type {DetailsForm} from '../../services/store-settings-form.service';
 

@@ -1,0 +1,123 @@
+<ng-container *transloco="let t">
+  <app-page-header [title]="t('roles.title')" [context]="t('roles.context')" />
+
+  @if (facade.error(); as failure) {
+    <app-load-error [message]="failure.message" (retry)="facade.reload()" />
+  }
+
+  <app-busy-overlay reserve="page" [busy]="facade.isLoading()" [label]="t('roles.loading')">
+    @if (!facade.isEmpty()) {
+      <div class="stack">
+        <!--
+          Renaming does not re-issue a token: whoever is signed in keeps the old authority until they
+          sign in again. uaa's behaviour, and nothing here can hide it.
+        -->
+        <app-notice-bar icon="info" tone="amber" [message]="t('roles.notice.rename')" />
+
+        <app-panel [title]="t('roles.panel.title')">
+          <button panelAction class="primary-action" type="button" (click)="facade.startCreate()">
+            {{ t('roles.action.create') }}
+          </button>
+
+          @if (facade.rows().length) {
+            <app-data-table [columns]="columns(t)" [label]="t('roles.panel.title')">
+              @for (role of facade.rows(); track role.id) {
+                <app-table-row class="row" [interactive]="true" (click)="facade.select(role)">
+                  <span class="cell name" [attr.data-label]="t('roles.column.name')">{{ role.name }}</span>
+                  <span class="cell id" [attr.data-label]="t('roles.column.id')">{{ role.id }}</span>
+                  <span class="cell go" aria-hidden="true"><app-icon name="pencil" [size]="14" /></span>
+                </app-table-row>
+              }
+            </app-data-table>
+
+            <app-pagination
+              [page]="facade.pageIndex()"
+              [totalPages]="facade.totalPages()"
+              [totalElements]="facade.totalElements()"
+              [pageSize]="pageSize"
+              [unit]="t('roles.unit')"
+              [label]="t('roles.paginationLabel')"
+              (pageChange)="facade.goToPage($event)"
+            />
+          } @else {
+            <app-empty-state
+              icon="shield"
+              [title]="t('roles.empty.title')"
+              [message]="t('roles.empty.message')"
+            />
+          }
+        </app-panel>
+      </div>
+    }
+  </app-busy-overlay>
+
+  <!--
+    A role is `{id, name}`, so this is one field. The design's Description, Scope, Inherits from,
+    Permissions and Assigned users have no source in uaa — see lessons.md, "Roles — a role is a name".
+  -->
+  @if (facade.editing(); as target) {
+    <app-form-dialog
+      open
+      [title]="target === 'new' ? t('roles.form.createTitle') : t('roles.form.renameTitle')"
+      [description]="t('roles.form.description')"
+      [closeLabel]="t('shared.actions.cancel')"
+      (dismissed)="facade.dismiss()"
+    >
+      <form class="form" [formGroup]="facade.form" (ngSubmit)="facade.save()">
+        <app-form-field
+          controlId="role-name"
+          required
+          [label]="t('roles.form.name')"
+          [control]="facade.form.controls.name"
+          [hint]="t('roles.form.nameHint')"
+        >
+          <app-text-field
+            formControlName="name"
+            id="role-name"
+            latin
+            mono
+            [placeholder]="t('roles.form.namePlaceholder')"
+          />
+        </app-form-field>
+
+        @if (target !== 'new') {
+          <div class="meta">
+            <span class="meta-label">{{ t('roles.form.id') }}</span>
+            <span class="meta-value">{{ target.id }}</span>
+          </div>
+        }
+
+        <div class="actions">
+          @if (target !== 'new') {
+            <button class="danger-action" type="button" (click)="facade.askDelete(target)">
+              {{ t('roles.action.delete') }}
+            </button>
+          }
+          <div class="grow"></div>
+          <button class="secondary-action" type="button" (click)="facade.dismiss()">
+            {{ t('shared.actions.cancel') }}
+          </button>
+          <button class="primary-action" type="submit" [disabled]="facade.busy()">
+            {{ facade.busy() ? t('roles.form.saving') : t('roles.form.save') }}
+          </button>
+        </div>
+      </form>
+    </app-form-dialog>
+  }
+
+  <!--
+    Typed confirmation: deleting a role strips an authority from every account holding it, and uaa
+    gives no warning about how many that is.
+  -->
+  <app-confirm-dialog
+    [open]="!!facade.deleting()"
+    [title]="t('roles.delete.title')"
+    [message]="t('roles.delete.message', {name: facade.deleting()?.name ?? ''})"
+    [confirmationText]="facade.deleting()?.name ?? null"
+    [confirmationLabel]="t('roles.delete.confirmationLabel')"
+    [confirmLabel]="t('roles.action.delete')"
+    [cancelLabel]="t('shared.actions.cancel')"
+    (confirmed)="facade.confirmDelete()"
+    (dismissed)="facade.dismiss()"
+  />
+</ng-container>

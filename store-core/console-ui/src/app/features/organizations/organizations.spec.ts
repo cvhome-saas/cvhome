@@ -3,7 +3,7 @@ import {Router, provideRouter} from '@angular/router';
 import {Observable, of, throwError} from 'rxjs';
 
 import type {CreateOrgUser} from '@api/tenancy/org.service';
-import {NOTIFICATION_PORT} from '@core/errors/notification.port';
+import {NOTIFICATION_PORT} from '@cvhome-saas/ui-kit';
 import type {OrgRow} from '@models/platform';
 import {translocoTesting} from '@testing/transloco-testing';
 import {Organizations} from './organizations';

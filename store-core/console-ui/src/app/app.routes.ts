@@ -1,7 +1,6 @@
 import { Routes } from '@angular/router';
 
-import {canAccessSecuredPages} from '@core/auth/auth-guard.service';
-import {confirmLeave} from '@core/routing/confirm-leave.guard';
+import {canAccessSecuredPages, confirmLeave} from '@cvhome-saas/ui-kit';
 import {
   consoleContext,
   firstRunOnly,

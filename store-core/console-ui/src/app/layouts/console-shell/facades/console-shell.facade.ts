@@ -5,12 +5,12 @@ import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {translateSignal} from '@jsverse/transloco';
 import {filter, map, startWith} from 'rxjs';
 
-import {CONSOLE_LOCALES, LocaleCode, LocaleService} from '@core/i18n/locale.service';
+import {CONSOLE_LOCALES, LocaleCode, LocaleService} from '@cvhome-saas/ui-kit/i18n';
 import {SelectedStoreService} from '@api/tenancy/selected-store.service';
-import {THEME} from '@core/theme/theme.provider';
+import {THEME} from '@cvhome-saas/ui-kit/theme';
 import type {ConsoleNotification, ConsoleStore} from '@models/console';
 import {ConsoleApi} from '../services/console.api.service';
-import {routeData} from '@core/routing/route-data';
+import {routeData} from '@cvhome-saas/ui-kit';
 
 /** Which of the shell's popovers is open. Only one at a time. */
 export type ConsoleMenu = 'notifications' | 'language' | 'theme' | 'profile' | 'store';

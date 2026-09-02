@@ -4,7 +4,7 @@ import {TranslocoLocaleService} from '@jsverse/transloco-locale';
 
 import {ENTITLEMENT_ORDER, type EntitlementKey, type EntitlementValue, type PlanView} from '@models/billing';
 import {Money} from '@shared/i18n/money';
-import {snapshot} from '@shared/state/snapshot';
+import {snapshot} from '@cvhome-saas/ui-kit';
 import {PlatformPlansApi} from '../services/platform-plans.api.service';
 
 /** Minor units to major, the catalogue's own convention. */

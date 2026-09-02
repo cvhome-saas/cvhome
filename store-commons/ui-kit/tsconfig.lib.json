@@ -1,0 +1,30 @@
+/* `types: []` is load-bearing: it keeps @types/node out of the library, so any file here that
+   reaches for `process` or `Buffer` fails at build time rather than at a consumer's runtime.
+
+   `include` names the entry-point directories explicitly, and `exclude` restates node_modules,
+   because the library root is also the workspace root: with the CLI's stock `exclude` block the
+   compiler would walk node_modules looking for sources. */
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./out-tsc/lib",
+    "declaration": true,
+    "declarationMap": true,
+    "inlineSources": true,
+    "types": []
+  },
+  "include": [
+    "src/**/*.ts",
+    "ui/**/*.ts",
+    "theme/**/*.ts",
+    "i18n/**/*.ts",
+    "forms/**/*.ts",
+    "uaa/**/*.ts"
+  ],
+  "exclude": [
+    "**/*.spec.ts",
+    "node_modules",
+    "dist",
+    "out-tsc"
+  ]
+}

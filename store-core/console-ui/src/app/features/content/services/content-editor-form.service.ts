@@ -4,7 +4,7 @@ import {map} from 'rxjs';
 
 import {ContentItemsService} from '@api/content/content-items.service';
 import type {ContentListType, ContentTranslation, PersistableContent} from '@models/content';
-import {uniqueAsync} from '@shared/forms/unique-async';
+import {uniqueAsync} from '@cvhome-saas/ui-kit/forms';
 
 export const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 

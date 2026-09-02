@@ -1,0 +1,15 @@
+/*
+ * Two controls reading as one field, and *not* stretched to the width of the form.
+ *
+ * A duration is a small number and a word — "30 minutes". Given a full-width row the amount box
+ * grew to 400px with the unit picker hung off the end, which reads as a text field that happens to
+ * have a dropdown beside it rather than as one control. Both halves are capped, and the pair sits
+ * at the start of the row.
+ */
+:host {
+  display: grid;
+  grid-template-columns: minmax(4.5rem, 7rem) minmax(7rem, 9rem);
+  gap: var(--spacing-tight);
+  align-items: center;
+  justify-content: start;
+}

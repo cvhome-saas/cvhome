@@ -29,7 +29,9 @@
 import {readFileSync} from 'node:fs';
 import {execSync} from 'node:child_process';
 
-const SOURCE = 'src';
+import {SOURCE_ROOTS} from './sources.mjs';
+
+const SOURCES = SOURCE_ROOTS;
 
 /**
  * The exact set Tailwind emits from its own default theme, read from the installed package so it
@@ -44,7 +46,7 @@ const TAILWIND_DEFAULTS = new Set(
 const TAILWIND_DYNAMIC = /^--(?:spacing|container|breakpoint)$/;
 
 const files = execSync(
-  `find ${SOURCE} -type f \\( -name '*.css' -o -name '*.ts' -o -name '*.html' \\)`,
+  `find ${SOURCES.join(' ')} -type f \\( -name '*.css' -o -name '*.ts' -o -name '*.html' \\)`,
   {encoding: 'utf8'},
 ).trim().split('\n').filter(Boolean);
 
