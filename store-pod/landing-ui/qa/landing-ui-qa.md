@@ -418,9 +418,10 @@ cua renders no pages any more. `/{locale}/login` starts the OAuth2 flow; cua sen
   session's); clicking one in the fresh browser is answered by cua with a redirect to the storefront login
   without the marker, because there is no saved request to resume. Never a 500.
 
-### AUTH-06 — All five locales, both pages · high · [verified] (en, ar in the browser; es, fr, ru server-rendered strings)
+### AUTH-06 — All five locales, both pages · high · [verified] (en, ar in the browser; fr on org2-store1) / [not verified] (es, ru — no demo store serves them; their strings render before the THM-03 fallback redirect)
 
-- **Steps** — open `/{en,ar,es,fr,ru}/login?auth=1` and `/{…}/register`.
+- **Steps** — open `/{en,ar,es,fr,ru}/login?auth=1` and `/{…}/register` on a store that supports the locale
+  (`org1-store1` serves en/ar, `org2-store1` fr; an unsupported locale falls back per THM-03).
 - **Expect** — every label, button and message translated; nothing falls back to a key or to English.
 
 ### AUTH-07 — The contract still admits a theme without the pages · [unit only]
