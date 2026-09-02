@@ -84,12 +84,6 @@
 .cell-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 0.15rem;
-}
-
-.cell-actions button[disabled] {
-  cursor: not-allowed;
-  opacity: 0.45;
 }
 
 /*

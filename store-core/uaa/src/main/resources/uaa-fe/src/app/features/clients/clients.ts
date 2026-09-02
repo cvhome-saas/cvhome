@@ -1,32 +1,29 @@
 import {Component, inject} from '@angular/core';
-import {ReactiveFormsModule} from '@angular/forms';
+import {Router, RouterLink} from '@angular/router';
 import {TranslocoDirective} from '@jsverse/transloco';
 
 import {
   BusyOverlay,
-  ConfirmDialog,
   DataTable,
   EmptyState,
-  FormField,
+  Icon,
   LoadError,
   NoticeBar,
   PageHeader,
   Pagination,
   Panel,
-  SetPasswordDialog,
   TableRow,
-  TextField,
   type TableColumn,
 } from '@cvhome-saas/ui-kit/ui';
 
-import type {ClientDetails, ClientSummary} from '@cvhome-saas/ui-kit/uaa';
+import type {ClientSummary} from '@cvhome-saas/ui-kit/uaa';
 
 import {ClientsFacade, PAGE_SIZE} from './facades/clients.facade';
 
 @Component({
   selector: 'app-clients',
   imports: [
-    ReactiveFormsModule,
+    RouterLink,
     TranslocoDirective,
     PageHeader,
     Panel,
@@ -37,21 +34,19 @@ import {ClientsFacade, PAGE_SIZE} from './facades/clients.facade';
     Pagination,
     DataTable,
     TableRow,
-    FormField,
-    TextField,
-    ConfirmDialog,
-    SetPasswordDialog,
+    Icon,
   ],
   providers: [ClientsFacade],
   templateUrl: './clients.html',
   styleUrl: './clients.css',
 })
 export class Clients {
+  private readonly router = inject(Router);
   protected readonly facade = inject(ClientsFacade);
   protected readonly pageSize = PAGE_SIZE;
 
   /**
-   * Two columns: the row selects, and the pane is where a client is edited.
+   * Two columns and a chevron.
    *
    * The design draws five — Type, Protocol, Last token, Status — and `ClientSummary` carries none of
    * them. See lessons.md, "Clients — the list carries three fields".
@@ -62,19 +57,14 @@ export class Clients {
   ];
 
   protected columns(t: (key: string) => string): readonly TableColumn[] {
-    return this.keys.map(({key, width}) => ({key, width, label: t('clients.column.' + key)}));
+    return [
+      ...this.keys.map(({key, width}) => ({key, width, label: t('clients.column.' + key)})),
+      {key: 'go', width: '2rem', label: ''},
+    ];
   }
 
-  /**
-   * The pane holds a full `ClientDetails`; the rotate and delete dialogs key on the list's
-   * `ClientSummary`. The three fields they need are the three the summary has.
-   */
-  protected asSummary(client: ClientDetails): ClientSummary {
-    return {id: client.id, clientId: client.clientId, clientName: client.clientName};
-  }
-
-  /** The comma-separated hint under a list field, built from what the server says it accepts. */
-  protected allowed(values: readonly string[]): string {
-    return values.join(', ');
+  /** A client is a page, not a pane: `ClientDetails` is five groups of settings and two open maps. */
+  protected open(client: ClientSummary): void {
+    void this.router.navigate(['/clients', client.id]);
   }
 }

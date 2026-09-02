@@ -27,7 +27,9 @@
     "signIn": "تسجيل الدخول",
     "users": "المستخدمون",
     "roles": "الأدوار",
-    "clients": "تطبيقات OAuth2"
+    "clients": "تطبيقات OAuth2",
+    "clientCreate": "تسجيل عميل",
+    "clientEdit": "عميل"
   },
   "signIn": {
     "title": "تسجيل الدخول",
@@ -74,11 +76,7 @@
       "busy": "جارٍ التعيين…"
     },
     "roles": {
-      "title": "الأدوار",
-      "message": "اختر الأدوار التي يجب أن يحملها {{name}}.",
-      "empty": "لا يوفّر uaa أدوارًا يمكن منحها لهذا الحساب.",
-      "confirm": "حفظ الأدوار",
-      "busy": "جارٍ الحفظ…"
+      "empty": "لا يوفّر uaa أدوارًا يمكن منحها لهذا الحساب."
     },
     "delete": {
       "title": "حذف هذا الحساب",
@@ -92,11 +90,10 @@
       "passwordReset": "تم تعيين كلمة مرور جديدة لـ {{name}}.",
       "rolesSaved": "تم تحديث أدوار {{name}}.",
       "deleted": "تم حذف {{name}}.",
-      "saved": "تم حفظ {{name}}."
+      "saved": "تم حفظ {{name}}.",
+      "created": "تم إنشاء {{name}}."
     },
     "detail": {
-      "emptyTitle": "لم يُحدَّد حساب",
-      "emptyMessage": "اختر حسابًا من القائمة لتعديله.",
       "firstName": "الاسم الأول",
       "lastName": "اسم العائلة",
       "username": "اسم المستخدم",
@@ -104,10 +101,20 @@
       "roles": "الأدوار",
       "readOnlyNote": "لا يسمح uaa بتغيير أيٍّ منهما من هنا.",
       "setPassword": "تعيين كلمة مرور",
-      "enable": "السماح بتسجيل الدخول",
-      "disable": "منع تسجيل الدخول",
       "save": "حفظ",
-      "saving": "جارٍ الحفظ…"
+      "saving": "جارٍ الحفظ…",
+      "createTitle": "إنشاء مستخدم",
+      "editTitle": "تعديل المستخدم",
+      "createHint": "يحفظ uaa الحساب بدون كلمة مرور — ستضبطها في الخطوة التالية.",
+      "usernameHint": "ما يسجّل به الحساب الدخول. لا يمكن تغييره لاحقًا.",
+      "enabledLabel": "الحساب مُفعّل",
+      "enabledHint": "الحساب المعطّل يحتفظ بأدواره ولا يستطيع تسجيل الدخول.",
+      "metadata": "البيانات الوصفية",
+      "metadataHint": "يدمج uaa البيانات الوصفية عند الحفظ، لذا لا يمكن حذف مفتاح مخزَّن من هنا — يمكن تعديله فقط، أو إضافة مفتاح جديد بجانبه.",
+      "metadataLocked": "لا يمكن حذف المفاتيح المخزَّنة عبر تحديث uaa."
+    },
+    "action": {
+      "create": "إنشاء مستخدم"
     }
   },
   "roles": {
@@ -132,7 +139,6 @@
     },
     "action": {
       "create": "دور جديد",
-      "rename": "إعادة تسمية",
       "delete": "حذف"
     },
     "form": {
@@ -143,7 +149,8 @@
       "nameHint": "نص الصلاحية نفسه. تطابقه الخدمات حرفيًا.",
       "save": "حفظ",
       "saving": "جارٍ الحفظ…",
-      "id": "معرّف الدور"
+      "id": "معرّف الدور",
+      "description": "الدور هو اسم. ما يمنحه تُقرّره كل خدمة، ولا يُخزَّن هنا."
     },
     "delete": {
       "title": "حذف هذا الدور",
@@ -154,10 +161,6 @@
       "created": "تم إنشاء {{name}}.",
       "renamed": "تم حفظ {{name}}.",
       "deleted": "تم حذف {{name}}."
-    },
-    "detail": {
-      "emptyTitle": "لم يُحدَّد دور",
-      "emptyMessage": "اختر دورًا من القائمة لتعديله، أو أنشئ دورًا جديدًا."
     }
   },
   "clients": {
@@ -182,13 +185,10 @@
     },
     "action": {
       "register": "تسجيل تطبيق",
-      "edit": "تعديل",
       "rotate": "سر جديد",
       "delete": "حذف"
     },
     "form": {
-      "createTitle": "تسجيل تطبيق",
-      "editTitle": "تعديل التطبيق",
       "clientId": "معرّف التطبيق",
       "clientName": "الاسم",
       "grantTypes": "أنواع المنح",
@@ -196,13 +196,10 @@
       "scopes": "النطاقات",
       "redirectUris": "عناوين إعادة التوجيه",
       "postLogoutUris": "عناوين إعادة التوجيه بعد الخروج",
-      "redirectUrisHint": "مفصولة بفواصل. يجب أن تطابق عنوان التطبيق تمامًا.",
       "save": "حفظ",
       "saving": "جارٍ الحفظ…",
-      "lifetimes": "مدد صلاحية الرموز",
       "accessTtl": "رمز الوصول",
-      "refreshTtl": "رمز التحديث",
-      "ttlHint": "مدة بصيغة ISO-8601، مثل PT30M أو P30D. اتركه فارغًا لاستخدام الإعداد الافتراضي."
+      "refreshTtl": "رمز التحديث"
     },
     "rotate": {
       "title": "تعيين سر جديد",
@@ -226,11 +223,91 @@
       "updated": "تم حفظ {{clientId}}.",
       "secretRotated": "تم تعيين سر جديد لـ {{clientId}}.",
       "deleted": "تم حذف {{clientId}}."
-    },
-    "detail": {
-      "emptyTitle": "لم يُحدَّد تطبيق",
-      "emptyMessage": "اختر تطبيقًا من القائمة لتعديله، أو سجّل تطبيقًا جديدًا."
     }
   },
-  "brandSub": "الدخول الموحّد"
+  "brandSub": "الدخول الموحّد",
+  "clientForm": {
+    "back": "العودة إلى العملاء",
+    "createTitle": "تسجيل عميل",
+    "editTitle": "إعدادات عميل OAuth",
+    "context": "ما يُسمح للتطبيق بطلبه من uaa",
+    "loading": "جارٍ تحميل العميل…",
+    "invalid": "بعض الإعدادات ما زالت تحتاج انتباهًا — راجع قائمة التحقق.",
+    "generate": "توليد",
+    "clientIdHint": "حروف صغيرة وأرقام وشرطات، ثلاثة أحرف على الأقل. تغييره يعطّل كل تكامل يستخدمه.",
+    "pickOne": "اختر واحدًا على الأقل.",
+    "serverDefault": "افتراضي الخادم",
+    "unitLabel": "الوحدة",
+    "redirectEmpty": "مطلوب عندما يكون authorization_code أحد أنواع المنح.",
+    "logoutEmpty": "اختياري. إلى أين يُرسل uaa المتصفّح بعد تسجيل الخروج.",
+    "requireProofKey": "اشتراط مفتاح الإثبات (PKCE)",
+    "requireProofKeyHint": "إلزامي للعميل العام، وهو الذي لا يحمل سرًا.",
+    "requireConsent": "اشتراط موافقة التفويض",
+    "requireConsentHint": "يوافق المستخدم على النطاقات عند أول تسجيل دخول.",
+    "jwkSetUrl": "عنوان JWK Set",
+    "jwkSetUrlHint": "من أين يجلب uaa مفاتيح العميل العامة. مطلوب لـ private_key_jwt.",
+    "tokenEndpointAlg": "خوارزمية توقيع مصادقة نقطة الرموز",
+    "tokenEndpointAlgHint": "كيف يوقّع العميل إثباته عند نقطة الرموز.",
+    "subjectDn": "اسم الجهة في شهادة X.509",
+    "subjectDnHint": "الشهادة التي يتوقّعها uaa لـ tls_client_auth.",
+    "customSettings": "إعدادات مخصصة",
+    "authorizationCodeTtl": "رمز التفويض",
+    "authorizationCodeTtlHint": "كم يبقى الرمز قابلًا للاستبدال. قصير بطبيعته.",
+    "deviceCodeTtl": "رمز الجهاز",
+    "deviceCodeTtlHint": "كم يبقى رمز تدفّق الجهاز صالحًا.",
+    "ttlHint": "اترك المقدار فارغًا لاستخدام افتراضي uaa.",
+    "reuseRefreshTokens": "إعادة استخدام رموز التجديد",
+    "reuseRefreshTokensHint": "إيقافه يدوّر رمز التجديد عند كل استخدام، وهو الخيار الأأمن.",
+    "certificateBound": "رموز وصول مرتبطة بالشهادة",
+    "certificateBoundHint": "يربط الرمز بشهادة mTLS الخاصة بالعميل.",
+    "idTokenAlg": "خوارزمية توقيع رمز الهوية",
+    "accessTokenFormat": "صيغة رمز الوصول",
+    "accessTokenFormatHint": "الرموز المكتفية ذاتيًا يقرأها أي خدمة تحمل المفتاح؛ الرموز المرجعية لا.",
+    "section": {
+      "basic": "المعلومات الأساسية",
+      "authentication": "المصادقة",
+      "redirects": "إعادة التوجيه",
+      "clientSettings": "إعدادات العميل",
+      "tokenSettings": "إعدادات الرموز",
+      "readiness": "قبل الحفظ",
+      "summary": "الملخص",
+      "danger": "السر والحذف"
+    },
+    "check": {
+      "clientId": "معرّف العميل مضبوط وبالشكل المقبول",
+      "clientName": "اسم العميل مضبوط",
+      "auth": "طريقة مصادقة واحدة على الأقل",
+      "grants": "نوع منح واحد على الأقل",
+      "redirectRequired": "عنوان إعادة توجيه، وهو ما يحتاجه authorization_code",
+      "redirectOptional": "لا حاجة لإعادة توجيه مع أنواع المنح هذه",
+      "pkceRequired": "PKCE مُفعّل، وهو ما يتطلبه العميل العام",
+      "pkceOptional": "PKCE اختياري لعميل يحمل سرًا",
+      "jwkSetUrl": "عنوان JWK Set حيث يحتاجه private_key_jwt",
+      "subjectDn": "اسم الجهة حيث يحتاجه tls_client_auth"
+    },
+    "unit": {
+      "seconds": "ثوانٍ",
+      "minutes": "دقائق",
+      "hours": "ساعات",
+      "days": "أيام"
+    },
+    "uri": {
+      "add": "إضافة",
+      "remove": "إزالة",
+      "removeRow": "إزالة العنوان {{position}}",
+      "rowLabel": "{{label}} {{position}}",
+      "invalid": "أدخل عنوانًا مطلقًا مع مخططه.",
+      "insecure": "HTTP عادي إلى مضيف بعيد — يمكن لأي طرف على المسار قراءة الرمز المُسلّم هنا."
+    }
+  },
+  "pairs": {
+    "add": "إضافة",
+    "remove": "إزالة",
+    "removeRow": "إزالة الإعداد {{position}}",
+    "key": "المفتاح",
+    "value": "القيمة",
+    "keyFor": "مفتاح الإعداد {{position}}",
+    "valueFor": "قيمة الإعداد {{position}}",
+    "empty": "لا توجد إعدادات مخصصة."
+  }
 }

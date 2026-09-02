@@ -1,0 +1,49 @@
+:host {
+  display: grid;
+  gap: var(--spacing-inline);
+}
+
+.pair-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-inline);
+}
+
+.group-label {
+  color: var(--foreground-subtle);
+  font-size: var(--text-4xs);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* `.add` is a `.ghost-action`; only its type scale differs, because it names a row not a page. */
+.add {
+  min-block-size: 1.85rem;
+  padding-block: 0.2rem;
+  font-size: var(--text-3xs);
+  font-weight: 600;
+}
+
+.pair-rows {
+  display: grid;
+  gap: var(--spacing-tight);
+}
+
+.pair-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr) auto;
+  gap: var(--spacing-tight);
+  align-items: center;
+}
+
+.pair-empty {
+  margin: 0;
+  padding: 0.7rem;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-md);
+  color: var(--muted-foreground);
+  font-size: var(--text-3xs);
+  text-align: center;
+}

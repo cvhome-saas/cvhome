@@ -75,26 +75,47 @@ MFA" rather than "we cannot tell".
 
 ## Users — email and username cannot be changed here
 
-- **Screen:** the detail pane, where the design draws both as editable fields.
+- **Screen:** the edit dialog, where the design draws both as editable fields.
 - **What is missing:** `UpdateUserRequest` carries neither — only `firstName`, `lastName`, `enabled`,
-  `roles` and `metadata`.
-- **Decision:** both are rendered **read-only**, in a labelled block that says so. Editable-looking
-  fields that silently fail to save are the worse failure.
+  `roles` and `metadata`. `CreateUserRequest` carries both, so the create dialog *does* edit them;
+  they become read-only the moment the account exists.
+- **Decision:** both are rendered **read-only when editing**, in a labelled block that says so.
+  Editable-looking fields that silently fail to save are the worse failure.
 - **Expected contract:** `UpdateUserRequest.email`, and a rename flow that decides what happens to a
   JWT `sub` — the username *is* the identity, so this is not a field change.
 
-## Users — no invite, no CSV import
+## Users — metadata is merged, never replaced
 
-- **Screen:** the "Invite user" and "Import CSV" buttons.
-- **What is missing:** invitations as a concept. `AdminUserService.create` exists and takes a
-  password, so it is a *create*, not an invite; there is no token, no email, no acceptance.
-- **Decision:** neither built. Create is a feature this alignment did not add — see the PR's scope.
+- **Screen:** the Metadata rows in the edit dialog, where each row has a remove button.
+- **What is missing:** removal. `AdminService.updateUser` applies the bag with
+  `u.getMetadata().putAll(req.metadata())` — a merge. A key already stored cannot be unset through
+  this API at any value, including by omitting it.
+- **Decision:** rows that came back from the server have their **remove button disabled**, with the
+  reason as its title, and the section says so beneath. A remove that silently does nothing is worse
+  than no remove: `org` and `store` are written by tenancy and read by other services, so an
+  operator who believed a removal had worked would be wrong about which store an account belongs to.
+  Editing a stored key and adding a new one both work and are offered.
+- **Expected contract:** either `PUT /users/{id}/metadata` replacing the map wholesale, or a
+  documented null-value convention meaning "unset".
+
+## Users — creating an account is two calls, and there are no invites
+
+- **Screen:** the design's "Invite user" and "Import CSV" buttons.
+- **What is missing:** invitations as a concept, and CSV import. There is no token, no email and no
+  acceptance step anywhere in uaa. `CreateUserRequest` is
+  `(username, email, firstName, lastName, roles, metadata)` and carries **no password**, while
+  `AdminService.createUser` leaves `passwordHash` null and `enabled` at its entity default of
+  `true` — so a freshly created account exists, is enabled, and cannot sign in.
+- **Decision:** **create is built**, as the two calls it really is: `POST /users`, then the
+  set-password dialog opens on the new account without being asked for. Presenting it as one step
+  and leaving the second to be discovered is how an operator ends up with an account nobody can use.
+  Invite and CSV import are not built.
 - **Expected contract:** for invites, `POST /api/v1/admin/invitations` returning a one-time token,
   which is roughly what tenancy already does for store members.
 
 ## Roles — a role is a name
 
-- **Screen:** the roles table's Scope, Users, Perms and Type columns, and the detail pane's
+- **Screen:** the roles table's Scope, Users, Perms and Type columns, and the edit dialog's
   Description, Inherits from, Permissions and Assigned users.
 - **What is missing:** all of it. uaa's `Role` entity is `{id, name}`. Authorities *are* the role
   names; what they grant is decided by `@PreAuthorize` in each service, not by data.
@@ -132,3 +153,16 @@ MFA" rather than "we cannot tell".
   resumes the OAuth2 authorization flow.
 - **Expected contract:** each is its own feature. Social login already exists in **cua** (shoppers)
   and is the closest precedent for uaa gaining it.
+
+## Clients — a custom setting's value is a string
+
+- **Screen:** the Custom settings rows on the client form, in both `clientSettings` and
+  `tokenSettings`.
+- **What is missing:** the value's type. Spring's `ClientSettings` and `TokenSettings` are
+  `Map<String, Object>`, and nothing documents which keys exist or what they hold.
+- **Decision:** values are edited and sent **as strings**. A member that arrives as a number or an
+  object is shown as its JSON so it is at least legible rather than `[object Object]`, and saving it
+  back sends that text. None of uaa's own settings use a non-string value; inventing a type picker
+  for a bag nobody documents would cost more than it is worth and would still be guessing.
+- **Expected contract:** a documented list of the settings uaa reads, with their types — at which
+  point these become real fields rather than an open map.

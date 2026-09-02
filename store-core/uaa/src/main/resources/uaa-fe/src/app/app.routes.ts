@@ -39,6 +39,24 @@ export const routes: Routes = [
         loadComponent: () => import('@features/clients/clients').then((m) => m.Clients),
         data: {titleKey: 'route.clients'},
       },
+      /*
+       * A client is a page, not a pane. `ClientDetails` carries two URI arrays, two open key/value
+       * maps and five groups of settings — Spring's own `ClientSettings` and `TokenSettings` — which
+       * is more than a column beside a table can hold without becoming a form nobody can read.
+       *
+       * `new` is declared before `:id` because the router takes the first match, and a literal
+       * segment that follows its own parameter is unreachable.
+       */
+      {
+        path: 'clients/new',
+        loadComponent: () => import('@features/client-form/client-form').then((m) => m.ClientForm),
+        data: {titleKey: 'route.clientCreate'},
+      },
+      {
+        path: 'clients/:id',
+        loadComponent: () => import('@features/client-form/client-form').then((m) => m.ClientForm),
+        data: {titleKey: 'route.clientEdit'},
+      },
     ],
   },
   {path: '**', redirectTo: ''},

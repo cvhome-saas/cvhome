@@ -1,0 +1,371 @@
+<ng-container *transloco="let t">
+  <a class="back" routerLink="/clients">
+    <app-icon name="arrowLeft" [size]="14" />
+    {{ t('clientForm.back') }}
+  </a>
+
+  <app-page-header
+    [title]="facade.isNew() ? t('clientForm.createTitle') : t('clientForm.editTitle')"
+    [context]="t('clientForm.context')"
+  />
+
+  @if (facade.error(); as failure) {
+    <app-load-error [message]="failure.message" (retry)="facade.reload()" />
+  }
+
+  <app-busy-overlay reserve="page" [busy]="facade.isLoading()" [label]="t('clientForm.loading')">
+    <form class="page" [formGroup]="facade.form" (ngSubmit)="facade.save()">
+      <div class="layout">
+        <div class="sections">
+          <!-- ------------------------------------------------------------------ basic -->
+          <app-panel padded [title]="t('clientForm.section.basic')">
+            <div class="fields">
+              <app-form-field
+                controlId="client-id"
+                required
+                [label]="t('clients.form.clientId')"
+                [control]="facade.form.controls.clientId"
+                [hint]="t('clientForm.clientIdHint')"
+              >
+                <div class="with-action">
+                  <app-text-field formControlName="clientId" id="client-id" latin mono />
+                  <button class="secondary-action" type="button" (click)="facade.generateClientId()">
+                    {{ t('clientForm.generate') }}
+                  </button>
+                </div>
+              </app-form-field>
+
+              <app-form-field
+                controlId="client-name"
+                required
+                [label]="t('clients.form.clientName')"
+                [control]="facade.form.controls.clientName"
+              >
+                <app-text-field formControlName="clientName" id="client-name" />
+              </app-form-field>
+            </div>
+          </app-panel>
+
+          <!-- --------------------------------------------------------- authentication -->
+          <app-panel padded [title]="t('clientForm.section.authentication')">
+            <div class="groups">
+              <div class="pick-group">
+                <span class="group-label">{{ t('clients.form.authMethods') }}</span>
+                <div class="chips">
+                  @for (option of facade.options().clientAuthenticationMethods; track option) {
+                    <app-checkbox
+                      [label]="option"
+                      [checked]="facade.isPicked(picks('clientAuthenticationMethods'), option)"
+                      (checkedChange)="facade.togglePick(picks('clientAuthenticationMethods'), option, $event)"
+                    />
+                  }
+                </div>
+                <app-field-error
+                  [control]="facade.form.controls.clientAuthenticationMethods"
+                  [fallback]="t('clientForm.pickOne')"
+                />
+              </div>
+
+              <div class="pick-group">
+                <span class="group-label">{{ t('clients.form.grantTypes') }}</span>
+                <div class="chips">
+                  @for (option of facade.options().authorizationGrantTypes; track option) {
+                    <app-checkbox
+                      [label]="option"
+                      [checked]="facade.isPicked(picks('authorizationGrantTypes'), option)"
+                      (checkedChange)="facade.togglePick(picks('authorizationGrantTypes'), option, $event)"
+                    />
+                  }
+                </div>
+                <app-field-error
+                  [control]="facade.form.controls.authorizationGrantTypes"
+                  [fallback]="t('clientForm.pickOne')"
+                />
+              </div>
+
+              <div class="pick-group">
+                <span class="group-label">{{ t('clients.form.scopes') }}</span>
+                <div class="chips">
+                  @for (option of facade.options().scopes; track option) {
+                    <app-checkbox
+                      [label]="option"
+                      [checked]="facade.isPicked(picks('scopes'), option)"
+                      (checkedChange)="facade.togglePick(picks('scopes'), option, $event)"
+                    />
+                  }
+                </div>
+              </div>
+            </div>
+          </app-panel>
+
+          <!-- ------------------------------------------------------------- redirects -->
+          <app-panel padded [title]="t('clientForm.section.redirects')">
+            <div class="groups">
+              <app-uri-list
+                [array]="facade.redirectUris"
+                [label]="t('clients.form.redirectUris')"
+                [emptyHint]="t('clientForm.redirectEmpty')"
+                (add)="facade.addUri(facade.redirectUris)"
+                (remove)="facade.removeUri(facade.redirectUris, $event)"
+              />
+              <app-uri-list
+                [array]="facade.postLogoutRedirectUris"
+                [label]="t('clients.form.postLogoutUris')"
+                [emptyHint]="t('clientForm.logoutEmpty')"
+                (add)="facade.addUri(facade.postLogoutRedirectUris)"
+                (remove)="facade.removeUri(facade.postLogoutRedirectUris, $event)"
+              />
+            </div>
+          </app-panel>
+
+          <!-- -------------------------------------------------------- client settings -->
+          <app-panel padded [title]="t('clientForm.section.clientSettings')">
+            <div class="fields" formGroupName="clientSettings">
+              <app-toggle
+                formControlName="requireProofKey"
+                [label]="t('clientForm.requireProofKey')"
+                [description]="t('clientForm.requireProofKeyHint')"
+              />
+              <app-toggle
+                formControlName="requireAuthorizationConsent"
+                [label]="t('clientForm.requireConsent')"
+                [description]="t('clientForm.requireConsentHint')"
+              />
+
+              <app-form-field
+                controlId="jwk-set-url"
+                [label]="t('clientForm.jwkSetUrl')"
+                [control]="facade.form.controls.clientSettings.controls.jwkSetUrl"
+                [hint]="t('clientForm.jwkSetUrlHint')"
+              >
+                <app-text-field formControlName="jwkSetUrl" id="jwk-set-url" latin mono />
+              </app-form-field>
+
+              <app-form-field
+                controlId="token-endpoint-alg"
+                [label]="t('clientForm.tokenEndpointAlg')"
+                [hint]="t('clientForm.tokenEndpointAlgHint')"
+              >
+                <app-select
+                  id="token-endpoint-alg"
+                  formControlName="tokenEndpointAuthenticationSigningAlgorithm"
+                  [options]="
+                    optional(
+                      facade.options().tokenEndpointAuthenticationSigningAlgorithm,
+                      t('clientForm.serverDefault')
+                    )
+                  "
+                />
+              </app-form-field>
+
+              <app-form-field
+                controlId="subject-dn"
+                [label]="t('clientForm.subjectDn')"
+                [hint]="t('clientForm.subjectDnHint')"
+              >
+                <app-text-field formControlName="x509CertificateSubjectDN" id="subject-dn" latin mono />
+              </app-form-field>
+
+              <app-pair-list
+                [array]="facade.form.controls.clientSettings.controls.customSettings"
+                [label]="t('clientForm.customSettings')"
+                (add)="facade.addPair(facade.form.controls.clientSettings.controls.customSettings)"
+                (remove)="facade.removePair(facade.form.controls.clientSettings.controls.customSettings, $event)"
+              />
+            </div>
+          </app-panel>
+
+          <!-- --------------------------------------------------------- token settings -->
+          <app-panel padded [title]="t('clientForm.section.tokenSettings')">
+            <div class="fields" formGroupName="tokenSettings">
+              <div class="ttl-grid">
+                <app-form-field
+                  controlId="access-ttl"
+                  [label]="t('clients.form.accessTtl')"
+                  [hint]="t('clientForm.ttlHint')"
+                >
+                  <app-duration-field
+                    id="access-ttl"
+                    formControlName="accessTokenTimeToLive"
+                    [unitOptions]="units(t)"
+                    [amountLabel]="t('clients.form.accessTtl')"
+                    [unitLabel]="t('clientForm.unitLabel')"
+                  />
+                </app-form-field>
+
+                <app-form-field
+                  controlId="refresh-ttl"
+                  [label]="t('clients.form.refreshTtl')"
+                  [hint]="t('clientForm.ttlHint')"
+                >
+                  <app-duration-field
+                    id="refresh-ttl"
+                    formControlName="refreshTokenTimeToLive"
+                    [unitOptions]="units(t)"
+                    [amountLabel]="t('clients.form.refreshTtl')"
+                    [unitLabel]="t('clientForm.unitLabel')"
+                  />
+                </app-form-field>
+
+                <app-form-field
+                  controlId="code-ttl"
+                  [label]="t('clientForm.authorizationCodeTtl')"
+                  [hint]="t('clientForm.authorizationCodeTtlHint')"
+                >
+                  <app-duration-field
+                    id="code-ttl"
+                    formControlName="authorizationCodeTimeToLive"
+                    [unitOptions]="units(t)"
+                    [amountLabel]="t('clientForm.authorizationCodeTtl')"
+                    [unitLabel]="t('clientForm.unitLabel')"
+                  />
+                </app-form-field>
+
+                <app-form-field
+                  controlId="device-ttl"
+                  [label]="t('clientForm.deviceCodeTtl')"
+                  [hint]="t('clientForm.deviceCodeTtlHint')"
+                >
+                  <app-duration-field
+                    id="device-ttl"
+                    formControlName="deviceCodeTimeToLive"
+                    [unitOptions]="units(t)"
+                    [amountLabel]="t('clientForm.deviceCodeTtl')"
+                    [unitLabel]="t('clientForm.unitLabel')"
+                  />
+                </app-form-field>
+              </div>
+
+              <app-toggle
+                formControlName="reuseRefreshTokens"
+                [label]="t('clientForm.reuseRefreshTokens')"
+                [description]="t('clientForm.reuseRefreshTokensHint')"
+              />
+              <app-toggle
+                formControlName="x509CertificateBoundAccessTokens"
+                [label]="t('clientForm.certificateBound')"
+                [description]="t('clientForm.certificateBoundHint')"
+              />
+
+              <app-form-field controlId="id-token-alg" [label]="t('clientForm.idTokenAlg')">
+                <app-select
+                  id="id-token-alg"
+                  formControlName="idTokenSignatureAlgorithm"
+                  [options]="optional(facade.options().idTokenSignatureAlgorithm, t('clientForm.serverDefault'))"
+                />
+              </app-form-field>
+
+              <app-form-field
+                controlId="access-token-format"
+                [label]="t('clientForm.accessTokenFormat')"
+                [hint]="t('clientForm.accessTokenFormatHint')"
+              >
+                <app-select
+                  id="access-token-format"
+                  formControlName="accessTokenFormat"
+                  [options]="optional(facade.options().accessTokenFormat, t('clientForm.serverDefault'))"
+                />
+              </app-form-field>
+
+              <app-pair-list
+                [array]="facade.form.controls.tokenSettings.controls.customSettings"
+                [label]="t('clientForm.customSettings')"
+                (add)="facade.addPair(facade.form.controls.tokenSettings.controls.customSettings)"
+                (remove)="facade.removePair(facade.form.controls.tokenSettings.controls.customSettings, $event)"
+              />
+            </div>
+          </app-panel>
+        </div>
+
+        <!-- ---------------------------------------------------------------- readiness -->
+        <aside class="side">
+          <app-panel padded [title]="t('clientForm.section.readiness')">
+            <ul class="checks">
+              @for (check of facade.checks(); track check.id) {
+                <li class="check" [class.met]="check.ok">
+                  <app-icon [name]="check.ok ? 'checkCircle' : 'alertCircle'" [size]="14" />
+                  <span>{{ t(check.key) }}</span>
+                </li>
+              }
+            </ul>
+          </app-panel>
+
+          <app-panel padded [title]="t('clientForm.section.summary')">
+            <dl class="summary">
+              <dt>client_id</dt>
+              <dd>{{ facade.summary().clientId || '—' }}</dd>
+              <dt>auth</dt>
+              <dd>{{ facade.summary().auth || '—' }}</dd>
+              <dt>grants</dt>
+              <dd>{{ facade.summary().grants || '—' }}</dd>
+              <dt>scopes</dt>
+              <dd>{{ facade.summary().scopes || '—' }}</dd>
+              <dt>access_ttl</dt>
+              <dd>{{ facade.summary().accessTtl || '—' }}</dd>
+              <dt>refresh_ttl</dt>
+              <dd>{{ facade.summary().refreshTtl || '—' }}</dd>
+              <dt>format</dt>
+              <dd>{{ facade.summary().format || '—' }}</dd>
+            </dl>
+          </app-panel>
+
+          @if (!facade.isNew()) {
+            <app-panel padded [title]="t('clientForm.section.danger')">
+              <div class="danger-zone">
+                <app-notice-bar icon="lock" tone="amber" [message]="t('clients.notice.secret')" />
+                <button class="secondary-action" type="button" (click)="facade.rotating.set(true)">
+                  {{ t('clients.action.rotate') }}
+                </button>
+                <button class="danger-action" type="button" (click)="facade.deleting.set(true)">
+                  {{ t('clients.action.delete') }}
+                </button>
+              </div>
+            </app-panel>
+          }
+        </aside>
+      </div>
+
+      <!--
+        The footer stays with the form rather than sticking to the viewport: the readiness panel is
+        what tells an operator whether saving will work, and a bar pinned over it would cover the
+        answer on a short window.
+      -->
+      <div class="footer">
+        <a class="secondary-action" routerLink="/clients">{{ t('shared.actions.cancel') }}</a>
+        <button class="primary-action" type="submit" [disabled]="facade.busy()">
+          {{ facade.busy() ? t('clients.form.saving') : t('clients.form.save') }}
+        </button>
+      </div>
+    </form>
+  </app-busy-overlay>
+
+  <app-set-password-dialog
+    [open]="facade.rotating()"
+    [busy]="facade.busy()"
+    [title]="t('clients.rotate.title')"
+    [message]="t('clients.rotate.message', {clientId: facade.summary().clientId})"
+    [passwordLabel]="t('clients.rotate.secret')"
+    [repeatLabel]="t('clients.rotate.repeatSecret')"
+    [hint]="t('clients.rotate.hint')"
+    [handoverHint]="t('clients.rotate.handoverHint')"
+    [weakMessage]="t('clients.rotate.weak')"
+    [mismatchMessage]="t('clients.rotate.mismatch')"
+    [confirmLabel]="t('clients.rotate.confirm')"
+    [busyLabel]="t('clients.rotate.busy')"
+    [cancelLabel]="t('shared.actions.cancel')"
+    (submitted)="facade.rotateSecret($event)"
+    (dismissed)="facade.rotating.set(false)"
+  />
+
+  <app-confirm-dialog
+    [open]="facade.deleting()"
+    [title]="t('clients.delete.title')"
+    [message]="t('clients.delete.message', {clientId: facade.summary().clientId})"
+    [confirmationText]="facade.summary().clientId"
+    [confirmationLabel]="t('clients.delete.confirmationLabel')"
+    [confirmLabel]="t('clients.action.delete')"
+    [cancelLabel]="t('shared.actions.cancel')"
+    (confirmed)="facade.confirmDelete()"
+    (dismissed)="facade.deleting.set(false)"
+  />
+</ng-container>

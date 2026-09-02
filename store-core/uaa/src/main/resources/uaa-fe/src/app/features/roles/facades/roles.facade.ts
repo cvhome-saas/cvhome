@@ -31,13 +31,12 @@ export class RolesFacade {
   readonly pageIndex = signal(0);
 
   /**
-   * What the detail pane is showing: a role, `'new'` while creating, or null when nothing is picked.
+   * What the dialog is editing: a role, `'new'` while creating, or null when it is closed.
    *
-   * One signal rather than a separate "form open" flag — in a master-detail layout the selection
-   * *is* the form's subject, and two sources of that truth is how a pane ends up showing one role
-   * while saving another.
+   * One signal rather than a separate "dialog open" flag — the subject *is* the open state, and two
+   * sources of that truth is how a form ends up showing one role while saving another.
    */
-  readonly selected = signal<RoleDto | 'new' | null>(null);
+  readonly editing = signal<RoleDto | 'new' | null>(null);
   readonly deleting = signal<RoleDto | null>(null);
 
   readonly form = new FormGroup({
@@ -67,28 +66,34 @@ export class RolesFacade {
 
   startCreate(): void {
     this.form.reset({name: ''});
-    this.selected.set('new');
+    this.editing.set('new');
   }
 
-  /** Picking a row fills the pane. The list and a rename action share this one entry point. */
+  /** Clicking a row opens the dialog on it. */
   select(role: RoleDto): void {
     this.form.reset({name: role.name});
-    this.selected.set(role);
+    this.editing.set(role);
   }
 
   dismiss(): void {
-    this.selected.set(null);
+    this.editing.set(null);
     this.deleting.set(null);
   }
 
-  /** The row currently in the pane, for the list's selected state. */
-  isSelected(role: RoleDto): boolean {
-    const target = this.selected();
-    return target !== null && target !== 'new' && target.id === role.id;
+  /**
+   * Deleting closes the form and opens the confirmation, rather than stacking one modal on another.
+   *
+   * Two dialogs in the top layer at once leaves the operator looking at a form they can no longer
+   * reach, and Escape then closes the wrong one. Cancelling the confirmation returns to the list —
+   * acceptable here, because a role is a single field to retype.
+   */
+  askDelete(role: RoleDto): void {
+    this.editing.set(null);
+    this.deleting.set(role);
   }
 
   save(): void {
-    const target = this.selected();
+    const target = this.editing();
     if (!target || this.form.invalid) {
       this.form.markAllAsTouched();
       return;

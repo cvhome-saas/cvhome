@@ -2,7 +2,7 @@ import {Component, computed, inject, input, output} from '@angular/core';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 
 import type {PlatformUserRow} from '../user-row';
-import {Badge, DataTable, type TableColumn, TableRow, Icon} from '@cvhome-saas/ui-kit/ui';
+import {ActionMenu, Badge, DataTable, type MenuAction, type TableColumn, TableRow} from '@cvhome-saas/ui-kit/ui';
 
 /** What a row action asks the host to do. The host owns the dialogs and the writes. */
 export interface UserAdminIntent {
@@ -16,7 +16,7 @@ const COLUMN_KEYS: readonly {key: string; labelKey: string; width: string}[] = [
   {key: 'roles', labelKey: 'shared.userAdmin.column.roles', width: 'minmax(9rem, 1.3fr)'},
   {key: 'scope', labelKey: 'shared.userAdmin.column.scope', width: 'minmax(9rem, 1.2fr)'},
   {key: 'status', labelKey: 'shared.userAdmin.column.status', width: 'minmax(5rem, 0.6fr)'},
-  {key: 'actions', labelKey: '', width: '10rem'},
+  {key: 'actions', labelKey: 'shared.userAdmin.column.actions', width: '4rem'},
 ];
 
 /**
@@ -34,10 +34,16 @@ const COLUMN_KEYS: readonly {key: string; labelKey: string; width: string}[] = [
  * `impersonate` is deliberately present and deliberately disabled: the point of writing the
  * requirement is that the screen it belongs to already exists. See
  * `.agents/requirments/user-impersonation.md`, and lessons.md, "Platform — no impersonation".
+ *
+ * **The five actions are a menu, not a row of glyphs.** They were five bare `.icon-action` buttons
+ * in a 10rem column: an eye, a padlock, a shield, an arrow and a bin, distinguishable only by
+ * hovering for a tooltip, and one of them permanently inert with no visible reason. A menu names
+ * every one of them in words, gives the disabled entry room to say why it is disabled, and returns
+ * the column to the 4rem it actually needs.
  */
 @Component({
   selector: 'app-user-admin-table',
-  imports: [Badge, DataTable, Icon, TableRow, TranslocoDirective],
+  imports: [ActionMenu, Badge, DataTable, TableRow, TranslocoDirective],
   templateUrl: './user-admin-table.html',
   styleUrl: './user-admin-table.css',
 })
@@ -79,7 +85,70 @@ export class UserAdminTable {
     }));
   });
 
-  protected emit(kind: UserAdminIntent['kind'], row: PlatformUserRow): void {
-    this.act.emit({kind, row});
+  /**
+   * A click on the row selects it — unless it landed inside the actions cell.
+   *
+   * The whole row is a selector when `selectable`, and the menu sits inside it, so without this a
+   * pick would also open the account behind the menu. Read off the event rather than stopped on a
+   * wrapper: `stopPropagation` on a `<div>` is a click handler on a non-interactive element, which
+   * is a genuine a11y smell and which the template linter is right to refuse.
+   */
+  protected onRowClick(event: Event, row: PlatformUserRow): void {
+    if (!this.selectable()) {
+      return;
+    }
+    if ((event.target as HTMLElement).closest('.cell-actions')) {
+      return;
+    }
+    this.picked.emit(row);
+  }
+
+  /**
+   * The row's menu, rebuilt per row because two entries read from the row itself.
+   *
+   * `impersonate` is listed and disabled rather than omitted: a capability the product intends to
+   * have is worth showing as not-yet-built, and a menu has room to say so where a bare glyph did
+   * not. It carries no `kind`, so picking it cannot reach {@link act}.
+   */
+  protected actionsFor(row: PlatformUserRow): readonly MenuAction[] {
+    return [
+      {
+        key: 'toggleEnabled',
+        icon: row.enabled ? 'eyeOff' : 'eye',
+        label: row.enabled
+          ? this.transloco.translate('shared.userAdmin.action.disable')
+          : this.transloco.translate('shared.userAdmin.action.enable'),
+      },
+      {
+        key: 'resetPassword',
+        icon: 'lock',
+        label: this.transloco.translate('shared.userAdmin.action.resetPassword'),
+      },
+      {
+        key: 'editRoles',
+        icon: 'shield',
+        label: this.transloco.translate('shared.userAdmin.action.editRoles'),
+      },
+      {
+        key: 'impersonate',
+        icon: 'signIn',
+        disabled: true,
+        label: this.transloco.translate('shared.userAdmin.action.impersonateUnavailable'),
+      },
+      {
+        key: 'delete',
+        icon: 'trash',
+        danger: true,
+        label: this.transloco.translate('shared.userAdmin.action.delete'),
+      },
+    ];
+  }
+
+  /** Only the four keys that are real intents reach the host; `impersonate` is inert by design. */
+  protected onPick(action: MenuAction, row: PlatformUserRow): void {
+    if (action.key === 'impersonate') {
+      return;
+    }
+    this.act.emit({kind: action.key as UserAdminIntent['kind'], row});
   }
 }

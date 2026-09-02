@@ -7,6 +7,7 @@ import {
   Checkbox,
   ConfirmDialog,
   EmptyState,
+  FormDialog,
   FormField,
   LoadError,
   NoticeBar,
@@ -15,8 +16,11 @@ import {
   Panel,
   SetPasswordDialog,
   TextField,
+  Toggle,
 } from '@cvhome-saas/ui-kit/ui';
-import {UserAdminTable, type PlatformUserRow, type UserAdminIntent} from '@cvhome-saas/ui-kit/uaa';
+import {UserAdminTable, type UserAdminIntent} from '@cvhome-saas/ui-kit/uaa';
+
+import {PairList} from '@shared/ui/pair-list/pair-list';
 
 import {PAGE_SIZE, UsersFacade} from './facades/users.facade';
 
@@ -33,9 +37,12 @@ import {PAGE_SIZE, UsersFacade} from './facades/users.facade';
     EmptyState,
     Pagination,
     UserAdminTable,
+    FormDialog,
     FormField,
     TextField,
     Checkbox,
+    Toggle,
+    PairList,
     SetPasswordDialog,
     ConfirmDialog,
   ],
@@ -47,19 +54,14 @@ export class Users {
   protected readonly facade = inject(UsersFacade);
   protected readonly pageSize = PAGE_SIZE;
 
-  /** Rendered in a dialog's message, so it needs a name even when the row has none. */
-  protected userName(row: PlatformUserRow | null): string {
-    return row?.name || row?.username || '';
-  }
-
   /** The table hands roles back as a list; uaa has no display names for them, so they read as-is. */
   protected readonly roleList = (roles: readonly string[]): string => roles.join(', ');
 
   /**
    * The table's row actions still exist and still work — they are the fast path.
    *
-   * `editRoles` no longer opens a dialog: roles are edited in the pane, so the intent selects the
-   * row instead. The two that are genuinely modal keep their dialogs.
+   * `editRoles` opens the same dialog the row itself does: roles are one field of the account, not
+   * a screen of their own. The two that are genuinely modal keep their own dialogs.
    */
   protected onAction(intent: UserAdminIntent): void {
     switch (intent.kind) {

@@ -7,7 +7,9 @@ import {
   ConfirmDialog,
   DataTable,
   EmptyState,
+  FormDialog,
   FormField,
+  Icon,
   LoadError,
   NoticeBar,
   PageHeader,
@@ -33,9 +35,11 @@ import {PAGE_SIZE, RolesFacade} from './facades/roles.facade';
     Pagination,
     DataTable,
     TableRow,
+    FormDialog,
     FormField,
     TextField,
     ConfirmDialog,
+    Icon,
   ],
   providers: [RolesFacade],
   templateUrl: './roles.html',
@@ -46,8 +50,7 @@ export class Roles {
   protected readonly pageSize = PAGE_SIZE;
 
   /**
-   * Two columns. The row's actions moved into the detail pane, which is the point of the layout:
-   * a list that only selects, and one place where a role is edited.
+   * Two columns and a pencil. The row opens the dialog; there is nowhere else a role is edited.
    */
   private readonly keys: readonly {key: string; width: string}[] = [
     {key: 'name', width: 'minmax(12rem, 2fr)'},
@@ -56,7 +59,9 @@ export class Roles {
 
   /** Column headers are translated here rather than in the table, which takes plain strings. */
   protected columns(t: (key: string) => string): readonly TableColumn[] {
-    return this.keys.map(({key, width}) => ({key, width, label: t('roles.column.' + key)}));
+    return [
+      ...this.keys.map(({key, width}) => ({key, width, label: t('roles.column.' + key)})),
+      {key: 'go', width: '2rem', label: ''},
+    ];
   }
-
 }

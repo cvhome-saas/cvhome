@@ -15,199 +15,40 @@
         -->
         <app-notice-bar icon="lock" tone="amber" [message]="t('clients.notice.secret')" />
 
-        <div class="split">
-          <app-panel class="list" [title]="t('clients.panel.title')">
-            <button panelAction class="primary" type="button" (click)="facade.startCreate()">
-              {{ t('clients.action.register') }}
-            </button>
+        <app-panel [title]="t('clients.panel.title')">
+          <a panelAction class="primary-action" routerLink="/clients/new">
+            {{ t('clients.action.register') }}
+          </a>
 
-            @if (facade.rows().length) {
-              <app-data-table [columns]="columns(t)" [label]="t('clients.panel.title')">
-                @for (client of facade.rows(); track client.id) {
-                  <app-table-row
-                    class="row"
-                    [interactive]="true"
-                    [class.selected]="facade.isSelected(client)"
-                    [attr.aria-current]="facade.isSelected(client) ? 'true' : null"
-                    (click)="facade.select(client)"
-                  >
-                    <span class="cell mono" [attr.data-label]="t('clients.column.clientId')">{{ client.clientId }}</span>
-                    <span class="cell" [attr.data-label]="t('clients.column.clientName')">{{ client.clientName }}</span>
-                  </app-table-row>
-                }
-              </app-data-table>
+          @if (facade.rows().length) {
+            <app-data-table [columns]="columns(t)" [label]="t('clients.panel.title')">
+              @for (client of facade.rows(); track client.id) {
+                <app-table-row class="row" [interactive]="true" (click)="open(client)">
+                  <span class="cell mono" [attr.data-label]="t('clients.column.clientId')">{{ client.clientId }}</span>
+                  <span class="cell" [attr.data-label]="t('clients.column.clientName')">{{ client.clientName }}</span>
+                  <span class="cell go" aria-hidden="true"><app-icon name="chevronRight" [size]="15" /></span>
+                </app-table-row>
+              }
+            </app-data-table>
 
-              <app-pagination
-                [page]="facade.pageIndex()"
-                [totalPages]="facade.totalPages()"
-                [totalElements]="facade.totalElements()"
-                [pageSize]="pageSize"
-                [unit]="t('clients.unit')"
-                [label]="t('clients.paginationLabel')"
-                (pageChange)="facade.goToPage($event)"
-              />
-            } @else {
-              <app-empty-state
-                icon="code"
-                [title]="t('clients.empty.title')"
-                [message]="t('clients.empty.message')"
-              />
-            }
-          </app-panel>
-
-          <aside class="detail">
-            @if (facade.selected(); as target) {
-              <app-panel
-                padded
-                [title]="target === 'new' ? t('clients.form.createTitle') : t('clients.form.editTitle')"
-              >
-                <form class="form" [formGroup]="facade.form" (ngSubmit)="facade.save()">
-                  <app-form-field
-                    controlId="client-id"
-                    required
-                    [label]="t('clients.form.clientId')"
-                    [control]="facade.form.controls.clientId"
-                  >
-                    <app-text-field formControlName="clientId" id="client-id" latin mono />
-                  </app-form-field>
-
-                  <app-form-field
-                    controlId="client-name"
-                    required
-                    [label]="t('clients.form.clientName')"
-                    [control]="facade.form.controls.clientName"
-                  >
-                    <app-text-field formControlName="clientName" id="client-name" />
-                  </app-form-field>
-
-                  <app-form-field
-                    controlId="grant-types"
-                    [label]="t('clients.form.grantTypes')"
-                    [control]="facade.form.controls.authorizationGrantTypes"
-                    [hint]="allowed(facade.options().authorizationGrantTypes)"
-                  >
-                    <app-text-field formControlName="authorizationGrantTypes" id="grant-types" latin mono />
-                  </app-form-field>
-
-                  <app-form-field
-                    controlId="auth-methods"
-                    [label]="t('clients.form.authMethods')"
-                    [control]="facade.form.controls.clientAuthenticationMethods"
-                    [hint]="allowed(facade.options().clientAuthenticationMethods)"
-                  >
-                    <app-text-field formControlName="clientAuthenticationMethods" id="auth-methods" latin mono />
-                  </app-form-field>
-
-                  <app-form-field
-                    controlId="scopes"
-                    [label]="t('clients.form.scopes')"
-                    [control]="facade.form.controls.scopes"
-                    [hint]="allowed(facade.options().scopes)"
-                  >
-                    <app-text-field formControlName="scopes" id="scopes" latin mono />
-                  </app-form-field>
-
-                  <app-form-field
-                    controlId="redirect-uris"
-                    [label]="t('clients.form.redirectUris')"
-                    [control]="facade.form.controls.redirectUris"
-                    [hint]="t('clients.form.redirectUrisHint')"
-                  >
-                    <app-text-field formControlName="redirectUris" id="redirect-uris" latin mono />
-                  </app-form-field>
-
-                  <app-form-field
-                    controlId="logout-uris"
-                    [label]="t('clients.form.postLogoutUris')"
-                    [control]="facade.form.controls.postLogoutRedirectUris"
-                    [hint]="t('clients.form.redirectUrisHint')"
-                  >
-                    <app-text-field formControlName="postLogoutRedirectUris" id="logout-uris" latin mono />
-                  </app-form-field>
-
-                  <p class="group-label">{{ t('clients.form.lifetimes') }}</p>
-
-                  <app-form-field
-                    controlId="access-ttl"
-                    [label]="t('clients.form.accessTtl')"
-                    [control]="facade.form.controls.accessTokenTimeToLive"
-                    [hint]="t('clients.form.ttlHint')"
-                  >
-                    <app-text-field formControlName="accessTokenTimeToLive" id="access-ttl" latin mono
-                                    placeholder="PT30M" />
-                  </app-form-field>
-
-                  <app-form-field
-                    controlId="refresh-ttl"
-                    [label]="t('clients.form.refreshTtl')"
-                    [control]="facade.form.controls.refreshTokenTimeToLive"
-                    [hint]="t('clients.form.ttlHint')"
-                  >
-                    <app-text-field formControlName="refreshTokenTimeToLive" id="refresh-ttl" latin mono
-                                    placeholder="P30D" />
-                  </app-form-field>
-
-                  <div class="actions">
-                    @if (target !== 'new') {
-                      <button class="ghost" type="button" (click)="facade.rotating.set(asSummary(target))">
-                        {{ t('clients.action.rotate') }}
-                      </button>
-                      <button class="ghost danger" type="button" (click)="facade.deleting.set(asSummary(target))">
-                        {{ t('clients.action.delete') }}
-                      </button>
-                    }
-                    <div class="grow"></div>
-                    <button class="ghost" type="button" (click)="facade.dismiss()">
-                      {{ t('shared.actions.cancel') }}
-                    </button>
-                    <button class="primary" type="submit" [disabled]="facade.busy()">
-                      {{ facade.busy() ? t('clients.form.saving') : t('clients.form.save') }}
-                    </button>
-                  </div>
-                </form>
-              </app-panel>
-            } @else {
-              <app-panel padded [title]="t('clients.detail.emptyTitle')">
-                <app-empty-state compact icon="code" [message]="t('clients.detail.emptyMessage')" />
-              </app-panel>
-            }
-          </aside>
-        </div>
+            <app-pagination
+              [page]="facade.pageIndex()"
+              [totalPages]="facade.totalPages()"
+              [totalElements]="facade.totalElements()"
+              [pageSize]="pageSize"
+              [unit]="t('clients.unit')"
+              [label]="t('clients.paginationLabel')"
+              (pageChange)="facade.goToPage($event)"
+            />
+          } @else {
+            <app-empty-state
+              icon="code"
+              [title]="t('clients.empty.title')"
+              [message]="t('clients.empty.message')"
+            />
+          }
+        </app-panel>
       </div>
     }
   </app-busy-overlay>
-
-  <!--
-    The same dialog the console uses to hand over a password, for the same reason: the value is typed
-    once, confirmed once, and never readable again.
-  -->
-  <app-set-password-dialog
-    [open]="!!facade.rotating()"
-    [busy]="facade.busy()"
-    [title]="t('clients.rotate.title')"
-    [message]="t('clients.rotate.message', {clientId: facade.rotating()?.clientId ?? ''})"
-    [passwordLabel]="t('clients.rotate.secret')"
-    [repeatLabel]="t('clients.rotate.repeatSecret')"
-    [hint]="t('clients.rotate.hint')"
-    [handoverHint]="t('clients.rotate.handoverHint')"
-    [weakMessage]="t('clients.rotate.weak')"
-    [mismatchMessage]="t('clients.rotate.mismatch')"
-    [confirmLabel]="t('clients.rotate.confirm')"
-    [busyLabel]="t('clients.rotate.busy')"
-    [cancelLabel]="t('shared.actions.cancel')"
-    (submitted)="facade.rotateSecret($event)"
-    (dismissed)="facade.dismiss()"
-  />
-
-  <app-confirm-dialog
-    [open]="!!facade.deleting()"
-    [title]="t('clients.delete.title')"
-    [message]="t('clients.delete.message', {clientId: facade.deleting()?.clientId ?? ''})"
-    [confirmationText]="facade.deleting()?.clientId ?? null"
-    [confirmationLabel]="t('clients.delete.confirmationLabel')"
-    [confirmLabel]="t('clients.action.delete')"
-    [cancelLabel]="t('shared.actions.cancel')"
-    (confirmed)="facade.confirmDelete()"
-    (dismissed)="facade.dismiss()"
-  />
 </ng-container>

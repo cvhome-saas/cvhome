@@ -1,0 +1,58 @@
+<ng-container *transloco="let t">
+  <div class="uri-head">
+    <span class="group-label">{{ label() }}</span>
+    <button class="ghost-action add" type="button" (click)="add.emit()">
+      <app-icon name="plus" [size]="13" />
+      {{ t('clientForm.uri.add') }}
+    </button>
+  </div>
+
+  @if (hint(); as text) {
+    <p class="field-hint">{{ text }}</p>
+  }
+
+  @if (array().controls.length) {
+    <div class="uri-rows">
+      @for (row of array().controls; track $index) {
+        <div class="uri-row">
+          <span
+            class="uri-status"
+            [class.ok]="valid(row) && !insecure(row)"
+            [class.warn]="insecure(row)"
+            [attr.title]="insecure(row) ? t('clientForm.uri.insecure') : null"
+          >
+            @if (insecure(row)) {
+              <app-icon name="alertCircle" [size]="14" />
+            } @else if (valid(row)) {
+              <app-icon name="checkCircle" [size]="14" />
+            }
+          </span>
+
+          <div class="uri-field">
+            <app-text-field
+              latin
+              mono
+              [formControl]="row"
+              [ariaLabel]="t('clientForm.uri.rowLabel', {label: label(), position: $index + 1})"
+              [invalid]="row.touched && row.invalid"
+              placeholder="https://"
+            />
+            <app-field-error [control]="row" [fallback]="t('clientForm.uri.invalid')" />
+          </div>
+
+          <button
+            class="icon-action danger"
+            type="button"
+            [attr.aria-label]="t('clientForm.uri.removeRow', {position: $index + 1})"
+            [title]="t('clientForm.uri.remove')"
+            (click)="remove.emit($index)"
+          >
+            <app-icon name="trash" [size]="14" />
+          </button>
+        </div>
+      }
+    </div>
+  } @else if (emptyHint(); as text) {
+    <p class="uri-empty">{{ text }}</p>
+  }
+</ng-container>

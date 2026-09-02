@@ -279,16 +279,12 @@
     "userAdmin": {
       "action": {
         "delete": "حذف الحساب",
-        "deleteNamed": "حذف {{name}}",
         "disable": "تعطيل الحساب",
-        "disableNamed": "تعطيل {{name}}",
         "editRoles": "تعديل الأدوار",
-        "editRolesNamed": "تعديل أدوار {{name}}",
         "enable": "تفعيل الحساب",
-        "enableNamed": "تفعيل {{name}}",
         "impersonateUnavailable": "الدخول بحساب آخر غير مبني بعد",
         "resetPassword": "تعيين كلمة مرور",
-        "resetPasswordNamed": "تعيين كلمة مرور لـ {{name}}"
+        "menuFor": "إجراءات {{name}}"
       },
       "column": {
         "actions": "إجراءات",
