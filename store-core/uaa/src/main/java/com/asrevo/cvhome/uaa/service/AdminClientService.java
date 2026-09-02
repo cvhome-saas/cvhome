@@ -66,28 +66,37 @@ public class AdminClientService {
         return ClientClientDetailsMapper.toClientDetails(client);
     }
 
-    public ClientDetails save(ClientDetails details) {
-        if (StringUtils.hasText(details.id())) {
-            // Update
-            RegisteredClient existingClient = clients.findById(details.id());
-            RegisteredClient updatedClient = ClientClientDetailsMapper.toRegisteredClient(details, existingClient);
-            clients.save(updatedClient);
-            return ClientClientDetailsMapper.toClientDetails(updatedClient);
-        } else {
-            // Create
-            ClientDetails newClientDetails = new ClientDetails(UUID.randomUUID().toString(), details.clientId(),
-                    details.clientName(), details.clientAuthenticationMethods(), details.authorizationGrantTypes(),
-                    details.redirectUris(), details.postLogoutRedirectUris(), details.scopes(),
-                    details.clientSettings(), details.tokenSettings());
-            RegisteredClient newClient = ClientClientDetailsMapper.toRegisteredClient(newClientDetails);
-            if (!StringUtils.hasText(newClient.getClientSecret())) {
-                newClient = RegisteredClient.from(newClient)
-                        .clientSecret(encoder.encode(secretGenerator.generateKey()))
-                        .build();
-            }
-            clients.save(newClient);
-            return ClientClientDetailsMapper.toClientDetails(newClient);
+    /** Registers a new client. The body's {@code id} is ignored: the registration id is always generated here. */
+    public ClientDetails create(ClientDetails details) {
+        ClientDetails newClientDetails = withId(UUID.randomUUID().toString(), details);
+        RegisteredClient newClient = ClientClientDetailsMapper.toRegisteredClient(newClientDetails);
+        if (!StringUtils.hasText(newClient.getClientSecret())) {
+            newClient = RegisteredClient.from(newClient)
+                    .clientSecret(encoder.encode(secretGenerator.generateKey()))
+                    .build();
         }
+        clients.save(newClient);
+        return ClientClientDetailsMapper.toClientDetails(newClient);
+    }
+
+    /**
+     * Updates the client at {@code id}. The path decides which registration is written — the body's own {@code id}
+     * is ignored, so a request to {@code PUT /clients/A} can no longer rewrite client B by naming it in the payload.
+     */
+    public ClientDetails update(String id, ClientDetails details) throws ClientNotFoundException {
+        RegisteredClient existingClient = clients.findById(id);
+        if (existingClient == null) {
+            throw ClientNotFoundException.of(id);
+        }
+        RegisteredClient updatedClient = ClientClientDetailsMapper.toRegisteredClient(withId(id, details), existingClient);
+        clients.save(updatedClient);
+        return ClientClientDetailsMapper.toClientDetails(updatedClient);
+    }
+
+    private static ClientDetails withId(String id, ClientDetails details) {
+        return new ClientDetails(id, details.clientId(), details.clientName(), details.clientAuthenticationMethods(),
+                details.authorizationGrantTypes(), details.redirectUris(), details.postLogoutRedirectUris(),
+                details.scopes(), details.clientSettings(), details.tokenSettings());
     }
 
     /**

@@ -58,6 +58,7 @@ dependencies {
     implementation libs.io.opentelemetry.instrumentation.opentelemetry.spring.boot.starter
 
     annotationProcessor libs.lombok
+    testImplementation project(':store-commons:test-support')
     integrationTestImplementation libs.spring.boot.starter.actuator.test
     integrationTestImplementation libs.spring.boot.starter.data.jpa.test
     integrationTestImplementation libs.spring.boot.starter.security.oauth2.authorization.server.test

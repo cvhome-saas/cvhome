@@ -20,14 +20,16 @@
 
   <main class="form-panel">
     <app-panel class="card" padded [title]="t('signIn.title')" [subtitle]="t('signIn.subtitle')">
-      @if (failed) {
-        <p class="failed" role="alert">
-          <app-icon name="alertCircle" />
-          <span>{{ t('signIn.failed') }}</span>
+      @if (notice(); as key) {
+        <p class="failed" [class.info]="key !== 'failed'" role="alert">
+          <app-icon [name]="key === 'failed' ? 'alertCircle' : 'info'" />
+          <span>{{ t('signIn.' + key) }}</span>
         </p>
       }
 
       <form class="form" method="post" [action]="action" (submit)="onSubmit()">
+        <!-- Spring Security's CSRF token, read from the XSRF-TOKEN cookie the page response planted. -->
+        <input type="hidden" name="_csrf" [value]="csrf()" />
         <app-form-field controlId="username" required [label]="t('signIn.username')">
           <app-text-field
             autocomplete="username"

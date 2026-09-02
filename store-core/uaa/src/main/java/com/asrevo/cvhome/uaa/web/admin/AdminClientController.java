@@ -42,13 +42,13 @@ public class AdminClientController {
     @PreAuthorize("hasAuthority('SCOPE_super_admin') or hasRole('SUPER_ADMIN')")
     @PostMapping
     public ClientDetails create(@RequestBody ClientDetails req) {
-        return adminClientService.save(req);
+        return adminClientService.create(req);
     }
 
     @PreAuthorize("hasAuthority('SCOPE_super_admin') or hasRole('SUPER_ADMIN')")
     @PutMapping("{id}")
-    public ClientDetails update(@PathVariable String id, @RequestBody ClientDetails req) {
-        return adminClientService.save(req);
+    public ClientDetails update(@PathVariable String id, @RequestBody ClientDetails req) throws ClientNotFoundException {
+        return adminClientService.update(id, req);
     }
 
     @PreAuthorize("hasAuthority('SCOPE_super_admin') or hasRole('SUPER_ADMIN')")
@@ -76,6 +76,7 @@ public class AdminClientController {
         adminClientService.delete(id);
     }
 
+    @PreAuthorize("hasAuthority('SCOPE_super_admin') or hasRole('SUPER_ADMIN')")
     @GetMapping("/options")
     public Map<String, Object> getOptions() {
         return Map.of("clientAuthenticationMethods",

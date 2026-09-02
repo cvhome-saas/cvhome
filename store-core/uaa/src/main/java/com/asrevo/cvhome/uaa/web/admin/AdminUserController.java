@@ -23,6 +23,8 @@ import com.asrevo.cvhome.uaa.dto.CreateUserRequest;
 import com.asrevo.cvhome.uaa.dto.ResetUserPasswordRequest;
 import com.asrevo.cvhome.uaa.dto.UpdateUserRequest;
 import com.asrevo.cvhome.uaa.dto.UserDto;
+import com.asrevo.cvhome.uaa.errors.RoleNotAssignableException;
+import com.asrevo.cvhome.uaa.errors.RoleNotFoundException;
 import com.asrevo.cvhome.uaa.errors.SuperAdminImmutableException;
 import com.asrevo.cvhome.uaa.errors.UserNotFoundException;
 import com.asrevo.cvhome.uaa.service.AdminService;
@@ -89,28 +91,29 @@ public class AdminUserController {
 
     @PreAuthorize("hasAuthority('SCOPE_super_admin') or hasRole('SUPER_ADMIN')")
     @PostMapping
-    public UserDto create(@RequestBody CreateUserRequest req) throws UserNotFoundException, SuperAdminImmutableException {
+    public UserDto create(@RequestBody CreateUserRequest req)
+            throws UserNotFoundException, SuperAdminImmutableException, RoleNotFoundException, RoleNotAssignableException {
         return adminService.createUser(req);
     }
 
     @PreAuthorize("hasAuthority('SCOPE_super_admin') or hasRole('SUPER_ADMIN')")
     @PutMapping("/{id}")
     public UserDto update(@PathVariable UUID id, @RequestBody UpdateUserRequest req)
-            throws UserNotFoundException, SuperAdminImmutableException {
+            throws UserNotFoundException, SuperAdminImmutableException, RoleNotFoundException, RoleNotAssignableException {
         return adminService.updateUser(id, req);
     }
 
     @PreAuthorize("hasAuthority('SCOPE_super_admin') or hasRole('SUPER_ADMIN')")
     @PutMapping("/{id}/reset-password")
     public void resetPassword(@PathVariable UUID id, @RequestBody ResetUserPasswordRequest req)
-            throws UserNotFoundException {
+            throws UserNotFoundException, SuperAdminImmutableException {
         adminService.resetPassword(id, req);
     }
 
     @PreAuthorize("hasAuthority('SCOPE_super_admin') or hasRole('SUPER_ADMIN')")
     @PostMapping("/{id}/roles")
     public void assign(@PathVariable UUID id, @RequestBody Set<String> roles)
-            throws UserNotFoundException, SuperAdminImmutableException {
+            throws UserNotFoundException, SuperAdminImmutableException, RoleNotFoundException, RoleNotAssignableException {
         adminService.assignRoles(id, roles);
     }
 

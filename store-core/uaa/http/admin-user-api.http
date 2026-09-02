@@ -33,10 +33,13 @@ GET {{SELLER_UI_URL}}/uaa/api/v1/admin/users/assignable-roles
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
 
 ### is a username taken — 200 boolean
-GET {{SELLER_UI_URL}}/uaa/api/v1/admin/users/username-exists?username=org1-admin
+GET {{SELLER_UI_URL}}/uaa/api/v1/admin/users/exists?username=org1-admin
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
 
 ### create an account — 200 UserDto
+# `password` is optional: without it the account exists, is enabled, and cannot sign in until a password is set.
+# Role names are the bare seeded names (STORE_ADMIN), not Spring authorities (ROLE_STORE_ADMIN); an unknown
+# name is 404 UAA.ROLE.NOT_FOUND and SUPER_ADMIN is 403 UAA.ROLE.NOT_ASSIGNABLE — never silently skipped.
 # @name createUser
 POST {{SELLER_UI_URL}}/uaa/api/v1/admin/users
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
@@ -48,9 +51,8 @@ Content-Type: application/json
   "firstName": "HTTP",
   "lastName": "Demo",
   "password": "Demo-Passw0rd!",
-  "enabled": true,
-  "roles": ["ROLE_STORE_ADMIN"],
-  "metadata": {"org": "{{ORG_ID}}"}
+  "roles": ["STORE_ADMIN"],
+  "metadata": {"org": "{{ORG_ID}}", "store": "{{STORE_ID}}"}
 }
 
 > {%
@@ -60,13 +62,56 @@ Content-Type: application/json
     });
 %}
 
+### unset a metadata key — 200
+# Metadata merges key by key; a key sent with a null value is REMOVED. This is the only way to clear `store`.
+PUT {{SELLER_UI_URL}}/uaa/api/v1/admin/users/{{UAA_USER_ID}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{"metadata": {"store": null}}
+
+> {%
+    client.test("store unset", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        client.assert(response.body.metadata.store === undefined, "store still " + response.body.metadata.store);
+    });
+%}
+
+### grant an unknown role — 404 UAA.ROLE.NOT_FOUND
+POST {{SELLER_UI_URL}}/uaa/api/v1/admin/users/{{UAA_USER_ID}}/roles
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+["ROLE_STORE_ADMIN"]
+
+### grant SUPER_ADMIN — 403 UAA.ROLE.NOT_ASSIGNABLE
+POST {{SELLER_UI_URL}}/uaa/api/v1/admin/users/{{UAA_USER_ID}}/roles
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+["SUPER_ADMIN"]
+
+### reset the super admin's password — 403 UAA.USER.SUPER_ADMIN_IMMUTABLE
+# The one account whose password comes from configuration alone. This used to answer 200.
+PUT {{SELLER_UI_URL}}/uaa/api/v1/admin/users/65d8419c-8765-4b8b-a15f-910dce959931/reset-password
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{"password": "owned"}
+
+> {%
+    client.test("immutable", function () {
+        client.assert(response.status === 403, "status " + response.status);
+    });
+%}
+
 ### grant roles — 200
 # The body is a bare JSON array (@RequestBody Set<String>), not an object.
 POST {{SELLER_UI_URL}}/uaa/api/v1/admin/users/{{UAA_USER_ID}}/roles
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
 Content-Type: application/json
 
-["ROLE_STORE_MODERATOR"]
+["STORE_MODERATOR"]
 
 ### revoke roles — 200
 # Same bare-array body, on its own path: a POST, not a DELETE. uaa has no "these are the roles now"
@@ -75,7 +120,7 @@ POST {{SELLER_UI_URL}}/uaa/api/v1/admin/users/{{UAA_USER_ID}}/roles/remove
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
 Content-Type: application/json
 
-["ROLE_STORE_MODERATOR"]
+["STORE_MODERATOR"]
 
 ### disable, then re-enable — 200 each
 POST {{SELLER_UI_URL}}/uaa/api/v1/admin/users/{{UAA_USER_ID}}/disable
@@ -86,7 +131,8 @@ POST {{SELLER_UI_URL}}/uaa/api/v1/admin/users/{{UAA_USER_ID}}/enable
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
 
 ### reset the password — 200
-POST {{SELLER_UI_URL}}/uaa/api/v1/admin/users/{{UAA_USER_ID}}/reset-password
+# A PUT, unlike every other write here.
+PUT {{SELLER_UI_URL}}/uaa/api/v1/admin/users/{{UAA_USER_ID}}/reset-password
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
 Content-Type: application/json
 

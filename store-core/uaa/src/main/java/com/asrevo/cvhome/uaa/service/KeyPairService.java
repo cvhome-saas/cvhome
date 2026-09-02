@@ -53,7 +53,9 @@ public class KeyPairService {
                     }
                 }
                 result.add(jwk);
-            } catch (Exception _) {
+            } catch (Exception e) {
+                // A key that cannot be parsed is a key whose tokens will fail verification; that must be visible.
+                log.error("Signing key {} could not be parsed and is excluded from the JWK set", sk.getKid(), e);
             }
         });
         return result;

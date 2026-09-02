@@ -29,7 +29,8 @@
     "roles": "Roles",
     "clients": "OAuth2 clients",
     "clientCreate": "Register a client",
-    "clientEdit": "Client"
+    "clientEdit": "Client",
+    "signOut": "Signing out"
   },
   "signIn": {
     "title": "Sign in",
@@ -45,7 +46,10 @@
       "title": "One account for every cvhome app.",
       "copy": "Sign in once to reach the seller console and the services behind it.",
       "legal": "© 2026 cvhome"
-    }
+    },
+    "expired": "That page had expired. Please sign in again.",
+    "signedOut": "You have been signed out.",
+    "signingOut": "Signing you out…"
   },
   "users": {
     "title": "Users",

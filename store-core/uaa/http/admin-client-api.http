@@ -11,6 +11,7 @@
 ### the options a client form may offer — 200
 # Built from ClientAuthMethod, OAuthGrantType and SignatureAlgorithm on the server, so a form driven
 # by this cannot offer a grant type uaa would reject. `scopes` is the one hand-written list.
+# Gated like every other method here (it used to rely on the filter chain alone).
 GET {{SELLER_UI_URL}}/uaa/api/v1/admin/clients/options
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
 
@@ -65,6 +66,34 @@ Content-Type: application/json
 # only moment a caller can show a secret is the one it supplied.
 GET {{SELLER_UI_URL}}/uaa/api/v1/admin/clients/{{CLIENT_RECORD_ID}}
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+
+### update it under the PATH id — 200; the body's own id is ignored
+# `PUT /clients/A` writes client A whatever `id` the body carries. It used to write whichever id was in
+# the body, so a request for A could rewrite B.
+PUT {{SELLER_UI_URL}}/uaa/api/v1/admin/clients/{{CLIENT_RECORD_ID}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{
+  "id": "b6d8f3d1-8f8f-9060-d3e3-8f8f9060d3e3",
+  "clientId": "http-demo-client",
+  "clientName": "HTTP demo client (renamed)",
+  "clientAuthenticationMethods": ["client_secret_basic"],
+  "authorizationGrantTypes": ["authorization_code", "refresh_token"],
+  "redirectUris": ["http://gateway.com:8000/login/oauth2/code/demo"],
+  "postLogoutRedirectUris": [],
+  "scopes": ["openid", "profile"],
+  "clientSettings": {"requireProofKey": true, "requireAuthorizationConsent": true, "customSettings": {}},
+  "tokenSettings": {"accessTokenTimeToLive": "PT15M", "reuseRefreshTokens": false,
+    "x509CertificateBoundAccessTokens": false, "customSettings": {}}
+}
+
+> {%
+    client.test("path wins", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        client.assert(response.body.id === client.global.get("CLIENT_RECORD_ID"), "wrote " + response.body.id);
+    });
+%}
 
 ### rotate its secret — 200, empty body
 POST {{SELLER_UI_URL}}/uaa/api/v1/admin/clients/{{CLIENT_RECORD_ID}}/reset-secret

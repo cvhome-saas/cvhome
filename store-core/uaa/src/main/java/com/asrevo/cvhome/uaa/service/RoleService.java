@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.asrevo.cvhome.uaa.domain.Role;
 import com.asrevo.cvhome.uaa.dto.CreateRoleRequest;
 import com.asrevo.cvhome.uaa.dto.UpdateRoleRequest;
+import com.asrevo.cvhome.uaa.errors.RoleNotFoundException;
 import com.asrevo.cvhome.uaa.repo.RoleRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -26,9 +27,8 @@ public class RoleService {
         return roleRepository.findAll(pageable);
     }
 
-    public Role findBy(UUID id) {
-        return roleRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException(String.format("Invalid role id %s", id)));
+    public Role findBy(UUID id) throws RoleNotFoundException {
+        return roleRepository.findById(id).orElseThrow(() -> RoleNotFoundException.of(id));
     }
 
     @Transactional
@@ -39,15 +39,15 @@ public class RoleService {
     }
 
     @Transactional
-    public Role update(UUID id, UpdateRoleRequest request) {
+    public Role update(UUID id, UpdateRoleRequest request) throws RoleNotFoundException {
         Role role = findBy(id);
         role.setName(request.name());
         return roleRepository.save(role);
     }
 
     @Transactional
-    public void delete(UUID id) {
-        roleRepository.deleteById(id);
+    public void delete(UUID id) throws RoleNotFoundException {
+        roleRepository.delete(findBy(id));
     }
 
 }

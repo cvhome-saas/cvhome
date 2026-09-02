@@ -34,7 +34,22 @@ public enum UaaErrors implements ErrorCode {
      * grants privileges.
      * </p>
      */
-    SUPER_ADMIN_IMMUTABLE("UAA.USER.SUPER_ADMIN_IMMUTABLE", ErrorCategory.FORBIDDEN);
+    SUPER_ADMIN_IMMUTABLE("UAA.USER.SUPER_ADMIN_IMMUTABLE", ErrorCategory.FORBIDDEN),
+
+    /** No role exists with the given id or name. */
+    ROLE_NOT_FOUND("UAA.ROLE.NOT_FOUND", ErrorCategory.NOT_FOUND),
+
+    /**
+     * The role exists but may not be granted through the admin API — today only {@code SUPER_ADMIN}, which is held by
+     * exactly one seeded account and is what grants every other privilege.
+     */
+    ROLE_NOT_ASSIGNABLE("UAA.ROLE.NOT_ASSIGNABLE", ErrorCategory.FORBIDDEN),
+
+    /**
+     * The caller authenticated as an OAuth2 client, not a person, and asked for something only a person has — a
+     * profile, a session list, a password. A {@code client_credentials} token has no user behind it.
+     */
+    NOT_A_USER_PRINCIPAL("UAA.AUTH.NOT_A_USER_PRINCIPAL", ErrorCategory.FORBIDDEN);
 
     private final String code;
 

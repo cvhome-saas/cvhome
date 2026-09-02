@@ -1,0 +1,43 @@
+# AuthController — com.asrevo.cvhome.uaa.web
+#
+# Who is signed in. Addressed through store-core-gateway (`/uaa/**` forward route) with the operator's session,
+# which the gateway turns into a bearer token for uaa — so what uaa sees here is a JWT, and `authenticatedVia`
+# reads JWT. On uaa's own origin the same endpoint answers a form-login session with SESSION.
+#
+# Requires a running stack: lcl start -d
+
+### who am I — 200 MeResponse
+# uid, username, email, names, roles (bare names) and authorities ({authority} objects, the shape the consoles read).
+# Never a password hash, never the raw token.
+GET {{SELLER_UI_URL}}/uaa/api/v1/auth/me
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+> {%
+    client.test("described", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        client.assert(response.body.uid !== undefined, "no uid");
+        client.assert(response.body.authenticatedVia === "JWT", "via " + response.body.authenticatedVia);
+    });
+%}
+
+### anonymous — 401 problem+json, not a redirect to /login
+GET {{SELLER_UI_URL}}/uaa/api/v1/auth/me
+
+> {%
+    client.test("unauthenticated", function () {
+        client.assert(response.status === 401, "status " + response.status);
+    });
+%}
+
+### a service token — 403 UAA.AUTH.NOT_A_USER_PRINCIPAL
+# A client_credentials token is a valid principal with no person behind it. Mint one with the curl in
+# qa/uaa-qa.md §00 and paste it here.
+GET {{SELLER_UI_URL}}/uaa/api/v1/auth/me
+Authorization: Bearer {{S2S_TOKEN}}
+
+> {%
+    client.test("not a user", function () {
+        client.assert(response.status === 403, "status " + response.status);
+        client.assert(response.body.code === "UAA.AUTH.NOT_A_USER_PRINCIPAL", "code " + response.body.code);
+    });
+%}

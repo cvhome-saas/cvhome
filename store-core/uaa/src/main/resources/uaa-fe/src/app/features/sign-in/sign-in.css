@@ -118,6 +118,13 @@
   font-size: var(--text-sm);
 }
 
+/* The same strip in a neutral tone, for "signed out" and "expired" rather than a refusal. */
+.failed.info {
+  color: var(--muted-foreground);
+  background: var(--muted);
+  border-color: var(--border);
+}
+
 .submit {
   display: inline-flex;
   align-items: center;

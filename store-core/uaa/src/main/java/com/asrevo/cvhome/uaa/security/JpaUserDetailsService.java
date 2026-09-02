@@ -17,6 +17,13 @@ import com.asrevo.cvhome.uaa.repo.UserRepository;
 @Service
 public class JpaUserDetailsService implements UserDetailsService {
 
+    /**
+     * What an account without a password presents to the encoder. A bcrypt hash of nothing anyone knows: it costs the
+     * same comparison as a real one and never matches, so an account created without a password fails to sign in
+     * exactly like one with a wrong password rather than throwing a 500 out of {@code User.builder().password(null)}.
+     */
+    static final String NO_PASSWORD = "{bcrypt}$2a$10$7EqJtq98hPqEX7fNZaFWoOhi5XG1Y8V0S0uJ7x1KSyZ0Z6b9Uk3Pm";
+
     private final UserRepository users;
 
     public JpaUserDetailsService(UserRepository users) {
@@ -35,9 +42,9 @@ public class JpaUserDetailsService implements UserDetailsService {
                 .collect(Collectors.toSet());
 
         return org.springframework.security.core.userdetails.User.withUsername(u.getUsername())
-                .password(u.getPasswordHash())
+                .password(u.getPasswordHash() == null ? NO_PASSWORD : u.getPasswordHash())
                 .authorities(authorities)
-                .accountLocked(!u.isEnabled())
+                .disabled(!u.isEnabled())
                 .build();
     }
 

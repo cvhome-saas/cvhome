@@ -1,6 +1,17 @@
+# Integration tests run this slice alone (no lcl), so it carries the same local secrets and turns the seed writers
+# on: the tests obtain real tokens from the seeded clients.
+UAA_ADMIN_PASSWORD: admin
+UAA_ADMIN_SDK_SECRET: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
+UAA_STORE_POD_SECRET: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
+UAA_STORE_CORE_SECRET: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
+UAA_WEB_APP_SECRET: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
+
 com:
   asrevo:
     cvhome:
+      uaa:
+        seed:
+          apply-on-boot: true
       test-store:
         users:
           - id: 65D8419C-8765-4B8B-A15F-910DCE959931

@@ -11,7 +11,7 @@ somewhere else entirely — that is [cua](../../../store-pod/cua/qa/cua-qa.md).
   is where the platform's sign-in page lives
 - **Runs on** — `lcl start -d --stack <name>`; uaa is `http://uaa.gateway.com:8001` and is the **first**
   service the stack brings up, because it issues the tokens. Read the live port from `lcl urls`
-- **Cases** — 47 (33 verified, 3 unit only, 11 not verified)
+- **Cases** — 64 (47 verified, 5 unit only, 12 not verified)
 - **Also see** — [gateway](../../gateway/gateway-service/qa/gateway-qa.md) (which relays the token and holds
   the session), [tenancy](../../tenancy/tenancy-service/qa/tenancy-qa.md) (which owns the *store-scoped*
   accounts and calls uaa to create them),
@@ -42,12 +42,25 @@ authorization-code flow. uaa's own login page is `http://uaa.gateway.com:8001`.
 `super-admin`, `org1-admin`, `org1-store1-admin`, `org1-store1-moderator`, `org1-store2-admin`, `org2-admin`.
 Only `super-admin` can reach `/api/v1/admin/**`.
 
-**Seeded clients** — `web-app` (the console's authorization-code client) and
+**Seeded clients** — `web-app` (the console's authorization-code client, PKCE required) and
 `store-core@service.store-core.internal` (client credentials, scope `store_core`). On a shifted stack the
 `web-app` redirect URIs are rewritten by an `after-up` hook; `lcl events` records `uaa.redirects.patched`.
 
+**Secrets come from the environment.** `application.yml` reads every client secret and the super admin's password
+from `UAA_*` variables with no default; the `lcl` and `test-stores` slices supply the local values (the shared
+`hLwOF…` secret, password `admin`) and turn the boot-time seed writers on (`com.asrevo.cvhome.uaa.seed.apply-on-boot`).
+Anywhere else the writers are off, so a password an operator changed survives a restart — and a missing variable
+fails the start rather than running on a committed secret.
+
+**CSRF is on.** Every session-authenticated write to uaa needs the `XSRF-TOKEN` cookie's value back in
+`X-XSRF-TOKEN` (Angular does that on its own) and the sign-in form carries it as `_csrf`. A bearer-token call is
+exempt, and so are the protocol endpoints (`/oauth2/token`, `/oauth2/introspect`, `/oauth2/revoke`).
+
+**Token lifetimes** — access 15 min, refresh 12 h, authorization code 5 min. A day-long access token is what the
+seed used to hand out.
+
 ```bash
-# a service-to-service token
+# a service-to-service token (the shared lcl secret is UAA_STORE_CORE_SECRET in application-lcl.yml)
 TOK=$(curl -s -u 'store-core@service.store-core.internal:<the shared lcl secret>' \
   -d 'grant_type=client_credentials&scope=store_core' \
   http://uaa.gateway.com:8001/oauth2/token | jq -r .access_token)
@@ -65,7 +78,12 @@ docker exec cvhome-postgres-1 psql -U postgres -d cvhome -c \
 ... "select * from uaa.user_roles;"
 ... "select id, client_id, client_authentication_methods, authorization_grant_types, redirect_uris, scopes
        from uaa.oauth2_registered_client;"
+... "select principal_name, authorization_grant_type, access_token_expires_at from uaa.oauth2_authorization;"
 ```
+
+Tokens are rows now (`uaa.oauth2_authorization`): a token endpoint call adds one, a restart keeps them, a
+revocation invalidates one in place. An empty table after a login is a regression — it means the in-memory
+authorization service is back.
 
 Logs: `.lcl/<stack>/logs/uaa.log`. **If a login fails, the stack almost certainly came up without
 `test-stores`.**
@@ -95,6 +113,9 @@ session and relays the token inward. Everything in this section is that path.
   Spring Security answers with the redirect that resumes the OAuth2 flow. A browser only submits inputs that
   carry a `name`, which is why `app-text-field` has a `name` input at all. Posting through `HttpClient`
   instead would authenticate and then strand the flow.
+- **And the token** — the form also posts `_csrf`, read from the `XSRF-TOKEN` cookie the page response set.
+  Without it the post comes back as `/login?error=expired` (SEC-05); a page that says "expired" on a fresh
+  load means the cookie was never planted, which is `CsrfCookieFilter`'s job.
 - **Note** — the form does not submit from a synthetic click in some automation tools. Use
   `document.querySelector('form').requestSubmit()`, or type into the password field and press Enter. A tool
   that appears to hang on the login page is almost always this, not uaa.
@@ -124,16 +145,21 @@ session and relays the token inward. Everything in this section is that path.
 ### AUT-06 — The token carries the claims the pods scope on · critical · [not verified]
 
 - **Steps** — decode an operator token obtained through the console.
-- **Expect** — an `org` claim and the role authorities the permission evaluator reads. A missing `org` claim is
-  tolerated by `ManagerOrgId`'s lenient `String` constructor (see
+- **Expect** — an `org` claim, a `store` claim where the account has one, `uid` (the account's UUID — `sub` stays
+  the username, which every service keys on), `roles`, and **nothing else from metadata**: the customizer copies only
+  `org` and `store`, so a metadata key named `roles` or `scope` cannot shadow the real claim (SEC-09). A missing
+  `org` claim is tolerated by `ManagerOrgId`'s lenient `String` constructor (see
   [tenancy-qa.md](../../tenancy/tenancy-service/qa/tenancy-qa.md) 99) — `SecurityUtils` relies on it, so do not
   "fix" it.
+- **Seen** — `LoginFlowIntegrationTest` walks form login → `/oauth2/authorize` with PKCE → code → token for
+  `org1-store1-admin` and asserts exactly these claims, plus `email`/`given_name` on the ID token.
 
 ### AUT-07 — `/userinfo` answers for a signed-in operator · [not verified]
 
 - **Steps** — call `/userinfo` with an operator token.
-- **Expect** — 200 with the subject, and **not** a password hash, a client secret or an internal id the console
-  has no business seeing.
+- **Expect** — 200 with the subject and the ID-token profile claims, and **not** a password hash, a client secret
+  or an internal id the console has no business seeing. This is the authorization server's own endpoint: the
+  hand-written `UserInfoController` that shadowed it was unreachable and is gone.
 
 ### AUT-08 — On a shifted stack the redirect URIs still point at this stack · high · [verified]
 
@@ -160,18 +186,21 @@ uaa's own guard is what keeps this safe, which is why the negative cases matter 
   path to index.html, so it answers **200 with the SPA's HTML**. That is why `UiKitConfig.uaaBasePath` exists,
   and why a mis-prefixed call shows up as `CLIENT.HTTP_200` rather than as a 404.
 
-### ADM-02 — An org admin is refused every admin endpoint · critical · [not verified]
+### ADM-02 — An org admin is refused every admin endpoint · critical · [unit only]
 
 - **Steps** — as `org1-admin`, repeat ADM-01, then attempt `POST /users`, `PUT /users/{id}`,
   `DELETE /users/{id}`, and the same across `/roles` and `/clients`.
-- **Expect** — **403** on every one. This is the case that proves the double gate; an org admin reaching any of
-  it is a platform-wide escalation.
+- **Expect** — **403** as `application/problem+json` (`COMMON.ACCESS_DENIED`) on every one. This is the case that
+  proves the double gate; an org admin reaching any of it is a platform-wide escalation.
+- **Seen** — `AdminUserApiIntegrationTest` proves the half a service token can reach: a `store_core` token gets
+  403, `admin-sdk` gets 200, anonymous 401. The org-admin session half is still to be driven through the console.
 
-### ADM-03 — Anonymous is refused · critical · [not verified]
+### ADM-03 — Anonymous is refused · critical · [unit only]
 
 - **Steps** — call any `/api/v1/admin/**` path with no token.
-- **Expect** — **401**. `/.well-known/**`, the actuator endpoints, the login page and the swagger paths are
-  deliberately open; nothing else is.
+- **Expect** — **401** as `application/problem+json`, never a redirect to `/login`. `/.well-known/**`, the login
+  page, `/actuator/health`, `/actuator/info` and the swagger paths are deliberately open; nothing else is — the
+  rest of the actuator needs a platform principal and is not even mapped (SEC-01).
 
 ### ADM-04 — Enable and disable actually take effect · high · [not verified]
 
@@ -182,7 +211,7 @@ uaa's own guard is what keeps this safe, which is why the negative cases matter 
 ### ADM-05 — Roles created here appear to the console · high · [verified]
 
 - **Steps** — add a role through `/api/v1/admin/roles`, then open the console's role picker.
-- **Expect** — the console renders the unknown role rather than crashing or dropping it — see U-11 below,
+- **Expect** — the console renders the unknown role rather than crashing or dropping it — see ACC-03 below,
   which is the console's half of the same assertion.
 
 ### ADM-06 — A client's secret is never read back · critical · [verified]
@@ -207,15 +236,16 @@ uaa's own guard is what keeps this safe, which is why the negative cases matter 
 ## ACC — Accounts, as the console drives them
 
 _From `qa/console-ui-users-and-profile.md` — the cases whose assertion is **uaa's**, not the console's. The
-screens are [console-ui-qa.md](../../console-ui/qa/console-ui-qa.md)._
+screens are [console-ui-qa.md](../../console-ui/qa/console-ui-qa.md). Was PERM-02 / U-10 / U-11 / P-02 / P-03;
+renumbered to ACC-01…05 because a prefix must be unique within the file and those were the console's._
 
-### PERM-02 — The new password actually signs in · critical · [not verified]
+### ACC-01 — The new password actually signs in · critical · [not verified]
 
-After PERM-01, sign out and sign in as `org1-store1-moderator` / `Passw0rdQA`.
+After console-ui's PERM-01, sign out and sign in as `org1-store1-moderator` / `Passw0rdQA`.
 
 **Expect** — the console opens. Set it back to `admin` afterwards, or note that you changed it.
 
-### U-10 — The role picker never offers platform superuser · critical · [unit only]
+### ACC-02 — The role picker never offers platform superuser · critical · [unit only]
 
 Open the create form.
 
@@ -225,7 +255,7 @@ removing only `USER` and `ORG_ADMIN`. The console intersects rather than filters
 uaa later cannot appear unreviewed either. **This is defence in depth, not a fix**: `lessons.md`, "Users —
 assignable-roles offers SUPER_ADMIN to an org admin".
 
-### U-11 — A role the console has never seen · high · [unit only]
+### ACC-03 — A role the console has never seen · high · [unit only]
 
 Add a role to `uaa.roles` and grant it to a user.
 
@@ -234,14 +264,14 @@ Transloco throws on a missing key and a role is a database row, not an enum.
 
 ---
 
-### P-02 — What it shows, and what it says instead · high · [not verified]
+### ACC-04 — What it shows, and what it says instead · high · [not verified]
 
 **Expect** — the username, the roles, and a notice explaining that the console can see nothing else.
 **No name, email, avatar, phone, job title, timezone, date format or bio** — none has a column anywhere, and
 the account record is unreachable twice over (`lessons.md`, "Users — the JWT carries no user id"). Empty
 fields would read as "you have not filled these in"; the notice is the honest version.
 
-### P-03 — No password control · high · [unit only]
+### ACC-05 — No password control · high · [unit only]
 
 **Expect** — nothing about passwords on `/profile`. A self-service change needs the caller's own user id and
 the JWT carries the username instead, so the action lives on `/users` where a row has a real id.
@@ -317,11 +347,11 @@ to `/clients` reaches the router rather than 404ing.
   three lists fail. `GET /api/v1/admin/{users,roles,clients}` each answer **403**, which is ADM-02 verified
   from the console's side.
 - **The refusal is rendered, but as a code.** The strip reads `CLIENT.HTTP_403 [403]` where the string
-  "You do not have permission to do that." already exists in the kit's dictionary. Two things combine: the
-  filter chain's 403 carries **no problem+json body**, so the parser synthesises
-  `code: CLIENT.HTTP_403, category: FORBIDDEN` — correctly — and then `app-load-error` is bound to
+  "You do not have permission to do that." already exists in the kit's dictionary. The filter chain's 403 now
+  **does** carry a problem+json body (`COMMON.ACCESS_DENIED`, written by `ProblemAccessDeniedHandler` — see
+  SEC-11), so the parser no longer has to synthesise a code; what remains is `app-load-error` being bound to
   `failure.message`, which is developer text. See console-ui-qa.md KIT-04b; it is pre-existing and affects
-  both consoles.
+  both consoles. **[not verified]** since the body change.
 
 ### CON-09 — The tab title is translated on a cold load · [verified]
 
@@ -539,6 +569,140 @@ checks every citation to it still names a real heading.
 
 ---
 
+## SEC — Hardening
+
+_The security review that started the uaa work found seventeen defects; each row below is one of them, stated as
+the request that used to succeed and now must not. Every case has a matching integration test where one is
+possible; the tag says whether it has also been driven against a stack._
+
+### SEC-01 — The actuator is closed · critical · [verified]
+
+- **Steps** — anonymous `GET /actuator/env`, `/actuator/heapdump`, `/actuator/loggers`, `/actuator`; then the same
+  with a `store_core` token; then `/actuator/health` and `/actuator/info` anonymously.
+- **Expect** — 401, 401, 401, 401; **404** with the token (the endpoints are not mapped at all — uaa narrows
+  `management.endpoints.web.exposure.include` to `health,info,prometheus`); 200 and 200.
+- **Why it matters** — a heap dump of an authorization server contains its signing key, and all of it was public.
+- **Seen** — `ActuatorExposureIntegrationTest`. On the first stack pass the live uaa still listed every endpoint:
+  it had started before the exposure change. Restart uaa after touching `application.yml`.
+
+### SEC-02 — The super admin's password is not reset on every boot · critical · [not verified]
+
+- **Steps** — with `seed.apply-on-boot` off (any profile but `lcl`/`test-stores`), change the super admin's
+  password in the database, restart uaa, sign in with the new password.
+- **Expect** — the new password holds. With the flag on (a local stack) the configured one is written back, which
+  is the point of a local stack. `AdminUserDatabaseInitializer` and `OAuth2ClientDatabaseInitializer` are both
+  behind the flag.
+
+### SEC-03 — No committed secret · high · [verified]
+
+- **Steps** — `grep -rn hLwOF store-core/uaa/src/main/resources/application.yml`; start uaa without
+  `UAA_ADMIN_SDK_SECRET` set and without the `lcl` profile.
+- **Expect** — no match; uaa fails to start with an unresolved placeholder rather than booting on a default.
+- **Seen** — the grep is empty; the defaults live in `application-lcl.yml` and `application-test-stores.yml`, and
+  `common-config.yml` / tenancy's `application.yml` read the same `UAA_*` names with the local value as fallback.
+
+### SEC-04 — The super admin's password cannot be set through the API · critical · [verified]
+
+- **Steps** — as `super-admin` (or with an `admin-sdk` token), `PUT /api/v1/admin/users/65d8419c-…/reset-password`.
+- **Expect** — **403 `UAA.USER.SUPER_ADMIN_IMMUTABLE`**. Every other mutator already refused that account; this one
+  did not, so any `super_admin` token could take the platform owner over. The guard is now keyed on the account's
+  **id**, not its email, so renaming the account does not lift it.
+- **Seen** — `AdminServiceTest`, and the block in `http/admin-user-api.http`.
+
+### SEC-05 — CSRF is enforced · critical · [verified]
+
+- **Steps** — `POST /login` without `_csrf`; a session-authenticated `POST /api/v1/admin/roles` without the
+  `X-XSRF-TOKEN` header; the same with it.
+- **Expect** — `302 /login?error=expired`; **403 problem+json**; 200.
+- **Seen** — `CsrfLoginIntegrationTest`. The first version of the 403 came back as the **SPA's index page with a
+  200**: the default handler used `sendError`, the container dispatched to `/error`, and `StaticController`'s
+  catch-all served `index.html` for it. Both are fixed — the handler writes the body itself and the router
+  excludes `/error` — and REG has the row.
+
+### SEC-06 — Lockout, rate limiting, password policy, audit · [not verified]
+
+- Phases 2 and 3 of the plan; their sections (`LCK`, `RL`, `PWD`, `AUD`) arrive with them.
+
+### SEC-07 — Short tokens and PKCE · high · [verified]
+
+- **Steps** — decode an operator token and a service token; start the console login without `code_challenge`.
+- **Expect** — `exp - iat` ≤ 900 s; the seed's refresh token is 12 h and its authorization code 5 min;
+  `/oauth2/authorize` for `web-app` without a challenge is refused with `invalid_request`.
+- **Seen** — `LoginFlowIntegrationTest` (both). The gateway canary (AUT-01) is what proves the real client still
+  sends PKCE.
+
+### SEC-08 — Signing keys · [not verified]
+
+- Phase 6 of the plan (`KEY`). For now: a key that fails to parse is **logged at ERROR** and left out of the JWK
+  set, where it used to disappear silently.
+
+### SEC-09 — The issuer is pinned · critical · [verified]
+
+- **Steps** — `GET /.well-known/openid-configuration` on `localhost:<port>`, not on `uaa.gateway.com`.
+- **Expect** — `issuer` is `http://uaa.gateway.com:<port>` from the service registry, whatever host the request
+  used. Left unpinned, a proxy's `X-Forwarded-Host` decided the issuer of every token.
+- **Seen** — `IssuerPinningIntegrationTest`; on the live stack `http://uaa.gateway.com:10001`.
+
+### SEC-10 — Metadata cannot forge a claim · critical · [verified]
+
+- **Steps** — as super-admin, `PUT /users/{id}` with `{"metadata": {"roles": ["SUPER_ADMIN"], "scope": "super_admin"}}`,
+  then obtain a token for that user.
+- **Expect** — the token's `roles` are the user's real roles and there is no `scope` from metadata. Only `org` and
+  `store` cross over.
+- **Seen** — `JwtCustomizerConfigTest.metadataCannotOverrideTheRolesClaim`.
+
+### SEC-11 — A refusal is a problem, not a page · high · [verified]
+
+- **Steps** — any 401 or 403 from the filter chain on `/api/**`.
+- **Expect** — `application/problem+json` with `COMMON.UNAUTHENTICATED` / `COMMON.ACCESS_DENIED`, no HTML, no
+  redirect. `/api/v1/auth/me` is the cheapest probe (`http/auth-api.http`).
+- **Seen** — `MeEndpointIntegrationTest`, `AdminUserApiIntegrationTest`.
+
+### SEC-12 — `PUT /clients/{id}` writes the path's client · high · [verified]
+
+- **Steps** — `PUT /api/v1/admin/clients/A` with a body whose `id` is B.
+- **Expect** — A is updated, B untouched, response `id` is A. It used to write B.
+- **Seen** — `AdminClientServiceTest`; the block in `http/admin-client-api.http`.
+
+### SEC-13 — `/api/v1/auth/me` is a DTO · high · [verified]
+
+- **Steps** — call it with a session, then with an `admin-sdk` token.
+- **Expect** — `{uid, username, email, firstName, lastName, roles, authorities[{authority}], authenticatedVia}`;
+  never the raw token or a `UserDetails`. The service token gets **403 `UAA.AUTH.NOT_A_USER_PRINCIPAL`**.
+- **Seen** — `MeEndpointIntegrationTest`.
+
+### SEC-14 — An account without a password fails cleanly · high · [verified]
+
+- **Steps** — create a user without `password`, try to sign in as it.
+- **Expect** — refused like a wrong password, not a 500 out of a null hash. Create **with** a password and the
+  account signs in at once — creation is one call now, not create-then-reset.
+- **Seen** — `AdminServiceTest` (create with/without); the sign-in half **[not verified]**.
+
+### SEC-15 — Role grants are exact · high · [verified]
+
+- **Steps** — grant `ROLE_STORE_ADMIN` (the authority spelling), then `SUPER_ADMIN`.
+- **Expect** — **404 `UAA.ROLE.NOT_FOUND`** and **403 `UAA.ROLE.NOT_ASSIGNABLE`**. Both used to answer 200 having
+  granted nothing.
+- **Seen** — `AdminServiceTest`; the blocks in `http/admin-user-api.http`.
+
+### SEC-16 — Tokens are rows · critical · [verified]
+
+- **Steps** — mint a service token; `select count(*) from uaa.oauth2_authorization`; `POST /oauth2/revoke`;
+  `POST /oauth2/introspect`.
+- **Expect** — the count grows by one; revocation keeps the row and introspection answers `active: false`.
+  Before the `JdbcOAuth2AuthorizationService` bean the table was always empty and revocation had nothing to act on.
+- **Seen** — `JdbcAuthorizationPersistenceIntegrationTest`.
+
+### SEC-17 — Metadata keys can be unset · [verified]
+
+- **Steps** — `PUT /users/{id}` with `{"metadata": {"store": null}}`.
+- **Expect** — `store` is gone from the response and from `uaa.users.metadata`. Merge is still the rule for every
+  non-null value.
+- **Seen** — `AdminServiceTest`; the block in `http/admin-user-api.http`. DSN-15's "stored keys cannot be removed"
+  is therefore stale on the console side until the pane learns the null convention.
+
+---
+
 ## SID — The `"*"` wildcard
 
 _From `qa/unify-store-id-value-objects.md` §EDGE, reformatted into the case shape used everywhere else._
@@ -554,18 +718,51 @@ a valid store id.
 
 ---
 
+## MIG — Resetting a database
+
+This project is not in production: **there are no migrations.** `schema.sql` is rewritten in place (the
+`oauth2_authorization` table changed shape for Spring Authorization Server 7 and the seed's token lifetimes and PKCE
+flag changed), so a database created before this branch is reset, not migrated:
+
+```bash
+lcl stop --hard --stack <name>          # drops the compose volumes, postgres included
+lcl start -d --stack <name>
+```
+
+or, keeping the other schemas, `drop schema uaa cascade;` and restart uaa. The seed writers then recreate the
+clients and accounts. Nothing in uaa carries an `alter table`.
+
+---
+
+## REG — Regression watchlist
+
+| What broke | How it looked | Caught by |
+|---|---|---|
+| `ClientAuthMethod.from` recursed into itself | `GET /clients/{id}` 500 with `StackOverflowError` | ADM-07, `ClientAuthMethodTest` |
+| A filter-chain 403 dispatched to `/error`, which the SPA router served as `index.html` | a forged POST and a `store_core` call to the admin API both answered **200 with the console's HTML** | SEC-05, SEC-11, `CsrfLoginIntegrationTest`, `AdminUserApiIntegrationTest` |
+| uaa's `management.endpoints.web.exposure.include` override lost to the imported `common-config.yml` | every actuator endpoint mapped on the live stack after the "fix" | SEC-01, `ActuatorExposureIntegrationTest` |
+| `admin-sdk` seeded with `refresh_token` and consent | a machine client with a grant it can never use | seed review |
+
+---
+
 ## 99 — Known gaps
 
 **Members are not reconciled with tenancy.** A user deleted in uaa leaves a membership row behind in tenancy,
 and removing a member in tenancy does not remove their uaa user.
 
-**The client secret is in `application.yml` in plain text for `lcl`.** It is local seed configuration and never
-leaves the machine, but it means any local service can mint a `store_core` token. Do not copy that pattern to
-`fargate`.
+**The shared local secret is in the `lcl` slices in plain text.** It is local seed configuration and never leaves
+the machine, but it means any local service can mint a `store_core` token. `application.yml` itself has no default
+any more; `fargate` must set every `UAA_*` variable.
+
+**`/logout` accepts GET.** The kit's `AuthService.logout()` navigates rather than posts, so the logout matcher takes
+any method. A GET logout is a link that signs you out; it should become a POST once the kit posts.
+
+**`DSN-15` is stale.** uaa can unset a metadata key now (send it with a `null` value); the console still disables
+the remove button on stored keys.
 
 **~~uaa has no `http/` directory.~~** Closed: `http/admin-user-api.http`, `http/admin-role-api.http` and
 `http/admin-client-api.http` now cover all three admin controllers, each including the 403-as-org-admin case.
-A loose `req.http` remains at the module root and should be folded in or deleted.
+The loose `req.http` at the module root is gone (it held plaintext credentials).
 
 **`PermissionAccessChecker.hasReadAccessOnStore` never checks `isSuperAdmin`,** so a super admin gets 403 on
 `store-info`. Tracked with the `isOrgAdmin` gap in tenancy-qa.md 99.

@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.asrevo.cvhome.uaa.domain.Role;
 import com.asrevo.cvhome.uaa.dto.CreateRoleRequest;
 import com.asrevo.cvhome.uaa.dto.UpdateRoleRequest;
+import com.asrevo.cvhome.uaa.errors.RoleNotFoundException;
 import com.asrevo.cvhome.uaa.service.RoleService;
 
 import lombok.RequiredArgsConstructor;
@@ -39,13 +40,13 @@ public class AdminRoleController {
 
     @PreAuthorize("hasAuthority('SCOPE_super_admin') or hasRole('SUPER_ADMIN')")
     @GetMapping("{id}")
-    public Role role(@PathVariable UUID id) {
+    public Role role(@PathVariable UUID id) throws RoleNotFoundException {
         return roleService.findBy(id);
     }
 
     @PreAuthorize("hasAuthority('SCOPE_super_admin') or hasRole('SUPER_ADMIN')")
     @DeleteMapping("{id}")
-    public void delete(@PathVariable UUID id) {
+    public void delete(@PathVariable UUID id) throws RoleNotFoundException {
         roleService.delete(id);
     }
 
@@ -57,7 +58,7 @@ public class AdminRoleController {
 
     @PreAuthorize("hasAuthority('SCOPE_super_admin') or hasRole('SUPER_ADMIN')")
     @PutMapping("/{id}")
-    public Role update(@PathVariable UUID id, @RequestBody UpdateRoleRequest request) {
+    public Role update(@PathVariable UUID id, @RequestBody UpdateRoleRequest request) throws RoleNotFoundException {
         return roleService.update(id, request);
     }
 

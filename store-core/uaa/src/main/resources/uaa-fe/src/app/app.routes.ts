@@ -3,10 +3,10 @@ import type {Routes} from '@angular/router';
 import {canAccessSecuredPages} from '@cvhome-saas/ui-kit';
 
 /**
- * Four routes, and the split between them is Spring Security's, not this app's.
+ * The split between these routes is Spring Security's, not this app's.
  *
- * `/login` is what `AppSecurityConfig.formLogin(loginPage("/login"))` points at and the only path in
- * here that is `permitAll`. Everything else is `anyRequest().authenticated()`, and the admin API
+ * `/login` is what `AppSecurityConfig.formLogin(loginPage("/login"))` points at and, with the logout
+ * bounce, the only path in here that is `permitAll`. Everything else is `anyRequest().authenticated()`, and the admin API
  * behind it additionally demands `SCOPE_super_admin`/`ROLE_SUPER_ADMIN`.
  *
  * `StaticController` forwards any path without a dot that is not `/api/` or `/oauth2/` to
@@ -17,6 +17,13 @@ export const routes: Routes = [
     path: 'login',
     loadComponent: () => import('@features/sign-in/sign-in').then((m) => m.SignIn),
     data: {titleKey: 'route.signIn'},
+  },
+  {
+    // Not under the shell: it paints one line and hands the browser to uaa's /logout.
+    path: 'external-logout-link',
+    loadComponent: () =>
+      import('@features/external-logout-link/external-logout-link').then((m) => m.ExternalLogoutLink),
+    data: {titleKey: 'route.signOut'},
   },
   {
     path: '',

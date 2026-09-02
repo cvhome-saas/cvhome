@@ -2,3 +2,12 @@ spring:
   config:
     import:
       - "classpath:fargate-config.yml"
+
+# Required environment (no defaults, the task definition must set them — see application.yml):
+#   UAA_ADMIN_PASSWORD      the super admin's password; only applied when seed.apply-on-boot is true
+#   UAA_ADMIN_SDK_SECRET    client secret of admin-sdk (tenancy's user-management client)
+#   UAA_STORE_POD_SECRET    client secret of the pod service client
+#   UAA_STORE_CORE_SECRET   client secret of the store-core service client (also used by uaa's own s2s registration)
+#   UAA_WEB_APP_SECRET      client secret of the gateway's login client
+# seed.apply-on-boot stays false here: set it to true for exactly one start to write new secrets into the database,
+# then turn it back off so an operator's password change survives the next restart.

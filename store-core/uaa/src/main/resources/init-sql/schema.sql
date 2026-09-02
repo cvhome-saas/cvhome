@@ -17,6 +17,9 @@ create table if not exists uaa.oauth2_registered_client
 );
 
 -- oauth2_authorization
+-- Spring Authorization Server's own table, in its Postgres shape: token values and metadata are text (the shipped
+-- schema's blob), instants are timestamptz, and the device-flow columns are present because the JDBC service
+-- inserts every column whether or not the grant is enabled.
 create table if not exists uaa.oauth2_authorization
 (
     id                            varchar(100) primary key,
@@ -24,33 +27,39 @@ create table if not exists uaa.oauth2_authorization
     principal_name                varchar(200) not null,
     authorization_grant_type      varchar(100) not null,
     authorized_scopes             varchar(1000),
-    attributes                    bytea,
-
+    attributes                    text,
     state                         varchar(500),
-    authorization_code_value      bytea,
-    authorization_code_issued_at  timestamp,
-    authorization_code_expires_at timestamp,
-    authorization_code_metadata   bytea,
-
-    access_token_value            bytea,
-    access_token_issued_at        timestamp,
-    access_token_expires_at       timestamp,
-    access_token_metadata         bytea,
+    authorization_code_value      text,
+    authorization_code_issued_at  timestamptz,
+    authorization_code_expires_at timestamptz,
+    authorization_code_metadata   text,
+    access_token_value            text,
+    access_token_issued_at        timestamptz,
+    access_token_expires_at       timestamptz,
+    access_token_metadata         text,
     access_token_type             varchar(100),
     access_token_scopes           varchar(1000),
-
-    oidc_id_token_value           bytea,
-    oidc_id_token_issued_at       timestamp,
-    oidc_id_token_expires_at      timestamp,
-    oidc_id_token_metadata        bytea,
-
-    refresh_token_value           bytea,
-    refresh_token_issued_at       timestamp,
-    refresh_token_expires_at      timestamp,
-    refresh_token_metadata        bytea,
-
+    oidc_id_token_value           text,
+    oidc_id_token_issued_at       timestamptz,
+    oidc_id_token_expires_at      timestamptz,
+    oidc_id_token_metadata        text,
+    refresh_token_value           text,
+    refresh_token_issued_at       timestamptz,
+    refresh_token_expires_at      timestamptz,
+    refresh_token_metadata        text,
+    user_code_value               text,
+    user_code_issued_at           timestamptz,
+    user_code_expires_at          timestamptz,
+    user_code_metadata            text,
+    device_code_value             text,
+    device_code_issued_at         timestamptz,
+    device_code_expires_at        timestamptz,
+    device_code_metadata          text,
     foreign key (registered_client_id) references uaa.oauth2_registered_client (id)
 );
+
+create index if not exists idx_oauth2_authorization_principal on uaa.oauth2_authorization (principal_name);
+create index if not exists idx_oauth2_authorization_client on uaa.oauth2_authorization (registered_client_id);
 
 -- oauth2_authorization_consent
 create table if not exists uaa.oauth2_authorization_consent
