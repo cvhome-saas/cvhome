@@ -1,6 +1,11 @@
 <app-data-table [columns]="columns()" [label]="label()" *transloco="let t">
   @for (row of rows(); track row.id) {
-    <app-table-row>
+    <app-table-row
+      [interactive]="selectable()"
+      [class.selected]="selectable() && row.id === selectedId()"
+      [attr.aria-current]="selectable() && row.id === selectedId() ? 'true' : null"
+      (click)="selectable() && picked.emit(row)"
+    >
       <div class="cell-user" role="cell" [attr.data-label]="t('shared.userAdmin.column.user')">
         <span class="avatar" aria-hidden="true">{{ row.initials }}</span>
         <span class="identity">

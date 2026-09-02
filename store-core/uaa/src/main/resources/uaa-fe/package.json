@@ -5,10 +5,11 @@
   "scripts": {
     "build": "npm run kit && ng build",
     "dev": "npm run kit && ng serve",
-    "start": "npm run kit && ng serve",
     "kit": "npm --prefix ../../../../../../store-commons/ui-kit run build",
-    "lint": "eslint .",
+    "lint": "eslint . && npm run lint:lessons",
+    "lint:lessons": "node scripts/check-lessons-citations.mjs",
     "ng": "ng",
+    "start": "npm run kit && ng serve",
     "test": "ng test",
     "test:ci": "ng test --watch=false --browsers=ChromeHeadless",
     "watch": "ng build --watch --configuration development"

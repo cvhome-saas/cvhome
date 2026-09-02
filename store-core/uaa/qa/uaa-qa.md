@@ -11,7 +11,7 @@ somewhere else entirely — that is [cua](../../../store-pod/cua/qa/cua-qa.md).
   is where the platform's sign-in page lives
 - **Runs on** — `lcl start -d --stack <name>`; uaa is `http://uaa.gateway.com:8001` and is the **first**
   service the stack brings up, because it issues the tokens. Read the live port from `lcl urls`
-- **Cases** — 30 (16 verified, 3 unit only, 11 not verified)
+- **Cases** — 38 (24 verified, 3 unit only, 11 not verified)
 - **Also see** — [gateway](../../gateway/gateway-service/qa/gateway-qa.md) (which relays the token and holds
   the session), [tenancy](../../tenancy/tenancy-service/qa/tenancy-qa.md) (which owns the *store-scoped*
   accounts and calls uaa to create them),
@@ -355,6 +355,83 @@ to `/clients` reaches the router rather than 404ing.
   kit's `dist`, and rebuilding it replaces that directory underneath the watcher; the dev server can latch a
   resolution failure and show `TS2307: Cannot find module '@cvhome-saas/ui-kit'` over a page that is otherwise
   fine. Restart the app (`lcl restart console-ui`), do not go hunting for a broken import.
+
+---
+
+## DSN — the SSO design alignment
+
+The console was aligned to the mocks in `store-core/uaa/sso/` — a grouped rail, a topbar, the Light
+theme, and a **list + detail pane** on all three screens replacing the inline form and the dialogs.
+What the design draws that uaa cannot do was removed, not faked;
+[`uaa-fe/lessons.md`](../src/main/resources/uaa-fe/lessons.md) is the record, and `npm run lint`
+checks every citation to it still names a real heading.
+
+### DSN-01 — The rail is a map of the product, not of this sprint · high · [verified]
+
+- **Steps** — sign in and read the rail.
+- **Expect** — four groups (Overview, Identity, Applications, System) and seven rows. Users, Roles
+  and Clients are links; **Dashboard, Audit log, Identity providers and Settings are `<span>`s** with
+  `aria-disabled="true"` and the title "Not built yet".
+- **What must NOT be there** — a count badge on any row, and the realm switcher. Both were in the
+  mock and neither has a source. A number in a navigation rail is read as fact.
+
+### DSN-02 — The rail collapses, then becomes a drawer · [verified]
+
+- **Steps** — collapse the rail with its toggle; then narrow the window below 900px.
+- **Seen** — collapsed to an icon strip at full width; below 900px the toggle appears, the rail goes
+  `position: fixed` and translates off-canvas, the scrim appears and closing it slides the rail back.
+  The split panes stack below 1100px.
+- **Structural, not fluid** — the type does not shrink at any width.
+
+### DSN-03 — The detail pane's width is load-bearing · high · [verified]
+
+- **Steps** — open Clients at 1440 wide with a client selected.
+- **Expect** — the list is still a **two-column table**, not stacked rows.
+- **Why this is a case at all.** `app-data-table` stacks its rows through a container query at 45rem,
+  so the pane's width decides the list's shape. At the design's 22.5rem the list was 716px and every
+  row stacked; at 20rem it is 752px and stays a grid. If someone widens the pane, this is what breaks
+  and it will look like a table bug rather than a layout one.
+
+### DSN-04 — Selecting a row fills the pane · critical · [verified]
+
+- **Steps** — on each of the three screens, click a row.
+- **Seen** — the row takes an emerald inline-start marker and `aria-current`, and the pane fills.
+  On Users the row's own action icons still work; **Edit roles now selects the row** rather than
+  opening a dialog.
+- **Still dialogs, deliberately** — setting a password and deleting. Both are genuinely modal
+  moments, and delete keeps its typed confirmation.
+
+### DSN-05 — Saving a user does not disable them · critical · [verified]
+
+- **Steps** — select a user, change a name, Save. Then check `enabled` on the server.
+- **Expect** — unchanged, along with `roles` and `email`.
+- **Why this is a case.** The pane sends `UpdateUserRequest` with names only. uaa's update is
+  genuinely partial, so the omitted fields are preserved — verified against the server rather than
+  assumed. If it ever stops being partial, saving a profile silently locks the account out.
+
+### DSN-06 — Saving a client keeps the settings it does not edit · critical · [verified]
+
+- **Steps** — edit a client's access-token lifetime and save; compare `tokenSettings` before/after.
+- **Seen** — `accessTokenTimeToLive` changed, and `refreshTokenTimeToLive`, `accessTokenFormat`,
+  `reuseRefreshTokens`, `clientSettings` and `scopes` were all carried through untouched.
+- **Note for whoever runs this** — `accessTokenFormat` is an **object** (`{value: 'self-contained'}`),
+  not a string. Comparing it with `===` compares references and always reports a false difference;
+  compare the serialised form.
+
+### DSN-07 — Identifiers stay readable under Arabic · high · [verified]
+
+- **Steps** — switch to العربية on Clients and Roles.
+- **Expect** — the layout mirrors (rail on the right, panes swapped), and client ids, role names and
+  UUIDs still read correctly.
+- **How** — those cells are `unicode-bidi: plaintext`, the CSS spelling of `dir="auto"`: the cell
+  aligns with the document while the string resolves from its own first strong character, so
+  `store-core@service.store-core.internal` does not have its punctuation reordered.
+
+### DSN-08 — The lessons file cannot rot · [verified]
+
+- **Steps** — `npm run lint` in uaa-fe.
+- **Expect** — `lessons.md: N citation(s) checked against 13 headings — all resolve.` Rename a
+  heading without fixing its citation and the build fails.
 
 ---
 

@@ -30,8 +30,14 @@ export class RolesFacade {
   readonly busy = signal(false);
   readonly pageIndex = signal(0);
 
-  /** The role the form is editing, `'new'` while creating, or null when the form is closed. */
-  readonly editing = signal<RoleDto | 'new' | null>(null);
+  /**
+   * What the detail pane is showing: a role, `'new'` while creating, or null when nothing is picked.
+   *
+   * One signal rather than a separate "form open" flag — in a master-detail layout the selection
+   * *is* the form's subject, and two sources of that truth is how a pane ends up showing one role
+   * while saving another.
+   */
+  readonly selected = signal<RoleDto | 'new' | null>(null);
   readonly deleting = signal<RoleDto | null>(null);
 
   readonly form = new FormGroup({
@@ -61,21 +67,28 @@ export class RolesFacade {
 
   startCreate(): void {
     this.form.reset({name: ''});
-    this.editing.set('new');
+    this.selected.set('new');
   }
 
-  startRename(role: RoleDto): void {
+  /** Picking a row fills the pane. The list and a rename action share this one entry point. */
+  select(role: RoleDto): void {
     this.form.reset({name: role.name});
-    this.editing.set(role);
+    this.selected.set(role);
   }
 
   dismiss(): void {
-    this.editing.set(null);
+    this.selected.set(null);
     this.deleting.set(null);
   }
 
+  /** The row currently in the pane, for the list's selected state. */
+  isSelected(role: RoleDto): boolean {
+    const target = this.selected();
+    return target !== null && target !== 'new' && target.id === role.id;
+  }
+
   save(): void {
-    const target = this.editing();
+    const target = this.selected();
     if (!target || this.form.invalid) {
       this.form.markAllAsTouched();
       return;

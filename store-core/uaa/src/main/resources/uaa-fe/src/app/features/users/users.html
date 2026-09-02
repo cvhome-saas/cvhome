@@ -14,33 +14,115 @@
         -->
         <app-notice-bar icon="info" tone="blue" [message]="t('users.notice.noSearch')" />
 
-        <app-panel [title]="t('users.panel.title')">
-          @if (facade.rows().length) {
-            <app-user-admin-table
-              [rows]="facade.rows()"
-              [label]="t('users.panel.title')"
-              [busy]="facade.busy()"
-              [roleList]="roleList"
-              (act)="onAction($event)"
-            />
+        <div class="split">
+          <app-panel class="list" [title]="t('users.panel.title')">
+            @if (facade.rows().length) {
+              <app-user-admin-table
+                [rows]="facade.rows()"
+                [label]="t('users.panel.title')"
+                [busy]="facade.busy()"
+                [roleList]="roleList"
+                [selectable]="true"
+                [selectedId]="facade.selected()?.id ?? null"
+                (picked)="facade.select($event)"
+                (act)="onAction($event)"
+              />
 
-            <app-pagination
-              [page]="facade.pageIndex()"
-              [totalPages]="facade.totalPages()"
-              [totalElements]="facade.totalElements()"
-              [pageSize]="pageSize"
-              [unit]="t('users.unit')"
-              [label]="t('users.paginationLabel')"
-              (pageChange)="facade.goToPage($event)"
-            />
-          } @else {
-            <app-empty-state
-              icon="users"
-              [title]="t('users.empty.title')"
-              [message]="t('users.empty.message')"
-            />
-          }
-        </app-panel>
+              <app-pagination
+                [page]="facade.pageIndex()"
+                [totalPages]="facade.totalPages()"
+                [totalElements]="facade.totalElements()"
+                [pageSize]="pageSize"
+                [unit]="t('users.unit')"
+                [label]="t('users.paginationLabel')"
+                (pageChange)="facade.goToPage($event)"
+              />
+            } @else {
+              <app-empty-state
+                icon="users"
+                [title]="t('users.empty.title')"
+                [message]="t('users.empty.message')"
+              />
+            }
+          </app-panel>
+
+          <aside class="detail">
+            @if (facade.selected(); as target) {
+              <app-panel padded [title]="userName(target)" [subtitle]="target.username">
+                <form class="form" [formGroup]="facade.form" (ngSubmit)="facade.save()">
+                  <div class="pair">
+                    <app-form-field
+                      controlId="first-name"
+                      [label]="t('users.detail.firstName')"
+                      [control]="facade.form.controls.firstName"
+                    >
+                      <app-text-field formControlName="firstName" id="first-name" />
+                    </app-form-field>
+
+                    <app-form-field
+                      controlId="last-name"
+                      [label]="t('users.detail.lastName')"
+                      [control]="facade.form.controls.lastName"
+                    >
+                      <app-text-field formControlName="lastName" id="last-name" />
+                    </app-form-field>
+                  </div>
+
+                  <!--
+                    Read-only, and said so. `UpdateUserRequest` carries neither: the username is the
+                    identity a JWT `sub` holds, and uaa exposes no way to change an email here.
+                    Rendering them as fields that silently fail to save would be worse than not
+                    rendering them. See lessons.md, "Users — email and username cannot be changed here".
+                  -->
+                  <div class="readonly">
+                    <div class="meta">
+                      <span class="meta-label">{{ t('users.detail.username') }}</span>
+                      <span class="meta-value">{{ target.username }}</span>
+                    </div>
+                    <div class="meta">
+                      <span class="meta-label">{{ t('users.detail.email') }}</span>
+                      <span class="meta-value">{{ target.email || '—' }}</span>
+                    </div>
+                    <p class="readonly-note">{{ t('users.detail.readOnlyNote') }}</p>
+                  </div>
+
+                  <div class="roles">
+                    <p class="group-label">{{ t('users.detail.roles') }}</p>
+                    @for (role of facade.roleOptions(); track role.value) {
+                      <app-checkbox
+                        [checked]="facade.draftRoles().includes(role.value)"
+                        [label]="role.label"
+                        (checkedChange)="facade.toggleRole(role.value)"
+                      />
+                    } @empty {
+                      <p class="readonly-note">{{ t('users.roles.empty') }}</p>
+                    }
+                  </div>
+
+                  <div class="actions">
+                    <button class="ghost" type="button" (click)="facade.resetting.set(target)">
+                      {{ t('users.detail.setPassword') }}
+                    </button>
+                    <button class="ghost" type="button" (click)="facade.toggleEnabled(target)">
+                      {{ target.enabled ? t('users.detail.disable') : t('users.detail.enable') }}
+                    </button>
+                    <div class="grow"></div>
+                    <button class="ghost danger" type="button" (click)="facade.deleting.set(target)">
+                      {{ t('users.delete.confirm') }}
+                    </button>
+                    <button class="primary" type="submit" [disabled]="facade.busy()">
+                      {{ facade.busy() ? t('users.detail.saving') : t('users.detail.save') }}
+                    </button>
+                  </div>
+                </form>
+              </app-panel>
+            } @else {
+              <app-panel padded [title]="t('users.detail.emptyTitle')">
+                <app-empty-state compact icon="users" [message]="t('users.detail.emptyMessage')" />
+              </app-panel>
+            }
+          </aside>
+        </div>
       </div>
     }
   </app-busy-overlay>
@@ -62,23 +144,6 @@
     (submitted)="facade.confirmReset($event)"
     (dismissed)="facade.dismissDialogs()"
   />
-
-  @if (facade.editingRoles(); as target) {
-    <app-roles-dialog
-      [open]="true"
-      [busy]="facade.busy()"
-      [title]="t('users.roles.title')"
-      [message]="t('users.roles.message', {name: userName(target)})"
-      [options]="facade.roleOptions()"
-      [held]="target.roles"
-      [emptyMessage]="t('users.roles.empty')"
-      [confirmLabel]="t('users.roles.confirm')"
-      [busyLabel]="t('users.roles.busy')"
-      [cancelLabel]="t('shared.actions.cancel')"
-      (submitted)="facade.confirmRoles($event)"
-      (dismissed)="facade.dismissDialogs()"
-    />
-  }
 
   <!--
     Typed confirmation: there is no undo and no soft delete. uaa refuses outright when the target is

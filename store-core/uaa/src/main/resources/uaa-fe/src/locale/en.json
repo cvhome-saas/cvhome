@@ -6,7 +6,22 @@
     "roles": "Roles",
     "clients": "Clients",
     "signOut": "Sign out",
-    "language": "Language"
+    "language": "Language",
+    "group": {
+      "overview": "Overview",
+      "identity": "Identity",
+      "applications": "Applications",
+      "system": "System"
+    },
+    "dashboard": "Dashboard",
+    "audit": "Audit log",
+    "providers": "Identity providers",
+    "settings": "Settings",
+    "notBuilt": "Not built yet",
+    "breadcrumb": "Breadcrumb",
+    "open": "Open navigation",
+    "close": "Close navigation",
+    "signedIn": "Signed in"
   },
   "route": {
     "signIn": "Sign in",
@@ -23,7 +38,12 @@
     "passwordPlaceholder": "your password",
     "submit": "Sign in",
     "submitting": "Signing in…",
-    "failed": "That username and password did not match an account."
+    "failed": "That username and password did not match an account.",
+    "pitch": {
+      "title": "One account for every cvhome app.",
+      "copy": "Sign in once to reach the seller console and the services behind it.",
+      "legal": "© 2026 cvhome"
+    }
   },
   "users": {
     "title": "Users",
@@ -71,7 +91,23 @@
       "disabled": "{{name}} can no longer sign in.",
       "passwordReset": "New password set for {{name}}.",
       "rolesSaved": "Roles updated for {{name}}.",
-      "deleted": "{{name}} was deleted."
+      "deleted": "{{name}} was deleted.",
+      "saved": "{{name}} was saved."
+    },
+    "detail": {
+      "emptyTitle": "No account selected",
+      "emptyMessage": "Pick an account from the list to edit it.",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "username": "Username",
+      "email": "Email",
+      "roles": "Roles",
+      "readOnlyNote": "uaa does not allow either to be changed here.",
+      "setPassword": "Set password",
+      "enable": "Allow sign-in",
+      "disable": "Block sign-in",
+      "save": "Save",
+      "saving": "Saving…"
     }
   },
   "roles": {
@@ -106,7 +142,8 @@
       "namePlaceholder": "ROLE_STORE_ADMIN",
       "nameHint": "The authority string itself. Services match on it exactly.",
       "save": "Save",
-      "saving": "Saving…"
+      "saving": "Saving…",
+      "id": "Role id"
     },
     "delete": {
       "title": "Delete this role",
@@ -117,6 +154,10 @@
       "created": "{{name}} was created.",
       "renamed": "{{name}} was saved.",
       "deleted": "{{name}} was deleted."
+    },
+    "detail": {
+      "emptyTitle": "No role selected",
+      "emptyMessage": "Pick a role from the list to edit it, or create a new one."
     }
   },
   "clients": {
@@ -157,7 +198,11 @@
       "postLogoutUris": "Post-logout redirect URIs",
       "redirectUrisHint": "Comma separated. Must match the application's callback exactly.",
       "save": "Save",
-      "saving": "Saving…"
+      "saving": "Saving…",
+      "lifetimes": "Token lifetimes",
+      "accessTtl": "Access token",
+      "refreshTtl": "Refresh token",
+      "ttlHint": "ISO-8601 duration, e.g. PT30M or P30D. Leave empty for uaa’s default."
     },
     "rotate": {
       "title": "Set a new secret",
@@ -181,6 +226,11 @@
       "updated": "{{clientId}} was saved.",
       "secretRotated": "A new secret was set for {{clientId}}.",
       "deleted": "{{clientId}} was deleted."
+    },
+    "detail": {
+      "emptyTitle": "No client selected",
+      "emptyMessage": "Pick a client from the list to edit it, or register a new one."
     }
-  }
+  },
+  "brandSub": "Single sign-on"
 }

@@ -55,6 +55,19 @@ export class UserAdminTable {
   /** Hides the organization column where every row is in the same organization. */
   readonly showScope = input(true);
 
+
+  /**
+   * Turns the rows into a selector.
+   *
+   * Opt-in, because a row that looks clickable and does nothing is worse than a plain one: the
+   * seller console lists accounts and acts on them through the row's own controls, while uaa's
+   * console puts the account in a detail pane. Off by default, so the former is unchanged.
+   */
+  readonly selectable = input(false);
+  /** The row currently in the host's detail pane, for the selected state. */
+  readonly selectedId = input<string | null>(null);
+  readonly picked = output<PlatformUserRow>();
+
   readonly act = output<UserAdminIntent>();
 
   protected readonly columns = computed<readonly TableColumn[]>(() => {

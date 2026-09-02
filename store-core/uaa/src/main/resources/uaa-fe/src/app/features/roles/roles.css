@@ -3,20 +3,59 @@
   gap: var(--spacing-section);
 }
 
-.form {
-  display: grid;
-  gap: var(--spacing-group);
-  max-inline-size: 32rem;
+/*
+ * List beside detail, top-aligned. The list takes the room; the pane is a fixed column, because a
+ * form that grows with the window is a form whose fields drift away from their labels.
+ */
+.split {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-section);
 }
 
-.actions,
-.row-actions {
-  display: inline-flex;
-  gap: var(--spacing-tight);
+.list {
+  flex: 1;
+  min-inline-size: 0;
 }
 
-.actions {
-  justify-content: flex-end;
+.detail {
+  flex: none;
+  inline-size: 20rem;
+}
+
+/*
+ * 20rem, not the 22.5rem the design draws.
+ *
+ * `app-data-table` stacks its rows through a container query at 45rem, so the pane's width decides
+ * whether the list beside it is still a table. At 20rem a 1440-wide window leaves the list 752px and
+ * it stays a grid; at 22.5rem it was 716px and every row stacked. The pane lost 40px; the list kept
+ * its shape.
+ */
+
+/* Below the large breakpoint the pane stops being a column and becomes the next block. */
+@media (width < 1100px) {
+  .split {
+    flex-direction: column;
+  }
+
+  .list,
+  .detail {
+    inline-size: 100%;
+  }
+}
+
+.row {
+  cursor: pointer;
+}
+
+.row.selected {
+  background: var(--accent-veil);
+  box-shadow: inset 2px 0 0 var(--primary);
+}
+
+/* The marker is on the inline-start edge, so it mirrors with the document. */
+[dir='rtl'] .row.selected {
+  box-shadow: inset -2px 0 0 var(--primary);
 }
 
 .cell {
@@ -32,9 +71,48 @@
 }
 
 .cell.id {
+  overflow: hidden;
   color: var(--muted-foreground);
   font-family: var(--font-mono);
-  font-size: var(--text-2xs);
+  font-size: var(--text-3xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.form {
+  display: grid;
+  gap: var(--spacing-group);
+}
+
+.meta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-inline);
+}
+
+.meta-label {
+  color: var(--foreground-subtle);
+  font-size: var(--text-4xs);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.meta-value {
+  overflow-wrap: anywhere;
+  color: var(--muted-foreground);
+  font-family: var(--font-mono);
+  font-size: var(--text-3xs);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-tight);
+}
+
+.grow {
+  flex: 1;
 }
 
 .primary {
@@ -44,7 +122,7 @@
   background: var(--primary);
   color: var(--primary-foreground);
   cursor: pointer;
-  font-size: var(--text-xs);
+  font-size: var(--text-2xs);
   font-weight: 600;
 }
 
@@ -60,7 +138,7 @@
   background: transparent;
   color: var(--foreground);
   cursor: pointer;
-  font-size: var(--text-xs);
+  font-size: var(--text-2xs);
 }
 
 .ghost:hover {
@@ -69,4 +147,33 @@
 
 .ghost.danger {
   color: var(--destructive);
+}
+
+/*
+ * Identifiers take their direction from their own content.
+ *
+ * A client id, a role name and a UUID are Latin technical strings sitting in a table that mirrors
+ * under Arabic. `plaintext` is the CSS spelling of `dir="auto"`: the cell still aligns with the
+ * document, but the string inside resolves from its first strong character, so `store-core@…` does
+ * not have its punctuation reordered. console-ui's watchlist records the same class of bug the
+ * other way round — Arabic copy rendered left-to-right for want of `dir="auto"`.
+ */
+.cell.mono,
+.cell.name,
+.cell.id,
+.meta-value {
+  unicode-bidi: plaintext;
+}
+
+/* The label the kit's stacked-row layout reveals; hidden while the grid is a grid. */
+@container data-table (max-width: 45rem) {
+  .cell::before {
+    content: attr(data-label) ': ';
+    color: var(--foreground-subtle);
+    font-family: var(--font-sans);
+    font-size: var(--text-4xs);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
 }

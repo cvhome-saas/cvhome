@@ -45,18 +45,18 @@ export class Roles {
   protected readonly facade = inject(RolesFacade);
   protected readonly pageSize = PAGE_SIZE;
 
-  protected readonly columns: readonly TableColumn[] = [
-    {key: 'name', label: 'Role', width: 'minmax(14rem, 2fr)'},
-    {key: 'id', label: 'Id', width: 'minmax(12rem, 1.4fr)'},
-    {key: 'actions', label: '', width: '11rem'},
+  /**
+   * Two columns. The row's actions moved into the detail pane, which is the point of the layout:
+   * a list that only selects, and one place where a role is edited.
+   */
+  private readonly keys: readonly {key: string; width: string}[] = [
+    {key: 'name', width: 'minmax(12rem, 2fr)'},
+    {key: 'id', width: 'minmax(10rem, 1.4fr)'},
   ];
 
   /** Column headers are translated here rather than in the table, which takes plain strings. */
-  protected translatedColumns(t: (key: string) => string): readonly TableColumn[] {
-    return this.columns.map((column) => ({
-      ...column,
-      label: column.key === 'actions' ? '' : t(`roles.column.${column.key}`),
-    }));
+  protected columns(t: (key: string) => string): readonly TableColumn[] {
+    return this.keys.map(({key, width}) => ({key, width, label: t('roles.column.' + key)}));
   }
 
 }

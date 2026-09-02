@@ -1,7 +1,99 @@
+/*
+ * Two halves: the brand on a dark ground, the form on the page ground.
+ *
+ * The dark panel is `--seat-1`/slate rather than a hand-picked colour, so it holds under all four
+ * themes instead of only the light one the design was drawn in.
+ */
 .wrap {
   display: grid;
-  place-items: center;
   min-block-size: 100vh;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+
+.brand-panel {
+  display: flex;
+  position: relative;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--spacing-gutter);
+  padding: var(--spacing-gutter);
+  overflow: hidden;
+  background: var(--color-slate-900);
+  color: var(--color-slate-100);
+}
+
+/* The emerald bloom the design carries, as one soft radial rather than an image. */
+.brand-panel::after {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  inset-block-end: -30%;
+  inset-inline-end: -25%;
+  inline-size: 32rem;
+  block-size: 32rem;
+  border-radius: var(--radius-full);
+  background: radial-gradient(circle at 30% 30%, var(--glow-color), transparent 65%);
+  pointer-events: none;
+}
+
+.brand,
+.pitch,
+.legal {
+  position: relative;
+  z-index: 1;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-tight);
+}
+
+.mark {
+  display: grid;
+  place-items: center;
+  inline-size: 2.25rem;
+  block-size: 2.25rem;
+  border-radius: var(--radius-lg);
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+
+.brand-name {
+  color: var(--color-white);
+  font-size: var(--text-lg);
+  font-weight: 700;
+}
+
+.pitch {
+  max-inline-size: 28rem;
+}
+
+.pitch-title {
+  margin: 0;
+  color: var(--color-white);
+  font-size: var(--text-4xl);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+.pitch-copy {
+  margin: var(--spacing-group) 0 0;
+  color: var(--color-slate-400);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+}
+
+.legal {
+  margin: 0;
+  color: var(--color-slate-500);
+  font-size: var(--text-3xs);
+}
+
+.form-panel {
+  display: grid;
+  place-items: center;
   padding: var(--spacing-gutter);
 }
 
@@ -15,6 +107,9 @@
 }
 
 .failed {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-tight);
   margin: 0 0 var(--spacing-group);
   padding: var(--spacing-field);
   border: 1px solid var(--destructive);
@@ -24,6 +119,10 @@
 }
 
 .submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-tight);
   padding: var(--spacing-field);
   border: none;
   border-radius: var(--radius-md);
@@ -37,4 +136,24 @@
 .submit:disabled {
   cursor: progress;
   opacity: 0.7;
+}
+
+/* One column below the medium breakpoint: the brand half becomes a header, not a wasted half. */
+@media (width < 768px) {
+  .wrap {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .brand-panel {
+    gap: var(--spacing-section);
+    padding: var(--spacing-section);
+  }
+
+  .pitch-title {
+    font-size: var(--text-2xl);
+  }
+
+  .legal {
+    display: none;
+  }
 }

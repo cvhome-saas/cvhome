@@ -49,8 +49,13 @@ export class ClientsFacade {
   readonly busy = signal(false);
   readonly pageIndex = signal(0);
 
-  /** The client the editor is open on, `'new'` while registering, or null when closed. */
-  readonly editing = signal<ClientDetails | 'new' | null>(null);
+  /**
+   * What the detail pane is showing: a fetched client, `'new'` while registering, or null.
+   *
+   * The list carries three fields, so selecting a row *fetches* — `ClientSummary` has no grant
+   * types, scopes or redirect URIs to show.
+   */
+  readonly selected = signal<ClientDetails | 'new' | null>(null);
   readonly deleting = signal<ClientSummary | null>(null);
   readonly rotating = signal<ClientSummary | null>(null);
 
@@ -62,6 +67,13 @@ export class ClientsFacade {
     scopes: new FormControl('', {nonNullable: true}),
     authorizationGrantTypes: new FormControl('', {nonNullable: true}),
     clientAuthenticationMethods: new FormControl('', {nonNullable: true}),
+    /*
+     * ISO-8601 durations, because that is what Java's `Duration` serialises to and what uaa reads
+     * back — `PT30M`, `P30D`. Taken verbatim rather than as a number plus a unit picker: the server
+     * accepts the whole grammar and inventing a smaller one here would reject valid values.
+     */
+    accessTokenTimeToLive: new FormControl('', {nonNullable: true}),
+    refreshTokenTimeToLive: new FormControl('', {nonNullable: true}),
   });
 
   private readonly page = snapshot(
@@ -90,9 +102,15 @@ export class ClientsFacade {
   }
 
   dismiss(): void {
-    this.editing.set(null);
+    this.selected.set(null);
     this.deleting.set(null);
     this.rotating.set(null);
+  }
+
+  /** The row currently in the pane, for the list's selected state. */
+  isSelected(row: ClientSummary): boolean {
+    const target = this.selected();
+    return target !== null && target !== 'new' && target.id === row.id;
   }
 
   startCreate(): void {
@@ -104,12 +122,14 @@ export class ClientsFacade {
       scopes: 'openid, profile',
       authorizationGrantTypes: 'authorization_code, refresh_token',
       clientAuthenticationMethods: 'client_secret_basic',
+      accessTokenTimeToLive: '',
+      refreshTokenTimeToLive: '',
     });
-    this.editing.set('new');
+    this.selected.set('new');
   }
 
-  /** Opens the editor on a row, which needs a fetch: the list carries three fields. */
-  startEdit(row: ClientSummary): void {
+  /** Opens the pane on a row, which needs a fetch: the list carries three fields. */
+  select(row: ClientSummary): void {
     this.busy.set(true);
     this.clients.findOne(row.id).subscribe({
       next: (client) => {
@@ -122,15 +142,17 @@ export class ClientsFacade {
           scopes: client.scopes.join(', '),
           authorizationGrantTypes: client.authorizationGrantTypes.join(', '),
           clientAuthenticationMethods: client.clientAuthenticationMethods.join(', '),
+          accessTokenTimeToLive: client.tokenSettings?.accessTokenTimeToLive ?? '',
+          refreshTokenTimeToLive: client.tokenSettings?.refreshTokenTimeToLive ?? '',
         });
-        this.editing.set(client);
+        this.selected.set(client);
       },
       error: (failure: unknown) => this.failed(failure),
     });
   }
 
   save(): void {
-    const target = this.editing();
+    const target = this.selected();
     if (!target || this.form.invalid) {
       this.form.markAllAsTouched();
       return;
@@ -157,16 +179,23 @@ export class ClientsFacade {
         x509CertificateSubjectDN: null,
         customSettings: {},
       },
-      tokenSettings: base?.tokenSettings ?? {
-        authorizationCodeTimeToLive: null,
-        accessTokenTimeToLive: null,
-        accessTokenFormat: null,
-        deviceCodeTimeToLive: null,
-        reuseRefreshTokens: false,
-        refreshTokenTimeToLive: null,
-        idTokenSignatureAlgorithm: null,
-        x509CertificateBoundAccessTokens: false,
-        customSettings: {},
+      /*
+       * The two lifetimes are edited; everything else in `tokenSettings` is protocol detail with no
+       * screen, so it is carried through untouched rather than reset to a default that would
+       * silently change how a live client behaves.
+       */
+      tokenSettings: {
+        ...(base?.tokenSettings ?? {
+          authorizationCodeTimeToLive: null,
+          accessTokenFormat: null,
+          deviceCodeTimeToLive: null,
+          reuseRefreshTokens: false,
+          idTokenSignatureAlgorithm: null,
+          x509CertificateBoundAccessTokens: false,
+          customSettings: {},
+        }),
+        accessTokenTimeToLive: raw.accessTokenTimeToLive.trim() || null,
+        refreshTokenTimeToLive: raw.refreshTokenTimeToLive.trim() || null,
       },
     };
     this.busy.set(true);
