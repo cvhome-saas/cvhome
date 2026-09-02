@@ -15,9 +15,9 @@ import org.springframework.security.config.annotation.web.configurers.oauth2.ser
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 
 import com.asrevo.cvhome.commons.domain.Pod;
+import com.asrevo.cvhome.cua.security.StorefrontLoginEntryPoint;
 import com.asrevo.cvhome.s2s.model.PodInfoProperties;
 import com.asrevo.cvhome.s2s.utils.UrlNormalize;
 import com.nimbusds.jose.jwk.source.JWKSource;
@@ -34,14 +34,17 @@ public class AuthorizationServerConfig {
 
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE)
-    SecurityFilterChain authorizationServerSecurity(HttpSecurity http, JwtDecoder jwtDecoder) {
+    SecurityFilterChain authorizationServerSecurity(HttpSecurity http, JwtDecoder jwtDecoder,
+                                                    StorefrontLoginEntryPoint storefrontLogin) {
         OAuth2AuthorizationServerConfigurer serverConfigurer = new OAuth2AuthorizationServerConfigurer();
         return http.with(serverConfigurer, configurer -> configurer.oidc(Customizer.withDefaults()))
                 .securityMatcher(serverConfigurer.getEndpointsMatcher())
                 .authorizeHttpRequests(auth -> auth.requestMatchers(serverConfigurer.getEndpointsMatcher()).authenticated())
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.decoder(jwtDecoder)))
                 .csrf(AbstractHttpConfigurer::disable)
-                .exceptionHandling(ex -> ex.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login")))
+                // An unauthenticated /oauth2/authorize is answered with a redirect to the storefront's own login
+                // page, never to a page of cua's: cua renders no HTML.
+                .exceptionHandling(ex -> ex.authenticationEntryPoint(storefrontLogin))
                 .build();
     }
 

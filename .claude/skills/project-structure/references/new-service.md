@@ -299,9 +299,10 @@ For a storefront *theme* rather than a new UI service, stop here and use `new-la
 
 ## BE+FE: one deployable serving both
 
-`uaa` and `cua` are single Java modules that also serve UI. Two sub-shapes:
+`uaa` is a single Java module that also serves UI (`cua` used to be; it is headless now — its pages are
+landing-ui's). Two sub-shapes:
 
-**Thymeleaf** (`cua`, uaa's login pages): add `spring.boot.starter.thymeleaf` +
+**Thymeleaf** (uaa's login pages): add `spring.boot.starter.thymeleaf` +
 `thymeleaf.extras.springsecurity6`, put templates in `src/main/resources/templates/`. Nothing else — no npm,
 no extra Gradle wiring.
 

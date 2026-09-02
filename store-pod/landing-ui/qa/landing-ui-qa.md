@@ -7,12 +7,12 @@ landing-ui is the storefront: the Next.js app a shopper actually sees. It render
 text direction, behind the pod's edge.
 
 - **Scope** — the home page, category and product pages, the blog/help/policy routes, the storefront's use of
-  the content read API, themes and templates, locale and RTL, and how the page behaves when a service behind it
-  is down
+  the content read API, themes and templates, locale and RTL, the shopper's login and registration pages (cua
+  is headless — the screens are here), and how the page behaves when a service behind it is down
 - **Runs on** — `lcl start -d --stack <name>` (`npm run dev` alone is not enough — it needs the backend).
   Always reach it through the edge at `http://<store>.spg-507f1f77.gateway.com`; read the live port from
   `lcl urls`
-- **Cases** — 20 (9 verified, 0 unit only, 11 not verified)
+- **Cases** — 27 (9 verified, 1 unit only, 17 not verified)
 - **Also see** — [spg](../../spg/qa/spg-qa.md) (the edge in front of it), content, catalog, inventory,
   [checkout](../../checkout/checkout-service/qa/checkout-qa.md),
   [cua](../../cua/qa/cua-qa.md) (shopper login)
@@ -372,6 +372,60 @@ side every stepper in those stores would have been inert.
 - `ReadableProductOption.name` was `null` for a language with no option description while the client types it
   non-optional, giving an empty `<legend>`, an empty `aria-label` and "Please choose ". It falls back to the
   code, like `ProductVariantMapper.label` already did.
+
+---
+
+## AUTH — Shopper login and registration
+
+cua renders no pages any more. `/{locale}/login` starts the OAuth2 flow; cua sends the browser back to
+`/{locale}/login?auth=1`, which renders `theme.pages.Login` (or the shell fallback); the form posts straight to
+`/cua/login`. `/{locale}/register` calls cua's JSON endpoint and then starts the same flow. The server half is
+[cua-qa.md](../../cua/qa/cua-qa.md) LGN-01/06/07/08.
+
+### AUTH-01 — The login page is the theme's · critical · [not verified]
+
+- **Steps** — on `http://org1-store1.spg-507f1f77.gateway.com/en?theme=starter` click the account icon, then
+  repeat with `?theme=basic` (a theme without `pages.Login`).
+- **Expect** — `starter` renders its own `pages/Login.tsx` (PageShell, its heading with the store name); `basic`
+  renders the shell's `default-login-page.tsx`, still in that theme's fonts, colours and radius. Both post to
+  `/cua/login` with `client_id` and `lang` hidden inputs. No `/css/login.css` request anywhere (the bridge is gone).
+
+### AUTH-02 — The whole flow, and the deep link · critical · [not verified]
+
+- **Steps** — open `/en/customer` signed out.
+- **Expect** — `Redirecting…`, then the themed login page, then after `user` / `revo` the callback and finally
+  `/en/customer` rendered signed in (`postLoginRedirect` survived the hand-off).
+
+### AUTH-03 — A wrong password shows the translated message · high · [not verified]
+
+- **Steps** — submit `user` / `wrong`, then correct it. Repeat under `/ar/…`.
+- **Expect** — the page reloads as `/en/login?auth=1&error=invalid` with `PAGE.LOGIN.ERROR_INVALID` in the
+  banner (Arabic under `/ar/`, right-to-left, form still aligned to the start edge); the second submit succeeds.
+
+### AUTH-04 — Registration, then straight into the store · critical · [not verified]
+
+- **Steps** — `/en/register`: submit an empty form, then the seeded `user@mail.com`, then a fresh account.
+- **Expect** — the first shows the server's field errors under the fields (`FIELD_ERRORS.*`); the second puts
+  `ERRORS.CODE.CUA_REGISTRATION_EMAIL_TAKEN` under the email field; the third goes through the login flow
+  without re-asking for anything the shopper already typed except the password, and lands on `/en`.
+
+### AUTH-05 — Social buttons appear only while cua is waiting · high · [not verified]
+
+- **Steps** — compare `/en/login?auth=1` reached through cua with `/en/login?auth=1` typed by hand in a fresh
+  browser.
+- **Expect** — both render the buttons for the store's enabled providers (the list is the store's, not the
+  session's); clicking one in the fresh browser is answered by cua with a redirect to the storefront login
+  without the marker, because there is no saved request to resume. Never a 500.
+
+### AUTH-06 — All five locales, both pages · high · [not verified]
+
+- **Steps** — open `/{en,ar,es,fr,ru}/login?auth=1` and `/{…}/register`.
+- **Expect** — every label, button and message translated; nothing falls back to a key or to English.
+
+### AUTH-07 — The contract still admits a theme without the pages · [unit only]
+
+- **Expect** — `libs/theme/test/define-theme.test.ts`: a theme with neither `Login` nor `Register` validates, a
+  theme with both keeps them, and a required page is still required. `npm test --workspace=libs/theme`.
 
 ---
 

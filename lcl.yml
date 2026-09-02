@@ -138,8 +138,8 @@ services:
     # frontend itself, with a Node it downloaded — adding a bare `npm install` here would run a *different* npm
     # over the same directory. That chain also builds @cvhome-saas/ui-kit first, because uaa's npmInstall
     # dependsOn ':store-commons:ui-kit:build' — the app links the library's dist as a file: dependency.
-    # (cua has no frontend at all to install: its login and register pages are server-rendered Thymeleaf,
-    # and it has no package.json.)
+    # (cua has no frontend at all to install: it renders no pages — the shopper's login and register pages are
+    # landing-ui theme pages, cua only redirects to them and processes the form POST — and it has no package.json.)
     command: [./gradlew, ":store-core:uaa:bootRun", "--args=--spring.profiles.active=lcl,test-stores", "--project-cache-dir=${stack.dir}/gradle", --console=plain]
     ports: { http: 8001 }
     depends-on: [postgres]

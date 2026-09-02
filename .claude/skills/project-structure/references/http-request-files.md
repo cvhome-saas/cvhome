@@ -107,7 +107,7 @@ there. Treat them as deleted; do not extend them, and do not take them as the pa
 ```
 store-pod/{catalog,checkout,merchant}/*-service/{store,issue,missed,products,requests}.http
 store-core/tenancy/tenancy-service/{store,signup,users,requests,router}.http
-store-core/uaa/req.http · store-pod/cua/req.http
+store-core/uaa/req.http
 store-core/gateway/gateway-service/gateway.http
 ```
 

@@ -303,9 +303,4 @@ export interface ThemeDefinition {
      * add exclusive variants) kind by kind.
      */
     sections?: ThemeSectionRegistry;
-    /**
-     * CSS served at `/css/login.css` for the customer auth pages rendered by `cua` (which link that path).
-     * Optional; the shell ships a neutral default.
-     */
-    loginCss?: string;
 }
