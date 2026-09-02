@@ -114,8 +114,9 @@ with the marker cua added it renders `theme.pages.Login ?? DefaultLoginPage` wit
 `{action: '/cua/login', clientId, lang, error?, socialLogins}`. The form is plain HTML posting to cua, so no
 client JavaScript is in the hand-off. `/{locale}/register` renders `theme.pages.Register ?? DefaultRegisterPage`,
 driven by `useRegisterForm` → `AuthService.register()` (JSON, typed conflicts mapped onto the field) → `login()`.
-Both pages are optional in the theme contract like `Search`; `starter` implements them, the other themes get the
-token-only fallbacks in `storefront/src/shell/theme/default-{login,register}-page.tsx`. Strings: `PAGE.LOGIN.*`,
+Both pages are optional in the theme contract like `Search`, and every registered theme implements them in its own
+idiom (`pages/{Login,Register}.tsx` + `sections/{LoginForm,RegisterForm}.tsx`); the token-only fallbacks in
+`storefront/src/shell/theme/default-{login,register}-page.tsx` cover a theme that has not yet. Strings: `PAGE.LOGIN.*`,
 `PAGE.REGISTER.*` in all five locales.
 
 ## Checkout redirect flow

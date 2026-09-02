@@ -134,8 +134,8 @@ exist. `white` / `black` / `transparent` remain.
 ### The optional pages: Search, Login, Register
 
 Three members of `ThemePages` are optional and get a shell fallback when a theme has none. `Login` and
-`Register` are the shopper's sign-in and sign-up screens (cua is headless — see `authentication.md`): copy
-`starter`'s `pages/Login.tsx` + `sections/LoginForm.tsx` (a plain HTML form posting `LoginData.action`, with
+`Register` are the shopper's sign-in and sign-up screens (cua is headless — see `authentication.md`); every
+shipped theme has them, so copy the closest one's `pages/Login.tsx` + `sections/LoginForm.tsx` (a plain HTML form posting `LoginData.action`, with
 `client_id` and `lang` as hidden inputs, the `error` banner and the `socialLogins` anchors) and
 `pages/Register.tsx` + `sections/RegisterForm.tsx` (`'use client'`, `useRegisterForm`). Strings are
 `PAGE.LOGIN.*` and `PAGE.REGISTER.*`. Search is the third:

@@ -18,8 +18,7 @@ the way it owns `Customer`. The PKCE flow, token handling and `MultiIssuerJwtDec
 What makes this cheap: cua and landing-ui are same-origin per store host (spg routes `/cua*` to cua, everything
 else to landing-ui, custom domains included), and `client_id` already *is* the `StoreMerchantId`.
 
-**Non-goals, decided:** no password reset, no rate limiting on registration, no designed Login/Register pages
-for the eleven non-starter themes (the token-only fallbacks inherit each theme's look).
+**Non-goals, decided:** no password reset, no rate limiting on registration.
 
 ## Verified facts the design rests on
 
@@ -231,3 +230,12 @@ log in with the first store's user (403/`error=invalid`).
   `CsrfTokenRequestAttributeHandler`; `StorefrontLoginEntryPoint` and `GET /login` plant the `XSRF-TOKEN` cookie
   on the redirect; the storefront page reads the cookie server-side (`cookies()`) and renders `_csrf` as a hidden
   input; `StorefrontCsrfDeniedHandler` sends a stale form back as `error=expired` with a fresh cookie.
+
+## Phase 4 (same PR): every theme, every QA case
+
+- `pages/Login.tsx`, `pages/Register.tsx`, `sections/LoginForm.tsx`, `sections/RegisterForm.tsx` in each of the
+  eleven remaining themes, each built from that theme's own idiom (its `Customer` heading, its `CheckoutForm`
+  label/field/submit conventions, its panel class where it has one — beauty `plate`, fashion `sheet`, hunger
+  `press`/`fold`, furniture `PageHead`/`sign`). The shell fallbacks stay for a theme that has not adopted them.
+- The QA cases still open after phase 3: the hand-off's port on a shifted stack (LGN-06), the social provider
+  redirect and its failure path (LGN-08), every theme's login page (AUTH-01), and the locales a demo store serves.

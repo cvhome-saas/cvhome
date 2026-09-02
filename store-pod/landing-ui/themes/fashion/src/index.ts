@@ -16,6 +16,8 @@ import {Checkout} from './pages/Checkout';
 import {CheckoutResult} from './pages/CheckoutResult';
 import {Customer} from './pages/Customer';
 import {Order} from './pages/Order';
+import {Login} from './pages/Login';
+import {Register} from './pages/Register';
 import {ErrorState} from './states/ErrorState';
 import {NotFound} from './states/NotFound';
 import {EmptyState} from './states/EmptyState';
@@ -49,7 +51,7 @@ export default defineTheme({
     },
     layout: {config: layoutConfig, Root},
     sections: layoutSections,
-    pages: {Category, Product, Content, BlogIndex, BlogPost, Faq, Policy, Checkout, CheckoutResult, Customer, Order},
+    pages: {Category, Product, Content, BlogIndex, BlogPost, Faq, Policy, Checkout, CheckoutResult, Customer, Order, Login, Register},
     states: {
         PageSkeleton: {
             home: HomeSkeleton,
