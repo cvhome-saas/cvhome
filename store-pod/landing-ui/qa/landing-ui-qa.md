@@ -12,7 +12,7 @@ text direction, behind the pod's edge.
 - **Runs on** — `lcl start -d --stack <name>` (`npm run dev` alone is not enough — it needs the backend).
   Always reach it through the edge at `http://<store>.spg-507f1f77.gateway.com`; read the live port from
   `lcl urls`
-- **Cases** — 27 (14 verified, 1 unit only, 12 not verified)
+- **Cases** — 27 (15 verified, 1 unit only, 11 not verified)
 - **Also see** — [spg](../../spg/qa/spg-qa.md) (the edge in front of it), content, catalog, inventory,
   [checkout](../../checkout/checkout-service/qa/checkout-qa.md),
   [cua](../../cua/qa/cua-qa.md) (shopper login)
@@ -418,7 +418,7 @@ cua renders no pages any more. `/{locale}/login` starts the OAuth2 flow; cua sen
   session's); clicking one in the fresh browser is answered by cua with a redirect to the storefront login
   without the marker, because there is no saved request to resume. Never a 500.
 
-### AUTH-06 — All five locales, both pages · high · [verified] (en, ar) / [not verified] (es, fr, ru)
+### AUTH-06 — All five locales, both pages · high · [verified] (en, ar in the browser; es, fr, ru server-rendered strings)
 
 - **Steps** — open `/{en,ar,es,fr,ru}/login?auth=1` and `/{…}/register`.
 - **Expect** — every label, button and message translated; nothing falls back to a key or to English.

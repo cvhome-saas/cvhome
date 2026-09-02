@@ -11,7 +11,7 @@ ports rather than about tokens.
   login configuration (`SocialLoginConfigApi`), and the `/cua` path-prefix handling the edge depends on
 - **Runs on** — `lcl start -d --stack <name>`; reached only through the pod edge at
   `http://<store>.spg-507f1f77.gateway.com/cua/**`, never on `:8124` directly
-- **Cases** — 22 (5 verified, 6 unit only, 11 not verified)
+- **Cases** — 22 (7 verified, 4 unit only, 11 not verified)
 - **Also see** — [spg](../../spg/qa/spg-qa.md) (which keeps the `/cua` prefix and sets `X-Forwarded-Port` for
   exactly this service), [merchant](../../merchant/merchant-service/qa/merchant-qa.md) (the store record cua
   caches), [landing-ui](../../landing-ui/qa/landing-ui-qa.md) (the storefront that starts the login),
@@ -155,19 +155,22 @@ Logs: `.lcl/<stack>/logs/cua.log`.
 - **Steps** — send an authorization request with a `Host` no store owns.
 - **Expect** — refused. It must **not** fall back to another store's client, and it must not 500.
 
-### LGN-10 — The form is CSRF-protected, and a stale one is not a dead end · high · [unit only]
+### LGN-10 — The form is CSRF-protected, and a stale one is not a dead end · high · [verified]
 
 - **Steps** — read the `Set-Cookie` headers on the hand-off `302` (`SESSION` and `XSRF-TOKEN; Path=/`), then post
   the form once with the `_csrf` hidden input the storefront rendered and once without it.
 - **Expect** — with it the flow resumes; without it `302 …/login?auth=1&error=expired` with a fresh `XSRF-TOKEN`,
-  and the re-rendered form submits fine. Covered by `LoginHandoffIntegrationTest.aFormWithoutTheCsrfTokenIsSentBackAsExpired`.
+  and the re-rendered form submits fine. Walked with curl through spg (the hand-off's `Set-Cookie: XSRF-TOKEN=…;
+  Path=/`, the storefront page's `name="_csrf"` hidden input carrying the same value, both POSTs); also
+  `LoginHandoffIntegrationTest.aFormWithoutTheCsrfTokenIsSentBackAsExpired`.
 
-### LGN-11 — `prompt=login` asks a signed-in session for the password again · critical · [unit only]
+### LGN-11 — `prompt=login` asks a signed-in session for the password again · critical · [verified]
 
 - **Steps** — sign in as `user`, then register a new shopper on `/en/register` in the same browser.
 - **Expect** — the sign-in form appears (not a silent callback), and after entering the new credentials the
-  storefront is signed in as the new shopper. Covered by
-  `LoginHandoffIntegrationTest.aSignedInSessionIsPromptedAgainWhenTheStorefrontAsksForLogin`; without
+  storefront is signed in as the new shopper. Walked with curl through spg: a session that had just signed in
+  as `user` and started a second `prompt=login` authorize (new `code_challenge`) was sent to `/en/login?auth=1`,
+  not to the callback. Also `LoginHandoffIntegrationTest.aSignedInSessionIsPromptedAgainWhenTheStorefrontAsksForLogin`; without
   `prompt=login` the same session is single sign-on (`withoutPromptLoginASignedInSessionGetsACodeStraightAway`).
 
 ### CLI-05 — The session cookie is what carries the saved request across the hand-off · high · [verified]
