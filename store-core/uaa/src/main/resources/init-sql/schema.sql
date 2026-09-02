@@ -277,16 +277,24 @@ CREATE INDEX IF NOT EXISTS idx_audit_actor ON uaa.audit_events (actor_id, occurr
 CREATE INDEX IF NOT EXISTS idx_audit_target ON uaa.audit_events (target_type, target_id, occurred_at DESC);
 CREATE INDEX IF NOT EXISTS idx_audit_client ON uaa.audit_events (client_id, occurred_at DESC);
 
+-- The keys that sign every token. The public half is plain JSON (it is what the JWKS serves); the private half is a
+-- secret-crypto envelope (`ENC:…`) and never leaves the row unencrypted. One key is ACTIVE and signs; a rotated-out
+-- key is RETIRING — still in the JWKS so in-flight tokens verify — until retire_after, then RETIRED.
 create table if not exists uaa.signing_keys
 (
-    id         uuid                        not null,
-    active     boolean                     not null,
-    created_at timestamp(6) with time zone not null,
-    jwk_json   oid                         not null,
-    kid        varchar(190)                not null,
-    primary key (id),
-    constraint UKtobs6m52hleh04iy0qgpb2yfv unique (kid)
+    id               uuid primary key,
+    kid              varchar(190) not null unique,
+    algorithm        varchar(20)  not null default 'RS256',
+    status           varchar(16)  not null check (status in ('ACTIVE', 'RETIRING', 'RETIRED')),
+    public_jwk_json  text         not null,
+    private_jwk_enc  text         not null,
+    created_at       timestamptz  not null,
+    activated_at     timestamptz,
+    retire_after     timestamptz,
+    retired_at       timestamptz
 );
+
+create index if not exists idx_signing_keys_status on uaa.signing_keys (status);
 
 -- The transactional outbox (namastack), in uaa's own schema. Every event in uaa-events is a row here until its
 -- consumer has run; the starter's schema initialisation is off, so these are the only DDL for it.

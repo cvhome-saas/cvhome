@@ -11,7 +11,7 @@ somewhere else entirely — that is [cua](../../../store-pod/cua/qa/cua-qa.md).
   is where the platform's sign-in page lives
 - **Runs on** — `lcl start -d --stack <name>`; uaa is `http://uaa.gateway.com:8001` and is the **first**
   service the stack brings up, because it issues the tokens. Read the live port from `lcl urls`
-- **Cases** — 111 (87 verified, 9 unit only, 15 not verified)
+- **Cases** — 115 (89 verified, 11 unit only, 15 not verified)
 - **Also see** — [gateway](../../gateway/gateway-service/qa/gateway-qa.md) (which relays the token and holds
   the session), [tenancy](../../tenancy/tenancy-service/qa/tenancy-qa.md) (which owns the *store-scoped*
   accounts and calls uaa to create them),
@@ -651,11 +651,12 @@ possible; the tag says whether it has also been driven against a stack._
 - **Seen** — `LoginFlowIntegrationTest` (both). The gateway canary (AUT-01) is what proves the real client still
   sends PKCE.
 
-### SEC-08 — Signing keys · [not verified]
+### SEC-08 — Signing keys · [verified]
 
 - Phase 6 of the plan (`KEY`). For now: a key that fails to parse is **logged at ERROR** and left out of the JWK
   set, where it used to disappear silently.
-
+- **Closed by phase 6** — see KEY-01…04: encrypted at rest, rotated with a retire window, scheduled, unreadable keys
+  replaced.
 ### SEC-09 — The issuer is pinned · critical · [verified]
 
 - **Steps** — `GET /.well-known/openid-configuration` on `localhost:<port>`, not on `uaa.gateway.com`.
@@ -1194,6 +1195,53 @@ how long a new secret lives (`clientSecretValidityDays`) and how long the one it
 
 ---
 
+## KEY — Signing keys
+
+One key signs (`ACTIVE`); a rotated-out key keeps verifying (`RETIRING`, public half only in the JWKS) until
+`settings.keys.retireDays` have passed, then leaves (`RETIRED`). The public JWK is stored plain; the private JWK is a
+secret-crypto envelope (`private_jwk_enc` starts with `ENC:`) and never leaves the row unencrypted. Every token carries
+the active `kid` in its header, which is how the encoder picks one key while two share the algorithm and how a resource
+server knows to refetch the JWKS. `http/admin-key-api.http` runs every call below.
+
+### KEY-01 — Rotation keeps in-flight tokens alive · critical · [verified]
+
+- **Steps** — mint a token, note its header `kid`. Settings → *Signing keys* → *Rotate now*, confirm (or
+  `POST /uaa/api/v1/admin/keys/rotate`). Call an admin endpoint with the old token; mint a new one; call with it.
+  `GET /oauth2/jwks`; `GET /keys`; `GET /keys/status`.
+- **Expect** — the old token still answers 200 (its key is *Retiring*, *leaves the JWKS* in `retireDays`); the new
+  token carries the new `kid` and answers 200; the JWKS lists both keys with no `d`, `p` or `q` member; the table shows
+  *Active* and *Retiring* with the dates; the status line names the active key, when it started signing and the next
+  automatic rotation. Audit `key.rotated` with *replaces <kid>, which verifies until <date>*.
+- **Truth underneath** — `select status, left(private_jwk_enc, 4) from uaa.signing_keys` → every row `ENC:`.
+- **Also** — `KeyRotationIntegrationTest` (with the test clock: eight days later `retireDue()` retires the old key and
+  the old token answers **401**; the JWKS is back to one key), `KeyRotationServiceTest`, `SigningKeyMaterialMapperTest`.
+
+### KEY-02 — Scheduled rotation and retirement · [unit only]
+
+- **Steps** — set *Rotate automatically every* to 1 day, wait past it (or advance the test clock) for the hourly tick.
+- **Expect** — `KeyRotationScheduler.tick()` retires what is past its window and rotates when the active key is older
+  than the interval; 0 means manual only, and the status line says so. Mechanism: `KeyRotationService.rotateIfDue`.
+
+### KEY-03 — An unreadable key is not an outage · high · [unit only]
+
+- **Steps** — change the crypto provider's key underneath a stored signing key (locally: edit
+  `com.asrevo.cvhome.crypto.local.key` in `application-lcl.yml` and restart).
+- **Expect** — the active key's private half cannot be opened: it is moved to *Retiring* (its public half still verifies
+  what it signed), a fresh key is generated and activated, the log says so, and the status line shows *1 stored key
+  cannot be read back*. No token request fails. `KeyRotationServiceTest.anUnreadableActiveKeyIsReplacedNotFatal`.
+- **Why the lcl slice pins a static crypto key** — the shared `com.asrevo.cvhome.crypto` config is `LOCAL` with no
+  key, which falls back to a *random key per boot*: without `key-provider-type: STATIC` every restart would do exactly
+  this to every stored key. A deployment must give the provider a stable key (KMS, or `CVHOME_CRYPTO_KEY`).
+
+### KEY-04 — The gate holds, and nothing answers key material · critical · [verified]
+
+- **Steps** — `POST /keys/rotate` as a `store_core` token; `GET /keys` anonymous; read `GET /keys` and `GET /keys/status`
+  as super admin.
+- **Expect** — **403**, **401**; the admin reads carry `kid`, algorithm, status and dates only — never a JWK, never
+  `ENC:`.
+
+---
+
 ## SID — The `"*"` wildcard
 
 _From `qa/unify-store-id-value-objects.md` §EDGE, reformatted into the case shape used everywhere else._
@@ -1273,6 +1321,11 @@ or carrying only the token hash plus a fetch is a follow-up for the delivery ser
 **The invitee's shell is empty.** A `USER`-role account that signs in to uaa's console reaches the shell and gets a
 403 bar on every admin screen (CON-06); `/account` is the only page it can use. A landing on `/account` for
 non-admins is a follow-up.
+
+**The signing keys' crypto key is the platform's LOCAL provider.** `common-config.yml` sets
+`com.asrevo.cvhome.crypto.type: LOCAL` with no key, which resolves ENV → FILE → *random per boot*. uaa's `lcl` and
+`test-stores` slices pin a static key so a restart can read the stored private halves (KEY-03); `fargate` must supply
+one. cua's social-login secrets sit on the same provider and have the same exposure.
 
 **Delivery is a log line.** `LoggingLinkDeliveryHandler` is the only consumer of the link events; the SMS /
 WhatsApp / email service that subscribes to `uaa-events` does not exist yet, so the operator carries every link.

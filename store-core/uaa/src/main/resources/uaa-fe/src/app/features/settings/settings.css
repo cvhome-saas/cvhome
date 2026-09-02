@@ -111,3 +111,49 @@
   font-family: var(--font-mono);
   font-size: var(--text-4xs);
 }
+
+/* --- the signing keys ---------------------------------------------------------------------------------- */
+.key-status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--spacing-group);
+  margin-block-end: var(--spacing-group);
+}
+
+.key-line {
+  margin: 0;
+  color: var(--foreground-strong);
+  font-size: var(--text-xs);
+}
+
+.key-label {
+  color: var(--foreground-subtle);
+  font-size: var(--text-4xs);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.key-hint {
+  margin: 0.2rem 0 0;
+  color: var(--muted-foreground);
+  font-size: var(--text-3xs);
+}
+
+.cell {
+  display: inline-flex;
+  align-items: center;
+  min-inline-size: 0;
+  font-size: var(--text-3xs);
+}
+
+.cell.mono {
+  overflow: hidden;
+  color: var(--foreground-strong);
+  font-family: var(--font-mono);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  unicode-bidi: plaintext;
+}

@@ -20,6 +20,7 @@ import org.springframework.security.oauth2.server.authorization.token.JwtEncodin
 
 import com.asrevo.cvhome.uaa.domain.Role;
 import com.asrevo.cvhome.uaa.domain.User;
+import com.asrevo.cvhome.uaa.keys.KeyRotationService;
 import com.asrevo.cvhome.uaa.repo.UserRepository;
 import com.asrevo.cvhome.uaa.settings.RealmSettings;
 import com.asrevo.cvhome.uaa.settings.SettingsService;
@@ -79,9 +80,12 @@ class JwtCustomizerConfigTest {
 
     private final RealmSettings realm = mock(RealmSettings.class);
 
-    private final JwtCustomizerConfig config = new JwtCustomizerConfig(users, settings, Clock.systemUTC());
+    private final KeyRotationService keys = mock(KeyRotationService.class);
+
+    private final JwtCustomizerConfig config = new JwtCustomizerConfig(users, settings, keys, Clock.systemUTC());
 
     {
+        when(keys.activeKid()).thenReturn("kid-1");
         when(settings.current()).thenReturn(realm);
         when(realm.tokens()).thenReturn(new RealmSettings.Tokens(3600, 900, 43200, 365, 24));
     }

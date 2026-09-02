@@ -18,6 +18,7 @@ import org.springframework.security.oauth2.server.authorization.token.OAuth2Toke
 import com.asrevo.cvhome.commons.domain.Permission;
 import com.asrevo.cvhome.uaa.domain.Role;
 import com.asrevo.cvhome.uaa.domain.User;
+import com.asrevo.cvhome.uaa.keys.KeyRotationService;
 import com.asrevo.cvhome.uaa.repo.UserRepository;
 import com.asrevo.cvhome.uaa.settings.SettingsService;
 
@@ -69,17 +70,23 @@ public class JwtCustomizerConfig {
 
     private final SettingsService settings;
 
+    private final KeyRotationService keys;
+
     private final Clock clock;
 
-    public JwtCustomizerConfig(UserRepository userRepository, SettingsService settings, Clock clock) {
+    public JwtCustomizerConfig(UserRepository userRepository, SettingsService settings, KeyRotationService keys, Clock clock) {
         this.userRepository = userRepository;
         this.settings = settings;
+        this.keys = keys;
         this.clock = clock;
     }
 
     @Bean
     OAuth2TokenCustomizer<JwtEncodingContext> oauth2TokenCustomizer() {
         return context -> {
+            // The active key's kid on every header: with it the encoder selects one key even while a retiring key
+            // shares the algorithm, and a verifier that meets an unknown kid knows to refetch the JWKS.
+            context.getJwsHeader().keyId(keys.activeKid());
             if (OAuth2TokenType.ACCESS_TOKEN.equals(context.getTokenType())) {
                 clampLifetime(context);
                 addClientSettingClaims(context);

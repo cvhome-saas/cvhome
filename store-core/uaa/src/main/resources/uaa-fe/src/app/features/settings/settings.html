@@ -129,6 +129,50 @@
                 <app-number-field id="s-retire" formControlName="retireDays" [min]="1" compact [suffix]="t('settings.unit.days')" />
               </app-form-field>
             </div>
+            <!-- What signs right now, what still verifies, and the one action. Never the key material. -->
+            @if (facade.keyStatus(); as keys) {
+              <div class="key-status">
+                <div>
+                  <p class="key-line"><span class="key-label">{{ t('settings.keys.activeKey') }}</span> <code class="latin">{{ keys.activeKid }}</code> · {{ keys.algorithm }}</p>
+                  <p class="key-hint">
+                    {{ t('settings.keys.since', {when: when(keys.activatedAt)}) }}
+                    @if (keys.nextRotationAt) {
+                      · {{ t('settings.keys.nextRotation', {when: when(keys.nextRotationAt)}) }}
+                    } @else {
+                      · {{ t('settings.keys.manualOnly') }}
+                    }
+                    @if (keys.retiringCount) {
+                      · {{ t('settings.keys.retiringCount', {count: keys.retiringCount}) }}
+                    }
+                  </p>
+                  @if (keys.unusableCount) {
+                    <app-notice-bar icon="alertCircle" tone="red" [message]="t('settings.keys.unusable', {count: keys.unusableCount})" />
+                  }
+                </div>
+                <button class="secondary-action" type="button" [disabled]="facade.busy()" (click)="facade.rotatingKey.set(true)">
+                  {{ t('settings.keys.rotateNow') }}
+                </button>
+              </div>
+
+              <app-data-table [columns]="keyColumns(t)" [label]="t('settings.keys.tableLabel')">
+                @for (key of facade.keyList(); track key.id) {
+                  <app-table-row>
+                    <span class="cell mono latin" [attr.data-label]="t('settings.keys.column.kid')">{{ key.kid }}</span>
+                    <span class="cell" [attr.data-label]="t('settings.keys.column.algorithm')">{{ key.algorithm }}</span>
+                    <span class="cell" [attr.data-label]="t('settings.keys.column.status')">
+                      <app-badge [tone]="key.status === 'ACTIVE' ? 'green' : key.status === 'RETIRING' ? 'amber' : 'slate'" shape="square">
+                        {{ t('settings.keys.status.' + key.status) }}
+                      </app-badge>
+                    </span>
+                    <span class="cell" [attr.data-label]="t('settings.keys.column.activated')">{{ when(key.activatedAt) }}</span>
+                    <span class="cell" [attr.data-label]="t('settings.keys.column.retire')">
+                      {{ key.status === 'RETIRED' ? when(key.retiredAt) : key.retireAfter ? when(key.retireAfter) : '—' }}
+                    </span>
+                  </app-table-row>
+                }
+              </app-data-table>
+            }
+
             <div class="grid">
               <app-form-field controlId="s-audit" [label]="t('settings.audit.retention')" [hint]="t('settings.audit.retentionHint')" [control]="facade.form.controls.auditRetentionDays">
                 <app-number-field id="s-audit" formControlName="auditRetentionDays" [min]="1" compact [suffix]="t('settings.unit.days')" />
@@ -159,6 +203,16 @@
       </form>
     }
   </app-busy-overlay>
+
+  <app-confirm-dialog
+    [open]="facade.rotatingKey()"
+    [title]="t('settings.keys.confirmTitle')"
+    [message]="t('settings.keys.confirmMessage', {days: facade.form.controls.keys.controls.retireDays.value})"
+    [confirmLabel]="t('settings.keys.rotateNow')"
+    [cancelLabel]="t('shared.actions.cancel')"
+    (confirmed)="facade.rotateKey()"
+    (dismissed)="facade.rotatingKey.set(false)"
+  />
 
   <app-confirm-dialog
     [open]="facade.rotatingAll()"

@@ -127,7 +127,13 @@ public enum UaaErrors implements ErrorCode {
     USERNAME_TAKEN("UAA.USER.USERNAME_TAKEN", ErrorCategory.CONFLICT),
 
     /** Another account already carries that email. */
-    EMAIL_TAKEN("UAA.USER.EMAIL_TAKEN", ErrorCategory.CONFLICT);
+    EMAIL_TAKEN("UAA.USER.EMAIL_TAKEN", ErrorCategory.CONFLICT),
+
+    /** A stored signing key's private half could not be read back; it is excluded from signing. */
+    SIGNING_KEY_UNUSABLE("UAA.KEY.UNUSABLE", ErrorCategory.INTERNAL),
+
+    /** No signing key is active and a new one could not be made, so no token can be minted. */
+    NO_ACTIVE_SIGNING_KEY("UAA.KEY.NO_ACTIVE", ErrorCategory.INTERNAL);
 
     private final String code;
 

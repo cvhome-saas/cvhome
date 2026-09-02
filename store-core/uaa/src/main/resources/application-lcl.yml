@@ -35,3 +35,10 @@ com:
             - 127.0.0.1
             - gateway.com
             - .gateway.com
+      # The key that wraps the signing keys' private halves at rest. Static and committed for a local stack — like every
+      # other local secret in this slice — so a restart can still read them. Without it the shared LOCAL provider falls
+      # back to a random key per boot, and every stored signing key becomes unreadable at the next start.
+      crypto:
+        local:
+          key-provider-type: STATIC
+          key: ${UAA_CRYPTO_KEY:6b8d7f2a9c4e1d3b5a7f9e2c4d6b8a1f3e5d7c9b2a4f6e8d1c3b5a7f9e2d4c6b}

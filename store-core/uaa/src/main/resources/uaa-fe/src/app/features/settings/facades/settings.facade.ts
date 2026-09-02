@@ -5,7 +5,14 @@ import {TranslocoService} from '@jsverse/transloco';
 import {ApiErrorService, snapshot} from '@cvhome-saas/ui-kit';
 import {formDirty} from '@cvhome-saas/ui-kit/forms';
 import {ToastService} from '@cvhome-saas/ui-kit/ui';
-import {AdminClientService, AdminSettingsService, type RealmSettings, type RotatedSecret} from '@cvhome-saas/ui-kit/uaa';
+import {
+  AdminClientService,
+  AdminKeyService,
+  AdminSettingsService,
+  type RealmSettings,
+  type RotatedSecret,
+} from '@cvhome-saas/ui-kit/uaa';
+import {forkJoin} from 'rxjs';
 
 /** How the sections are grouped on the page; the `Email` section is not built (no mail sender). */
 export const SETTINGS_SECTIONS = ['general', 'authentication', 'sessions', 'keys', 'danger'] as const;
@@ -34,12 +41,22 @@ function bool(initial: boolean): FormControl<boolean> {
 export class SettingsFacade {
   private readonly settings = inject(AdminSettingsService);
   private readonly clients = inject(AdminClientService);
+  private readonly keys = inject(AdminKeyService);
   private readonly apiErrors = inject(ApiErrorService);
   private readonly toast = inject(ToastService);
   private readonly transloco = inject(TranslocoService);
 
   readonly busy = signal(false);
   readonly section = signal<SettingsSection>('general');
+
+  /** The signing keys: the posture and the table. Its own snapshot, re-read after a rotation. */
+  private readonly keyState = snapshot(
+    () => ({}),
+    () => forkJoin({status: this.keys.status(), list: this.keys.list()}),
+  );
+  readonly keyStatus = computed(() => this.keyState.value()?.status ?? null);
+  readonly keyList = computed(() => this.keyState.value()?.list ?? []);
+  readonly rotatingKey = signal(false);
 
   /** The danger zone's confirmation, and what it answered: every new secret, shown once. */
   readonly rotatingAll = signal(false);
@@ -206,6 +223,27 @@ export class SettingsFacade {
     if (value) {
       this.form.reset(this.formValue(value));
     }
+  }
+
+  /**
+   * A new signing key now. In-flight tokens keep verifying for the retire window; the table shows the
+   * previous key as retiring with the date it leaves the JWKS.
+   */
+  rotateKey(): void {
+    this.busy.set(true);
+    this.keys.rotate().subscribe({
+      next: (created) => {
+        this.busy.set(false);
+        this.rotatingKey.set(false);
+        this.toast.success(this.transloco.translate('settings.keys.toast.rotated', {kid: created.kid}));
+        this.keyState.reload();
+      },
+      error: (failure: unknown) => {
+        this.busy.set(false);
+        this.rotatingKey.set(false);
+        this.apiErrors.notify(failure);
+      },
+    });
   }
 
   /**

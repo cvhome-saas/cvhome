@@ -638,7 +638,32 @@
       "rotationDays": "Rotate automatically every",
       "rotationHint": "0 = manual rotation only.",
       "retireDays": "Keep retiring keys in the JWKS for",
-      "retireHint": "In-flight tokens still verify during this window."
+      "retireHint": "In-flight tokens still verify during this window.",
+      "activeKey": "Signing now",
+      "since": "since {{when}}",
+      "nextRotation": "next automatic rotation {{when}}",
+      "manualOnly": "rotation is manual",
+      "retiringCount": "{{count}} key(s) still verifying",
+      "unusable": "{{count}} stored key(s) cannot be read back — the crypto provider’s key changed underneath them. They still verify what they signed; nothing signs with them.",
+      "rotateNow": "Rotate now",
+      "tableLabel": "Signing keys",
+      "column": {
+        "kid": "Key id",
+        "algorithm": "Algorithm",
+        "status": "Status",
+        "activated": "Signing since",
+        "retire": "Leaves the JWKS"
+      },
+      "status": {
+        "ACTIVE": "Active",
+        "RETIRING": "Retiring",
+        "RETIRED": "Retired"
+      },
+      "confirmTitle": "Rotate the signing key?",
+      "confirmMessage": "New tokens are signed with a fresh key at once. Tokens already issued keep verifying for {{days}} day(s), then the old key leaves the JWKS.",
+      "toast": {
+        "rotated": "Signing key {{kid}} is active."
+      }
     },
     "audit": {
       "retention": "Audit log retention",

@@ -12,3 +12,6 @@ spring:
 #   UAA_REMEMBER_ME_KEY     signs the remember-me cookie; the same value on every instance
 # seed.apply-on-boot stays false here: set it to true for exactly one start to write new secrets into the database,
 # then turn it back off so an operator's password change survives the next restart.
+# Signing keys are stored with their private half encrypted by the platform's secret-crypto provider
+# (com.asrevo.cvhome.crypto in common-config.yml). A deployment must give that provider a stable key — AWS KMS, or a
+# LOCAL key via CVHOME_CRYPTO_KEY / a key file — or every stored signing key becomes unreadable at the next start.
