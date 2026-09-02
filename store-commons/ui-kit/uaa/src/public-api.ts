@@ -14,5 +14,6 @@ export * from './lib/user-row';
 export * from './lib/admin-user.service';
 export * from './lib/admin-role.service';
 export * from './lib/admin-settings.service';
+export * from './lib/account.service';
 export * from './lib/admin-client.service';
 export * from './lib/user-admin-table/user-admin-table';

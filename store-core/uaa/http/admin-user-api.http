@@ -130,13 +130,27 @@ Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
 POST {{SELLER_UI_URL}}/uaa/api/v1/admin/users/{{UAA_USER_ID}}/enable
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
 
-### reset the password — 200
+### unlock a locked account — 200, idempotent
+# Clears the lockout, the lockout count and the failed attempts; audited as user.unlocked.
+POST {{SELLER_UI_URL}}/uaa/api/v1/admin/users/{{UAA_USER_ID}}/unlock
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+
+### the account's live sessions — 200 SessionSummary[]
+GET {{SELLER_UI_URL}}/uaa/api/v1/admin/users/{{UAA_USER_ID}}/sessions
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+
+### sign the account out everywhere — 200 {revoked}
+DELETE {{SELLER_UI_URL}}/uaa/api/v1/admin/users/{{UAA_USER_ID}}/sessions
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+
+### reset the password — 200; also ends every session and token of the account
+# Goes through the realm's policy: 400 UAA.PASSWORD.POLICY_VIOLATION names each broken rule.
 # A PUT, unlike every other write here.
 PUT {{SELLER_UI_URL}}/uaa/api/v1/admin/users/{{UAA_USER_ID}}/reset-password
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
 Content-Type: application/json
 
-{"password": "Demo-Passw0rd!2"}
+{"password": "Demo-Passw0rd!2026"}
 
 ### a malformed id — 400 at binding, not 404
 # Path variables here are declared UUID, unlike the client API's plain strings.

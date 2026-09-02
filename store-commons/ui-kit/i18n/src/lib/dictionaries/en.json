@@ -284,7 +284,8 @@
         "enable": "Enable account",
         "impersonateUnavailable": "Signing in as another account is not built yet",
         "resetPassword": "Set password",
-        "menuFor": "Actions for {{name}}"
+        "menuFor": "Actions for {{name}}",
+        "unlock": "Unlock account"
       },
       "column": {
         "actions": "Actions",
@@ -296,7 +297,13 @@
       "disabled": "Disabled",
       "enabled": "Enabled",
       "noOrg": "No organization",
-      "unnamed": "No name recorded"
+      "unnamed": "No name recorded",
+      "status": {
+        "ACTIVE": "Active",
+        "PENDING": "Pending",
+        "LOCKED": "Locked",
+        "DISABLED": "Disabled"
+      }
     }
   },
   "errors": {

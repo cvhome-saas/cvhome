@@ -125,6 +125,64 @@
             [label]="t('users.detail.enabledLabel')"
             [description]="t('users.detail.enabledHint')"
           />
+
+          <!-- What uaa knows about how this account signs in. Read-only facts, two actions. -->
+          <section class="security" [attr.aria-label]="t('users.security.title')">
+            <div class="security-head">
+              <span class="group-label">{{ t('users.security.title') }}</span>
+              <app-badge [tone]="target.status === 'ACTIVE' ? 'green' : target.status === 'LOCKED' ? 'red' : target.status === 'PENDING' ? 'amber' : 'slate'" shape="square">
+                {{ t('shared.userAdmin.status.' + target.status) }}
+              </app-badge>
+            </div>
+            <dl class="facts">
+              <dt>{{ t('users.security.lastSignIn') }}</dt>
+              <dd>{{ when(target.lastSignInAt) }}@if (target.lastSignInVia) { <span class="via">· {{ target.lastSignInVia }}</span> }</dd>
+              <dt>{{ t('users.security.passwordChanged') }}</dt>
+              <dd>{{ target.passwordChangedAt ? when(target.passwordChangedAt) : t('users.security.noPassword') }}</dd>
+              <dt>{{ t('users.security.failedAttempts') }}</dt>
+              <dd>{{ target.failedLoginAttempts }}</dd>
+              @if (target.status === 'LOCKED') {
+                <dt>{{ t('users.security.lockedUntil') }}</dt>
+                <dd>
+                  {{ target.lockedUntil ? when(target.lockedUntil) : t('users.security.lockedPermanently') }}
+                  <button class="link" type="button" [disabled]="facade.busy()" (click)="facade.unlock(target)">
+                    {{ t('users.security.unlock') }}
+                  </button>
+                </dd>
+              }
+            </dl>
+
+            <div class="security-head">
+              <span class="group-label">{{ t('users.security.sessions') }}</span>
+              @if (facade.sessions()?.length) {
+                <button class="link danger" type="button" (click)="facade.revokeSessions(target)">
+                  {{ t('users.security.signOutEverywhere') }}
+                </button>
+              }
+            </div>
+            @if (facade.sessions(); as sessions) {
+              @if (sessions.length) {
+                <ul class="sessions">
+                  @for (session of sessions; track session.id) {
+                    <li class="session">
+                      <span class="session-main">
+                        <span class="latin">{{ session.ip || '—' }}</span>
+                        <span class="session-meta">{{ session.via || '' }} · {{ when(session.lastAccessedAt) }}</span>
+                        <span class="session-meta agent" [title]="session.userAgent || ''">{{ session.userAgent || '' }}</span>
+                      </span>
+                      <button class="link" type="button" [attr.aria-label]="t('users.security.revoke')" (click)="facade.revokeSession(target, session)">
+                        {{ t('users.security.revoke') }}
+                      </button>
+                    </li>
+                  }
+                </ul>
+              } @else {
+                <p class="readonly-note">{{ t('users.security.noSessions') }}</p>
+              }
+            } @else {
+              <p class="readonly-note">{{ t('users.security.loadingSessions') }}</p>
+            }
+          </section>
         }
 
         <div class="roles">

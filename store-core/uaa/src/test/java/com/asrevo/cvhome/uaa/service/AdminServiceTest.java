@@ -10,7 +10,6 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.asrevo.cvhome.uaa.audit.AuditService;
 import com.asrevo.cvhome.uaa.domain.Role;
@@ -22,13 +21,19 @@ import com.asrevo.cvhome.uaa.dto.UpdateUserRequest;
 import com.asrevo.cvhome.uaa.errors.RoleNotAssignableException;
 import com.asrevo.cvhome.uaa.errors.RoleNotFoundException;
 import com.asrevo.cvhome.uaa.errors.SuperAdminImmutableException;
+import com.asrevo.cvhome.uaa.password.PasswordService;
 import com.asrevo.cvhome.uaa.repo.RoleRepository;
 import com.asrevo.cvhome.uaa.repo.UserRepository;
+import com.asrevo.cvhome.uaa.security.LockoutService;
+import com.asrevo.cvhome.uaa.session.SessionAdminService;
+import com.asrevo.cvhome.uaa.token.TokenRevocationService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -71,18 +76,23 @@ class AdminServiceTest {
 
     private final RoleRepository roles = mock(RoleRepository.class);
 
-    private final PasswordEncoder encoder = mock(PasswordEncoder.class);
+    private final PasswordService passwords = mock(PasswordService.class);
 
     private final AuditService audit = mock(AuditService.class);
 
-    private final AdminService service = new AdminService(users, roles, encoder, audit, Clock.systemUTC());
+    private final SessionAdminService sessions = mock(SessionAdminService.class);
+
+    private final TokenRevocationService tokens = mock(TokenRevocationService.class);
+
+    private final AdminService service = new AdminService(users, roles, passwords, audit, Clock.systemUTC(), sessions,
+            tokens, mock(LockoutService.class));
 
     private User superAdmin;
 
     private User ordinary;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws Exception {
         superAdmin = new User();
         superAdmin.setId(UaaConstants.SUPER_ADMIN_ID);
         superAdmin.setUsername("super-admin");
@@ -100,8 +110,11 @@ class AdminServiceTest {
             store.put(saved.getId(), saved);
             return saved;
         });
-        when(encoder.encode(anyString()))
-                .thenAnswer(invocation -> String.format(CONCAT, HASH_PREFIX, invocation.getArgument(0)));
+        doAnswer(invocation -> {
+            User target = invocation.getArgument(0);
+            target.setPasswordHash(String.format(CONCAT, HASH_PREFIX, invocation.getArgument(1)));
+            return null;
+        }).when(passwords).setPassword(any(User.class), anyString());
     }
 
     @Test
@@ -158,14 +171,14 @@ class AdminServiceTest {
         service.createUser(new CreateUserRequest(NEW_USERNAME, NEW_EMAIL, null, null, null, Set.of(), Map.of()));
 
         verify(users).save(any(User.class));
-        verify(encoder, never()).encode(anyString());
+        verify(passwords, never()).setPassword(any(User.class), anyString());
     }
 
     @Test
     void createWithAPasswordEncodesIt() throws Exception {
         service.createUser(new CreateUserRequest(NEW_USERNAME, NEW_EMAIL, null, null, NEW_PASSWORD, Set.of(), Map.of()));
 
-        verify(encoder).encode(NEW_PASSWORD);
+        verify(passwords).setPassword(any(User.class), eq(NEW_PASSWORD));
     }
 
     @Test

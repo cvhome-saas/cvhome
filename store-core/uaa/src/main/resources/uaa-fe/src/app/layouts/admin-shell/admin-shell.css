@@ -272,3 +272,8 @@
 [dir='rtl'] .rail.open {
   transform: none;
 }
+
+.who {
+  color: inherit;
+  text-decoration: none;
+}

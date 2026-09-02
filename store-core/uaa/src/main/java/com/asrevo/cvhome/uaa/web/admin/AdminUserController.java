@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.uaa.web.admin;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -23,11 +24,17 @@ import com.asrevo.cvhome.uaa.dto.CreateUserRequest;
 import com.asrevo.cvhome.uaa.dto.ResetUserPasswordRequest;
 import com.asrevo.cvhome.uaa.dto.UpdateUserRequest;
 import com.asrevo.cvhome.uaa.dto.UserDto;
+import com.asrevo.cvhome.uaa.errors.PasswordCompromisedException;
+import com.asrevo.cvhome.uaa.errors.PasswordPolicyViolationException;
+import com.asrevo.cvhome.uaa.errors.PasswordReusedException;
 import com.asrevo.cvhome.uaa.errors.RoleNotAssignableException;
 import com.asrevo.cvhome.uaa.errors.RoleNotFoundException;
+import com.asrevo.cvhome.uaa.errors.SessionNotFoundException;
 import com.asrevo.cvhome.uaa.errors.SuperAdminImmutableException;
 import com.asrevo.cvhome.uaa.errors.UserNotFoundException;
 import com.asrevo.cvhome.uaa.service.AdminService;
+import com.asrevo.cvhome.uaa.session.SessionAdminService;
+import com.asrevo.cvhome.uaa.session.SessionSummary;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,6 +46,8 @@ import lombok.extern.slf4j.Slf4j;
 public class AdminUserController {
 
     private final AdminService adminService;
+
+    private final SessionAdminService sessions;
 
     private static @NonNull Map<String, String> extractMetadataFilters(Map<String, String> allParams) {
         Map<String, String> metadataFilters = new java.util.HashMap<>();
@@ -92,7 +101,8 @@ public class AdminUserController {
     @PreAuthorize("hasAuthority('SCOPE_super_admin') or hasRole('SUPER_ADMIN')")
     @PostMapping
     public UserDto create(@RequestBody CreateUserRequest req)
-            throws UserNotFoundException, SuperAdminImmutableException, RoleNotFoundException, RoleNotAssignableException {
+            throws UserNotFoundException, SuperAdminImmutableException, RoleNotFoundException, RoleNotAssignableException,
+            PasswordPolicyViolationException, PasswordReusedException, PasswordCompromisedException {
         return adminService.createUser(req);
     }
 
@@ -106,8 +116,35 @@ public class AdminUserController {
     @PreAuthorize("hasAuthority('SCOPE_super_admin') or hasRole('SUPER_ADMIN')")
     @PutMapping("/{id}/reset-password")
     public void resetPassword(@PathVariable UUID id, @RequestBody ResetUserPasswordRequest req)
-            throws UserNotFoundException, SuperAdminImmutableException {
+            throws UserNotFoundException, SuperAdminImmutableException, PasswordPolicyViolationException,
+            PasswordReusedException, PasswordCompromisedException {
         adminService.resetPassword(id, req);
+    }
+
+    @PreAuthorize("hasAuthority('SCOPE_super_admin') or hasRole('SUPER_ADMIN')")
+    @PostMapping("/{id}/unlock")
+    public void unlock(@PathVariable UUID id) throws UserNotFoundException, SuperAdminImmutableException {
+        adminService.unlock(id);
+    }
+
+    @PreAuthorize("hasAuthority('SCOPE_super_admin') or hasRole('SUPER_ADMIN')")
+    @GetMapping("/{id}/sessions")
+    public List<SessionSummary> sessions(@PathVariable UUID id) throws UserNotFoundException {
+        return sessions.list(adminService.getUser(id).username(), null);
+    }
+
+    @PreAuthorize("hasAuthority('SCOPE_super_admin') or hasRole('SUPER_ADMIN')")
+    @DeleteMapping("/{id}/sessions/{sessionId}")
+    public void revokeSession(@PathVariable UUID id, @PathVariable String sessionId)
+            throws UserNotFoundException, SessionNotFoundException {
+        sessions.revoke(adminService.getUser(id).username(), sessionId);
+    }
+
+    /** Signs the account out everywhere. */
+    @PreAuthorize("hasAuthority('SCOPE_super_admin') or hasRole('SUPER_ADMIN')")
+    @DeleteMapping("/{id}/sessions")
+    public Map<String, Integer> revokeSessions(@PathVariable UUID id) throws UserNotFoundException {
+        return Map.of("revoked", sessions.revokeAll(adminService.getUser(id).username(), null));
     }
 
     @PreAuthorize("hasAuthority('SCOPE_super_admin') or hasRole('SUPER_ADMIN')")

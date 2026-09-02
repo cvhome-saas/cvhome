@@ -21,7 +21,8 @@
     "breadcrumb": "Breadcrumb",
     "open": "Open navigation",
     "close": "Close navigation",
-    "signedIn": "Signed in"
+    "signedIn": "Signed in",
+    "account": "My account"
   },
   "route": {
     "signIn": "Sign in",
@@ -31,7 +32,8 @@
     "clientCreate": "Register a client",
     "clientEdit": "Client",
     "signOut": "Signing out",
-    "settings": "Settings"
+    "settings": "Settings",
+    "account": "My account"
   },
   "signIn": {
     "title": "Sign in",
@@ -50,7 +52,12 @@
     },
     "expired": "That page had expired. Please sign in again.",
     "signedOut": "You have been signed out.",
-    "signingOut": "Signing you out…"
+    "signingOut": "Signing you out…",
+    "locked": "This account is locked after too many failed attempts. Try again in {{minutes}} minutes, or ask an administrator.",
+    "disabled": "This account has been disabled. Ask an administrator.",
+    "expiredPassword": "Your password has expired. Ask an administrator for a reset link.",
+    "attemptsLeft": "{{count}} attempt(s) left before a {{minutes}}-minute lock.",
+    "rememberMe": "Keep me signed in"
   },
   "users": {
     "title": "Users",
@@ -96,7 +103,9 @@
       "rolesSaved": "Roles updated for {{name}}.",
       "deleted": "{{name}} was deleted.",
       "saved": "{{name}} was saved.",
-      "created": "{{name}} created."
+      "created": "{{name}} created.",
+      "unlocked": "{{name}} was unlocked.",
+      "signedOut": "{{name}} was signed out of {{count}} session(s)."
     },
     "detail": {
       "firstName": "First name",
@@ -120,6 +129,21 @@
     },
     "action": {
       "create": "Create user"
+    },
+    "security": {
+      "title": "Security",
+      "lastSignIn": "Last sign-in",
+      "passwordChanged": "Password changed",
+      "noPassword": "No password set",
+      "failedAttempts": "Failed attempts",
+      "lockedUntil": "Locked until",
+      "lockedPermanently": "permanently — an administrator must unlock",
+      "unlock": "Unlock",
+      "sessions": "Active sessions",
+      "signOutEverywhere": "Sign out everywhere",
+      "revoke": "End",
+      "noSessions": "No active sessions.",
+      "loadingSessions": "Loading sessions…"
     }
   },
   "roles": {
@@ -458,6 +482,36 @@
     "neverUpdated": "Never changed from the defaults.",
     "toast": {
       "saved": "Settings were saved."
+    }
+  },
+  "account": {
+    "title": "My account",
+    "password": {
+      "title": "Change password",
+      "subtitle": "Prove it is you with the current one",
+      "notice": "Changing your password signs you out everywhere else and ends every token issued to you.",
+      "current": "Current password",
+      "new": "New password",
+      "hint": "At least the realm's minimum length, with the character classes it requires.",
+      "repeat": "Repeat new password",
+      "mismatch": "The passwords do not match.",
+      "save": "Change password",
+      "saving": "Changing…"
+    },
+    "sessions": {
+      "title": "Sessions",
+      "subtitle": "Where you are signed in",
+      "loading": "Loading sessions…",
+      "thisDevice": "this device",
+      "lastActive": "last active",
+      "revoke": "End",
+      "signOutOthers": "Sign out the other {{count}}",
+      "none": "No sessions",
+      "noneHint": "uaa lists nothing for this account."
+    },
+    "toast": {
+      "passwordChanged": "Your password was changed.",
+      "signedOutOthers": "{{count}} other session(s) ended."
     }
   }
 }

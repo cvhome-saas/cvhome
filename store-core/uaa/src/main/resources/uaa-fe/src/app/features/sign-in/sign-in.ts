@@ -1,7 +1,9 @@
 import {Component, inject, signal} from '@angular/core';
+import {toSignal} from '@angular/core/rxjs-interop';
+import {catchError, of} from 'rxjs';
 import {TranslocoDirective} from '@jsverse/transloco';
 
-import {UI_KIT_CONFIG} from '@cvhome-saas/ui-kit';
+import {CrudService, UI_KIT_CONFIG} from '@cvhome-saas/ui-kit';
 import {FormField, Icon, Panel, TextField} from '@cvhome-saas/ui-kit/ui';
 
 /**
@@ -35,10 +37,26 @@ export class SignIn {
 
   protected readonly action = this.config.loginUrl;
   protected readonly submitting = signal(false);
+  private readonly http = inject(CrudService);
+
   protected readonly csrf = signal(readCookie('XSRF-TOKEN'));
 
   /** Which message to show above the form, keyed into `signIn.*`, or `undefined` for none. */
-  protected readonly notice = signal<'failed' | 'expired' | 'signedOut' | undefined>(readNotice());
+  protected readonly notice = signal<Notice | undefined>(readNotice());
+
+  /** How many attempts are left before a lock, when the server said. */
+  protected readonly attemptsLeft = readAttemptsLeft();
+
+  /**
+   * What the realm lets this page offer. Public, and allowed to fail: without it the form is the plain
+   * username/password one, which is always right.
+   */
+  protected readonly realm = toSignal(
+    this.http.get<LoginSettings>('/api/v1/public/login/settings').pipe(catchError(() => of(null))),
+    {initialValue: null as LoginSettings | null},
+  );
+
+  protected readonly rememberMe = signal(false);
 
   protected onSubmit(): void {
     // Re-read at the last moment: the cookie may have been rotated since the page rendered.
@@ -55,7 +73,21 @@ function readCookie(name: string): string {
   return match ? decodeURIComponent(match.slice(1).join('=')) : '';
 }
 
-function readNotice(): 'failed' | 'expired' | 'signedOut' | undefined {
+type Notice = 'failed' | 'expired' | 'signedOut' | 'locked' | 'disabled' | 'expiredPassword';
+
+/** What `GET /api/v1/public/login/settings` answers. */
+interface LoginSettings {
+  readonly displayName: string;
+  readonly rememberMeEnabled: boolean;
+  readonly lockoutThreshold: number;
+  readonly lockoutMinutes: number;
+}
+
+/**
+ * The failure handler's vocabulary: `?error` alone is a wrong password, `?error=locked|disabled|expired-password`
+ * are states the person needs to know about, `?error=expired` is a stale CSRF token, `?logout` is a farewell.
+ */
+function readNotice(): Notice | undefined {
   const params = new URLSearchParams(window.location.search);
   if (params.has('logout')) {
     return 'signedOut';
@@ -63,5 +95,21 @@ function readNotice(): 'failed' | 'expired' | 'signedOut' | undefined {
   if (!params.has('error')) {
     return undefined;
   }
-  return params.get('error') === 'expired' ? 'expired' : 'failed';
+  switch (params.get('error')) {
+    case 'expired':
+      return 'expired';
+    case 'locked':
+      return 'locked';
+    case 'disabled':
+      return 'disabled';
+    case 'expired-password':
+      return 'expiredPassword';
+    default:
+      return 'failed';
+  }
+}
+
+function readAttemptsLeft(): number | null {
+  const value = new URLSearchParams(window.location.search).get('attemptsLeft');
+  return value === null ? null : Number.parseInt(value, 10);
 }

@@ -56,6 +56,11 @@ public enum ErrorCategory {
     UNPROCESSABLE(422),
 
     /**
+     * The caller sent more requests in a window than the endpoint allows; the response says when to retry.
+     */
+    TOO_MANY_REQUESTS(429),
+
+    /**
      * Persistence, object storage or other infrastructure failure.
      */
     STORAGE(500),

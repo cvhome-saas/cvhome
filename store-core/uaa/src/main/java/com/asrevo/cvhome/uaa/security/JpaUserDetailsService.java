@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.uaa.security;
 
+import java.time.Clock;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -12,9 +13,23 @@ import org.springframework.stereotype.Service;
 
 import com.asrevo.cvhome.uaa.domain.Role;
 import com.asrevo.cvhome.uaa.domain.User;
+import com.asrevo.cvhome.uaa.password.PasswordService;
 import com.asrevo.cvhome.uaa.repo.UserRepository;
 
+import lombok.RequiredArgsConstructor;
+
+/**
+ * The account as Spring Security sees it.
+ *
+ * <p>
+ * The flags are what enforce the realm's policy: {@code accountNonLocked} carries the lockout,
+ * {@code credentialsNonExpired} the password age, {@code enabled} the administrator's switch. Spring checks all
+ * three <em>before</em> the password, so a locked or disabled account fails the same way whether or not the guess
+ * was right.
+ * </p>
+ */
 @Service
+@RequiredArgsConstructor
 public class JpaUserDetailsService implements UserDetailsService {
 
     /**
@@ -26,9 +41,9 @@ public class JpaUserDetailsService implements UserDetailsService {
 
     private final UserRepository users;
 
-    public JpaUserDetailsService(UserRepository users) {
-        this.users = users;
-    }
+    private final PasswordService passwords;
+
+    private final Clock clock;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -50,6 +65,8 @@ public class JpaUserDetailsService implements UserDetailsService {
                 .password(u.getPasswordHash() == null ? NO_PASSWORD : u.getPasswordHash())
                 .authorities(authorities)
                 .disabled(!u.isEnabled())
+                .accountLocked(u.isLocked(clock.instant()))
+                .credentialsExpired(passwords.expired(u))
                 .build();
     }
 

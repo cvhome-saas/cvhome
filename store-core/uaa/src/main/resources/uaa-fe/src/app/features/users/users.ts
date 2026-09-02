@@ -14,6 +14,7 @@ import {
   PageHeader,
   Pagination,
   Panel,
+  Badge,
   SetPasswordDialog,
   TextField,
   Toggle,
@@ -45,6 +46,7 @@ import {PAGE_SIZE, UsersFacade} from './facades/users.facade';
     PairList,
     SetPasswordDialog,
     ConfirmDialog,
+    Badge,
   ],
   providers: [UsersFacade],
   templateUrl: './users.html',
@@ -53,6 +55,11 @@ import {PAGE_SIZE, UsersFacade} from './facades/users.facade';
 export class Users {
   protected readonly facade = inject(UsersFacade);
   protected readonly pageSize = PAGE_SIZE;
+
+  /** A timestamp for the security section, in the reader's locale; `—` when uaa has none. */
+  protected when(value: string | null): string {
+    return value ? new Date(value).toLocaleString() : '—';
+  }
 
   /** The table hands roles back as a list; uaa has no display names for them, so they read as-is. */
   protected readonly roleList = (roles: readonly string[]): string => roles.join(', ');
@@ -67,6 +74,9 @@ export class Users {
     switch (intent.kind) {
       case 'toggleEnabled':
         this.facade.toggleEnabled(intent.row);
+        break;
+      case 'unlock':
+        this.facade.unlockRow(intent.row);
         break;
       case 'resetPassword':
         this.facade.resetting.set(intent.row);

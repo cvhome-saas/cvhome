@@ -1,6 +1,6 @@
 import {Component, computed, inject, signal} from '@angular/core';
 import {toSignal} from '@angular/core/rxjs-interop';
-import {NavigationEnd, Router, RouterOutlet} from '@angular/router';
+import {NavigationEnd, Router, RouterLink, RouterOutlet} from '@angular/router';
 import {filter, map, startWith} from 'rxjs';
 import {TranslocoDirective} from '@jsverse/transloco';
 
@@ -24,7 +24,8 @@ import {Icon, SectionNav, type NavSection} from '@cvhome-saas/ui-kit/ui';
  */
 @Component({
   selector: 'app-admin-shell',
-  imports: [RouterOutlet, TranslocoDirective, Icon, SectionNav],
+  imports: [RouterOutlet,
+    RouterLink, TranslocoDirective, Icon, SectionNav],
   templateUrl: './admin-shell.html',
   styleUrl: './admin-shell.css',
 })
@@ -80,10 +81,17 @@ export class AdminShell {
     {initialValue: firstSegment(this.router.url)},
   );
 
-  /** The breadcrumb's trailing label — the section the operator is in. */
-  protected readonly currentLabelKey = computed(
-    () => this.sections.find((s) => s.key === this.active())?.labelKey ?? 'nav.users',
-  );
+  /**
+   * The breadcrumb's trailing label — the section the operator is in, or the account page, which has no rail
+   * row (it is reached from the who-chip) and so is named explicitly rather than falling back to Users.
+   */
+  protected readonly currentLabelKey = computed(() => {
+    const active = this.active();
+    if (active === 'account') {
+      return 'nav.account';
+    }
+    return this.sections.find((s) => s.key === active)?.labelKey ?? 'nav.users';
+  });
 
   protected selectLocale(code: LocaleCode): void {
     this.locale.select(code);

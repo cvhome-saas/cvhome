@@ -1,0 +1,17 @@
+# PublicLoginController — com.asrevo.cvhome.uaa.web.pub
+#
+# What the sign-in page needs before anyone is signed in. Public, stateless, rate-limited per address like every
+# `/api/v1/public/**` path. Addressed on uaa's own origin here: the page that calls it lives there.
+#
+# Requires a running stack: lcl start -d
+
+### the realm's sign-in settings — 200
+# displayName, defaultLocale, whether remember-me is offered, and the lockout policy the page explains.
+GET {{UAA_URL}}/api/v1/public/login/settings
+
+> {%
+    client.test("public", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        client.assert(typeof response.body.lockoutThreshold === "number", "no threshold");
+    });
+%}

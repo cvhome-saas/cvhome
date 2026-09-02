@@ -11,7 +11,7 @@ somewhere else entirely — that is [cua](../../../store-pod/cua/qa/cua-qa.md).
   is where the platform's sign-in page lives
 - **Runs on** — `lcl start -d --stack <name>`; uaa is `http://uaa.gateway.com:8001` and is the **first**
   service the stack brings up, because it issues the tokens. Read the live port from `lcl urls`
-- **Cases** — 76 (56 verified, 6 unit only, 14 not verified)
+- **Cases** — 92 (70 verified, 8 unit only, 14 not verified)
 - **Also see** — [gateway](../../gateway/gateway-service/qa/gateway-qa.md) (which relays the token and holds
   the session), [tenancy](../../tenancy/tenancy-service/qa/tenancy-qa.md) (which owns the *store-scoped*
   accounts and calls uaa to create them),
@@ -619,9 +619,9 @@ possible; the tag says whether it has also been driven against a stack._
   catch-all served `index.html` for it. Both are fixed — the handler writes the body itself and the router
   excludes `/error` — and REG has the row.
 
-### SEC-06 — Lockout, rate limiting, password policy, audit · [not verified]
+### SEC-06 — Lockout, rate limiting, password policy, audit · [verified]
 
-- Phases 2 and 3 of the plan; their sections (`LCK`, `RL`, `PWD`, `AUD`) arrive with them.
+- Built in phases 2 and 3: see `LCK`, `RL`, `PWD` and `SES` below; the audit query screen is phase 8 (`AUD`).
 
 ### SEC-07 — Short tokens and PKCE · high · [verified]
 
@@ -761,7 +761,7 @@ the role name** — the claim is issued so they can start reading it without a t
   each naming the actor (`admin-sdk` for a client token, the username for a session) and the role.
 - **Seen** — `AdminRoleApiIntegrationTest` counts the rows.
 
-### ROL-08 — The Roles screen · high · [not verified]
+### ROL-08 — The Roles screen · high · [verified]
 
 - **Steps** — open **Roles**; switch System / Custom; search; open `ORG_ADMIN`; open a custom role; create one with
   a parent and a few permissions; switch to العربية.
@@ -769,6 +769,10 @@ the role name** — the claim is issued so they can start reading it without a t
   name and scope are disabled with the notice; the matrix ticks by group with *Select all / Clear* and the count line
   reads `N direct · M effective`; the parent select lists every other role; the delete button is absent on a
   system role. Identifiers stay left-to-right under Arabic.
+- **Seen** — created `REGIONAL_BUYER` with two keys (row read `REALM 0 2 CUSTOM`), set its parent to `ORG_ADMIN`
+  (row read `4`, the union), deleted it with the typed confirmation; `role.created` and `role.updated` rows with
+  actor `super-admin` and ip; العربية mirrored the page (`dir=rtl`, «الأدوار») with the role names still
+  left-to-right.
 
 ---
 
@@ -799,7 +803,7 @@ that build each mechanism** (LCK, PWD, SES, KEY) — until then a change is a ch
   every account on its first attempt, and the column would store it.
 - **Seen** — `SettingsServiceTest` (each rule), `AdminSettingsApiIntegrationTest` (the first).
 
-### SET-04 — The Settings screen · high · [not verified]
+### SET-04 — The Settings screen · high · [verified]
 
 - **Steps** — open **Settings** (the rail row is a link now); change a number; watch the header; Discard; change
   again and Save; reload.
@@ -807,6 +811,168 @@ that build each mechanism** (LCK, PWD, SES, KEY) — until then a change is a ch
   titled as not built; the header reads *Saved* until a field changes, then *Save changes* + *Discard*; durations
   are edited in minutes / hours / days and read back the same; *Allow self-registration* is disabled with its
   note; the last-saved stamp names you.
+- **Seen** — *Saved* → edit the lockout threshold → *Discard* + *Save changes* → *Saved*, toast, the stamp
+  `Last saved by super-admin at …`, and the `settings.updated` audit row carrying only the `lockout` diff. The
+  first build of the page threw `Cannot read properties of null (reading '_rawValidators')`: the audit-retention
+  field sat inside the keys form group in the template. REG has the row.
+
+---
+
+## LCK — Lockout
+
+_Phase 3. Failed password sign-ins are counted per account; at the realm's threshold (`settings.lockout.threshold`,
+default 5) the account is locked for `durationSeconds` (default 15 min), and after `permanentAfter` lockouts (default
+5) it stays locked until an administrator unlocks it. Locked and disabled accounts fail **before** the password is
+compared, so a locked account learns nothing from a guess and never counts another attempt._
+
+### LCK-01 — Five wrong passwords lock, the right one is then refused, unlock restores · critical · [verified]
+
+- **Steps** — sign in as `org2-store2-moderator` with a wrong password five times, then with `admin`; as
+  super-admin read the account and `POST …/unlock`; sign in again.
+- **Expect** — the first four wrong attempts return to `/login?error&attemptsLeft=N` counting down to 1; the fifth
+  — the one that locks — already lands on `/login?error=locked` (never "0 attempts left"); the right password then
+  lands on `/login?error=locked` too; the admin API shows `status: LOCKED`; after the unlock the sign-in succeeds.
+  Audit: five `user.login.failed` (reason `BAD_CREDENTIALS`), one `user.locked`, one `user.unlocked`, one `user.login`.
+- **Seen** — `LockoutIntegrationTest`, `LockoutServiceTest`.
+
+### LCK-02 — A disabled account is told so · high · [verified]
+
+- **Steps** — disable an account, sign in as it.
+- **Expect** — `/login?error=disabled`. The page says the account is disabled and to contact an administrator; a
+  wrong password on a disabled account says the same, not "attempts left".
+- **Seen** — `AdminSessionsIntegrationTest`.
+
+### LCK-03 — The sign-in page explains the state · high · [verified]
+
+- **Steps** — drive LCK-01 in the browser, then unlock the account from the Users screen (row menu → *Unlock
+  account*).
+- **Expect** — "N attempt(s) left before a 15-minute lock" under the wrong-password message (the minutes come from
+  the realm's public login settings, not a literal); "This account is locked …" when it is; "signed out" after a
+  logout; the page never says which half of the credentials was wrong. On the Users screen the row's badge reads
+  **LOCKED**, the dialog's *Security* section shows the failed-attempt count, and *Unlock account* returns the badge
+  to ACTIVE, zeroes the counters and writes `user.unlocked` with the administrator as the actor.
+- **Seen** — EN and AR, stack `uaa-sso`, 2026-09-02. **Beware** — a failed sign-in attempt submitted from a browser
+  that already holds an administrator session ends that session (Spring clears the security context on any
+  authentication failure). That is the framework's default and is left as is; use a second browser profile for the
+  wrong-password half.
+
+---
+
+## RL — Rate limiting
+
+_Phase 3. A fixed window per address on the endpoints that take a secret: `/login` (10 a minute), `/oauth2/token`
+(60) and `/api/v1/public/**` (20). Refused before Spring Security runs, so a refused attempt costs no hash and locks
+nothing; POSTs only, so loading a page never counts. In memory, per instance — a brake on guessing, not accounting._
+
+### RL-01 — A burst of sign-ins is a 429 with a problem body · critical · [verified]
+
+- **Steps** — POST `/login` eleven times from one address within a minute (any username, even one that does not
+  exist).
+- **Expect** — ten 302s, then **429** `application/problem+json` `UAA.AUTH.RATE_LIMITED` with `Retry-After: 60` and
+  a `traceId`; `GET /login` still answers 200. Audit: one `request.rate_limited` row per refusal.
+- **Seen** — `RateLimitIntegrationTest` (limit lowered to 3 for its context), `RateLimiterTest`.
+
+### RL-02 — The token endpoint is limited too · high · [not verified]
+
+- **Steps** — 61 `client_credentials` calls from one address in a minute.
+- **Expect** — the 61st is 429. Services that legitimately mint that often share an address only behind a proxy
+  that forwards the client's, which `forward-headers-strategy: NATIVE` honours.
+
+---
+
+## PWD — Password policy
+
+_Phase 3. Every password set through the API — admin reset, self-service change, and later the invitation and
+reset-link flows — goes through one funnel: the realm's rules (length, character classes, not the username or the
+email's local part), the account's recent hashes, and, when enabled, the Have I Been Pwned range check. Seeds and
+boot initializers write hashes directly and are the deliberate exception; that is why `admin` still signs in._
+
+### PWD-01 — Every broken rule is reported at once · high · [verified]
+
+- **Steps** — reset a password to `short`.
+- **Expect** — **400 `UAA.PASSWORD.POLICY_VIOLATION`** with one field error on `password` per rule: `minLength`,
+  `upper`, `digit` (the defaults require 12 characters, upper, lower, digit).
+- **Seen** — `PasswordPolicyValidatorTest`, `AccountApiIntegrationTest`.
+
+### PWD-02 — A recent password cannot come back · high · [unit only]
+
+- **Steps** — change a password to A, then B, then A again.
+- **Expect** — **422 `UAA.PASSWORD.REUSED`** naming how many are remembered (`settings.password.historyCount`).
+- **Seen** — `PasswordServiceTest`.
+
+### PWD-03 — Expiry forces a change · [unit only]
+
+- **Steps** — set `password.expiryDays` to 1, backdate `uaa.users.password_changed_at` by two days, sign in.
+- **Expect** — `/login?error=expired-password`; the account is told to ask for a reset.
+- **Seen** — `PasswordServiceTest.expiryFollowsTheChangeDate` for the rule; the sign-in path is not driven.
+
+### PWD-04 — The breach check is a check, not a decision · [not verified]
+
+- **Steps** — enable `password.rejectBreached`, set `password123456` (in every breach corpus), then set a strong one
+  with the network cut.
+- **Expect** — the first is **422 `UAA.PASSWORD.COMPROMISED`**; the second is accepted with a WARN in the log — an
+  outage at the corpus must not block a reset.
+
+### PWD-05 — New hashes are bcrypt 12 · [verified]
+
+- **Steps** — reset a password, `select password_hash from uaa.users where …`.
+- **Expect** — `{bcrypt}$2a$12$…`; the seeded `$2a$10$` hashes still verify.
+
+---
+
+## SES — Sessions and revocation
+
+_Phase 3. Sessions are Spring Session rows indexed by principal, stamped at sign-in with ip, user agent, how the
+sign-in happened and when. Ending a session deletes its row. Disabling, deleting or resetting an account, and a
+self-service password change, end its sessions **and** its OAuth2 authorizations (`uaa.oauth2_authorization`),
+which makes its refresh tokens unusable at once; a self-contained access token lives out its fifteen minutes._
+
+### SES-01 — Two sessions, end one · high · [verified]
+
+- **Steps** — sign in twice (two browsers) as `org2-store1-moderator`; as super-admin `GET /users/{id}/sessions`;
+  `DELETE` one of them.
+- **Expect** — two rows with ip, `via: PASSWORD` and timestamps; after the delete one browser is signed out
+  (`/api/v1/auth/me` 401) and the other is not. A session id that is not the account's is **404**, never a hint.
+- **Seen** — `AdminSessionsIntegrationTest`.
+
+### SES-02 — Disabling signs the account out everywhere · critical · [verified]
+
+- **Steps** — with the sessions of SES-01 alive, `POST /users/{id}/disable`.
+- **Expect** — both browsers get 401; a fresh sign-in says `disabled`; `uaa.oauth2_authorization` holds no row for
+  the account. Re-enable afterwards.
+- **Seen** — `AdminSessionsIntegrationTest`, `AdminServiceTest`.
+
+### SES-03 — Changing my password keeps only my session · critical · [verified]
+
+- **Steps** — sign in twice as `org1-store2-admin`; from one, `PUT /api/v1/account/password` with the current and a
+  new password.
+- **Expect** — that session stays, the other is gone, the old password no longer signs in, the new one does; a wrong
+  current password is **400 `UAA.PASSWORD.CURRENT_MISMATCH`** and changes nothing.
+- **Seen** — `AccountApiIntegrationTest`. **Restore** — this leaves the account on the new password until the
+  database is reset.
+
+### SES-04 — A service client has no account · [verified]
+
+- **Steps** — `GET /api/v1/account/sessions` with a `client_credentials` token.
+- **Expect** — **403 `UAA.AUTH.NOT_A_USER_PRINCIPAL`**.
+
+### SES-06 — The account page · high · [verified]
+
+- **Steps** — from the who-chip open `/account` as `super-admin`, in English and Arabic.
+- **Expect** — the breadcrumb reads *My account*; *Change password* asks for the current password, a new one and its
+  repeat, states the realm's rules in the hint and warns that the change signs every other session out; *Sessions*
+  lists this device with its ip, `PASSWORD`, last-active time and user agent, marked *this device*. Arabic mirrors
+  the layout; the user agent and ip stay left-to-right.
+- **Seen** — the screen; the password change itself is SES-03 (`AccountApiIntegrationTest`).
+
+### SES-05 — Idle and absolute timeouts, remember-me, single session · [not verified]
+
+- **Steps** — set `sessions.idleSeconds` to 60 and wait; set `sessions.maxSeconds` to 120 and keep clicking; turn
+  remember-me on and sign in with the box ticked, then delete the `SESSION` cookie; turn *one session per user* on
+  and sign in twice.
+- **Expect** — signed out after a minute idle; signed out after two minutes however active; still signed in from
+  the remember-me cookie (and not when the setting is off); the first session ends when the second begins.
+  Mechanisms: `LoginSuccessHandler`, `SessionMaxAgeFilter`, `SettingsAwareRememberMeServices`.
 
 ---
 
@@ -849,6 +1015,12 @@ clients and accounts. Nothing in uaa carries an `alter table`.
 | A filter-chain 403 dispatched to `/error`, which the SPA router served as `index.html` | a forged POST and a `store_core` call to the admin API both answered **200 with the console's HTML** | SEC-05, SEC-11, `CsrfLoginIntegrationTest`, `AdminUserApiIntegrationTest` |
 | uaa's `management.endpoints.web.exposure.include` override lost to the imported `common-config.yml` | every actuator endpoint mapped on the live stack after the "fix" | SEC-01, `ActuatorExposureIntegrationTest` |
 | `admin-sdk` seeded with `refresh_token` and consent | a machine client with a grant it can never use | seed review |
+| The `roles` JWT claim was a `TreeSet`; the JDBC authorization store serialises claim values with type info the gateway's UserInfo parser refuses | gateway login died with `Could not resolve type id 'java.util.TreeSet'` | AUT-01, `LoginFlowIntegrationTest` |
+| A settings field placed inside the wrong `formGroupName` | the Settings page threw at render and showed skeletons for ever | SET-04 |
+| A `GET /api/…` was saved as the request to resume after login | signing in landed on raw JSON at `/api/v1/auth/me?continue` | AUT-02 (the request cache excludes `/api/**`) |
+| The realm's remember-me key sat one YAML level too high in the local slices | uaa refused to start: `Could not resolve placeholder 'UAA_REMEMBER_ME_KEY'` | boot |
+| The attempt that crossed the lockout threshold was reported as `attemptsLeft=0` | the sign-in page said "0 attempt(s) left before a 15-minute lock" on an account that was already locked | LCK-01, LCK-03, `LoginFailureHandlerTest` |
+| `/account` had no rail row, so the breadcrumb fell back to *Users* | "cvhome identity › Users" over the account page | SES-06 |
 
 ---
 

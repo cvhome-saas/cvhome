@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.uaa.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.security.autoconfigure.actuate.web.servlet.EndpointRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,6 +12,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
@@ -24,7 +26,12 @@ import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import com.asrevo.cvhome.uaa.security.CsrfCookieFilter;
+import com.asrevo.cvhome.uaa.security.LoginFailureHandler;
+import com.asrevo.cvhome.uaa.security.LoginSuccessHandler;
 import com.asrevo.cvhome.uaa.security.ProblemAccessDeniedHandler;
+import com.asrevo.cvhome.uaa.security.SettingsAwareRememberMeServices;
+import com.asrevo.cvhome.uaa.session.SessionMaxAgeFilter;
+import com.asrevo.cvhome.uaa.settings.SettingsService;
 
 /**
  * The two application chains beneath the authorization server's own.
@@ -50,6 +57,8 @@ import com.asrevo.cvhome.uaa.security.ProblemAccessDeniedHandler;
  * a message, where an HTML page would arrive as a parse error.</li>
  * <li>{@code /logout} accepts GET as well as POST for now: the shared {@code AuthService.logout()} navigates rather
  * than posts. Recorded as a known gap.</li>
+ * <li>Sign-in success stamps the session and applies the realm's idle timeout and single-session rule; failure sends
+ * the page a reason it can explain; remember-me and the absolute session ceiling follow the realm's settings.</li>
  * </ul>
  */
 @Configuration
@@ -80,8 +89,9 @@ public class AppSecurityConfig {
     }
 
     @Bean
-    SecurityFilterChain appSecurity(HttpSecurity http, RequestCache requestCache, ProblemAccessDeniedHandler denied)
-            throws Exception {
+    SecurityFilterChain appSecurity(HttpSecurity http, RequestCache requestCache, ProblemAccessDeniedHandler denied,
+                                    LoginSuccessHandler loginSuccess, LoginFailureHandler loginFailure,
+                                    SettingsAwareRememberMeServices rememberMe, SettingsService settings) throws Exception {
         http.authorizeHttpRequests(auth -> auth
                         .requestMatchers("/.well-known/**").permitAll()
                         .requestMatchers(EndpointRequest.to("health", "info", "prometheus")).permitAll()
@@ -93,7 +103,9 @@ public class AppSecurityConfig {
                         .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/api-docs/**").permitAll()
                         .requestMatchers("/api/v1/admin/**").hasAnyAuthority("SCOPE_super_admin", SUPER_ADMIN)
                         .anyRequest().authenticated())
-                .formLogin(login -> login.loginPage(LOGIN_PAGE))
+                .formLogin(login -> login.loginPage(LOGIN_PAGE).successHandler(loginSuccess).failureHandler(loginFailure))
+                .rememberMe(remember -> remember.rememberMeServices(rememberMe).key(rememberMe.getKey()))
+                .addFilterAfter(new SessionMaxAgeFilter(settings), BasicAuthenticationFilter.class)
                 .logout(logout -> logout
                         .logoutRequestMatcher(PathPatternRequestMatcher.withDefaults().matcher(LOGOUT))
                         .logoutSuccessUrl(LOGOUT_SUCCESS)
@@ -110,6 +122,16 @@ public class AppSecurityConfig {
                 .requestCache(cache -> cache.requestCache(requestCache))
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
         return http.build();
+    }
+
+    /**
+     * Remember-me, gated by the realm's settings. The key signs the cookie and must be the same on every instance,
+     * so it is configuration, not something generated at start.
+     */
+    @Bean
+    SettingsAwareRememberMeServices rememberMeServices(@Value("${com.asrevo.cvhome.uaa.remember-me.key}") String key,
+                                                       UserDetailsService userDetailsService, SettingsService settings) {
+        return new SettingsAwareRememberMeServices(key, userDetailsService, settings);
     }
 
     /**

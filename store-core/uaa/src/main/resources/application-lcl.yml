@@ -20,3 +20,8 @@ com:
         seed:
           # A fresh local database gets the known password and secrets on every start.
           apply-on-boot: true
+        # Signs the remember-me cookie. Local only; a deployment sets UAA_REMEMBER_ME_KEY.
+        remember-me:
+          key: local-remember-me-key-not-a-secret
+        rate-limit:
+          enabled: true

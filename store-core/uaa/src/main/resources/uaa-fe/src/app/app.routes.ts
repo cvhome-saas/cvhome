@@ -42,6 +42,11 @@ export const routes: Routes = [
         data: {titleKey: 'route.roles'},
       },
       {
+        path: 'account',
+        loadComponent: () => import('@features/account/account').then((m) => m.Account),
+        data: {titleKey: 'route.account'},
+      },
+      {
         path: 'settings',
         loadComponent: () => import('@features/settings/settings').then((m) => m.Settings),
         data: {titleKey: 'route.settings'},

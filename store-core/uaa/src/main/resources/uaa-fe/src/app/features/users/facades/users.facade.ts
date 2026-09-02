@@ -8,6 +8,7 @@ import {
   AdminUserService,
   type AdminUserAction,
   type PlatformUserRow,
+  type SessionSummary,
   type UserDto,
 } from '@cvhome-saas/ui-kit/uaa';
 
@@ -75,6 +76,9 @@ export class UsersFacade {
   /** Roles are a set of checkboxes over one value, so they are held beside the form. */
   readonly draftRoles = signal<readonly string[]>([]);
 
+  /** The open account's live sessions, fetched with it; null while nothing is open or the leg failed. */
+  readonly sessions = signal<readonly SessionSummary[] | null>(null);
+
   /**
    * Metadata keys that arrived from the server, whose remove buttons are disabled.
    *
@@ -115,6 +119,64 @@ export class UsersFacade {
     this.editing.set(null);
     this.resetting.set(null);
     this.deleting.set(null);
+    this.sessions.set(null);
+  }
+
+  /**
+   * The sessions leg is allowed to fail on its own: the dialog still edits the account, and the section says the
+   * list could not be loaded rather than the whole form blanking.
+   */
+  private loadSessions(id: string): void {
+    this.sessions.set(null);
+    this.admin.sessions(id).subscribe({
+      next: (list) => this.sessions.set(list),
+      error: () => this.sessions.set([]),
+    });
+  }
+
+  /** Clears the lockout; the dialog re-reads the account so the status badge follows. */
+  unlock(target: UserDto): void {
+    this.busy.set(true);
+    this.admin.unlock(target.id).subscribe({
+      next: () => {
+        this.busy.set(false);
+        this.toast.success(this.transloco.translate('users.toast.unlocked', {name: target.username}));
+        this.users.reload();
+        this.refresh(target.id);
+      },
+      error: (failure: unknown) => {
+        this.busy.set(false);
+        this.apiErrors.notify(failure);
+      },
+    });
+  }
+
+  revokeSession(target: UserDto, session: SessionSummary): void {
+    this.admin.revokeSession(target.id, session.id).subscribe({
+      next: () => this.loadSessions(target.id),
+      error: (failure: unknown) => this.apiErrors.notify(failure),
+    });
+  }
+
+  /** Signs the account out everywhere. */
+  revokeSessions(target: UserDto): void {
+    this.admin.revokeSessions(target.id).subscribe({
+      next: ({revoked}) => {
+        this.toast.success(this.transloco.translate('users.toast.signedOut', {name: target.username, count: revoked}));
+        this.loadSessions(target.id);
+      },
+      error: (failure: unknown) => this.apiErrors.notify(failure),
+    });
+  }
+
+  private refresh(id: string): void {
+    this.admin.findOne(id).subscribe({
+      next: (user) => {
+        if (this.editing() !== 'new' && this.editing()) {
+          this.editing.set(user);
+        }
+      },
+    });
   }
 
   /** Opening a row fetches it: the dialog edits the metadata bag the row model does not carry. */
@@ -125,6 +187,7 @@ export class UsersFacade {
         this.busy.set(false);
         this.fill(user);
         this.editing.set(user);
+        this.loadSessions(user.id);
       },
       error: (failure: unknown) => {
         this.busy.set(false);
@@ -256,6 +319,10 @@ export class UsersFacade {
     if (target) {
       this.apply(target, {kind: 'delete'}, 'users.toast.deleted');
     }
+  }
+
+  unlockRow(row: PlatformUserRow): void {
+    this.apply(row, {kind: 'unlock'}, 'users.toast.unlocked');
   }
 
   toggleEnabled(row: PlatformUserRow): void {

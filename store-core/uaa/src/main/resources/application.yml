@@ -34,6 +34,10 @@ com:
       uaa:
         seed:
           apply-on-boot: false
+        remember-me:
+          key: ${UAA_REMEMBER_ME_KEY}
+        rate-limit:
+          enabled: true
       oauth2:
         clients:
           admin-sdk:

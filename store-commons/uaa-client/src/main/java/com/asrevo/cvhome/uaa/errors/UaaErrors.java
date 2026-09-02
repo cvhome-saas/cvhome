@@ -73,7 +73,25 @@ public enum UaaErrors implements ErrorCode {
     SETTINGS_INVALID("UAA.SETTINGS.INVALID", ErrorCategory.VALIDATION),
 
     /** The settings were changed by someone else since the caller read them. */
-    SETTINGS_CONFLICT("UAA.SETTINGS.CONFLICT", ErrorCategory.CONFLICT);
+    SETTINGS_CONFLICT("UAA.SETTINGS.CONFLICT", ErrorCategory.CONFLICT),
+
+    /** The new password breaks the realm's policy; the field errors name each rule it breaks. */
+    PASSWORD_POLICY_VIOLATION("UAA.PASSWORD.POLICY_VIOLATION", ErrorCategory.VALIDATION),
+
+    /** The new password is one of the account's recent ones. */
+    PASSWORD_REUSED("UAA.PASSWORD.REUSED", ErrorCategory.UNPROCESSABLE),
+
+    /** The new password appears in a known breach corpus. */
+    PASSWORD_COMPROMISED("UAA.PASSWORD.COMPROMISED", ErrorCategory.UNPROCESSABLE),
+
+    /** A self-service password change named a current password that does not match. */
+    CURRENT_PASSWORD_MISMATCH("UAA.PASSWORD.CURRENT_MISMATCH", ErrorCategory.VALIDATION),
+
+    /** No session with that id belongs to the account. */
+    SESSION_NOT_FOUND("UAA.SESSION.NOT_FOUND", ErrorCategory.NOT_FOUND),
+
+    /** Too many attempts from one address in the window. */
+    RATE_LIMITED("UAA.AUTH.RATE_LIMITED", ErrorCategory.TOO_MANY_REQUESTS);
 
     private final String code;
 

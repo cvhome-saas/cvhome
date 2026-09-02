@@ -35,8 +35,8 @@
       }
 
       <span role="cell" [attr.data-label]="t('shared.userAdmin.column.status')">
-        <app-badge [tone]="row.enabled ? 'green' : 'slate'" shape="square">
-          {{ row.enabled ? t('shared.userAdmin.enabled') : t('shared.userAdmin.disabled') }}
+        <app-badge [tone]="statusTone(row)" shape="square">
+          {{ t('shared.userAdmin.status.' + row.status) }}
         </app-badge>
       </span>
 

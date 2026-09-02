@@ -10,7 +10,6 @@ import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,13 +23,20 @@ import com.asrevo.cvhome.uaa.dto.CreateUserRequest;
 import com.asrevo.cvhome.uaa.dto.ResetUserPasswordRequest;
 import com.asrevo.cvhome.uaa.dto.UpdateUserRequest;
 import com.asrevo.cvhome.uaa.dto.UserDto;
+import com.asrevo.cvhome.uaa.errors.PasswordCompromisedException;
+import com.asrevo.cvhome.uaa.errors.PasswordPolicyViolationException;
+import com.asrevo.cvhome.uaa.errors.PasswordReusedException;
 import com.asrevo.cvhome.uaa.errors.RoleNotAssignableException;
 import com.asrevo.cvhome.uaa.errors.RoleNotFoundException;
 import com.asrevo.cvhome.uaa.errors.SuperAdminImmutableException;
 import com.asrevo.cvhome.uaa.errors.UserNotFoundException;
+import com.asrevo.cvhome.uaa.password.PasswordService;
 import com.asrevo.cvhome.uaa.repo.RoleRepository;
 import com.asrevo.cvhome.uaa.repo.UserRepository;
 import com.asrevo.cvhome.uaa.repo.UserSpecifications;
+import com.asrevo.cvhome.uaa.security.LockoutService;
+import com.asrevo.cvhome.uaa.session.SessionAdminService;
+import com.asrevo.cvhome.uaa.token.TokenRevocationService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,6 +45,11 @@ import static java.util.stream.Collectors.toSet;
 
 /**
  * Platform-wide user administration.
+ *
+ * <p>
+ * Disabling, deleting or resetting an account also ends its sessions and tokens — the token store is real now, so
+ * "disabled" means "signed out everywhere", not "signed out at the next login".
+ * </p>
  *
  * <p>
  * Every mutator except {@link #getUsers} and {@link #usernameExist} refuses the seeded super admin — including
@@ -61,11 +72,17 @@ public class AdminService {
 
     private final RoleRepository roleRepository;
 
-    private final PasswordEncoder passwordEncoder;
+    private final PasswordService passwords;
 
     private final AuditService audit;
 
     private final Clock clock;
+
+    private final SessionAdminService sessions;
+
+    private final TokenRevocationService tokens;
+
+    private final LockoutService lockout;
 
     @Transactional(readOnly = true)
     public Page<UserDto> getUsers(Map<String, String> metadataFilters, Pageable pageable) {
@@ -112,20 +129,20 @@ public class AdminService {
      */
     @Transactional
     public UserDto createUser(CreateUserRequest req)
-            throws UserNotFoundException, SuperAdminImmutableException, RoleNotFoundException, RoleNotAssignableException {
+            throws UserNotFoundException, SuperAdminImmutableException, RoleNotFoundException, RoleNotAssignableException,
+            PasswordPolicyViolationException, PasswordReusedException, PasswordCompromisedException {
         User u = new User();
         u.setUsername(req.username());
         u.setEmail(req.email());
         u.setFirstName(req.firstName());
         u.setLastName(req.lastName());
-        if (req.password() != null && !req.password().isBlank()) {
-            u.setPasswordHash(passwordEncoder.encode(req.password()));
-            u.setPasswordChangedAt(clock.instant());
-        }
         if (req.metadata() != null) {
             applyMetadata(u, req.metadata());
         }
         User saved = userRepository.save(u);
+        if (req.password() != null && !req.password().isBlank()) {
+            passwords.setPassword(saved, req.password());
+        }
         if (req.roles() != null && !req.roles().isEmpty()) {
             assignRoles(saved.getId(), req.roles());
         }
@@ -217,20 +234,31 @@ public class AdminService {
                 .change(Map.of(ROLES, before), Map.of(ROLES, u.getRoles().stream().map(Role::getName).collect(toSet()))));
     }
 
-    /** Sets a password. Refuses the super admin: that account's password comes from configuration alone. */
+    /**
+     * Sets a password through the policy, then ends every session and token the account holds: a reset is what an
+     * administrator does when the old password may be in the wrong hands. Refuses the super admin, whose password
+     * comes from configuration alone.
+     */
     @Transactional
     public void resetPassword(UUID userId, ResetUserPasswordRequest req)
-            throws UserNotFoundException, SuperAdminImmutableException {
+            throws UserNotFoundException, SuperAdminImmutableException, PasswordPolicyViolationException,
+            PasswordReusedException, PasswordCompromisedException {
         User u = getNonSuperAdmin(userId);
-        if (req.password() != null && !req.password().isBlank()) {
-            u.setPasswordHash(passwordEncoder.encode(req.password()));
-            u.setPasswordChangedAt(clock.instant());
-            if (u.getActivatedAt() == null) {
-                u.setActivatedAt(clock.instant());
-            }
-        }
+        passwords.setPassword(u, req.password());
         userRepository.save(u);
+        revokeEverything(u);
         audit.record(event(AuditEventType.USER_PASSWORD_RESET, u).reason(ADMIN_RESET));
+    }
+
+    /** Clears a lockout. Idempotent: unlocking an unlocked account is not an error. */
+    @Transactional
+    public void unlock(UUID id) throws UserNotFoundException, SuperAdminImmutableException {
+        lockout.unlock(getNonSuperAdmin(id));
+    }
+
+    private void revokeEverything(User u) {
+        sessions.revokeAll(u.getUsername(), null);
+        tokens.revokeAllForUser(u.getUsername());
     }
 
     @Transactional(readOnly = true)
@@ -249,6 +277,7 @@ public class AdminService {
     public void disableUser(UUID id) throws UserNotFoundException, SuperAdminImmutableException {
         User u = getNonSuperAdmin(id);
         u.setEnabled(false);
+        revokeEverything(u);
         audit.record(event(AuditEventType.USER_DISABLED, u));
     }
 
@@ -256,6 +285,7 @@ public class AdminService {
     public void delete(UUID id) throws UserNotFoundException, SuperAdminImmutableException {
         User u = getNonSuperAdmin(id);
         UserDto before = toDto(u);
+        revokeEverything(u);
         userRepository.deleteById(u.getId());
         audit.record(event(AuditEventType.USER_DELETED, u).change(before, null));
     }

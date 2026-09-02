@@ -12,6 +12,15 @@ com:
       uaa:
         seed:
           apply-on-boot: true
+        remember-me:
+          key: test-remember-me-key
+        # Every integration test signs in from 127.0.0.1; the suite would trip a real limit in a minute.
+        # RateLimitIntegrationTest lowers it again for its own context.
+        rate-limit:
+          enabled: true
+          login: { limit: 1000, window: 1m }
+          token: { limit: 1000, window: 1m }
+          public-api: { limit: 1000, window: 1m }
       test-store:
         users:
           - id: 65D8419C-8765-4B8B-A15F-910DCE959931

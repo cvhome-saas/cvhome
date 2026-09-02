@@ -4,7 +4,13 @@ import {Observable, concat, map, of, toArray} from 'rxjs';
 
 import {CrudService, UI_KIT_CONFIG} from '@cvhome-saas/ui-kit';
 import type {SpringPage} from '@cvhome-saas/ui-kit';
-import type {CreateUserRequest, ResetUserPasswordRequest, UpdateUserRequest, UserDto} from './uaa.models';
+import type {
+  CreateUserRequest,
+  ResetUserPasswordRequest,
+  SessionSummary,
+  UpdateUserRequest,
+  UserDto,
+} from './uaa.models';
 
 /**
  * uaa's own user administration, addressed directly rather than through tenancy.
@@ -136,6 +142,25 @@ export class AdminUserService {
    * includes `SUPER_ADMIN`. Here that is correct: the caller is one. See lessons.md, "Users —
    * assignable-roles offers SUPER_ADMIN to an org admin", which is about the *other* caller.
    */
+  /** Clears a lockout. Idempotent on an account that is not locked. */
+  unlock(id: string): Observable<void> {
+    return this.crudService.post(`${this.base}/${id}/unlock`, {});
+  }
+
+  /** The account's live sessions, newest first. */
+  sessions(id: string): Observable<readonly SessionSummary[]> {
+    return this.crudService.get(`${this.base}/${id}/sessions`);
+  }
+
+  revokeSession(id: string, sessionId: string): Observable<void> {
+    return this.crudService.delete(`${this.base}/${id}/sessions/${sessionId}`);
+  }
+
+  /** Signs the account out everywhere. */
+  revokeSessions(id: string): Observable<{revoked: number}> {
+    return this.crudService.delete(`${this.base}/${id}/sessions`);
+  }
+
   assignableRoles(): Observable<string[]> {
     return this.crudService.get(`${this.base}/assignable-roles`);
   }
@@ -163,6 +188,8 @@ export class AdminUserService {
         return this.enable(id);
       case 'disable':
         return this.disable(id);
+      case 'unlock':
+        return this.unlock(id);
       case 'delete':
         return this.delete(id);
       case 'resetPassword':
@@ -183,6 +210,7 @@ export class AdminUserService {
 export type AdminUserAction =
   | {readonly kind: 'enable'}
   | {readonly kind: 'disable'}
+  | {readonly kind: 'unlock'}
   | {readonly kind: 'delete'}
   | {readonly kind: 'resetPassword'; readonly password: string}
   | {readonly kind: 'setRoles'; readonly add: readonly string[]; readonly remove: readonly string[]};

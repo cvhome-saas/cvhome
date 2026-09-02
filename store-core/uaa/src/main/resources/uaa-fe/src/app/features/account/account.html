@@ -1,0 +1,56 @@
+<ng-container *transloco="let t">
+  <app-page-header [title]="t('account.title')" [context]="facade.me()?.username ?? ''" />
+
+  <div class="grid">
+    <app-panel padded [title]="t('account.password.title')" [subtitle]="t('account.password.subtitle')">
+      <app-notice-bar icon="info" tone="amber" [message]="t('account.password.notice')" />
+      <form class="form" [formGroup]="facade.form" (ngSubmit)="facade.changePassword()">
+        <app-form-field controlId="a-current" required [label]="t('account.password.current')" [control]="facade.form.controls.currentPassword">
+          <app-text-field id="a-current" formControlName="currentPassword" type="password" autocomplete="current-password" />
+        </app-form-field>
+        <app-form-field controlId="a-new" required [label]="t('account.password.new')" [control]="facade.form.controls.password" [hint]="t('account.password.hint')">
+          <app-text-field id="a-new" formControlName="password" type="password" autocomplete="new-password" />
+        </app-form-field>
+        <app-form-field controlId="a-repeat" required [label]="t('account.password.repeat')" [control]="facade.form.controls.repeatPassword" [error]="facade.form.hasError('passwordMismatch') && facade.form.controls.repeatPassword.touched ? t('account.password.mismatch') : null">
+          <app-text-field id="a-repeat" formControlName="repeatPassword" type="password" autocomplete="new-password" />
+        </app-form-field>
+        <div class="actions">
+          <button class="primary-action" type="submit" [disabled]="facade.busy()">
+            {{ facade.busy() ? t('account.password.saving') : t('account.password.save') }}
+          </button>
+        </div>
+      </form>
+    </app-panel>
+
+    <app-panel padded [title]="t('account.sessions.title')" [subtitle]="t('account.sessions.subtitle')">
+      @if (facade.others() > 0) {
+        <button panelAction class="danger-action" type="button" (click)="facade.revokeOthers()">
+          {{ t('account.sessions.signOutOthers', {count: facade.others()}) }}
+        </button>
+      }
+      @if (facade.sessionsError(); as failure) {
+        <app-load-error [message]="failure.message" (retry)="facade.reloadSessions()" />
+      }
+      <app-busy-overlay reserve="panel" [busy]="facade.sessionsLoading()" [label]="t('account.sessions.loading')">
+        @if (facade.sessions().length) {
+          <ul class="sessions">
+            @for (session of facade.sessions(); track session.id) {
+              <li class="session" [class.current]="session.current">
+                <span class="session-main">
+                  <span class="latin">{{ session.ip || '—' }} @if (session.current) { <span class="you">{{ t('account.sessions.thisDevice') }}</span> }</span>
+                  <span class="session-meta">{{ session.via || '' }} · {{ t('account.sessions.lastActive') }} {{ when(session.lastAccessedAt) }}</span>
+                  <span class="session-meta agent" [title]="session.userAgent || ''">{{ session.userAgent || '' }}</span>
+                </span>
+                @if (!session.current) {
+                  <button class="link" type="button" (click)="facade.revoke(session)">{{ t('account.sessions.revoke') }}</button>
+                }
+              </li>
+            }
+          </ul>
+        } @else {
+          <app-empty-state icon="users" [title]="t('account.sessions.none')" [message]="t('account.sessions.noneHint')" />
+        }
+      </app-busy-overlay>
+    </app-panel>
+  </div>
+</ng-container>

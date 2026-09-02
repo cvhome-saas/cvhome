@@ -1,0 +1,58 @@
+# AccountController — com.asrevo.cvhome.uaa.web.account
+#
+# What a signed-in person may do to their own account: see it, change the password, see and end their sessions.
+# Any authenticated user. Through store-core-gateway the caller is a JWT (`/uaa/**` forward route); on uaa's own
+# origin it is the form-login session. A service client (client_credentials) is refused as not a user.
+#
+# Requires a running stack: lcl start -d
+
+### my account — 200 MeResponse
+GET {{SELLER_UI_URL}}/uaa/api/v1/account/me
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+### my sessions — 200 SessionSummary[]
+# ip, user agent, how the session started (`via`), created / last accessed / expires, and which one is `current`.
+# Through the gateway the "current" session is the gateway's, which holds no uaa session of its own, so `current`
+# is false on every row here; on uaa's own origin it marks the browser's session.
+GET {{SELLER_UI_URL}}/uaa/api/v1/account/sessions
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+### change my password — 200; every other session and token of the account ends
+# The current password proves it is the person and not a hijacked session. The new one goes through the realm's
+# policy (400 UAA.PASSWORD.POLICY_VIOLATION with a field error per broken rule), the history
+# (422 UAA.PASSWORD.REUSED) and, when enabled, the breach check (422 UAA.PASSWORD.COMPROMISED).
+PUT {{SELLER_UI_URL}}/uaa/api/v1/account/password
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{"currentPassword": "admin", "newPassword": "Fresh-Passw0rd-2026"}
+
+### a wrong current password — 400 UAA.PASSWORD.CURRENT_MISMATCH
+PUT {{SELLER_UI_URL}}/uaa/api/v1/account/password
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{"currentPassword": "nope", "newPassword": "Fresh-Passw0rd-2026"}
+
+### put it back — 200 (the seed only runs on a clean database)
+PUT {{SELLER_UI_URL}}/uaa/api/v1/account/password
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{"currentPassword": "Fresh-Passw0rd-2026", "newPassword": "admin"}
+
+> {%
+    client.test("restored", function () {
+        // Expected to FAIL policy: `admin` is shorter than the minimum. Restore through the admin reset instead,
+        // or accept that this account now has the fresh password until the database is reset.
+        client.log("status " + response.status);
+    });
+%}
+
+### end every other session — 200 {revoked}
+DELETE {{SELLER_UI_URL}}/uaa/api/v1/account/sessions
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+### a service token — 403 UAA.AUTH.NOT_A_USER_PRINCIPAL
+GET {{SELLER_UI_URL}}/uaa/api/v1/account/sessions
+Authorization: Bearer {{S2S_TOKEN}}

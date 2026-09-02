@@ -1,0 +1,85 @@
+package com.asrevo.cvhome.uaa.web.account;
+
+import java.util.List;
+import java.util.Map;
+
+import jakarta.servlet.http.HttpSession;
+
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.asrevo.cvhome.uaa.dto.MeResponse;
+import com.asrevo.cvhome.uaa.errors.CurrentPasswordMismatchException;
+import com.asrevo.cvhome.uaa.errors.NotAUserPrincipalException;
+import com.asrevo.cvhome.uaa.errors.PasswordCompromisedException;
+import com.asrevo.cvhome.uaa.errors.PasswordPolicyViolationException;
+import com.asrevo.cvhome.uaa.errors.PasswordReusedException;
+import com.asrevo.cvhome.uaa.errors.SessionNotFoundException;
+import com.asrevo.cvhome.uaa.security.CurrentUserResolver;
+import com.asrevo.cvhome.uaa.service.AccountService;
+import com.asrevo.cvhome.uaa.session.SessionAdminService;
+import com.asrevo.cvhome.uaa.session.SessionSummary;
+
+import lombok.RequiredArgsConstructor;
+
+/**
+ * What a signed-in person may do to their own account. Any authenticated user; a service client is refused as not
+ * a user.
+ */
+@RestController
+@RequestMapping("/api/v1/account")
+@RequiredArgsConstructor
+@PreAuthorize("isAuthenticated()")
+public class AccountController {
+
+    private final CurrentUserResolver currentUser;
+
+    private final AccountService account;
+
+    private final SessionAdminService sessions;
+
+    @GetMapping("me")
+    public MeResponse me(Authentication authentication) throws NotAUserPrincipalException {
+        return currentUser.describe(authentication);
+    }
+
+    /** Changes the password, then ends every other session and every token of the account. */
+    @PutMapping("password")
+    public void changePassword(@RequestBody ChangePasswordRequest req, Authentication authentication, HttpSession session)
+            throws NotAUserPrincipalException, CurrentPasswordMismatchException, PasswordPolicyViolationException,
+            PasswordReusedException, PasswordCompromisedException {
+        account.changePassword(currentUser.resolve(authentication), req.currentPassword(), req.newPassword(),
+                session == null ? null : session.getId());
+    }
+
+    @GetMapping("sessions")
+    public List<SessionSummary> sessions(Authentication authentication, HttpSession session)
+            throws NotAUserPrincipalException {
+        return sessions.list(currentUser.resolve(authentication).getUsername(), session == null ? null : session.getId());
+    }
+
+    @DeleteMapping("sessions/{sessionId}")
+    public void revokeSession(@PathVariable String sessionId, Authentication authentication)
+            throws NotAUserPrincipalException, SessionNotFoundException {
+        sessions.revoke(currentUser.resolve(authentication).getUsername(), sessionId);
+    }
+
+    /** Ends every session but this one. */
+    @DeleteMapping("sessions")
+    public Map<String, Integer> revokeOtherSessions(Authentication authentication, HttpSession session)
+            throws NotAUserPrincipalException {
+        return Map.of("revoked", sessions.revokeAll(currentUser.resolve(authentication).getUsername(),
+                session == null ? null : session.getId()));
+    }
+
+    public record ChangePasswordRequest(String currentPassword, String newPassword) {
+    }
+
+}

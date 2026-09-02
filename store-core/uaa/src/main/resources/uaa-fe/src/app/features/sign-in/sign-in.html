@@ -21,9 +21,14 @@
   <main class="form-panel">
     <app-panel class="card" padded [title]="t('signIn.title')" [subtitle]="t('signIn.subtitle')">
       @if (notice(); as key) {
-        <p class="failed" [class.info]="key !== 'failed'" role="alert">
-          <app-icon [name]="key === 'failed' ? 'alertCircle' : 'info'" />
-          <span>{{ t('signIn.' + key) }}</span>
+        <p class="failed" [class.info]="key === 'signedOut' || key === 'expired'" role="alert">
+          <app-icon [name]="key === 'signedOut' || key === 'expired' ? 'info' : 'alertCircle'" />
+          <span>
+            {{ t('signIn.' + key, {minutes: realm()?.lockoutMinutes ?? 15}) }}
+            @if (key === 'failed' && attemptsLeft !== null && attemptsLeft > 0) {
+              {{ t('signIn.attemptsLeft', {count: attemptsLeft, minutes: realm()?.lockoutMinutes ?? 15}) }}
+            }
+          </span>
         </p>
       }
 
@@ -49,6 +54,14 @@
             [placeholder]="t('signIn.passwordPlaceholder')"
           />
         </app-form-field>
+
+        @if (realm()?.rememberMeEnabled) {
+          <!-- A real checkbox with a name: the form posts it, and Spring's remember-me reads `remember-me`. -->
+          <label class="remember">
+            <input type="checkbox" name="remember-me" value="true" [checked]="rememberMe()" (change)="rememberMe.set(!rememberMe())" />
+            <span>{{ t('signIn.rememberMe') }}</span>
+          </label>
+        }
 
         <button class="submit" type="submit" [disabled]="submitting()">
           <span>{{ submitting() ? t('signIn.submitting') : t('signIn.submit') }}</span>
