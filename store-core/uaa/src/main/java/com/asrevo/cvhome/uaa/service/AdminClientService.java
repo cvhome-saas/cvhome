@@ -17,6 +17,10 @@ import org.springframework.security.oauth2.server.authorization.client.Registere
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import com.asrevo.cvhome.uaa.audit.AuditEventType;
+import com.asrevo.cvhome.uaa.audit.AuditRecord;
+import com.asrevo.cvhome.uaa.audit.AuditService;
+import com.asrevo.cvhome.uaa.audit.AuditTargetType;
 import com.asrevo.cvhome.uaa.dto.ClientDetails;
 import com.asrevo.cvhome.uaa.dto.ClientSummary;
 import com.asrevo.cvhome.uaa.errors.ClientNotFoundException;
@@ -36,6 +40,8 @@ public class AdminClientService {
 
     private final JdbcTemplate jdbc;
 
+    private final AuditService audit;
+
     private final StringKeyGenerator secretGenerator = new Base64StringKeyGenerator(
             Base64.getUrlEncoder().withoutPadding(), 32);
 
@@ -54,7 +60,13 @@ public class AdminClientService {
     }
 
     public boolean delete(String id) {
+        RegisteredClient existing = clients.findById(id);
         int updatedRows = jdbc.update("delete from oauth2_registered_client where id=?", id);
+        if (updatedRows > 0 && existing != null) {
+            audit.record(AuditRecord.of(AuditEventType.CLIENT_DELETED).client(existing.getClientId())
+                    .target(AuditTargetType.CLIENT, id, existing.getClientId())
+                    .change(ClientClientDetailsMapper.toClientDetails(existing), null));
+        }
         return updatedRows > 0;
     }
 
@@ -76,7 +88,10 @@ public class AdminClientService {
                     .build();
         }
         clients.save(newClient);
-        return ClientClientDetailsMapper.toClientDetails(newClient);
+        ClientDetails created = ClientClientDetailsMapper.toClientDetails(newClient);
+        audit.record(AuditRecord.of(AuditEventType.CLIENT_CREATED).client(created.clientId())
+                .target(AuditTargetType.CLIENT, created.id(), created.clientId()).change(null, created));
+        return created;
     }
 
     /**
@@ -90,7 +105,11 @@ public class AdminClientService {
         }
         RegisteredClient updatedClient = ClientClientDetailsMapper.toRegisteredClient(withId(id, details), existingClient);
         clients.save(updatedClient);
-        return ClientClientDetailsMapper.toClientDetails(updatedClient);
+        ClientDetails after = ClientClientDetailsMapper.toClientDetails(updatedClient);
+        audit.record(AuditRecord.of(AuditEventType.CLIENT_UPDATED).client(after.clientId())
+                .target(AuditTargetType.CLIENT, id, after.clientId())
+                .change(ClientClientDetailsMapper.toClientDetails(existingClient), after));
+        return after;
     }
 
     private static ClientDetails withId(String id, ClientDetails details) {
@@ -116,6 +135,8 @@ public class AdminClientService {
                 .clientSecret(encoder.encode(newSecret))
                 .build();
         clients.save(updatedClient);
+        audit.record(AuditRecord.of(AuditEventType.CLIENT_SECRET_ROTATED).client(client.getClientId())
+                .target(AuditTargetType.CLIENT, id, client.getClientId()));
     }
 
 }

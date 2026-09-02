@@ -11,7 +11,7 @@ somewhere else entirely — that is [cua](../../../store-pod/cua/qa/cua-qa.md).
   is where the platform's sign-in page lives
 - **Runs on** — `lcl start -d --stack <name>`; uaa is `http://uaa.gateway.com:8001` and is the **first**
   service the stack brings up, because it issues the tokens. Read the live port from `lcl urls`
-- **Cases** — 64 (47 verified, 5 unit only, 12 not verified)
+- **Cases** — 76 (56 verified, 6 unit only, 14 not verified)
 - **Also see** — [gateway](../../gateway/gateway-service/qa/gateway-qa.md) (which relays the token and holds
   the session), [tenancy](../../tenancy/tenancy-service/qa/tenancy-qa.md) (which owns the *store-scoped*
   accounts and calls uaa to create them),
@@ -703,6 +703,113 @@ possible; the tag says whether it has also been driven against a stack._
 
 ---
 
+## ROL — Roles and permissions
+
+_Phase 2 of the uaa SSO plan. A role is no longer only a name: it carries a description, a scope, an optional
+parent it inherits from, and a set of keys from the permission catalogue in `store-commons:commons`. The token
+now carries `permissions` (the effective set over the user's roles) beside `roles`; **services still authorise on
+the role name** — the claim is issued so they can start reading it without a token-format change._
+
+### ROL-01 — The catalogue is the enum · [verified]
+
+- **Steps** — `GET /uaa/api/v1/admin/roles/permissions`.
+- **Expect** — every value of `Permission` with its group and description, and nothing else. Grant a key that is not
+  in it and the role write is **400 `UAA.PERMISSION.UNKNOWN`** naming the key (ROL-04).
+- **Seen** — `AdminRoleApiIntegrationTest`.
+
+### ROL-02 — Inheritance is transitive and cycle-free · high · [verified]
+
+- **Steps** — create `REGIONAL_BUYER` inheriting from `ORG_ADMIN` with `users:read`; read it back; set `ORG_ADMIN`'s
+  parent to `REGIONAL_BUYER`.
+- **Expect** — `effectivePermissions` holds `users:read` plus everything `ORG_ADMIN` grants; the second write is
+  **422 `UAA.ROLE.INHERITANCE_CYCLE`**. Clearing the parent (`clearInheritsFrom: true`) drops the inherited keys.
+- **Seen** — `RoleServiceTest`, `AdminRoleApiIntegrationTest`.
+
+### ROL-03 — A system role keeps its name and cannot be deleted · critical · [verified]
+
+- **Steps** — `PUT /roles/{ORG_ADMIN}` with `{"name":"OWNER"}`; `DELETE /roles/{ORG_ADMIN}`; then
+  `PUT` with only `description` and `permissions`.
+- **Expect** — **403 `UAA.ROLE.SYSTEM_IMMUTABLE`** twice; the third write is 200. Renaming `STORE_ADMIN` would not
+  rename the `hasPermission` checks that read it.
+- **Seen** — `AdminRoleApiIntegrationTest`; the blocks in `http/admin-role-api.http`.
+
+### ROL-04 — Names are the claim, so they are normalised and validated · [verified]
+
+- **Steps** — create `" staff "`; create `store-admin`; create `STAFF` twice.
+- **Expect** — `STAFF`; **400 `UAA.ROLE.NAME_INVALID`** with a field error on `name`; **409 `UAA.ROLE.NAME_TAKEN`**.
+- **Seen** — `RoleServiceTest`.
+
+### ROL-05 — A held role cannot be deleted · high · [unit only]
+
+- **Steps** — delete a custom role after granting it to an account.
+- **Expect** — **409 `UAA.ROLE.IN_USE`** with the holder count. Remove it from the accounts first. Before this, a
+  delete silently stripped every holder.
+- **Seen** — `RoleServiceTest.aHeldRoleCannotBeDeleted`.
+
+### ROL-06 — The token carries `permissions` · critical · [verified]
+
+- **Steps** — obtain a token for `org1-store1-admin` (AUT-06); call `/api/v1/auth/me` as `org1-admin`.
+- **Expect** — `permissions` lists the effective keys (`users:read`, `users:write` for a store admin); `/me` carries
+  `permissions` and `PERM_<key>` authorities beside `ROLE_*`. Nothing authorises on them yet.
+- **Seen** — `LoginFlowIntegrationTest`, `MeEndpointIntegrationTest`.
+
+### ROL-07 — Every write leaves an audit row · high · [verified]
+
+- **Steps** — create, change permissions on, and delete a custom role; then
+  `select event_type, actor_name, target_name, before_json, after_json from uaa.audit_events order by id desc limit 5`.
+- **Expect** — `role.created`, `role.permissions.updated` (with the `permissions` before/after) and `role.deleted`,
+  each naming the actor (`admin-sdk` for a client token, the username for a session) and the role.
+- **Seen** — `AdminRoleApiIntegrationTest` counts the rows.
+
+### ROL-08 — The Roles screen · high · [not verified]
+
+- **Steps** — open **Roles**; switch System / Custom; search; open `ORG_ADMIN`; open a custom role; create one with
+  a parent and a few permissions; switch to العربية.
+- **Expect** — five columns (Role with description, Scope, Users, Perms = effective count, Type); a system role's
+  name and scope are disabled with the notice; the matrix ticks by group with *Select all / Clear* and the count line
+  reads `N direct · M effective`; the parent select lists every other role; the delete button is absent on a
+  system role. Identifiers stay left-to-right under Arabic.
+
+---
+
+## SET — Realm settings
+
+_Phase 2. One row, `uaa.settings`, read and written whole with a version. Lockout, password policy, session and
+token defaults, key rotation and audit retention **are stored here from this phase and enforced from the phases
+that build each mechanism** (LCK, PWD, SES, KEY) — until then a change is a change of record only._
+
+### SET-01 — The document round-trips and audits · high · [verified]
+
+- **Steps** — `GET /uaa/api/v1/admin/settings`, change `lockout.threshold`, `PUT` it back with its `version`.
+- **Expect** — 200 with `version + 1` and `updatedBy` = the caller; a `settings.updated` audit row whose diff holds
+  only `lockout`.
+- **Seen** — `AdminSettingsApiIntegrationTest`; `http/admin-settings-api.http`.
+
+### SET-02 — A stale version is refused · high · [verified]
+
+- **Steps** — `PUT` the document you read *before* SET-01's save.
+- **Expect** — **409 `UAA.SETTINGS.CONFLICT`**; nothing written. The screen asks for a reload rather than
+  overwriting someone else's change.
+
+### SET-03 — Ranges are checked on the way in · critical · [verified]
+
+- **Steps** — `PUT` with `lockout.threshold: 0`, then with `password.minLength: 4`, then with
+  `sessions.maxSeconds` shorter than `idleSeconds`.
+- **Expect** — **400 `UAA.SETTINGS.INVALID`** with the field named, every time. A threshold of zero would lock
+  every account on its first attempt, and the column would store it.
+- **Seen** — `SettingsServiceTest` (each rule), `AdminSettingsApiIntegrationTest` (the first).
+
+### SET-04 — The Settings screen · high · [not verified]
+
+- **Steps** — open **Settings** (the rail row is a link now); change a number; watch the header; Discard; change
+  again and Save; reload.
+- **Expect** — sections General / Authentication / Sessions & tokens / Signing keys, with *Email* disabled and
+  titled as not built; the header reads *Saved* until a field changes, then *Save changes* + *Discard*; durations
+  are edited in minutes / hours / days and read back the same; *Allow self-registration* is disabled with its
+  note; the last-saved stamp names you.
+
+---
+
 ## SID — The `"*"` wildcard
 
 _From `qa/unify-store-id-value-objects.md` §EDGE, reformatted into the case shape used everywhere else._
@@ -756,6 +863,8 @@ any more; `fargate` must set every `UAA_*` variable.
 
 **`/logout` accepts GET.** The kit's `AuthService.logout()` navigates rather than posts, so the logout matcher takes
 any method. A GET logout is a link that signs you out; it should become a POST once the kit posts.
+
+**Lessons closed by this branch.** `lessons.md` entries "Roles — a role is a name" and "Users — metadata is merged, never replaced" now describe the old system; the console side of DSN-15 still disables the remove button.
 
 **`DSN-15` is stale.** uaa can unset a metadata key now (send it with a `null` value); the console still disables
 the remove button on stored keys.

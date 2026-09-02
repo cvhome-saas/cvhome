@@ -1,0 +1,78 @@
+# AdminSettingsController — com.asrevo.cvhome.uaa.web.admin
+#
+# The realm's policy: one document, read whole, written whole with its `version`. Addressed through
+# store-core-gateway (`/uaa/**` forward route). Behind SCOPE_super_admin / ROLE_SUPER_ADMIN.
+#
+# Requires a running stack: lcl start -d
+
+### read the settings — 200 RealmSettings
+# @name readSettings
+GET {{SELLER_UI_URL}}/uaa/api/v1/admin/settings
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+
+> {%
+    client.test("read", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        client.global.set("SETTINGS_VERSION", response.body.version);
+    });
+%}
+
+### write them back with one change — 200, version + 1
+# Every field is sent; the server checks ranges (a lockout threshold of 0 would lock everyone on the
+# first attempt) and the version, and audits `settings.updated` with the fields that changed.
+PUT {{SELLER_UI_URL}}/uaa/api/v1/admin/settings
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{
+  "displayName": "cvhome ID", "supportEmail": null, "defaultLocale": "en",
+  "selfRegistrationEnabled": false, "requireEmailVerification": false,
+  "password": {"minLength": 12, "requireUpper": true, "requireLower": true, "requireDigit": true,
+    "requireSpecial": false, "historyCount": 5, "expiryDays": 0, "rejectBreached": false},
+  "lockout": {"threshold": 7, "durationSeconds": 900, "permanentAfter": 5},
+  "sessions": {"idleSeconds": 1800, "maxSeconds": 43200, "rememberMeEnabled": false,
+    "rememberMeSeconds": 2592000, "singleSessionPerUser": false},
+  "tokens": {"maxAccessTokenTtlSeconds": 3600, "defaultAccessTokenTtlSeconds": 900,
+    "defaultRefreshTokenTtlSeconds": 43200, "clientSecretValidityDays": 365, "clientSecretGraceHours": 24},
+  "keys": {"rotationDays": 90, "retireDays": 7},
+  "auditRetentionDays": 365,
+  "version": {{SETTINGS_VERSION}}
+}
+
+> {%
+    client.test("written", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        client.assert(response.body.lockout.threshold === 7, "threshold " + response.body.lockout.threshold);
+    });
+%}
+
+### the same document again — 409 UAA.SETTINGS.CONFLICT
+# Its version is now stale: somebody (you) saved since it was read.
+PUT {{SELLER_UI_URL}}/uaa/api/v1/admin/settings
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{
+  "displayName": "cvhome ID", "supportEmail": null, "defaultLocale": "en",
+  "selfRegistrationEnabled": false, "requireEmailVerification": false,
+  "password": {"minLength": 12, "requireUpper": true, "requireLower": true, "requireDigit": true,
+    "requireSpecial": false, "historyCount": 5, "expiryDays": 0, "rejectBreached": false},
+  "lockout": {"threshold": 7, "durationSeconds": 900, "permanentAfter": 5},
+  "sessions": {"idleSeconds": 1800, "maxSeconds": 43200, "rememberMeEnabled": false,
+    "rememberMeSeconds": 2592000, "singleSessionPerUser": false},
+  "tokens": {"maxAccessTokenTtlSeconds": 3600, "defaultAccessTokenTtlSeconds": 900,
+    "defaultRefreshTokenTtlSeconds": 43200, "clientSecretValidityDays": 365, "clientSecretGraceHours": 24},
+  "keys": {"rotationDays": 90, "retireDays": 7},
+  "auditRetentionDays": 365,
+  "version": {{SETTINGS_VERSION}}
+}
+
+### as a non-super-admin — 403
+GET {{SELLER_UI_URL}}/uaa/api/v1/admin/settings
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+> {%
+    client.test("forbidden", function () {
+        client.assert(response.status === 403, "status " + response.status);
+    });
+%}

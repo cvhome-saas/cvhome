@@ -19,12 +19,52 @@
             {{ t('roles.action.create') }}
           </button>
 
+          <div class="toolbar">
+            <div class="segments" role="group" [attr.aria-label]="t('roles.filter.label')">
+              @for (filter of filters; track filter) {
+                <button
+                  class="segment"
+                  type="button"
+                  [class.active]="facade.filter() === filter"
+                  [attr.aria-pressed]="facade.filter() === filter"
+                  (click)="facade.filter.set(filter)"
+                >
+                  <span>{{ t('roles.filter.' + filter) }}</span>
+                  <span class="count">{{ count(filter) }}</span>
+                </button>
+              }
+            </div>
+            <app-search-box
+              [value]="facade.query()"
+              [label]="t('roles.filter.search')"
+              [placeholder]="t('roles.filter.search')"
+              width="18rem"
+              (valueChange)="facade.query.set($event)"
+            />
+          </div>
+
           @if (facade.rows().length) {
             <app-data-table [columns]="columns(t)" [label]="t('roles.panel.title')">
               @for (role of facade.rows(); track role.id) {
                 <app-table-row class="row" [interactive]="true" (click)="facade.select(role)">
-                  <span class="cell name" [attr.data-label]="t('roles.column.name')">{{ role.name }}</span>
-                  <span class="cell id" [attr.data-label]="t('roles.column.id')">{{ role.id }}</span>
+                  <span class="cell name" [attr.data-label]="t('roles.column.name')">
+                    <span class="role-name">{{ role.name }}</span>
+                    @if (role.description) {
+                      <span class="role-description">{{ role.description }}</span>
+                    }
+                  </span>
+                  <span class="cell" [attr.data-label]="t('roles.column.scope')">
+                    <app-badge tone="slate">{{ t('roles.scope.' + role.scope) }}</app-badge>
+                  </span>
+                  <span class="cell num" [attr.data-label]="t('roles.column.users')">{{ role.userCount }}</span>
+                  <span class="cell num" [attr.data-label]="t('roles.column.perms')" [title]="t('roles.permsHint', {direct: role.permissions.length})">
+                    {{ role.effectivePermissions.length }}
+                  </span>
+                  <span class="cell" [attr.data-label]="t('roles.column.type')">
+                    <app-badge [tone]="role.systemRole ? 'green' : 'slate'">
+                      {{ t(role.systemRole ? 'roles.type.system' : 'roles.type.custom') }}
+                    </app-badge>
+                  </span>
                   <span class="cell go" aria-hidden="true"><app-icon name="pencil" [size]="14" /></span>
                 </app-table-row>
               }
@@ -43,7 +83,7 @@
             <app-empty-state
               icon="shield"
               [title]="t('roles.empty.title')"
-              [message]="t('roles.empty.message')"
+              [message]="t(facade.all().length ? 'roles.empty.filtered' : 'roles.empty.message')"
             />
           }
         </app-panel>
@@ -51,44 +91,94 @@
     }
   </app-busy-overlay>
 
-  <!--
-    A role is `{id, name}`, so this is one field. The design's Description, Scope, Inherits from,
-    Permissions and Assigned users have no source in uaa — see lessons.md, "Roles — a role is a name".
-  -->
   @if (facade.editing(); as target) {
     <app-form-dialog
       open
-      [title]="target === 'new' ? t('roles.form.createTitle') : t('roles.form.renameTitle')"
-      [description]="t('roles.form.description')"
+      wide
+      [title]="target === 'new' ? t('roles.form.createTitle') : target.name"
+      [description]="target !== 'new' && target.systemRole ? t('roles.form.systemNotice') : t('roles.form.description')"
       [closeLabel]="t('shared.actions.cancel')"
       (dismissed)="facade.dismiss()"
     >
       <form class="form" [formGroup]="facade.form" (ngSubmit)="facade.save()">
-        <app-form-field
-          controlId="role-name"
-          required
-          [label]="t('roles.form.name')"
-          [control]="facade.form.controls.name"
-          [hint]="t('roles.form.nameHint')"
-        >
-          <app-text-field
-            formControlName="name"
-            id="role-name"
-            latin
-            mono
-            [placeholder]="t('roles.form.namePlaceholder')"
+        <div class="two-up">
+          <app-form-field
+            controlId="role-name"
+            required
+            [label]="t('roles.form.name')"
+            [control]="facade.form.controls.name"
+            [hint]="t('roles.form.nameHint')"
+          >
+            <app-text-field
+              formControlName="name"
+              id="role-name"
+              latin
+              mono
+              [placeholder]="t('roles.form.namePlaceholder')"
+            />
+          </app-form-field>
+
+          <app-form-field controlId="role-scope" [label]="t('roles.form.scope')" [hint]="t('roles.form.scopeHint')">
+            <app-select id="role-scope" formControlName="scope" [options]="facade.scopeOptions()" />
+          </app-form-field>
+        </div>
+
+        <app-form-field controlId="role-description" [label]="t('roles.form.descriptionLabel')" [control]="facade.form.controls.description">
+          <app-textarea formControlName="description" id="role-description" [rows]="2" [maxLength]="255" />
+        </app-form-field>
+
+        <app-form-field controlId="role-parent" [label]="t('roles.form.inherits')" [hint]="t('roles.form.inheritsHint')">
+          <app-select
+            id="role-parent"
+            formControlName="inheritsFromId"
+            clearable
+            [options]="facade.parentOptions()"
+            [placeholder]="t('roles.form.noParent')"
           />
         </app-form-field>
+
+        <section class="matrix" [attr.aria-label]="t('roles.form.permissions')">
+          <header class="matrix-head">
+            <span class="matrix-title">{{ t('roles.form.permissions') }}</span>
+            <span class="matrix-count">
+              {{ t('roles.form.permissionCount', {direct: facade.draftPermissions().length, effective: facade.draftEffective().size}) }}
+            </span>
+          </header>
+          @for (group of facade.groups(); track group.key) {
+            <div class="group">
+              <div class="group-head">
+                <span class="group-name">{{ t('roles.group.' + group.key) }}</span>
+                <button class="link" type="button" (click)="facade.setGroup(group, facade.groupState(group) !== 'all')">
+                  {{ t(facade.groupState(group) === 'all' ? 'roles.form.clearGroup' : 'roles.form.selectGroup') }}
+                </button>
+              </div>
+              <div class="chips">
+                @for (permission of group.items; track permission.key) {
+                  <app-checkbox
+                    [checked]="facade.draftPermissions().includes(permission.key)"
+                    [label]="permission.key"
+                    [describedBy]="null"
+                    (checkedChange)="facade.togglePermission(permission.key)"
+                  />
+                }
+              </div>
+            </div>
+          } @empty {
+            <p class="readonly-note">{{ t('roles.form.catalogueUnavailable') }}</p>
+          }
+        </section>
 
         @if (target !== 'new') {
           <div class="meta">
             <span class="meta-label">{{ t('roles.form.id') }}</span>
             <span class="meta-value">{{ target.id }}</span>
+            <span class="meta-label">{{ t('roles.form.assigned') }}</span>
+            <span class="meta-value">{{ t('roles.form.assignedCount', {count: target.userCount}) }}</span>
           </div>
         }
 
         <div class="actions">
-          @if (target !== 'new') {
+          @if (target !== 'new' && !target.systemRole) {
             <button class="danger-action" type="button" (click)="facade.askDelete(target)">
               {{ t('roles.action.delete') }}
             </button>
@@ -106,8 +196,8 @@
   }
 
   <!--
-    Typed confirmation: deleting a role strips an authority from every account holding it, and uaa
-    gives no warning about how many that is.
+    Typed confirmation: uaa refuses to delete a role that is still held (409), so what this guards
+    against is deleting the wrong empty one.
   -->
   <app-confirm-dialog
     [open]="!!facade.deleting()"

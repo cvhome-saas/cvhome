@@ -1,7 +1,8 @@
 package com.asrevo.cvhome.uaa.config;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,6 +12,7 @@ import org.springframework.security.oauth2.server.authorization.OAuth2TokenType;
 import org.springframework.security.oauth2.server.authorization.token.JwtEncodingContext;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer;
 
+import com.asrevo.cvhome.commons.domain.Permission;
 import com.asrevo.cvhome.uaa.domain.Role;
 import com.asrevo.cvhome.uaa.domain.User;
 import com.asrevo.cvhome.uaa.repo.UserRepository;
@@ -19,7 +21,8 @@ import com.asrevo.cvhome.uaa.repo.UserRepository;
  * What uaa puts into the tokens it mints.
  *
  * <p>
- * <strong>Access tokens</strong> carry {@code roles}, {@code uid} and the two tenancy claims — {@code org} and
+ * <strong>Access tokens</strong> carry {@code roles}, {@code permissions} (the effective set over those roles),
+ * {@code uid} and the two tenancy claims — {@code org} and
  * {@code store} — copied from user metadata. Only those two: metadata is an open bag any {@code super_admin} caller can
  * write, and copying it whole used to let a key named {@code roles} or {@code scope} overwrite the real claim, since
  * the bag was written after them. The allow-list is the fix; {@code roles} is also written last so nothing can follow
@@ -49,6 +52,8 @@ public class JwtCustomizerConfig {
     static final String ROLES = "roles";
 
     static final String UID = "uid";
+
+    static final String PERMISSIONS = "permissions";
 
     private final UserRepository userRepository;
 
@@ -92,11 +97,17 @@ public class JwtCustomizerConfig {
                     }
                 });
             }
-            // Last on purpose: nothing written after this line can shadow it.
-            Set<String> roles = new TreeSet<>();
-            user.getRoles().stream().map(Role::getName).forEach(roles::add);
+            // Last on purpose: nothing written after this line can shadow it. A plain List, not a Set: the
+            // authorization store serialises claim values with type information, and only the JDK's common
+            // collections are on its allow-list — a TreeSet here broke the gateway's UserInfo call.
+            List<String> permissions = user.getRoles().stream().flatMap(r -> r.effectivePermissions().stream())
+                    .map(Permission::key).distinct().sorted().toList();
+            if (!permissions.isEmpty()) {
+                context.getClaims().claim(PERMISSIONS, new ArrayList<>(permissions));
+            }
+            List<String> roles = user.getRoles().stream().map(Role::getName).sorted().toList();
             if (!roles.isEmpty()) {
-                context.getClaims().claim(ROLES, roles);
+                context.getClaims().claim(ROLES, new ArrayList<>(roles));
             }
         });
     }

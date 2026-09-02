@@ -49,7 +49,31 @@ public enum UaaErrors implements ErrorCode {
      * The caller authenticated as an OAuth2 client, not a person, and asked for something only a person has — a
      * profile, a session list, a password. A {@code client_credentials} token has no user behind it.
      */
-    NOT_A_USER_PRINCIPAL("UAA.AUTH.NOT_A_USER_PRINCIPAL", ErrorCategory.FORBIDDEN);
+    NOT_A_USER_PRINCIPAL("UAA.AUTH.NOT_A_USER_PRINCIPAL", ErrorCategory.FORBIDDEN),
+
+    /** A role name that is not upper-case letters, digits and underscores. */
+    ROLE_NAME_INVALID("UAA.ROLE.NAME_INVALID", ErrorCategory.VALIDATION),
+
+    /** A role with that name already exists. */
+    ROLE_NAME_TAKEN("UAA.ROLE.NAME_TAKEN", ErrorCategory.CONFLICT),
+
+    /** The role is seeded by the platform: its name and scope are fixed and it cannot be deleted. */
+    SYSTEM_ROLE_IMMUTABLE("UAA.ROLE.SYSTEM_IMMUTABLE", ErrorCategory.FORBIDDEN),
+
+    /** The role is still held by at least one account, so deleting it would silently change their authority. */
+    ROLE_IN_USE("UAA.ROLE.IN_USE", ErrorCategory.CONFLICT),
+
+    /** Setting that parent would make the role inherit from itself, directly or through a chain. */
+    ROLE_INHERITANCE_CYCLE("UAA.ROLE.INHERITANCE_CYCLE", ErrorCategory.UNPROCESSABLE),
+
+    /** A permission key that is not in the catalogue. */
+    PERMISSION_UNKNOWN("UAA.PERMISSION.UNKNOWN", ErrorCategory.VALIDATION),
+
+    /** A settings value outside the range the server accepts. */
+    SETTINGS_INVALID("UAA.SETTINGS.INVALID", ErrorCategory.VALIDATION),
+
+    /** The settings were changed by someone else since the caller read them. */
+    SETTINGS_CONFLICT("UAA.SETTINGS.CONFLICT", ErrorCategory.CONFLICT);
 
     private final String code;
 

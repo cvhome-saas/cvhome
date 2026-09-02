@@ -18,6 +18,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DatabaseIntegrationTest
 class MeEndpointIntegrationTest {
 
+    private static final String AUTHORITIES = "authorities";
+
     @LocalServerPort
     private int port;
 
@@ -43,7 +45,9 @@ class MeEndpointIntegrationTest {
         assertThat(me.get("email").asText()).isEqualTo("org1-admin@mail.com");
         assertThat(me.get("authenticatedVia").asText()).isEqualTo("SESSION");
         assertThat(me.get("roles").toString()).contains("ORG_ADMIN");
-        assertThat(me.get("authorities").toString()).contains("ROLE_ORG_ADMIN");
+        assertThat(me.get("permissions").toString()).contains("users:invite");
+        assertThat(me.get(AUTHORITIES).toString()).contains("PERM_users:invite");
+        assertThat(me.get(AUTHORITIES).toString()).contains("ROLE_ORG_ADMIN");
         assertThat(response.body()).doesNotContain("password").doesNotContain("credentials");
     }
 

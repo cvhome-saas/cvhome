@@ -41,6 +41,7 @@ dependencies {
     implementation libs.spring.cloud.starter
     implementation libs.thymeleaf.extras.springsecurity6
     implementation libs.springdoc.openapi.starter.webmvc.ui
+    implementation libs.caffeine
 
     implementation project(':store-commons:ecs-commons:fargate-task-info')
     implementation project(':store-commons:ecs-commons:ecs-service-discoveryclient')

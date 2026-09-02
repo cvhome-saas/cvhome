@@ -30,7 +30,8 @@
     "clients": "OAuth2 clients",
     "clientCreate": "Register a client",
     "clientEdit": "Client",
-    "signOut": "Signing out"
+    "signOut": "Signing out",
+    "settings": "Settings"
   },
   "signIn": {
     "title": "Sign in",
@@ -123,7 +124,7 @@
   },
   "roles": {
     "title": "Roles",
-    "context": "The authorities uaa can grant",
+    "context": "Named sets of permissions, issued in tokens as the roles claim",
     "loading": "Loading roles…",
     "unit": "roles",
     "paginationLabel": "Role pages",
@@ -132,14 +133,42 @@
     },
     "column": {
       "name": "Role",
+      "scope": "Scope",
+      "users": "Users",
+      "perms": "Perms",
+      "type": "Type",
       "id": "Id"
+    },
+    "permsHint": "{{direct}} granted directly; the number shown includes what is inherited",
+    "filter": {
+      "label": "Show",
+      "all": "All",
+      "system": "System",
+      "custom": "Custom",
+      "search": "Search roles…"
+    },
+    "scope": {
+      "REALM": "Realm",
+      "ORGANIZATION": "Organization",
+      "CLIENT": "Client"
+    },
+    "type": {
+      "system": "System",
+      "custom": "Custom"
+    },
+    "group": {
+      "IDENTITY": "Identity",
+      "CLIENTS": "Clients",
+      "IDENTITY_PROVIDERS": "Identity providers",
+      "SYSTEM": "System"
     },
     "notice": {
       "rename": "Renaming a role does not re-issue anyone's token: whoever is signed in keeps the old authority until they sign in again."
     },
     "empty": {
       "title": "No roles",
-      "message": "uaa has no roles registered yet."
+      "message": "uaa has no roles registered yet.",
+      "filtered": "No roles match this filter."
     },
     "action": {
       "create": "New role",
@@ -147,23 +176,36 @@
     },
     "form": {
       "createTitle": "New role",
-      "renameTitle": "Rename role",
-      "name": "Name",
-      "namePlaceholder": "ROLE_STORE_ADMIN",
-      "nameHint": "The authority string itself. Services match on it exactly.",
-      "save": "Save",
+      "name": "Role name",
+      "namePlaceholder": "REGIONAL_BUYER",
+      "nameHint": "Appears verbatim in the token's roles claim. Upper-case letters, digits and underscores.",
+      "scope": "Scope",
+      "scopeHint": "Realm: across every client. Organization: inside one seller organization. Client: only through one application.",
+      "descriptionLabel": "Description",
+      "inherits": "Inherits from",
+      "inheritsHint": "Everything the parent grants is granted here too.",
+      "noParent": "No parent",
+      "permissions": "Permissions",
+      "permissionCount": "{{direct}} direct · {{effective}} effective",
+      "selectGroup": "Select all",
+      "clearGroup": "Clear",
+      "catalogueUnavailable": "The permission catalogue could not be loaded; name, scope and parent can still be saved.",
+      "save": "Save role",
       "saving": "Saving…",
       "id": "Role id",
-      "description": "A role is a name. What it grants is decided by each service, not stored here."
+      "assigned": "Assigned",
+      "assignedCount": "{{count}} account(s) hold this role directly",
+      "description": "What the role grants is issued in the token as the permissions claim; services still authorise on the role name.",
+      "systemNotice": "A system role: its name and scope are fixed because services key on them. Its description, parent and permissions can still change."
     },
     "delete": {
       "title": "Delete this role",
-      "message": "{{name}} will be removed, and every account holding it loses that authority.",
+      "message": "{{name}} will be removed. uaa refuses if any account still holds it.",
       "confirmationLabel": "Type the role name to confirm"
     },
     "toast": {
       "created": "{{name}} was created.",
-      "renamed": "{{name}} was saved.",
+      "saved": "{{name}} was saved.",
       "deleted": "{{name}} was deleted."
     }
   },
@@ -313,5 +355,109 @@
     "keyFor": "Setting {{position}} key",
     "valueFor": "Setting {{position}} value",
     "empty": "No custom settings defined."
+  },
+  "settings": {
+    "title": "Settings",
+    "context": "Realm-wide policy; changes apply to every client on save",
+    "loading": "Loading settings…",
+    "sections": "Settings sections",
+    "section": {
+      "general": "General",
+      "authentication": "Authentication",
+      "sessions": "Sessions & tokens",
+      "keys": "Signing keys",
+      "email": "Email"
+    },
+    "email": {
+      "notBuilt": "Not built: the platform has no mail sender. Links are handed to an event a delivery service will subscribe to."
+    },
+    "action": {
+      "save": "Save changes",
+      "saving": "Saving…",
+      "saved": "Saved",
+      "discard": "Discard"
+    },
+    "general": {
+      "subtitle": "How the realm presents itself",
+      "displayName": "Display name",
+      "displayNameHint": "Shown on the sign-in page.",
+      "supportEmail": "Support email",
+      "defaultLocale": "Default locale",
+      "selfRegistration": "Allow self-registration",
+      "selfRegistrationHint": "Not available: staff accounts are created by an administrator or by invitation.",
+      "requireVerification": "Require email verification",
+      "requireVerificationHint": "An unverified account cannot sign in."
+    },
+    "locale": {
+      "en": "English",
+      "ar": "العربية"
+    },
+    "authentication": {
+      "subtitle": "What a password must be, and what happens when it is guessed"
+    },
+    "password": {
+      "title": "Password policy",
+      "minLength": "Minimum length",
+      "expiryDays": "Expire after",
+      "historyCount": "Remember last passwords",
+      "requireUpper": "Require an upper-case letter",
+      "requireLower": "Require a lower-case letter",
+      "requireDigit": "Require a digit",
+      "requireSpecial": "Require a symbol",
+      "rejectBreached": "Reject breached passwords",
+      "rejectBreachedHint": "Checked against the Have I Been Pwned k-anonymity range API when a password is set."
+    },
+    "lockout": {
+      "title": "Brute-force protection",
+      "threshold": "Lock after failures",
+      "duration": "Lock duration",
+      "permanentAfter": "Permanent lock after lockouts",
+      "permanentAfterHint": "0 = never; an administrator must then unlock."
+    },
+    "sessions": {
+      "subtitle": "How long a sign-in lasts",
+      "notice": "Clients inherit the token defaults unless they override them in their own token settings.",
+      "idle": "Session idle timeout",
+      "idleHint": "Signs the user out after this period of inactivity.",
+      "max": "Session maximum",
+      "maxHint": "Absolute limit regardless of activity.",
+      "rememberMe": "Offer \"Remember me\"",
+      "rememberMeHint": "Extends the session with a remember-me cookie.",
+      "rememberMeDays": "Remember me for",
+      "single": "One session per user",
+      "singleHint": "A new sign-in revokes older sessions."
+    },
+    "tokens": {
+      "title": "Token defaults",
+      "defaultAccess": "Access token",
+      "maxAccess": "Access token ceiling",
+      "maxAccessHint": "No client may issue a longer access token.",
+      "defaultRefresh": "Refresh token",
+      "secretValidity": "Client secret validity",
+      "secretGrace": "Old secret grace after rotation",
+      "secretGraceHint": "The previous secret keeps working this long after a rotation."
+    },
+    "keys": {
+      "subtitle": "When the signing key rotates and how long retired keys stay verifiable",
+      "rotationDays": "Rotate automatically every",
+      "rotationHint": "0 = manual rotation only.",
+      "retireDays": "Keep retiring keys in the JWKS for",
+      "retireHint": "In-flight tokens still verify during this window."
+    },
+    "audit": {
+      "retention": "Audit log retention",
+      "retentionHint": "Older events are removed nightly."
+    },
+    "unit": {
+      "days": "days",
+      "hours": "hours",
+      "minutes": "minutes"
+    },
+    "zeroNever": "0 = never",
+    "updatedBy": "Last saved by {{who}} at {{when}}",
+    "neverUpdated": "Never changed from the defaults.",
+    "toast": {
+      "saved": "Settings were saved."
+    }
   }
 }

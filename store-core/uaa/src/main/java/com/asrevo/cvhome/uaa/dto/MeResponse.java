@@ -16,7 +16,8 @@ import java.util.UUID;
  * @param authenticatedVia {@code SESSION} for a form login, {@code JWT} for a bearer token
  */
 public record MeResponse(UUID uid, String username, String email, String firstName, String lastName,
-                         Set<String> roles, List<AuthorityDto> authorities, String authenticatedVia) {
+                         Set<String> roles, Set<String> permissions, List<AuthorityDto> authorities,
+                         String authenticatedVia) {
 
     public record AuthorityDto(String authority) {
     }

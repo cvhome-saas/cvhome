@@ -1,11 +1,34 @@
--- Seed roles
-insert into uaa.roles (id, name)
-values ('c1e3a8e6-3a3e-4b1a-8e3e-3a3e4b1a8e3e', 'SUPER_ADMIN'),
-       ('d2f4b9f7-4b4f-5c2b-9f8f-4b4f5c2b9f8f', 'USER'),
-       ('4CA169A8-E8AC-4874-ACAE-795BF7B27832', 'ORG_ADMIN'),
-       ('58C35650-746C-48F8-84E7-78E588045194', 'STORE_ADMIN'),
-       ('23BAB562-5FF0-4690-A0C2-89E2CEA6FCE8', 'STORE_MODERATOR')
+-- The realm's one settings row; every column has its default.
+insert into uaa.settings (id) values (1) on conflict (id) do nothing;
+
+-- Seed roles. System roles cannot be renamed or deleted; their permissions can still be edited.
+insert into uaa.roles (id, name, description, scope, system_role)
+values ('c1e3a8e6-3a3e-4b1a-8e3e-3a3e4b1a8e3e', 'SUPER_ADMIN', 'The platform owner. Everything, everywhere.', 'REALM', true),
+       ('d2f4b9f7-4b4f-5c2b-9f8f-4b4f5c2b9f8f', 'USER', 'A signed-in account with no administrative rights.', 'REALM', true),
+       ('4CA169A8-E8AC-4874-ACAE-795BF7B27832', 'ORG_ADMIN', 'Owns an organization: its stores, members and billing.', 'ORGANIZATION', true),
+       ('58C35650-746C-48F8-84E7-78E588045194', 'STORE_ADMIN', 'Runs one store: catalog, orders, content and staff.', 'ORGANIZATION', true),
+       ('23BAB562-5FF0-4690-A0C2-89E2CEA6FCE8', 'STORE_MODERATOR', 'Reads a store and edits its content; no orders, no staff.', 'ORGANIZATION', true),
+       ('7A1D2C3B-4E5F-4A6B-8C7D-9E0F1A2B3C4D', 'STORE_RETAIL', 'Point-of-sale staff for one store.', 'ORGANIZATION', true)
 on conflict (id) do nothing;
+
+-- SUPER_ADMIN holds every permission in the catalogue (the enum in store-commons:commons is the source of truth).
+insert into uaa.role_permissions (role_id, permission)
+select 'c1e3a8e6-3a3e-4b1a-8e3e-3a3e4b1a8e3e', p
+from unnest(array['users:read', 'users:write', 'users:invite', 'users:sessions', 'users:unlock',
+                  'roles:read', 'roles:write', 'clients:read', 'clients:write', 'clients:secrets',
+                  'idps:read', 'idps:write', 'settings:read', 'settings:write', 'audit:read',
+                  'keys:read', 'keys:rotate', 'dashboard:read']) as p
+on conflict (role_id, permission) do nothing;
+
+-- Organization and store roles: what the console lets them do, expressed as permissions the token will carry.
+insert into uaa.role_permissions (role_id, permission)
+values ('4CA169A8-E8AC-4874-ACAE-795BF7B27832', 'users:read'),
+       ('4CA169A8-E8AC-4874-ACAE-795BF7B27832', 'users:write'),
+       ('4CA169A8-E8AC-4874-ACAE-795BF7B27832', 'users:invite'),
+       ('58C35650-746C-48F8-84E7-78E588045194', 'users:read'),
+       ('58C35650-746C-48F8-84E7-78E588045194', 'users:write'),
+       ('23BAB562-5FF0-4690-A0C2-89E2CEA6FCE8', 'users:read')
+on conflict (role_id, permission) do nothing;
 
 insert into uaa.users (id, username, email, first_name, last_name, password_hash, enabled, metadata)
 values ('65D8419C-8765-4B8B-A15F-910DCE959931', 'super-admin', 'super-admin@mail.com', 'Super', 'Admin',

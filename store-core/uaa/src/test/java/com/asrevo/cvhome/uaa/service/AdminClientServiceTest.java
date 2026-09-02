@@ -11,6 +11,7 @@ import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 
+import com.asrevo.cvhome.uaa.audit.AuditService;
 import com.asrevo.cvhome.uaa.dto.ClientDetails;
 import com.asrevo.cvhome.uaa.errors.ClientNotFoundException;
 
@@ -44,7 +45,8 @@ class AdminClientServiceTest {
 
     private final PasswordEncoder encoder = mock(PasswordEncoder.class);
 
-    private final AdminClientService service = new AdminClientService(clients, encoder, mock(JdbcTemplate.class));
+    private final AdminClientService service = new AdminClientService(clients, encoder, mock(JdbcTemplate.class),
+            mock(AuditService.class));
 
     private static RegisteredClient existing(String id) {
         return RegisteredClient.withId(id).clientId(String.format("client-%s", id)).clientName(id)

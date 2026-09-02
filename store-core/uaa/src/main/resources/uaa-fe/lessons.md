@@ -47,6 +47,9 @@ MFA" rather than "we cannot tell".
   The rail is a map of the product, and hiding them would make it a map of this sprint. Each is a
   place an operator will eventually go.
 - **Expected contract:** four separate features, not one.
+- **Partly closed by feat/uaa-sso (phase 2):** Settings is built (`/settings`, `GET/PUT
+  /api/v1/admin/settings`). Dashboard, Audit log and Identity providers stay disabled until their
+  phases.
 
 ## Users — no MFA state
 
@@ -97,6 +100,9 @@ MFA" rather than "we cannot tell".
   Editing a stored key and adding a new one both work and are offered.
 - **Expected contract:** either `PUT /users/{id}/metadata` replacing the map wholesale, or a
   documented null-value convention meaning "unset".
+- **Closed by feat/uaa-sso (phase 1):** the null-value convention. A key sent with `null` in
+  `UpdateUserRequest.metadata` is removed. The pane still disables the remove button on stored keys
+  until it learns to send that.
 
 ## Users — creating an account is two calls, and there are no invites
 
@@ -123,6 +129,10 @@ MFA" rather than "we cannot tell".
   design draws would be inventing a permission model in the UI that no service reads.
 - **Expected contract:** a real model — `Role.description`, `Role.permissions[]`, `Role.parentId` —
   and services that consult it. That is a platform decision, not a screen.
+- **Closed by feat/uaa-sso (phase 2):** `RoleDto` carries description, scope, systemRole, the parent,
+  own and effective permissions and the holder count; the catalogue is `GET /roles/permissions`; the
+  token carries `permissions`. Services still authorise on the role name — the second half of the
+  contract is theirs to adopt.
 
 ## Clients — the list carries three fields
 

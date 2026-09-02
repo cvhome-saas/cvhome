@@ -1,8 +1,10 @@
 package com.asrevo.cvhome.uaa.service;
 
+import java.time.Clock;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
@@ -12,6 +14,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.asrevo.cvhome.uaa.audit.AuditEventType;
+import com.asrevo.cvhome.uaa.audit.AuditRecord;
+import com.asrevo.cvhome.uaa.audit.AuditService;
 import com.asrevo.cvhome.uaa.domain.Role;
 import com.asrevo.cvhome.uaa.domain.UaaConstants;
 import com.asrevo.cvhome.uaa.domain.User;
@@ -46,16 +51,26 @@ import static java.util.stream.Collectors.toSet;
 @Slf4j
 public class AdminService {
 
+    static final String ROLES = "roles";
+
+    static final String ADMIN_RESET = "ADMIN_RESET";
+
+    private static final String COMMA = ",";
+
     private final UserRepository userRepository;
 
     private final RoleRepository roleRepository;
 
     private final PasswordEncoder passwordEncoder;
 
+    private final AuditService audit;
+
+    private final Clock clock;
+
     @Transactional(readOnly = true)
     public Page<UserDto> getUsers(Map<String, String> metadataFilters, Pageable pageable) {
         Specification<User> spec = buildSpec(metadataFilters);
-        return userRepository.findAll(spec, pageable).map(AdminService::toDto);
+        return userRepository.findAll(spec, pageable).map(this::toDto);
     }
 
     private Specification<User> buildSpec(Map<String, String> metadataFilters) {
@@ -70,9 +85,15 @@ public class AdminService {
         return spec;
     }
 
-    static UserDto toDto(User u) {
+    UserDto toDto(User u) {
         return new UserDto(u.getId(), u.getUsername(), u.getEmail(), u.getFirstName(), u.getLastName(), u.isEnabled(),
-                u.getRoles().stream().map(Role::getName).collect(toSet()), u.getMetadata());
+                u.status(clock.instant()), u.isEmailVerified(), u.getRoles().stream().map(Role::getName).collect(toSet()),
+                u.getMetadata(), u.getLastSignInAt(), u.getLastSignInClientId(), u.getLastSignInVia(), u.getLockedUntil(),
+                u.getFailedLoginAttempts(), u.getPasswordChangedAt(), u.getCreatedAt());
+    }
+
+    private static AuditRecord event(AuditEventType type, User u) {
+        return AuditRecord.of(type).user(u.getId(), u.getUsername());
     }
 
     // orElseThrow is generic over the thrown type, so a checked exception needs no Unchecked wrapper here.
@@ -99,6 +120,7 @@ public class AdminService {
         u.setLastName(req.lastName());
         if (req.password() != null && !req.password().isBlank()) {
             u.setPasswordHash(passwordEncoder.encode(req.password()));
+            u.setPasswordChangedAt(clock.instant());
         }
         if (req.metadata() != null) {
             applyMetadata(u, req.metadata());
@@ -107,7 +129,9 @@ public class AdminService {
         if (req.roles() != null && !req.roles().isEmpty()) {
             assignRoles(saved.getId(), req.roles());
         }
-        return getUser(saved.getId());
+        UserDto created = getUser(saved.getId());
+        audit.record(event(AuditEventType.USER_CREATED, saved).change(null, created));
+        return created;
     }
 
     /**
@@ -118,12 +142,15 @@ public class AdminService {
     public void assignRoles(UUID id, Set<String> roleNames)
             throws UserNotFoundException, SuperAdminImmutableException, RoleNotFoundException, RoleNotAssignableException {
         User u = getNonSuperAdmin(id);
-        if (roleNames == null) {
+        if (roleNames == null || roleNames.isEmpty()) {
             return;
         }
+        Set<String> before = u.getRoles().stream().map(Role::getName).collect(toSet());
         for (String name : roleNames) {
             u.getRoles().add(assignableRole(name));
         }
+        audit.record(event(AuditEventType.USER_ROLE_ASSIGNED, u).detail(String.join(COMMA, new TreeSet<>(roleNames)))
+                .change(Map.of(ROLES, before), Map.of(ROLES, u.getRoles().stream().map(Role::getName).collect(toSet()))));
     }
 
     private Role assignableRole(String name) throws RoleNotFoundException, RoleNotAssignableException {
@@ -141,6 +168,7 @@ public class AdminService {
     public UserDto updateUser(UUID id, UpdateUserRequest req)
             throws UserNotFoundException, SuperAdminImmutableException, RoleNotFoundException, RoleNotAssignableException {
         User u = getNonSuperAdmin(id);
+        UserDto before = toDto(u);
         if (req.firstName() != null) {
             u.setFirstName(req.firstName());
         }
@@ -162,7 +190,9 @@ public class AdminService {
             u.getRoles().addAll(resolved);
         }
         User saved = userRepository.save(u);
-        return getUser(saved.getId());
+        UserDto after = getUser(saved.getId());
+        audit.record(event(AuditEventType.USER_UPDATED, saved).change(before, after));
+        return after;
     }
 
     private static void applyMetadata(User u, Map<String, Object> metadata) {
@@ -181,7 +211,10 @@ public class AdminService {
             return;
         }
         User u = getNonSuperAdmin(id);
+        Set<String> before = u.getRoles().stream().map(Role::getName).collect(toSet());
         u.getRoles().removeIf(r -> roleNames.contains(r.getName()));
+        audit.record(event(AuditEventType.USER_ROLE_REMOVED, u).detail(String.join(COMMA, new TreeSet<>(roleNames)))
+                .change(Map.of(ROLES, before), Map.of(ROLES, u.getRoles().stream().map(Role::getName).collect(toSet()))));
     }
 
     /** Sets a password. Refuses the super admin: that account's password comes from configuration alone. */
@@ -191,8 +224,13 @@ public class AdminService {
         User u = getNonSuperAdmin(userId);
         if (req.password() != null && !req.password().isBlank()) {
             u.setPasswordHash(passwordEncoder.encode(req.password()));
+            u.setPasswordChangedAt(clock.instant());
+            if (u.getActivatedAt() == null) {
+                u.setActivatedAt(clock.instant());
+            }
         }
         userRepository.save(u);
+        audit.record(event(AuditEventType.USER_PASSWORD_RESET, u).reason(ADMIN_RESET));
     }
 
     @Transactional(readOnly = true)
@@ -202,18 +240,24 @@ public class AdminService {
 
     @Transactional
     public void enableUser(UUID id) throws UserNotFoundException, SuperAdminImmutableException {
-        getNonSuperAdmin(id).setEnabled(true);
+        User u = getNonSuperAdmin(id);
+        u.setEnabled(true);
+        audit.record(event(AuditEventType.USER_ENABLED, u));
     }
 
     @Transactional
     public void disableUser(UUID id) throws UserNotFoundException, SuperAdminImmutableException {
-        getNonSuperAdmin(id).setEnabled(false);
+        User u = getNonSuperAdmin(id);
+        u.setEnabled(false);
+        audit.record(event(AuditEventType.USER_DISABLED, u));
     }
 
     @Transactional
     public void delete(UUID id) throws UserNotFoundException, SuperAdminImmutableException {
         User u = getNonSuperAdmin(id);
+        UserDto before = toDto(u);
         userRepository.deleteById(u.getId());
+        audit.record(event(AuditEventType.USER_DELETED, u).change(before, null));
     }
 
     private User getNonSuperAdmin(UUID id) throws UserNotFoundException, SuperAdminImmutableException {

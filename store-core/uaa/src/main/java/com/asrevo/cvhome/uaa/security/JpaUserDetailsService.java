@@ -40,6 +40,11 @@ public class JpaUserDetailsService implements UserDetailsService {
                 .map(Role::getName)
                 .map(r -> new SimpleGrantedAuthority(String.format("ROLE_%s", r)))
                 .collect(Collectors.toSet());
+        // The effective permissions as PERM_<key>, so the console can hide what a session cannot do. Nothing
+        // authorises on them yet; the roles above remain the gate.
+        u.getRoles().stream().flatMap(r -> r.effectivePermissions().stream())
+                .map(p -> new SimpleGrantedAuthority(String.format("PERM_%s", p.key())))
+                .forEach(authorities::add);
 
         return org.springframework.security.core.userdetails.User.withUsername(u.getUsername())
                 .password(u.getPasswordHash() == null ? NO_PASSWORD : u.getPasswordHash())

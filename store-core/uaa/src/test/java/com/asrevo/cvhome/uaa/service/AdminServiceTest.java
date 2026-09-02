@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.uaa.service;
 
+import java.time.Clock;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.asrevo.cvhome.uaa.audit.AuditService;
 import com.asrevo.cvhome.uaa.domain.Role;
 import com.asrevo.cvhome.uaa.domain.UaaConstants;
 import com.asrevo.cvhome.uaa.domain.User;
@@ -71,7 +73,9 @@ class AdminServiceTest {
 
     private final PasswordEncoder encoder = mock(PasswordEncoder.class);
 
-    private final AdminService service = new AdminService(users, roles, encoder);
+    private final AuditService audit = mock(AuditService.class);
+
+    private final AdminService service = new AdminService(users, roles, encoder, audit, Clock.systemUTC());
 
     private User superAdmin;
 

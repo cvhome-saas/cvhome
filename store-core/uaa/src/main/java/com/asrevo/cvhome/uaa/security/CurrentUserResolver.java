@@ -2,6 +2,7 @@ package com.asrevo.cvhome.uaa.security;
 
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import org.springframework.security.core.Authentication;
@@ -11,6 +12,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.asrevo.cvhome.commons.domain.Permission;
 import com.asrevo.cvhome.uaa.domain.Role;
 import com.asrevo.cvhome.uaa.domain.User;
 import com.asrevo.cvhome.uaa.dto.MeResponse;
@@ -46,9 +48,11 @@ public class CurrentUserResolver {
                 .sorted()
                 .map(MeResponse.AuthorityDto::new)
                 .toList();
-        Set<String> roles = user.getRoles().stream().map(Role::getName).collect(Collectors.toCollection(java.util.TreeSet::new));
+        Set<String> roles = user.getRoles().stream().map(Role::getName).collect(Collectors.toCollection(TreeSet::new));
+        Set<String> permissions = user.getRoles().stream().flatMap(r -> r.effectivePermissions().stream())
+                .map(Permission::key).collect(Collectors.toCollection(TreeSet::new));
         return new MeResponse(user.getId(), user.getUsername(), user.getEmail(), user.getFirstName(), user.getLastName(),
-                roles, authorities, authentication instanceof JwtAuthenticationToken ? VIA_JWT : VIA_SESSION);
+                roles, permissions, authorities, authentication instanceof JwtAuthenticationToken ? VIA_JWT : VIA_SESSION);
     }
 
     @Transactional(readOnly = true)

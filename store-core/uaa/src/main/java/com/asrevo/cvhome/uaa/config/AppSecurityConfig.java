@@ -113,7 +113,7 @@ public class AppSecurityConfig {
     }
 
     /**
-     * Saves only GETs that are not the favicon or the error page, so what the login resumes is the page — or the
+     * Saves only GETs that are not the favicon, the error page or an API call, so what the login resumes is the page — or the
      * {@code /oauth2/authorize} — the person was actually going to. Shared with the authorization server's chain so a
      * login on either chain resumes a request saved by the other.
      */
@@ -124,7 +124,9 @@ public class AppSecurityConfig {
         RequestMatcher notFavicon = new NegatedRequestMatcher(
                 PathPatternRequestMatcher.withDefaults().matcher("/favicon.*"));
         RequestMatcher notError = new NegatedRequestMatcher(PathPatternRequestMatcher.withDefaults().matcher("/error"));
-        cache.setRequestMatcher(new AndRequestMatcher(getRequests, notFavicon, notError));
+        // An API call is never the page a person was going to: resuming one after login lands them on raw JSON.
+        RequestMatcher notApi = new NegatedRequestMatcher(PathPatternRequestMatcher.withDefaults().matcher(API));
+        cache.setRequestMatcher(new AndRequestMatcher(getRequests, notFavicon, notError, notApi));
         return cache;
     }
 

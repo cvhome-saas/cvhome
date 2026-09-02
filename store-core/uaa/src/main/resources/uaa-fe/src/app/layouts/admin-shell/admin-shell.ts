@@ -16,7 +16,7 @@ import {Icon, SectionNav, type NavSection} from '@cvhome-saas/ui-kit/ui';
  * console-ui's own sidebar could adopt later. Writing a second grouped rail here is exactly the
  * duplication the kit exists to prevent.
  *
- * **Four sections are rendered disabled.** Dashboard, Audit log, Identity providers and Settings are
+ * **Three sections are rendered disabled.** Dashboard, Audit log and Identity providers are
  * in the design and have no backend at all — no endpoint, no data, nothing behind them. They are
  * shown rather than hidden so the rail is a map of the product rather than of this sprint, and each
  * says why on hover. See lessons.md, "Shell — four sections have no backend"; the count badge and
@@ -50,8 +50,7 @@ export class AdminShell {
     {key: 'providers', labelKey: 'nav.providers', icon: 'signIn', group: 'nav.group.identity',
      disabled: true, disabledHintKey: 'nav.notBuilt'},
     {key: 'clients', labelKey: 'nav.clients', icon: 'layoutGrid', group: 'nav.group.applications'},
-    {key: 'settings', labelKey: 'nav.settings', icon: 'cog', group: 'nav.group.system',
-     disabled: true, disabledHintKey: 'nav.notBuilt'},
+    {key: 'settings', labelKey: 'nav.settings', icon: 'cog', group: 'nav.group.system'},
   ];
 
   protected readonly collapsed = signal(false);

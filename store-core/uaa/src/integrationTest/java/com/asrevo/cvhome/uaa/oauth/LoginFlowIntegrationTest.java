@@ -90,6 +90,7 @@ class LoginFlowIntegrationTest {
         assertThat(claims.get("org").asText()).isEqualTo("21f023932bc66470c104b76f");
         assertThat(claims.get("store").asText()).isEqualTo("65f023632bc46470c104b76f");
         assertThat(claims.get("roles").toString()).contains("STORE_ADMIN");
+        assertThat(claims.get("permissions").toString()).contains("users:read").contains("users:write");
         assertThat(claims.get("iss").asText()).isEqualTo(IssuerPinningIntegrationTest.PINNED);
         JsonNode idToken = UaaClient.claims(body.get("id_token").asText());
         assertThat(idToken.get("email").asText()).isEqualTo("org1-store1-admin@mail.com");
