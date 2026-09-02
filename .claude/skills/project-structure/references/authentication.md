@@ -146,8 +146,11 @@ code. A failure is `…/login?auth=1&error=invalid|social` — a token, never te
 storefront translates. Without the `auth=1` marker `/login` just starts the flow, which is what deep links and
 `shell/auth/secured.tsx` rely on. Registration is `POST /cua/api/v1/public/registration` from
 `theme.pages.Register` (`useRegisterForm`), then the same login flow. The helpers live in
-`store-pod/cua/.../security/StorefrontUrls.java`; CSRF stays disabled in cua (login-CSRF only; the `SESSION`
-cookie is `SameSite=Lax`, path `/cua/`).
+`store-pod/cua/.../security/StorefrontUrls.java`. The form is CSRF-protected without JavaScript: the hand-off
+redirect plants an `XSRF-TOKEN` cookie (path `/`), the storefront page reads it server-side and echoes it as a
+hidden `_csrf` input, and a stale form comes back as `error=expired`. `prompt=login` is enforced by
+`PromptLoginFilter` — a live cua session is logged out and sent to the form, once — so registering while another
+shopper's session is alive signs in as the new account.
 
 Each `-service` also has its own small `controller/v1/auth/AuthController` for exposing the current principal to
 its own clients.

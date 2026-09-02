@@ -15,12 +15,13 @@ export function LoginForm({data}: { data: LoginData }) {
         <div className="flex flex-col gap-6">
             {data.error && (
                 <p role="alert" className="rounded-card border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
-                    {data.error === 'social' ? t('ERROR_SOCIAL') : t('ERROR_INVALID')}
+                    {t(data.error === 'social' ? 'ERROR_SOCIAL' : data.error === 'expired' ? 'ERROR_EXPIRED' : 'ERROR_INVALID')}
                 </p>
             )}
             <form method="post" action={data.action} className="flex flex-col gap-4">
                 <input type="hidden" name="client_id" value={data.clientId}/>
                 <input type="hidden" name="lang" value={data.lang}/>
+                {data.csrfToken && <input type="hidden" name="_csrf" value={data.csrfToken}/>}
                 <div className="flex flex-col gap-1.5">
                     <Label htmlFor="username">{t('USERNAME')}</Label>
                     <Input id="username" name="username" autoComplete="username" required autoFocus/>

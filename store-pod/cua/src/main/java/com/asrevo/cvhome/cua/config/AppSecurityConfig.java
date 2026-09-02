@@ -13,6 +13,9 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 import org.springframework.security.web.savedrequest.RequestCache;
 import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
@@ -22,6 +25,7 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import com.asrevo.cvhome.cua.security.CustomOAuth2UserService;
 import com.asrevo.cvhome.cua.security.CustomOidcUserService;
+import com.asrevo.cvhome.cua.security.StorefrontCsrfDeniedHandler;
 import com.asrevo.cvhome.cua.security.StorefrontLoginEntryPoint;
 import com.asrevo.cvhome.cua.security.StorefrontLoginFailureHandler;
 import com.asrevo.cvhome.cua.security.StorefrontLoginSuccessHandler;
@@ -81,8 +85,16 @@ public class AppSecurityConfig {
                                 StorefrontLoginFailureHandler.SOCIAL))
                         .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService)
                                 .oidcUserService(customOidcUserService)))
-                .csrf(AbstractHttpConfigurer::disable)
-                .exceptionHandling(ex -> ex.authenticationEntryPoint(storefrontLogin))
+                /*
+                 * The form the storefront renders carries the token as a hidden `_csrf` input, read from the
+                 * cookie the hand-off planted (see StorefrontLoginEntryPoint). The plain request handler, not the
+                 * XOR one, because the value in the form has to equal the value in the cookie for a page cua
+                 * never rendered to be able to fill it in.
+                 */
+                .csrf(csrf -> csrf.csrfTokenRepository(csrfTokenRepository())
+                        .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler()))
+                .exceptionHandling(ex -> ex.authenticationEntryPoint(storefrontLogin)
+                        .accessDeniedHandler(new StorefrontCsrfDeniedHandler(requestCache(), csrfTokenRepository())))
                 .requestCache(cache -> cache.requestCache(requestCache()))
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.decoder(jwtDecoder)));
         return http.build();
@@ -114,6 +126,18 @@ public class AppSecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.decoder(multiIssuerJwtDecoder)));
         return http.build();
+    }
+
+    /**
+     * Readable by the storefront's server, which is why the cookie is not HttpOnly-by-JS-standards relevant: it
+     * is read from the request on the storefront side, never by a script. Path {@code /}, not the {@code /cua}
+     * context path, so the browser presents it to the storefront page as well as to {@code /cua/login}.
+     */
+    @Bean
+    public CsrfTokenRepository csrfTokenRepository() {
+        CookieCsrfTokenRepository repository = CookieCsrfTokenRepository.withHttpOnlyFalse();
+        repository.setCookiePath("/");
+        return repository;
     }
 
     @Bean

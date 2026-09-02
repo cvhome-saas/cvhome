@@ -231,7 +231,8 @@
       "NO_ACCOUNT": "Don't have an account?",
       "SIGN_UP": "Create one",
       "ERROR_INVALID": "Invalid username or password.",
-      "ERROR_SOCIAL": "We couldn't sign you in with that provider. Please try again."
+      "ERROR_SOCIAL": "We couldn't sign you in with that provider. Please try again.",
+      "ERROR_EXPIRED": "That sign-in page had expired. Please try again."
     },
     "REGISTER": {
       "TITLE": "Create account",

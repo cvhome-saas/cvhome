@@ -231,7 +231,8 @@
       "NO_ACCOUNT": "¿No tienes cuenta?",
       "SIGN_UP": "Crea una",
       "ERROR_INVALID": "Nombre de usuario o contraseña incorrectos.",
-      "ERROR_SOCIAL": "No pudimos iniciar sesión con ese proveedor. Inténtalo de nuevo."
+      "ERROR_SOCIAL": "No pudimos iniciar sesión con ese proveedor. Inténtalo de nuevo.",
+      "ERROR_EXPIRED": "Esa página de inicio de sesión había caducado. Inténtalo de nuevo."
     },
     "REGISTER": {
       "TITLE": "Crear cuenta",

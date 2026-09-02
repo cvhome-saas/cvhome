@@ -7,6 +7,8 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -63,6 +65,23 @@ class LoginHandoffIntegrationTest {
 
     private static final String RESUMED_AUTHORIZE = "/oauth2/authorize?";
 
+    private static final String EXPIRED = "/en/login?auth=1&error=expired";
+
+    private static final String XSRF_COOKIE = "XSRF-TOKEN=";
+
+    private static final String SESSION_COOKIE = "SESSION=";
+
+    private static final String ATTRIBUTES = ";";
+
+    private static final String PAIR = "%s%s";
+
+    private static final String CALLBACK = "/en/callback?code=";
+
+    private static final String FIRST_CHALLENGE = "E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM";
+
+    /** A second sign-in the storefront starts has a fresh PKCE challenge; that is what tells the flows apart. */
+    private static final String SECOND_CHALLENGE = "XAaXCEfz7-YLOOyWmusnRfKPr55J1VF_dM7fnQHdqqw";
+
     /** Long enough for the registration body's size rule; the seeded {@code revo} is not. */
     private static final String NEW_PASSWORD = "secret-1";
 
@@ -73,6 +92,8 @@ class LoginHandoffIntegrationTest {
     private final HttpClient http = HttpClient.newBuilder().followRedirects(HttpClient.Redirect.NEVER).build();
 
     private String session;
+
+    private String csrf;
 
     private String url(String path) {
         return String.format("http://localhost:%d%s", port, path);
@@ -88,7 +109,13 @@ class LoginHandoffIntegrationTest {
 
     private HttpResponse<String> postLogin(String cookie, String store, String username, String password)
             throws IOException, InterruptedException {
-        String form = String.format("username=%s&password=%s&client_id=%s&lang=en", username, password, store);
+        return postLogin(cookie, store, username, password, csrf);
+    }
+
+    private HttpResponse<String> postLogin(String cookie, String store, String username, String password, String token)
+            throws IOException, InterruptedException {
+        String form = String.format("username=%s&password=%s&client_id=%s&lang=en&_csrf=%s", username, password,
+                store, Objects.requireNonNullElse(token, ""));
         HttpRequest.Builder request = HttpRequest.newBuilder(URI.create(url(LOGIN)))
                 .header("Content-Type", "application/x-www-form-urlencoded")
                 .POST(HttpRequest.BodyPublishers.ofString(form));
@@ -102,32 +129,84 @@ class LoginHandoffIntegrationTest {
         return response.headers().firstValue(LOCATION).orElse(null);
     }
 
+    private static Optional<String> cookie(HttpResponse<String> response, String name) {
+        List<String> cookies = response.headers().allValues(SET_COOKIE);
+        return cookies.stream().filter(it -> it.startsWith(name)).findFirst();
+    }
+
     /** Signing in rotates the session id (fixation protection), so the cookie to carry on with is the newest one. */
     private static String cookieAfter(HttpResponse<String> response, String previous) {
-        return response.headers().firstValue(SET_COOKIE).orElse(previous);
+        return cookie(response, SESSION_COOKIE).orElse(previous);
+    }
+
+    /** Both cookies as one {@code Cookie} header: the session for the saved request, the token for the form. */
+    private static String both(String session, String xsrf) {
+        return String.format("%s; %s", session, xsrf);
+    }
+
+    private String authorizeUrl(boolean promptLogin, String challenge) {
+        String redirect = URLEncoder.encode(url("/en/callback"), StandardCharsets.UTF_8);
+        return String.format("""
+                /oauth2/authorize?response_type=code&client_id=%s&redirect_uri=%s&scope=openid\
+                &code_challenge=%s&code_challenge_method=S256%s&store=%s&lang=en""",
+                STORE, redirect, challenge, promptLogin ? "&prompt=login" : "", STORE);
     }
 
     /** Walks {@code /oauth2/authorize}, keeping the session cookie that now carries the saved request. */
     @BeforeEach
     void startAuthorization() throws IOException, InterruptedException {
-        String redirect = URLEncoder.encode(url("/en/callback"), StandardCharsets.UTF_8);
-        String authorize = String.format("""
-                /oauth2/authorize?response_type=code&client_id=%s&redirect_uri=%s&scope=openid\
-                &code_challenge=%s&code_challenge_method=S256&prompt=login&store=%s&lang=en""",
-                STORE, redirect, "E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM", STORE);
-
-        HttpResponse<String> response = get(authorize, null);
+        HttpResponse<String> response = get(authorizeUrl(true, FIRST_CHALLENGE), null);
 
         assertThat(response.statusCode()).as("authorize must hand the browser to the storefront").isEqualTo(302);
         assertThat(location(response)).isEqualTo(url(PENDING));
-        Optional<String> cookie = response.headers().firstValue(SET_COOKIE);
-        assertThat(cookie).as("authorize must start the session that holds the saved request").isPresent();
-        session = cookie.get();
+        Optional<String> sessionCookie = cookie(response, SESSION_COOKIE);
+        assertThat(sessionCookie).as("authorize must start the session that holds the saved request").isPresent();
+        Optional<String> xsrf = cookie(response, XSRF_COOKIE);
+        assertThat(xsrf).as("the hand-off must plant the CSRF cookie the form will echo").isPresent();
+        String xsrfCookie = xsrf.get().split(ATTRIBUTES)[0];
+        csrf = xsrfCookie.substring(XSRF_COOKIE.length());
+        session = both(sessionCookie.get().split(ATTRIBUTES)[0], xsrfCookie);
     }
 
     @Test
-    void theSessionCookieIsHttpOnlyWithAPath() {
-        assertThat(session).startsWith("SESSION=").contains("Path=/").contains("HttpOnly");
+    void theHandoffPlantsBothCookies() {
+        assertThat(session).startsWith(SESSION_COOKIE).contains(XSRF_COOKIE);
+    }
+
+    @Test
+    void aFormWithoutTheCsrfTokenIsSentBackAsExpired() throws IOException, InterruptedException {
+        HttpResponse<String> response = postLogin(session, STORE, USER, PASSWORD, null);
+
+        assertThat(response.statusCode()).isEqualTo(302);
+        assertThat(location(response)).isEqualTo(url(EXPIRED));
+    }
+
+    /** {@code prompt=login} means the password again, even for a session that is already signed in. */
+    @Test
+    void aSignedInSessionIsPromptedAgainWhenTheStorefrontAsksForLogin() throws IOException, InterruptedException {
+        HttpResponse<String> login = postLogin(session, STORE, USER, PASSWORD);
+        String signedIn = both(cookieAfter(login, session).split(ATTRIBUTES)[0], String.format(PAIR, XSRF_COOKIE, csrf));
+
+        HttpResponse<String> again = get(authorizeUrl(true, SECOND_CHALLENGE), signedIn);
+
+        assertThat(again.statusCode()).isEqualTo(302);
+        assertThat(location(again)).as("a live session must not skip the form").isEqualTo(url(PENDING));
+
+        HttpResponse<String> relogin = postLogin(both(cookieAfter(again, signedIn).split(ATTRIBUTES)[0],
+                String.format(PAIR, XSRF_COOKIE, csrf)), STORE, USER, PASSWORD);
+        assertThat(location(relogin)).startsWith(url(RESUMED_AUTHORIZE));
+    }
+
+    /** Without {@code prompt=login} a live session is single sign-on: straight to the callback. */
+    @Test
+    void withoutPromptLoginASignedInSessionGetsACodeStraightAway() throws IOException, InterruptedException {
+        HttpResponse<String> login = postLogin(session, STORE, USER, PASSWORD);
+        String signedIn = both(cookieAfter(login, session).split(ATTRIBUTES)[0], String.format(PAIR, XSRF_COOKIE, csrf));
+
+        HttpResponse<String> silent = get(authorizeUrl(false, SECOND_CHALLENGE), signedIn);
+
+        assertThat(silent.statusCode()).isEqualTo(302);
+        assertThat(location(silent)).startsWith(url(CALLBACK));
     }
 
     @Test
@@ -148,11 +227,11 @@ class LoginHandoffIntegrationTest {
 
         URI resumed = URI.create(location(login));
         HttpResponse<String> authorize = get(String.format("%s?%s", resumed.getRawPath(), resumed.getRawQuery()),
-                cookieAfter(login, session));
+                cookieAfter(login, session).split(ATTRIBUTES)[0]);
 
         assertThat(authorize.statusCode()).isEqualTo(302);
         assertThat(location(authorize)).as("prompt=login must not send an authenticated shopper round again")
-                .startsWith(url("/en/callback?code="));
+                .startsWith(url(CALLBACK));
     }
 
     /** A shopper is the store's: an account registered on one store is nobody on another. */
@@ -171,10 +250,10 @@ class LoginHandoffIntegrationTest {
         assertThat(location(home)).startsWith(url(RESUMED_AUTHORIZE));
     }
 
-    /** No session, nothing saved: the shopper is still sent to the storefront, without the pending marker. */
+    /** A valid token but no session, nothing saved: still sent to the storefront, without the pending marker. */
     @Test
     void aPostWithoutASavedRequestLandsOnTheStorefrontWithoutTheMarker() throws IOException, InterruptedException {
-        HttpResponse<String> response = postLogin(null, STORE, USER, PASSWORD);
+        HttpResponse<String> response = postLogin(String.format(PAIR, XSRF_COOKIE, csrf), STORE, USER, PASSWORD);
 
         assertThat(response.statusCode()).isEqualTo(302);
         assertThat(location(response)).isEqualTo(url(NOT_PENDING));

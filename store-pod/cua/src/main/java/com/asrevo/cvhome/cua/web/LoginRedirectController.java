@@ -5,10 +5,12 @@ import java.util.Objects;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.security.web.savedrequest.RequestCache;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import com.asrevo.cvhome.cua.security.StorefrontLoginEntryPoint;
 import com.asrevo.cvhome.cua.security.StorefrontUrls;
 
 import lombok.RequiredArgsConstructor;
@@ -25,8 +27,11 @@ public class LoginRedirectController {
 
     private final RequestCache requestCache;
 
+    private final CsrfTokenRepository csrfTokens;
+
     @GetMapping("/login")
     public String login(HttpServletRequest request, HttpServletResponse response) {
+        StorefrontLoginEntryPoint.plantCsrfCookie(csrfTokens, request, response);
         boolean pending = Objects.nonNull(requestCache.getRequest(request, response));
         return String.format("redirect:%s", StorefrontUrls.loginPage(request, response, requestCache, pending, null));
     }

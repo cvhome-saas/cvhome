@@ -11,7 +11,7 @@ ports rather than about tokens.
   login configuration (`SocialLoginConfigApi`), and the `/cua` path-prefix handling the edge depends on
 - **Runs on** — `lcl start -d --stack <name>`; reached only through the pod edge at
   `http://<store>.spg-507f1f77.gateway.com/cua/**`, never on `:8124` directly
-- **Cases** — 20 (5 verified, 4 unit only, 11 not verified)
+- **Cases** — 22 (5 verified, 6 unit only, 11 not verified)
 - **Also see** — [spg](../../spg/qa/spg-qa.md) (which keeps the `/cua` prefix and sets `X-Forwarded-Port` for
   exactly this service), [merchant](../../merchant/merchant-service/qa/merchant-qa.md) (the store record cua
   caches), [landing-ui](../../landing-ui/qa/landing-ui-qa.md) (the storefront that starts the login),
@@ -155,6 +155,21 @@ Logs: `.lcl/<stack>/logs/cua.log`.
 - **Steps** — send an authorization request with a `Host` no store owns.
 - **Expect** — refused. It must **not** fall back to another store's client, and it must not 500.
 
+### LGN-10 — The form is CSRF-protected, and a stale one is not a dead end · high · [unit only]
+
+- **Steps** — read the `Set-Cookie` headers on the hand-off `302` (`SESSION` and `XSRF-TOKEN; Path=/`), then post
+  the form once with the `_csrf` hidden input the storefront rendered and once without it.
+- **Expect** — with it the flow resumes; without it `302 …/login?auth=1&error=expired` with a fresh `XSRF-TOKEN`,
+  and the re-rendered form submits fine. Covered by `LoginHandoffIntegrationTest.aFormWithoutTheCsrfTokenIsSentBackAsExpired`.
+
+### LGN-11 — `prompt=login` asks a signed-in session for the password again · critical · [unit only]
+
+- **Steps** — sign in as `user`, then register a new shopper on `/en/register` in the same browser.
+- **Expect** — the sign-in form appears (not a silent callback), and after entering the new credentials the
+  storefront is signed in as the new shopper. Covered by
+  `LoginHandoffIntegrationTest.aSignedInSessionIsPromptedAgainWhenTheStorefrontAsksForLogin`; without
+  `prompt=login` the same session is single sign-on (`withoutPromptLoginASignedInSessionGetsACodeStraightAway`).
+
 ### CLI-05 — The session cookie is what carries the saved request across the hand-off · high · [verified]
 
 - **Steps** — start a login and read the `Set-Cookie` on the `302` from `/cua/oauth2/authorize`, then the one on
@@ -218,15 +233,9 @@ by `LoginHandoffIntegrationTest` rather than a request file.
 **cua's only prior coverage in the whole `qa/` tree was one case** (SID-01), reached incidentally by a
 store-id refactor. Nothing has ever exercised registration, social login or the dynamic client on purpose.
 
-**`prompt=login` does not re-prompt an already-authenticated cua session.** The storefront sends it on every
-`login()`, but a shopper whose cua session is still signed in as A who registers account B is handed straight
-to the callback as A — the new account exists but is not the one signed in (seen during QA; the same was true
-of the Thymeleaf pages). Signing out first (`/cua/connect/logout`) makes registration sign in as the new
-shopper. Either drop `prompt=login` from the storefront or have the register page sign out first.
-
-**CSRF is disabled in cua**, as it always was: the storefront's form posts to `/cua/login` without a token.
-The exposure is login-CSRF only (an attacker signing a victim into the attacker's shopper account); enabling it
-later means `CookieCsrfTokenRepository` with cookie path `/` and a pre-flight GET from the storefront page.
+**`PromptLoginFilter` consumes its marker on the next `prompt=login` authorize, whoever sends it.** A shopper
+who is logged out by the filter, abandons the form, signs in through some other path and then starts a new
+`prompt=login` flow passes through that one time without being asked again. One-time and same-session only.
 
 **The storefront login only works through the store host.** Documented in
 [`references/qa-testing.md`](../../../.claude/skills/project-structure/references/qa-testing.md) §2 and §6 as

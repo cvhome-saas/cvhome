@@ -15,8 +15,10 @@ import org.springframework.security.config.annotation.web.configurers.oauth2.ser
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.context.SecurityContextHolderFilter;
 
 import com.asrevo.cvhome.commons.domain.Pod;
+import com.asrevo.cvhome.cua.security.PromptLoginFilter;
 import com.asrevo.cvhome.cua.security.StorefrontLoginEntryPoint;
 import com.asrevo.cvhome.s2s.model.PodInfoProperties;
 import com.asrevo.cvhome.s2s.utils.UrlNormalize;
@@ -42,6 +44,9 @@ public class AuthorizationServerConfig {
                 .authorizeHttpRequests(auth -> auth.requestMatchers(serverConfigurer.getEndpointsMatcher()).authenticated())
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.decoder(jwtDecoder)))
                 .csrf(AbstractHttpConfigurer::disable)
+                // prompt=login is enforced here, once the context is loaded: a signed-in session is logged out
+                // so the chain below treats the request as anonymous and hands the shopper to the form.
+                .addFilterAfter(new PromptLoginFilter(), SecurityContextHolderFilter.class)
                 // An unauthenticated /oauth2/authorize is answered with a redirect to the storefront's own login
                 // page, never to a page of cua's: cua renders no HTML.
                 .exceptionHandling(ex -> ex.authenticationEntryPoint(storefrontLogin))

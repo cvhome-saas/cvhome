@@ -402,12 +402,13 @@ cua renders no pages any more. `/{locale}/login` starts the OAuth2 flow; cua sen
 - **Expect** — the page reloads as `/en/login?auth=1&error=invalid` with `PAGE.LOGIN.ERROR_INVALID` in the
   banner (Arabic under `/ar/`, right-to-left, form still aligned to the start edge); the second submit succeeds.
 
-### AUTH-04 — Registration, then straight into the store · critical · [verified] (from a signed-out browser — see 99)
+### AUTH-04 — Registration, then straight into the store · critical · [verified]
 
 - **Steps** — `/en/register`: submit an empty form, then the seeded `user@mail.com`, then a fresh account.
 - **Expect** — the first shows the server's field errors under the fields (`FIELD_ERRORS.*`); the second puts
   `ERRORS.CODE.CUA_REGISTRATION_EMAIL_TAKEN` under the email field; the third goes through the login flow
-  without re-asking for anything the shopper already typed except the password, and lands on `/en`.
+  without re-asking for anything the shopper already typed except the password, and lands on `/en` — signed in
+  as the **new** shopper even if the browser was signed in as someone else beforehand (`prompt=login`).
 
 ### AUTH-05 — Social buttons appear only while cua is waiting · high · [not verified]
 
@@ -431,11 +432,6 @@ cua renders no pages any more. `/{locale}/login` starts the OAuth2 flow; cua sen
 
 ## 99 — Known gaps
 
-- **Registering while cua still holds a signed-in session keeps the old identity.** `useRegisterForm` calls
-  `login()` after the 201, and cua answers `prompt=login` from an authenticated session with a code for the
-  existing shopper rather than a fresh prompt — so a shopper signed in as A who creates account B stays A.
-  Pre-existing cua behaviour, now visible because registration is a storefront page. Sign out first, or see
-  [cua-qa.md](../../cua/qa/cua-qa.md) 99.
 - **`libs/types`, `libs/services` and `libs/hooks` are linted by nothing.** `npm run lint` covers
   `storefront libs/ui libs/i18n libs/theme themes`, so the three tsc-built libs — including
   `use-product-purchase.ts`, which carried two of the variant rework's blockers — are checked only by `tsc`.

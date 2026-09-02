@@ -197,7 +197,7 @@ export interface CheckoutResultData {
 export type CustomerData = Record<string, never>;
 
 /** Why the last sign-in attempt failed, as cua reports it on the URL. The storefront owns the wording. */
-export type LoginError = 'invalid' | 'social';
+export type LoginError = 'invalid' | 'social' | 'expired';
 
 /** One social-login button: the provider, its name, and the link that starts that provider's flow. */
 export interface LoginSocialOption {
@@ -216,6 +216,12 @@ export interface LoginData {
     action: string;
     clientId: string;
     lang: string;
+    /**
+     * cua's CSRF token, read from the `XSRF-TOKEN` cookie the hand-off planted and echoed as a hidden `_csrf`
+     * input. Absent only when the page was reached without cua's redirect; the form then posts without it and
+     * comes back as `error=expired`.
+     */
+    csrfToken?: string;
     error?: LoginError;
     socialLogins: LoginSocialOption[];
 }

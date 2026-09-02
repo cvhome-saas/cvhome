@@ -18,10 +18,8 @@ the way it owns `Customer`. The PKCE flow, token handling and `MultiIssuerJwtDec
 What makes this cheap: cua and landing-ui are same-origin per store host (spg routes `/cua*` to cua, everything
 else to landing-ui, custom domains included), and `client_id` already *is* the `StoreMerchantId`.
 
-**Non-goals, decided:** CSRF stays disabled in cua (status quo; only login-CSRF exposure, `SameSite=Lax`
-session cookie blocks cross-site POSTs; enabling it later needs `CookieCsrfTokenRepository` with cookie path `/`
-and a pre-flight GET from the page). No password reset, no rate limiting on registration, no change to
-`prompt=login`.
+**Non-goals, decided:** no password reset, no rate limiting on registration, no designed Login/Register pages
+for the eleven non-starter themes (the token-only fallbacks inherit each theme's look).
 
 ## Verified facts the design rests on
 
@@ -221,3 +219,15 @@ log in with the first store's user (403/`error=invalid`).
 - `prompt=login` plus the no-SavedRequest fallback means a second password entry in the expired-session edge
   case only. Follow-up: reconsider `prompt=login` now that `/connect/logout` ends the cua session anyway.
 - `lang` path injection guarded by `LanguageCode.isLanguage()`.
+
+## Phase 3 (same PR): the two gaps QA surfaced
+
+- **`prompt=login` enforced.** Spring Authorization Server answered it from a live session, so a shopper signed in
+  as A who registered B was handed to the callback as A. `security/PromptLoginFilter`, in the authorization-server
+  chain after `SecurityContextHolderFilter`, logs a signed-in `prompt=login` authorize out (session invalidated)
+  and marks the fresh session; the resumed request passes once. Without `prompt=login` a live session stays
+  single sign-on.
+- **CSRF on the form, without JavaScript.** `CookieCsrfTokenRepository` (cookie path `/`, readable) with the plain
+  `CsrfTokenRequestAttributeHandler`; `StorefrontLoginEntryPoint` and `GET /login` plant the `XSRF-TOKEN` cookie
+  on the redirect; the storefront page reads the cookie server-side (`cookies()`) and renders `_csrf` as a hidden
+  input; `StorefrontCsrfDeniedHandler` sends a stale form back as `error=expired` with a fresh cookie.

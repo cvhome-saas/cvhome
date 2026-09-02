@@ -10,6 +10,8 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 import org.springframework.security.web.savedrequest.RequestCache;
 
@@ -28,7 +30,11 @@ class StorefrontLoginHandlersTest {
 
     private static final String EN = "en";
 
+    private static final String XSRF = "XSRF-TOKEN";
+
     private final RequestCache cache = new HttpSessionRequestCache();
+
+    private final CsrfTokenRepository csrfTokens = CookieCsrfTokenRepository.withHttpOnlyFalse();
 
     private final MockHttpServletResponse response = new MockHttpServletResponse();
 
@@ -54,9 +60,20 @@ class StorefrontLoginHandlersTest {
         MockHttpServletRequest authorize = request(GET, AUTHORIZE);
         authorize.setParameter(LANG, EN);
 
-        new StorefrontLoginEntryPoint(cache).commence(authorize, response, new BadCredentialsException("anonymous"));
+        new StorefrontLoginEntryPoint(cache, csrfTokens).commence(authorize, response,
+                new BadCredentialsException("anonymous"));
 
         assertThat(response.getRedirectedUrl()).isEqualTo("http://shop.example.com/en/login?auth=1");
+        assertThat(response.getCookie(XSRF)).as("the hand-off plants the CSRF cookie").isNotNull();
+    }
+
+    @Test
+    void aStaleFormIsSentBackWithAFreshCookieAndTheExpiredToken() throws IOException {
+        new StorefrontCsrfDeniedHandler(cache, csrfTokens)
+                .handle(loginPost(EN), response, new org.springframework.security.access.AccessDeniedException("csrf"));
+
+        assertThat(response.getRedirectedUrl()).isEqualTo("http://shop.example.com/en/login?error=expired");
+        assertThat(response.getCookie(XSRF)).isNotNull();
     }
 
     @Test

@@ -1,4 +1,5 @@
 import type {Metadata} from 'next';
+import {cookies} from 'next/headers';
 import {getTranslations} from 'next-intl/server';
 import type {LoginData, LoginError} from '@store-front/theme';
 import {AuthService} from '@store-front/services/auth-service';
@@ -11,7 +12,10 @@ import {LoginRedirect} from '@/shell/auth/login-redirect';
 
 type Props = { searchParams: Promise<Record<string, string | string[] | undefined>> };
 
-const ERRORS: readonly LoginError[] = ['invalid', 'social'];
+const ERRORS: readonly LoginError[] = ['invalid', 'social', 'expired'];
+
+/** The cookie cua's hand-off plants; its value is the token the form has to echo. */
+const CSRF_COOKIE = 'XSRF-TOKEN';
 
 export async function generateMetadata(): Promise<Metadata> {
     const t = await getTranslations('PAGE.LOGIN');
@@ -33,8 +37,8 @@ export default async function LoginPage({searchParams}: Props) {
     if (sp.auth !== '1') {
         return <LoginRedirect storeContext={storeContext}/>;
     }
-    const [theme, ctx, socialLogins] = await Promise.all([
-        getTheme(), loadPageContext(), orUndefined(AuthService.socialLogins(storeContext)),
+    const [theme, ctx, socialLogins, cookieJar] = await Promise.all([
+        getTheme(), loadPageContext(), orUndefined(AuthService.socialLogins(storeContext)), cookies(),
     ]);
     const error = typeof sp.error === 'string' && (ERRORS as readonly string[]).includes(sp.error)
         ? sp.error as LoginError : undefined;
@@ -42,6 +46,7 @@ export default async function LoginPage({searchParams}: Props) {
         action: AuthService.loginAction(storeContext),
         clientId: storeContext.store,
         lang: storeContext.locale,
+        csrfToken: cookieJar.get(CSRF_COOKIE)?.value,
         error,
         socialLogins: (socialLogins ?? []).map(login => ({
             providerId: login.providerId,

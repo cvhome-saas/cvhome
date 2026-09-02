@@ -231,7 +231,8 @@
       "NO_ACCOUNT": "Vous n'avez pas de compte ?",
       "SIGN_UP": "Créez-en un",
       "ERROR_INVALID": "Nom d'utilisateur ou mot de passe invalide.",
-      "ERROR_SOCIAL": "La connexion via ce fournisseur a échoué. Veuillez réessayer."
+      "ERROR_SOCIAL": "La connexion via ce fournisseur a échoué. Veuillez réessayer.",
+      "ERROR_EXPIRED": "Cette page de connexion avait expiré. Veuillez réessayer."
     },
     "REGISTER": {
       "TITLE": "Créer un compte",
