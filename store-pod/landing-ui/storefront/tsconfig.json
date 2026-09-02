@@ -66,7 +66,9 @@
     ".next-storefront-builder/types/**/*.ts",
     ".next-storefront-builder/dev/types/**/*.ts",
     ".next-cua-login/types/**/*.ts",
-    ".next-cua-login/dev/types/**/*.ts"
+    ".next-cua-login/dev/types/**/*.ts",
+    ".next-shifted/types/**/*.ts",
+    ".next-shifted/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"

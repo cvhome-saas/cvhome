@@ -384,11 +384,14 @@ cua renders no pages any more. `/{locale}/login` starts the OAuth2 flow; cua sen
 
 ### AUTH-01 — The login page is the theme's · critical · [verified]
 
-- **Steps** — on `http://org1-store1.spg-507f1f77.gateway.com/en?theme=starter` click the account icon, then
-  repeat with `?theme=basic` (a theme without `pages.Login`).
-- **Expect** — `starter` renders its own `pages/Login.tsx` (PageShell, its heading with the store name); `basic`
-  renders the shell's `default-login-page.tsx`, still in that theme's fonts, colours and radius. Both post to
-  `/cua/login` with `client_id` and `lang` hidden inputs. No `/css/login.css` request anywhere (the bridge is gone).
+- **Steps** — for every registered theme open `/en/login?auth=1&theme=<id>` and `/en/register?theme=<id>` on
+  `http://org1-store1.spg-507f1f77.gateway.com` (the dev override cookie), then `?theme=` to clear it.
+- **Expect** — each theme renders its own `pages/Login.tsx` / `pages/Register.tsx` in its own idiom (basic's
+  `display` rule, beauty's `plate`, fashion's `sheet`, furniture's enamel `PageHead`, grocery's `signage`, hunger's
+  `press plate`, pink's `hair display`, …), every form posts to `/cua/login` with `client_id`, `lang` and `_csrf`
+  hidden inputs, and no `/css/login.css` request appears anywhere (the bridge is gone). Walked for all twelve
+  themes through spg; the shell fallback (`default-login-page.tsx`) is now reachable only by a theme that drops
+  the page.
 
 ### AUTH-02 — The whole flow, and the deep link · critical · [verified]
 

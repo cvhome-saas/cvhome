@@ -11,7 +11,7 @@ ports rather than about tokens.
   login configuration (`SocialLoginConfigApi`), and the `/cua` path-prefix handling the edge depends on
 - **Runs on** — `lcl start -d --stack <name>`; reached only through the pod edge at
   `http://<store>.spg-507f1f77.gateway.com/cua/**`, never on `:8124` directly
-- **Cases** — 22 (7 verified, 4 unit only, 11 not verified)
+- **Cases** — 22 (9 verified, 4 unit only, 9 not verified)
 - **Also see** — [spg](../../spg/qa/spg-qa.md) (which keeps the `/cua` prefix and sets `X-Forwarded-Port` for
   exactly this service), [merchant](../../merchant/merchant-service/qa/merchant-qa.md) (the store record cua
   caches), [landing-ui](../../landing-ui/qa/landing-ui-qa.md) (the storefront that starts the login),
@@ -92,12 +92,15 @@ Logs: `.lcl/<stack>/logs/cua.log`.
   cross-store one is `201`, because a shopper is per store. Covered by
   `PublicRegistrationControllerIntegrationTest`.
 
-### LGN-06 — The hand-off carries the store host and its port · critical · [not verified]
+### LGN-06 — The hand-off carries the store host and its port · critical · [verified]
 
 - **Steps** — on a shifted stack (`lcl start -d --stack xxx`), start a login and read the `Location` of the
   `302` from `/cua/oauth2/authorize`.
 - **Expect** — `http://org1-store1.spg-507f1f77.gateway.com:<spg-port>/en/login?auth=1` — the store's host
   **with** the port, the shopper's locale as the path prefix, never `/cua/login`. Same origin rule as CLI-02.
+  Walked on `lcl start -d --stack shifted` (offset +2000): `302 http://org1-store1.spg-507f1f77.gateway.com:2080/en/login?auth=1`,
+  the storefront page on `:2080` carrying the form and `_csrf`, and the login POST resuming
+  `…:2080/cua/oauth2/authorize?…`.
 
 ### LGN-07 — A wrong password comes back to the form, and the form still works · high · [verified]
 
@@ -106,13 +109,16 @@ Logs: `.lcl/<stack>/logs/cua.log`.
   styling, and the second submit completes the flow: the saved authorize request survived the failure.
   Covered by `LoginHandoffIntegrationTest`.
 
-### LGN-08 — Social buttons only appear while cua is waiting · high · [verified] (rendering) / [not verified] (provider round-trip)
+### LGN-08 — Social buttons only appear while cua is waiting · high · [verified]
 
 - **Steps** — open `/en/login?auth=1` after starting a login (buttons present for the store's enabled
   providers), then open `/en/login` directly (no buttons: the page starts the flow instead).
 - **Expect** — each button navigates to `/cua/oauth2/authorization/<store>.<provider>` and cua redirects to the
   provider. A provider failure lands on `…/login?auth=1&error=social`. Locally the seeded providers carry demo
-  app ids, so the provider itself refuses — that is expected.
+  app ids, so the provider itself refuses — that is expected. Walked with curl through spg: with a saved
+  request, `/cua/oauth2/authorization/<store>.google` → `302 https://accounts.google.com/o/oauth2/v2/auth?…`,
+  and the provider's refusal (`/cua/login/oauth2/code/<store>.google?error=access_denied&state=…`) →
+  `302 …/en/login?auth=1&error=social`.
 
 ### LGN-09 — A stale `/cua/login` link is sent to the storefront · [unit only]
 
@@ -141,7 +147,8 @@ Logs: `.lcl/<stack>/logs/cua.log`.
 - **Expect** — `redirect_uri=http://org1-store1.spg-507f1f77.gateway.com:<spg-b>/callback`, **with** the port.
   On the default stack the port is 80 and the defect is invisible, so this must be run on a shifted stack.
 - **Cross-reference** — [spg-qa.md](../../spg/qa/spg-qa.md) HDR-01 and
-  [`qa/lcl-qa.md`](../../../qa/lcl-qa.md) case 09, which records the same observation as still not verified.
+  [`qa/lcl-qa.md`](../../../qa/lcl-qa.md) case 09. LGN-06 exercises the same header on the login hand-off and was run on a
+  shifted stack, so the port is known to survive.
 
 ### CLI-03 — The `/cua` prefix reaches the service intact · critical · [not verified]
 
