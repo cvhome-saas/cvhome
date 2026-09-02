@@ -51,6 +51,9 @@ dependencies {
     // enum constants, so server and client must compile against the same ones.
     implementation project(':store-commons:uaa-client')
     implementation project(':store-commons:autoconfigure')
+    // The published event contracts, and the outbox that carries them (namastack, JPA flavour — uaa is JPA).
+    implementation project(':store-core:uaa:uaa-events')
+    implementation libs.namastack.outbox.starter.jpa
 
     compileOnly libs.lombok
     runtimeOnly libs.postgresql

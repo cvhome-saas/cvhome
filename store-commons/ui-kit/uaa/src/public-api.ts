@@ -12,6 +12,7 @@
 export * from './lib/uaa.models';
 export * from './lib/user-row';
 export * from './lib/admin-user.service';
+export * from './lib/public-link.service';
 export * from './lib/admin-role.service';
 export * from './lib/admin-settings.service';
 export * from './lib/account.service';

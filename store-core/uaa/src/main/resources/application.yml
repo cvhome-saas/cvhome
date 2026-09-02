@@ -18,6 +18,21 @@ spring:
       schema-locations: classpath:init-sql/schema.sql
       data-locations: classpath:init-sql/data-common.sql
 
+# The transactional outbox every uaa event goes through (uaa-events). The tables live in the uaa schema and come from
+# schema.sql like everything else; the starter's own DDL is off.
+namastack:
+  outbox:
+    multicaster:
+      enabled: true
+    polling:
+      fixed:
+        interval: 2s
+      batch-size: 10
+    jpa:
+      schema-initialization:
+        enabled: false
+      schema-name: ${spring.application.name}
+
 # uaa is the one service whose actuator must not be wide open: a heap dump of an authorization server contains its
 # signing key. Only health, info and prometheus are mapped; common-config.yml reads this placeholder, because an
 # imported config file outranks the one that imports it and a direct override here would lose.
@@ -38,6 +53,12 @@ com:
           key: ${UAA_REMEMBER_ME_KEY}
         rate-limit:
           enabled: true
+        # One-time links: how long an invitation and a reset link stay usable, and whether the logging consumer
+        # writes the link itself (never in a deployment — the link is a credential).
+        links:
+          invitation-validity: P7D
+          reset-validity: PT1H
+          log-links: false
       oauth2:
         clients:
           admin-sdk:

@@ -6,9 +6,8 @@ import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 
 import {TranslocoDatePipe} from '@jsverse/transloco-locale';
 
-import {Badge, BusyOverlay, ConfirmDialog, DataTable, type TableColumn, TableRow, EmptyState, Icon, LoadError, PageHeader, Pagination, Panel, Select, type SelectOption, TabSwitcher, SetPasswordDialog} from '@cvhome-saas/ui-kit/ui';
+import {Badge, BusyOverlay, ConfirmDialog, DataTable, type TableColumn, TableRow, EmptyState, Icon, LoadError, PageHeader, Pagination, Panel, Select, type SelectOption, TabSwitcher, SetPasswordDialog, OneTimeLinkDialog} from '@cvhome-saas/ui-kit/ui';
 import {ExportButton} from '@shared/ui/export-button/export-button';
-import {InvitationLinkDialog} from './components/invitation-link-dialog/invitation-link-dialog';
 import {InviteDialog} from './components/invite-dialog/invite-dialog';
 import {UserDialog} from './components/user-dialog/user-dialog';
 import {PAGE_SIZE, UsersFacade} from './facades/users.facade';
@@ -54,7 +53,7 @@ const INVITATION_COLUMN_KEYS: readonly {key: string; labelKey: string; width: st
     EmptyState,
     ExportButton,
     Icon,
-    InvitationLinkDialog,
+    OneTimeLinkDialog,
     InviteDialog,
     LoadError,
     PageHeader,

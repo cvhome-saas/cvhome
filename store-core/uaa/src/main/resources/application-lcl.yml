@@ -25,3 +25,6 @@ com:
           key: local-remember-me-key-not-a-secret
         rate-limit:
           enabled: true
+        # Locally the log is the delivery channel: the link an invitation produced is printed so a tester can open it.
+        links:
+          log-links: true

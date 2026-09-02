@@ -11,7 +11,7 @@ somewhere else entirely — that is [cua](../../../store-pod/cua/qa/cua-qa.md).
   is where the platform's sign-in page lives
 - **Runs on** — `lcl start -d --stack <name>`; uaa is `http://uaa.gateway.com:8001` and is the **first**
   service the stack brings up, because it issues the tokens. Read the live port from `lcl urls`
-- **Cases** — 92 (70 verified, 8 unit only, 14 not verified)
+- **Cases** — 103 (81 verified, 8 unit only, 14 not verified)
 - **Also see** — [gateway](../../gateway/gateway-service/qa/gateway-qa.md) (which relays the token and holds
   the session), [tenancy](../../tenancy/tenancy-service/qa/tenancy-qa.md) (which owns the *store-scoped*
   accounts and calls uaa to create them),
@@ -231,6 +231,18 @@ uaa's own guard is what keeps this safe, which is why the negative cases matter 
   parses an auth method, so only reading or saving one client reached it. Fixed, with
   `ClientAuthMethodTest` — uaa's first unit test — holding it.
 
+### ADM-08 — Search, status filters and counts · high · [verified]
+
+- **Steps** — `GET /users?q=store2%20mod`, `?status=PENDING`, `?role=ORG_ADMIN`, `?metadata[org]=<id>`, then
+  `GET /users/counts`. `http/admin-user-api.http` has each.
+- **Expect** — `q` is a case-insensitive contains over username, email **and the full name** ("Store2 Mod" finds
+  `org1-store2-moderator` and `org2-store2-moderator`); the filters AND together; `counts` answers
+  `{total, active, pending, locked, disabled}` and `active + pending + locked + disabled == total` on the seed.
+- **Mind the NULLs.** `locked_until` is null on every never-locked row, so a filter written as
+  `NOT (locked_permanently OR locked_until > now)` matched nothing; `UserSpecifications.hasStatus` is null-safe on
+  purpose. `UserSearchIntegrationTest` holds it.
+- **Gate** — a `store_core` token gets 403 on `/counts`, `/invitations` and `POST /invitations`; anonymous 401.
+
 ---
 
 ## ACC — Accounts, as the console drives them
@@ -385,6 +397,10 @@ to `/clients` reaches the router rather than 404ing.
   kit's `dist`, and rebuilding it replaces that directory underneath the watcher; the dev server can latch a
   resolution failure and show `TS2307: Cannot find module '@cvhome-saas/ui-kit'` over a page that is otherwise
   fine. Restart the app (`lcl restart console-ui`), do not go hunting for a broken import.
+- **A new kit export is a second trap.** Vite pre-bundles the kit into `.angular/cache/<version>/<app>/vite/deps/`
+  and a restart alone keeps that bundle: the page throws `does not provide an export named 'OneTimeLinkDialog'`
+  and renders nothing. `rm -rf store-core/console-ui/.angular/cache`, then restart. Seen when the one-time-link
+  dialog moved into the kit.
 
 ---
 
@@ -546,6 +562,8 @@ checks every citation to it still names a real heading.
 - **Why** — `AdminService.updateUser` does `metadata.putAll(...)`. A key already stored cannot be
   unset through this API at any value, including by omitting it. An operator who believed a removal
   worked would be wrong about which store an account belongs to.
+- **Superseded by INV-06 (phase 4).** The remove button is live again: a removed row goes out as `key: null`,
+  which uaa now treats as "unset". Verified on the `team` key of a test account.
 
 ### DSN-16 — Creating a user is two calls · high · [verified]
 
@@ -557,6 +575,8 @@ checks every citation to it still names a real heading.
   in. Presenting create as one step is how that happens.
 - **[not verified]** — signing in as the created account. Everything up to and including
   set-password is verified.
+- **The alternative is INV-01.** *Invite user* creates the account pending and hands the person a one-time link
+  to choose their own password; the create-then-set-password path stays as the fast one.
 
 ### DSN-17 — Every table paginates · [verified]
 
@@ -976,6 +996,115 @@ which makes its refresh tokens unusable at once; a self-contained access token l
 
 ---
 
+## INV — Invitations and one-time links
+
+An invitation creates the account **pending** — no password hash, `activated_at` null — and issues a 256-bit
+token whose SHA-256 is the only thing stored (`uaa.invitations.token_hash`). The plaintext link is answered
+**once** by the admin call and, in the same transaction, registered on the `User` aggregate as an
+`InvitationIssuedEvent` that the namastack outbox delivers to `LoggingLinkDeliveryHandler`. Nothing emails it: the
+console shows it in `app-one-time-link-dialog` and the operator carries it. A password-reset link is the same
+mechanism for an account that already has a password (`uaa.password_reset_tokens`, one hour). The public pages
+are `/accept-invitation?token=` and `/reset-password?token=`, served by uaa itself, anonymous, rate-limited.
+
+### INV-01 — Invite, accept, sign in · critical · [verified]
+
+- **Steps** — uaa console → Users → **Invite user**: email `ada.qa@mail.com`, name, tick `USER`, *Create
+  invitation*. Copy the link from the dialog. In a private window open it; type `alllowercase12` twice and submit;
+  then `Welcome-Passw0rd-2026` twice. Follow *Go to sign in* and sign in as `ada.qa@mail.com`.
+- **Expect** — the tiles go to *Pending invitations 1*, the row shows `PENDING`, the Invitations tab lists it
+  *Pending* with *Resend* / *Revoke*. The accept page greets by first name, shows the account and expiry, lists
+  the realm's rules. The weak password is refused by the server with **"Add an upper-case letter."** bound to the
+  field (`UAA.PASSWORD.POLICY_VIOLATION`, `params.rule=upper`). The strong one answers *Your account is ready*;
+  signing in works; the row is `ACTIVE`, `email_verified` true, the invitation *Accepted*.
+- **Truth underneath** — `select status from uaa.invitations` → `ACCEPTED`; `select status, count(*) from
+  uaa.outbox_record group by status` → `COMPLETED`; `uaa.log` carries `One-time invitation link issued for …`
+  and, because `com.asrevo.cvhome.uaa.links.log-links=true` under `lcl`, the link itself. Audit rows
+  `user.created`, `invitation.created`, `invitation.accepted`, `user.activated`.
+- **Also** — `InvitationFlowIntegrationTest`.
+
+### INV-02 — A link works once · critical · [verified]
+
+- **Steps** — reload the accepted link from INV-01; open `/accept-invitation` with no token; open it with a made-up
+  token; call `GET /api/v1/public/password-resets/nope`.
+- **Expect** — *This link cannot be used* with *Go to sign in* for the first three (one message for expired,
+  revoked and spent: an anonymous visitor can act on none of them differently); the API answers **404**
+  `application/problem+json` (`UAA.INVITATION.NOT_USABLE` / `UAA.PASSWORD.RESET_TOKEN_NOT_USABLE`). Never a 401
+  and never a login redirect — the public chain is stateless.
+
+### INV-03 — Resend rotates, revoke withdraws · high · [verified]
+
+- **Steps** — invite a second address; Invitations tab → *Resend* on it (a new link dialog), then *Revoke* and
+  confirm. Then `POST /users/{id}/invitations/resend` on the account from INV-01.
+- **Expect** — after resend the **old** link answers 404 and the new one previews; only one `PENDING` row per
+  user exists (`uq_invitations_one_pending`), the previous is `REVOKED` with detail *superseded by a resend*.
+  After revoke the row is *Revoked*, the tile drops, the pending account remains (delete it from its row, or
+  re-invite). Resend on an activated account answers **422** `UAA.USER.NOT_PENDING`.
+- **Also** — the invitation status tabs (*Pending / Accepted / Revoked / Expired / All*) each re-query the server.
+- **[verified]** for the API half and the *Accepted* / *Pending* tabs; the console's *Resend* and *Revoke* buttons
+  were driven once each on an earlier build and are **[not verified]** on this one.
+
+### INV-04 — Inviting a taken address is a 409 with a field · high · [verified]
+
+- **Steps** — invite `org1-admin@mail.com`.
+- **Expect** — **409** `UAA.USER.EMAIL_TAKEN` with `fieldErrors[0].field == "email"`; the dialog marks the email
+  field. The username defaults to the email, so the email check fires before the username one.
+- **Also** — `InvitationFlowIntegrationTest`.
+
+### INV-05 — An admin-issued reset link · critical · [verified]
+
+- **Steps** — Users → open `org1-store1-moderator` → **Issue reset link**, leave *Also sign them out everywhere*
+  off, *Issue link*. Open the link in a private window; type two different passwords; then
+  `Reset-Passw0rd-2026` twice. Sign in with it. Repeat with the toggle **on** while the account has a live
+  session.
+- **Expect** — the dialog is the same show-once one. The page says *Choose a new password*; the mismatch is caught
+  locally (*The two passwords do not match.*) without a request; the strong password answers *Password saved* and
+  the old password stops working. With the toggle on, `GET /users/{id}/sessions` is empty after issuing and every
+  `oauth2_authorization` row for the user is gone (`SES-*` mechanisms). A live link becomes unusable once a second
+  one is issued, and the link is single-use. Audit `user.password.reset_link.issued`, then `user.password.reset`
+  with reason `RESET_LINK`.
+- **Also** — `PasswordResetLinkIntegrationTest` (leaves `org1-store1-moderator` on `Reset-Passw0rd-2026`
+  inside the test database only).
+- **[verified]** without the revoke toggle; **[unit only]** with it.
+
+### INV-06 — Metadata rows can be removed · high · [verified]
+
+- **Steps** — open a user, *Add* a metadata row `team = qa`, Save; reopen, *Remove* it, Save; reopen.
+- **Expect** — the key is present after the first save and **absent** after the second. The pane sends
+  `{"team": null}` for a stored key whose row was removed (SEC-17 is the API half).
+
+### INV-07 — "Forgot password?" explains, it does not promise · [verified]
+
+- **Steps** — `/login` → *Forgot your password?*.
+- **Expect** — a note that there is no self-service reset and an administrator issues a one-time link. No form,
+  no request. Arabic reads the same.
+
+---
+
+## VER — Email verification and editing
+
+### VER-01 — Changing the email un-verifies it · high · [verified]
+
+- **Steps** — open the account from INV-01 (verified by accepting): change the email to `ada.qa2@mail.com`,
+  Save, reopen.
+- **Expect** — the list shows the new address; the dialog's badge is **Email unverified** with a *Mark verified*
+  action beside it. Saving without touching the address sends no `email` at all (the request is diffed), so a
+  plain name edit does not un-verify. Audit `user.email.changed`. `EMAIL_TAKEN` (409) when the address belongs to
+  another account.
+
+### VER-02 — An operator can vouch for an address · [verified]
+
+- **Steps** — *Mark verified* on the account from VER-01.
+- **Expect** — the badge flips to **Email verified** in place; `POST /users/{id}/email/verify` answers the DTO;
+  the super admin's own row is refused (`SuperAdminImmutableException`).
+
+### VER-03 — The username is not a field · [verified]
+
+- **Steps** — open any account.
+- **Expect** — the username is read-only with *The username is the identity tokens carry; it cannot be changed.*
+  It is what a JWT `sub` holds; renaming it is not an edit, and this console does not offer one.
+
+---
+
 ## SID — The `"*"` wildcard
 
 _From `qa/unify-store-id-value-objects.md` §EDGE, reformatted into the case shape used everywhere else._
@@ -1021,6 +1150,10 @@ clients and accounts. Nothing in uaa carries an `alter table`.
 | The realm's remember-me key sat one YAML level too high in the local slices | uaa refused to start: `Could not resolve placeholder 'UAA_REMEMBER_ME_KEY'` | boot |
 | The attempt that crossed the lockout threshold was reported as `attemptsLeft=0` | the sign-in page said "0 attempt(s) left before a 15-minute lock" on an account that was already locked | LCK-01, LCK-03, `LoginFailureHandlerTest` |
 | `/account` had no rail row, so the breadcrumb fell back to *Users* | "cvhome identity › Users" over the account page | SES-06 |
+| A password-policy field error carried only the rule key as its message | the accept page said **"upper"** under the password | INV-01 (`params.rule`, translated by the kit's `errors.code.UAA_PASSWORD_POLICY_VIOLATION`) |
+| The accept page's mismatch check was a `computed` over a reactive form | two different passwords submitted with no message, then the server's 400 | INV-05 |
+| The Users tiles and tabs translated once and never again | switching to Arabic left *ACCOUNTS* / *All 12* in English | CON-05 (the `computed`s read `activeLang()` first) |
+| The Users panel rendered its empty state under a 403 | a `USER`-role session saw *No accounts* beneath the error bar | CON-06 |
 
 ---
 
@@ -1036,10 +1169,22 @@ any more; `fargate` must set every `UAA_*` variable.
 **`/logout` accepts GET.** The kit's `AuthService.logout()` navigates rather than posts, so the logout matcher takes
 any method. A GET logout is a link that signs you out; it should become a POST once the kit posts.
 
-**Lessons closed by this branch.** `lessons.md` entries "Roles — a role is a name" and "Users — metadata is merged, never replaced" now describe the old system; the console side of DSN-15 still disables the remove button.
+**Lessons closed by this branch.** `lessons.md` entries "Roles — a role is a name", "Users — metadata is merged,
+never replaced", "Users — creating an account is two calls, and there are no invites" and the email half of
+"Users — email and username cannot be changed here" now describe the old system; each carries its *Closed by*
+line. Still open: realm switcher, notifications, MFA, CSV import, SAML, and providers on the sign-in page.
 
-**`DSN-15` is stale.** uaa can unset a metadata key now (send it with a `null` value); the console still disables
-the remove button on stored keys.
+**The outbox row holds the plaintext link until it completes.** `uaa.outbox_record.payload` carries
+`InvitationIssuedEvent` / `PasswordResetLinkIssuedEvent` with the link in clear until the handler runs (seconds,
+under `lcl`). A stuck outbox would keep live links readable to anyone with the database. Encrypting the payload
+or carrying only the token hash plus a fetch is a follow-up for the delivery service.
+
+**The invitee's shell is empty.** A `USER`-role account that signs in to uaa's console reaches the shell and gets a
+403 bar on every admin screen (CON-06); `/account` is the only page it can use. A landing on `/account` for
+non-admins is a follow-up.
+
+**Delivery is a log line.** `LoggingLinkDeliveryHandler` is the only consumer of the link events; the SMS /
+WhatsApp / email service that subscribes to `uaa-events` does not exist yet, so the operator carries every link.
 
 **~~uaa has no `http/` directory.~~** Closed: `http/admin-user-api.http`, `http/admin-role-api.http` and
 `http/admin-client-api.http` now cover all three admin controllers, each including the 403-as-org-admin case.

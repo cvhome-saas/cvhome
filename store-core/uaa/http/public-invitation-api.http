@@ -1,0 +1,31 @@
+# PublicInvitationController — where an invitation link lands. Anonymous, stateless, rate limited (20/min per address).
+# The token in the path is the whole credential: take it from the `link` an invite answered with
+# (admin-user-api.http → invite), after `?token=`.
+#
+# Addressed on uaa's own origin: the link points there, not at the gateway.
+
+### preview — 200 LinkPreview {kind: INVITATION, username, email, firstName, expiresAt, password rules}
+GET {{UAA_URL}}/api/v1/public/invitations/{{UAA_ONE_TIME_TOKEN}}
+Accept: application/json
+
+### accept with a weak password — 400 UAA.PASSWORD.POLICY_VIOLATION with one fieldError per broken rule
+POST {{UAA_URL}}/api/v1/public/invitations/{{UAA_ONE_TIME_TOKEN}}/accept
+Content-Type: application/json
+
+{"password": "short"}
+
+### accept — 200 {username, loginUrl}; the account is ACTIVE and email-verified, the link is spent
+POST {{UAA_URL}}/api/v1/public/invitations/{{UAA_ONE_TIME_TOKEN}}/accept
+Content-Type: application/json
+
+{"password": "Welcome-Passw0rd-2026"}
+
+### the same token again — 404 UAA.INVITATION.NOT_USABLE, indistinguishable from a token that never existed
+GET {{UAA_URL}}/api/v1/public/invitations/{{UAA_ONE_TIME_TOKEN}}
+Accept: application/json
+
+> {%
+    client.test("spent", function () {
+        client.assert(response.status === 404, "status " + response.status);
+    });
+%}

@@ -80,11 +80,13 @@ export interface CreateUserRequest {
 
 /**
  * What `PUT /uaa/api/v1/admin/users/{id}` takes. Every field is optional: it is a partial update.
- * `metadata` merges key by key, and a key sent with `null` is **removed**.
+ * `metadata` merges key by key, and a key sent with `null` is **removed**. `email`, when present,
+ * replaces the address and marks it unverified again; the username is the identity and stays.
  */
 export interface UpdateUserRequest {
   readonly firstName?: string | null;
   readonly lastName?: string | null;
+  readonly email?: string;
   readonly enabled?: boolean;
   readonly roles?: readonly string[];
   readonly metadata?: Readonly<Record<string, string | null>>;
@@ -108,4 +110,98 @@ export function metadataString(
 ): string | null {
   const value = metadata?.[key];
   return typeof value === 'string' && value !== '' ? value : null;
+}
+
+/** `GET /users/counts`: the tiles above the account list. `locked` and `disabled` are subsets of `total`. */
+export interface UserCounts {
+  readonly total: number;
+  readonly active: number;
+  readonly pending: number;
+  readonly locked: number;
+  readonly disabled: number;
+}
+
+/**
+ * The account list's filters. Every part is optional and they combine with AND.
+ *
+ * `q` is a case-insensitive contains over username, email and the full name; `metadata` is the
+ * equality filter tenancy has always used (`metadata[org]=…`).
+ */
+export interface UserSearch {
+  readonly q?: string;
+  readonly status?: UserStatus | '';
+  readonly role?: string;
+  readonly metadata?: Readonly<Record<string, string>>;
+}
+
+export type InvitationStatus = 'PENDING' | 'ACCEPTED' | 'REVOKED' | 'EXPIRED';
+
+/** An invitation as the console lists it. Never carries the token. */
+export interface InvitationDto {
+  readonly id: string;
+  readonly userId: string;
+  readonly username: string;
+  readonly email: string;
+  readonly status: InvitationStatus;
+  readonly expiresAt: string;
+  readonly createdAt: string;
+  readonly createdBy: string | null;
+  readonly acceptedAt: string | null;
+}
+
+/**
+ * `POST /users/invitations`. The account is created pending — no password, not yet activated —
+ * and a one-time link is issued for its first password. `username` defaults to the email.
+ */
+export interface InviteUserRequest {
+  readonly username?: string | null;
+  readonly email: string;
+  readonly firstName: string | null;
+  readonly lastName: string | null;
+  readonly roles: readonly string[];
+  readonly metadata: Readonly<Record<string, string>>;
+}
+
+/**
+ * The one response that carries a one-time link. Shown once by the console; no later read can
+ * reproduce it, because only the token's hash is stored. `invitation` is null for a reset link.
+ */
+export interface IssuedLink {
+  readonly user: UserDto;
+  readonly invitation: InvitationDto | null;
+  readonly link: string;
+  readonly expiresAt: string;
+}
+
+/** `POST /users/{id}/password-reset-links`: whether issuing the link also signs the account out everywhere. */
+export interface CreateResetLinkRequest {
+  readonly revokeSessions: boolean;
+}
+
+/** The realm's password rules, as the public accept page needs them to validate before the round trip. */
+export interface PasswordRules {
+  readonly minLength: number;
+  readonly requireUpper: boolean;
+  readonly requireLower: boolean;
+  readonly requireDigit: boolean;
+  readonly requireSpecial: boolean;
+}
+
+/**
+ * What the public accept page shows before a password is chosen: whose account this is and what
+ * the password must satisfy. Nothing else, because the page is reachable by whoever holds the link.
+ */
+export interface LinkPreview {
+  readonly kind: 'INVITATION' | 'PASSWORD_RESET';
+  readonly username: string;
+  readonly email: string | null;
+  readonly firstName: string | null;
+  readonly expiresAt: string;
+  readonly password: PasswordRules;
+}
+
+/** The accept page's answer: who may now sign in, and where. */
+export interface AcceptedLink {
+  readonly username: string;
+  readonly loginUrl: string;
 }

@@ -21,6 +21,8 @@ com:
           login: { limit: 1000, window: 1m }
           token: { limit: 1000, window: 1m }
           public-api: { limit: 1000, window: 1m }
+        links:
+          log-links: true
       test-store:
         users:
           - id: 65D8419C-8765-4B8B-A15F-910DCE959931

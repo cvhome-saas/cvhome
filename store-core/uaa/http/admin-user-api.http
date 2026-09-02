@@ -152,6 +152,65 @@ Content-Type: application/json
 
 {"password": "Demo-Passw0rd!2026"}
 
+### search: q over username, email and names; status and role narrow; metadata[key] is equality — 200
+GET {{SELLER_UI_URL}}/uaa/api/v1/admin/users?q=store1&status=ACTIVE&role=STORE_ADMIN&page=0&count=20
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+
+### the tiles: total and one count per status — 200 {total, active, pending, locked, disabled}
+GET {{SELLER_UI_URL}}/uaa/api/v1/admin/users/counts
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+
+### change the email — 200; the address is unverified again, audited as user.email.changed
+# A taken address is 409 UAA.USER.EMAIL_TAKEN with a fieldError on `email`.
+PUT {{SELLER_UI_URL}}/uaa/api/v1/admin/users/{{UAA_USER_ID}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{"email": "renamed@example.com"}
+
+### mark the email verified on the administrator's word — 200 UserDto
+POST {{SELLER_UI_URL}}/uaa/api/v1/admin/users/{{UAA_USER_ID}}/email/verify
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+
+### invite: the account is created pending and the one-time link is returned ONCE — 201 IssuedLink
+# username defaults to the email. The link is also handed to the outbox for the delivery consumer; locally that
+# consumer logs it (links.log-links=true), so `lcl logs uaa --stack <name>` shows the same link.
+# A second invite for the same email is 409 UAA.USER.USERNAME_TAKEN.
+POST {{SELLER_UI_URL}}/uaa/api/v1/admin/users/invitations
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{"email": "invited@example.com", "firstName": "Invited", "roles": ["STORE_ADMIN"], "metadata": {"org": "{{ORG_ID}}"}}
+
+> {%
+    client.test("issued once", function () {
+        client.assert(response.status === 201, "status " + response.status);
+        client.assert(response.body.link.indexOf("/accept-invitation?token=") > 0, "no link");
+        client.global.set("UAA_INVITED_USER_ID", response.body.user.id);
+    });
+%}
+
+### the invitations tab — 200 Page<InvitationDto>; ?status=PENDING|ACCEPTED|REVOKED|EXPIRED narrows
+GET {{SELLER_UI_URL}}/uaa/api/v1/admin/users/invitations?status=PENDING&page=0&count=20
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+
+### resend: the previous link stops working and a new one is issued — 201 IssuedLink
+# 422 UAA.USER.NOT_PENDING once the account has a password.
+POST {{SELLER_UI_URL}}/uaa/api/v1/admin/users/{{UAA_INVITED_USER_ID}}/invitations/resend
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+
+### revoke the pending invitation — 200; the account stays, pending, until deleted or invited again
+DELETE {{SELLER_UI_URL}}/uaa/api/v1/admin/users/{{UAA_INVITED_USER_ID}}/invitations
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+
+### issue a password-reset link — 201 IssuedLink (invitation: null); earlier live links are retired
+# revokeSessions: true signs the account out now rather than when the link is used. The super admin is 403.
+POST {{SELLER_UI_URL}}/uaa/api/v1/admin/users/{{UAA_USER_ID}}/password-reset-links
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{"revokeSessions": false}
+
 ### a malformed id — 400 at binding, not 404
 # Path variables here are declared UUID, unlike the client API's plain strings.
 GET {{SELLER_UI_URL}}/uaa/api/v1/admin/users/not-a-uuid

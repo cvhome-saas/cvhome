@@ -6,8 +6,9 @@ import {canAccessSecuredPages} from '@cvhome-saas/ui-kit';
  * The split between these routes is Spring Security's, not this app's.
  *
  * `/login` is what `AppSecurityConfig.formLogin(loginPage("/login"))` points at and, with the logout
- * bounce, the only path in here that is `permitAll`. Everything else is `anyRequest().authenticated()`, and the admin API
- * behind it additionally demands `SCOPE_super_admin`/`ROLE_SUPER_ADMIN`.
+ * bounce and the two one-time-link pages, the only paths in here that are `permitAll`. Everything else
+ * is `anyRequest().authenticated()`, and the admin API behind it additionally demands
+ * `SCOPE_super_admin`/`ROLE_SUPER_ADMIN`.
  *
  * `StaticController` forwards any path without a dot that is not `/api/` or `/oauth2/` to
  * index.html, so a deep link to `/clients` reaches the router rather than 404ing.
@@ -24,6 +25,21 @@ export const routes: Routes = [
     loadComponent: () =>
       import('@features/external-logout-link/external-logout-link').then((m) => m.ExternalLogoutLink),
     data: {titleKey: 'route.signOut'},
+  },
+  /*
+   * The two public pages a one-time link lands on. Outside the shell and anonymous: uaa permits the
+   * paths and the `/api/v1/public/**` resources they call, and nothing else on the page needs a
+   * session. `kind` picks the words and the endpoint; `?token=` arrives as a component input.
+   */
+  {
+    path: 'accept-invitation',
+    loadComponent: () => import('@features/link-accept/link-accept').then((m) => m.LinkAccept),
+    data: {titleKey: 'route.acceptInvitation', kind: 'INVITATION'},
+  },
+  {
+    path: 'reset-password',
+    loadComponent: () => import('@features/link-accept/link-accept').then((m) => m.LinkAccept),
+    data: {titleKey: 'route.resetPassword', kind: 'PASSWORD_RESET'},
   },
   {
     path: '',

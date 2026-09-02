@@ -33,7 +33,9 @@
     "clientEdit": "Client",
     "signOut": "Signing out",
     "settings": "Settings",
-    "account": "My account"
+    "account": "My account",
+    "acceptInvitation": "Accept your invitation",
+    "resetPassword": "Choose a new password"
   },
   "signIn": {
     "title": "Sign in",
@@ -57,7 +59,9 @@
     "disabled": "This account has been disabled. Ask an administrator.",
     "expiredPassword": "Your password has expired. Ask an administrator for a reset link.",
     "attemptsLeft": "{{count}} attempt(s) left before a {{minutes}}-minute lock.",
-    "rememberMe": "Keep me signed in"
+    "rememberMe": "Keep me signed in",
+    "forgot": "Forgot your password?",
+    "forgotCopy": "There is no self-service reset on this platform. Ask an administrator: they can issue you a one-time link from the console, and it will bring you back here with a new password."
   },
   "users": {
     "title": "Users",
@@ -68,12 +72,11 @@
     "panel": {
       "title": "Accounts"
     },
-    "notice": {
-      "noSearch": "uaa matches accounts on metadata equality and offers no text search, so this list is not filtered."
-    },
     "empty": {
       "title": "No accounts",
-      "message": "uaa has no accounts registered yet."
+      "message": "uaa has no accounts registered yet.",
+      "noMatch": "No matching accounts",
+      "noMatchMessage": "Nothing matches that search and status. Clear one or both."
     },
     "reset": {
       "title": "Set a new password",
@@ -105,7 +108,12 @@
       "saved": "{{name}} was saved.",
       "created": "{{name}} created.",
       "unlocked": "{{name}} was unlocked.",
-      "signedOut": "{{name}} was signed out of {{count}} session(s)."
+      "signedOut": "{{name}} was signed out of {{count}} session(s).",
+      "invited": "{{name}} invited.",
+      "resent": "A new link was issued for {{name}}.",
+      "invitationRevoked": "The invitation for {{email}} was revoked.",
+      "resetLinkIssued": "A reset link was issued for {{name}}.",
+      "emailVerified": "{{name}}'s email is now marked verified."
     },
     "detail": {
       "firstName": "First name",
@@ -113,22 +121,27 @@
       "username": "Username",
       "email": "Email",
       "roles": "Roles",
-      "readOnlyNote": "uaa does not allow either to be changed here.",
       "setPassword": "Set password",
       "save": "Save",
       "saving": "Saving…",
       "createTitle": "Create a user",
       "editTitle": "Edit user",
-      "createHint": "uaa stores the account without a password — you will set one next.",
+      "createHint": "Creates the account and asks you for its password next. To let the person choose their own, invite them instead.",
       "usernameHint": "What the account signs in with. It cannot be changed afterwards.",
       "enabledLabel": "Account enabled",
       "enabledHint": "A disabled account keeps its roles and cannot sign in.",
       "metadata": "Metadata",
-      "metadataHint": "uaa merges metadata on save, so a key that is already stored cannot be removed here — only edited, or joined by a new one.",
-      "metadataLocked": "Stored keys cannot be removed through uaa's update."
+      "metadataHint": "Removing a row unsets that key on save. `org` and `store` are written by tenancy and read by other services.",
+      "usernameLocked": "The username is the identity tokens carry; it cannot be changed.",
+      "emailHint": "Changing the address marks it unverified again.",
+      "emailVerified": "Email verified",
+      "emailUnverified": "Email unverified",
+      "markVerified": "Mark verified",
+      "resetLink": "Issue reset link"
     },
     "action": {
-      "create": "Create user"
+      "create": "Create user",
+      "invite": "Invite user"
     },
     "security": {
       "title": "Security",
@@ -144,6 +157,93 @@
       "revoke": "End",
       "noSessions": "No active sessions.",
       "loadingSessions": "Loading sessions…"
+    },
+    "tiles": {
+      "label": "Account totals",
+      "total": "Accounts",
+      "activeOf": "{{count}} active",
+      "pending": "Pending invitations",
+      "pendingHint": "no password yet",
+      "locked": "Locked",
+      "lockedHint": "after failed attempts",
+      "disabled": "Disabled",
+      "disabledHint": "by an administrator"
+    },
+    "view": {
+      "label": "Accounts or invitations",
+      "accounts": "Accounts",
+      "invitations": "Invitations"
+    },
+    "filter": {
+      "label": "Filter accounts by status",
+      "search": "Search by name, username or email",
+      "clear": "Clear the search",
+      "ALL": "All",
+      "ACTIVE": "Active",
+      "PENDING": "Pending",
+      "LOCKED": "Locked",
+      "DISABLED": "Disabled"
+    },
+    "invitations": {
+      "filter": {
+        "label": "Filter invitations by status",
+        "ALL": "All",
+        "PENDING": "Pending",
+        "ACCEPTED": "Accepted",
+        "REVOKED": "Revoked",
+        "EXPIRED": "Expired"
+      },
+      "column": {
+        "who": "Invitee",
+        "status": "Status",
+        "expires": "Expires / accepted",
+        "createdBy": "Issued by",
+        "actions": "Actions"
+      },
+      "status": {
+        "PENDING": "Pending",
+        "ACCEPTED": "Accepted",
+        "REVOKED": "Revoked",
+        "EXPIRED": "Expired"
+      },
+      "resend": "Resend",
+      "revoke": "Revoke",
+      "unit": "invitations",
+      "paginationLabel": "Invitation pages",
+      "empty": {
+        "title": "No invitations",
+        "message": "Nothing here with that status. Invite someone from the button above."
+      }
+    },
+    "invite": {
+      "title": "Invite a user",
+      "hint": "The account is created without a password. You will get a one-time link for them to choose one.",
+      "usernameHint": "Optional — the email address when left blank.",
+      "delivery": "Nothing emails the link yet. You will be shown it once, to pass on yourself; it is valid for seven days.",
+      "confirm": "Create invitation",
+      "busy": "Creating…"
+    },
+    "resetLink": {
+      "title": "Issue a reset link",
+      "message": "A one-time link for {{name}} to choose a new password. Their current password keeps working until they do.",
+      "revokeLabel": "Also sign them out everywhere",
+      "revokeHint": "Ends every session and token now. For a suspected compromise, not for a forgotten password.",
+      "validity": "The link is valid for one hour and is shown once.",
+      "confirm": "Issue link",
+      "busy": "Issuing…"
+    },
+    "issued": {
+      "inviteTitle": "Invitation link",
+      "resetTitle": "Password reset link",
+      "message": "Send this to {{name}}. It works once and expires {{expires}}.",
+      "linkLabel": "link",
+      "warning": "This is the only time the link is shown. Copy it before closing — only its hash is stored, and a resend issues a different one.",
+      "done": "Done"
+    },
+    "revoke": {
+      "title": "Revoke this invitation",
+      "message": "The link sent to {{email}} will stop working. The pending account stays and can be re-invited.",
+      "confirm": "Revoke invitation"
     }
   },
   "roles": {
@@ -512,6 +612,56 @@
     "toast": {
       "passwordChanged": "Your password was changed.",
       "signedOutOthers": "{{count}} other session(s) ended."
+    }
+  },
+  "linkAccept": {
+    "title": {
+      "INVITATION": "Welcome",
+      "PASSWORD_RESET": "Choose a new password"
+    },
+    "subtitle": {
+      "INVITATION": "Choose a password to finish setting up your account.",
+      "PASSWORD_RESET": "Your old password stops working once you save the new one."
+    },
+    "loading": "Checking your link…",
+    "greeting": "Hello",
+    "account": "Account",
+    "expires": "Link valid until",
+    "password": "New password",
+    "repeatPassword": "Repeat password",
+    "reveal": "Show password",
+    "rulesLabel": "Password rules",
+    "rules": {
+      "minLength": "At least {{count}} characters",
+      "upper": "An upper-case letter",
+      "lower": "A lower-case letter",
+      "digit": "A digit",
+      "special": "A symbol"
+    },
+    "submit": {
+      "INVITATION": "Activate my account",
+      "PASSWORD_RESET": "Save new password"
+    },
+    "submitting": "Saving…",
+    "noToken": "This page needs the link you were sent. Open it from there.",
+    "unusable": {
+      "title": "This link cannot be used",
+      "message": {
+        "INVITATION": "It has expired, was revoked, or was already used. Ask the administrator who invited you for a new one.",
+        "PASSWORD_RESET": "It has expired, was revoked, or was already used. Ask an administrator for a new one."
+      }
+    },
+    "failed": {
+      "title": "Something went wrong",
+      "message": "The link could not be checked right now. Try again in a moment."
+    },
+    "done": {
+      "title": {
+        "INVITATION": "Your account is ready",
+        "PASSWORD_RESET": "Password saved"
+      },
+      "message": "Sign in as {{name}} with the password you just chose.",
+      "signIn": "Go to sign in"
     }
   }
 }

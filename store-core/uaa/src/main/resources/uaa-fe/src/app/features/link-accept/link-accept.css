@@ -1,0 +1,130 @@
+/*
+ * One centred card on the page ground. The sign-in page's brand half is not repeated: a visitor
+ * arriving from a link has one thing to do, and a pitch beside it would be noise.
+ */
+.wrap {
+  display: grid;
+  min-block-size: 100vh;
+  place-items: center;
+  padding: var(--spacing-gutter);
+  background: var(--background);
+}
+
+.card-wrap {
+  display: grid;
+  gap: var(--spacing-group);
+  inline-size: min(28rem, 100%);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-tight);
+}
+
+.mark {
+  display: grid;
+  place-items: center;
+  inline-size: 2.25rem;
+  block-size: 2.25rem;
+  border-radius: var(--radius-lg);
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+
+.brand-name {
+  color: var(--foreground-strong);
+  font-size: var(--text-lg);
+  font-weight: 700;
+}
+
+.card {
+  display: block;
+}
+
+.who {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.2rem var(--spacing-group);
+  margin: 0 0 var(--spacing-group);
+  font-size: var(--text-3xs);
+}
+
+.who dt {
+  color: var(--foreground-subtle);
+}
+
+.who dd {
+  margin: 0;
+  color: var(--foreground-strong);
+  overflow-wrap: anywhere;
+}
+
+.form {
+  display: grid;
+  gap: var(--spacing-group);
+}
+
+.rules {
+  display: grid;
+  gap: 0.15rem;
+  margin: 0;
+  padding-inline-start: 1.1rem;
+  color: var(--muted-foreground);
+  font-size: var(--text-3xs);
+}
+
+.muted {
+  margin: 0;
+  color: var(--muted-foreground);
+  font-size: var(--text-xs);
+}
+
+.notice {
+  display: flex;
+  gap: var(--spacing-tight);
+  align-items: flex-start;
+  margin: 0 0 var(--spacing-group);
+  padding: 0.6rem 0.75rem;
+  border-radius: var(--radius-md);
+  font-size: var(--text-xs);
+  line-height: 1.6;
+}
+
+.notice.warn {
+  background: var(--chart-4-wash);
+  color: var(--chart-4-foreground);
+}
+
+.notice.ok {
+  background: var(--chart-1-wash);
+  color: var(--chart-1-foreground);
+}
+
+/* The same primary button the sign-in form uses, as a button and as a link. */
+.submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-tight);
+  inline-size: 100%;
+  padding: 0.65rem 1rem;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font: inherit;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.submit:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.back {
+  color: var(--primary);
+  font-size: var(--text-xs);
+}

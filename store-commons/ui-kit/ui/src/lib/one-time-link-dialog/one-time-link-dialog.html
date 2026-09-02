@@ -1,0 +1,18 @@
+<dialog #dialog class="one-time-link" (close)="dismissed.emit()" (cancel)="dismissed.emit()">
+  <div class="one-time-link-body">
+    <h2 class="one-time-link-title">{{ title() }}</h2>
+    <p class="one-time-link-message">{{ message() }}</p>
+
+    <app-copy-field [value]="link()" [label]="linkLabel()" />
+
+    <!--
+      Stated as a warning rather than a hint: closing this dialog without copying the link loses it
+      for good, and the only recourse is a new one.
+    -->
+    <p class="one-time-link-warning" role="alert">{{ warning() }}</p>
+
+    <div class="one-time-link-actions">
+      <button class="primary-action" type="button" (click)="close()">{{ doneLabel() }}</button>
+    </div>
+  </div>
+</dialog>

@@ -68,6 +68,16 @@
           <app-icon name="arrowRight" />
         </button>
       </form>
+
+      <!-- Not a link to a form: resets are issued by an administrator, and the page says so. -->
+      <div class="forgot">
+        <button class="forgot-toggle" type="button" [attr.aria-expanded]="forgotOpen()" (click)="forgotOpen.set(!forgotOpen())">
+          {{ t('signIn.forgot') }}
+        </button>
+        @if (forgotOpen()) {
+          <p class="forgot-copy" role="note">{{ t('signIn.forgotCopy') }}</p>
+        }
+      </div>
     </app-panel>
   </main>
 </div>

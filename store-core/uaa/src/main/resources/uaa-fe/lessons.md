@@ -86,6 +86,9 @@ MFA" rather than "we cannot tell".
   Editable-looking fields that silently fail to save are the worse failure.
 - **Expected contract:** `UpdateUserRequest.email`, and a rename flow that decides what happens to a
   JWT `sub` — the username *is* the identity, so this is not a field change.
+- **Closed by feat/uaa-sso (phase 4), for email:** `UpdateUserRequest.email` exists and the dialog
+  edits it; a changed address is marked unverified, with a badge and a "Mark verified" action beside it.
+  The username stays read-only, on purpose — it is what a JWT `sub` carries.
 
 ## Users — metadata is merged, never replaced
 
@@ -103,6 +106,8 @@ MFA" rather than "we cannot tell".
 - **Closed by feat/uaa-sso (phase 1):** the null-value convention. A key sent with `null` in
   `UpdateUserRequest.metadata` is removed. The pane still disables the remove button on stored keys
   until it learns to send that.
+- **Closed by feat/uaa-sso (phase 4):** the pane sends `key: null` for every stored key whose row was
+  removed, so the remove button is live again and `lockedKeys` is no longer passed.
 
 ## Users — creating an account is two calls, and there are no invites
 
@@ -118,6 +123,11 @@ MFA" rather than "we cannot tell".
   Invite and CSV import are not built.
 - **Expected contract:** for invites, `POST /api/v1/admin/invitations` returning a one-time token,
   which is roughly what tenancy already does for store members.
+- **Closed by feat/uaa-sso (phase 4), for invites:** `POST /api/v1/admin/users/invitations` creates a
+  pending account and answers a one-time link once; the console shows it in the kit's
+  `app-one-time-link-dialog`, lists invitations with resend/revoke, and `/accept-invitation` takes the
+  password. Admin-issued reset links (`POST /users/{id}/password-reset-links`, `/reset-password`) use the
+  same mechanism. Create-then-set-password stays as the fast path. CSV import is still not built.
 
 ## Roles — a role is a name
 
@@ -163,6 +173,9 @@ MFA" rather than "we cannot tell".
   resumes the OAuth2 authorization flow.
 - **Expected contract:** each is its own feature. Social login already exists in **cua** (shoppers)
   and is the closest precedent for uaa gaining it.
+- **Partly closed by feat/uaa-sso (phase 3–4):** remember-me when the realm enables it, lockout and
+  attempts-left states, and a "Forgot password?" that explains resets are issued by an administrator
+  (there is no self-service reset, deliberately). Providers and MFA remain open.
 
 ## Clients — a custom setting's value is a string
 

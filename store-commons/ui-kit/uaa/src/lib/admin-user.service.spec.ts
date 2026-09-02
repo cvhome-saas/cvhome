@@ -131,4 +131,64 @@ describe('AdminUserService', () => {
     service.assignableRoles().subscribe();
     http.expectOne(scoped(`${BASE}/assignable-roles`)).flush([]);
   });
+
+  /** The text query and the exact filters travel as plain parameters beside the bracketed metadata. */
+  it('sends a search as q, status, role and bracketed metadata', () => {
+    service.search(0, 20, {q: ' ada ', status: 'PENDING', role: 'STORE_ADMIN', metadata: {org: 'o1'}}).subscribe();
+    const request = http.expectOne((it) => it.url === BASE);
+    expect(request.request.params.get('q')).toBe('ada');
+    expect(request.request.params.get('status')).toBe('PENDING');
+    expect(request.request.params.get('role')).toBe('STORE_ADMIN');
+    expect(request.request.params.get('metadata[org]')).toBe('o1');
+    request.flush(emptyPage);
+
+    service.search(0, 20, {q: '  ', status: ''}).subscribe();
+    const blank = http.expectOne((it) => it.url === BASE);
+    expect(blank.request.params.has('q')).toBeFalse();
+    expect(blank.request.params.has('status')).toBeFalse();
+    blank.flush(emptyPage);
+  });
+
+  it('reads the counts', () => {
+    service.counts().subscribe();
+    http.expectOne(scoped(`${BASE}/counts`)).flush({total: 0, active: 0, pending: 0, locked: 0, disabled: 0});
+  });
+
+  /** Invitations are a sub-resource of users, and the three writes are all POST/DELETE with the user id in the path. */
+  it('invites, lists, resends and revokes invitations', () => {
+    const invite = {email: 'ada@example.com', firstName: 'Ada', lastName: null, roles: [], metadata: {}};
+    service.invite(invite).subscribe();
+    const created = http.expectOne(scoped(`${BASE}/invitations`));
+    expect(created.request.method).toBe('POST');
+    expect(created.request.body).toEqual(invite);
+    created.flush({});
+
+    service.invitations(0, 20, 'PENDING').subscribe();
+    const list = http.expectOne((it) => it.url === `${BASE}/invitations`);
+    expect(list.request.params.get('status')).toBe('PENDING');
+    list.flush(emptyPage);
+
+    service.resendInvitation(USER).subscribe();
+    const resend = http.expectOne(scoped(`${BASE}/${USER}/invitations/resend`));
+    expect(resend.request.method).toBe('POST');
+    resend.flush({});
+
+    service.revokeInvitation(USER).subscribe();
+    const revoke = http.expectOne(scoped(`${BASE}/${USER}/invitations`));
+    expect(revoke.request.method).toBe('DELETE');
+    revoke.flush(null);
+  });
+
+  it('issues a reset link with the revoke flag in the body, and verifies an email with an empty POST', () => {
+    service.createResetLink(USER, {revokeSessions: true}).subscribe();
+    const link = http.expectOne(scoped(`${BASE}/${USER}/password-reset-links`));
+    expect(link.request.method).toBe('POST');
+    expect(link.request.body).toEqual({revokeSessions: true});
+    link.flush({});
+
+    service.verifyEmail(USER).subscribe();
+    const verify = http.expectOne(scoped(`${BASE}/${USER}/email/verify`));
+    expect(verify.request.method).toBe('POST');
+    verify.flush({});
+  });
 });

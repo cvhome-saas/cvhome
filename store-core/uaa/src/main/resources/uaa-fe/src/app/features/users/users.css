@@ -178,3 +178,54 @@
 .link.danger {
   color: var(--destructive);
 }
+
+/* --- the panel head and the two tab rows ----------------------------------------------------------- */
+.head-actions {
+  display: flex;
+  gap: var(--spacing-tight);
+}
+
+.views {
+  display: block;
+  margin-block-end: var(--spacing-group);
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-tight);
+  margin-block-end: var(--spacing-group);
+}
+
+/* --- the invitations table ------------------------------------------------------------------------- */
+.cell {
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+  font-size: var(--text-3xs);
+}
+
+.cell.who {
+  overflow-wrap: anywhere;
+}
+
+.sub {
+  color: var(--muted-foreground);
+  font-family: var(--font-mono);
+  font-size: var(--text-4xs);
+}
+
+.row-actions {
+  flex-direction: row;
+  gap: var(--spacing-field);
+}
+
+/* --- the email badge beside its field -------------------------------------------------------------- */
+.verified {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-field);
+  margin-block-start: calc(-1 * var(--spacing-tight));
+}

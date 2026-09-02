@@ -178,8 +178,13 @@ public final class UaaClient {
 
     /** Anonymous: no token, no cookies. */
     public HttpResponse<String> anonymous(String method, String path) throws IOException, InterruptedException {
+        return anonymous(method, path, null);
+    }
+
+    /** Anonymous with a JSON body — the public accept endpoints. */
+    public HttpResponse<String> anonymous(String method, String path, String body) throws IOException, InterruptedException {
         clearCookies();
-        return json(method, path, null, null, false);
+        return json(method, path, body, null, false);
     }
 
     private HttpResponse<String> json(String method, String path, String body, String token, boolean csrfHeader)

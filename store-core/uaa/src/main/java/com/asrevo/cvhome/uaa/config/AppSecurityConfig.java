@@ -100,6 +100,8 @@ public class AppSecurityConfig {
                         .requestMatchers(LOGIN_PAGE, LOGOUT, "/assets/**", "/media/**", "/img/**", "/webfonts/**", "/js/**",
                                 "/css/**", "/*.css", "/*.js", "/favicon.ico")
                         .permitAll()
+                        // The pages a one-time link lands on: the SPA route, whose API is the public chain above.
+                        .requestMatchers("/accept-invitation", "/reset-password").permitAll()
                         .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/api-docs/**").permitAll()
                         .requestMatchers("/api/v1/admin/**").hasAnyAuthority("SCOPE_super_admin", SUPER_ADMIN)
                         .anyRequest().authenticated())

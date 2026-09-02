@@ -73,6 +73,7 @@ include(
         'store-pod:cua',
 
         'store-core:uaa',
+        'store-core:uaa:uaa-events',
         'store-core:gateway:gateway-service',
         'store-core:tenancy:tenancy-commons',
         'store-core:tenancy:tenancy-events',

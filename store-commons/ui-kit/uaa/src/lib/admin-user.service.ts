@@ -5,11 +5,18 @@ import {Observable, concat, map, of, toArray} from 'rxjs';
 import {CrudService, UI_KIT_CONFIG} from '@cvhome-saas/ui-kit';
 import type {SpringPage} from '@cvhome-saas/ui-kit';
 import type {
+  CreateResetLinkRequest,
   CreateUserRequest,
+  InvitationDto,
+  InvitationStatus,
+  InviteUserRequest,
+  IssuedLink,
   ResetUserPasswordRequest,
   SessionSummary,
   UpdateUserRequest,
+  UserCounts,
   UserDto,
+  UserSearch,
 } from './uaa.models';
 
 /**
@@ -45,26 +52,46 @@ export class AdminUserService {
   private readonly base = `${inject(UI_KIT_CONFIG).uaaBasePath}${ADMIN_USER_API_PATH}`;
 
   /**
-   * A page of accounts, optionally narrowed by metadata.
-   *
-   * **Metadata equality is the only filter there is.** `AdminService.getUsers` reads every
-   * `metadata[<key>]` query parameter and matches on equality; there is no query over username,
-   * email or name, so the console offers an organization filter and no search box. See lessons.md,
-   * "Platform users — no text search".
+   * A page of accounts narrowed by metadata equality — the filter tenancy has always used, and the
+   * one console-ui's organization pages still call. {@link search} is the wider query.
    *
    * `count`, not Spring's `size` — uaa depends on `store-commons:autoconfigure` like everything else,
-   * so the platform-wide rename applies here too. The controller takes `@RequestParam Map allParams`
-   * and picks only the `metadata[...]` keys out of it, so the paging and the `?store=`/`?pod=` the
-   * request context stamps are ignored rather than mistaken for filters.
+   * so the platform-wide rename applies here too.
    */
   list(page: number, count: number, metadata: Readonly<Record<string, string>> = {}): Observable<SpringPage<UserDto>> {
-    const filters: Record<string, string> = {};
-    for (const [key, value] of Object.entries(metadata)) {
+    return this.search(page, count, {metadata});
+  }
+
+  /**
+   * A page of accounts, filtered.
+   *
+   * `q` is a case-insensitive contains over username, email and the full name; `status` and `role`
+   * are exact; `metadata` keys go out as the bracketed `metadata[<key>]` parameters
+   * `AdminUserController` slices by hand off `@RequestParam Map allParams`. An empty value is
+   * dropped rather than sent — `metadata[org]=` would match no account at all.
+   */
+  search(page: number, count: number, search: UserSearch = {}): Observable<SpringPage<UserDto>> {
+    const params: Record<string, string | number> = {page, count};
+    if (search.q?.trim()) {
+      params['q'] = search.q.trim();
+    }
+    if (search.status) {
+      params['status'] = search.status;
+    }
+    if (search.role) {
+      params['role'] = search.role;
+    }
+    for (const [key, value] of Object.entries(search.metadata ?? {})) {
       if (value) {
-        filters[`metadata[${key}]`] = value;
+        params[`metadata[${key}]`] = value;
       }
     }
-    return this.crudService.get(this.base, {page, count, ...filters});
+    return this.crudService.get(this.base, params);
+  }
+
+  /** The five figures above the list. */
+  counts(): Observable<UserCounts> {
+    return this.crudService.get(`${this.base}/counts`);
   }
 
   /** One account by uaa id. */
@@ -163,6 +190,49 @@ export class AdminUserService {
 
   assignableRoles(): Observable<string[]> {
     return this.crudService.get(`${this.base}/assignable-roles`);
+  }
+
+  /** Marks the address verified without a round trip through the person — an operator vouching for it. */
+  verifyEmail(id: string): Observable<UserDto> {
+    return this.crudService.post(`${this.base}/${id}/email/verify`, null);
+  }
+
+  /**
+   * Invites an account: creates it pending and answers with the one-time link, **once**.
+   *
+   * Only the token's hash is stored, so the `link` in the response is the only copy there will ever
+   * be. Show it in `app-one-time-link-dialog`, never in a toast.
+   */
+  invite(request: InviteUserRequest): Observable<IssuedLink> {
+    return this.crudService.post(`${this.base}/invitations`, request);
+  }
+
+  /** Invitations, newest first, optionally one status. */
+  invitations(page: number, count: number, status: InvitationStatus | '' = ''): Observable<SpringPage<InvitationDto>> {
+    const params: Record<string, string | number> = {page, count};
+    if (status) {
+      params['status'] = status;
+    }
+    return this.crudService.get(`${this.base}/invitations`, params);
+  }
+
+  /** A fresh link for a still-pending account; the previous one is revoked. 422 once the account has a password. */
+  resendInvitation(userId: string): Observable<IssuedLink> {
+    return this.crudService.post(`${this.base}/${userId}/invitations/resend`, null);
+  }
+
+  /** Withdraws the pending invitation. The account stays, pending, until deleted or re-invited. */
+  revokeInvitation(userId: string): Observable<void> {
+    return this.crudService.delete(`${this.base}/${userId}/invitations`);
+  }
+
+  /**
+   * A one-time password-reset link, answered once like {@link invite}. With `revokeSessions` the
+   * account is also signed out everywhere and its tokens revoked, which is the right call for a
+   * suspected compromise and the wrong one for someone who merely forgot.
+   */
+  createResetLink(id: string, request: CreateResetLinkRequest = {revokeSessions: false}): Observable<IssuedLink> {
+    return this.crudService.post(`${this.base}/${id}/password-reset-links`, request);
   }
 
   /**

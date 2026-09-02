@@ -147,6 +147,38 @@ create table if not exists uaa.password_history
 );
 CREATE INDEX IF NOT EXISTS idx_password_history_user ON uaa.password_history (user_id, created_at DESC);
 
+-- A pending account's one-time invitation. Only the token's hash is stored; the token itself is returned once to the
+-- administrator and handed to the delivery consumer through the outbox. One live invitation per account.
+create table if not exists uaa.invitations
+(
+    id          uuid PRIMARY KEY,
+    user_id     uuid         NOT NULL REFERENCES uaa.users (id) ON DELETE CASCADE,
+    email       VARCHAR(254) NOT NULL,
+    token_hash  VARCHAR(64)  NOT NULL UNIQUE,
+    status      VARCHAR(10)  NOT NULL DEFAULT 'PENDING',
+    expires_at  timestamptz  NOT NULL,
+    created_at  timestamptz  NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by  VARCHAR(190),
+    accepted_at timestamptz,
+    constraint invitations_status_ck check (status in ('PENDING', 'ACCEPTED', 'REVOKED', 'EXPIRED'))
+);
+CREATE UNIQUE INDEX IF NOT EXISTS uq_invitations_one_pending ON uaa.invitations (user_id) WHERE status = 'PENDING';
+CREATE INDEX IF NOT EXISTS idx_invitations_status ON uaa.invitations (status, created_at DESC);
+
+-- An administrator-issued password-reset link, same handling as an invitation: hash only, used once, short-lived.
+create table if not exists uaa.password_reset_tokens
+(
+    id         uuid PRIMARY KEY,
+    user_id    uuid        NOT NULL REFERENCES uaa.users (id) ON DELETE CASCADE,
+    token_hash VARCHAR(64) NOT NULL UNIQUE,
+    expires_at timestamptz NOT NULL,
+    created_at timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by VARCHAR(190),
+    used_at    timestamptz,
+    revoked_at timestamptz
+);
+CREATE INDEX IF NOT EXISTS idx_password_reset_tokens_user ON uaa.password_reset_tokens (user_id, created_at DESC);
+
 -- Realm-wide policy: exactly one row.
 create table if not exists uaa.settings
 (
@@ -227,3 +259,50 @@ create table if not exists uaa.signing_keys
     primary key (id),
     constraint UKtobs6m52hleh04iy0qgpb2yfv unique (kid)
 );
+
+-- The transactional outbox (namastack), in uaa's own schema. Every event in uaa-events is a row here until its
+-- consumer has run; the starter's schema initialisation is off, so these are the only DDL for it.
+CREATE TABLE IF NOT EXISTS uaa.outbox_record
+(
+    id             VARCHAR(255)             NOT NULL,
+    status         VARCHAR(20)              NOT NULL,
+    record_key     VARCHAR(255)             NOT NULL,
+    record_type    VARCHAR(255)             NOT NULL,
+    payload        TEXT                     NOT NULL,
+    context        TEXT,
+    created_at     TIMESTAMP WITH TIME ZONE NOT NULL,
+    completed_at   TIMESTAMP WITH TIME ZONE,
+    failure_count  INT                      NOT NULL,
+    failure_reason VARCHAR(1000),
+    next_retry_at  TIMESTAMP WITH TIME ZONE NOT NULL,
+    partition_no   INTEGER                  NOT NULL,
+    handler_id     VARCHAR(1000)            NOT NULL,
+    PRIMARY KEY (id)
+);
+
+CREATE TABLE IF NOT EXISTS uaa.outbox_instance
+(
+    instance_id    VARCHAR(255) PRIMARY KEY,
+    hostname       VARCHAR(255)             NOT NULL,
+    port           INTEGER                  NOT NULL,
+    status         VARCHAR(50)              NOT NULL,
+    started_at     TIMESTAMP WITH TIME ZONE NOT NULL,
+    last_heartbeat TIMESTAMP WITH TIME ZONE NOT NULL,
+    created_at     TIMESTAMP WITH TIME ZONE NOT NULL,
+    updated_at     TIMESTAMP WITH TIME ZONE NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS uaa.outbox_partition
+(
+    partition_number INTEGER PRIMARY KEY,
+    instance_id      VARCHAR(255),
+    version          BIGINT                   NOT NULL DEFAULT 0,
+    updated_at       TIMESTAMP WITH TIME ZONE NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_uaa_outbox_record_record_key_created ON uaa.outbox_record (record_key, created_at);
+CREATE INDEX IF NOT EXISTS idx_uaa_outbox_record_partition_status_retry ON uaa.outbox_record (partition_no, status, next_retry_at);
+CREATE INDEX IF NOT EXISTS idx_uaa_outbox_record_status_retry ON uaa.outbox_record (status, next_retry_at);
+CREATE INDEX IF NOT EXISTS idx_uaa_outbox_record_status ON uaa.outbox_record (status);
+CREATE INDEX IF NOT EXISTS idx_uaa_outbox_record_record_key_completed_created ON uaa.outbox_record (record_key, completed_at, created_at);
+CREATE INDEX IF NOT EXISTS idx_uaa_outbox_instance_status_heartbeat ON uaa.outbox_instance (status, last_heartbeat);

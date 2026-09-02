@@ -1,6 +1,7 @@
 package com.asrevo.cvhome.uaa.service;
 
 import java.time.Clock;
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -19,10 +20,14 @@ import com.asrevo.cvhome.uaa.audit.AuditService;
 import com.asrevo.cvhome.uaa.domain.Role;
 import com.asrevo.cvhome.uaa.domain.UaaConstants;
 import com.asrevo.cvhome.uaa.domain.User;
+import com.asrevo.cvhome.uaa.domain.UserStatus;
 import com.asrevo.cvhome.uaa.dto.CreateUserRequest;
 import com.asrevo.cvhome.uaa.dto.ResetUserPasswordRequest;
 import com.asrevo.cvhome.uaa.dto.UpdateUserRequest;
+import com.asrevo.cvhome.uaa.dto.UserCounts;
 import com.asrevo.cvhome.uaa.dto.UserDto;
+import com.asrevo.cvhome.uaa.dto.UserSearch;
+import com.asrevo.cvhome.uaa.errors.EmailTakenException;
 import com.asrevo.cvhome.uaa.errors.PasswordCompromisedException;
 import com.asrevo.cvhome.uaa.errors.PasswordPolicyViolationException;
 import com.asrevo.cvhome.uaa.errors.PasswordReusedException;
@@ -30,6 +35,7 @@ import com.asrevo.cvhome.uaa.errors.RoleNotAssignableException;
 import com.asrevo.cvhome.uaa.errors.RoleNotFoundException;
 import com.asrevo.cvhome.uaa.errors.SuperAdminImmutableException;
 import com.asrevo.cvhome.uaa.errors.UserNotFoundException;
+import com.asrevo.cvhome.uaa.errors.UsernameTakenException;
 import com.asrevo.cvhome.uaa.password.PasswordService;
 import com.asrevo.cvhome.uaa.repo.RoleRepository;
 import com.asrevo.cvhome.uaa.repo.UserRepository;
@@ -66,6 +72,8 @@ public class AdminService {
 
     static final String ADMIN_RESET = "ADMIN_RESET";
 
+    static final String EMAIL = "email";
+
     private static final String COMMA = ",";
 
     private final UserRepository userRepository;
@@ -85,15 +93,39 @@ public class AdminService {
     private final LockoutService lockout;
 
     @Transactional(readOnly = true)
-    public Page<UserDto> getUsers(Map<String, String> metadataFilters, Pageable pageable) {
-        Specification<User> spec = buildSpec(metadataFilters);
-        return userRepository.findAll(spec, pageable).map(this::toDto);
+    public Page<UserDto> getUsers(UserSearch search, Pageable pageable) {
+        return userRepository.findAll(buildSpec(search, clock.instant()), pageable).map(this::toDto);
     }
 
-    private Specification<User> buildSpec(Map<String, String> metadataFilters) {
+    /** The Users screen's tiles: one count per status, derived the same way the list's status filter is. */
+    @Transactional(readOnly = true)
+    public UserCounts counts() {
+        Instant now = clock.instant();
+        return new UserCounts(userRepository.count(),
+                countByStatus(UserStatus.ACTIVE, now), countByStatus(UserStatus.PENDING, now),
+                countByStatus(UserStatus.LOCKED, now), countByStatus(UserStatus.DISABLED, now));
+    }
+
+    private long countByStatus(UserStatus status, Instant now) {
+        return userRepository.count(UserSpecifications.hasStatus(status, now));
+    }
+
+    private static Specification<User> buildSpec(UserSearch search, Instant now) {
         Specification<User> spec = (_, _, cb) -> cb.conjunction();
-        if (metadataFilters != null) {
-            for (Map.Entry<String, String> entry : metadataFilters.entrySet()) {
+        if (search == null) {
+            return spec;
+        }
+        if (search.hasQuery()) {
+            spec = spec.and(UserSpecifications.matches(search.q()));
+        }
+        if (search.status() != null) {
+            spec = spec.and(UserSpecifications.hasStatus(search.status(), now));
+        }
+        if (search.hasRole()) {
+            spec = spec.and(UserSpecifications.hasRole(search.role()));
+        }
+        if (search.metadata() != null) {
+            for (Map.Entry<String, String> entry : search.metadata().entrySet()) {
                 if (entry.getKey() != null && entry.getValue() != null) {
                     spec = spec.and(UserSpecifications.hasMetadataField(entry.getKey(), entry.getValue()));
                 }
@@ -102,7 +134,7 @@ public class AdminService {
         return spec;
     }
 
-    UserDto toDto(User u) {
+    public UserDto toDto(User u) {
         return new UserDto(u.getId(), u.getUsername(), u.getEmail(), u.getFirstName(), u.getLastName(), u.isEnabled(),
                 u.status(clock.instant()), u.isEmailVerified(), u.getRoles().stream().map(Role::getName).collect(toSet()),
                 u.getMetadata(), u.getLastSignInAt(), u.getLastSignInClientId(), u.getLastSignInVia(), u.getLockedUntil(),
@@ -125,26 +157,47 @@ public class AdminService {
     /**
      * Creates an account. With a password the account can sign in at once; without one it exists, is enabled, and
      * cannot sign in until a password is set — {@code JpaUserDetailsService} treats a missing hash as a credential
-     * that never matches rather than as an error.
+     * that never matches rather than as an error. A taken username or email is a 409 naming the field, not the
+     * database's unique violation.
      */
     @Transactional
     public UserDto createUser(CreateUserRequest req)
             throws UserNotFoundException, SuperAdminImmutableException, RoleNotFoundException, RoleNotAssignableException,
-            PasswordPolicyViolationException, PasswordReusedException, PasswordCompromisedException {
-        User u = new User();
-        u.setUsername(req.username());
-        u.setEmail(req.email());
-        u.setFirstName(req.firstName());
-        u.setLastName(req.lastName());
-        if (req.metadata() != null) {
-            applyMetadata(u, req.metadata());
-        }
-        User saved = userRepository.save(u);
+            PasswordPolicyViolationException, PasswordReusedException, PasswordCompromisedException, UsernameTakenException,
+            EmailTakenException {
+        User saved = newAccount(req);
         if (req.password() != null && !req.password().isBlank()) {
             passwords.setPassword(saved, req.password());
         }
-        if (req.roles() != null && !req.roles().isEmpty()) {
-            assignRoles(saved.getId(), req.roles());
+        return finishCreate(saved, req.roles());
+    }
+
+    /** {@link #createUser} without a password: the shape an invitation starts from. Ignores {@code req.password()}. */
+    @Transactional
+    public UserDto createAccount(CreateUserRequest req)
+            throws UserNotFoundException, SuperAdminImmutableException, RoleNotFoundException, RoleNotAssignableException,
+            UsernameTakenException, EmailTakenException {
+        return finishCreate(newAccount(req), req.roles());
+    }
+
+    private User newAccount(CreateUserRequest req) throws UsernameTakenException, EmailTakenException {
+        if (userRepository.existsByUsernameIgnoreCase(req.username())) {
+            throw UsernameTakenException.of(req.username());
+        }
+        if (req.email() != null && userRepository.existsByEmailIgnoreCase(req.email())) {
+            throw EmailTakenException.of(req.email());
+        }
+        User u = User.create(req.username(), req.email(), req.firstName(), req.lastName());
+        if (req.metadata() != null) {
+            applyMetadata(u, req.metadata());
+        }
+        return userRepository.save(u);
+    }
+
+    private UserDto finishCreate(User saved, Set<String> roles)
+            throws UserNotFoundException, SuperAdminImmutableException, RoleNotFoundException, RoleNotAssignableException {
+        if (roles != null && !roles.isEmpty()) {
+            assignRoles(saved.getId(), roles);
         }
         UserDto created = getUser(saved.getId());
         audit.record(event(AuditEventType.USER_CREATED, saved).change(null, created));
@@ -179,11 +232,13 @@ public class AdminService {
 
     /**
      * Partial update: an absent field is left alone. {@code metadata} merges key by key, and a key sent with a
-     * {@code null} value is <em>removed</em> — the only way to unset {@code org} or {@code store} once written.
+     * {@code null} value is <em>removed</em> — the only way to unset {@code org} or {@code store} once written. A new
+     * email is unverified until a link reaches it.
      */
     @Transactional
     public UserDto updateUser(UUID id, UpdateUserRequest req)
-            throws UserNotFoundException, SuperAdminImmutableException, RoleNotFoundException, RoleNotAssignableException {
+            throws UserNotFoundException, SuperAdminImmutableException, RoleNotFoundException, RoleNotAssignableException,
+            EmailTakenException {
         User u = getNonSuperAdmin(id);
         UserDto before = toDto(u);
         if (req.firstName() != null) {
@@ -191,6 +246,9 @@ public class AdminService {
         }
         if (req.lastName() != null) {
             u.setLastName(req.lastName());
+        }
+        if (req.email() != null && !req.email().equalsIgnoreCase(u.getEmail())) {
+            changeEmail(u, req.email());
         }
         if (req.enabled() != null) {
             u.setEnabled(req.enabled());
@@ -210,6 +268,27 @@ public class AdminService {
         UserDto after = getUser(saved.getId());
         audit.record(event(AuditEventType.USER_UPDATED, saved).change(before, after));
         return after;
+    }
+
+    private void changeEmail(User u, String email) throws EmailTakenException {
+        if (userRepository.existsByEmailIgnoreCaseAndIdNot(email, u.getId())) {
+            throw EmailTakenException.of(email);
+        }
+        String previous = u.getEmail();
+        u.setEmail(email);
+        u.setEmailVerified(false);
+        audit.record(event(AuditEventType.USER_EMAIL_CHANGED, u).change(Map.of(EMAIL, previous), Map.of(EMAIL, email)));
+    }
+
+    /** Marks the address verified on an administrator's word — say, after they confirmed it out of band. */
+    @Transactional
+    public UserDto verifyEmail(UUID id) throws UserNotFoundException, SuperAdminImmutableException {
+        User u = getNonSuperAdmin(id);
+        if (!u.isEmailVerified()) {
+            u.setEmailVerified(true);
+            audit.record(event(AuditEventType.USER_EMAIL_VERIFIED, u));
+        }
+        return toDto(u);
     }
 
     private static void applyMetadata(User u, Map<String, Object> metadata) {
@@ -273,24 +352,29 @@ public class AdminService {
         audit.record(event(AuditEventType.USER_ENABLED, u));
     }
 
+    /** Switches the account off and signs it out everywhere; the aggregate publishes {@code UserDisabledEvent}. */
     @Transactional
     public void disableUser(UUID id) throws UserNotFoundException, SuperAdminImmutableException {
         User u = getNonSuperAdmin(id);
-        u.setEnabled(false);
+        u.disable();
+        userRepository.save(u);
         revokeEverything(u);
         audit.record(event(AuditEventType.USER_DISABLED, u));
     }
 
+    /** Deleted through the aggregate, not by id, so {@code UserDeletedEvent} reaches the outbox with the delete. */
     @Transactional
     public void delete(UUID id) throws UserNotFoundException, SuperAdminImmutableException {
         User u = getNonSuperAdmin(id);
         UserDto before = toDto(u);
         revokeEverything(u);
-        userRepository.deleteById(u.getId());
+        u.markDeleted();
+        userRepository.delete(u);
         audit.record(event(AuditEventType.USER_DELETED, u).change(before, null));
     }
 
-    private User getNonSuperAdmin(UUID id) throws UserNotFoundException, SuperAdminImmutableException {
+    /** The account, unless it is the seeded super admin, which no mutator may touch. */
+    public User getNonSuperAdmin(UUID id) throws UserNotFoundException, SuperAdminImmutableException {
         User user = findUser(id);
         if (UaaConstants.SUPER_ADMIN_ID.equals(user.getId())) {
             throw SuperAdminImmutableException.of(id);

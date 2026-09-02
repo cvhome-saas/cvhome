@@ -58,6 +58,13 @@ export class SignIn {
 
   protected readonly rememberMe = signal(false);
 
+  /**
+   * "Forgot password?" opens an explanation, not a form. There is no self-service reset: an
+   * administrator issues a one-time link from the console, and the person follows it. Saying so is
+   * better than a link that is not there — see lessons.md, "Sign-in — one step, password only".
+   */
+  protected readonly forgotOpen = signal(false);
+
   protected onSubmit(): void {
     // Re-read at the last moment: the cookie may have been rotated since the page rendered.
     this.csrf.set(readCookie('XSRF-TOKEN'));

@@ -17,6 +17,8 @@ public enum AuditEventType {
     USER_DISABLED("user.disabled", AuditCategory.ADMIN),
     USER_ACTIVATED("user.activated", AuditCategory.ADMIN),
     USER_PASSWORD_RESET("user.password.reset", AuditCategory.SECURITY),
+    USER_PASSWORD_RESET_LINK_ISSUED("user.password.reset_link.issued", AuditCategory.SECURITY),
+    USER_EMAIL_CHANGED("user.email.changed", AuditCategory.ADMIN),
     USER_PASSWORD_CHANGED("user.password.changed", AuditCategory.SECURITY),
     USER_EMAIL_VERIFIED("user.email.verified", AuditCategory.ADMIN),
     USER_ROLE_ASSIGNED("user.role.assigned", AuditCategory.ADMIN),

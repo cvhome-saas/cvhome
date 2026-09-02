@@ -266,7 +266,7 @@
   }
 
   @if (facade.issued(); as issued) {
-    <app-invitation-link-dialog
+    <app-one-time-link-dialog
       [open]="true"
       [title]="t('users.issued.title')"
       [message]="t('users.issued.message', {email: issued.email})"

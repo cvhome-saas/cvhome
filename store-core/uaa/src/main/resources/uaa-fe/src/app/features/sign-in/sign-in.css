@@ -173,3 +173,31 @@
   color: var(--muted-foreground);
   font-size: var(--text-sm);
 }
+
+/* --- "Forgot password?" — an explanation, since there is no self-service reset ------------------------ */
+.forgot {
+  display: grid;
+  gap: var(--spacing-tight);
+  margin-block-start: var(--spacing-group);
+}
+
+.forgot-toggle {
+  justify-self: start;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--primary);
+  font: inherit;
+  font-size: var(--text-xs);
+  cursor: pointer;
+}
+
+.forgot-copy {
+  margin: 0;
+  padding: 0.6rem 0.75rem;
+  border-radius: var(--radius-md);
+  background: var(--muted);
+  color: var(--muted-foreground);
+  font-size: var(--text-xs);
+  line-height: 1.6;
+}

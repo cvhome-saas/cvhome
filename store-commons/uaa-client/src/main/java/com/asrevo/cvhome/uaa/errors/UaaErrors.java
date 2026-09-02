@@ -91,7 +91,28 @@ public enum UaaErrors implements ErrorCode {
     SESSION_NOT_FOUND("UAA.SESSION.NOT_FOUND", ErrorCategory.NOT_FOUND),
 
     /** Too many attempts from one address in the window. */
-    RATE_LIMITED("UAA.AUTH.RATE_LIMITED", ErrorCategory.TOO_MANY_REQUESTS);
+    RATE_LIMITED("UAA.AUTH.RATE_LIMITED", ErrorCategory.TOO_MANY_REQUESTS),
+
+    /**
+     * No usable invitation for that token — missing, expired, revoked or already accepted, one code for all four so
+     * the public endpoint cannot be used to tell which tokens ever existed.
+     */
+    INVITATION_NOT_USABLE("UAA.INVITATION.NOT_USABLE", ErrorCategory.NOT_FOUND),
+
+    /** The account already has a live invitation; resend rotates it instead. */
+    INVITATION_ALREADY_PENDING("UAA.INVITATION.ALREADY_PENDING", ErrorCategory.CONFLICT),
+
+    /** An invitation action on an account that is not pending — it already has a password. */
+    USER_NOT_PENDING("UAA.USER.NOT_PENDING", ErrorCategory.UNPROCESSABLE),
+
+    /** No usable reset link for that token; the same single code as {@link #INVITATION_NOT_USABLE}, for the same reason. */
+    RESET_TOKEN_NOT_USABLE("UAA.PASSWORD.RESET_TOKEN_NOT_USABLE", ErrorCategory.NOT_FOUND),
+
+    /** Another account already signs in with that username. */
+    USERNAME_TAKEN("UAA.USER.USERNAME_TAKEN", ErrorCategory.CONFLICT),
+
+    /** Another account already carries that email. */
+    EMAIL_TAKEN("UAA.USER.EMAIL_TAKEN", ErrorCategory.CONFLICT);
 
     private final String code;
 

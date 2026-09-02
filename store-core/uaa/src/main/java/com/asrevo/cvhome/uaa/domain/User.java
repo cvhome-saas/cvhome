@@ -20,15 +20,36 @@ import jakarta.persistence.Table;
 
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
+import org.springframework.data.domain.AbstractAggregateRoot;
+
+import com.asrevo.cvhome.uaa.events.InvitationIssuedEvent;
+import com.asrevo.cvhome.uaa.events.PasswordResetLinkIssuedEvent;
+import com.asrevo.cvhome.uaa.events.UserCreatedEvent;
+import com.asrevo.cvhome.uaa.events.UserDeletedEvent;
+import com.asrevo.cvhome.uaa.events.UserDisabledEvent;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
+/**
+ * An account, and the aggregate root uaa's events are registered on.
+ *
+ * <p>
+ * The lifecycle transitions that other services care about — created, disabled, deleted, a link issued — are
+ * methods here that record the matching {@code uaa-events} record; Spring Data publishes them when the repository
+ * saves (or deletes) the aggregate, in the same transaction, and the outbox takes them from there. A service class
+ * never publishes a user event itself.
+ * </p>
+ */
 @Entity
 @Table(name = "users")
 @Data
+@EqualsAndHashCode(callSuper = false)
+@ToString(callSuper = false)
 @NoArgsConstructor
-public class User {
+public class User extends AbstractAggregateRoot<User> {
 
     @Id
     private UUID id;
@@ -101,6 +122,48 @@ public class User {
     @Column(name = "metadata", columnDefinition = "jsonb")
     private Map<String, Object> metadata = new HashMap<>();
 
+    /** A new account with its id already assigned, so the created event can name it before the insert. */
+    public static User create(String username, String email, String firstName, String lastName) {
+        User u = new User();
+        u.id = UUID.randomUUID();
+        u.username = username;
+        u.email = email;
+        u.firstName = firstName;
+        u.lastName = lastName;
+        u.registerEvent(new UserCreatedEvent(u.id.toString(), username, email));
+        return u;
+    }
+
+    public void disable() {
+        this.enabled = false;
+        registerEvent(new UserDisabledEvent(id.toString(), username));
+    }
+
+    /** Called before the repository delete, which is what publishes the event. */
+    public void markDeleted() {
+        registerEvent(new UserDeletedEvent(id.toString(), username, email));
+    }
+
+    public void invitationIssued(String link, Instant expiresAt, String locale) {
+        registerEvent(new InvitationIssuedEvent(id.toString(), username, email, displayName(), link, expiresAt, locale));
+    }
+
+    public void resetLinkIssued(String link, Instant expiresAt, String locale) {
+        registerEvent(new PasswordResetLinkIssuedEvent(id.toString(), username, email, displayName(), link, expiresAt,
+                locale));
+    }
+
+    /** The name a message addresses the person by: the given and family names, or the username. */
+    public String displayName() {
+        String name = String.join(" ", firstName == null ? "" : firstName, lastName == null ? "" : lastName).trim();
+        return name.isEmpty() ? username : name;
+    }
+
+    /** Whether the account has never been usable: no password and never activated. */
+    public boolean isPending() {
+        return activatedAt == null && passwordHash == null;
+    }
+
     @PrePersist
     public void prePersist() {
         Instant now = Instant.now();
@@ -132,7 +195,7 @@ public class User {
         if (isLocked(now)) {
             return UserStatus.LOCKED;
         }
-        if (activatedAt == null && passwordHash == null) {
+        if (isPending()) {
             return UserStatus.PENDING;
         }
         return UserStatus.ACTIVE;

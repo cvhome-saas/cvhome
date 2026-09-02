@@ -350,7 +350,8 @@
       "CATALOG_PRODUCT_VARIANT_DUPLICATE_SKU": "Another product or variant already uses one of these SKUs.",
       "CATALOG_PRODUCT_VARIANT_DUPLICATE_COMBINATION": "Two variants describe the same combination of values.",
       "CATALOG_PRODUCT_VARIANT_OPTIONS_INVALID": "Every variant must pick exactly one value of each chosen option.",
-      "CATALOG_PRODUCT_VARIANT_LIMIT_EXCEEDED": "A product can vary by at most 4 options and sell at most 100 variants."
+      "CATALOG_PRODUCT_VARIANT_LIMIT_EXCEEDED": "A product can vary by at most 4 options and sell at most 100 variants.",
+      "UAA_PASSWORD_POLICY_VIOLATION": "{rule, select, minLength {Too short for this realm's minimum.} upper {Add an upper-case letter.} lower {Add a lower-case letter.} digit {Add a digit.} special {Add a symbol.} notUsername {It must not contain the username.} notEmail {It must not contain the email address.} other {It does not meet the password policy.}}"
     }
   }
 }

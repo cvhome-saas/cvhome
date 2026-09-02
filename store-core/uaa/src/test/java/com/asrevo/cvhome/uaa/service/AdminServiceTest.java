@@ -161,7 +161,7 @@ class AdminServiceTest {
         patch.put(STORE, null);
         patch.put(TEAM, NORTH);
 
-        service.updateUser(ordinary.getId(), new UpdateUserRequest(null, null, null, null, patch));
+        service.updateUser(ordinary.getId(), new UpdateUserRequest(null, null, null, null, null, patch));
 
         assertThat(ordinary.getMetadata()).containsEntry(ORG, ORG_ID).containsEntry(TEAM, NORTH).doesNotContainKey(STORE);
     }
