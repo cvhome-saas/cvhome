@@ -219,6 +219,39 @@
       "PREVIOUS": "Anterior",
       "NEXT": "Siguiente",
       "SEARCH_ERROR": "No pudimos realizar esa búsqueda."
+    },
+    "LOGIN": {
+      "TITLE": "Iniciar sesión",
+      "HEADING": "Iniciar sesión en {store}",
+      "USERNAME": "Nombre de usuario",
+      "PASSWORD": "Contraseña",
+      "SUBMIT": "Iniciar sesión",
+      "OR": "o",
+      "SIGN_IN_WITH": "Iniciar sesión con {provider}",
+      "NO_ACCOUNT": "¿No tienes cuenta?",
+      "SIGN_UP": "Crea una",
+      "ERROR_INVALID": "Nombre de usuario o contraseña incorrectos.",
+      "ERROR_SOCIAL": "No pudimos iniciar sesión con ese proveedor. Inténtalo de nuevo.",
+      "ERROR_EXPIRED": "Esa página de inicio de sesión había caducado. Inténtalo de nuevo."
+    },
+    "REGISTER": {
+      "TITLE": "Crear cuenta",
+      "HEADING": "Crea tu cuenta en {store}",
+      "USERNAME": "Nombre de usuario",
+      "EMAIL": "Correo electrónico",
+      "PASSWORD": "Contraseña",
+      "FIRST_NAME": "Nombre",
+      "LAST_NAME": "Apellidos",
+      "SUBMIT": "Crear cuenta",
+      "ALREADY": "¿Ya tienes cuenta?",
+      "SIGN_IN": "Iniciar sesión",
+      "FAILED": "No pudimos crear tu cuenta. Inténtalo de nuevo.",
+      "FIELD_INVALID": "Revisa este campo.",
+      "FIELD_ERRORS": {
+        "VALIDATION_NotBlank": "Este campo es obligatorio.",
+        "VALIDATION_Size": "Este valor es demasiado corto o demasiado largo.",
+        "VALIDATION_Email": "Introduce un correo electrónico válido."
+      }
     }
   },
   "COMPONENTS": {
@@ -333,8 +366,8 @@
       "PAYMENT_INITIATE_FAILED": "Seguimos confirmando tu pago. No vuelvas a pagar: consulta tus pedidos en unos minutos.",
       "PAYMENT_CONFIGURATION_MISSING": "Esta tienda no acepta pagos en este momento.",
       "PAYMENT_PROCESSOR_UNSUPPORTED": "Ese método de pago no está disponible en esta tienda.",
-      "CUA_REGISTRATION_EMAIL_TAKEN": "Ya existe una cuenta con este correo electrónico.",
-      "CUA_REGISTRATION_USERNAME_TAKEN": "Este nombre de usuario ya está en uso.",
+      "CUA_REGISTRATION_EMAIL_TAKEN": "Ya existe una cuenta con ese correo electrónico.",
+      "CUA_REGISTRATION_USERNAME_TAKEN": "Ese nombre de usuario ya está en uso.",
       "CUSTOMER_COUNTRY_UNSUPPORTED": "No realizamos envíos al país seleccionado.",
       "CUSTOMER_ZONE_UNSUPPORTED": "La provincia o región seleccionada no es válida para este país.",
       "COMMON_UNAUTHENTICATED": "Inicia sesión para continuar.",

@@ -1,0 +1,64 @@
+### Shopper self-registration — public, stateless, store-scoped. Addressed on the store host, through spg, the
+### way the storefront's own register page calls it. No cookie, no token.
+
+### Register a shopper for STORE_ID → 201, empty body
+POST {{LANDING_UI_URL}}/cua/api/v1/public/registration?store={{STORE_ID}}&lang={{LANG}}
+Content-Type: application/json
+
+{
+  "username": "jane-{{$random.alphanumeric(6)}}",
+  "email": "jane-{{$random.alphanumeric(6)}}@example.com",
+  "password": "secret-1",
+  "firstName": "Jane",
+  "lastName": "Doe"
+}
+
+### The seeded shopper's username again → 409 CUA.REGISTRATION.USERNAME_TAKEN
+POST {{LANDING_UI_URL}}/cua/api/v1/public/registration?store={{STORE_ID}}&lang={{LANG}}
+Content-Type: application/json
+
+{
+  "username": "user",
+  "email": "someone-else@example.com",
+  "password": "secret-1"
+}
+
+### The seeded shopper's email again → 409 CUA.REGISTRATION.EMAIL_TAKEN
+POST {{LANDING_UI_URL}}/cua/api/v1/public/registration?store={{STORE_ID}}&lang={{LANG}}
+Content-Type: application/json
+
+{
+  "username": "someone-else",
+  "email": "user@mail.com",
+  "password": "secret-1"
+}
+
+### Isolation: the same username is free on the second store → 201 (uniqueness is per store, never per pod)
+POST {{LANDING_UI_URL}}/cua/api/v1/public/registration?store={{STORE_ID_2}}&lang={{LANG}}
+Content-Type: application/json
+
+{
+  "username": "jane-{{$random.alphanumeric(6)}}",
+  "email": "jane-{{$random.alphanumeric(6)}}@example.com",
+  "password": "secret-1"
+}
+
+### A malformed body → 400 COMMON.VALIDATION_FAILED with fieldErrors for email and password
+POST {{LANDING_UI_URL}}/cua/api/v1/public/registration?store={{STORE_ID}}&lang={{LANG}}
+Content-Type: application/json
+
+{
+  "username": "jo",
+  "email": "not-an-email",
+  "password": "123"
+}
+
+### No store → 400 (the store resolver refuses; nothing can register "nowhere")
+POST {{LANDING_UI_URL}}/cua/api/v1/public/registration?lang={{LANG}}
+Content-Type: application/json
+
+{
+  "username": "nobody",
+  "email": "nobody@example.com",
+  "password": "secret-1"
+}

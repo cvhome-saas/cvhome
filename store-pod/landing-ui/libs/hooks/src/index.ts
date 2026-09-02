@@ -11,3 +11,4 @@ export * from './use-product-purchase';
 export * from './use-search';
 export * from './use-search-combobox';
 export * from './use-user';
+export * from './use-register-form';

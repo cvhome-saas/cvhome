@@ -94,7 +94,7 @@ section you keep is mandatory.** Every row here has a repo mechanism behind it t
 - [ ] Dependency versions in `gradle/libs.versions.toml`, referenced as `libs.*`
 
 **Frontend**
-- [ ] i18n keys in **every locale the app ships**, no orphans — console-ui `src/locale/{en,ar}.json`, landing-ui `locales/{en,ar,es,fr,ru}.json`, cua `messages_{en,ar,es,fr,ru}.properties` (+ default `messages.properties`)
+- [ ] i18n keys in **every locale the app ships**, no orphans — console-ui `src/locale/{en,ar}.json`, landing-ui `locales/{en,ar,es,fr,ru}.json` (cua renders no pages and has no bundles)
 - [ ] Angular: standalone components, `OnPush`, `inject()`, signals, HTTP in a service never in a component
 - [ ] landing-ui: `libs/*` or `templates/*` changes built through the root `npm run build` chain; a new theme follows `references/new-landing-ui-template.md`
 - [ ] AR checked as RTL — layout, not only the strings

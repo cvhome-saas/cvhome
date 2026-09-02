@@ -97,11 +97,14 @@ Java module each time.
 
 ## 3. Server-rendered Thymeleaf
 
-Both authorization servers render classic server-side pages with
-`spring-boot-starter-thymeleaf` + `thymeleaf-extras-springsecurity6`:
+Only `store-core/uaa` renders server-side pages, with `spring-boot-starter-thymeleaf` +
+`thymeleaf-extras-springsecurity6`: the staff login pages, alongside its embedded SPA. Templates live under
+`src/main/resources/templates/`.
 
-- **`store-core/uaa`** — staff login pages (alongside its embedded SPA).
-- **`store-pod/cua`** — shopper login, registration, and social-login pages. No SPA at all here.
-
-Templates live under each module's `src/main/resources/templates/`. This is where to look for login/consent
-screens — they are *not* in any Angular or Next.js app.
+**`store-pod/cua` renders nothing.** It used to serve Thymeleaf login and registration pages, which meant every
+store on a pod got the same fixed screen. Now cua is headless: an unauthenticated `/oauth2/authorize` is
+answered with a redirect to the storefront's `/{lang}/login?auth=1`, landing-ui renders the login form as a
+theme page (`ThemePages.Login`, shell fallback when a theme has none), the form posts straight back to
+`/cua/login`, and cua resumes the saved authorize request. Registration is `POST /cua/api/v1/public/registration`
+(JSON), rendered by `ThemePages.Register`. Shopper login screens therefore live in `store-pod/landing-ui` —
+see `landing-ui.md`.

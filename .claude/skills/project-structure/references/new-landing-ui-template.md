@@ -101,7 +101,7 @@ themes/<id>/
     ├── config.ts           ThemeLayoutConfig (cart drawer/page, mobile nav kind, grid, aspect, container, search)
     ├── layout/             Root, Header, Nav, MobileNav, HeaderActions, CartDrawer, Announcement, Footer
     ├── pages/              Home, Category, Product, Content, Checkout, CheckoutResult, Customer, Order
-    │                       (+ Search — the only optional page; without it the shell renders a fallback)
+    │                       (+ Search, Login, Register — the optional pages; without them the shell renders fallbacks)
     ├── sections/           Hero, ProductRail, Listing, BuyBox, Gallery, SearchBox, SearchResults, CheckoutForm, …
     ├── components/         ProductCard, ProductGrid, ProductBadges, CartLineItem, Breadcrumbs, PageShell, …
     └── states/             ErrorState*, NotFound, EmptyState*, Redirecting*, skeletons/*   (* = 'use client')
@@ -131,7 +131,15 @@ exist. `white` / `black` / `transparent` remain.
 
 ## 5. Step 3 — contract checklist (before you call it done)
 
-### The Search page (the one optional page)
+### The optional pages: Search, Login, Register
+
+Three members of `ThemePages` are optional and get a shell fallback when a theme has none. `Login` and
+`Register` are the shopper's sign-in and sign-up screens (cua is headless — see `authentication.md`); every
+shipped theme has them, so copy the closest one's `pages/Login.tsx` + `sections/LoginForm.tsx` (a plain HTML form posting `LoginData.action`, with
+`client_id` and `lang` as hidden inputs, the `error` banner and the `socialLogins` anchors) and
+`pages/Register.tsx` + `sections/RegisterForm.tsx` (`'use client'`, `useRegisterForm`). Strings are
+`PAGE.LOGIN.*` and `PAGE.REGISTER.*`. Search is the third:
+
 
 `ThemePages.Search` is optional, and `defineTheme()` does not require it. A theme without one gets
 `storefront/src/shell/theme/default-search-page.tsx` — built only from design tokens, so it inherits the

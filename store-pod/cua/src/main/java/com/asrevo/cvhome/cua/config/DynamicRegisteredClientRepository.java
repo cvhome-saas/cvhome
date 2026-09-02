@@ -19,6 +19,8 @@ import org.springframework.security.oauth2.server.authorization.settings.TokenSe
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import com.asrevo.cvhome.cua.security.StorefrontUrls;
+
 public class DynamicRegisteredClientRepository implements RegisteredClientRepository {
 
     private static String extractHost(boolean useLang) {
@@ -29,15 +31,9 @@ public class DynamicRegisteredClientRepository implements RegisteredClientReposi
         }
 
         HttpServletRequest request = attributes.getRequest();
-        String scheme = request.getScheme();
-        String serverName = request.getServerName();
-        int serverPort = request.getServerPort();
-
-        StringBuilder dynamicUri = new StringBuilder();
-        dynamicUri.append(scheme).append("://").append(serverName);
-        if ("http".equals(scheme) && serverPort != 80 || "https".equals(scheme) && serverPort != 443) {
-            dynamicUri.append(":").append(serverPort);
-        }
+        // The same origin rule the login hand-off uses: what is a valid redirect_uri is also where the shopper
+        // is sent to sign in, so the two must never disagree about the host or the port.
+        StringBuilder dynamicUri = new StringBuilder(StorefrontUrls.origin(request));
         if (useLang) {
             String lang = request.getParameter("lang");
             if (Objects.nonNull(lang)) {

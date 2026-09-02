@@ -55,7 +55,7 @@ catalog). See `references/build-system.md`.
 | `store-pod/inventory` | **BE** | 8126 | **Stock, pricing & reservations**, split out of catalog and keyed by **sku** (schema `inventory`; `product_id` is informational only, no FK to catalog). Deliberately tiny — one entity (`Inventory` + `InventoryPrice`), one service each for stock and reservations, no facade/mapper/populator layers. APIs: `InventoryApi` (sku-addressed upsert `PUT /private/inventory/{sku}`, batch upsert `PUT /private/inventory/bulk`, `DELETE /private/inventory/{sku}`, `DELETE /private/inventory/by-product/{id}`, product-addressed bulk read `GET /private/inventory/by-products?productIds=`), `ExternalInventoryApi` (public bulk `GET /availability?skus=` → `SkuInventory` with raw amounts, and `POST /availability/query` for a sku list too long for a query string), `ExternalProductReservationApi` (`STORE-POD.INVENTORY.RESERVE`). Consumers merge price/stock client-side (console-ui, landing-ui) or compose s2s (checkout's `ProductDetailsComposer`). |
 | `store-pod/checkout` | **BE** | 8123 | **Cart, orders, customers**: shopping cart, order lifecycle + status history, customer records, order/product/customer statistics. APIs: `ShoppingCartApi`, `OrderApi`, `CustomerOrderApi`, `OrderStatusHistoryApi`, `CustomerApi`, `OrderStatisticApi`. |
 | `store-pod/payment` | **BE** | 8125 | **Payments**: gateway configuration per store, payment execution, provider webhooks. APIs: `PaymentConfigurationController`, `PrivatePaymentApi`, `PublicPaymentConfigurationController`, `PublicPaymentWebhookApi`, `ExternalPaymentGatewayApi`. Uses Stripe. |
-| `store-pod/cua` | **BE+FE** | 8124 | "Customer User Account" — a **second OAuth2 Authorization Server**, this one for *storefront shoppers* (separate identity realm from `uaa`, which is for staff). Self-registration, social login, Thymeleaf-rendered login/registration pages. Controllers: `LoginController`, `RegistrationController`, `SocialLoginConfigController`, `UserInfoController`. Standalone module (no commons/core split). |
+| `store-pod/cua` | **BE** | 8124 | "Customer User Account" — a **second OAuth2 Authorization Server**, this one for *storefront shoppers* (separate identity realm from `uaa`, which is for staff). Self-registration (JSON), social login, form-login *processing*. **Headless**: it renders no HTML — an unauthenticated `/oauth2/authorize` redirects to the storefront's own `/{lang}/login?auth=1`, landing-ui renders the themed form, and the form posts back to `/cua/login`. Controllers: `PublicRegistrationController`, `PublicSocialLoginController`, `SocialLoginConfigController`, `AuthController`, `LoginRedirectController`. Standalone module (no commons/core split). |
 | `store-pod/landing-ui` | **FE** | 8110 | The customer-facing **storefront**. ONE Next.js 16 / React 19 app (`storefront/`) plus **theme packages** (`themes/<id>/`) inside an npm-workspaces monorepo; business logic in `libs/` (`types`, `services`, `hooks`), shared primitives in `libs/ui`, the theme contract in `libs/theme`. The theme is resolved per request from the `Theme` header spg injects; merchant colours come from the `Color-Theme` preset through a contrast-guarded bridge. Old one-app-per-theme templates are parked in `templates-deprecated/`. See `references/landing-ui.md`. |
 
 ## Every service sits behind a gateway
@@ -248,7 +248,7 @@ Details and per-pod module lists: `references/store-pod.md`.
 ## Adding a whole new service
 
 Decide the **shape** first — backend only (`catalog`, `tenancy`), frontend only (`console-ui`,
-`landing-ui`), or one deployable serving both (`uaa`, `cua`) — then the **tree** (`store-core/` = one shared
+`landing-ui`), or one deployable serving both (`uaa`) — then the **tree** (`store-core/` = one shared
 platform instance, `store-pod/` = deployed once per pod). Those two choices fix the module layout, the config
 slices, the s2s client and the fronting gateway.
 
@@ -308,7 +308,9 @@ something is wrong, and `lcl stop` to tear that stack down. Several named stacks
 2. **Embedded Angular in Spring Boot** (`uaa`): `uaa-fe` lives at `store-core/uaa/src/main/resources/uaa-fe`,
    is **not** a Gradle module, is built by the `node` plugin, and its `dist` is copied into
    `src/main/resources/static` before `processResources` — so Spring Boot serves the SPA from its own port.
-3. **Server-rendered Thymeleaf** (`uaa` login pages, `cua`): classic server-side templates, no SPA.
+3. **Server-rendered Thymeleaf** (`uaa` login pages): classic server-side templates, no SPA. `cua` has none:
+   the shopper's login and register pages are landing-ui theme pages (`ThemePages.Login` / `Register`, with
+   shell fallbacks), and cua only redirects to them and processes the posted form.
 
 See `references/frontends.md`.
 

@@ -219,6 +219,39 @@
       "PREVIOUS": "Previous",
       "NEXT": "Next",
       "SEARCH_ERROR": "We couldn't run that search."
+    },
+    "LOGIN": {
+      "TITLE": "Sign in",
+      "HEADING": "Sign in to {store}",
+      "USERNAME": "Username",
+      "PASSWORD": "Password",
+      "SUBMIT": "Sign in",
+      "OR": "or",
+      "SIGN_IN_WITH": "Sign in with {provider}",
+      "NO_ACCOUNT": "Don't have an account?",
+      "SIGN_UP": "Create one",
+      "ERROR_INVALID": "Invalid username or password.",
+      "ERROR_SOCIAL": "We couldn't sign you in with that provider. Please try again.",
+      "ERROR_EXPIRED": "That sign-in page had expired. Please try again."
+    },
+    "REGISTER": {
+      "TITLE": "Create account",
+      "HEADING": "Create your account at {store}",
+      "USERNAME": "Username",
+      "EMAIL": "Email",
+      "PASSWORD": "Password",
+      "FIRST_NAME": "First name",
+      "LAST_NAME": "Last name",
+      "SUBMIT": "Create account",
+      "ALREADY": "Already have an account?",
+      "SIGN_IN": "Sign in",
+      "FAILED": "We couldn't create your account. Please try again.",
+      "FIELD_INVALID": "Please check this field.",
+      "FIELD_ERRORS": {
+        "VALIDATION_NotBlank": "This field is required.",
+        "VALIDATION_Size": "This value is too short or too long.",
+        "VALIDATION_Email": "Please enter a valid email address."
+      }
     }
   },
   "COMPONENTS": {
@@ -333,8 +366,8 @@
       "PAYMENT_INITIATE_FAILED": "We're still confirming your payment. Please don't pay again — check your orders in a few minutes.",
       "PAYMENT_CONFIGURATION_MISSING": "This store isn't accepting payments at the moment.",
       "PAYMENT_PROCESSOR_UNSUPPORTED": "That payment method isn't available for this store.",
-      "CUA_REGISTRATION_EMAIL_TAKEN": "An account with this email already exists.",
-      "CUA_REGISTRATION_USERNAME_TAKEN": "This username is already taken.",
+      "CUA_REGISTRATION_EMAIL_TAKEN": "An account with that email already exists.",
+      "CUA_REGISTRATION_USERNAME_TAKEN": "That username is already taken.",
       "CUSTOMER_COUNTRY_UNSUPPORTED": "We don't ship to the selected country.",
       "CUSTOMER_ZONE_UNSUPPORTED": "The selected state or region isn't valid for this country.",
       "COMMON_UNAUTHENTICATED": "Please sign in to continue.",

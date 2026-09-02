@@ -9,8 +9,8 @@ never share an identity realm.
 | Port | 8001 | 8124 |
 | Who it authenticates | Platform staff, org owners, merchants/sellers | **Storefront shoppers** |
 | Reached via | `store-core-gateway` (:8000) | `spg` at `/cua` |
-| Front end | Thymeleaf login + embedded Angular admin SPA (`uaa-fe`) | Thymeleaf login/registration/social-login pages |
-| Self-registration | No — admin-provisioned (`AdminUserController`) | **Yes** — `RegistrationController`, social login |
+| Front end | Thymeleaf login + embedded Angular admin SPA (`uaa-fe`) | **None** — headless. The storefront (`landing-ui`) renders login and registration as theme pages; cua redirects to them and processes the posted form |
+| Self-registration | No — admin-provisioned (`AdminUserController`) | **Yes** — `POST /api/v1/public/registration` (JSON, `?store=`), social login |
 | Serves tokens to | console-ui, tenancy, gateway, all `-service` s2s clients | landing-ui storefront sessions |
 | Deployment | One shared instance for the whole SaaS | One per pod |
 
@@ -136,9 +136,21 @@ app holds no tokens and makes same-origin relative calls. Relevant gateway class
 `AuthController`, `LogoutController`, plus `security/UaaLogoutSuccessHandler` and
 `security/SecurityContextServerLogoutHandler` in `autoconfigure`.
 
-**Shopper (store-pod):** the storefront (`landing-ui`) sends the shopper to `cua` through `spg` at `/cua`, using
-`@store-front/services`' `AuthService`; the template's `callback/` route completes the flow and
-`Common/Secured.tsx` + `useUser` guard `/customer/**` pages.
+**Shopper (store-pod):** the storefront (`landing-ui`) is a PKCE public client whose `client_id` is the store
+id. `AuthService.login()` sends the browser to `/cua/oauth2/authorize?…&lang=<locale>`; cua saves that request
+and its `StorefrontLoginEntryPoint` redirects to `{origin}/{lang}/login?auth=1` — same origin, because spg
+fronts both. landing-ui renders `theme.pages.Login` (or the shell fallback) as a plain HTML form that posts
+`username`, `password`, `client_id`, `lang` to `/cua/login`; on success `StorefrontLoginSuccessHandler` resumes
+the saved authorize request, which redirects to `/{lang}/callback?code=`, where the storefront exchanges the
+code. A failure is `…/login?auth=1&error=invalid|social` — a token, never text: cua has no strings, the
+storefront translates. Without the `auth=1` marker `/login` just starts the flow, which is what deep links and
+`shell/auth/secured.tsx` rely on. Registration is `POST /cua/api/v1/public/registration` from
+`theme.pages.Register` (`useRegisterForm`), then the same login flow. The helpers live in
+`store-pod/cua/.../security/StorefrontUrls.java`. The form is CSRF-protected without JavaScript: the hand-off
+redirect plants an `XSRF-TOKEN` cookie (path `/`), the storefront page reads it server-side and echoes it as a
+hidden `_csrf` input, and a stale form comes back as `error=expired`. `prompt=login` is enforced by
+`PromptLoginFilter` — a live cua session is logged out and sent to the form, once — so registering while another
+shopper's session is alive signs in as the new account.
 
 Each `-service` also has its own small `controller/v1/auth/AuthController` for exposing the current principal to
 its own clients.

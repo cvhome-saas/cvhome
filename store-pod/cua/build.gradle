@@ -35,12 +35,10 @@ dependencies {
     implementation libs.spring.boot.starter.security.oauth2.resource.server
     implementation libs.spring.boot.starter.security
     implementation libs.spring.boot.starter.restclient
-    implementation libs.spring.boot.starter.thymeleaf
     implementation libs.spring.boot.starter.web
     implementation libs.spring.boot.starter.validation
     implementation libs.spring.boot.starter.session.jdbc
     implementation libs.spring.cloud.starter
-    implementation libs.thymeleaf.extras.springsecurity6
     implementation libs.springdoc.openapi.starter.webmvc.ui
 
     implementation project(':store-commons:ecs-commons:fargate-task-info')
@@ -49,8 +47,6 @@ dependencies {
     implementation project(':store-commons:commons')
     implementation project(':store-commons:autoconfigure')
     implementation project(':store-commons:secret-crypto:secret-crypto-autoconfigure')
-    implementation project(':store-pod:merchant:merchant-external-api')
-    implementation project(':store-pod:content:content-external-api')
 
     compileOnly libs.lombok
     runtimeOnly libs.postgresql
@@ -64,7 +60,6 @@ dependencies {
     integrationTestImplementation libs.spring.boot.starter.security.oauth2.authorization.server.test
     integrationTestImplementation libs.spring.boot.starter.security.oauth2.resource.server.test
     integrationTestImplementation libs.spring.boot.starter.session.jdbc.test
-    integrationTestImplementation libs.spring.boot.starter.thymeleaf.test
     integrationTestImplementation libs.spring.boot.starter.validation.test
     integrationTestImplementation libs.spring.boot.starter.webmvc.test
 }

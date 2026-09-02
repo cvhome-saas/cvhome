@@ -106,6 +106,19 @@ brand and type facets, a did-you-mean, and the language the results actually cam
 - Not filterable: price and in-stock. They live in the inventory service keyed by sku, so the catalog cannot
   filter or sort on them; they are merged in after paging.
 
+## Shopper login and registration
+
+cua is headless; these screens are the storefront's. `/{locale}/login` is two pages under one route: without
+`?auth=1` it starts the OAuth2 flow (`shell/auth/login-redirect.tsx` — what deep links and `Secured` rely on);
+with the marker cua added it renders `theme.pages.Login ?? DefaultLoginPage` with a `LoginData` of
+`{action: '/cua/login', clientId, lang, error?, socialLogins}`. The form is plain HTML posting to cua, so no
+client JavaScript is in the hand-off. `/{locale}/register` renders `theme.pages.Register ?? DefaultRegisterPage`,
+driven by `useRegisterForm` → `AuthService.register()` (JSON, typed conflicts mapped onto the field) → `login()`.
+Both pages are optional in the theme contract like `Search`, and every registered theme implements them in its own
+idiom (`pages/{Login,Register}.tsx` + `sections/{LoginForm,RegisterForm}.tsx`); the token-only fallbacks in
+`storefront/src/shell/theme/default-{login,register}-page.tsx` cover a theme that has not yet. Strings: `PAGE.LOGIN.*`,
+`PAGE.REGISTER.*` in all five locales.
+
 ## Checkout redirect flow
 
 After payment the gateway returns to `{domain}/{locale}/checkout/success?code=&orderId=` (or `/cancel`).

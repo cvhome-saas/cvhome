@@ -10,6 +10,7 @@ import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.cua.domain.SocialLoginConfigId;
 import com.asrevo.cvhome.cua.repo.SocialLoginConfigRepository;
 import com.asrevo.cvhome.cua.web.dto.PersistableSocialLoginConfig;
+import com.asrevo.cvhome.cua.web.dto.ReadableSocialLogin;
 import com.asrevo.cvhome.cua.web.dto.ReadableSocialLoginConfig;
 import com.asrevo.cvhome.cua.web.mapper.SocialLoginConfigMapper;
 
@@ -34,6 +35,14 @@ public class SocialLoginConfigService {
             dto.setStoreMerchantId(merchantStore);
             repository.save(mapper.toEntity(dto));
         });
+    }
+
+    /** The providers switched on for a store, shaped for a login page: id, display name, registration id — no secrets. */
+    public List<ReadableSocialLogin> enabledLogins(StoreMerchantId merchantStore) {
+        return repository.findEnabledSocialLoginConfig(merchantStore).stream()
+                .map(id -> new ReadableSocialLogin(id.providerId().getProviderId(), id.providerId().getClientName(),
+                        id.toRegistrationId()))
+                .toList();
     }
 
     public Optional<ReadableSocialLoginConfig> findById(SocialLoginConfigId socialLoginConfigId) {

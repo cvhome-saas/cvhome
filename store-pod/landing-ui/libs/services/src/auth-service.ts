@@ -1,7 +1,7 @@
 import {storeBaseServiceUrl, StoreContext} from "@store-front/types/store-context";
-import {apiFetch, get} from "./http-utils";
+import {apiFetch, get, publicGet, publicPost} from "./http-utils";
 import {generateCodeChallenge, generateCodeVerifier} from "./pkce-utils";
-import {AuthEventType, AuthUser} from "@store-front/types";
+import {AuthEventType, AuthUser, RegistrationRequest, SocialLogin} from "@store-front/types";
 
 /** The subset of the OAuth2 token response this client uses. */
 export interface TokenResponse {
@@ -10,9 +10,20 @@ export interface TokenResponse {
     refresh_token?: string;
 }
 
+/** Options for {@link AuthService.login}. */
+export interface LoginOptions {
+    /** Where to land after the callback, instead of the page the shopper is on now (locale-prefixed). */
+    returnTo?: string;
+}
+
 export class AuthService {
 
-    static async login(context: StoreContext): Promise<void> {
+    /**
+     * Starts the authorization-code flow against cua. cua answers by sending the browser back to this
+     * storefront's `/{locale}/login?auth=1`, which renders the themed form; the form posts to
+     * {@link loginAction} and cua then resumes the flow to `/{locale}/callback`.
+     */
+    static async login(context: StoreContext, options?: LoginOptions): Promise<void> {
         const verifier = generateCodeVerifier();
         sessionStorage.setItem('code_verifier', verifier);
         const challenge = await generateCodeChallenge(verifier);
@@ -32,8 +43,37 @@ export class AuthService {
         authUrl.searchParams.append('store', context.store);
         authUrl.searchParams.append('lang', context.locale);
 
-        this.setPostLoginRedirect()
+        this.setPostLoginRedirect(options?.returnTo)
         window.location.href = authUrl.toString();
+    }
+
+    /**
+     * Where the login form posts: cua's form-login processing URL, on this store's own origin. A relative
+     * path on purpose — the browser is same-origin with cua behind spg (custom domains included), and a
+     * server-rendered form must not carry the internal gateway address into the HTML.
+     */
+    static loginAction(context: StoreContext): string {
+        return `${context.externalGateway ?? ''}/cua/login`;
+    }
+
+    /** The link a social-login button navigates to. Only meaningful while cua holds a saved authorize request. */
+    static socialLoginHref(context: StoreContext, login: SocialLogin): string {
+        return `${context.externalGateway ?? ''}/cua/oauth2/authorization/${login.registrationId}`;
+    }
+
+    /** The providers this store has switched on. Must fail: the caller decides whether a missing list degrades. */
+    static async socialLogins(context: StoreContext): Promise<SocialLogin[]> {
+        const url = `${storeBaseServiceUrl('cua', context)}/api/v1/public/social-logins?store=${context.store}&lang=${context.locale}`;
+        return apiFetch<SocialLogin[]>(url, publicGet());
+    }
+
+    /**
+     * Creates a shopper account for this store. Must fail, and with the typed body: a taken username and a
+     * taken email are different conflicts the form highlights under different controls.
+     */
+    static async register(context: StoreContext, request: RegistrationRequest): Promise<void> {
+        const url = `${storeBaseServiceUrl('cua', context)}/api/v1/public/registration?store=${context.store}&lang=${context.locale}`;
+        await apiFetch<void>(url, publicPost(request));
     }
 
     static setPostLoginRedirect(p?: string) {
