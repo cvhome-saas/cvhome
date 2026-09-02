@@ -11,7 +11,7 @@ somewhere else entirely — that is [cua](../../../store-pod/cua/qa/cua-qa.md).
   is where the platform's sign-in page lives
 - **Runs on** — `lcl start -d --stack <name>`; uaa is `http://uaa.gateway.com:8001` and is the **first**
   service the stack brings up, because it issues the tokens. Read the live port from `lcl urls`
-- **Cases** — 30 (16 verified, 3 unit only, 11 not verified)
+- **Cases** — 47 (33 verified, 3 unit only, 11 not verified)
 - **Also see** — [gateway](../../gateway/gateway-service/qa/gateway-qa.md) (which relays the token and holds
   the session), [tenancy](../../tenancy/tenancy-service/qa/tenancy-qa.md) (which owns the *store-scoped*
   accounts and calls uaa to create them),
@@ -355,6 +355,187 @@ to `/clients` reaches the router rather than 404ing.
   kit's `dist`, and rebuilding it replaces that directory underneath the watcher; the dev server can latch a
   resolution failure and show `TS2307: Cannot find module '@cvhome-saas/ui-kit'` over a page that is otherwise
   fine. Restart the app (`lcl restart console-ui`), do not go hunting for a broken import.
+
+---
+
+## DSN — the SSO design alignment
+
+The console was aligned to the mocks in `store-core/uaa/sso/` — a grouped rail, a topbar, the Light
+theme, and a **list + detail pane** on all three screens replacing the inline form and the dialogs.
+What the design draws that uaa cannot do was removed, not faked;
+[`uaa-fe/lessons.md`](../src/main/resources/uaa-fe/lessons.md) is the record, and `npm run lint`
+checks every citation to it still names a real heading.
+
+### DSN-01 — The rail is a map of the product, not of this sprint · high · [verified]
+
+- **Steps** — sign in and read the rail.
+- **Expect** — four groups (Overview, Identity, Applications, System) and seven rows. Users, Roles
+  and Clients are links; **Dashboard, Audit log, Identity providers and Settings are `<span>`s** with
+  `aria-disabled="true"` and the title "Not built yet".
+- **What must NOT be there** — a count badge on any row, and the realm switcher. Both were in the
+  mock and neither has a source. A number in a navigation rail is read as fact.
+
+### DSN-02 — The rail collapses, then becomes a drawer · [verified]
+
+- **Steps** — collapse the rail with its toggle; then narrow the window below 900px.
+- **Seen** — collapsed to an icon strip at full width; below 900px the toggle appears, the rail goes
+  `position: fixed` and translates off-canvas, the scrim appears and closing it slides the rail back.
+  The split panes stack below 1100px.
+- **Structural, not fluid** — the type does not shrink at any width.
+
+### DSN-03 — A row opens the right container · critical · [verified]
+
+- **Steps** — click a row on each of the three screens.
+- **Expect** — **Roles** and **Users** open a modal; **Clients** navigates to `/clients/{id}`.
+- **Why the split.** A role is one field and a client is five sections, two URI arrays and two open
+  maps. Both prior designs agree: the pre-kit app routed the client form, and the mocks draw a whole
+  *SSO New Client* page for it. A modal there would be a form nobody can read; a route for a role's
+  single field is ceremony.
+- **Also check** — the Users row's action **menu** does not also open the row behind it. The table
+  reads the click target rather than stopping propagation on a wrapper, so this is a real regression
+  risk if that check is removed.
+
+### DSN-04 — Two dialogs never stack · high · [verified]
+
+- **Steps** — open a role, press Delete. Open a user, press Set password, then Delete account.
+- **Expect** — the form closes as the second dialog opens. Never two in the top layer at once.
+- **Why** — a modal over a modal leaves a form the operator can see and cannot reach, and Escape
+  then closes the wrong one. Cancelling returns to the list, which is the accepted cost.
+- **Still dialogs, deliberately** — setting a password and deleting. Both are genuinely modal
+  moments, and delete keeps its typed confirmation.
+
+### DSN-05 — Saving a user does not disable them · critical · [verified]
+
+- **Steps** — select a user, change a name, Save. Then check `enabled` on the server.
+- **Expect** — unchanged, along with `roles` and `email`.
+- **Why this is a case.** The pane sends `UpdateUserRequest` with names only. uaa's update is
+  genuinely partial, so the omitted fields are preserved — verified against the server rather than
+  assumed. If it ever stops being partial, saving a profile silently locks the account out.
+
+### DSN-06 — Saving a client keeps the settings it does not edit · critical · [verified]
+
+- **Steps** — edit a client's access-token lifetime and save; compare `tokenSettings` before/after.
+- **Seen** — `accessTokenTimeToLive` changed, and `refreshTokenTimeToLive`, `accessTokenFormat`,
+  `reuseRefreshTokens`, `clientSettings` and `scopes` were all carried through untouched.
+- **Note for whoever runs this** — `accessTokenFormat` is an **object** (`{value: 'self-contained'}`),
+  not a string. Comparing it with `===` compares references and always reports a false difference;
+  compare the serialised form.
+
+### DSN-07 — Identifiers stay readable under Arabic · high · [verified]
+
+- **Steps** — switch to العربية on Clients and Roles.
+- **Expect** — the layout mirrors (rail on the right, panes swapped), and client ids, role names and
+  UUIDs still read correctly.
+- **How** — those cells are `unicode-bidi: plaintext`, the CSS spelling of `dir="auto"`: the cell
+  aligns with the document while the string resolves from its own first strong character, so
+  `store-core@service.store-core.internal` does not have its punctuation reordered.
+
+### DSN-08 — The lessons file cannot rot · [verified]
+
+- **Steps** — `npm run lint` in uaa-fe.
+- **Expect** — `lessons.md: N citation(s) checked against 13 headings — all resolve.` Rename a
+  heading without fixing its citation and the build fails.
+
+
+### DSN-09 — The kit's own buttons are styled · critical · [verified]
+
+- **Steps** — in uaa-fe open **Clients → a client → New secret**, and **Users → a user → Set
+  password**. Look at the dialog's footer.
+- **Expect** — a filled emerald *Set secret* and a neutral *Cancel*, not two runs of bare text.
+- **What this is really testing.** `set-password-dialog`, `roles-dialog`, `load-error`,
+  `empty-state`, `file-drop-zone`, `tree`, `action-menu` and `user-admin-table` all render
+  `.primary-action`, `.secondary-action`, `.icon-action`, `.danger-action` or `.popover`, and every
+  one of those declarations used to live in **console-ui's** `styles.css`. uaa-fe imported the token
+  layer and not that, so the kit's own components rendered unstyled here and nothing errored. The
+  layer is now `@cvhome-saas/ui-kit/theme/css/controls.css` and both consoles import it. **Delete
+  that import from either app's `styles.css` and this case is how you find out.**
+- **Cheap probe** — in the console:
+  `getComputedStyle(Object.assign(document.body.appendChild(document.createElement('i')),{className:'primary-action'})).minHeight`
+  must not be `0px`.
+
+### DSN-10 — The user row's actions are a menu · high · [verified]
+
+- **Steps** — Users, open a row's **⋮**.
+- **Expect** — five named entries; *Delete account* in the danger tone; *Signing in as another
+  account is not built yet* listed and **disabled**. The column has a header reading **Actions**.
+- **Before** — five bare glyphs in a 10rem column (eye, padlock, shield, arrow, bin), told apart
+  only by hovering for a tooltip, one of them permanently inert with no visible reason.
+- **Note** — this component is console-ui's too, on Platform users and Organization → Users. Check
+  one of those as well; the change is deliberate there.
+
+### DSN-11 — A duration is a number and a unit · high · [verified]
+
+- **Steps** — Clients → a client → **Token settings**.
+- **Expect** — four compact `amount + unit` pairs, two-up. `PT24H` reads as **1 · days**;
+  `PT5M` as **5 · minutes**.
+- **Round-trip** — set Access token to `90 minutes`, save, reload. The Summary shows `PT1H30M` and
+  the field still reads **90 · minutes** — the largest unit that divides evenly, so nothing is lost.
+- **Empty is not zero** — clear the amount and save: the field sends `null` ("uaa's default"), never
+  `PT0S` ("expires immediately"). These are different answers and the control must not conflate them.
+- **Was** — a text box asking an operator to type `PT30M`, and before that four number boxes to add up.
+
+### DSN-12 — Redirect URIs are rows, and one of them warns · high · [verified]
+
+- **Steps** — Clients → a client → **Redirects**. Add a row, type `console.example.com/cb`, blur.
+- **Expect** — a field error (*Enter an absolute URI, including its scheme*). Fix it to
+  `https://…` and the row's glyph turns into an emerald check.
+- **The amber case** — `http://console-ui.gateway.com:10000/...` shows an **amber warning**, and
+  `http://localhost:10000/...` does not. Plain HTTP to a remote host is legal and uaa accepts it;
+  it also hands the authorization code to anything on the network path. It is flagged where it is
+  typed because it is never looked at again.
+- **Blank rows** — click Add and save without typing: the empty row is dropped, not sent.
+
+### DSN-13 — The checklist and the form agree · critical · [verified]
+
+- **Setup** — Clients → **Register client**.
+- **Steps** — tick `authorization_code` with no redirect URI; set the only auth method to `none`
+  with PKCE off; tick `private_key_jwt` with no JWK Set URL; tick `tls_client_auth` with no
+  Subject DN.
+- **Expect** — each turns its **Before you save** line grey, and Save refuses with
+  *Some settings still need attention*.
+- **Why it matters.** These are OAuth rules uaa enforces somewhere less visible. The panel is not
+  decoration: every line is backed by the same root-level validator, so the panel cannot read ready
+  while the form refuses, or the reverse.
+
+### DSN-14 — A client round-trips whole · critical · [verified]
+
+- **Steps** — on `web-app`, change something in **every** section — a scope, a redirect URI, a TTL,
+  PKCE, the ID-token algorithm, a custom setting — then Save and reload.
+- **Expect** — all of it read back. Then `GET /api/v1/admin/clients/{id}` and confirm
+  `tokenSettings.accessTokenFormat` is `{"value":"self-contained"}`, an **object**.
+- **The trap** — `OAuth2TokenFormat` serialises as `{value}`, not the bare string the field name
+  suggests. Sending a string is accepted and read back as an object, so the *next* save carries
+  `[object Object]` into the registry. Nothing fails at the time.
+
+### DSN-15 — Metadata merges, and the UI does not pretend otherwise · critical · [verified]
+
+- **Steps** — Users → a user with `org`/`store` metadata. Try to remove a stored row; add a new
+  key/value; save; reopen.
+- **Expect** — the stored rows' remove buttons are **disabled**, titled *Stored keys cannot be
+  removed through uaa's update*. The added key persists. Editing a stored value persists.
+- **Why** — `AdminService.updateUser` does `metadata.putAll(...)`. A key already stored cannot be
+  unset through this API at any value, including by omitting it. An operator who believed a removal
+  worked would be wrong about which store an account belongs to.
+
+### DSN-16 — Creating a user is two calls · high · [verified]
+
+- **Steps** — Users → **Create user**, fill username and email, Save.
+- **Expect** — the account is created **and the password dialog opens by itself**. Set a password,
+  then sign in as that account (DSN-16 is not complete without this).
+- **Why the second half is not optional.** `createUser` never sets a password hash and `enabled`
+  defaults to `true`, so skipping it leaves an account that exists, looks enabled, and cannot sign
+  in. Presenting create as one step is how that happens.
+- **[not verified]** — signing in as the created account. Everything up to and including
+  set-password is verified.
+
+### DSN-17 — Every table paginates · [verified]
+
+- **Steps** — Users, Roles, Clients.
+- **Expect** — each shows `Showing 1–N of N …` beneath its table. All three are the kit's
+  `app-pagination` over a `SpringPage`, and uaa's three list endpoints all page.
+- **Note** — none of the three has a search box, and Users says so in a notice: uaa's admin list
+  matches metadata equality and offers no text query at all.
+
 
 ---
 

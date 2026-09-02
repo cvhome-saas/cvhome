@@ -3,20 +3,8 @@
   gap: var(--spacing-section);
 }
 
-.form {
-  display: grid;
-  gap: var(--spacing-group);
-  max-inline-size: 32rem;
-}
-
-.actions,
-.row-actions {
-  display: inline-flex;
-  gap: var(--spacing-tight);
-}
-
-.actions {
-  justify-content: flex-end;
+.row {
+  cursor: pointer;
 }
 
 .cell {
@@ -26,59 +14,46 @@
   font-size: var(--text-sm);
 }
 
-.cell.name {
+.cell.mono {
   color: var(--foreground-strong);
   font-family: var(--font-mono);
 }
 
-.cell.id {
-  color: var(--muted-foreground);
-  font-family: var(--font-mono);
-  font-size: var(--text-2xs);
+/* The affordance that says the row leaves the page rather than opening something beside it. */
+.cell.go {
+  justify-content: flex-end;
+  color: var(--foreground-subtle);
 }
 
-.primary {
-  padding: var(--spacing-tight) var(--spacing-field);
-  border: none;
-  border-radius: var(--radius-md);
-  background: var(--primary);
-  color: var(--primary-foreground);
-  cursor: pointer;
-  font-size: var(--text-xs);
-  font-weight: 600;
-}
-
-.primary:disabled {
-  cursor: progress;
-  opacity: 0.7;
-}
-
-.ghost {
-  padding: var(--spacing-tight) var(--spacing-field);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  background: transparent;
-  color: var(--foreground);
-  cursor: pointer;
-  font-size: var(--text-xs);
-}
-
-.ghost:hover {
-  border-color: var(--edge-strong);
-}
-
-.ghost.danger {
-  color: var(--destructive);
+/* The chevron points the way the document runs, so it mirrors under Arabic. */
+[dir='rtl'] .cell.go {
+  transform: scaleX(-1);
 }
 
 /*
- * `.split` and the field grid come from console-ui's `shared/styles/field.css`, which did not move
- * into the kit: twenty-nine of that app's features list it by relative path in `styleUrls`, and no
- * kit control needs it. This app declares the one rule it actually uses rather than pulling a
- * stylesheet across a package boundary for a two-column row.
+ * Identifiers take their direction from their own content.
+ *
+ * `plaintext` is the CSS spelling of `dir="auto"`: the cell still aligns with the document, but the
+ * string inside resolves from its first strong character, so `store-core@…` does not have its
+ * punctuation reordered under Arabic.
  */
-.split {
-  display: grid;
-  gap: var(--spacing-group);
-  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+.cell.mono {
+  unicode-bidi: plaintext;
+}
+
+/* The label the kit's stacked-row layout reveals; hidden while the grid is a grid. */
+@container data-table (max-width: 45rem) {
+  .cell::before {
+    content: attr(data-label) ': ';
+    color: var(--foreground-subtle);
+    font-family: var(--font-sans);
+    font-size: var(--text-4xs);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .cell.go {
+    display: none;
+  }
 }

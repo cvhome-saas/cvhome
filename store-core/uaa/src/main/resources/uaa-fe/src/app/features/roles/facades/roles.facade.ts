@@ -30,7 +30,12 @@ export class RolesFacade {
   readonly busy = signal(false);
   readonly pageIndex = signal(0);
 
-  /** The role the form is editing, `'new'` while creating, or null when the form is closed. */
+  /**
+   * What the dialog is editing: a role, `'new'` while creating, or null when it is closed.
+   *
+   * One signal rather than a separate "dialog open" flag — the subject *is* the open state, and two
+   * sources of that truth is how a form ends up showing one role while saving another.
+   */
   readonly editing = signal<RoleDto | 'new' | null>(null);
   readonly deleting = signal<RoleDto | null>(null);
 
@@ -64,7 +69,8 @@ export class RolesFacade {
     this.editing.set('new');
   }
 
-  startRename(role: RoleDto): void {
+  /** Clicking a row opens the dialog on it. */
+  select(role: RoleDto): void {
     this.form.reset({name: role.name});
     this.editing.set(role);
   }
@@ -72,6 +78,18 @@ export class RolesFacade {
   dismiss(): void {
     this.editing.set(null);
     this.deleting.set(null);
+  }
+
+  /**
+   * Deleting closes the form and opens the confirmation, rather than stacking one modal on another.
+   *
+   * Two dialogs in the top layer at once leaves the operator looking at a form they can no longer
+   * reach, and Escape then closes the wrong one. Cancelling the confirmation returns to the list —
+   * acceptable here, because a role is a single field to retype.
+   */
+  askDelete(role: RoleDto): void {
+    this.editing.set(null);
+    this.deleting.set(role);
   }
 
   save(): void {

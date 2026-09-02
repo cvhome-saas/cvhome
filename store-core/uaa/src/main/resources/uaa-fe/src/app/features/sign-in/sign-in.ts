@@ -2,7 +2,7 @@ import {Component, inject, signal} from '@angular/core';
 import {TranslocoDirective} from '@jsverse/transloco';
 
 import {UI_KIT_CONFIG} from '@cvhome-saas/ui-kit';
-import {FormField, Panel, TextField} from '@cvhome-saas/ui-kit/ui';
+import {FormField, Icon, Panel, TextField} from '@cvhome-saas/ui-kit/ui';
 
 /**
  * The platform's sign-in page.
@@ -24,7 +24,7 @@ import {FormField, Panel, TextField} from '@cvhome-saas/ui-kit/ui';
  */
 @Component({
   selector: 'app-sign-in',
-  imports: [TranslocoDirective, FormField, TextField, Panel],
+  imports: [TranslocoDirective, FormField, TextField, Panel, Icon],
   templateUrl: './sign-in.html',
   styleUrl: './sign-in.css',
 })

@@ -20,6 +20,18 @@
 @import '@cvhome-saas/ui-kit/theme/css/theme-light.css';
 @import '@cvhome-saas/ui-kit/theme/css/theme-bridge.css';
 
+/*
+ * The action vocabulary, the popover surface, the focus ring.
+ *
+ * Not optional and not cosmetic: `set-password-dialog`, `roles-dialog`, `load-error`,
+ * `empty-state`, `action-menu`, `tree` and `user-admin-table` render `.primary-action`,
+ * `.secondary-action`, `.icon-action`, `.danger-action` and `.popover`, and every one of those
+ * declarations used to live in console-ui's own stylesheet. Without this line the kit's dialogs
+ * show their buttons as bare text and the user table's row actions as an unpadded run of glyphs —
+ * which is exactly what this console shipped until the layer moved into the library.
+ */
+@import '@cvhome-saas/ui-kit/theme/css/controls.css';
+
 @custom-variant rtl (&:where([dir='rtl'], [dir='rtl'] *));
 
 :root {

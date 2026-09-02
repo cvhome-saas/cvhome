@@ -13,4 +13,5 @@ export * from './lib/password-strength';
 export * from './lib/passwords-match';
 export * from './lib/slug';
 export * from './lib/unique-async';
+export * from './lib/uri';
 export * from './lib/validation-messages';

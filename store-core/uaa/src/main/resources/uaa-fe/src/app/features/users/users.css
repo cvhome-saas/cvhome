@@ -1,0 +1,94 @@
+.stack {
+  display: grid;
+  gap: var(--spacing-section);
+}
+
+.form {
+  display: grid;
+  gap: var(--spacing-group);
+}
+
+.meta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-inline);
+}
+
+.meta-label {
+  color: var(--foreground-subtle);
+  font-size: var(--text-4xs);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.meta-value {
+  overflow-wrap: anywhere;
+  color: var(--muted-foreground);
+  font-family: var(--font-mono);
+  font-size: var(--text-3xs);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-tight);
+}
+
+.grow {
+  flex: 1;
+}
+
+.pair {
+  display: grid;
+  gap: var(--spacing-group);
+  grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+}
+
+.readonly {
+  display: grid;
+  gap: var(--spacing-tight);
+  padding: var(--spacing-field);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  background: var(--input);
+}
+
+.readonly-note {
+  margin: 0;
+  color: var(--foreground-subtle);
+  font-size: var(--text-3xs);
+}
+
+.roles {
+  display: grid;
+  gap: var(--spacing-tight);
+}
+
+.group-label {
+  margin: 0;
+  color: var(--foreground-subtle);
+  font-size: var(--text-4xs);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/*
+ * Identifiers take their direction from their own content.
+ *
+ * A username and a UUID are Latin technical strings inside a dialog that mirrors under Arabic.
+ * `plaintext` is the CSS spelling of `dir="auto"`: the element still aligns with the document, but
+ * the string inside resolves from its first strong character, so `store-core@…` does not have its
+ * punctuation reordered.
+ */
+.meta-value {
+  unicode-bidi: plaintext;
+}
+
+/* A wrapping set of role picks. */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-tight) var(--spacing-field);
+}

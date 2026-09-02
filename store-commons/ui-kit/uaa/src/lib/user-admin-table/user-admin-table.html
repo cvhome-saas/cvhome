@@ -1,6 +1,11 @@
 <app-data-table [columns]="columns()" [label]="label()" *transloco="let t">
   @for (row of rows(); track row.id) {
-    <app-table-row>
+    <app-table-row
+      [interactive]="selectable()"
+      [class.selected]="selectable() && row.id === selectedId()"
+      [attr.aria-current]="selectable() && row.id === selectedId() ? 'true' : null"
+      (click)="onRowClick($event, row)"
+    >
       <div class="cell-user" role="cell" [attr.data-label]="t('shared.userAdmin.column.user')">
         <span class="avatar" aria-hidden="true">{{ row.initials }}</span>
         <span class="identity">
@@ -36,69 +41,12 @@
       </span>
 
       <div class="cell-actions" role="cell" [attr.data-label]="t('shared.userAdmin.column.actions')">
-        <button
-          class="icon-action"
-          type="button"
+        <app-action-menu
+          [actions]="actionsFor(row)"
           [disabled]="busy()"
-          [title]="row.enabled ? t('shared.userAdmin.action.disable') : t('shared.userAdmin.action.enable')"
-          [attr.aria-label]="
-            row.enabled
-              ? t('shared.userAdmin.action.disableNamed', {name: row.username})
-              : t('shared.userAdmin.action.enableNamed', {name: row.username})
-          "
-          (click)="emit('toggleEnabled', row)"
-        >
-          <app-icon [name]="row.enabled ? 'eyeOff' : 'eye'" />
-        </button>
-
-        <button
-          class="icon-action"
-          type="button"
-          [disabled]="busy()"
-          [title]="t('shared.userAdmin.action.resetPassword')"
-          [attr.aria-label]="t('shared.userAdmin.action.resetPasswordNamed', {name: row.username})"
-          (click)="emit('resetPassword', row)"
-        >
-          <app-icon name="lock" />
-        </button>
-
-        <button
-          class="icon-action"
-          type="button"
-          [disabled]="busy()"
-          [title]="t('shared.userAdmin.action.editRoles')"
-          [attr.aria-label]="t('shared.userAdmin.action.editRolesNamed', {name: row.username})"
-          (click)="emit('editRoles', row)"
-        >
-          <app-icon name="shield" />
-        </button>
-
-        <!--
-          Present and disabled, not hidden. Impersonation has no backend at all — the console holds a
-          session cookie rather than a token, so acting as a merchant means swapping the authorized
-          client in the gateway's session. See .agents/requirments/user-impersonation.md and
-          lessons.md, "Platform — no impersonation".
-        -->
-        <button
-          class="icon-action"
-          type="button"
-          disabled
-          [title]="t('shared.userAdmin.action.impersonateUnavailable')"
-          [attr.aria-label]="t('shared.userAdmin.action.impersonateUnavailable')"
-        >
-          <app-icon name="signIn" />
-        </button>
-
-        <button
-          class="icon-action danger-action"
-          type="button"
-          [disabled]="busy()"
-          [title]="t('shared.userAdmin.action.delete')"
-          [attr.aria-label]="t('shared.userAdmin.action.deleteNamed', {name: row.username})"
-          (click)="emit('delete', row)"
-        >
-          <app-icon name="trash" />
-        </button>
+          [ariaLabel]="t('shared.userAdmin.action.menuFor', {name: row.username})"
+          (picked)="onPick($event, row)"
+        />
       </div>
     </app-table-row>
   }

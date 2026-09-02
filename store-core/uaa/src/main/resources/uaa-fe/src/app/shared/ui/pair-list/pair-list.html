@@ -1,0 +1,44 @@
+<ng-container *transloco="let t">
+  <div class="pair-head">
+    <span class="group-label">{{ label() }}</span>
+    <button class="ghost-action add" type="button" (click)="add.emit()">
+      <app-icon name="plus" [size]="13" />
+      {{ t('pairs.add') }}
+    </button>
+  </div>
+
+  @if (array().controls.length) {
+    <div class="pair-rows">
+      @for (row of array().controls; track $index) {
+        <div class="pair-row" [formGroup]="row">
+          <app-text-field
+            latin
+            mono
+            formControlName="key"
+            [ariaLabel]="t('pairs.keyFor', {position: $index + 1})"
+            [placeholder]="t('pairs.key')"
+          />
+          <app-text-field
+            latin
+            mono
+            formControlName="value"
+            [ariaLabel]="t('pairs.valueFor', {position: $index + 1})"
+            [placeholder]="t('pairs.value')"
+          />
+          <button
+            class="icon-action danger"
+            type="button"
+            [disabled]="locked(row.controls.key.value)"
+            [attr.aria-label]="t('pairs.removeRow', {position: $index + 1})"
+            [title]="locked(row.controls.key.value) ? lockedHint() : t('pairs.remove')"
+            (click)="remove.emit($index)"
+          >
+            <app-icon name="trash" [size]="14" />
+          </button>
+        </div>
+      }
+    </div>
+  } @else {
+    <p class="pair-empty">{{ t('pairs.empty') }}</p>
+  }
+</ng-container>

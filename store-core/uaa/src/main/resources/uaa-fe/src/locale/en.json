@@ -6,13 +6,30 @@
     "roles": "Roles",
     "clients": "Clients",
     "signOut": "Sign out",
-    "language": "Language"
+    "language": "Language",
+    "group": {
+      "overview": "Overview",
+      "identity": "Identity",
+      "applications": "Applications",
+      "system": "System"
+    },
+    "dashboard": "Dashboard",
+    "audit": "Audit log",
+    "providers": "Identity providers",
+    "settings": "Settings",
+    "notBuilt": "Not built yet",
+    "breadcrumb": "Breadcrumb",
+    "open": "Open navigation",
+    "close": "Close navigation",
+    "signedIn": "Signed in"
   },
   "route": {
     "signIn": "Sign in",
     "users": "Users",
     "roles": "Roles",
-    "clients": "OAuth2 clients"
+    "clients": "OAuth2 clients",
+    "clientCreate": "Register a client",
+    "clientEdit": "Client"
   },
   "signIn": {
     "title": "Sign in",
@@ -23,7 +40,12 @@
     "passwordPlaceholder": "your password",
     "submit": "Sign in",
     "submitting": "Signing in…",
-    "failed": "That username and password did not match an account."
+    "failed": "That username and password did not match an account.",
+    "pitch": {
+      "title": "One account for every cvhome app.",
+      "copy": "Sign in once to reach the seller console and the services behind it.",
+      "legal": "© 2026 cvhome"
+    }
   },
   "users": {
     "title": "Users",
@@ -54,11 +76,7 @@
       "busy": "Setting…"
     },
     "roles": {
-      "title": "Roles",
-      "message": "Choose the roles {{name}} should hold.",
-      "empty": "uaa offers no roles this account may be given.",
-      "confirm": "Save roles",
-      "busy": "Saving…"
+      "empty": "uaa offers no roles this account may be given."
     },
     "delete": {
       "title": "Delete this account",
@@ -71,7 +89,32 @@
       "disabled": "{{name}} can no longer sign in.",
       "passwordReset": "New password set for {{name}}.",
       "rolesSaved": "Roles updated for {{name}}.",
-      "deleted": "{{name}} was deleted."
+      "deleted": "{{name}} was deleted.",
+      "saved": "{{name}} was saved.",
+      "created": "{{name}} created."
+    },
+    "detail": {
+      "firstName": "First name",
+      "lastName": "Last name",
+      "username": "Username",
+      "email": "Email",
+      "roles": "Roles",
+      "readOnlyNote": "uaa does not allow either to be changed here.",
+      "setPassword": "Set password",
+      "save": "Save",
+      "saving": "Saving…",
+      "createTitle": "Create a user",
+      "editTitle": "Edit user",
+      "createHint": "uaa stores the account without a password — you will set one next.",
+      "usernameHint": "What the account signs in with. It cannot be changed afterwards.",
+      "enabledLabel": "Account enabled",
+      "enabledHint": "A disabled account keeps its roles and cannot sign in.",
+      "metadata": "Metadata",
+      "metadataHint": "uaa merges metadata on save, so a key that is already stored cannot be removed here — only edited, or joined by a new one.",
+      "metadataLocked": "Stored keys cannot be removed through uaa's update."
+    },
+    "action": {
+      "create": "Create user"
     }
   },
   "roles": {
@@ -96,7 +139,6 @@
     },
     "action": {
       "create": "New role",
-      "rename": "Rename",
       "delete": "Delete"
     },
     "form": {
@@ -106,7 +148,9 @@
       "namePlaceholder": "ROLE_STORE_ADMIN",
       "nameHint": "The authority string itself. Services match on it exactly.",
       "save": "Save",
-      "saving": "Saving…"
+      "saving": "Saving…",
+      "id": "Role id",
+      "description": "A role is a name. What it grants is decided by each service, not stored here."
     },
     "delete": {
       "title": "Delete this role",
@@ -141,13 +185,10 @@
     },
     "action": {
       "register": "Register client",
-      "edit": "Edit",
       "rotate": "New secret",
       "delete": "Delete"
     },
     "form": {
-      "createTitle": "Register a client",
-      "editTitle": "Edit client",
       "clientId": "Client id",
       "clientName": "Name",
       "grantTypes": "Grant types",
@@ -155,9 +196,10 @@
       "scopes": "Scopes",
       "redirectUris": "Redirect URIs",
       "postLogoutUris": "Post-logout redirect URIs",
-      "redirectUrisHint": "Comma separated. Must match the application's callback exactly.",
       "save": "Save",
-      "saving": "Saving…"
+      "saving": "Saving…",
+      "accessTtl": "Access token",
+      "refreshTtl": "Refresh token"
     },
     "rotate": {
       "title": "Set a new secret",
@@ -182,5 +224,90 @@
       "secretRotated": "A new secret was set for {{clientId}}.",
       "deleted": "{{clientId}} was deleted."
     }
+  },
+  "brandSub": "Single sign-on",
+  "clientForm": {
+    "back": "Back to clients",
+    "createTitle": "Register a client",
+    "editTitle": "OAuth client configuration",
+    "context": "What the application is allowed to ask uaa for",
+    "loading": "Loading client…",
+    "invalid": "Some settings still need attention — see the checklist.",
+    "generate": "Generate",
+    "clientIdHint": "Lowercase letters, digits and dashes, at least three characters. Changing it breaks every integration already using it.",
+    "pickOne": "Pick at least one.",
+    "serverDefault": "Server default",
+    "unitLabel": "Unit",
+    "redirectEmpty": "Required when authorization_code is one of the grant types.",
+    "logoutEmpty": "Optional. Where uaa may send the browser after a sign-out.",
+    "requireProofKey": "Require proof key (PKCE)",
+    "requireProofKeyHint": "Mandatory for a public client, which is one that holds no secret.",
+    "requireConsent": "Require authorization consent",
+    "requireConsentHint": "The user approves the requested scopes the first time they sign in.",
+    "jwkSetUrl": "JWK Set URL",
+    "jwkSetUrlHint": "Where uaa fetches the client’s public keys. Needed for private_key_jwt.",
+    "tokenEndpointAlg": "Token endpoint auth signing algorithm",
+    "tokenEndpointAlgHint": "How the client signs its assertion at the token endpoint.",
+    "subjectDn": "X.509 certificate subject DN",
+    "subjectDnHint": "The certificate uaa expects for tls_client_auth.",
+    "customSettings": "Custom settings",
+    "authorizationCodeTtl": "Authorization code",
+    "authorizationCodeTtlHint": "How long a code stays redeemable. Short by design.",
+    "deviceCodeTtl": "Device code",
+    "deviceCodeTtlHint": "How long a device-flow code stays valid.",
+    "ttlHint": "Leave the amount empty for uaa’s default.",
+    "reuseRefreshTokens": "Reuse refresh tokens",
+    "reuseRefreshTokensHint": "Off rotates the refresh token on every use, which is the safer choice.",
+    "certificateBound": "Certificate-bound access tokens",
+    "certificateBoundHint": "Binds a token to the client’s mTLS certificate.",
+    "idTokenAlg": "ID token signature algorithm",
+    "accessTokenFormat": "Access token format",
+    "accessTokenFormatHint": "Self-contained tokens are readable by any service holding the key; reference tokens are not.",
+    "section": {
+      "basic": "Basic info",
+      "authentication": "Authentication",
+      "redirects": "Redirects",
+      "clientSettings": "Client settings",
+      "tokenSettings": "Token settings",
+      "readiness": "Before you save",
+      "summary": "Summary",
+      "danger": "Secret and removal"
+    },
+    "check": {
+      "clientId": "Client id set, and in the accepted shape",
+      "clientName": "Client name set",
+      "auth": "At least one authentication method",
+      "grants": "At least one grant type",
+      "redirectRequired": "A redirect URI, which authorization_code needs",
+      "redirectOptional": "No redirect URI needed for these grant types",
+      "pkceRequired": "PKCE is on, which a public client requires",
+      "pkceOptional": "PKCE optional for a client that holds a secret",
+      "jwkSetUrl": "JWK Set URL, where private_key_jwt needs one",
+      "subjectDn": "Subject DN, where tls_client_auth needs one"
+    },
+    "unit": {
+      "seconds": "seconds",
+      "minutes": "minutes",
+      "hours": "hours",
+      "days": "days"
+    },
+    "uri": {
+      "add": "Add",
+      "remove": "Remove",
+      "removeRow": "Remove URI {{position}}",
+      "rowLabel": "{{label}} {{position}}",
+      "invalid": "Enter an absolute URI, including its scheme.",
+      "insecure": "Plain HTTP to a remote host — anything on the network path can read the code delivered here."
+    }
+  },
+  "pairs": {
+    "add": "Add",
+    "remove": "Remove",
+    "removeRow": "Remove setting {{position}}",
+    "key": "Key",
+    "value": "Value",
+    "keyFor": "Setting {{position}} key",
+    "valueFor": "Setting {{position}} value",
+    "empty": "No custom settings defined."
   }
 }

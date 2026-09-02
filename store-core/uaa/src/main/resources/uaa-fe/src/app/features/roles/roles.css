@@ -3,20 +3,8 @@
   gap: var(--spacing-section);
 }
 
-.form {
-  display: grid;
-  gap: var(--spacing-group);
-  max-inline-size: 32rem;
-}
-
-.actions,
-.row-actions {
-  display: inline-flex;
-  gap: var(--spacing-tight);
-}
-
-.actions {
-  justify-content: flex-end;
+.row {
+  cursor: pointer;
 }
 
 .cell {
@@ -32,41 +20,82 @@
 }
 
 .cell.id {
+  overflow: hidden;
   color: var(--muted-foreground);
   font-family: var(--font-mono);
-  font-size: var(--text-2xs);
+  font-size: var(--text-3xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.primary {
-  padding: var(--spacing-tight) var(--spacing-field);
-  border: none;
-  border-radius: var(--radius-md);
-  background: var(--primary);
-  color: var(--primary-foreground);
-  cursor: pointer;
-  font-size: var(--text-xs);
+/* The affordance that says the row opens something. */
+.cell.go {
+  justify-content: flex-end;
+  color: var(--foreground-subtle);
+}
+
+.form {
+  display: grid;
+  gap: var(--spacing-group);
+}
+
+.meta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-inline);
+}
+
+.meta-label {
+  color: var(--foreground-subtle);
+  font-size: var(--text-4xs);
   font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
-.primary:disabled {
-  cursor: progress;
-  opacity: 0.7;
+.meta-value {
+  overflow-wrap: anywhere;
+  color: var(--muted-foreground);
+  font-family: var(--font-mono);
+  font-size: var(--text-3xs);
 }
 
-.ghost {
-  padding: var(--spacing-tight) var(--spacing-field);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  background: transparent;
-  color: var(--foreground);
-  cursor: pointer;
-  font-size: var(--text-xs);
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-tight);
 }
 
-.ghost:hover {
-  border-color: var(--edge-strong);
+.grow {
+  flex: 1;
 }
 
-.ghost.danger {
-  color: var(--destructive);
+/*
+ * Identifiers take their direction from their own content.
+ *
+ * `plaintext` is the CSS spelling of `dir="auto"`: the cell still aligns with the document, but the
+ * string inside resolves from its first strong character, so a UUID and a role name do not have
+ * their punctuation reordered under Arabic.
+ */
+.cell.name,
+.cell.id,
+.meta-value {
+  unicode-bidi: plaintext;
+}
+
+/* The label the kit's stacked-row layout reveals; hidden while the grid is a grid. */
+@container data-table (max-width: 45rem) {
+  .cell::before {
+    content: attr(data-label) ': ';
+    color: var(--foreground-subtle);
+    font-family: var(--font-sans);
+    font-size: var(--text-4xs);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .cell.go {
+    display: none;
+  }
 }

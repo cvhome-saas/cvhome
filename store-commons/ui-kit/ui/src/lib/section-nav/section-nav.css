@@ -197,3 +197,55 @@ hr {
 .settings-nav.collapsed .nav-count {
   display: none;
 }
+
+/*
+ * A group heading inside the rail.
+ *
+ * Same typographic role as `.nav-heading` — the rail's own title — but it sits between runs of
+ * items rather than at the top, so it carries its own leading and no flex sizing. Hidden while the
+ * rail is collapsed: a label over an icon strip is a label with nothing to label.
+ */
+.nav-group {
+  margin: 0;
+  padding: var(--spacing-section) 0.7rem var(--spacing-inline);
+  color: var(--foreground-subtle);
+  font-size: var(--text-4xs);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+/* The first group needs no leading — the rail's own head already provides it. */
+.nav-group:first-of-type {
+  padding-block-start: var(--spacing-tight);
+}
+
+/*
+ * A section the product does not have yet.
+ *
+ * Dimmed and not interactive, but still legible: it is signposting a place, and copy the operator
+ * cannot read is worse than no row at all. `cursor: not-allowed` and the title are what tell them
+ * why nothing happens on click.
+ */
+.nav-item.disabled {
+  color: var(--foreground-quiet);
+  cursor: not-allowed;
+}
+
+.nav-item.disabled:hover {
+  background: none;
+  color: var(--foreground-quiet);
+}
+
+/* Holds the toggle at the end of the row when the rail carries no title of its own. */
+.nav-heading-spacer {
+  flex: 1;
+}
+
+/* The host owns the surface; the rail contributes only its rows. See `flat`. */
+.settings-nav.flat {
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: none;
+}

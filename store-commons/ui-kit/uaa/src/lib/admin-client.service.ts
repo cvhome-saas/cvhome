@@ -34,7 +34,13 @@ export interface ClientSummary {
 export interface ClientTokenSettings {
   readonly authorizationCodeTimeToLive: string | null;
   readonly accessTokenTimeToLive: string | null;
-  readonly accessTokenFormat: string | null;
+  /**
+   * `{value: 'self-contained'}` — an `OAuth2TokenFormat`, which serializes as an object with one
+   * field, not as the bare string the name suggests. Declared as it really is: it has no screen and
+   * is only ever carried back unchanged, and a `string` here would make the first caller that reads
+   * it print `[object Object]`.
+   */
+  readonly accessTokenFormat: {readonly value: string} | null;
   readonly deviceCodeTimeToLive: string | null;
   readonly reuseRefreshTokens: boolean;
   readonly refreshTokenTimeToLive: string | null;

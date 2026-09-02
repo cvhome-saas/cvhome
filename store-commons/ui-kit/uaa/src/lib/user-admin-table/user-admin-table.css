@@ -84,10 +84,17 @@
 .cell-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 0.15rem;
 }
 
-.cell-actions button[disabled] {
-  cursor: not-allowed;
-  opacity: 0.45;
+/*
+ * The selected row, when the table is being used as a selector. The marker sits on the inline-start
+ * edge so it mirrors with the document rather than staying on the left under RTL.
+ */
+app-table-row.selected {
+  background: var(--accent-veil);
+  box-shadow: inset 2px 0 0 var(--primary);
+}
+
+[dir='rtl'] app-table-row.selected {
+  box-shadow: inset -2px 0 0 var(--primary);
 }

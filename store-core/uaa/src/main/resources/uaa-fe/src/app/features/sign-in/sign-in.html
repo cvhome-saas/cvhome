@@ -1,33 +1,58 @@
 <div class="wrap" *transloco="let t">
-  <app-panel class="card" padded [title]="t('signIn.title')" [subtitle]="t('signIn.subtitle')">
-    @if (failed) {
-      <p class="failed" role="alert">{{ t('signIn.failed') }}</p>
-    }
+  <!--
+    The brand half. Decorative only — every claim on it is about what cvhome ID *is*, not about
+    capability the platform does not have. The mock's passkey / SSO / session bullets were removed
+    with the features they describe; see lessons.md, "Sign-in — one step, password only".
+  -->
+  <aside class="brand-panel">
+    <div class="brand">
+      <span class="mark"><app-icon name="shield" /></span>
+      <span class="brand-name">{{ t('brand') }}</span>
+    </div>
 
-    <form class="form" method="post" [action]="action" (submit)="onSubmit()">
-      <app-form-field controlId="username" required [label]="t('signIn.username')">
-        <app-text-field
-          autocomplete="username"
-          id="username"
-          latin
-          name="username"
-          [placeholder]="t('signIn.usernamePlaceholder')"
-        />
-      </app-form-field>
+    <div class="pitch">
+      <h2 class="pitch-title">{{ t('signIn.pitch.title') }}</h2>
+      <p class="pitch-copy">{{ t('signIn.pitch.copy') }}</p>
+    </div>
 
-      <app-form-field controlId="password" required [label]="t('signIn.password')">
-        <app-text-field
-          autocomplete="current-password"
-          id="password"
-          name="password"
-          type="password"
-          [placeholder]="t('signIn.passwordPlaceholder')"
-        />
-      </app-form-field>
+    <p class="legal">{{ t('signIn.pitch.legal') }}</p>
+  </aside>
 
-      <button class="submit" type="submit" [disabled]="submitting()">
-        {{ submitting() ? t('signIn.submitting') : t('signIn.submit') }}
-      </button>
-    </form>
-  </app-panel>
+  <main class="form-panel">
+    <app-panel class="card" padded [title]="t('signIn.title')" [subtitle]="t('signIn.subtitle')">
+      @if (failed) {
+        <p class="failed" role="alert">
+          <app-icon name="alertCircle" />
+          <span>{{ t('signIn.failed') }}</span>
+        </p>
+      }
+
+      <form class="form" method="post" [action]="action" (submit)="onSubmit()">
+        <app-form-field controlId="username" required [label]="t('signIn.username')">
+          <app-text-field
+            autocomplete="username"
+            id="username"
+            latin
+            name="username"
+            [placeholder]="t('signIn.usernamePlaceholder')"
+          />
+        </app-form-field>
+
+        <app-form-field controlId="password" required [label]="t('signIn.password')">
+          <app-text-field
+            autocomplete="current-password"
+            id="password"
+            name="password"
+            type="password"
+            [placeholder]="t('signIn.passwordPlaceholder')"
+          />
+        </app-form-field>
+
+        <button class="submit" type="submit" [disabled]="submitting()">
+          <span>{{ submitting() ? t('signIn.submitting') : t('signIn.submit') }}</span>
+          <app-icon name="arrowRight" />
+        </button>
+      </form>
+    </app-panel>
+  </main>
 </div>
