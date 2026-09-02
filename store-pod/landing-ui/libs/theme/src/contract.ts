@@ -196,6 +196,32 @@ export interface CheckoutResultData {
 
 export type CustomerData = Record<string, never>;
 
+/** Why the last sign-in attempt failed, as cua reports it on the URL. The storefront owns the wording. */
+export type LoginError = 'invalid' | 'social';
+
+/** One social-login button: the provider, its name, and the link that starts that provider's flow. */
+export interface LoginSocialOption {
+    providerId: string;
+    name: string;
+    href: string;
+}
+
+/**
+ * What the login page renders. The page is a plain HTML form that posts the credentials to cua's form-login
+ * endpoint (`action`), full-page, so the session cookie and the saved authorize request do the rest; `clientId`
+ * and `lang` ride along as hidden inputs. It is only rendered while cua is waiting (`/login?auth=1`) — without
+ * that marker the shell starts the flow instead.
+ */
+export interface LoginData {
+    action: string;
+    clientId: string;
+    lang: string;
+    error?: LoginError;
+    socialLogins: LoginSocialOption[];
+}
+
+export type RegisterData = Record<string, never>;
+
 export interface OrderData {
     orderId: number;
 }
@@ -230,6 +256,13 @@ export interface ThemePages {
      * pages before any shopper could search at all.
      */
     Search?: ComponentType<PageProps<SearchData>>;
+    /**
+     * Optional, like `Search`. The shopper's sign-in form — themed here rather than served by cua, so a store's
+     * login looks like the store. Without it the shell renders a token-only form from the shared primitives.
+     */
+    Login?: ComponentType<PageProps<LoginData>>;
+    /** Optional, like `Login`: self-registration, driven by `useRegisterForm`. */
+    Register?: ComponentType<PageProps<RegisterData>>;
 }
 
 export type PageSkeletonKind = 'home' | 'category' | 'product' | 'content' | 'checkout' | 'customer' | 'order';

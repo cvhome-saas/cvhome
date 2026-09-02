@@ -7,6 +7,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.cua.domain.User;
 import com.asrevo.cvhome.cua.dto.ReadableUser;
 import com.asrevo.cvhome.cua.errors.DuplicateEmailException;
@@ -24,19 +25,25 @@ public class UserService {
 
     private final PasswordEncoder passwordEncoder;
 
+    /**
+     * Creates a shopper account for {@code store}. The store is the caller's to supply, never the request body's:
+     * a shopper registers with the store whose page they are on, and letting the body name the store would let one
+     * form register accounts anywhere on the pod.
+     */
     @Transactional
-    public void registerUser(RegistrationRequest request)
+    public void registerUser(StoreMerchantId store, RegistrationRequest request)
             throws DuplicateUsernameException, DuplicateEmailException {
-        if (userRepository.findByClientIdAndUsername(request.getClientId(), request.getUsername()).isPresent()) {
-            throw DuplicateUsernameException.of(request.getClientId(), request.getUsername());
+        String clientId = store.getId();
+        if (userRepository.findByClientIdAndUsername(clientId, request.getUsername()).isPresent()) {
+            throw DuplicateUsernameException.of(clientId, request.getUsername());
         }
 
-        if (userRepository.findByClientIdAndEmail(request.getClientId(), request.getEmail()).isPresent()) {
-            throw DuplicateEmailException.of(request.getClientId(), request.getEmail());
+        if (userRepository.findByClientIdAndEmail(clientId, request.getEmail()).isPresent()) {
+            throw DuplicateEmailException.of(clientId, request.getEmail());
         }
 
         User user = new User();
-        user.setClientId(request.getClientId());
+        user.setClientId(clientId);
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
         user.setFirstName(request.getFirstName());

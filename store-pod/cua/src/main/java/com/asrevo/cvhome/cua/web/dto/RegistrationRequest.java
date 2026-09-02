@@ -25,6 +25,4 @@ public class RegistrationRequest {
 
     private String lastName;
 
-    private String clientId;
-
 }

@@ -219,6 +219,38 @@
       "PREVIOUS": "السابق",
       "NEXT": "التالي",
       "SEARCH_ERROR": "تعذّر تنفيذ البحث."
+    },
+    "LOGIN": {
+      "TITLE": "تسجيل الدخول",
+      "HEADING": "تسجيل الدخول إلى {store}",
+      "USERNAME": "اسم المستخدم",
+      "PASSWORD": "كلمة المرور",
+      "SUBMIT": "تسجيل الدخول",
+      "OR": "أو",
+      "SIGN_IN_WITH": "تسجيل الدخول باستخدام {provider}",
+      "NO_ACCOUNT": "ليس لديك حساب؟",
+      "SIGN_UP": "أنشئ حسابًا",
+      "ERROR_INVALID": "اسم المستخدم أو كلمة المرور غير صحيحة.",
+      "ERROR_SOCIAL": "تعذّر تسجيل الدخول عبر هذا المزوّد. يرجى المحاولة مرة أخرى."
+    },
+    "REGISTER": {
+      "TITLE": "إنشاء حساب",
+      "HEADING": "أنشئ حسابك في {store}",
+      "USERNAME": "اسم المستخدم",
+      "EMAIL": "البريد الإلكتروني",
+      "PASSWORD": "كلمة المرور",
+      "FIRST_NAME": "الاسم الأول",
+      "LAST_NAME": "اسم العائلة",
+      "SUBMIT": "إنشاء حساب",
+      "ALREADY": "لديك حساب بالفعل؟",
+      "SIGN_IN": "تسجيل الدخول",
+      "FAILED": "تعذّر إنشاء حسابك. يرجى المحاولة مرة أخرى.",
+      "FIELD_INVALID": "يرجى التحقق من هذا الحقل.",
+      "FIELD_ERRORS": {
+        "VALIDATION_NotBlank": "هذا الحقل مطلوب.",
+        "VALIDATION_Size": "هذه القيمة قصيرة جدًا أو طويلة جدًا.",
+        "VALIDATION_Email": "يرجى إدخال بريد إلكتروني صالح."
+      }
     }
   },
   "COMPONENTS": {
@@ -333,7 +365,7 @@
       "PAYMENT_INITIATE_FAILED": "ما زلنا نؤكد عملية الدفع. يرجى عدم الدفع مرة أخرى — تحقّق من طلباتك بعد بضع دقائق.",
       "PAYMENT_CONFIGURATION_MISSING": "هذا المتجر لا يقبل الدفع في الوقت الحالي.",
       "PAYMENT_PROCESSOR_UNSUPPORTED": "وسيلة الدفع هذه غير متاحة في هذا المتجر.",
-      "CUA_REGISTRATION_EMAIL_TAKEN": "يوجد حساب مسجَّل بهذا البريد الإلكتروني بالفعل.",
+      "CUA_REGISTRATION_EMAIL_TAKEN": "يوجد حساب بهذا البريد الإلكتروني بالفعل.",
       "CUA_REGISTRATION_USERNAME_TAKEN": "اسم المستخدم هذا مستخدم بالفعل.",
       "CUSTOMER_COUNTRY_UNSUPPORTED": "لا نقوم بالشحن إلى الدولة المختارة.",
       "CUSTOMER_ZONE_UNSUPPORTED": "المنطقة أو المحافظة المختارة غير صالحة لهذه الدولة.",

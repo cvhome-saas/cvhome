@@ -20,3 +20,5 @@ export * from "./customer";
 export * from "./listing";
 export * from "./search";
 export * from "./layout";
+export * from "./social-login";
+export * from "./registration";

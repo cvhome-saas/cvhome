@@ -219,6 +219,38 @@
       "PREVIOUS": "Précédent",
       "NEXT": "Suivant",
       "SEARCH_ERROR": "Nous n'avons pas pu effectuer cette recherche."
+    },
+    "LOGIN": {
+      "TITLE": "Connexion",
+      "HEADING": "Se connecter à {store}",
+      "USERNAME": "Nom d'utilisateur",
+      "PASSWORD": "Mot de passe",
+      "SUBMIT": "Se connecter",
+      "OR": "ou",
+      "SIGN_IN_WITH": "Se connecter avec {provider}",
+      "NO_ACCOUNT": "Vous n'avez pas de compte ?",
+      "SIGN_UP": "Créez-en un",
+      "ERROR_INVALID": "Nom d'utilisateur ou mot de passe invalide.",
+      "ERROR_SOCIAL": "La connexion via ce fournisseur a échoué. Veuillez réessayer."
+    },
+    "REGISTER": {
+      "TITLE": "Créer un compte",
+      "HEADING": "Créez votre compte sur {store}",
+      "USERNAME": "Nom d'utilisateur",
+      "EMAIL": "Email",
+      "PASSWORD": "Mot de passe",
+      "FIRST_NAME": "Prénom",
+      "LAST_NAME": "Nom",
+      "SUBMIT": "Créer un compte",
+      "ALREADY": "Vous avez déjà un compte ?",
+      "SIGN_IN": "Se connecter",
+      "FAILED": "Nous n'avons pas pu créer votre compte. Veuillez réessayer.",
+      "FIELD_INVALID": "Veuillez vérifier ce champ.",
+      "FIELD_ERRORS": {
+        "VALIDATION_NotBlank": "Ce champ est obligatoire.",
+        "VALIDATION_Size": "Cette valeur est trop courte ou trop longue.",
+        "VALIDATION_Email": "Veuillez saisir une adresse email valide."
+      }
     }
   },
   "COMPONENTS": {
@@ -333,7 +365,7 @@
       "PAYMENT_INITIATE_FAILED": "Nous confirmons encore votre paiement. Ne payez pas à nouveau — consultez vos commandes dans quelques minutes.",
       "PAYMENT_CONFIGURATION_MISSING": "Cette boutique n'accepte pas les paiements pour le moment.",
       "PAYMENT_PROCESSOR_UNSUPPORTED": "Ce moyen de paiement n'est pas disponible pour cette boutique.",
-      "CUA_REGISTRATION_EMAIL_TAKEN": "Un compte existe déjà avec cette adresse e-mail.",
+      "CUA_REGISTRATION_EMAIL_TAKEN": "Un compte existe déjà avec cet email.",
       "CUA_REGISTRATION_USERNAME_TAKEN": "Ce nom d'utilisateur est déjà pris.",
       "CUSTOMER_COUNTRY_UNSUPPORTED": "Nous ne livrons pas dans le pays sélectionné.",
       "CUSTOMER_ZONE_UNSUPPORTED": "La région sélectionnée n'est pas valide pour ce pays.",

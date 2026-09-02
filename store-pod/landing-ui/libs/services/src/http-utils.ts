@@ -128,10 +128,9 @@ export async function handleResponse<T>(res: Response, url?: string): Promise<T>
     if (!res.ok) {
         throw await toApiError(res, url);
     }
-    if (res.status === 204) {
-        return undefined as T;
-    }
-    return await res.json() as T;
+    // A 201 with no body (cua's registration) is as legitimate as a 204: only parse what was sent.
+    const text = await res.text();
+    return (text ? JSON.parse(text) : undefined) as T;
 }
 
 /**

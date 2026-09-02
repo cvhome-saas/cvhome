@@ -1,0 +1,12 @@
+### The social providers a store has enabled, for the storefront's login page. Public; carries no credential —
+### the app id and secret stay behind /api/v1/private/social-login-config.
+
+### STORE_ID's providers → [{providerId, name, registrationId}] (the seed enables google, github, facebook)
+GET {{LANDING_UI_URL}}/cua/api/v1/public/social-logins?store={{STORE_ID}}&lang={{LANG}}
+
+### Isolation: the second store's list is its own
+GET {{LANDING_UI_URL}}/cua/api/v1/public/social-logins?store={{STORE_ID_2}}&lang={{LANG}}
+
+### Each registrationId is a link target on the store host: /cua/oauth2/authorization/<registrationId>
+### (only meaningful while cua holds a saved authorize request for the session)
+GET {{LANDING_UI_URL}}/cua/oauth2/authorization/{{STORE_ID}}.google

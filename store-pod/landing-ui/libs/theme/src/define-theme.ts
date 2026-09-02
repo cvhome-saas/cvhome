@@ -1,7 +1,8 @@
 import type {ThemeDefinition} from './contract';
 
-// `Search` is deliberately absent: it is optional in ThemePages, and the shell renders a fallback for any
-// theme that has not implemented one. Adding it here would break the build for every theme that has not.
+// `Search`, `Login` and `Register` are deliberately absent: they are optional in ThemePages, and the shell renders
+// a fallback for any theme that has not implemented them. Adding one here would break the build for every theme
+// that has not.
 // `Home` is gone from ThemePages entirely: the shell composes the home page from the store's layout document
 // and the theme's `sections` registry (with shell fallbacks for anything unregistered).
 const PAGES = ['Category', 'Product', 'Content', 'BlogIndex', 'BlogPost', 'Faq', 'Policy', 'Checkout', 'CheckoutResult', 'Customer', 'Order'] as const;

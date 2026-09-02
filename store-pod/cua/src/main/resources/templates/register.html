@@ -141,7 +141,6 @@
     <div class="error" th:if="${error}" th:text="${error}"></div>
 
     <form method="post" th:action="@{/register}" th:object="${registrationRequest}">
-        <input th:field="*{clientId}" type="hidden">
         <div class="form-group">
             <label for="username" th:text="#{register.username}">Username</label>
             <input autofocus id="username" required th:field="*{username}" type="text"/>

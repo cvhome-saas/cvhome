@@ -77,7 +77,6 @@ public class RegistrationController {
                 model.addAttribute(FORM_STORE_LOGO_KEY, storeLogo.logoUrl(storeId, language(request)));
                 model.addAttribute(FORM_CLIENT_ID_KEY, clientId);
                 RegistrationRequest registrationRequest = new RegistrationRequest();
-                registrationRequest.setClientId(clientId);
                 model.addAttribute(FORM_REGISTRATION_REQUEST_KEY, registrationRequest);
 
             }
@@ -90,6 +89,7 @@ public class RegistrationController {
                                @Valid @ModelAttribute("registrationRequest") RegistrationRequest registrationRequest,
                                BindingResult bindingResult, Model model) {
 
+        StoreMerchantId store = null;
         SavedRequest savedRequest = requestCache.getRequest(request, response);
         if (savedRequest != null) {
             String clientId = UriComponentsBuilder.fromUriString(savedRequest.getRedirectUrl())
@@ -99,24 +99,24 @@ public class RegistrationController {
             if (clientId != null) {
 
                 StoreMerchantId storeId = new StoreMerchantId(clientId);
-                ReadableMerchantStore store = externalMerchantStoreService.getStore(storeId);
+                ReadableMerchantStore merchantStore = externalMerchantStoreService.getStore(storeId);
 
-                model.addAttribute(FORM_STORE_KEY, store);
+                model.addAttribute(FORM_STORE_KEY, merchantStore);
                 // The logo is the content service's now, not a field on the merchant record.
                 model.addAttribute(FORM_STORE_LOGO_KEY, storeLogo.logoUrl(storeId, language(request)));
                 model.addAttribute(FORM_CLIENT_ID_KEY, clientId);
-                registrationRequest.setClientId(clientId);
+                store = storeId;
                 model.addAttribute(FORM_REGISTRATION_REQUEST_KEY, registrationRequest);
 
             }
         }
 
-        if (bindingResult.hasErrors()) {
+        if (bindingResult.hasErrors() || store == null) {
             return REGISTER_PAGE;
         }
 
         try {
-            userService.registerUser(registrationRequest);
+            userService.registerUser(store, registrationRequest);
             // Two catches rather than one: each collision belongs under the control the shopper has to change, and
             // the compiler is what says the set is complete.
         } catch (DuplicateUsernameException e) {
