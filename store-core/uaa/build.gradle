@@ -29,33 +29,16 @@ bootBuildImage {
 }
 
 dependencies {
-    implementation libs.spring.boot.starter.actuator
-    implementation libs.spring.boot.starter.data.jpa
-    implementation libs.spring.boot.starter.oauth2.authorization.server
-    implementation libs.spring.boot.starter.security.oauth2.resource.server
-    implementation libs.spring.boot.starter.security
-    implementation libs.spring.boot.starter.oauth2.client
-    implementation libs.spring.boot.starter.thymeleaf
-    implementation libs.spring.boot.starter.web
-    implementation libs.spring.boot.starter.validation
-    implementation libs.spring.boot.starter.session.jdbc
-    implementation libs.spring.cloud.starter
-    implementation libs.thymeleaf.extras.springsecurity6
-    implementation libs.springdoc.openapi.starter.webmvc.ui
-    implementation libs.caffeine
+    /*
+     * The SSO server itself. uaa is a shell around it: this module supplies the deployment's identity — the pinned
+     * issuer, the single realm, the seeds and the embedded admin SPA — and sso-core supplies everything else. The
+     * starters arrive transitively from sso-core on purpose; re-listing them here is how the two deployments drift.
+     */
+    implementation project(':store-commons:sso:sso-core')
 
+    implementation libs.spring.cloud.starter
     implementation project(':store-commons:ecs-commons:fargate-task-info')
     implementation project(':store-commons:ecs-commons:ecs-service-discoveryclient')
-
-    implementation project(':store-commons:commons')
-    // UaaErrors and the condition types it names live here, shared with the admin SDK: the client catalog keys on the
-    // enum constants, so server and client must compile against the same ones.
-    implementation project(':store-commons:uaa-client')
-    implementation project(':store-commons:autoconfigure')
-    // The published event contracts, and the outbox that carries them (namastack, JPA flavour — uaa is JPA).
-    implementation project(':store-core:uaa:uaa-events')
-    implementation libs.namastack.outbox.starter.jpa
-    implementation project(':store-commons:secret-crypto:secret-crypto-autoconfigure')
 
     compileOnly libs.lombok
     runtimeOnly libs.postgresql
@@ -70,7 +53,6 @@ dependencies {
     integrationTestImplementation libs.spring.boot.starter.security.oauth2.authorization.server.test
     integrationTestImplementation libs.spring.boot.starter.security.oauth2.resource.server.test
     integrationTestImplementation libs.spring.boot.starter.session.jdbc.test
-    integrationTestImplementation libs.spring.boot.starter.thymeleaf.test
     integrationTestImplementation libs.spring.boot.starter.validation.test
     integrationTestImplementation libs.spring.boot.starter.webmvc.test
 }

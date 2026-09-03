@@ -31,6 +31,8 @@ include(
         // The SSO server, built once and deployed twice: store-core/uaa (one realm) and store-pod/cua
         // (one realm per store). sso-commons carries the realm vocabulary both shells compile against.
         'store-commons:sso:sso-commons',
+        'store-commons:sso:sso-events',
+        'store-commons:sso:sso-core',
         'store-commons:secret-crypto:secret-crypto-core',
         'store-commons:secret-crypto:secret-crypto-local',
         'store-commons:secret-crypto:secret-crypto-aws',
@@ -76,7 +78,6 @@ include(
         'store-pod:cua',
 
         'store-core:uaa',
-        'store-core:uaa:uaa-events',
         'store-core:gateway:gateway-service',
         'store-core:tenancy:tenancy-commons',
         'store-core:tenancy:tenancy-events',
