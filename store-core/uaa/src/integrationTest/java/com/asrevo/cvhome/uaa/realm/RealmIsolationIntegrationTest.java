@@ -64,6 +64,18 @@ class RealmIsolationIntegrationTest {
         assertThat(RealmContext.callIn(STORE_B, () -> users.findByUsername(HIDDEN))).isEmpty();
     }
 
+    /**
+     * By id as well as by name. {@code CurrentUserResolver} looks an account up by the token's {@code uid}, so if
+     * a find by primary key ignored the tenant, one store's token could resolve another store's account.
+     */
+    @Test
+    void aUserOfOneRealmIsInvisibleInAnotherByIdToo() {
+        UUID id = RealmContext.callIn(STORE_A, () -> users.save(newUser("by-id")).getId());
+
+        assertThat(RealmContext.callIn(STORE_A, () -> users.findById(id))).isPresent();
+        assertThat(RealmContext.callIn(STORE_B, () -> users.findById(id))).isEmpty();
+    }
+
     /** The invariant the whole design rests on: one address is a different person in each store. */
     @Test
     void theSameUsernameAndEmailExistOncePerRealm() {
