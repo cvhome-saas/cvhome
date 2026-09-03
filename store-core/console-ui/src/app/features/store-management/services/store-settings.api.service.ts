@@ -503,7 +503,7 @@ export class StoreSettingsApi {
         icon: isLoginProvider(providerId) ? LOGIN_PROVIDER_ICON[providerId] : LOGIN_PROVIDER_FALLBACK_ICON,
         appId: config?.appId ?? '',
         appSecret: config?.appSecret ?? '',
-        callbackUrl: this.callbackUrl(storefront, store.id, providerId),
+        callbackUrl: this.callbackUrl(storefront, providerId),
         enabled: config?.enabled ?? false,
         configured: config !== undefined,
       };
@@ -530,8 +530,11 @@ export class StoreSettingsApi {
    * Answers the path alone when the host is unknown — the pod lookup is refused for a suspended
    * store — because a path an operator can still recognise beats a URL built on a guess.
    */
-  private callbackUrl(storefront: string | null, storeId: string, providerId: string): string {
-    const path = `/cua/login/oauth2/code/${storeId}.${providerId.toLowerCase()}`;
+  private callbackUrl(storefront: string | null, providerId: string): string {
+    // The registration id is the bare provider alias now, not `{store}.{provider}`: aliases are unique within a
+    // store's own realm, and the realm is decided by the host. The URL is still per-store, because it is built on
+    // the store's own domain — which is what the merchant registers with Google.
+    const path = `/cua/login/oauth2/code/${providerId.toLowerCase()}`;
     return storefront ? `https://${storefront}${path}` : path;
   }
 

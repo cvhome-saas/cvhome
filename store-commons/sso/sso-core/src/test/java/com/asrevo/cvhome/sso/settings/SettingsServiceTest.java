@@ -5,7 +5,12 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.asrevo.cvhome.commons.domain.RealmId;
 import com.asrevo.cvhome.sso.audit.AuditService;
+import com.asrevo.cvhome.sso.realm.RealmContext;
+import com.asrevo.cvhome.sso.realm.RealmMode;
+import com.asrevo.cvhome.sso.realm.SsoRealmProperties;
+import com.asrevo.cvhome.sso.realm.SsoTenantIdentifierResolver;
 import com.asrevo.cvhome.uaa.errors.SettingsConflictException;
 import com.asrevo.cvhome.uaa.errors.SettingsInvalidException;
 
@@ -24,17 +29,51 @@ class SettingsServiceTest {
 
     private static final String ACTOR = "super-admin";
 
+    private static final String REALM = "platform";
+
+    private static final String STORE_A = "store-a";
+
+    private static final String STORE_B = "store-b";
+
     private final SettingsRepository repository = mock(SettingsRepository.class);
 
-    private final SettingsService service = new SettingsService(repository, mock(AuditService.class));
+    private final SettingsService service =
+            new SettingsService(repository, mock(AuditService.class), new SsoTenantIdentifierResolver(single()));
 
     private Settings stored;
 
     @BeforeEach
     void setUp() {
-        stored = new Settings();
-        when(repository.findById(Settings.SINGLETON_ID)).thenReturn(Optional.of(stored));
+        stored = new Settings(REALM);
+        when(repository.findById(REALM)).thenReturn(Optional.of(stored));
         when(repository.saveAndFlush(any(Settings.class))).thenAnswer(invocation -> invocation.getArgument(0));
+    }
+
+    /**
+     * The leak the realm key exists to stop: with a constant key, whichever store loaded first imposed its
+     * password policy, lockout thresholds and token lifetimes on every other store for the next thirty seconds.
+     */
+    @Test
+    void oneRealmsPolicyIsNeverServedToAnother() {
+        SsoRealmProperties multi = new SsoRealmProperties();
+        multi.setMode(RealmMode.MULTI);
+        SettingsService shared =
+                new SettingsService(repository, mock(AuditService.class), new SsoTenantIdentifierResolver(multi));
+        when(repository.findById(STORE_A)).thenReturn(Optional.of(new Settings(STORE_A)));
+        when(repository.findById(STORE_B)).thenReturn(Optional.of(new Settings(STORE_B)));
+
+        RealmContext.runIn(RealmId.of(STORE_A), shared::current);
+        RealmContext.runIn(RealmId.of(STORE_B), shared::current);
+
+        // Each realm loaded its own row rather than the other's cached one.
+        verify(repository).findById(STORE_A);
+        verify(repository).findById(STORE_B);
+    }
+
+    private static SsoRealmProperties single() {
+        SsoRealmProperties properties = new SsoRealmProperties();
+        properties.setMode(RealmMode.SINGLE);
+        return properties;
     }
 
     private static RealmSettings with(RealmSettings base, RealmSettings.Lockout lockout, long version) {
@@ -48,7 +87,7 @@ class SettingsServiceTest {
     void readsAreCachedUntilAWrite() throws Exception {
         RealmSettings first = service.current();
         service.current();
-        verify(repository, times(1)).findById(Settings.SINGLETON_ID);
+        verify(repository, times(1)).findById(REALM);
 
         service.update(with(first, new RealmSettings.Lockout(3, 600, 0), first.version()), ACTOR);
 

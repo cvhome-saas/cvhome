@@ -10,7 +10,6 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.security.web.savedrequest.RequestCache;
-import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
 
@@ -30,7 +29,6 @@ import lombok.RequiredArgsConstructor;
  * hidden input, which keeps the hand-off free of JavaScript.
  * </p>
  */
-@Component
 @RequiredArgsConstructor
 public class StorefrontLoginEntryPoint implements AuthenticationEntryPoint {
 

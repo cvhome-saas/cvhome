@@ -12,6 +12,7 @@ import com.asrevo.cvhome.sso.audit.AuditEventType;
 import com.asrevo.cvhome.sso.audit.AuditRecord;
 import com.asrevo.cvhome.sso.audit.AuditService;
 import com.asrevo.cvhome.sso.audit.AuditTargetType;
+import com.asrevo.cvhome.sso.realm.SsoTenantIdentifierResolver;
 import com.asrevo.cvhome.uaa.errors.SettingsConflictException;
 import com.asrevo.cvhome.uaa.errors.SettingsInvalidException;
 import com.github.benmanes.caffeine.cache.Caffeine;
@@ -25,13 +26,18 @@ import com.github.benmanes.caffeine.cache.LoadingCache;
  * invalidated on write. Ranges are checked here, not by the database: a lockout threshold of zero would lock every
  * account on its first attempt, and the column would happily store it.
  * </p>
+ *
+ * <p>
+ * <strong>The cache is keyed by realm.</strong> It was keyed by a constant while uaa was the only deployment,
+ * which with a realm per store would have let whichever store loaded first impose its password policy, lockout
+ * thresholds and token lifetimes on every other store for the next thirty seconds. The key comes from the same
+ * resolver Hibernate uses, so the cache cannot disagree with the row it caches.
+ * </p>
  */
 @Service
 public class SettingsService {
 
     static final Duration CACHE_TTL = Duration.ofSeconds(30);
-
-    static final String SINGLETON = "settings";
 
     private static final int MIN_PASSWORD_LENGTH = 8;
 
@@ -47,28 +53,33 @@ public class SettingsService {
 
     private final AuditService audit;
 
+    private final SsoTenantIdentifierResolver realms;
+
     private final LoadingCache<String, RealmSettings> cache;
 
-    public SettingsService(SettingsRepository repository, AuditService audit) {
+    public SettingsService(SettingsRepository repository, AuditService audit, SsoTenantIdentifierResolver realms) {
         this.repository = repository;
         this.audit = audit;
-        this.cache = Caffeine.newBuilder().expireAfterWrite(CACHE_TTL).build(key -> RealmSettings.of(load()));
+        this.realms = realms;
+        this.cache = Caffeine.newBuilder().expireAfterWrite(CACHE_TTL).build(realm -> RealmSettings.of(load(realm)));
     }
 
-    private Settings load() {
-        return repository.findById(Settings.SINGLETON_ID).orElseGet(() -> repository.save(new Settings()));
+    /** A realm that has never been configured gets the defaults, written on first read so it has a version. */
+    private Settings load(String realm) {
+        return repository.findById(realm).orElseGet(() -> repository.save(new Settings(realm)));
     }
 
-    /** The current policy, at most thirty seconds old. */
+    /** The current realm's policy, at most thirty seconds old. */
     public RealmSettings current() {
-        return Objects.requireNonNull(cache.get(SINGLETON));
+        return Objects.requireNonNull(cache.get(realms.resolveCurrentTenantIdentifier()));
     }
 
     @Transactional
     public RealmSettings update(RealmSettings requested, String actor)
             throws SettingsInvalidException, SettingsConflictException {
         validate(requested);
-        Settings entity = load();
+        String realm = realms.resolveCurrentTenantIdentifier();
+        Settings entity = load(realm);
         if (entity.getVersion() != requested.version()) {
             throw SettingsConflictException.of(requested.version());
         }
@@ -82,9 +93,9 @@ public class SettingsService {
         } catch (ObjectOptimisticLockingFailureException e) {
             throw SettingsConflictException.of(requested.version());
         }
-        cache.invalidateAll();
+        cache.invalidate(realm);
         audit.record(AuditRecord.of(AuditEventType.SETTINGS_UPDATED)
-                .target(AuditTargetType.SETTINGS, SINGLETON, SINGLETON)
+                .target(AuditTargetType.SETTINGS, realm, realm)
                 .change(before, after));
         return after;
     }
@@ -121,9 +132,9 @@ public class SettingsService {
         }
     }
 
-    /** For tests and callers that need the policy without the cache. */
+    /** For tests and callers that need this realm's policy without the cache. */
     RealmSettings reload() {
-        cache.invalidateAll();
+        cache.invalidate(realms.resolveCurrentTenantIdentifier());
         return current();
     }
 

@@ -1,5 +1,8 @@
--- The realm's one settings row; every column has its default.
-insert into uaa.settings (id) values (1) on conflict (id) do nothing;
+-- The one realm uaa serves, and the only one it ever will: its staff and service accounts are a single pool.
+insert into uaa.realms (id, display_name) values ('platform', 'cvhome ID') on conflict (id) do nothing;
+
+-- The platform realm's settings row; every column has its default.
+insert into uaa.settings (realm_id) values ('platform') on conflict (realm_id) do nothing;
 
 -- Seed roles. System roles cannot be renamed or deleted; their permissions can still be edited.
 insert into uaa.roles (id, name, description, scope, system_role)

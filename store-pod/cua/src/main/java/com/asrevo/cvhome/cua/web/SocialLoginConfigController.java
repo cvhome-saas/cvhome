@@ -10,10 +10,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.cua.config.SocialProvider;
 import com.asrevo.cvhome.cua.service.SocialLoginConfigService;
 import com.asrevo.cvhome.cua.web.dto.PersistableSocialLoginConfig;
 import com.asrevo.cvhome.cua.web.dto.ReadableSocialLoginConfig;
+import com.asrevo.cvhome.uaa.errors.IdpAliasTakenException;
+import com.asrevo.cvhome.uaa.errors.IdpConfigInvalidException;
+import com.asrevo.cvhome.uaa.errors.IdpNotFoundException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -27,18 +29,19 @@ public class SocialLoginConfigController {
     @GetMapping
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CUA.*')")
     public List<ReadableSocialLoginConfig> getConfigs(StoreMerchantId merchantStore) {
-        return service.getConfigs(merchantStore);
+        return service.getConfigs();
     }
 
     @PostMapping
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CUA.*')")
-    public void saveConfigs(StoreMerchantId merchantStore, @RequestBody List<PersistableSocialLoginConfig> configs) {
-        service.saveConfigs(merchantStore, configs);
+    public void saveConfigs(StoreMerchantId merchantStore, @RequestBody List<PersistableSocialLoginConfig> configs)
+            throws IdpAliasTakenException, IdpConfigInvalidException, IdpNotFoundException {
+        service.saveConfigs(configs);
     }
 
     @GetMapping("/supported-social-providers")
-    public SocialProvider[] getSupportedProviders() {
-        return SocialProvider.values();
+    public java.util.List<String> getSupportedProviders() {
+        return service.supportedProviders();
     }
 
 }

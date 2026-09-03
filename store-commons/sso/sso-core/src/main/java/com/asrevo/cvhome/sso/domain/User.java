@@ -134,10 +134,22 @@ public class User extends AbstractAggregateRoot<User> {
     @Column(name = "metadata", columnDefinition = "jsonb")
     private Map<String, Object> metadata = new HashMap<>();
 
-    /** A new account with its id already assigned, so the created event can name it before the insert. */
+    /**
+     * A new account with its id already assigned, so the created event can name it before the insert.
+     *
+     * <p>
+     * The timestamps are set here rather than left to {@code @PrePersist}. Assigning the id makes Spring Data see
+     * the entity as existing, so a save goes through {@code merge} and the persist callback does not
+     * necessarily run — which showed up as a not-null violation on {@code created_at} the first time an account
+     * was saved before its password was set.
+     * </p>
+     */
     public static User create(String username, String email, String firstName, String lastName) {
         User u = new User();
         u.id = UUID.randomUUID();
+        Instant now = Instant.now();
+        u.createdAt = now;
+        u.updatedAt = now;
         u.username = username;
         u.email = email;
         u.firstName = firstName;

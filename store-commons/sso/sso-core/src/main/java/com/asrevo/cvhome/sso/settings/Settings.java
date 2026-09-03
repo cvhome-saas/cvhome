@@ -8,7 +8,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
 
-import org.hibernate.annotations.TenantId;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,9 +16,10 @@ import lombok.NoArgsConstructor;
  * The realm's one row of policy. Column defaults live in {@code schema.sql}; the seed inserts the row.
  */
 /*
- * Still a singleton row (id = 1) even though it now carries a realm. That is correct for uaa, which has one realm
- * and always will, and it is the one thing here that a MULTI deployment cannot use as-is: two realms cannot both
- * hold id = 1. Making the realm the key belongs with cua, where a second realm exists to test it against.
+ * One row per realm, keyed by the realm. It was a singleton (id = 1) while uaa was the only deployment, which is
+ * exactly as far as that shape goes: two realms cannot both hold id = 1, so a store's own policy had nowhere to
+ * live. The realm is the identifier rather than a @TenantId discriminator because a settings lookup is always
+ * "this realm's row" — an exact find by key, with nothing to filter.
  */
 @Entity
 @Table(name = "settings")
@@ -27,16 +27,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Settings {
 
-    public static final short SINGLETON_ID = 1;
-
+    /** The realm whose policy this is, and the row's identity. */
     @Id
-    private short id = SINGLETON_ID;
-
-    /**
-     * The realm this row belongs to. Hibernate fills it on insert and adds it to every query; no repository
-     * method mentions it. uaa writes one constant value here forever, cua one per store.
-     */
-    @TenantId
     @Column(name = "realm_id", nullable = false, length = 64)
     private String realmId;
 
@@ -136,5 +128,10 @@ public class Settings {
     @Version
     @Column(nullable = false)
     private long version;
+
+
+    public Settings(String realmId) {
+        this.realmId = realmId;
+    }
 
 }

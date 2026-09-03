@@ -26,7 +26,7 @@ public class PublicSocialLoginController {
 
     @GetMapping
     public List<ReadableSocialLogin> enabledLogins(StoreMerchantId merchantStore, LanguageCode language) {
-        return service.enabledLogins(merchantStore);
+        return service.enabledLogins();
     }
 
 }

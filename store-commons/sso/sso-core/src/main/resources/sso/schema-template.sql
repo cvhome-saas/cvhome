@@ -1,5 +1,29 @@
-create schema if not exists uaa;
-create table if not exists uaa.oauth2_registered_client
+-- The SSO server's schema, shared by both deployments.
+--
+-- Source of truth for store-core/uaa and store-pod/cua alike: each shell's init-sql/schema.sql is generated from
+-- this file at build time, with @@SCHEMA@@ replaced by that deployment's schema name. Two hand-maintained copies
+-- is how the two servers drifted apart in the first place, and a column added to one and not the other fails only
+-- on the deployment nobody was testing.
+--
+-- Not production yet: drop and recreate. No ALTERs, no migrations — a developer resets with
+-- `drop schema <name> cascade` and restarts.
+
+create schema if not exists @@SCHEMA@@;
+-- The realms this deployment serves. uaa has exactly one row and always will; cua has one per store, written
+-- when the store is provisioned.
+--
+-- It exists so that "is this a store we serve?" has an answer that is not "did anyone happen to create a row in
+-- some other table". cua used to synthesise an OAuth2 client for any client_id presented, which meant an unknown
+-- store still got a working client and was only stopped later, by the user lookup finding nobody.
+create table if not exists @@SCHEMA@@.realms
+(
+    id           varchar(64) primary key,
+    display_name varchar(190),
+    enabled      boolean     not null default true,
+    created_at   timestamptz not null default current_timestamp
+);
+
+create table if not exists @@SCHEMA@@.oauth2_registered_client
 (
     id                            varchar(100) primary key,
     client_id                     varchar(100)  not null unique,
@@ -16,12 +40,12 @@ create table if not exists uaa.oauth2_registered_client
     token_settings                varchar(2000) not null
 );
 
--- What uaa knows about a registered client beyond what Spring's table holds: whether it may authenticate at all, a
+-- What the server knows about a registered client beyond what Spring's table holds: whether it may authenticate at all, a
 -- description, and when it last obtained a token. One row per registration, created with it.
-create table if not exists uaa.client_extension
+create table if not exists @@SCHEMA@@.client_extension
 (
     realm_id varchar(64) not null default 'platform',
-    registered_client_id varchar(100) primary key references uaa.oauth2_registered_client (id) on delete cascade,
+    registered_client_id varchar(100) primary key references @@SCHEMA@@.oauth2_registered_client (id) on delete cascade,
     enabled              boolean     not null default true,
     description          varchar(500),
     disabled_at          timestamptz,
@@ -33,24 +57,24 @@ create table if not exists uaa.client_extension
 
 -- A rotated-out secret that still authenticates for a grace window, so an integration can pick up the new one
 -- without an outage. Hashed like the live secret; revoked early by an operator or retired by expiry.
-create table if not exists uaa.client_secret_history
+create table if not exists @@SCHEMA@@.client_secret_history
 (
     realm_id varchar(64) not null default 'platform',
     id                   uuid primary key,
-    registered_client_id varchar(100) not null references uaa.oauth2_registered_client (id) on delete cascade,
+    registered_client_id varchar(100) not null references @@SCHEMA@@.oauth2_registered_client (id) on delete cascade,
     secret_hash          varchar(200) not null,
     created_at           timestamptz  not null,
     expires_at           timestamptz  not null,
     revoked_at           timestamptz
 );
 
-create index if not exists idx_client_secret_history_client on uaa.client_secret_history (registered_client_id);
+create index if not exists idx_client_secret_history_client on @@SCHEMA@@.client_secret_history (registered_client_id);
 
 -- oauth2_authorization
 -- Spring Authorization Server's own table, in its Postgres shape: token values and metadata are text (the shipped
 -- schema's blob), instants are timestamptz, and the device-flow columns are present because the JDBC service
 -- inserts every column whether or not the grant is enabled.
-create table if not exists uaa.oauth2_authorization
+create table if not exists @@SCHEMA@@.oauth2_authorization
 (
     id                            varchar(100) primary key,
     registered_client_id          varchar(100) not null,
@@ -85,25 +109,25 @@ create table if not exists uaa.oauth2_authorization
     device_code_issued_at         timestamptz,
     device_code_expires_at        timestamptz,
     device_code_metadata          text,
-    foreign key (registered_client_id) references uaa.oauth2_registered_client (id)
+    foreign key (registered_client_id) references @@SCHEMA@@.oauth2_registered_client (id)
 );
 
-create index if not exists idx_oauth2_authorization_principal on uaa.oauth2_authorization (principal_name);
-create index if not exists idx_oauth2_authorization_client on uaa.oauth2_authorization (registered_client_id);
+create index if not exists idx_oauth2_authorization_principal on @@SCHEMA@@.oauth2_authorization (principal_name);
+create index if not exists idx_oauth2_authorization_client on @@SCHEMA@@.oauth2_authorization (registered_client_id);
 
 -- oauth2_authorization_consent
-create table if not exists uaa.oauth2_authorization_consent
+create table if not exists @@SCHEMA@@.oauth2_authorization_consent
 (
     registered_client_id varchar(100)  not null,
     principal_name       varchar(200)  not null,
     authorities          varchar(1000) not null,
     primary key (registered_client_id, principal_name),
-    foreign key (registered_client_id) references uaa.oauth2_registered_client (id)
+    foreign key (registered_client_id) references @@SCHEMA@@.oauth2_registered_client (id)
 );
 
 
 -- Users table
-create table if not exists uaa.users
+create table if not exists @@SCHEMA@@.users
 (
     id                     uuid PRIMARY KEY,
     realm_id               varchar(64)  NOT NULL DEFAULT 'platform',
@@ -132,12 +156,12 @@ create table if not exists uaa.users
     constraint uk_users_realm_username unique (realm_id, username)
 );
 
-CREATE INDEX IF NOT EXISTS idx_users_metadata ON uaa.users USING gin (metadata);
-CREATE INDEX IF NOT EXISTS idx_users_email_lower ON uaa.users (lower(email));
-CREATE INDEX IF NOT EXISTS idx_users_username_lower ON uaa.users (lower(username));
+CREATE INDEX IF NOT EXISTS idx_users_metadata ON @@SCHEMA@@.users USING gin (metadata);
+CREATE INDEX IF NOT EXISTS idx_users_email_lower ON @@SCHEMA@@.users (lower(email));
+CREATE INDEX IF NOT EXISTS idx_users_username_lower ON @@SCHEMA@@.users (lower(username));
 
 -- Roles table
-create table if not exists uaa.roles
+create table if not exists @@SCHEMA@@.roles
 (
     id               uuid PRIMARY KEY,
     realm_id         varchar(64) NOT NULL DEFAULT 'platform',
@@ -145,7 +169,7 @@ create table if not exists uaa.roles
     description      VARCHAR(255),
     scope            VARCHAR(20) NOT NULL DEFAULT 'REALM',
     system_role      BOOLEAN     NOT NULL DEFAULT FALSE,
-    inherits_from_id uuid REFERENCES uaa.roles (id),
+    inherits_from_id uuid REFERENCES @@SCHEMA@@.roles (id),
     created_at       timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at       timestamptz,
     constraint uk_roles_realm_name unique (realm_id, name),
@@ -153,41 +177,41 @@ create table if not exists uaa.roles
 );
 
 -- The permissions a role grants; the effective set of a user is the union over their roles and what those inherit.
-create table if not exists uaa.role_permissions
+create table if not exists @@SCHEMA@@.role_permissions
 (
-    role_id    uuid        NOT NULL REFERENCES uaa.roles (id) ON DELETE CASCADE,
+    role_id    uuid        NOT NULL REFERENCES @@SCHEMA@@.roles (id) ON DELETE CASCADE,
     permission VARCHAR(80) NOT NULL,
     PRIMARY KEY (role_id, permission)
 );
 
 -- User-Roles join table
-create table if not exists uaa.user_roles
+create table if not exists @@SCHEMA@@.user_roles
 (
     user_id uuid NOT NULL,
     role_id uuid NOT NULL,
     PRIMARY KEY (user_id, role_id),
-    constraint FKh8ciramu9cc9q3qcqiv4ue8a6 foreign key (role_id) references uaa.roles,
-    constraint FKhfh9dx7w3ubf1co1vdev94g3f foreign key (user_id) references uaa.users
+    constraint FKh8ciramu9cc9q3qcqiv4ue8a6 foreign key (role_id) references @@SCHEMA@@.roles,
+    constraint FKhfh9dx7w3ubf1co1vdev94g3f foreign key (user_id) references @@SCHEMA@@.users
 );
 
 -- The previous hashes a user may not reuse; trimmed to settings.password_history_count on every change.
-create table if not exists uaa.password_history
+create table if not exists @@SCHEMA@@.password_history
 (
     realm_id varchar(64) not null default 'platform',
     id            uuid PRIMARY KEY,
-    user_id       uuid         NOT NULL REFERENCES uaa.users (id) ON DELETE CASCADE,
+    user_id       uuid         NOT NULL REFERENCES @@SCHEMA@@.users (id) ON DELETE CASCADE,
     password_hash VARCHAR(100) NOT NULL,
     created_at    timestamptz  NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
-CREATE INDEX IF NOT EXISTS idx_password_history_user ON uaa.password_history (user_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_password_history_user ON @@SCHEMA@@.password_history (user_id, created_at DESC);
 
 -- A pending account's one-time invitation. Only the token's hash is stored; the token itself is returned once to the
 -- administrator and handed to the delivery consumer through the outbox. One live invitation per account.
-create table if not exists uaa.invitations
+create table if not exists @@SCHEMA@@.invitations
 (
     realm_id varchar(64) not null default 'platform',
     id          uuid PRIMARY KEY,
-    user_id     uuid         NOT NULL REFERENCES uaa.users (id) ON DELETE CASCADE,
+    user_id     uuid         NOT NULL REFERENCES @@SCHEMA@@.users (id) ON DELETE CASCADE,
     email       VARCHAR(254) NOT NULL,
     token_hash  VARCHAR(64)  NOT NULL UNIQUE,
     status      VARCHAR(10)  NOT NULL DEFAULT 'PENDING',
@@ -197,15 +221,15 @@ create table if not exists uaa.invitations
     accepted_at timestamptz,
     constraint invitations_status_ck check (status in ('PENDING', 'ACCEPTED', 'REVOKED', 'EXPIRED'))
 );
-CREATE UNIQUE INDEX IF NOT EXISTS uq_invitations_one_pending ON uaa.invitations (user_id) WHERE status = 'PENDING';
-CREATE INDEX IF NOT EXISTS idx_invitations_status ON uaa.invitations (status, created_at DESC);
+CREATE UNIQUE INDEX IF NOT EXISTS uq_invitations_one_pending ON @@SCHEMA@@.invitations (user_id) WHERE status = 'PENDING';
+CREATE INDEX IF NOT EXISTS idx_invitations_status ON @@SCHEMA@@.invitations (status, created_at DESC);
 
 -- An administrator-issued password-reset link, same handling as an invitation: hash only, used once, short-lived.
-create table if not exists uaa.password_reset_tokens
+create table if not exists @@SCHEMA@@.password_reset_tokens
 (
     realm_id varchar(64) not null default 'platform',
     id         uuid PRIMARY KEY,
-    user_id    uuid        NOT NULL REFERENCES uaa.users (id) ON DELETE CASCADE,
+    user_id    uuid        NOT NULL REFERENCES @@SCHEMA@@.users (id) ON DELETE CASCADE,
     token_hash VARCHAR(64) NOT NULL UNIQUE,
     expires_at timestamptz NOT NULL,
     created_at timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -213,13 +237,14 @@ create table if not exists uaa.password_reset_tokens
     used_at    timestamptz,
     revoked_at timestamptz
 );
-CREATE INDEX IF NOT EXISTS idx_password_reset_tokens_user ON uaa.password_reset_tokens (user_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_password_reset_tokens_user ON @@SCHEMA@@.password_reset_tokens (user_id, created_at DESC);
 
 -- Realm-wide policy: exactly one row.
-create table if not exists uaa.settings
+create table if not exists @@SCHEMA@@.settings
 (
-    realm_id varchar(64) not null default 'platform',
-    id                                smallint PRIMARY KEY DEFAULT 1 CHECK (id = 1),
+    -- One row per realm, keyed by it. A singleton (id = 1) was as far as one deployment's policy went; with a
+    -- realm per store there is nowhere for a store's own policy to live.
+    realm_id                          varchar(64)  PRIMARY KEY,
     display_name                      VARCHAR(100) NOT NULL DEFAULT 'cvhome ID',
     support_email                     VARCHAR(254),
     default_locale                    VARCHAR(10)  NOT NULL DEFAULT 'en',
@@ -255,7 +280,7 @@ create table if not exists uaa.settings
 );
 
 -- Append-only record of every authentication and administrative event. Never updated, trimmed by retention.
-create table if not exists uaa.audit_events
+create table if not exists @@SCHEMA@@.audit_events
 (
     realm_id varchar(64) not null default 'platform',
     id          BIGSERIAL PRIMARY KEY,
@@ -281,16 +306,16 @@ create table if not exists uaa.audit_events
     constraint audit_target_type_ck check (target_type is null or target_type in
         ('USER', 'ROLE', 'CLIENT', 'IDP', 'SETTINGS', 'KEY', 'SESSION', 'INVITATION', 'TOKEN'))
 );
-CREATE INDEX IF NOT EXISTS idx_audit_occurred ON uaa.audit_events (occurred_at DESC);
-CREATE INDEX IF NOT EXISTS idx_audit_type_time ON uaa.audit_events (event_type, occurred_at DESC);
-CREATE INDEX IF NOT EXISTS idx_audit_actor ON uaa.audit_events (actor_id, occurred_at DESC);
-CREATE INDEX IF NOT EXISTS idx_audit_target ON uaa.audit_events (target_type, target_id, occurred_at DESC);
-CREATE INDEX IF NOT EXISTS idx_audit_client ON uaa.audit_events (client_id, occurred_at DESC);
+CREATE INDEX IF NOT EXISTS idx_audit_occurred ON @@SCHEMA@@.audit_events (occurred_at DESC);
+CREATE INDEX IF NOT EXISTS idx_audit_type_time ON @@SCHEMA@@.audit_events (event_type, occurred_at DESC);
+CREATE INDEX IF NOT EXISTS idx_audit_actor ON @@SCHEMA@@.audit_events (actor_id, occurred_at DESC);
+CREATE INDEX IF NOT EXISTS idx_audit_target ON @@SCHEMA@@.audit_events (target_type, target_id, occurred_at DESC);
+CREATE INDEX IF NOT EXISTS idx_audit_client ON @@SCHEMA@@.audit_events (client_id, occurred_at DESC);
 
 -- The keys that sign every token. The public half is plain JSON (it is what the JWKS serves); the private half is a
 -- secret-crypto envelope (`ENC:…`) and never leaves the row unencrypted. One key is ACTIVE and signs; a rotated-out
 -- key is RETIRING — still in the JWKS so in-flight tokens verify — until retire_after, then RETIRED.
-create table if not exists uaa.signing_keys
+create table if not exists @@SCHEMA@@.signing_keys
 (
     id               uuid primary key,
     kid              varchar(190) not null unique,
@@ -304,12 +329,12 @@ create table if not exists uaa.signing_keys
     retired_at       timestamptz
 );
 
-create index if not exists idx_signing_keys_status on uaa.signing_keys (status);
+create index if not exists idx_signing_keys_status on @@SCHEMA@@.signing_keys (status);
 
--- External logins brokered through uaa. The alias is Spring's registration id and the last path segment of the
+-- External logins brokered through @@SCHEMA@@. The alias is Spring's registration id and the last path segment of the
 -- redirect URI registered at the provider; the client id and secret are secret-crypto envelopes. `type` is what the
 -- provider speaks; `preset` is which button the console drew it from and which defaults apply.
-create table if not exists uaa.identity_providers
+create table if not exists @@SCHEMA@@.identity_providers
 (
     id                   uuid primary key,
     realm_id             varchar(64)  not null default 'platform',
@@ -344,12 +369,12 @@ create table if not exists uaa.identity_providers
 );
 
 -- One row per (provider, subject): which external identity signs in as which account.
-create table if not exists uaa.user_identities
+create table if not exists @@SCHEMA@@.user_identities
 (
     realm_id varchar(64) not null default 'platform',
     id            uuid primary key,
-    user_id       uuid         not null references uaa.users (id) on delete cascade,
-    provider_id   uuid         not null references uaa.identity_providers (id) on delete cascade,
+    user_id       uuid         not null references @@SCHEMA@@.users (id) on delete cascade,
+    provider_id   uuid         not null references @@SCHEMA@@.identity_providers (id) on delete cascade,
     subject       varchar(255) not null,
     email         varchar(255),
     linked_at     timestamptz  not null,
@@ -357,11 +382,11 @@ create table if not exists uaa.user_identities
     unique (provider_id, subject)
 );
 
-create index if not exists idx_user_identities_user on uaa.user_identities (user_id);
+create index if not exists idx_user_identities_user on @@SCHEMA@@.user_identities (user_id);
 
--- The transactional outbox (namastack), in uaa's own schema. Every event in uaa-events is a row here until its
+-- The transactional outbox (namastack), in this deployment's own schema. Every event in sso-events is a row here until its
 -- consumer has run; the starter's schema initialisation is off, so these are the only DDL for it.
-CREATE TABLE IF NOT EXISTS uaa.outbox_record
+CREATE TABLE IF NOT EXISTS @@SCHEMA@@.outbox_record
 (
     id             VARCHAR(255)             NOT NULL,
     status         VARCHAR(20)              NOT NULL,
@@ -379,7 +404,7 @@ CREATE TABLE IF NOT EXISTS uaa.outbox_record
     PRIMARY KEY (id)
 );
 
-CREATE TABLE IF NOT EXISTS uaa.outbox_instance
+CREATE TABLE IF NOT EXISTS @@SCHEMA@@.outbox_instance
 (
     instance_id    VARCHAR(255) PRIMARY KEY,
     hostname       VARCHAR(255)             NOT NULL,
@@ -391,7 +416,7 @@ CREATE TABLE IF NOT EXISTS uaa.outbox_instance
     updated_at     TIMESTAMP WITH TIME ZONE NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS uaa.outbox_partition
+CREATE TABLE IF NOT EXISTS @@SCHEMA@@.outbox_partition
 (
     partition_number INTEGER PRIMARY KEY,
     instance_id      VARCHAR(255),
@@ -399,9 +424,9 @@ CREATE TABLE IF NOT EXISTS uaa.outbox_partition
     updated_at       TIMESTAMP WITH TIME ZONE NOT NULL
 );
 
-CREATE INDEX IF NOT EXISTS idx_uaa_outbox_record_record_key_created ON uaa.outbox_record (record_key, created_at);
-CREATE INDEX IF NOT EXISTS idx_uaa_outbox_record_partition_status_retry ON uaa.outbox_record (partition_no, status, next_retry_at);
-CREATE INDEX IF NOT EXISTS idx_uaa_outbox_record_status_retry ON uaa.outbox_record (status, next_retry_at);
-CREATE INDEX IF NOT EXISTS idx_uaa_outbox_record_status ON uaa.outbox_record (status);
-CREATE INDEX IF NOT EXISTS idx_uaa_outbox_record_record_key_completed_created ON uaa.outbox_record (record_key, completed_at, created_at);
-CREATE INDEX IF NOT EXISTS idx_uaa_outbox_instance_status_heartbeat ON uaa.outbox_instance (status, last_heartbeat);
+CREATE INDEX IF NOT EXISTS idx_@@SCHEMA@@_outbox_record_record_key_created ON @@SCHEMA@@.outbox_record (record_key, created_at);
+CREATE INDEX IF NOT EXISTS idx_@@SCHEMA@@_outbox_record_partition_status_retry ON @@SCHEMA@@.outbox_record (partition_no, status, next_retry_at);
+CREATE INDEX IF NOT EXISTS idx_@@SCHEMA@@_outbox_record_status_retry ON @@SCHEMA@@.outbox_record (status, next_retry_at);
+CREATE INDEX IF NOT EXISTS idx_@@SCHEMA@@_outbox_record_status ON @@SCHEMA@@.outbox_record (status);
+CREATE INDEX IF NOT EXISTS idx_@@SCHEMA@@_outbox_record_record_key_completed_created ON @@SCHEMA@@.outbox_record (record_key, completed_at, created_at);
+CREATE INDEX IF NOT EXISTS idx_@@SCHEMA@@_outbox_instance_status_heartbeat ON @@SCHEMA@@.outbox_instance (status, last_heartbeat);

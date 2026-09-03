@@ -10,8 +10,8 @@ export type RegistrationFieldErrors = Partial<Record<RegistrationField, string>>
 
 /** Which control a typed conflict belongs under. */
 const CONFLICT_FIELDS: Readonly<Record<string, RegistrationField>> = {
-    'CUA.REGISTRATION.USERNAME_TAKEN': 'username',
-    'CUA.REGISTRATION.EMAIL_TAKEN': 'email',
+    'UAA.USER.USERNAME_TAKEN': 'username',
+    'UAA.USER.EMAIL_TAKEN': 'email',
 };
 
 const FIELDS: readonly RegistrationField[] = ['username', 'email', 'password', 'firstName', 'lastName'];

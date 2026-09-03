@@ -97,7 +97,13 @@ public class AuthorizationServerConfig {
         return new LoginUrlAuthenticationEntryPoint("/login");
     }
 
+    /**
+     * Clients as rows an administrator manages, which is uaa's shape. cua replaces this: a storefront's client is
+     * derived from the store, because its valid redirect URIs span every domain and language the store is reached
+     * on and could never be enumerated in a column.
+     */
     @Bean
+    @ConditionalOnMissingBean(RegisteredClientRepository.class)
     RegisteredClientRepository registeredClientRepository(JdbcTemplate jdbcTemplate, ClientExtensionRepository extensions) {
         return new EnabledAwareRegisteredClientRepository(new JdbcRegisteredClientRepository(jdbcTemplate), extensions);
     }

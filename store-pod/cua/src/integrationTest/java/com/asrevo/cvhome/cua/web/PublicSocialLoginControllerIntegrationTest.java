@@ -27,6 +27,8 @@ class PublicSocialLoginControllerIntegrationTest {
     /** Not in the seed at all. */
     private static final String UNKNOWN_STORE = "000000000000000000000000";
 
+    private static final String GOOGLE = "google";
+
     @LocalServerPort
     private int port;
 
@@ -36,8 +38,9 @@ class PublicSocialLoginControllerIntegrationTest {
 
         expect(response, HttpStatus.OK);
         JsonNode logins = json(response);
-        assertThat(logins.findValuesAsString("providerId")).containsExactlyInAnyOrder("google", "github", "facebook");
-        assertThat(logins.findValuesAsString("registrationId")).contains(String.format("%s.google", STORE));
+        assertThat(logins.findValuesAsString("providerId")).containsExactlyInAnyOrder(GOOGLE, "github", "facebook");
+        // The alias alone: it is unique within the realm, and the realm comes from the host.
+        assertThat(logins.findValuesAsString("registrationId")).contains(GOOGLE);
         assertThat(logins.findValuesAsString("name")).contains("Google");
     }
 

@@ -66,6 +66,9 @@ public class SelfRegistrationService {
 
         User user = User.create(request.username(), request.email(), request.firstName(), request.lastName());
         user.setEnabled(true);
+        // Saved before the password is set: PasswordService records the hash in password_history, whose foreign
+        // key needs the account to exist. The flush is what puts the row there inside this transaction.
+        users.saveAndFlush(user);
         // The same funnel every other password goes through: the realm's policy, its history and its breach check.
         passwords.setPassword(user, request.password());
         users.save(user);

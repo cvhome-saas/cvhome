@@ -82,8 +82,8 @@ class LoginHandoffIntegrationTest {
     /** A second sign-in the storefront starts has a fresh PKCE challenge; that is what tells the flows apart. */
     private static final String SECOND_CHALLENGE = "XAaXCEfz7-YLOOyWmusnRfKPr55J1VF_dM7fnQHdqqw";
 
-    /** Long enough for the registration body's size rule; the seeded {@code revo} is not. */
-    private static final String NEW_PASSWORD = "secret-1";
+    /** Registration goes through the realm's password policy now, the same funnel as every other password. */
+    private static final String NEW_PASSWORD = "Str0ng-Passphrase!";
 
     @LocalServerPort
     private int port;

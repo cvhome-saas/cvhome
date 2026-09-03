@@ -94,3 +94,26 @@ tasks.named('processResources') {
 tasks.named('clean') {
     delete "${project.projectDir}/src/main/resources/static"
 }
+
+/*
+ * The SSO schema is generated from sso-core's template with this deployment's schema name substituted, rather than
+ * kept as a second hand-maintained copy. A column added to one deployment and not the other is a failure that only
+ * shows up on whichever one nobody was testing, which is the shape of drift this whole refactor exists to end.
+ */
+def ssoSchemaName = "uaa"
+def ssoSchemaTemplate = project(":store-commons:sso:sso-core").file("src/main/resources/sso/schema-template.sql")
+def ssoSchemaOut = layout.buildDirectory.dir("generated/sso-schema")
+
+def generateSsoSchema = tasks.register("generateSsoSchema") {
+    inputs.file(ssoSchemaTemplate)
+    inputs.property("schema", ssoSchemaName)
+    outputs.dir(ssoSchemaOut)
+    doLast {
+        def target = ssoSchemaOut.get().file("init-sql/schema.sql").asFile
+        target.parentFile.mkdirs()
+        target.text = ssoSchemaTemplate.text.replace("@@SCHEMA@@", ssoSchemaName)
+    }
+}
+
+sourceSets.main.resources.srcDir(generateSsoSchema)
+

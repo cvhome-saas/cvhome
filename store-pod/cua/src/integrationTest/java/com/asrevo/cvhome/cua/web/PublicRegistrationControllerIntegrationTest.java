@@ -40,7 +40,7 @@ class PublicRegistrationControllerIntegrationTest {
 
     private static String body(String username, String email) {
         return String.format("""
-                {"username": "%s", "email": "%s", "password": "secret-1", "firstName": "Jane", "lastName": "Doe"}""",
+                {"username": "%s", "email": "%s", "password": "Str0ng-Passphrase!", "firstName": "Jane", "lastName": "Doe"}""",
                 username, email);
     }
 
@@ -72,7 +72,7 @@ class PublicRegistrationControllerIntegrationTest {
         ResponseEntity<String> response = register(STORE, body("user", "free@example.com"));
 
         expect(response, HttpStatus.CONFLICT);
-        assertThat(json(response).path(CODE).asString()).isEqualTo("CUA.REGISTRATION.USERNAME_TAKEN");
+        assertThat(json(response).path(CODE).asString()).isEqualTo("UAA.USER.USERNAME_TAKEN");
     }
 
     @Test
@@ -80,7 +80,7 @@ class PublicRegistrationControllerIntegrationTest {
         ResponseEntity<String> response = register(STORE, body(ApiClient.slug("free"), "user@mail.com"));
 
         expect(response, HttpStatus.CONFLICT);
-        assertThat(json(response).path(CODE).asString()).isEqualTo("CUA.REGISTRATION.EMAIL_TAKEN");
+        assertThat(json(response).path(CODE).asString()).isEqualTo("UAA.USER.EMAIL_TAKEN");
     }
 
     @Test

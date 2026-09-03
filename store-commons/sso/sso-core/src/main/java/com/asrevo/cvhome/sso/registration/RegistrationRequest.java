@@ -12,9 +12,11 @@ import jakarta.validation.constraints.Size;
  * host. Letting the body name it would let one form create accounts in any store the deployment serves.
  * </p>
  */
-public record RegistrationRequest(@NotBlank @Size(max = 190) String username,
+public record RegistrationRequest(@NotBlank @Size(min = 3, max = 190) String username,
                                   @NotBlank @Email @Size(max = 254) String email,
                                   @Size(max = 50) String firstName,
                                   @Size(max = 50) String lastName,
-                                  @NotBlank String password) {
+                                  // A floor only; the realm's password policy is the real rule and
+                                  // reports per-rule field errors of its own.
+                                  @NotBlank @Size(min = 6, max = 200) String password) {
 }

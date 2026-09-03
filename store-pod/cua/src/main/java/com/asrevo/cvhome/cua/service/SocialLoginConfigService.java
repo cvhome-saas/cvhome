@@ -6,46 +6,104 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.cua.domain.SocialLoginConfigId;
-import com.asrevo.cvhome.cua.repo.SocialLoginConfigRepository;
 import com.asrevo.cvhome.cua.web.dto.PersistableSocialLoginConfig;
 import com.asrevo.cvhome.cua.web.dto.ReadableSocialLogin;
 import com.asrevo.cvhome.cua.web.dto.ReadableSocialLoginConfig;
-import com.asrevo.cvhome.cua.web.mapper.SocialLoginConfigMapper;
+import com.asrevo.cvhome.sso.domain.AccountLinking;
+import com.asrevo.cvhome.sso.domain.IdentityProvider;
+import com.asrevo.cvhome.sso.dto.IdentityProviderRequest;
+import com.asrevo.cvhome.sso.idp.IdentityProviderService;
+import com.asrevo.cvhome.sso.idp.IdpPreset;
+import com.asrevo.cvhome.uaa.errors.IdpAliasTakenException;
+import com.asrevo.cvhome.uaa.errors.IdpConfigInvalidException;
+import com.asrevo.cvhome.uaa.errors.IdpNotFoundException;
 
 import lombok.RequiredArgsConstructor;
 
+/**
+ * The merchant console's social-login screen, over the shared identity-provider store.
+ *
+ * <p>
+ * <strong>Transitional, and deliberately narrow.</strong> cua used to keep its own {@code social_login_configs}
+ * table with three providers and two fields each. That data now lives in {@code identity_providers} alongside
+ * everything the shared server can broker — presets, account-linking policy, just-in-time provisioning, attribute
+ * mapping — and this class is the small translation that lets the existing console screen go on working while the
+ * richer screen is built. When the console addresses the identity-provider API directly, this goes.
+ * </p>
+ *
+ * <p>
+ * Nothing here names a store. The realm is resolved from the request, and every query and write below is scoped to
+ * it by Hibernate's tenant filter — which is what makes one merchant's Google application invisible to another.
+ * </p>
+ */
 @Service
 @RequiredArgsConstructor
 public class SocialLoginConfigService {
 
-    private final SocialLoginConfigRepository repository;
-    private final SocialLoginConfigMapper mapper;
+    /** What the console offers, and what cua brokered before the two servers became one. */
+    private static final List<IdpPreset> SOCIAL = List.of(IdpPreset.GOOGLE, IdpPreset.FACEBOOK, IdpPreset.GITHUB);
 
-    public List<ReadableSocialLoginConfig> getConfigs(StoreMerchantId merchantStore) {
-        return repository.findAllByIdStoreMerchantId(merchantStore).stream()
-                .map(mapper::toDTO)
+    private final IdentityProviderService providers;
+
+    /**
+     * The buttons a storefront's login page renders, for the store the request arrived for.
+     *
+     * <p>
+     * The registration id is the bare alias now, not {@code {store}.{provider}}. It no longer has to carry the
+     * store because the alias is unique within its realm and the realm comes from the host — and the callback URL
+     * a merchant registers with Google is still per-store, because it is built on their own domain.
+     * </p>
+     */
+    public List<ReadableSocialLogin> enabledLogins() {
+        return providers.visibleForLogin().stream()
+                .map(p -> new ReadableSocialLogin(p.alias(), p.displayName(), p.alias()))
+                .toList();
+    }
+
+    /** One row per provider the console offers, whether or not this store has configured it. */
+    public List<ReadableSocialLoginConfig> getConfigs() {
+        return SOCIAL.stream()
+                .map(preset -> stored(preset)
+                        .map(p -> ReadableSocialLoginConfig.of(preset.name(), preset.displayName(), null, p.isEnabled()))
+                        .orElseGet(() -> ReadableSocialLoginConfig.of(preset.name(), preset.displayName(), null, false)))
                 .toList();
     }
 
     @Transactional
-    public void saveConfigs(StoreMerchantId merchantStore, List<PersistableSocialLoginConfig> configs) {
-        configs.forEach(dto -> {
-            dto.setStoreMerchantId(merchantStore);
-            repository.save(mapper.toEntity(dto));
-        });
+    public void saveConfigs(List<PersistableSocialLoginConfig> configs)
+            throws IdpAliasTakenException, IdpConfigInvalidException, IdpNotFoundException {
+        for (PersistableSocialLoginConfig config : configs) {
+            IdpPreset preset = IdpPreset.valueOf(config.providerId().toUpperCase());
+            Optional<IdentityProvider> existing = stored(preset);
+            IdentityProviderRequest request = request(preset, config);
+            if (existing.isPresent()) {
+                providers.update(existing.get().getId(), request);
+            } else {
+                providers.create(request);
+            }
+        }
     }
 
-    /** The providers switched on for a store, shaped for a login page: id, display name, registration id — no secrets. */
-    public List<ReadableSocialLogin> enabledLogins(StoreMerchantId merchantStore) {
-        return repository.findEnabledSocialLoginConfig(merchantStore).stream()
-                .map(id -> new ReadableSocialLogin(id.providerId().getProviderId(), id.providerId().getClientName(),
-                        id.toRegistrationId()))
-                .toList();
+    /** The providers the console screen knows how to draw. */
+    public List<String> supportedProviders() {
+        return SOCIAL.stream().map(Enum::name).toList();
     }
 
-    public Optional<ReadableSocialLoginConfig> findById(SocialLoginConfigId socialLoginConfigId) {
-        return repository.findById(socialLoginConfigId).map(mapper::toDTO);
+    private Optional<IdentityProvider> stored(IdpPreset preset) {
+        return providers.byAlias(alias(preset));
     }
+
+    private IdentityProviderRequest request(IdpPreset preset, PersistableSocialLoginConfig config) {
+        return new IdentityProviderRequest(alias(preset), preset.displayName(), preset, false, config.appId(),
+                config.appSecret(), null, null, null, null, null, null, null, null, null,
+                // A shopper who signs in with Google and already has a password account for the same address is
+                // the same person to a store; CONFIRM asks for that password once rather than assuming it.
+                AccountLinking.CONFIRM, true, null, true, null);
+    }
+
+    /** The alias is the Spring registrationId, and it is unique per realm — every store may have a "google". */
+    private String alias(IdpPreset preset) {
+        return preset.name().toLowerCase();
+    }
+
 }
