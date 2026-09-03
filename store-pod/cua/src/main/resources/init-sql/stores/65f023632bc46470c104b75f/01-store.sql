@@ -16,20 +16,37 @@ values ('318F2FD5-E235-4C2E-AB7E-6C949BA4CDD3', '65f023632bc46470c104b75f', 'use
         '{bcrypt}$2a$10$pse9zsAXkH/zOjZpfiP7X.weD6CNtVY/NR5A4mYUwbYqcYThHchRa', true)
 on conflict (id) do nothing;
 
--- Brokered providers. The alias is the Spring registrationId and is unique per realm, so every store
--- may have its own 'google'. Client ids and secrets are secret-crypto envelopes.
+-- Brokered providers. The alias is the Spring registrationId and is unique per realm, so every store may
+-- have its own 'google'. Client ids and secrets are secret-crypto envelopes.
+--
+-- The endpoint columns are spelled out because a stored provider is self-contained: IdentityProviderMapper
+-- resolves a preset's defaults into the row when one is created through the API, and nothing fills them in on
+-- read. A row seeded without them is a provider that cannot be built — "give an issuer to discover from, or the
+-- authorization and token endpoints by hand". These mirror IdpPreset.GOOGLE and IdpPreset.GITHUB.
 insert into cua.identity_providers (id, realm_id, alias, display_name, type, preset, enabled,
                                     hide_on_login, sort_order, client_id_enc, client_secret_enc,
+                                    issuer_uri, authorization_uri, token_uri, user_info_uri, jwk_set_uri,
+                                    scopes, user_name_attribute, client_auth_method, attribute_mapping,
                                     account_linking, jit_provisioning, trust_email_verified,
                                     created_at, updated_at)
 values
     (gen_random_uuid(), '65f023632bc46470c104b75f', 'google', 'Google', 'OIDC', 'GOOGLE', true, false, 0,
      'ENC:1:default-key:AES-256-GCM:wK1wBF3994Pl18DU:O+3nIg14UfunYfgwO2AChB/CjmvIWc1ZuIDsLMiJgN4K7E4LpBqTmj73sVW/WI8w+Z6KiRKz7aqFzwPIsyEuYypYRqGRY28GMmYYM9/AycTx8oTFimOwMA==',
      'ENC:1:default-key:AES-256-GCM:L4DLeZZK1FrVt2HT:shNmEE6dRRnvp2QAJOn+Dj1glyNmw1m0OXMrDngOCPSi01Y3hS2G1L9IsJ16SEGOWuV9',
+     'https://accounts.google.com', 'https://accounts.google.com/o/oauth2/v2/auth',
+     'https://oauth2.googleapis.com/token', 'https://openidconnect.googleapis.com/v1/userinfo',
+     'https://www.googleapis.com/oauth2/v3/certs',
+     'openid profile email', 'sub', 'client_secret_basic',
+     '{"email": "email", "given_name": "firstName", "family_name": "lastName"}'::jsonb,
      'CONFIRM', true, true, now(), now()),
     (gen_random_uuid(), '65f023632bc46470c104b75f', 'github', 'GitHub', 'OAUTH2', 'GITHUB', true, false, 1,
      'ENC:1:default-key:AES-256-GCM:2ky6qTJ7Q526PUMh:Gtagmo7cH99rrfzHjhZwRvCamcbwU8Q8/gPghV3dUMbdMk8u',
      'ENC:1:default-key:AES-256-GCM:gWao1lpRxoqZqqry:/qV5PXK+AM9ETM13Qs/SFhAbgxzcGH/qftlcAPT2GGeVmcXgHWEExTv/DN6mwMNPZm8u0uhq4qA=',
+     null, 'https://github.com/login/oauth/authorize',
+     'https://github.com/login/oauth/access_token', 'https://api.github.com/user',
+     null,
+     'read:user user:email', 'id', 'client_secret_basic',
+     '{"email": "email", "name": "firstName"}'::jsonb,
      'CONFIRM', true, true, now(), now())
 on conflict do nothing;
 

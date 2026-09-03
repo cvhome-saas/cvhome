@@ -189,6 +189,17 @@ against a live stack on 2026-09-03.
   the same `PasswordService` as every other password in the server; cua used to encode it directly, so shoppers
   had no policy, no history and no breach check.
 
+### RLM-08 — Social sign-in uses the store's own provider row · critical · [verified]
+
+- **Steps** — `GET /cua/oauth2/authorization/google` at store 1's host, then at store 2's. Same for `github`.
+- **Expect** — `302` to the provider with that store's client id, PKCE, and
+  `redirect_uri=…/cua/login/oauth2/code/google` **on the host the request came from**. The registration id is the
+  bare alias: it is unique within the realm, and the realm comes from the host, so the callback URL a merchant
+  registers with Google is still per-store because it is built on their own domain.
+- **Known trap** — a `500` here with `UAA.IDP.CONFIG_INVALID` means the provider row has no endpoints. A stored
+  provider is self-contained: `IdentityProviderMapper` resolves the preset's defaults into the row when one is
+  created through the API, and nothing fills them in on read. A row seeded without them cannot be built.
+
 ## CLI — The dynamic client, and the port that must survive
 
 ### CLI-01 — The `redirect_uri` is derived from the request's real host · critical · [not verified]
