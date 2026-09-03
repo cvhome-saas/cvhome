@@ -9,6 +9,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 
+import com.asrevo.cvhome.errors.web.ProblemDetailFactory;
+
+import tools.jackson.databind.ObjectMapper;
+
 /**
  * Wires the realm into the request and into Hibernate.
  *
@@ -56,8 +60,10 @@ public class RealmConfig {
      * {@code MULTI} mode the same username exists in many realms.
      */
     @Bean
-    FilterRegistrationBean<RealmFilter> realmFilter(RealmResolver resolver) {
-        FilterRegistrationBean<RealmFilter> registration = new FilterRegistrationBean<>(new RealmFilter(resolver));
+    FilterRegistrationBean<RealmFilter> realmFilter(RealmResolver resolver, ProblemDetailFactory problems,
+                                                    ObjectMapper json) {
+        FilterRegistrationBean<RealmFilter> registration =
+                new FilterRegistrationBean<>(new RealmFilter(resolver, problems, json));
         registration.setOrder(Ordered.HIGHEST_PRECEDENCE);
         return registration;
     }

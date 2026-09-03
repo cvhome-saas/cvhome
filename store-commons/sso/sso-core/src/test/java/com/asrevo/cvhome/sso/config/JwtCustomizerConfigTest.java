@@ -21,6 +21,9 @@ import org.springframework.security.oauth2.server.authorization.token.JwtEncodin
 import com.asrevo.cvhome.sso.domain.Role;
 import com.asrevo.cvhome.sso.domain.User;
 import com.asrevo.cvhome.sso.keys.KeyRotationService;
+import com.asrevo.cvhome.sso.realm.RealmMode;
+import com.asrevo.cvhome.sso.realm.SsoRealmProperties;
+import com.asrevo.cvhome.sso.realm.SsoTenantIdentifierResolver;
 import com.asrevo.cvhome.sso.repo.UserRepository;
 import com.asrevo.cvhome.sso.settings.RealmSettings;
 import com.asrevo.cvhome.sso.settings.SettingsService;
@@ -33,6 +36,9 @@ import static org.mockito.Mockito.when;
  * What ends up in a token, and — the point — what does not.
  */
 class JwtCustomizerConfigTest {
+
+    /** SINGLE, as uaa runs: the realm claims and the subject swap are the multi-realm deployment's business. */
+    private static final SsoRealmProperties SINGLE_REALM = singleRealm();
 
     private static final String USERNAME = "org1-store1-admin";
 
@@ -82,7 +88,14 @@ class JwtCustomizerConfigTest {
 
     private final KeyRotationService keys = mock(KeyRotationService.class);
 
-    private final JwtCustomizerConfig config = new JwtCustomizerConfig(users, settings, keys, Clock.systemUTC());
+    private final JwtCustomizerConfig config = new JwtCustomizerConfig(users, settings, keys, Clock.systemUTC(),
+            SINGLE_REALM, new SsoTenantIdentifierResolver(SINGLE_REALM));
+
+    private static SsoRealmProperties singleRealm() {
+        SsoRealmProperties properties = new SsoRealmProperties();
+        properties.setMode(RealmMode.SINGLE);
+        return properties;
+    }
 
     {
         when(keys.activeKid()).thenReturn("kid-1");

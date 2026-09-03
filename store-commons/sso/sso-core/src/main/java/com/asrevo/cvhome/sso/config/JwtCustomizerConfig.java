@@ -6,6 +6,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,6 +20,8 @@ import com.asrevo.cvhome.commons.domain.Permission;
 import com.asrevo.cvhome.sso.domain.Role;
 import com.asrevo.cvhome.sso.domain.User;
 import com.asrevo.cvhome.sso.keys.KeyRotationService;
+import com.asrevo.cvhome.sso.realm.SsoRealmProperties;
+import com.asrevo.cvhome.sso.realm.SsoTenantIdentifierResolver;
 import com.asrevo.cvhome.sso.repo.UserRepository;
 import com.asrevo.cvhome.sso.settings.SettingsService;
 
@@ -66,6 +69,12 @@ public class JwtCustomizerConfig {
 
     static final String PERMISSIONS = "permissions";
 
+    /** The store a shopper's token belongs to. */
+    static final String REALM = "realm";
+
+    /** The same value, under the name resource servers already read. */
+    static final String CLIENT_ID = "clientId";
+
     private final UserRepository userRepository;
 
     private final SettingsService settings;
@@ -74,11 +83,18 @@ public class JwtCustomizerConfig {
 
     private final Clock clock;
 
-    public JwtCustomizerConfig(UserRepository userRepository, SettingsService settings, KeyRotationService keys, Clock clock) {
+    private final SsoRealmProperties realmProperties;
+
+    private final SsoTenantIdentifierResolver realms;
+
+    public JwtCustomizerConfig(UserRepository userRepository, SettingsService settings, KeyRotationService keys,
+                               Clock clock, SsoRealmProperties realmProperties, SsoTenantIdentifierResolver realms) {
         this.userRepository = userRepository;
         this.settings = settings;
         this.keys = keys;
         this.clock = clock;
+        this.realmProperties = realmProperties;
+        this.realms = realms;
     }
 
     @Bean
@@ -121,6 +137,7 @@ public class JwtCustomizerConfig {
         }
         userRepository.findByUsername(principal.getName()).ifPresent(user -> {
             context.getClaims().claim(UID, user.getId().toString());
+            addRealmClaims(context, user);
             if (profile) {
                 addProfileClaims(context, user);
             } else {
@@ -138,11 +155,38 @@ public class JwtCustomizerConfig {
             if (!permissions.isEmpty()) {
                 context.getClaims().claim(PERMISSIONS, new ArrayList<>(permissions));
             }
-            List<String> roles = user.getRoles().stream().map(Role::getName).sorted().toList();
+            List<String> roles = Stream.concat(user.getRoles().stream().map(Role::getName),
+                    realmProperties.getDefaultRoles().stream()).distinct().sorted().toList();
             if (!roles.isEmpty()) {
                 context.getClaims().claim(ROLES, new ArrayList<>(roles));
             }
         });
+    }
+
+    /**
+     * What a multi-realm token has to say about which store it belongs to.
+     *
+     * <p>
+     * Both claims exist because resource servers already read {@code clientId} — {@code StoreRoleAccessChecker}
+     * matches it against the {@code ?store=} of the request — and {@code realm} is what that check should read
+     * once every service has been moved over. They carry the same value.
+     * </p>
+     *
+     * <p>
+     * The subject becomes the account id rather than the username. A username is unique within a realm and
+     * nowhere else, so with a realm per store four demo shoppers are all called {@code user}; checkout joins its
+     * own customer records on {@code sub}, and would have merged them. In a single-realm deployment the username
+     * is already unique and the gateway's OIDC client pins {@code user-name-attribute: sub}, so uaa keeps it.
+     * </p>
+     */
+    private void addRealmClaims(JwtEncodingContext context, User user) {
+        if (realmProperties.single()) {
+            return;
+        }
+        String realm = realms.resolveCurrentTenantIdentifier();
+        context.getClaims().claim(REALM, realm);
+        context.getClaims().claim(CLIENT_ID, realm);
+        context.getClaims().subject(user.getId().toString());
     }
 
     private static void addProfileClaims(JwtEncodingContext context, User user) {

@@ -48,7 +48,13 @@ public class SelfRegistrationService {
 
     private final AuditService audit;
 
-    @Transactional
+    /*
+     * rollbackFor, because every way this can refuse is a checked exception and Spring rolls back only for
+     * unchecked ones by default. Without it the account row — saved first so password history has a row to point
+     * at — survived a rejected password: an enabled account with no password, holding the username against the
+     * person who was trying to claim it.
+     */
+    @Transactional(rollbackFor = Exception.class)
     public void register(RegistrationRequest request)
             throws SelfRegistrationDisabledException, UsernameTakenException, EmailTakenException,
             PasswordPolicyViolationException, PasswordReusedException, PasswordCompromisedException {

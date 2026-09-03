@@ -124,6 +124,17 @@ public enum UaaErrors implements ErrorCode {
     RESET_TOKEN_NOT_USABLE("UAA.PASSWORD.RESET_TOKEN_NOT_USABLE", ErrorCategory.NOT_FOUND),
 
     /**
+     * The request arrived for one store and named another.
+     *
+     * <p>
+     * Only a multi-realm deployment can raise it: the edge resolves the storefront host to a store before the
+     * request lands, so a form or query parameter naming a different one is either a misconfigured theme or an
+     * attempt to act in another merchant's realm. Refused rather than resolved to either store.
+     * </p>
+     */
+    CROSS_STORE_REQUEST("UAA.REALM.CROSS_STORE_REQUEST", ErrorCategory.FORBIDDEN),
+
+    /**
      * Self-registration is off for this realm. A refusal rather than a 404 so a storefront can tell a shopper why
      * the form did nothing; the realm's own setting is what decides it.
      */

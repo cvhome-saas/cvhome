@@ -1,5 +1,7 @@
 package com.asrevo.cvhome.sso.realm;
 
+import java.util.List;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import com.asrevo.cvhome.commons.domain.RealmId;
@@ -26,6 +28,17 @@ public class SsoRealmProperties {
 
     /** The realm id in {@code SINGLE} mode. Ignored in {@code MULTI}. */
     private String fixed = RealmId.PLATFORM.getId();
+
+    /**
+     * Roles every principal of this deployment carries, on top of any granted to them individually.
+     *
+     * <p>
+     * cua sets {@code CUSTOMER}: every account it holds is a shopper, by construction, and the old cua wrote that
+     * role into each token as a literal. uaa leaves it empty — its principals differ from one another, so their
+     * roles are rows, not a property.
+     * </p>
+     */
+    private List<String> defaultRoles = List.of();
 
     public RealmId fixedRealm() {
         return RealmId.of(fixed);
