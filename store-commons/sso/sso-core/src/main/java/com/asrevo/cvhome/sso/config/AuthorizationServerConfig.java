@@ -1,8 +1,9 @@
 package com.asrevo.cvhome.sso.config;
 
 import java.time.Clock;
-import java.util.Objects;
 
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -24,13 +25,11 @@ import org.springframework.security.oauth2.server.authorization.authentication.C
 import org.springframework.security.oauth2.server.authorization.client.JdbcRegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.savedrequest.RequestCache;
 
-import com.asrevo.cvhome.commons.domain.ServiceDomain;
-import com.asrevo.cvhome.s2s.model.ServiceDomainProperties;
-import com.asrevo.cvhome.s2s.utils.UrlNormalize;
 import com.asrevo.cvhome.sso.client.EnabledAwareRegisteredClientRepository;
 import com.asrevo.cvhome.sso.client.GraceAwareClientSecretAuthenticationProvider;
 import com.asrevo.cvhome.sso.repo.ClientExtensionRepository;
@@ -63,30 +62,39 @@ import com.nimbusds.jose.proc.SecurityContext;
 @EnableWebSecurity
 public class AuthorizationServerConfig {
 
-    static final String UAA = "uaa";
-
-    static final String UNPINNED_ISSUER = """
-            uaa's issuer is not configured: com.asrevo.cvhome.services.uaa must carry schema, domain and port \
-            so every token names the same issuer whatever host the request arrived on.""";
-
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE)
     SecurityFilterChain authorizationServerSecurity(HttpSecurity http, RequestCache requestCache,
+                                                    AuthenticationEntryPoint entryPoint,
+                                                    ObjectProvider<AuthorizationServerHttpCustomizer> customizers,
                                                     RegisteredClientRepository clients, OAuth2AuthorizationService authorizations,
                                                     PasswordEncoder encoder, ClientSecretHistoryRepository history, Clock clock)
             throws Exception {
         // Built here rather than as a bean: a lone AuthenticationProvider bean becomes the global manager's provider.
         var graceAware = new GraceAwareClientSecretAuthenticationProvider(clients, authorizations, encoder, history, clock);
         OAuth2AuthorizationServerConfigurer serverConfigurer = new OAuth2AuthorizationServerConfigurer();
-        return http.with(serverConfigurer, configurer -> configurer.oidc(Customizer.withDefaults())
+        http.with(serverConfigurer, configurer -> configurer.oidc(Customizer.withDefaults())
                         .clientAuthentication(clientAuth -> clientAuth.authenticationProviders(providers ->
                                 providers.replaceAll(p -> p instanceof ClientSecretAuthenticationProvider ? graceAware : p))))
                 .securityMatcher(serverConfigurer.getEndpointsMatcher())
                 .authorizeHttpRequests(auth -> auth.requestMatchers(serverConfigurer.getEndpointsMatcher()).authenticated())
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
                 .requestCache(cache -> cache.requestCache(requestCache))
-                .exceptionHandling(ex -> ex.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login")))
-                .build();
+                .exceptionHandling(ex -> ex.authenticationEntryPoint(entryPoint));
+        for (AuthorizationServerHttpCustomizer customizer : customizers.orderedStream().toList()) {
+            customizer.customize(http);
+        }
+        return http.build();
+    }
+
+    /**
+     * What an unauthenticated {@code /oauth2/authorize} is answered with. uaa serves its own sign-in page; cua
+     * renders no HTML and hands the shopper to their storefront's, so it replaces this bean.
+     */
+    @Bean
+    @ConditionalOnMissingBean(name = "authorizationServerEntryPoint")
+    AuthenticationEntryPoint authorizationServerEntryPoint() {
+        return new LoginUrlAuthenticationEntryPoint("/login");
     }
 
     @Bean
@@ -106,12 +114,8 @@ public class AuthorizationServerConfig {
     }
 
     @Bean
-    AuthorizationServerSettings authorizationServerSettings(ServiceDomainProperties services) {
-        ServiceDomain uaa = services.getService(UAA);
-        if (Objects.isNull(uaa) || Objects.isNull(uaa.schema()) || Objects.isNull(uaa.domain()) || Objects.isNull(uaa.port())) {
-            throw new IllegalStateException(UNPINNED_ISSUER);
-        }
-        return AuthorizationServerSettings.builder().issuer(UrlNormalize.normalizeUri(uaa.getServiceHost())).build();
+    AuthorizationServerSettings authorizationServerSettings(IssuerPin pin) {
+        return AuthorizationServerSettings.builder().issuer(pin.issuer()).build();
     }
 
     @Bean
