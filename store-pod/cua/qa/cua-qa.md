@@ -205,6 +205,23 @@ against a live stack on 2026-09-03.
   provider is self-contained: `IdentityProviderMapper` resolves the preset's defaults into the row when one is
   created through the API, and nothing fills them in on read. A row seeded without them cannot be built.
 
+### RLM-09 — Brokered sign-in links to an account that already exists · critical · [verified]
+
+- **Setup** — a store with a real Google and GitHub application configured (the seeded demo credentials cannot
+  complete a round trip).
+- **Steps** — sign in with GitHub, then sign in again with Google using the same address.
+- **Expect** — the first creates the account (`user.created … provisioned by provider github`) and links the
+  identity; the second links a second identity to the *same* account and signs in. Both audit rows are in
+  `cua.audit_events`.
+- **Why LINK and not CONFIRM** — `CONFIRM` asks for the account's password once before linking, and cua has
+  nowhere to ask: it renders no HTML and the storefront has no confirmation step, so the outcome reaches the
+  shopper as a bare "we couldn't sign you in with that provider" with no way forward. `LINK` joins silently, and
+  only where the provider vouches for the email — `trust_email_verified` is what gates that.
+
+> **Known gap.** `LINK` still falls back to a confirmation when the provider does *not* vouch for the email, and
+> cua cannot complete that either — the shopper sees `?error=social` with no explanation. A storefront
+> confirmation step, and an error token distinct from `social`, is outstanding work.
+
 ## CLI — The dynamic client, and the port that must survive
 
 ### CLI-01 — The `redirect_uri` is derived from the request's real host · critical · [not verified]

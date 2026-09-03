@@ -130,9 +130,15 @@ public class SocialLoginConfigService {
     private IdentityProviderRequest request(IdpPreset preset, PersistableSocialLoginConfig config) {
         return new IdentityProviderRequest(alias(preset), preset.displayName(), preset, false, config.appId(),
                 config.appSecret(), null, null, null, null, null, null, null, null, null,
-                // A shopper who signs in with Google and already has a password account for the same address is
-                // the same person to a store; CONFIRM asks for that password once rather than assuming it.
-                AccountLinking.CONFIRM, true, null, true, null);
+                /*
+                 * LINK, not CONFIRM. A shopper who signs in with Google and already has an account for the same
+                 * address is the same person to a store, and LINK joins them silently *only* where the provider
+                 * vouches for the email — which is what trustEmailVerified below turns on. CONFIRM asks for the
+                 * account's password once instead, and cua has nowhere to ask: it renders no HTML, and the
+                 * storefront has no confirmation step, so a CONFIRM outcome reaches the shopper as a bare "we
+                 * couldn't sign you in with that provider" with no way forward.
+                 */
+                AccountLinking.LINK, true, null, true, null);
     }
 
     /** The alias is the Spring registrationId, and it is unique per realm — every store may have a "google". */

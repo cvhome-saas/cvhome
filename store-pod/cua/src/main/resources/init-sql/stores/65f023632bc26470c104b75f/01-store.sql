@@ -38,7 +38,7 @@ values
      'https://www.googleapis.com/oauth2/v3/certs',
      'openid profile email', 'sub', 'client_secret_basic',
      '{"email": "email", "given_name": "firstName", "family_name": "lastName"}'::jsonb,
-     'CONFIRM', true, true, now(), now()),
+     'LINK', true, true, now(), now()),
     (gen_random_uuid(), '65f023632bc26470c104b75f', 'github', 'GitHub', 'OAUTH2', 'GITHUB', true, false, 1,
      'ENC:1:default-key:AES-256-GCM:2ky6qTJ7Q526PUMh:Gtagmo7cH99rrfzHjhZwRvCamcbwU8Q8/gPghV3dUMbdMk8u',
      'ENC:1:default-key:AES-256-GCM:gWao1lpRxoqZqqry:/qV5PXK+AM9ETM13Qs/SFhAbgxzcGH/qftlcAPT2GGeVmcXgHWEExTv/DN6mwMNPZm8u0uhq4qA=',
@@ -47,7 +47,7 @@ values
      null,
      'read:user user:email', 'id', 'client_secret_basic',
      '{"email": "email", "name": "firstName"}'::jsonb,
-     'CONFIRM', true, true, now(), now())
+     'LINK', true, true, now(), now())
 on conflict do nothing;
 
 -- The storefront's OAuth2 client. A public client with PKCE — the storefront is a browser app and holds no secret.

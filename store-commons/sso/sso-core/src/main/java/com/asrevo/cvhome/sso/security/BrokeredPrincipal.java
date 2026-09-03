@@ -3,6 +3,8 @@ package com.asrevo.cvhome.sso.security;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -37,9 +39,27 @@ public final class BrokeredPrincipal implements OidcUser, Serializable {
                              OidcUserInfo userInfo) {
         this.username = username;
         this.providerAlias = providerAlias;
-        this.attributes = attributes == null ? Map.of() : Map.copyOf(attributes);
+        this.attributes = copyToleratingNulls(attributes);
         this.idToken = idToken;
         this.userInfo = userInfo;
+    }
+
+    /**
+     * An unmodifiable copy that keeps null values.
+     *
+     * <p>
+     * {@code Map.copyOf} rejects them, and providers send them: GitHub's {@code /user} answers with
+     * {@code email}, {@code name}, {@code company} and half a dozen more set to null for any account that has not
+     * filled them in, so brokering a GitHub sign-in threw a {@link NullPointerException} before the broker ever
+     * saw the attributes. An absent attribute and a null one mean the same thing to everything downstream, but it
+     * is the provider's answer that is recorded here rather than a tidied version of it.
+     * </p>
+     */
+    private static Map<String, Object> copyToleratingNulls(Map<String, Object> attributes) {
+        if (attributes == null || attributes.isEmpty()) {
+            return Map.of();
+        }
+        return Collections.unmodifiableMap(new LinkedHashMap<>(attributes));
     }
 
     public String providerAlias() {
