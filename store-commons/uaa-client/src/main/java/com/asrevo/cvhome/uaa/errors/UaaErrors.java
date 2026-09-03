@@ -123,6 +123,12 @@ public enum UaaErrors implements ErrorCode {
     /** No usable reset link for that token; the same single code as {@link #INVITATION_NOT_USABLE}, for the same reason. */
     RESET_TOKEN_NOT_USABLE("UAA.PASSWORD.RESET_TOKEN_NOT_USABLE", ErrorCategory.NOT_FOUND),
 
+    /**
+     * Self-registration is off for this realm. A refusal rather than a 404 so a storefront can tell a shopper why
+     * the form did nothing; the realm's own setting is what decides it.
+     */
+    SELF_REGISTRATION_DISABLED("UAA.USER.SELF_REGISTRATION_DISABLED", ErrorCategory.FORBIDDEN),
+
     /** Another account already signs in with that username. */
     USERNAME_TAKEN("UAA.USER.USERNAME_TAKEN", ErrorCategory.CONFLICT),
 
