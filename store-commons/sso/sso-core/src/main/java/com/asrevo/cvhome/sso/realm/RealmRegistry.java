@@ -1,6 +1,8 @@
 package com.asrevo.cvhome.sso.realm;
 
 import java.time.Duration;
+import java.util.List;
+import java.util.stream.Stream;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -31,7 +33,24 @@ public class RealmRegistry {
 
     private final RealmRepository realms;
 
+    private final SsoRealmProperties properties;
+
     private final Cache<String, Boolean> known = Caffeine.newBuilder().expireAfterWrite(TTL).build();
+
+    /**
+     * Every realm this deployment serves, for background work — which arrives with no request, and so with no
+     * realm to take from one. The platform realm is always in the list even when no store row names it: the
+     * schedulers audit their own work, and those rows are written there.
+     */
+    @Transactional(readOnly = true)
+    public List<RealmId> all() {
+        if (properties.single()) {
+            return List.of(properties.fixedRealm());
+        }
+        return Stream.concat(Stream.of(RealmId.PLATFORM),
+                        realms.findAllByEnabledTrue().stream().map(realm -> RealmId.of(realm.getId())))
+                .distinct().toList();
+    }
 
     public boolean exists(RealmId realm) {
         if (Boolean.TRUE.equals(known.getIfPresent(realm.getId()))) {

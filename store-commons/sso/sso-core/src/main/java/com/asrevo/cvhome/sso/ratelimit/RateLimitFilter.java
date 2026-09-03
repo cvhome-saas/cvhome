@@ -1,6 +1,7 @@
 package com.asrevo.cvhome.sso.ratelimit;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 
@@ -15,11 +16,13 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ProblemDetail;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.asrevo.cvhome.commons.domain.RealmId;
 import com.asrevo.cvhome.errors.web.ProblemDetailFactory;
 import com.asrevo.cvhome.sso.audit.AuditActor;
 import com.asrevo.cvhome.sso.audit.AuditEventType;
 import com.asrevo.cvhome.sso.audit.AuditRecord;
 import com.asrevo.cvhome.sso.audit.AuditService;
+import com.asrevo.cvhome.sso.realm.RealmContext;
 import com.asrevo.cvhome.uaa.errors.UaaErrors;
 
 import tools.jackson.databind.ObjectMapper;
@@ -31,6 +34,11 @@ import tools.jackson.databind.ObjectMapper;
  * Runs before Spring Security, so a refused attempt costs no password hash and no event. The 429 carries the
  * shared problem shape from the factory — the one place in uaa a body is written outside the advice — and a
  * {@code Retry-After} of the window. Only POSTs count: loading the sign-in page is not an attempt.
+ * </p>
+ *
+ * <p>
+ * It runs after the realm filter, which is what lets the attempt be counted against the store it was aimed at as
+ * well as against the address it came from. See {@link RateLimitProperties} for why both.
  * </p>
  */
 public class RateLimitFilter extends OncePerRequestFilter {
@@ -45,11 +53,11 @@ public class RateLimitFilter extends OncePerRequestFilter {
 
     private final RateLimitProperties properties;
 
-    private final RateLimiter login;
+    private final Buckets login;
 
-    private final RateLimiter token;
+    private final Buckets token;
 
-    private final RateLimiter publicApi;
+    private final Buckets publicApi;
 
     private final ProblemDetailFactory problems;
 
@@ -60,9 +68,9 @@ public class RateLimitFilter extends OncePerRequestFilter {
     public RateLimitFilter(RateLimitProperties properties, ProblemDetailFactory problems, ObjectMapper json,
                            AuditService audit) {
         this.properties = properties;
-        this.login = new RateLimiter(properties.login());
-        this.token = new RateLimiter(properties.token());
-        this.publicApi = new RateLimiter(properties.publicApi());
+        this.login = Buckets.of(properties.login(), properties.spread());
+        this.token = Buckets.of(properties.token(), properties.spread());
+        this.publicApi = Buckets.of(properties.publicApi(), properties.spread());
         this.problems = problems;
         this.json = json;
         this.audit = audit;
@@ -76,9 +84,8 @@ public class RateLimitFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
-        RateLimiter rule = ruleFor(request);
-        String key = String.format("%s|%s", request.getRemoteAddr(), request.getServletPath());
-        if (rule == null || rule.tryAcquire(key)) {
+        Buckets rule = ruleFor(request);
+        if (rule == null || rule.tryAcquire(realm(), request.getRemoteAddr(), request.getServletPath())) {
             chain.doFilter(request, response);
             return;
         }
@@ -93,7 +100,12 @@ public class RateLimitFilter extends OncePerRequestFilter {
         json.writeValue(response.getOutputStream(), problem);
     }
 
-    private RateLimiter ruleFor(HttpServletRequest request) {
+    /** The realm the edge resolved, or a placeholder — an unrealmed POST is still counted, just not per store. */
+    private static String realm() {
+        return RealmContext.current().map(RealmId::getId).orElse("-");
+    }
+
+    private Buckets ruleFor(HttpServletRequest request) {
         String path = request.getServletPath();
         if (LOGIN.equals(path)) {
             return login;
@@ -105,6 +117,32 @@ public class RateLimitFilter extends OncePerRequestFilter {
             return publicApi;
         }
         return null;
+    }
+
+    /**
+     * One rule's two counters.
+     *
+     * <p>
+     * The realm's is checked first and spent whether or not the address's then refuses, because the attempt was
+     * made either way; a fixed window is a brake on guessing, not a ledger.
+     * </p>
+     */
+    private record Buckets(RateLimiter perRealm, RateLimiter perAddress) {
+
+        static Buckets of(RateLimitProperties.Rule rule, int spread) {
+            return new Buckets(new RateLimiter(rule),
+                    new RateLimiter(new RateLimitProperties.Rule(rule.limit() * spread, rule.window())));
+        }
+
+        boolean tryAcquire(String realm, String address, String path) {
+            boolean realmHasRoom = perRealm.tryAcquire(String.format("%s|%s|%s", realm, address, path));
+            boolean addressHasRoom = perAddress.tryAcquire(String.format("%s|%s", address, path));
+            return realmHasRoom && addressHasRoom;
+        }
+
+        Duration window() {
+            return perRealm.window();
+        }
     }
 
 }

@@ -115,7 +115,7 @@ public class KeyRotationService {
                 return key;
             }
             log.error("Active signing key {} cannot be decrypted; retiring it and generating a replacement", key.getKid());
-            key.retiring(clock.instant().plus(settings.current().keys().retireDays(), ChronoUnit.DAYS));
+            key.retiring(clock.instant().plus(settings.platform().keys().retireDays(), ChronoUnit.DAYS));
             keys.save(key);
             cache.invalidate();
         }
@@ -153,7 +153,7 @@ public class KeyRotationService {
     @Transactional
     public SigningKeyDto rotate(String actor) {
         Instant now = clock.instant();
-        int retireDays = settings.current().keys().retireDays();
+        int retireDays = settings.platform().keys().retireDays();
         List<SigningKey> previous = keys.findActiveWithLock();
         for (SigningKey key : previous) {
             key.retiring(now.plus(retireDays, ChronoUnit.DAYS));
@@ -208,7 +208,7 @@ public class KeyRotationService {
     @Transactional
     public KeyStatus status() {
         SigningKey active = ensureActive();
-        RealmSettings.Keys policy = settings.current().keys();
+        RealmSettings.Keys policy = settings.platform().keys();
         int unusable = (int) keys.findByStatusIn(List.of(SigningKeyStatus.ACTIVE, SigningKeyStatus.RETIRING)).stream()
                 .filter(key -> !readable(key)).count();
         return new KeyStatus(active.getKid(), active.getAlgorithm(), active.getActivatedAt(), policy.rotationDays(),
@@ -217,7 +217,7 @@ public class KeyRotationService {
     }
 
     private Optional<Instant> nextRotationAt() {
-        int rotationDays = settings.current().keys().rotationDays();
+        int rotationDays = settings.platform().keys().rotationDays();
         if (rotationDays <= 0) {
             return Optional.empty();
         }

@@ -35,10 +35,14 @@ class SettingsServiceTest {
 
     private static final String STORE_B = "store-b";
 
+    /** The defaults; every case that cares about a ceiling states the one it is testing. */
+    private static final SsoPlatformCeilings CEILINGS = new SsoPlatformCeilings(0, 0, 0, 0, 0, 0, 0, 0);
+
     private final SettingsRepository repository = mock(SettingsRepository.class);
 
     private final SettingsService service =
-            new SettingsService(repository, mock(AuditService.class), new SsoTenantIdentifierResolver(single()));
+            new SettingsService(repository, mock(AuditService.class), new SsoTenantIdentifierResolver(single()),
+                    CEILINGS);
 
     private Settings stored;
 
@@ -58,7 +62,8 @@ class SettingsServiceTest {
         SsoRealmProperties multi = new SsoRealmProperties();
         multi.setMode(RealmMode.MULTI);
         SettingsService shared =
-                new SettingsService(repository, mock(AuditService.class), new SsoTenantIdentifierResolver(multi));
+                new SettingsService(repository, mock(AuditService.class), new SsoTenantIdentifierResolver(multi),
+                        CEILINGS);
         when(repository.findById(STORE_A)).thenReturn(Optional.of(new Settings(STORE_A)));
         when(repository.findById(STORE_B)).thenReturn(Optional.of(new Settings(STORE_B)));
 
@@ -101,6 +106,41 @@ class SettingsServiceTest {
 
         assertThatThrownBy(() -> service.update(with(base, new RealmSettings.Lockout(0, 600, 0), base.version()), ACTOR))
                 .isInstanceOf(SettingsInvalidException.class);
+    }
+
+    /**
+     * A merchant edits their own realm, but the pod underneath is shared. Turning lockout off by setting a
+     * threshold nobody reaches, or minting a token that outlives the store, is refused above the realm.
+     */
+    @Test
+    void aRealmCannotSetAPolicyPastThePlatformsLimits() {
+        RealmSettings base = service.current();
+
+        assertThatThrownBy(() -> service.update(with(base, new RealmSettings.Lockout(1_000_000, 900, 5),
+                base.version()), ACTOR))
+                .isInstanceOf(SettingsInvalidException.class)
+                .hasMessageContaining("lockout.threshold");
+        assertThatThrownBy(() -> service.update(withTokens(base, new RealmSettings.Tokens(3600, 3600,
+                Integer.MAX_VALUE, 365, 24)), ACTOR))
+                .isInstanceOf(SettingsInvalidException.class)
+                .hasMessageContaining("tokens.defaultRefreshTokenTtlSeconds");
+    }
+
+    /** And a policy inside them still goes through, so the ceiling is a ceiling and not a wall. */
+    @Test
+    void aPolicyWithinThemIsAccepted() throws Exception {
+        RealmSettings base = service.current();
+
+        RealmSettings after = service.update(with(base, new RealmSettings.Lockout(20, 60, 5), base.version()), ACTOR);
+
+        assertThat(after.lockout().threshold()).isEqualTo(20);
+    }
+
+    private static RealmSettings withTokens(RealmSettings base, RealmSettings.Tokens tokens) {
+        return new RealmSettings(base.displayName(), base.supportEmail(), base.defaultLocale(),
+                base.selfRegistrationEnabled(), base.requireEmailVerification(), base.password(), base.lockout(),
+                base.sessions(), tokens, base.keys(), base.auditRetentionDays(), base.updatedAt(),
+                base.updatedBy(), base.version());
     }
 
     @Test

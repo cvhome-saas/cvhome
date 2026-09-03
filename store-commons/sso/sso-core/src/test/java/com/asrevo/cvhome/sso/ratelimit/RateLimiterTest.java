@@ -28,11 +28,18 @@ class RateLimiterTest {
 
     @Test
     void defaultsAreFilledIn() {
-        RateLimitProperties properties = new RateLimitProperties(true, null, null, null);
+        RateLimitProperties properties = new RateLimitProperties(true, null, null, null, 0);
 
         assertThat(properties.login().limit()).isEqualTo(10);
         assertThat(properties.token().limit()).isEqualTo(60);
         assertThat(properties.publicApi().window()).isEqualTo(Duration.ofMinutes(1));
+        assertThat(properties.spread()).isEqualTo(5);
+    }
+
+    /** A rule that names only its limit used to bind a null window and throw while the web server was starting. */
+    @Test
+    void aRuleWithoutAWindowGetsTheDefaultOne() {
+        assertThat(new RateLimitProperties.Rule(3, null).window()).isEqualTo(Duration.ofMinutes(1));
     }
 
 }

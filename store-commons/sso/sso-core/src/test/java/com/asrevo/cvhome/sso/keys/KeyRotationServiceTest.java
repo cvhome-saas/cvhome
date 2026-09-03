@@ -57,7 +57,9 @@ class KeyRotationServiceTest {
 
     @BeforeEach
     void wire() {
-        when(settings.current()).thenReturn(realm);
+        // platform(), not current(): one signing key serves the whole deployment, so its rotation interval
+        // cannot come from whichever realm a background thread happened to be in.
+        when(settings.platform()).thenReturn(realm);
         when(realm.keys()).thenReturn(new RealmSettings.Keys(ROTATION_DAYS, RETIRE_DAYS));
         when(repo.save(any())).thenAnswer(invocation -> {
             SigningKey key = invocation.getArgument(0);
