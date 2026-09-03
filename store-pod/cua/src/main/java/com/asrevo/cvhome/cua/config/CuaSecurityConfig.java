@@ -12,6 +12,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.savedrequest.RequestCache;
 
+import com.asrevo.cvhome.cua.security.StorefrontBrokeredLoginSuccessHandler;
 import com.asrevo.cvhome.cua.security.StorefrontCsrfDeniedHandler;
 import com.asrevo.cvhome.cua.security.StorefrontLoginEntryPoint;
 import com.asrevo.cvhome.cua.security.StorefrontLoginFailureHandler;
@@ -19,6 +20,7 @@ import com.asrevo.cvhome.cua.security.StorefrontLoginSuccessHandler;
 import com.asrevo.cvhome.s2s.jwt.MultiIssuerJwtDecoder;
 import com.asrevo.cvhome.sso.config.SsoSecurityDefaults;
 import com.asrevo.cvhome.sso.security.BrokeredLogin;
+import com.asrevo.cvhome.sso.security.BrokeredLoginSuccessHandler;
 
 /**
  * cua's application chain: a headless authorization server behind a storefront.
@@ -43,7 +45,8 @@ public class CuaSecurityConfig {
     @Bean
     @Order(3)
     SecurityFilterChain appSecurity(HttpSecurity http, SsoSecurityDefaults defaults, RequestCache requestCache,
-                                    CookieCsrfTokenRepository csrfCookies, BrokeredLogin brokered) throws Exception {
+                                    CookieCsrfTokenRepository csrfCookies, BrokeredLogin brokered,
+                                    BrokeredLoginSuccessHandler brokeredSuccess) throws Exception {
         defaults.applyTo(http)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/.well-known/**").permitAll()
@@ -81,7 +84,9 @@ public class CuaSecurityConfig {
                         .authorizationEndpoint(endpoint -> endpoint.authorizationRequestResolver(brokered.resolver()))
                         .userInfoEndpoint(userInfo -> userInfo.userService(brokered.getOauth2Users())
                                 .oidcUserService(brokered.getOidcUsers()))
-                        .successHandler(new StorefrontLoginSuccessHandler(requestCache))
+                        // Not the plain storefront handler: a brokered login has to swap its BrokeredPrincipal
+                        // for the standard one before the authorization server writes it to oauth2_authorization.
+                        .successHandler(new StorefrontBrokeredLoginSuccessHandler(requestCache, brokeredSuccess))
                         .failureHandler(new StorefrontLoginFailureHandler(requestCache,
                                 StorefrontLoginFailureHandler.SOCIAL)))
                 .exceptionHandling(ex -> ex
