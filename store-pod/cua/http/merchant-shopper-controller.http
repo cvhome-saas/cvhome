@@ -1,0 +1,64 @@
+# MerchantShopperController — com.asrevo.cvhome.cua.web
+#
+# A store's shoppers, administered by its own merchant. Narrower than the platform's user administration on
+# purpose: accounts arrive by registration or by a provider, roles are configuration, and a merchant cannot set a
+# shopper's password. Addressed through the seller gateway, as a console request travels.
+#
+# Requires a running stack: lcl start -d
+
+### this store's shoppers, newest page first
+# @name listShoppers
+GET {{SELLER_UI_URL}}/spg/cua/api/v1/private/shoppers?store={{STORE_ID}}&lang={{LANG}}&size=20
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+> {%
+    client.test("listed", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        if (response.body.content.length > 0) {
+            client.global.set("SHOPPER_ID", response.body.content[0].id);
+        }
+    });
+%}
+
+### search by name or address
+GET {{SELLER_UI_URL}}/spg/cua/api/v1/private/shoppers?store={{STORE_ID}}&lang={{LANG}}&q=user&status=ACTIVE
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+### how many, and in what state
+GET {{SELLER_UI_URL}}/spg/cua/api/v1/private/shoppers/counts?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+### one shopper
+GET {{SELLER_UI_URL}}/spg/cua/api/v1/private/shoppers/{{SHOPPER_ID}}?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+### where they are signed in — address, browser, when it started
+GET {{SELLER_UI_URL}}/spg/cua/api/v1/private/shoppers/{{SHOPPER_ID}}/sessions?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+### sign them out everywhere → {"revoked": n}
+DELETE {{SELLER_UI_URL}}/spg/cua/api/v1/private/shoppers/{{SHOPPER_ID}}/sessions?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+### clear a lockout after too many wrong passwords; idempotent
+POST {{SELLER_UI_URL}}/spg/cua/api/v1/private/shoppers/{{SHOPPER_ID}}/unlock?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+### disable — ends every session and every token the account holds
+POST {{SELLER_UI_URL}}/spg/cua/api/v1/private/shoppers/{{SHOPPER_ID}}/disable?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+### and back
+POST {{SELLER_UI_URL}}/spg/cua/api/v1/private/shoppers/{{SHOPPER_ID}}/enable?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+### isolation: the same shopper id, asked for as the second store — 404, it is not that realm's row
+GET {{SELLER_UI_URL}}/spg/cua/api/v1/private/shoppers/{{SHOPPER_ID}}?store={{STORE_ID_2}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+### no session at all — 401
+GET {{SELLER_UI_URL}}/spg/cua/api/v1/private/shoppers?store={{STORE_ID}}&lang={{LANG}}
+
+### erasure: the account and its credentials go; orders live in other services
+# DELETE {{SELLER_UI_URL}}/spg/cua/api/v1/private/shoppers/{{SHOPPER_ID}}?store={{STORE_ID}}&lang={{LANG}}
+# Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
