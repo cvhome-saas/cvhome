@@ -153,6 +153,13 @@ public final class UaaClient {
                 .orElse("");
     }
 
+    /** Every cookie the client holds, for a test that needs to explain a 403. */
+    public String cookieDump() {
+        return cookies.getCookieStore().getCookies().stream()
+                .map(c -> String.format("%s=%s(domain=%s,path=%s)", c.getName(), c.getValue(), c.getDomain(), c.getPath()))
+                .collect(java.util.stream.Collectors.joining(" "));
+    }
+
     public void clearCookies() {
         cookies.getCookieStore().removeAll();
     }

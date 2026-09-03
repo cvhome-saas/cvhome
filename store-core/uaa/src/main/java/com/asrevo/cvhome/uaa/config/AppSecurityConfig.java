@@ -25,6 +25,7 @@ import org.springframework.security.web.util.matcher.AndRequestMatcher;
 import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
+import com.asrevo.cvhome.uaa.security.BrokeredLogin;
 import com.asrevo.cvhome.uaa.security.CsrfCookieFilter;
 import com.asrevo.cvhome.uaa.security.LoginFailureHandler;
 import com.asrevo.cvhome.uaa.security.LoginSuccessHandler;
@@ -59,6 +60,9 @@ import com.asrevo.cvhome.uaa.settings.SettingsService;
  * than posts. Recorded as a known gap.</li>
  * <li>Sign-in success stamps the session and applies the realm's idle timeout and single-session rule; failure sends
  * the page a reason it can explain; remember-me and the absolute session ceiling follow the realm's settings.</li>
+ * <li>Brokered logins ({@code oauth2Login}) use the same login page and the same request cache, so a login that
+ * started at {@code /oauth2/authorize} resumes there whichever way the person authenticated. The callback path is
+ * exempt from CSRF because Apple posts the code back as a form.</li>
  * </ul>
  */
 @Configuration
@@ -91,7 +95,8 @@ public class AppSecurityConfig {
     @Bean
     SecurityFilterChain appSecurity(HttpSecurity http, RequestCache requestCache, ProblemAccessDeniedHandler denied,
                                     LoginSuccessHandler loginSuccess, LoginFailureHandler loginFailure,
-                                    SettingsAwareRememberMeServices rememberMe, SettingsService settings) throws Exception {
+                                    SettingsAwareRememberMeServices rememberMe, SettingsService settings,
+                                    BrokeredLogin brokered) throws Exception {
         http.authorizeHttpRequests(auth -> auth
                         .requestMatchers("/.well-known/**").permitAll()
                         .requestMatchers(EndpointRequest.to("health", "info", "prometheus")).permitAll()
@@ -102,10 +107,20 @@ public class AppSecurityConfig {
                         .permitAll()
                         // The pages a one-time link lands on: the SPA route, whose API is the public chain above.
                         .requestMatchers("/accept-invitation", "/reset-password").permitAll()
+                        // Brokered logins: the redirect out, the callback in, and the password step that links one.
+                        .requestMatchers("/oauth2/authorization/**", "/login/oauth2/**", "/api/v1/auth/link-confirm")
+                        .permitAll()
                         .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/api-docs/**").permitAll()
                         .requestMatchers("/api/v1/admin/**").hasAnyAuthority("SCOPE_super_admin", SUPER_ADMIN)
                         .anyRequest().authenticated())
                 .formLogin(login -> login.loginPage(LOGIN_PAGE).successHandler(loginSuccess).failureHandler(loginFailure))
+                .oauth2Login(login -> login.loginPage(LOGIN_PAGE)
+                        .clientRegistrationRepository(brokered.getRegistrations())
+                        .authorizationEndpoint(endpoint -> endpoint.authorizationRequestResolver(brokered.resolver()))
+                        .userInfoEndpoint(userInfo -> userInfo.userService(brokered.getOauth2Users())
+                                .oidcUserService(brokered.getOidcUsers()))
+                        .successHandler(brokered.getSuccess())
+                        .failureHandler(brokered.getFailure()))
                 .rememberMe(remember -> remember.rememberMeServices(rememberMe).key(rememberMe.getKey()))
                 .addFilterAfter(new SessionMaxAgeFilter(settings), BasicAuthenticationFilter.class)
                 .logout(logout -> logout
@@ -114,8 +129,9 @@ public class AppSecurityConfig {
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID", "SESSION"))
                 .csrf(csrf -> csrf
-                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                        .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler()))
+                        .csrfTokenRepository(csrfCookies())
+                        .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
+                        .ignoringRequestMatchers("/login/oauth2/code/*"))
                 .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
                 .exceptionHandling(ex -> ex
                         .accessDeniedHandler(denied)
@@ -124,6 +140,21 @@ public class AppSecurityConfig {
                 .requestCache(cache -> cache.requestCache(requestCache))
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
         return http.build();
+    }
+
+    /**
+     * The CSRF cookie, pinned to the root path.
+     *
+     * <p>
+     * Without an explicit path a cookie takes the request's directory, so a response from {@code /login/oauth2/code/…}
+     * mints a <em>second</em> {@code XSRF-TOKEN} scoped to {@code /login/oauth2} — and the next POST elsewhere sends
+     * whichever the browser prefers, which is a 403 nobody can explain. Found by the brokered-login test.
+     * </p>
+     */
+    private static CookieCsrfTokenRepository csrfCookies() {
+        CookieCsrfTokenRepository repository = CookieCsrfTokenRepository.withHttpOnlyFalse();
+        repository.setCookieCustomizer(cookie -> cookie.path("/"));
+        return repository;
     }
 
     /**

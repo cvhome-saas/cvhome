@@ -18,6 +18,7 @@ import com.asrevo.cvhome.uaa.dto.SigningKeyDto;
 import com.asrevo.cvhome.uaa.repo.SigningKeyRepository;
 import com.asrevo.cvhome.uaa.settings.RealmSettings;
 import com.asrevo.cvhome.uaa.settings.SettingsService;
+import com.asrevo.cvhome.uaa.support.FakeCrypto;
 import com.nimbusds.jose.jwk.JWKSet;
 
 import static org.assertj.core.api.Assertions.assertThat;

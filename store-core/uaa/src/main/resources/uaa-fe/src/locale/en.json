@@ -35,7 +35,8 @@
     "settings": "Settings",
     "account": "My account",
     "acceptInvitation": "Accept your invitation",
-    "resetPassword": "Choose a new password"
+    "resetPassword": "Choose a new password",
+    "providers": "Identity providers"
   },
   "signIn": {
     "title": "Sign in",
@@ -61,7 +62,26 @@
     "attemptsLeft": "{{count}} attempt(s) left before a {{minutes}}-minute lock.",
     "rememberMe": "Keep me signed in",
     "forgot": "Forgot your password?",
-    "forgotCopy": "There is no self-service reset on this platform. Ask an administrator: they can issue you a one-time link from the console, and it will bring you back here with a new password."
+    "forgotCopy": "There is no self-service reset on this platform. Ask an administrator: they can issue you a one-time link from the console, and it will bring you back here with a new password.",
+    "continueTo": "Continuing to {{client}}.",
+    "continueWith": "Continue with {{name}}",
+    "orEmail": "or with email",
+    "email": "Email or username",
+    "emailPlaceholder": "you@example.com",
+    "continue": "Continue",
+    "checking": "Checking…",
+    "notYou": "Not you?",
+    "reveal": "Show password",
+    "idpRejected": "An account with this email already exists here. Sign in with your password instead, or ask an administrator to link the two.",
+    "idpUnknownUser": "That login is not connected to an account here. Ask an administrator to invite you first.",
+    "idpNoEmail": "The provider did not share an email address, so we cannot tell which account this is.",
+    "idpFailed": "That sign-in could not be completed. Try again, or use your password.",
+    "link": {
+      "explain": "You already have an account for {{email}}. Enter its password once and {{provider}} will sign you in from now on.",
+      "password": "Your cvhome password",
+      "confirm": "Confirm and link"
+    },
+    "emailHint": "An email at an organisation with its own sign-in goes straight there."
   },
   "users": {
     "title": "Users",
@@ -721,6 +741,17 @@
     "toast": {
       "passwordChanged": "Your password was changed.",
       "signedOutOthers": "{{count}} other session(s) ended."
+    },
+    "identities": {
+      "title": "Linked logins",
+      "subtitle": "External accounts that can sign you in here",
+      "loading": "Loading linked logins…",
+      "since": "linked {{when}}",
+      "unlink": "Unlink",
+      "none": "No external logins are linked to this account.",
+      "toast": {
+        "unlinked": "{{name}} can no longer sign you in."
+      }
     }
   },
   "linkAccept": {
@@ -771,6 +802,123 @@
       },
       "message": "Sign in as {{name}} with the password you just chose.",
       "signIn": "Go to sign in"
+    }
+  },
+  "idps": {
+    "title": "Identity providers",
+    "context": "External logins people can pick on the sign-in page, brokered through cvhome identity",
+    "loading": "Loading providers…",
+    "panel": {
+      "title": "Sign-in page order",
+      "subtitle": "Top to bottom is how the buttons appear. A disabled provider is no button and no login."
+    },
+    "action": {
+      "add": "Add provider",
+      "up": "Move up",
+      "down": "Move down",
+      "delete": "Delete provider"
+    },
+    "column": {
+      "provider": "Provider",
+      "protocol": "Protocol",
+      "policy": "When the email matches",
+      "status": "Status",
+      "order": "Order"
+    },
+    "status": {
+      "enabled": "Enabled",
+      "hidden": "Enabled, hidden",
+      "disabled": "Disabled"
+    },
+    "jitShort": "creates accounts",
+    "linking": {
+      "CONFIRM": "Ask for the password once",
+      "LINK": "Link when the provider vouches for the email",
+      "REJECT": "Refuse"
+    },
+    "empty": {
+      "title": "No providers yet",
+      "message": "People sign in with a password only. Add a provider to offer another way in."
+    },
+    "preview": {
+      "title": "Sign-in page preview",
+      "subtitle": "What an enabled, unhidden provider adds to the page",
+      "heading": "Sign in to cvhome",
+      "continueWith": "Continue with {{name}}",
+      "none": "No provider buttons.",
+      "or": "or with email",
+      "email": "Email"
+    },
+    "choose": {
+      "title": "Choose a provider type",
+      "subtitle": "Well-known providers come pre-configured; the generic ones take an issuer or the endpoints by hand.",
+      "unverified": "scaffolded, unverified",
+      "notBuilt": "Not built",
+      "samlHint": "SAML brokering is not built. OpenID Connect and OAuth 2.0 are."
+    },
+    "form": {
+      "createTitle": "New {{name}} login",
+      "subtitle": "Register the redirect URI at the provider, then paste its client id and secret here.",
+      "sections": "Provider settings",
+      "displayName": "Display name",
+      "alias": "Alias",
+      "aliasHint": "Lower case, digits and dashes. It is the last part of the redirect URI, so changing it means re-registering at the provider.",
+      "redirectUri": "redirect URI",
+      "redirectHint": "Register this at the provider as the callback / redirect URI.",
+      "clientId": "Client ID",
+      "clientSecret": "Client secret",
+      "secretHint": "Stored encrypted; never shown again.",
+      "secretStored": "A secret is stored. Leave blank to keep it.",
+      "issuerNote": "Give the issuer and uaa discovers the endpoints from it, or fill the endpoints by hand.",
+      "endpointsNote": "A plain OAuth 2.0 provider has no discovery: the authorization, token and user-info endpoints are needed.",
+      "issuerUri": "Issuer",
+      "issuerHint": "The URL whose /.well-known/openid-configuration describes the provider.",
+      "authorizationUri": "Authorization endpoint",
+      "tokenUri": "Token endpoint",
+      "userInfoUri": "User-info endpoint",
+      "jwkSetUri": "JWK Set URI",
+      "scopes": "Scopes",
+      "scopesHint": "Space-separated. Blank keeps the preset’s.",
+      "clientAuth": "Client authentication",
+      "presetDefault": "Preset default",
+      "userNameAttribute": "Subject attribute",
+      "userNameAttributeHint": "The user-info field that identifies the person stably, e.g. id.",
+      "test": "Test connection",
+      "testOk": "{{url}} answered. Issuer: {{issuer}}.",
+      "testFailed": "The provider did not answer: {{detail}}",
+      "mappingHint": "Which claim from the provider fills which field: email, firstName, lastName.",
+      "mapping": "Claim mapping",
+      "defaultRoles": "Roles granted on login",
+      "defaultRolesHint": "Granted at every login through this provider, never removed.",
+      "linking": "When the email matches an existing account",
+      "linkingHint": "Silent linking needs a provider that vouches for the email; otherwise the person confirms with their password once.",
+      "jit": "Create new users",
+      "jitHint": "Off: only pre-existing accounts may sign in through this provider.",
+      "trustEmail": "Trust email as verified",
+      "trustEmailHint": "Skip our verification when the provider says the address is verified.",
+      "hide": "Hide on the sign-in page",
+      "hideHint": "No button; still reachable through an email-domain rule.",
+      "domains": "Email domains",
+      "domainsHint": "Comma-separated. Someone typing an email at one of these domains is sent straight to this provider.",
+      "save": "Save provider",
+      "saving": "Saving…"
+    },
+    "section": {
+      "connection": "Connection",
+      "mapping": "Mapping",
+      "behaviour": "Behaviour"
+    },
+    "delete": {
+      "title": "Delete this provider",
+      "message": "{{name}} is removed and every identity linked through it with it. People who signed in only this way lose that way in.",
+      "confirmationLabel": "Type the alias to confirm"
+    },
+    "toast": {
+      "created": "{{name}} added.",
+      "saved": "{{name}} saved.",
+      "enabled": "{{name}} is on the sign-in page.",
+      "disabled": "{{name}} is off.",
+      "deleted": "{{name}} deleted."
     }
   }
 }

@@ -58,6 +58,11 @@ export const routes: Routes = [
         data: {titleKey: 'route.roles'},
       },
       {
+        path: 'identity-providers',
+        loadComponent: () => import('@features/identity-providers/identity-providers').then((m) => m.IdentityProviders),
+        data: {titleKey: 'route.providers'},
+      },
+      {
         path: 'account',
         loadComponent: () => import('@features/account/account').then((m) => m.Account),
         data: {titleKey: 'route.account'},

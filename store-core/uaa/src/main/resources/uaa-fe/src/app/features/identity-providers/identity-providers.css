@@ -1,0 +1,225 @@
+.layout {
+  display: grid;
+  gap: var(--spacing-section);
+  grid-template-columns: minmax(0, 2fr) minmax(16rem, 1fr);
+}
+
+@media (max-width: 60rem) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.row {
+  cursor: pointer;
+}
+
+.row.off .cell.provider {
+  opacity: 0.6;
+}
+
+.cell {
+  display: inline-flex;
+  align-items: center;
+  min-inline-size: 0;
+  font-size: var(--text-3xs);
+}
+
+.cell.provider {
+  gap: var(--spacing-tight);
+}
+
+.identity {
+  display: grid;
+  min-inline-size: 0;
+}
+
+.alias {
+  color: var(--muted-foreground);
+  font-family: var(--font-mono);
+  font-size: var(--text-4xs);
+  unicode-bidi: plaintext;
+}
+
+.muted {
+  color: var(--muted-foreground);
+}
+
+.cell.order {
+  gap: 0.15rem;
+}
+
+.icon-action {
+  display: grid;
+  place-items: center;
+  inline-size: 1.6rem;
+  block-size: 1.6rem;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--card);
+  color: var(--muted-foreground);
+  cursor: pointer;
+}
+
+.icon-action:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* --- the glyph tile every provider carries ------------------------------------------------------------ */
+.glyph {
+  display: grid;
+  flex: none;
+  place-items: center;
+  inline-size: 2rem;
+  block-size: 2rem;
+  border-radius: var(--radius-md);
+  background: var(--muted);
+  color: var(--foreground-strong);
+  font-size: var(--text-4xs);
+  font-weight: 700;
+}
+
+.glyph.small {
+  inline-size: 1.4rem;
+  block-size: 1.4rem;
+}
+
+/* --- the sign-in preview -------------------------------------------------------------------------------- */
+.preview {
+  display: grid;
+  gap: var(--spacing-tight);
+  padding: var(--spacing-field);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-lg);
+}
+
+.preview-heading {
+  margin: 0 0 var(--spacing-tight);
+  color: var(--foreground-strong);
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.preview-button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-tight);
+  padding: 0.45rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--card);
+  font-size: var(--text-3xs);
+}
+
+.preview-or {
+  margin: var(--spacing-tight) 0 0;
+  color: var(--foreground-subtle);
+  font-size: var(--text-4xs);
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.preview-field {
+  padding: 0.45rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--input);
+  color: var(--foreground-subtle);
+  font-size: var(--text-3xs);
+}
+
+/* --- the type chooser ----------------------------------------------------------------------------------- */
+.presets {
+  display: grid;
+  gap: var(--spacing-tight);
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+}
+
+.preset {
+  display: grid;
+  gap: 0.2rem;
+  justify-items: start;
+  padding: var(--spacing-field);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--card);
+  color: var(--foreground);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.preset:hover:not(.disabled) {
+  border-color: var(--primary);
+}
+
+.preset.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.preset-name {
+  color: var(--foreground-strong);
+  font-weight: 600;
+}
+
+.preset-meta {
+  color: var(--muted-foreground);
+  font-size: var(--text-4xs);
+}
+
+/* --- the form ------------------------------------------------------------------------------------------ */
+.form {
+  display: grid;
+  gap: var(--spacing-group);
+}
+
+.pair {
+  display: grid;
+  gap: var(--spacing-group);
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+}
+
+.readonly-note {
+  margin: 0;
+  color: var(--foreground-subtle);
+  font-size: var(--text-3xs);
+}
+
+.group-label {
+  margin: 0;
+  color: var(--foreground-subtle);
+  font-size: var(--text-4xs);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.roles {
+  display: grid;
+  gap: var(--spacing-tight);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-tight) var(--spacing-field);
+}
+
+.test {
+  display: grid;
+  gap: var(--spacing-tight);
+  justify-items: start;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-tight);
+}
+
+.grow {
+  flex: 1;
+}

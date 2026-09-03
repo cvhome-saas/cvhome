@@ -35,9 +35,12 @@ import com.asrevo.cvhome.uaa.dto.ResetUserPasswordRequest;
 import com.asrevo.cvhome.uaa.dto.UpdateUserRequest;
 import com.asrevo.cvhome.uaa.dto.UserCounts;
 import com.asrevo.cvhome.uaa.dto.UserDto;
+import com.asrevo.cvhome.uaa.dto.UserIdentityDto;
 import com.asrevo.cvhome.uaa.dto.UserSearch;
 import com.asrevo.cvhome.uaa.errors.EmailTakenException;
+import com.asrevo.cvhome.uaa.errors.IdentityNotFoundException;
 import com.asrevo.cvhome.uaa.errors.InvitationNotUsableException;
+import com.asrevo.cvhome.uaa.errors.LastCredentialException;
 import com.asrevo.cvhome.uaa.errors.PasswordCompromisedException;
 import com.asrevo.cvhome.uaa.errors.PasswordPolicyViolationException;
 import com.asrevo.cvhome.uaa.errors.PasswordReusedException;
@@ -48,6 +51,7 @@ import com.asrevo.cvhome.uaa.errors.SuperAdminImmutableException;
 import com.asrevo.cvhome.uaa.errors.UserNotFoundException;
 import com.asrevo.cvhome.uaa.errors.UserNotPendingException;
 import com.asrevo.cvhome.uaa.errors.UsernameTakenException;
+import com.asrevo.cvhome.uaa.idp.UserIdentityService;
 import com.asrevo.cvhome.uaa.invitation.InvitationService;
 import com.asrevo.cvhome.uaa.invitation.PasswordResetService;
 import com.asrevo.cvhome.uaa.service.AdminService;
@@ -82,6 +86,8 @@ public class AdminUserController {
     private final InvitationService invitations;
 
     private final PasswordResetService resets;
+
+    private final UserIdentityService userIdentities;
 
     private static Map<String, String> extractMetadataFilters(Map<String, String> allParams) {
         Map<String, String> metadataFilters = new HashMap<>();
@@ -257,6 +263,21 @@ public class AdminUserController {
     public void removeRoles(@PathVariable UUID id, @RequestBody Set<String> roles)
             throws UserNotFoundException, SuperAdminImmutableException {
         adminService.removeRoles(id, roles);
+    }
+
+    /** The account's linked external identities. */
+    @PreAuthorize(ADMIN)
+    @GetMapping("/{id}/identities")
+    public List<UserIdentityDto> identities(@PathVariable UUID id) throws UserNotFoundException {
+        return userIdentities.list(adminService.getUser(id).id());
+    }
+
+    /** Unlinks one; refused when it is the account's only credential. */
+    @PreAuthorize(ADMIN)
+    @DeleteMapping("/{id}/identities/{identityId}")
+    public void unlinkIdentity(@PathVariable UUID id, @PathVariable UUID identityId)
+            throws UserNotFoundException, SuperAdminImmutableException, IdentityNotFoundException, LastCredentialException {
+        userIdentities.unlink(adminService.getNonSuperAdmin(id), identityId);
     }
 
     @PreAuthorize(ADMIN)

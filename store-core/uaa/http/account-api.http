@@ -56,3 +56,11 @@ Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
 ### a service token — 403 UAA.AUTH.NOT_A_USER_PRINCIPAL
 GET {{SELLER_UI_URL}}/uaa/api/v1/account/sessions
 Authorization: Bearer {{S2S_TOKEN}}
+
+### the external logins linked to this account — 200 UserIdentityDto[]
+GET {{SELLER_UI_URL}}/uaa/api/v1/account/identities
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+### unlink one — 200; 422 UAA.IDENTITY.LAST_CREDENTIAL when the account has no password and no other identity
+DELETE {{SELLER_UI_URL}}/uaa/api/v1/account/identities/{{IDENTITY_ID}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}

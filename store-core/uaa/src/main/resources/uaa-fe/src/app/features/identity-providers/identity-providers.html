@@ -1,0 +1,237 @@
+<ng-container *transloco="let t">
+  <app-page-header [title]="t('idps.title')" [context]="t('idps.context')" />
+
+  @if (facade.error(); as failure) {
+    <app-load-error [message]="failure.message" (retry)="facade.reload()" />
+  }
+
+  <app-busy-overlay reserve="page" [busy]="facade.isLoading()" [label]="t('idps.loading')">
+    @if (!facade.error()) {
+      <div class="layout">
+        <app-panel [title]="t('idps.panel.title')" [subtitle]="t('idps.panel.subtitle')">
+          <button panelAction class="primary-action" type="button" (click)="facade.startAdd()">
+            {{ t('idps.action.add') }}
+          </button>
+
+          @if (facade.rows().length) {
+            <app-data-table [columns]="columns(t)" [label]="t('idps.panel.title')">
+              @for (provider of facade.rows(); track provider.id; let first = $first; let last = $last) {
+                <app-table-row class="row" [interactive]="true" [class.off]="!provider.enabled" (click)="open($event, provider)">
+                  <span class="cell provider" [attr.data-label]="t('idps.column.provider')">
+                    <span class="glyph" aria-hidden="true">{{ glyph(provider.preset) }}</span>
+                    <span class="identity">
+                      <strong>{{ provider.displayName }}</strong>
+                      <span class="alias latin">{{ provider.alias }}</span>
+                    </span>
+                  </span>
+                  <span class="cell" [attr.data-label]="t('idps.column.protocol')">
+                    <app-badge tone="slate">{{ provider.type === 'OIDC' ? 'OIDC' : 'OAuth 2.0' }}</app-badge>
+                  </span>
+                  <span class="cell muted" [attr.data-label]="t('idps.column.policy')">{{ policy(provider, t) }}</span>
+                  <span class="cell status" [attr.data-label]="t('idps.column.status')">
+                    <app-toggle
+                      [checked]="provider.enabled"
+                      [label]="t(provider.enabled ? (provider.hideOnLogin ? 'idps.status.hidden' : 'idps.status.enabled') : 'idps.status.disabled')"
+                      (checkedChange)="facade.toggleEnabled(provider)"
+                    />
+                  </span>
+                  <span class="cell order" [attr.data-label]="t('idps.column.order')">
+                    <button class="icon-action" type="button" [disabled]="first || facade.busy()" [attr.aria-label]="t('idps.action.up')" (click)="facade.move(provider, -1)">
+                      <app-icon name="arrowUp" [size]="14" />
+                    </button>
+                    <button class="icon-action" type="button" [disabled]="last || facade.busy()" [attr.aria-label]="t('idps.action.down')" (click)="facade.move(provider, 1)">
+                      <app-icon name="arrowDown" [size]="14" />
+                    </button>
+                  </span>
+                </app-table-row>
+              }
+            </app-data-table>
+          } @else if (!facade.isLoading()) {
+            <app-empty-state icon="signIn" [title]="t('idps.empty.title')" [message]="t('idps.empty.message')" />
+          }
+        </app-panel>
+
+        <!-- What the sign-in page draws, in this order, from the enabled and not-hidden providers. -->
+        <app-panel padded [title]="t('idps.preview.title')" [subtitle]="t('idps.preview.subtitle')">
+          <div class="preview">
+            <p class="preview-heading">{{ t('idps.preview.heading') }}</p>
+            @for (provider of facade.preview(); track provider.id) {
+              <span class="preview-button">
+                <span class="glyph small" aria-hidden="true">{{ glyph(provider.preset) }}</span>
+                {{ t('idps.preview.continueWith', {name: provider.displayName}) }}
+              </span>
+            } @empty {
+              <p class="muted">{{ t('idps.preview.none') }}</p>
+            }
+            <p class="preview-or">{{ t('idps.preview.or') }}</p>
+            <span class="preview-field">{{ t('idps.preview.email') }}</span>
+          </div>
+        </app-panel>
+      </div>
+    }
+  </app-busy-overlay>
+
+  <!-- Step one: what kind of provider. Social and well-known first, then the standards-based ones. SAML is not built. -->
+  @if (facade.choosingType()) {
+    <app-form-dialog open wide [title]="t('idps.choose.title')" [description]="t('idps.choose.subtitle')" [closeLabel]="t('shared.actions.cancel')" (dismissed)="facade.dismiss()">
+      <div class="presets">
+        @for (preset of facade.presets(); track preset.preset) {
+          <button class="preset" type="button" (click)="facade.choose(preset)">
+            <span class="glyph" aria-hidden="true">{{ glyph(preset.preset) }}</span>
+            <span class="preset-name">{{ preset.displayName }}</span>
+            <span class="preset-meta">{{ preset.type === 'OIDC' ? 'OIDC' : 'OAuth 2.0' }}@if (!preset.verified) { · {{ t('idps.choose.unverified') }} }</span>
+          </button>
+        }
+        <div class="preset disabled" [title]="t('idps.choose.samlHint')">
+          <span class="glyph" aria-hidden="true">S</span>
+          <span class="preset-name">SAML 2.0</span>
+          <span class="preset-meta">{{ t('idps.choose.notBuilt') }}</span>
+        </div>
+      </div>
+    </app-form-dialog>
+  }
+
+  @if (facade.editing(); as target) {
+    <app-form-dialog
+      open
+      wide
+      [title]="target === 'new' ? t('idps.form.createTitle', {name: facade.preset()?.displayName ?? ''}) : target.displayName"
+      [description]="t('idps.form.subtitle')"
+      [closeLabel]="t('shared.actions.cancel')"
+      (dismissed)="facade.dismiss()"
+    >
+      <form class="form" [formGroup]="facade.form" (ngSubmit)="facade.save()">
+        <app-tab-switcher [tabs]="sections(t)" [active]="facade.section()" [label]="t('idps.form.sections')" (activeChange)="facade.section.set($any($event))" />
+
+        @if (facade.section() === 'connection') {
+          <div class="pair">
+            <app-form-field controlId="idp-name" [label]="t('idps.form.displayName')" [control]="facade.form.controls.displayName">
+              <app-text-field formControlName="displayName" id="idp-name" />
+            </app-form-field>
+            <app-form-field controlId="idp-alias" required [label]="t('idps.form.alias')" [hint]="t('idps.form.aliasHint')" [control]="facade.form.controls.alias">
+              <app-text-field formControlName="alias" id="idp-alias" latin mono />
+            </app-form-field>
+          </div>
+
+          <app-copy-field [value]="facade.redirectUri()" [label]="t('idps.form.redirectUri')" />
+          <p class="readonly-note">{{ t('idps.form.redirectHint') }}</p>
+
+          <div class="pair">
+            <app-form-field controlId="idp-client-id" required [label]="t('idps.form.clientId')" [control]="facade.form.controls.clientId">
+              <app-text-field formControlName="clientId" id="idp-client-id" latin mono />
+            </app-form-field>
+            <app-form-field
+              controlId="idp-client-secret"
+              [label]="t('idps.form.clientSecret')"
+              [hint]="target !== 'new' && target.hasClientSecret ? t('idps.form.secretStored') : t('idps.form.secretHint')"
+              [control]="facade.form.controls.clientSecret"
+            >
+              <app-text-field formControlName="clientSecret" id="idp-client-secret" type="password" autocomplete="new-password" latin mono />
+            </app-form-field>
+          </div>
+
+          @if (facade.preset()?.generic) {
+            <app-notice-bar icon="info" tone="blue" [message]="t(facade.preset()?.needsIssuer ? 'idps.form.issuerNote' : 'idps.form.endpointsNote')" />
+            <app-form-field controlId="idp-issuer" [label]="t('idps.form.issuerUri')" [hint]="t('idps.form.issuerHint')" [control]="facade.form.controls.issuerUri">
+              <app-text-field formControlName="issuerUri" id="idp-issuer" latin mono />
+            </app-form-field>
+            <div class="pair">
+              <app-form-field controlId="idp-auth" [label]="t('idps.form.authorizationUri')" [control]="facade.form.controls.authorizationUri">
+                <app-text-field formControlName="authorizationUri" id="idp-auth" latin mono />
+              </app-form-field>
+              <app-form-field controlId="idp-token" [label]="t('idps.form.tokenUri')" [control]="facade.form.controls.tokenUri">
+                <app-text-field formControlName="tokenUri" id="idp-token" latin mono />
+              </app-form-field>
+              <app-form-field controlId="idp-userinfo" [label]="t('idps.form.userInfoUri')" [control]="facade.form.controls.userInfoUri">
+                <app-text-field formControlName="userInfoUri" id="idp-userinfo" latin mono />
+              </app-form-field>
+              <app-form-field controlId="idp-jwks" [label]="t('idps.form.jwkSetUri')" [control]="facade.form.controls.jwkSetUri">
+                <app-text-field formControlName="jwkSetUri" id="idp-jwks" latin mono />
+              </app-form-field>
+            </div>
+          }
+
+          <div class="pair">
+            <app-form-field controlId="idp-scopes" [label]="t('idps.form.scopes')" [hint]="t('idps.form.scopesHint')" [control]="facade.form.controls.scopes">
+              <app-text-field formControlName="scopes" id="idp-scopes" latin mono />
+            </app-form-field>
+            <app-form-field controlId="idp-auth-method" [label]="t('idps.form.clientAuth')">
+              <app-select id="idp-auth-method" formControlName="clientAuthMethod" clearable [options]="facade.authMethodOptions" [placeholder]="t('idps.form.presetDefault')" />
+            </app-form-field>
+          </div>
+          @if (facade.preset()?.type === 'OAUTH2') {
+            <app-form-field controlId="idp-username-attr" [label]="t('idps.form.userNameAttribute')" [hint]="t('idps.form.userNameAttributeHint')" [control]="facade.form.controls.userNameAttribute">
+              <app-text-field formControlName="userNameAttribute" id="idp-username-attr" latin mono />
+            </app-form-field>
+          }
+
+          @if (target !== 'new') {
+            <div class="test">
+              <button class="secondary-action" type="button" [disabled]="facade.busy()" (click)="facade.test()">
+                {{ t('idps.form.test') }}
+              </button>
+              @if (facade.testResult(); as result) {
+                <app-notice-bar [icon]="result.ok ? 'checkCircle' : 'alertCircle'" [tone]="result.ok ? 'green' : 'red'"
+                  [message]="result.ok ? t('idps.form.testOk', {url: result.checked, issuer: result.discoveredIssuer ?? '—'}) : t('idps.form.testFailed', {detail: result.detail})" />
+              }
+            </div>
+          }
+        }
+
+        @if (facade.section() === 'mapping') {
+          <p class="readonly-note">{{ t('idps.form.mappingHint') }}</p>
+          <app-pair-list
+            [array]="facade.form.controls.attributeMapping"
+            [label]="t('idps.form.mapping')"
+            (add)="facade.addMapping()"
+            (remove)="facade.removeMapping($event)"
+          />
+          <div class="roles">
+            <p class="group-label">{{ t('idps.form.defaultRoles') }}</p>
+            <p class="readonly-note">{{ t('idps.form.defaultRolesHint') }}</p>
+            <div class="chips">
+              @for (role of facade.roleOptions(); track role) {
+                <app-checkbox [checked]="facade.draftRoles().includes(role)" [label]="role" (checkedChange)="facade.toggleRole(role)" />
+              }
+            </div>
+          </div>
+        }
+
+        @if (facade.section() === 'behaviour') {
+          <app-form-field controlId="idp-linking" [label]="t('idps.form.linking')" [hint]="t('idps.form.linkingHint')">
+            <app-select id="idp-linking" formControlName="accountLinking" [options]="facade.linkingOptions()" />
+          </app-form-field>
+          <app-toggle formControlName="jitProvisioning" [label]="t('idps.form.jit')" [description]="t('idps.form.jitHint')" />
+          <app-toggle formControlName="trustEmailVerified" [label]="t('idps.form.trustEmail')" [description]="t('idps.form.trustEmailHint')" />
+          <app-toggle formControlName="hideOnLogin" [label]="t('idps.form.hide')" [description]="t('idps.form.hideHint')" />
+          <app-form-field controlId="idp-domains" [label]="t('idps.form.domains')" [hint]="t('idps.form.domainsHint')" [control]="facade.form.controls.emailDomains">
+            <app-text-field formControlName="emailDomains" id="idp-domains" latin />
+          </app-form-field>
+        }
+
+        <div class="actions">
+          @if (target !== 'new') {
+            <button class="danger-action" type="button" (click)="facade.askDelete(target)">{{ t('idps.action.delete') }}</button>
+          }
+          <div class="grow"></div>
+          <button class="secondary-action" type="button" (click)="facade.dismiss()">{{ t('shared.actions.cancel') }}</button>
+          <button class="primary-action" type="submit" [disabled]="facade.busy()">
+            {{ facade.busy() ? t('idps.form.saving') : t('idps.form.save') }}
+          </button>
+        </div>
+      </form>
+    </app-form-dialog>
+  }
+
+  <app-confirm-dialog
+    [open]="!!facade.deleting()"
+    [title]="t('idps.delete.title')"
+    [message]="t('idps.delete.message', {name: facade.deleting()?.displayName ?? ''})"
+    [confirmationText]="facade.deleting()?.alias ?? null"
+    [confirmationLabel]="t('idps.delete.confirmationLabel')"
+    [confirmLabel]="t('idps.action.delete')"
+    [cancelLabel]="t('shared.actions.cancel')"
+    (confirmed)="facade.confirmDelete()"
+    (dismissed)="facade.dismiss()"
+  />
+</ng-container>

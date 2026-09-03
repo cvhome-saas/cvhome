@@ -4,6 +4,7 @@ import {Observable} from 'rxjs';
 import {CrudService, UI_KIT_CONFIG} from '@cvhome-saas/ui-kit';
 
 import type {SessionSummary} from './uaa.models';
+import type {UserIdentityDto} from './admin-idp.service';
 
 /**
  * What a signed-in person may do to their own account: change the password, see and end their sessions.
@@ -34,6 +35,16 @@ export class AccountService {
 
   revokeSession(sessionId: string): Observable<void> {
     return this.crudService.delete(`${this.base}/sessions/${sessionId}`);
+  }
+
+  /** The external logins linked to this account. */
+  identities(): Observable<readonly UserIdentityDto[]> {
+    return this.crudService.get(`${this.base}/identities`);
+  }
+
+  /** Unlinks one; 422 `LAST_CREDENTIAL` when it is the only way to sign in. */
+  unlinkIdentity(identityId: string): Observable<void> {
+    return this.crudService.delete(`${this.base}/identities/${identityId}`);
   }
 
   /** Ends every session but this one. */

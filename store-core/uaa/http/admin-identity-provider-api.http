@@ -1,0 +1,105 @@
+# AdminIdentityProviderController — com.asrevo.cvhome.uaa.web.admin
+#
+# External logins brokered through uaa. A provider's alias is Spring's registration id and the last
+# segment of the redirect URI to register at the provider (`redirectUri` in every read). The client
+# secret is never in a response — only `hasClientSecret`. Addressed through store-core-gateway.
+#
+# Behind SCOPE_super_admin / ROLE_SUPER_ADMIN. Requires a running stack: lcl start -d
+
+### the presets the type chooser offers — 200 IdpPresetDto[]
+GET {{SELLER_UI_URL}}/uaa/api/v1/admin/identity-providers/presets
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+
+### list — 200 IdentityProviderDto[] in sign-in order
+GET {{SELLER_UI_URL}}/uaa/api/v1/admin/identity-providers
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+
+### add a Google login — 201
+# Every endpoint comes from the preset; only the alias, the credentials and the behaviour are yours.
+# @name createIdp
+POST {{SELLER_UI_URL}}/uaa/api/v1/admin/identity-providers
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{
+  "alias": "google",
+  "preset": "GOOGLE",
+  "displayName": "Google",
+  "clientId": "your-client-id.apps.googleusercontent.com",
+  "clientSecret": "your-client-secret",
+  "emailDomains": ["example.com"],
+  "accountLinking": "CONFIRM",
+  "jitProvisioning": true,
+  "defaultRoles": ["USER"],
+  "trustEmailVerified": true
+}
+
+> {%
+    client.test("created", function () {
+        client.assert(response.status === 201, "status " + response.status);
+        client.assert(!("clientSecret" in response.body), "secret in response");
+        client.global.set("IDP_ID", response.body.id);
+    });
+%}
+
+### read it — 200; `redirectUri` is what to register at Google
+GET {{SELLER_UI_URL}}/uaa/api/v1/admin/identity-providers/{{IDP_ID}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+
+### a generic OpenID Connect provider with only an issuer — 201; the endpoints are discovered when first used
+POST {{SELLER_UI_URL}}/uaa/api/v1/admin/identity-providers
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{"alias": "corp", "preset": "GENERIC_OIDC", "displayName": "Corp SSO", "clientId": "uaa", "clientSecret": "s",
+ "issuerUri": "https://accounts.google.com", "accountLinking": "LINK", "jitProvisioning": false}
+
+### a generic OAuth2 provider with no token endpoint — 400 UAA.IDP.CONFIG_INVALID on `issuerUri`
+POST {{SELLER_UI_URL}}/uaa/api/v1/admin/identity-providers
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{"alias": "broken", "preset": "GENERIC_OAUTH2", "clientId": "x", "clientSecret": "y"}
+
+### the same alias twice — 409 UAA.IDP.ALIAS_TAKEN, fieldErrors[0].field == alias
+POST {{SELLER_UI_URL}}/uaa/api/v1/admin/identity-providers
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{"alias": "google", "preset": "GOOGLE", "clientId": "x", "clientSecret": "y"}
+
+### update — 200; a blank clientSecret keeps the stored one
+PUT {{SELLER_UI_URL}}/uaa/api/v1/admin/identity-providers/{{IDP_ID}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{"alias": "google", "preset": "GOOGLE", "displayName": "Google Workspace", "clientId": "your-client-id.apps.googleusercontent.com",
+ "hideOnLogin": false, "emailDomains": ["example.com", "eng.example.com"], "accountLinking": "CONFIRM",
+ "jitProvisioning": true, "defaultRoles": ["USER"]}
+
+### test it — 200 IdpTestResult, or 502 UAA.IDP.DISCOVERY_FAILED carrying `provider` when it does not answer
+POST {{SELLER_UI_URL}}/uaa/api/v1/admin/identity-providers/{{IDP_ID}}/test
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+
+### disable / enable — 200; a disabled provider is no button and no registration
+POST {{SELLER_UI_URL}}/uaa/api/v1/admin/identity-providers/{{IDP_ID}}/disable
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+
+###
+POST {{SELLER_UI_URL}}/uaa/api/v1/admin/identity-providers/{{IDP_ID}}/enable
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+
+### the sign-in page's order — 200, a bare array of aliases
+PUT {{SELLER_UI_URL}}/uaa/api/v1/admin/identity-providers/order
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+["corp", "google"]
+
+### as a non-super-admin — 403
+GET {{SELLER_UI_URL}}/uaa/api/v1/admin/identity-providers
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+### delete — 200
+DELETE {{SELLER_UI_URL}}/uaa/api/v1/admin/identity-providers/{{IDP_ID}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}

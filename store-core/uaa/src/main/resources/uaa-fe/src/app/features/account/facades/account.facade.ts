@@ -5,7 +5,7 @@ import {TranslocoService} from '@jsverse/transloco';
 import {ApiErrorService, AuthService, snapshot} from '@cvhome-saas/ui-kit';
 import {passwordsMatch} from '@cvhome-saas/ui-kit/forms';
 import {ToastService} from '@cvhome-saas/ui-kit/ui';
-import {AccountService, type SessionSummary} from '@cvhome-saas/ui-kit/uaa';
+import {AccountService, type SessionSummary, type UserIdentityDto} from '@cvhome-saas/ui-kit/uaa';
 
 /**
  * The signed-in person's own account: who they are, their sessions, and a password change.
@@ -44,6 +44,34 @@ export class AccountFacade {
   readonly sessionsError = this.sessionList.error;
   readonly reloadSessions = () => this.sessionList.reload();
   readonly others = computed(() => this.sessions().filter((s) => !s.current).length);
+
+  /** The external logins linked to this account, and the one thing a person may do to one. */
+  private readonly identityList = snapshot(
+    () => ({}),
+    () => this.account.identities(),
+  );
+
+  readonly identities = computed<readonly UserIdentityDto[]>(() => this.identityList.value() ?? []);
+  readonly identitiesLoading = this.identityList.isLoading;
+
+  /**
+   * Unlinks a provider. uaa refuses when it is the account's only way in — no password and no other identity — and
+   * that refusal is rendered rather than predicted: which credentials an account has is uaa's to know.
+   */
+  unlink(identity: UserIdentityDto): void {
+    this.busy.set(true);
+    this.account.unlinkIdentity(identity.id).subscribe({
+      next: () => {
+        this.busy.set(false);
+        this.toast.success(this.transloco.translate('account.identities.toast.unlinked', {name: identity.providerName ?? ''}));
+        this.identityList.reload();
+      },
+      error: (failure: unknown) => {
+        this.busy.set(false);
+        this.apiErrors.notify(failure);
+      },
+    });
+  }
 
   changePassword(): void {
     if (this.form.invalid) {

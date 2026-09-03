@@ -201,3 +201,81 @@
   font-size: var(--text-xs);
   line-height: 1.6;
 }
+
+/* --- identity-first: the provider buttons, the divider and the identity chip --------------------------- */
+.client {
+  margin: 0 0 var(--spacing-group);
+  color: var(--muted-foreground);
+  font-size: var(--text-xs);
+}
+
+.providers {
+  display: grid;
+  gap: var(--spacing-tight);
+  margin-block-end: var(--spacing-group);
+}
+
+.provider {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-tight);
+  padding: 0.6rem 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--card);
+  color: var(--foreground-strong);
+  font-size: var(--text-sm);
+  text-decoration: none;
+}
+
+.provider:hover {
+  border-color: var(--primary);
+}
+
+.glyph {
+  display: grid;
+  flex: none;
+  place-items: center;
+  inline-size: 1.6rem;
+  block-size: 1.6rem;
+  border-radius: var(--radius-md);
+  background: var(--muted);
+  font-size: var(--text-4xs);
+  font-weight: 700;
+}
+
+.or {
+  margin: 0 0 var(--spacing-group);
+  color: var(--foreground-subtle);
+  font-size: var(--text-4xs);
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.identity-chip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-tight);
+  margin: 0 0 var(--spacing-group);
+  padding: 0.45rem 0.65rem;
+  border-radius: var(--radius-md);
+  background: var(--muted);
+  font-size: var(--text-xs);
+}
+
+.chip-email {
+  overflow-wrap: anywhere;
+  color: var(--foreground-strong);
+  unicode-bidi: plaintext;
+}
+
+.link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--primary);
+  font: inherit;
+  font-size: var(--text-3xs);
+  cursor: pointer;
+}

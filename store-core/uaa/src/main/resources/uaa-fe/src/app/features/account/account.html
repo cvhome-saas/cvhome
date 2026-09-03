@@ -22,6 +22,30 @@
       </form>
     </app-panel>
 
+    <!-- The external logins that can sign this account in, and the one thing its owner may do to one. -->
+    <app-panel padded [title]="t('account.identities.title')" [subtitle]="t('account.identities.subtitle')">
+      <app-busy-overlay reserve="panel" [busy]="facade.identitiesLoading()" [label]="t('account.identities.loading')">
+        @if (facade.identities().length) {
+          <ul class="identities">
+            @for (identity of facade.identities(); track identity.id) {
+              <li class="identity">
+                <span class="identity-main">
+                  <strong>{{ identity.providerName || identity.providerAlias }}</strong>
+                  <span class="identity-meta latin">{{ identity.email || identity.subject }}</span>
+                  <span class="identity-meta">{{ t('account.identities.since', {when: when(identity.linkedAt)}) }}</span>
+                </span>
+                <button class="link danger" type="button" [disabled]="facade.busy()" (click)="facade.unlink(identity)">
+                  {{ t('account.identities.unlink') }}
+                </button>
+              </li>
+            }
+          </ul>
+        } @else {
+          <p class="muted">{{ t('account.identities.none') }}</p>
+        }
+      </app-busy-overlay>
+    </app-panel>
+
     <app-panel padded [title]="t('account.sessions.title')" [subtitle]="t('account.sessions.subtitle')">
       @if (facade.others() > 0) {
         <button panelAction class="danger-action" type="button" (click)="facade.revokeOthers()">

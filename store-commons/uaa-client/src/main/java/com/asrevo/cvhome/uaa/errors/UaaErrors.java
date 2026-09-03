@@ -133,7 +133,31 @@ public enum UaaErrors implements ErrorCode {
     SIGNING_KEY_UNUSABLE("UAA.KEY.UNUSABLE", ErrorCategory.INTERNAL),
 
     /** No signing key is active and a new one could not be made, so no token can be minted. */
-    NO_ACTIVE_SIGNING_KEY("UAA.KEY.NO_ACTIVE", ErrorCategory.INTERNAL);
+    NO_ACTIVE_SIGNING_KEY("UAA.KEY.NO_ACTIVE", ErrorCategory.INTERNAL),
+
+    /** No identity provider exists with the given id or alias. */
+    IDP_NOT_FOUND("UAA.IDP.NOT_FOUND", ErrorCategory.NOT_FOUND),
+
+    /** Another provider already uses that alias, which is the registration id in every redirect URI. */
+    IDP_ALIAS_TAKEN("UAA.IDP.ALIAS_TAKEN", ErrorCategory.CONFLICT),
+
+    /** The provider's settings are incomplete for its type: a generic OAuth2 provider with no token endpoint, say. */
+    IDP_CONFIG_INVALID("UAA.IDP.CONFIG_INVALID", ErrorCategory.VALIDATION),
+
+    /** The provider's discovery document or endpoints could not be reached. Carries the provider. */
+    IDP_DISCOVERY_FAILED("UAA.IDP.DISCOVERY_FAILED", ErrorCategory.REMOTE_SERVICE),
+
+    /** No linked identity with the given id on that account. */
+    IDENTITY_NOT_FOUND("UAA.IDENTITY.NOT_FOUND", ErrorCategory.NOT_FOUND),
+
+    /** That external identity is already linked to another account. */
+    IDENTITY_ALREADY_LINKED("UAA.IDENTITY.ALREADY_LINKED", ErrorCategory.CONFLICT),
+
+    /** Unlinking would leave a password-less account with no way to sign in. */
+    LAST_CREDENTIAL("UAA.IDENTITY.LAST_CREDENTIAL", ErrorCategory.UNPROCESSABLE),
+
+    /** No brokered login is waiting to be confirmed, or the password given for it was wrong. */
+    LINK_CONFIRMATION_INVALID("UAA.IDENTITY.LINK_CONFIRMATION_INVALID", ErrorCategory.VALIDATION);
 
     private final String code;
 

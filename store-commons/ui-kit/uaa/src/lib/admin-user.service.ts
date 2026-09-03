@@ -18,6 +18,7 @@ import type {
   UserDto,
   UserSearch,
 } from './uaa.models';
+import type {UserIdentityDto} from './admin-idp.service';
 
 /**
  * uaa's own user administration, addressed directly rather than through tenancy.
@@ -190,6 +191,16 @@ export class AdminUserService {
 
   assignableRoles(): Observable<string[]> {
     return this.crudService.get(`${this.base}/assignable-roles`);
+  }
+
+  /** The account's linked external identities. */
+  identities(id: string): Observable<readonly UserIdentityDto[]> {
+    return this.crudService.get(`${this.base}/${id}/identities`);
+  }
+
+  /** Unlinks one; 422 `LAST_CREDENTIAL` when it is the account's only way to sign in. */
+  unlinkIdentity(id: string, identityId: string): Observable<void> {
+    return this.crudService.delete(`${this.base}/${id}/identities/${identityId}`);
   }
 
   /** Marks the address verified without a round trip through the person — an operator vouching for it. */

@@ -11,7 +11,7 @@ somewhere else entirely — that is [cua](../../../store-pod/cua/qa/cua-qa.md).
   is where the platform's sign-in page lives
 - **Runs on** — `lcl start -d --stack <name>`; uaa is `http://uaa.gateway.com:8001` and is the **first**
   service the stack brings up, because it issues the tokens. Read the live port from `lcl urls`
-- **Cases** — 115 (89 verified, 11 unit only, 15 not verified)
+- **Cases** — 122 (94 verified, 13 unit only, 15 not verified)
 - **Also see** — [gateway](../../gateway/gateway-service/qa/gateway-qa.md) (which relays the token and holds
   the session), [tenancy](../../tenancy/tenancy-service/qa/tenancy-qa.md) (which owns the *store-scoped*
   accounts and calls uaa to create them),
@@ -1242,6 +1242,74 @@ server knows to refetch the JWKS. `http/admin-key-api.http` runs every call belo
 
 ---
 
+## IDP — Identity providers and brokered logins
+
+A provider is a registration uaa brokers a login through: its `alias` is Spring's registration id and the last
+segment of the redirect URI to register at the provider, and its client id and secret are secret-crypto envelopes.
+`preset` fills the endpoints for a known provider; the generic ones take an issuer (discovered) or the endpoints by
+hand. A brokered login resolves to a local account by identity (provider + subject), then by email according to
+`accountLinking`, then — with `jitProvisioning` — by creating one. `http/admin-identity-provider-api.http` and
+`http/public-idp-api.http` run the calls.
+
+### IDP-01 — Register a provider, and it appears on the sign-in page · critical · [verified]
+
+- **Steps** — console → Identity providers → *Add provider* → Google. Alias `google`, a client id and secret, email
+  domain `example.com`, *Ask for the password once*, *Create new users* on. Save. Read `/login` in a private window.
+- **Expect** — 201; the row shows *OIDC* and the policy line; the preview panel and the real sign-in page both draw
+  *Continue with Google*; `GET /api/v1/public/idps` lists it. The detail dialog shows the redirect URI to register
+  (`…/login/oauth2/code/google`) with a copy button, `hasClientSecret` true and **no secret**; `select client_id_enc,
+  client_secret_enc from uaa.identity_providers` → both `ENC:`.
+- **Also** — the endpoints came from the preset: `authorizationUri` is Google's, scopes `openid profile email`.
+
+### IDP-02 — The authorization redirect is real, with PKCE · critical · [verified]
+
+- **Steps** — `curl -i http://uaa.gateway.com:8001/oauth2/authorization/google` (or press the button).
+- **Expect** — **302** to `https://accounts.google.com/o/oauth2/v2/auth` carrying `client_id`, `state`, `nonce`,
+  `code_challenge` and `code_challenge_method=S256`, and `redirect_uri` on uaa's pinned issuer. Typing an email first
+  adds `login_hint`. Apple is the one preset without PKCE (it uses `response_mode=form_post`); it is **[not verified]**
+  and needs a developer account.
+
+### IDP-03 — Test connection · [verified]
+
+- **Steps** — the provider's dialog → *Test connection*. Then break the issuer and test again.
+- **Expect** — *…/.well-known/openid-configuration answered. Issuer: https://accounts.google.com.* A provider that does
+  not answer is **502** `UAA.IDP.DISCOVERY_FAILED` carrying `provider`, rendered as *The provider did not answer*.
+
+### IDP-04 — A brokered login, end to end · critical · [unit only]
+
+- **Covered by** `BrokeredLoginIntegrationTest` against an in-process stub OIDC provider: a new person is provisioned
+  (username = email, default roles granted, `email_verified` from the provider), a second login reuses the identity,
+  an existing account confirms with its password once and is linked thereafter, `REJECT` refuses with
+  `idp_rejected`, and a disabled provider is no registration at all. Driving a real Google or GitHub app is
+  **[not verified]** — it needs credentials nobody has committed.
+- **What the person sees** — `link_required` is not an error page: the sign-in page shows *You already have an account
+  for … Enter its password once*, and posts to `/api/v1/auth/link-confirm`, which answers where to go.
+
+### IDP-05 — Home-realm discovery · high · [verified]
+
+- **Steps** — `POST /api/v1/public/idps/discover {"email": "someone@example.com"}`; then an address at a domain no
+  provider claims; then a provider hidden from the page.
+- **Expect** — the first answers the provider, the second `{"provider": null}`, the third still answers (hiding is
+  about the button, not about discovery). The longest matching domain wins, so `eng.example.com` beats `example.com`.
+  Nothing here says whether an account exists.
+
+### IDP-06 — The gate, and what a secret never does · critical · [verified]
+
+- **Steps** — every `/api/v1/admin/identity-providers` call as a `store_core` token and anonymously; read a provider
+  as super admin; register the same alias twice; register a generic OAuth2 provider with no endpoints.
+- **Expect** — **403** and **401**; a read never carries `clientSecret`; **409** `UAA.IDP.ALIAS_TAKEN` with the field;
+  **400** `UAA.IDP.CONFIG_INVALID` naming the missing field.
+
+### IDP-07 — Linked logins, and the last credential · high · [unit only]
+
+- **Steps** — `/account` → *Linked logins* → *Unlink*; then try it on an account that has no password and only that
+  identity.
+- **Expect** — the row disappears and that provider can no longer sign the person in; the second case is **422**
+  `UAA.IDENTITY.LAST_CREDENTIAL` — set a password first. An administrator has the same two calls under
+  `/users/{id}/identities`.
+
+---
+
 ## SID — The `"*"` wildcard
 
 _From `qa/unify-store-id-value-objects.md` §EDGE, reformatted into the case shape used everywhere else._
@@ -1291,6 +1359,9 @@ clients and accounts. Nothing in uaa carries an `alter table`.
 | The accept page's mismatch check was a `computed` over a reactive form | two different passwords submitted with no message, then the server's 400 | INV-05 |
 | The Users tiles and tabs translated once and never again | switching to Arabic left *ACCOUNTS* / *All 12* in English | CON-05 (the `computed`s read `activeLang()` first) |
 | The Users panel rendered its empty state under a 403 | a `USER`-role session saw *No accounts* beneath the error bar | CON-06 |
+| The CSRF cookie had no explicit path | a response from `/login/oauth2/code/…` minted a second `XSRF-TOKEN` scoped to that directory, and the next POST elsewhere sent the wrong one | IDP-04 (the repository now pins the cookie to `/`) |
+| The brokered-login failure handler saved the exception into the session | Spring Session JDBC could not serialise the HTTP response inside it: a refusal became a 500 | IDP-04 |
+| A provider's default role names were folded to lower case | `USER` was stored as `user`, matched no role, and every brokered login arrived with no roles | IDP-04 |
 | The grace-aware client-secret provider was a bean | Spring adopted the lone `AuthenticationProvider` bean as the global manager's provider: every form login failed and lockout stopped counting | AUT-02, LCK-01 (the provider is built inside the SAS chain, never a bean) |
 | Spring's provider saves an upgraded hash through the registry it was given | `UnsupportedOperationException` from the grace view's read-only `save` on the first token with a `{bcrypt}` strength-10 seed | CLI-03 (`SingleClientRepository.save` is a no-op) |
 
@@ -1321,6 +1392,15 @@ or carrying only the token hash plus a fetch is a follow-up for the delivery ser
 **The invitee's shell is empty.** A `USER`-role account that signs in to uaa's console reaches the shell and gets a
 403 bar on every admin screen (CON-06); `/account` is the only page it can use. A landing on `/account` for
 non-admins is a follow-up.
+
+**A brokered login never plants the CSRF cookie.** The OAuth2 redirects short-circuit before the filter that writes
+`XSRF-TOKEN`, so the confirmation POST works only after the browser has loaded `/login` — which it always does, because
+that is where the failure handler sends it. A client driving the flow by hand must fetch that page too (the integration
+test does).
+
+**Apple is scaffolded, not verified.** The preset carries the endpoints and `response_mode=form_post`, and takes the
+ES256 client-secret JWT as the stored secret rather than minting it from a `.p8` key. Nobody has run it against a
+developer account. SAML is not built at all, and the type chooser says so.
 
 **The signing keys' crypto key is the platform's LOCAL provider.** `common-config.yml` sets
 `com.asrevo.cvhome.crypto.type: LOCAL` with no key, which resolves ENV → FILE → *random per boot*. uaa's `lcl` and

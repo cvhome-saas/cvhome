@@ -229,3 +229,11 @@ Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
 ### delete it — 200
 DELETE {{SELLER_UI_URL}}/uaa/api/v1/admin/users/{{UAA_USER_ID}}
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+
+### an account's linked external identities — 200 UserIdentityDto[]
+GET {{SELLER_UI_URL}}/uaa/api/v1/admin/users/{{UAA_USER_ID}}/identities
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+
+### unlink one — 200; 422 UAA.IDENTITY.LAST_CREDENTIAL when it is the account's only credential
+DELETE {{SELLER_UI_URL}}/uaa/api/v1/admin/users/{{UAA_USER_ID}}/identities/{{IDENTITY_ID}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}

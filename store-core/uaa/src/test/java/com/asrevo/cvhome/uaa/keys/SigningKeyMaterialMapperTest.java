@@ -10,6 +10,7 @@ import com.asrevo.cvhome.crypto.EncryptedValue;
 import com.asrevo.cvhome.uaa.domain.SigningKey;
 import com.asrevo.cvhome.uaa.domain.SigningKeyStatus;
 import com.asrevo.cvhome.uaa.errors.SigningKeyUnusableException;
+import com.asrevo.cvhome.uaa.support.FakeCrypto;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.jwk.KeyUse;
 import com.nimbusds.jose.jwk.RSAKey;

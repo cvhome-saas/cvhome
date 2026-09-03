@@ -296,6 +296,55 @@ create table if not exists uaa.signing_keys
 
 create index if not exists idx_signing_keys_status on uaa.signing_keys (status);
 
+-- External logins brokered through uaa. The alias is Spring's registration id and the last path segment of the
+-- redirect URI registered at the provider; the client id and secret are secret-crypto envelopes. `type` is what the
+-- provider speaks; `preset` is which button the console drew it from and which defaults apply.
+create table if not exists uaa.identity_providers
+(
+    id                   uuid primary key,
+    alias                varchar(50)  not null unique,
+    display_name         varchar(100) not null,
+    type                 varchar(16)  not null check (type in ('OIDC', 'OAUTH2')),
+    preset               varchar(24)  not null
+        check (preset in ('GOOGLE', 'MICROSOFT', 'APPLE', 'GITHUB', 'GENERIC_OIDC', 'GENERIC_OAUTH2')),
+    enabled              boolean      not null default true,
+    hide_on_login        boolean      not null default false,
+    sort_order           integer      not null default 0,
+    client_id_enc        text         not null,
+    client_secret_enc    text,
+    issuer_uri           varchar(500),
+    authorization_uri    varchar(500),
+    token_uri            varchar(500),
+    user_info_uri        varchar(500),
+    jwk_set_uri          varchar(500),
+    scopes               varchar(500),
+    user_name_attribute  varchar(100),
+    client_auth_method   varchar(32)  not null default 'client_secret_basic',
+    email_domains        varchar(1000),
+    account_linking      varchar(16)  not null default 'CONFIRM' check (account_linking in ('LINK', 'CONFIRM', 'REJECT')),
+    jit_provisioning     boolean      not null default false,
+    default_roles        varchar(500),
+    trust_email_verified boolean      not null default true,
+    attribute_mapping    varchar(1000),
+    created_at           timestamptz  not null,
+    updated_at           timestamptz  not null
+);
+
+-- One row per (provider, subject): which external identity signs in as which account.
+create table if not exists uaa.user_identities
+(
+    id            uuid primary key,
+    user_id       uuid         not null references uaa.users (id) on delete cascade,
+    provider_id   uuid         not null references uaa.identity_providers (id) on delete cascade,
+    subject       varchar(255) not null,
+    email         varchar(255),
+    linked_at     timestamptz  not null,
+    last_login_at timestamptz,
+    unique (provider_id, subject)
+);
+
+create index if not exists idx_user_identities_user on uaa.user_identities (user_id);
+
 -- The transactional outbox (namastack), in uaa's own schema. Every event in uaa-events is a row here until its
 -- consumer has run; the starter's schema initialisation is off, so these are the only DDL for it.
 CREATE TABLE IF NOT EXISTS uaa.outbox_record

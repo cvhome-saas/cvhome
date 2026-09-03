@@ -69,3 +69,39 @@
   font-size: var(--text-3xs);
   cursor: pointer;
 }
+
+/* --- the linked external logins ----------------------------------------------------------------------- */
+.identities {
+  display: grid;
+  gap: var(--spacing-tight);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.identity {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-tight);
+  padding: 0.5rem 0.65rem;
+  border-radius: var(--radius-md);
+  background: var(--muted);
+  font-size: var(--text-3xs);
+}
+
+.identity-main {
+  display: grid;
+  min-inline-size: 0;
+}
+
+.identity-meta {
+  color: var(--muted-foreground);
+  overflow-wrap: anywhere;
+}
+
+.muted {
+  margin: 0;
+  color: var(--muted-foreground);
+  font-size: var(--text-3xs);
+}

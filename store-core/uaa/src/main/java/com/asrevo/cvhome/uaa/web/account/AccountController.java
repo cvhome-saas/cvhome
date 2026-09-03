@@ -2,6 +2,7 @@ package com.asrevo.cvhome.uaa.web.account;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -16,12 +17,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.asrevo.cvhome.uaa.dto.MeResponse;
+import com.asrevo.cvhome.uaa.dto.UserIdentityDto;
 import com.asrevo.cvhome.uaa.errors.CurrentPasswordMismatchException;
+import com.asrevo.cvhome.uaa.errors.IdentityNotFoundException;
+import com.asrevo.cvhome.uaa.errors.LastCredentialException;
 import com.asrevo.cvhome.uaa.errors.NotAUserPrincipalException;
 import com.asrevo.cvhome.uaa.errors.PasswordCompromisedException;
 import com.asrevo.cvhome.uaa.errors.PasswordPolicyViolationException;
 import com.asrevo.cvhome.uaa.errors.PasswordReusedException;
 import com.asrevo.cvhome.uaa.errors.SessionNotFoundException;
+import com.asrevo.cvhome.uaa.idp.UserIdentityService;
 import com.asrevo.cvhome.uaa.security.CurrentUserResolver;
 import com.asrevo.cvhome.uaa.service.AccountService;
 import com.asrevo.cvhome.uaa.session.SessionAdminService;
@@ -44,6 +49,8 @@ public class AccountController {
     private final AccountService account;
 
     private final SessionAdminService sessions;
+
+    private final UserIdentityService identities;
 
     @GetMapping("me")
     public MeResponse me(Authentication authentication) throws NotAUserPrincipalException {
@@ -69,6 +76,19 @@ public class AccountController {
     public void revokeSession(@PathVariable String sessionId, Authentication authentication)
             throws NotAUserPrincipalException, SessionNotFoundException {
         sessions.revoke(currentUser.resolve(authentication).getUsername(), sessionId);
+    }
+
+    /** The external logins linked to this account. */
+    @GetMapping("identities")
+    public List<UserIdentityDto> identities(Authentication authentication) throws NotAUserPrincipalException {
+        return identities.list(currentUser.resolve(authentication).getId());
+    }
+
+    /** Unlinks one; refused when it is the account's only way to sign in. */
+    @DeleteMapping("identities/{identityId}")
+    public void unlinkIdentity(@PathVariable UUID identityId, Authentication authentication)
+            throws NotAUserPrincipalException, IdentityNotFoundException, LastCredentialException {
+        identities.unlink(currentUser.resolve(authentication), identityId);
     }
 
     /** Ends every session but this one. */

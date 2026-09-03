@@ -50,6 +50,8 @@ MFA" rather than "we cannot tell".
 - **Partly closed by feat/uaa-sso (phase 2):** Settings is built (`/settings`, `GET/PUT
   /api/v1/admin/settings`). Dashboard, Audit log and Identity providers stay disabled until their
   phases.
+- **Closed by feat/uaa-sso (phase 7), for Identity providers:** the rail entry is a real route now. Dashboard and
+  Audit log are still disabled; they arrive with the audit query API.
 
 ## Users — no MFA state
 
@@ -183,6 +185,9 @@ MFA" rather than "we cannot tell".
 - **Partly closed by feat/uaa-sso (phase 3–4):** remember-me when the realm enables it, lockout and
   attempts-left states, and a "Forgot password?" that explains resets are issued by an administrator
   (there is no self-service reset, deliberately). Providers and MFA remain open.
+- **Closed by feat/uaa-sso (phase 7), for providers:** the page is identity-first — provider buttons, an email step
+  that asks uaa which realm the address belongs to, then the password with the identity shown above it. A brokered
+  login that matches an existing account confirms with that password once. Passkeys and MFA remain open.
 
 ## Clients — a custom setting's value is a string
 

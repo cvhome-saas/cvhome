@@ -1,4 +1,4 @@
-package com.asrevo.cvhome.uaa.keys;
+package com.asrevo.cvhome.uaa.support;
 
 import java.util.Arrays;
 
@@ -6,33 +6,33 @@ import com.asrevo.cvhome.crypto.EncryptedValue;
 import com.asrevo.cvhome.crypto.SecretCryptoProvider;
 
 /** XOR "encryption" with a switchable key, so a test can make a stored envelope unreadable by changing the key. */
-final class FakeCrypto implements SecretCryptoProvider {
+public final class FakeCrypto implements SecretCryptoProvider {
 
-    static final String ID = "FAKE";
+    public static final String ID = "FAKE";
 
     private byte key;
 
-    FakeCrypto(byte key) {
+    public FakeCrypto(byte key) {
         this.key = key;
     }
 
-    void rekey(byte newKey) {
+    public void rekey(byte newKey) {
         this.key = newKey;
     }
 
     @Override
     public EncryptedValue encrypt(byte[] plaintext) {
-        return EncryptedValue.builder().version(1).keyId("k").algorithm(ID).iv(new byte[0]).ciphertext(xor(plaintext)).build();
+        return EncryptedValue.builder().version(1).keyId(String.valueOf(key)).algorithm(ID).iv(new byte[0])
+                .ciphertext(xor(plaintext)).build();
     }
 
     @Override
     public byte[] decrypt(EncryptedValue encryptedValue) {
-        byte[] plain = xor(encryptedValue.getCiphertext());
-        // A wrong key yields bytes that are not JSON; the mapper turns the parse failure into "unusable".
-        if (plain.length == 0 || plain[0] != '{') {
+        // The envelope names the key it was made with; a re-keyed provider refuses it, as a real one would.
+        if (!String.valueOf(key).equals(encryptedValue.getKeyId())) {
             throw new IllegalStateException("cannot decrypt");
         }
-        return plain;
+        return xor(encryptedValue.getCiphertext());
     }
 
     @Override
