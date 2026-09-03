@@ -2,6 +2,35 @@
   <app-page-header [title]="t('account.title')" [context]="facade.me()?.username ?? ''" />
 
   <div class="grid">
+    <!--
+      Who you are. For an administrator this is context; for everyone else it is the whole console —
+      the admin API is behind SUPER_ADMIN, so this page is where they land and the only thing uaa can
+      tell them about themselves.
+    -->
+    <app-panel padded [title]="t('account.profile.title')" [subtitle]="t('account.profile.subtitle')">
+      <dl class="facts">
+        <dt>{{ t('account.profile.name') }}</dt>
+        <dd>{{ facade.fullName() || '—' }}</dd>
+        <dt>{{ t('account.profile.username') }}</dt>
+        <dd class="latin">{{ facade.me()?.username }}</dd>
+        <dt>{{ t('account.profile.email') }}</dt>
+        <dd class="latin">{{ facade.me()?.email || '—' }}</dd>
+        <dt>{{ t('account.profile.roles') }}</dt>
+        <dd>
+          @for (role of facade.roles(); track role) {
+            <app-badge tone="slate">{{ role }}</app-badge>
+          } @empty {
+            {{ t('account.profile.noRoles') }}
+          }
+        </dd>
+        @if (facade.permissions().length) {
+          <dt>{{ t('account.profile.permissions') }}</dt>
+          <dd class="permissions latin">{{ facade.permissions().join(' · ') }}</dd>
+        }
+      </dl>
+      <p class="readonly-note">{{ t('account.profile.note') }}</p>
+    </app-panel>
+
     <app-panel padded [title]="t('account.password.title')" [subtitle]="t('account.password.subtitle')">
       <app-notice-bar icon="info" tone="amber" [message]="t('account.password.notice')" />
       <form class="form" [formGroup]="facade.form" (ngSubmit)="facade.changePassword()">

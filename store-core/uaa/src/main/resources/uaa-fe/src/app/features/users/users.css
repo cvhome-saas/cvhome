@@ -193,14 +193,6 @@
   gap: var(--spacing-tight);
 }
 
-/*
- * The view tabs hug their labels rather than stretching across the panel: a track whose grey band
- * runs the full width reads as a header bar, not as a choice between two views.
- */
-.views {
-  margin-block-end: var(--spacing-group);
-}
-
 /* --- the invitations table ------------------------------------------------------------------------- */
 .cell {
   display: flex;

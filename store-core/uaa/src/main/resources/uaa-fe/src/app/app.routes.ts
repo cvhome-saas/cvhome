@@ -2,6 +2,8 @@ import type {Routes} from '@angular/router';
 
 import {canAccessSecuredPages} from '@cvhome-saas/ui-kit';
 
+import {canAdministerRealm, isAdminLanding} from '@shared/auth/realm-admin';
+
 /**
  * The split between these routes is Spring Security's, not this app's.
  *
@@ -46,29 +48,39 @@ export const routes: Routes = [
     loadComponent: () => import('@layouts/admin-shell/admin-shell').then((m) => m.AdminShell),
     canActivate: [canAccessSecuredPages],
     children: [
-      {path: '', pathMatch: 'full', redirectTo: 'users'},
+      /*
+       * Two empty-path routes, in order: an administrator matches the first and lands in the console,
+       * everyone else falls through to the second and lands on their own account.
+       */
+      {path: '', pathMatch: 'full', canMatch: [isAdminLanding], redirectTo: 'users'},
+      {path: '', pathMatch: 'full', redirectTo: 'account'},
       {
         path: 'users',
+        canActivate: [canAdministerRealm],
         loadComponent: () => import('@features/users/users').then((m) => m.Users),
         data: {titleKey: 'route.users'},
       },
       {
         path: 'roles',
+        canActivate: [canAdministerRealm],
         loadComponent: () => import('@features/roles/roles').then((m) => m.Roles),
         data: {titleKey: 'route.roles'},
       },
       {
         path: 'dashboard',
+        canActivate: [canAdministerRealm],
         loadComponent: () => import('@features/dashboard/dashboard').then((m) => m.DashboardScreen),
         data: {titleKey: 'route.dashboard'},
       },
       {
         path: 'audit',
+        canActivate: [canAdministerRealm],
         loadComponent: () => import('@features/audit/audit').then((m) => m.Audit),
         data: {titleKey: 'route.audit'},
       },
       {
         path: 'identity-providers',
+        canActivate: [canAdministerRealm],
         loadComponent: () => import('@features/identity-providers/identity-providers').then((m) => m.IdentityProviders),
         data: {titleKey: 'route.providers'},
       },
@@ -79,11 +91,13 @@ export const routes: Routes = [
       },
       {
         path: 'settings',
+        canActivate: [canAdministerRealm],
         loadComponent: () => import('@features/settings/settings').then((m) => m.Settings),
         data: {titleKey: 'route.settings'},
       },
       {
         path: 'clients',
+        canActivate: [canAdministerRealm],
         loadComponent: () => import('@features/clients/clients').then((m) => m.Clients),
         data: {titleKey: 'route.clients'},
       },
@@ -97,11 +111,13 @@ export const routes: Routes = [
        */
       {
         path: 'clients/new',
+        canActivate: [canAdministerRealm],
         loadComponent: () => import('@features/client-form/client-form').then((m) => m.ClientForm),
         data: {titleKey: 'route.clientCreate'},
       },
       {
         path: 'clients/:id',
+        canActivate: [canAdministerRealm],
         loadComponent: () => import('@features/client-form/client-form').then((m) => m.ClientForm),
         data: {titleKey: 'route.clientEdit'},
       },

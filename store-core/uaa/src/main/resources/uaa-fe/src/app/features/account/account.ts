@@ -3,6 +3,7 @@ import {ReactiveFormsModule} from '@angular/forms';
 import {TranslocoDirective} from '@jsverse/transloco';
 
 import {
+  Badge,
   BusyOverlay,
   EmptyState,
   FormField,
@@ -21,7 +22,7 @@ import {AccountFacade} from './facades/account.facade';
  */
 @Component({
   selector: 'app-account',
-  imports: [ReactiveFormsModule, TranslocoDirective, PageHeader, Panel, NoticeBar, BusyOverlay, LoadError, EmptyState, FormField, TextField],
+  imports: [ReactiveFormsModule, TranslocoDirective, PageHeader, Panel, NoticeBar, BusyOverlay, LoadError, EmptyState, FormField, TextField, Badge],
   providers: [AccountFacade],
   templateUrl: './account.html',
   styleUrl: './account.css',

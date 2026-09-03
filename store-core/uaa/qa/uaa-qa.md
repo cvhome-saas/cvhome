@@ -11,7 +11,7 @@ somewhere else entirely — that is [cua](../../../store-pod/cua/qa/cua-qa.md).
   is where the platform's sign-in page lives
 - **Runs on** — `lcl start -d --stack <name>`; uaa is `http://uaa.gateway.com:8001` and is the **first**
   service the stack brings up, because it issues the tokens. Read the live port from `lcl urls`
-- **Cases** — 142 (113 verified, 14 unit only, 14 not verified; one case is a walkthrough with no single outcome)
+- **Cases** — 143 (114 verified, 14 unit only, 14 not verified; one case is a walkthrough with no single outcome)
 - **Also see** — [gateway](../../gateway/gateway-service/qa/gateway-qa.md) (which relays the token and holds
   the session), [tenancy](../../tenancy/tenancy-service/qa/tenancy-qa.md) (which owns the *store-scoped*
   accounts and calls uaa to create them),
@@ -429,6 +429,25 @@ to `/clients` reaches the router rather than 404ing.
 - **Expect** — the page scrolls to that panel and marks it current; **the URL stays `/settings`**. It used to
   leave the page entirely: the entries were `<a href="#settings-general">`, and a fragment-only href resolves
   against the document base — `<base href="/">` — so every click landed on the console's landing route.
+
+---
+
+### CON-12 — Someone who is not an administrator · critical · [verified]
+
+- **Setup** — any account that is not a super admin: `org1-admin` (ORG_ADMIN) or
+  `org1-store1-moderator` (STORE_MODERATOR), password `admin`.
+- **Steps** — sign in at `/login`; then type `/users`, `/settings` and `/` into the address bar.
+- **Expect** — every one of them lands on **`/account`**. The rail holds a single entry, *My account*,
+  under **You**; the seven admin sections are not drawn. The page opens with *Who you are* — name,
+  username, email, roles and effective permissions — above the password form, the linked logins and
+  the sessions.
+- **Why it is the whole rail and not a subset** — every `/api/v1/admin/**` endpoint is behind
+  `SCOPE_super_admin`/`ROLE_SUPER_ADMIN`, so an org administrator holding `users:read` still reads
+  nothing here. A rail offering screens the API refuses is what this replaced: the person landed on an
+  admin screen and met an access-denied bar with the full navigation beside it.
+- **Watch for** — the landing decision is a `canMatch` guard, not a redirect function: a redirect is
+  resolved while the URL is matched, before `/me` has been fetched, and asked then *everyone* looks
+  like a non-administrator. A super admin opening `/` must reach `/users`.
 
 ---
 
@@ -1537,6 +1556,10 @@ clients and accounts. Nothing in uaa carries an `alter table`.
 | The Users panel rendered its empty state under a 403 | a `USER`-role session saw *No accounts* beneath the error bar | CON-06 |
 | The CSRF cookie had no explicit path | a response from `/login/oauth2/code/…` minted a second `XSRF-TOKEN` scoped to that directory, and the next POST elsewhere sent the wrong one | IDP-04 (the repository now pins the cookie to `/`) |
 | The brokered-login failure handler saved the exception into the session | Spring Session JDBC could not serialise the HTTP response inside it: a refusal became a 500 | IDP-04 |
+| A non-administrator got the admin console | the rail drew all seven sections and the landing route was an admin screen, so an org admin or store moderator signed in to an access-denied bar | CON-12 |
+| The kit dropped the profile `/me` returns | uaa's `MeResponse` sends the name, the address and the derived roles; the client mapped none of them, so the account page reported no name for a person whose first name it had just received | CON-12 |
+| Panel controls sat flush against the panel | a table panel is deliberately unpadded, and the tabs and search above the table inherited that: no top inset, none at either edge | CON-09 |
+| A page-scale busy overlay collapsed the page rhythm | the dashboard's range tabs, tiles and panels all touched, because everything below the header lives inside one overlay | CON-10 |
 | Settings' left sub-nav left the page | fragment-only `href` resolves against `<base href="/">`, so a section link navigated to the landing route | CON-11 |
 | Four control heights on one row | buttons 2.25rem, select 2.375rem, search box and tab track whatever their padding made — the theme had no control-height token, so nothing lined up | CON-09 |
 | The tab track filled its row | its host was `display: block`, so on Users and Clients it pushed the search box onto a second line | CON-09 |

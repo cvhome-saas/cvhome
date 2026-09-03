@@ -43,6 +43,16 @@ interface AuthenticationResponse {
   };
   /** Present on the *session* shape below, where the principal is not wrapped. */
   username?: string;
+  /*
+   * uaa's own `MeResponse`. It has carried the name, the address and the derived roles and
+   * permissions since the console gained a settings screen; this client read none of them and
+   * reported `givenName: null` for a person whose first name the endpoint had just sent.
+   */
+  email?: string | null;
+  firstName?: string | null;
+  lastName?: string | null;
+  roles?: string[];
+  permissions?: string[];
   authorities: {authority: string}[];
 }
 
@@ -79,6 +89,8 @@ export class AuthService {
               givenName: principal.givenName,
               familyName: principal.familyName,
               email: principal.email,
+              roles: it.roles ?? [],
+              permissions: it.permissions ?? [],
               authorities: it.authorities.map(a => a.authority),
             };
           } else if (it?.username) {
@@ -88,9 +100,11 @@ export class AuthService {
             this.authUser = {
               sub: it.username,
               username: it.username,
-              givenName: null,
-              familyName: null,
-              email: null,
+              givenName: it.firstName ?? null,
+              familyName: it.lastName ?? null,
+              email: it.email ?? null,
+              roles: it.roles ?? [],
+              permissions: it.permissions ?? [],
               authorities: (it.authorities ?? []).map(a => a.authority),
             };
           } else {
@@ -144,15 +158,20 @@ export class AuthService {
 /**
  * The signed-in principal, as far as uaa will describe it.
  *
- * Everything but `sub`, `username` and `authorities` is null today. The nullability is not defensive
- * typing — it is what the endpoint returns.
+ * The nullability is not defensive typing — it is what the endpoint returns. Behind the gateway the
+ * profile fields come from the ID token and are still null; on uaa's own session they are populated,
+ * because `MeResponse` sends them.
  */
 export interface AuthUser {
   readonly sub: string;
-  /** uaa's username, e.g. `org1-admin`. The only human-readable identity currently available. */
+  /** uaa's username, e.g. `org1-admin`. The only identity a row and a token share. */
   readonly username: string;
   readonly givenName: string | null;
   readonly familyName: string | null;
   readonly email: string | null;
+  /** Bare role names, e.g. `SUPER_ADMIN`. Empty where the endpoint does not send them. */
+  readonly roles?: readonly string[];
+  /** Effective permission keys, e.g. `users:read`. Empty where the endpoint does not send them. */
+  readonly permissions?: readonly string[];
   readonly authorities: readonly string[];
 }

@@ -8,6 +8,8 @@ import {AuthService} from '@cvhome-saas/ui-kit';
 import {LocaleService, type LocaleCode} from '@cvhome-saas/ui-kit/i18n';
 import {Icon, SectionNav, type NavSection} from '@cvhome-saas/ui-kit/ui';
 
+import {isRealmAdmin} from '@shared/auth/realm-admin';
+
 /**
  * The chrome the three admin sections sit inside: a grouped rail beside a topbar and the page.
  *
@@ -40,7 +42,7 @@ export class AdminShell {
    * is read as fact, which is the finding console-ui already recorded against this same design
    * (lessons.md, "Shell — no sidebar badge counts").
    */
-  protected readonly sections: readonly NavSection[] = [
+  private readonly adminSections: readonly NavSection[] = [
     {key: 'dashboard', labelKey: 'nav.dashboard', icon: 'home', group: 'nav.group.overview'},
     {key: 'audit', labelKey: 'nav.audit', icon: 'clock', group: 'nav.group.overview'},
     {key: 'users', labelKey: 'nav.users', icon: 'users', group: 'nav.group.identity'},
@@ -49,6 +51,21 @@ export class AdminShell {
     {key: 'clients', labelKey: 'nav.clients', icon: 'layoutGrid', group: 'nav.group.applications'},
     {key: 'settings', labelKey: 'nav.settings', icon: 'cog', group: 'nav.group.system'},
   ];
+
+  /**
+   * What this person can actually open.
+   *
+   * Every screen above is behind `SCOPE_super_admin`/`ROLE_SUPER_ADMIN` on the server, so for anyone
+   * else the whole rail is a list of doors that answer 403. An org administrator used to sign in,
+   * land on an admin screen and read an access-denied bar with the full navigation still beside it —
+   * a rail that offers what the API refuses is worse than no rail. They get their own account
+   * instead, which is the one thing this console can show them.
+   */
+  protected readonly sections = computed<readonly NavSection[]>(() =>
+    isRealmAdmin(this.auth)
+      ? this.adminSections
+      : [{key: 'account', labelKey: 'nav.account', icon: 'user', group: 'nav.group.you'}],
+  );
 
   protected readonly collapsed = signal(false);
   protected readonly mobileNavOpen = signal(false);
@@ -86,7 +103,7 @@ export class AdminShell {
     if (active === 'account') {
       return 'nav.account';
     }
-    return this.sections.find((s) => s.key === active)?.labelKey ?? 'nav.users';
+    return this.sections().find((s) => s.key === active)?.labelKey ?? 'nav.account';
   });
 
   protected selectLocale(code: LocaleCode): void {

@@ -11,7 +11,8 @@
       "overview": "Overview",
       "identity": "Identity",
       "applications": "Applications",
-      "system": "System"
+      "system": "System",
+      "you": "You"
     },
     "dashboard": "Dashboard",
     "audit": "Audit log",
@@ -754,6 +755,17 @@
       "toast": {
         "unlinked": "{{name}} can no longer sign you in."
       }
+    },
+    "profile": {
+      "title": "Who you are",
+      "subtitle": "What cvhome identity holds about this account",
+      "name": "Name",
+      "username": "Username",
+      "email": "Email",
+      "roles": "Roles",
+      "noRoles": "No roles",
+      "permissions": "Permissions",
+      "note": "Your name, email and roles are set by an administrator. Ask one to change them."
     }
   },
   "linkAccept": {

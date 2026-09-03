@@ -21,6 +21,19 @@
   transition: opacity var(--default-transition-duration) ease;
 }
 
+/*
+ * A page-scale overlay wraps whole page regions — a filter row, a tile grid, the panels under it —
+ * and stacking them in a plain block collapsed the rhythm the page column was keeping between its
+ * other children: uaa's dashboard had its range tabs, its four tiles and its four panels touching,
+ * because everything below the header lives inside one of these. A panel-scale overlay wraps a
+ * single table and wants no gap, which is why this is scoped to the page reserve.
+ */
+:host(.reserve-page) .busy-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-section);
+}
+
 :host([aria-busy='true']) .busy-content {
   opacity: 0.45;
 }

@@ -236,3 +236,19 @@ MFA" rather than "we cannot tell".
 - **Still true:** `--muted` is the *panel* surface, which is white on this theme. A chip or row inside a panel
   wants `--input`. Painting one `--muted` is invisible, and that is how several of them shipped.
 
+## Shell — the rail promised what the API refuses
+
+- **Screen:** the navigation rail, and whatever screen a non-administrator first landed on.
+- **What was wrong:** every `/api/v1/admin/**` endpoint is behind `SCOPE_super_admin`/`ROLE_SUPER_ADMIN`,
+  but the rail drew all seven admin sections for anyone who could sign in. An org administrator — who
+  holds real permissions like `users:read` and uses them in the seller console — arrived at an admin
+  screen, an access-denied bar, and a full navigation rail inviting them to try six more.
+- **Decision:** the console asks the question the server will ask (`isRealmAdmin`), in one place. An
+  administrator gets the console; everyone else gets their own account page, and a rail with one entry.
+- **Not gated on permissions, deliberately:** `users:read` in the token does not open this API, and a
+  rail built from permissions would offer screens that answer 403. When the admin gate becomes
+  permission-based, `realm-admin.ts` is the single place that changes.
+- **The landing is a `canMatch`, not a redirect function:** a redirect is resolved while the URL is
+  matched, before `canAccessSecuredPages` has fetched `/me`. Asked at that moment every visitor looks
+  like a non-administrator, and a super admin opening `/` was sent to their own account.
+

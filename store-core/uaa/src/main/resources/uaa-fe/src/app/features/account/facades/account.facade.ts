@@ -25,6 +25,17 @@ export class AccountFacade {
   readonly busy = signal(false);
   readonly me = computed(() => this.auth.getCachedAuthUser());
 
+  /** The name uaa has for this person, or nothing rather than a guess assembled from the username. */
+  readonly fullName = computed(() => {
+    const me = this.me();
+    return [me?.givenName, me?.familyName].filter(Boolean).join(' ');
+  });
+
+  readonly roles = computed<readonly string[]>(() => this.me()?.roles ?? []);
+
+  /** Effective permissions, sorted, so the list reads the same on every visit. */
+  readonly permissions = computed<readonly string[]>(() => [...(this.me()?.permissions ?? [])].sort());
+
   readonly form = new FormGroup(
     {
       currentPassword: new FormControl('', {nonNullable: true, validators: [Validators.required]}),
