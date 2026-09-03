@@ -45,6 +45,17 @@ public enum IdpPreset {
                     "https://api.github.com/user", null),
             "read:user user:email", IdpDefaults.ID, IdpDefaults.SECRET_BASIC, IdpDefaults.NAME_MAPPING),
 
+    /**
+     * Facebook, which shoppers use and platform staff do not — it arrived with cua, where a merchant configures
+     * their own app. OAuth2 rather than OIDC: Facebook's userinfo is the Graph API, and the fields wanted have to
+     * be named in the URL or it answers with an id and nothing else.
+     */
+    FACEBOOK(IdpType.OAUTH2, "Facebook",
+            new Endpoints(null, "https://www.facebook.com/v19.0/dialog/oauth",
+                    "https://graph.facebook.com/v19.0/oauth/access_token",
+                    "https://graph.facebook.com/me?fields=id,name,email", null),
+            "email public_profile", IdpDefaults.ID, IdpDefaults.SECRET_POST, IdpDefaults.NAME_MAPPING),
+
     GENERIC_OIDC(IdpType.OIDC, "OpenID Connect", Endpoints.NONE, IdpDefaults.OIDC_SCOPES, IdpDefaults.SUB,
             IdpDefaults.SECRET_BASIC, IdpDefaults.OIDC_MAPPING),
 

@@ -317,7 +317,7 @@ create table if not exists uaa.identity_providers
     display_name         varchar(100) not null,
     type                 varchar(16)  not null check (type in ('OIDC', 'OAUTH2')),
     preset               varchar(24)  not null
-        check (preset in ('GOOGLE', 'MICROSOFT', 'APPLE', 'GITHUB', 'GENERIC_OIDC', 'GENERIC_OAUTH2')),
+        check (preset in ('GOOGLE', 'MICROSOFT', 'APPLE', 'GITHUB', 'FACEBOOK', 'GENERIC_OIDC', 'GENERIC_OAUTH2')),
     enabled              boolean      not null default true,
     hide_on_login        boolean      not null default false,
     sort_order           integer      not null default 0,

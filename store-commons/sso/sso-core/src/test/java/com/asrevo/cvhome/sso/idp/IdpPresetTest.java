@@ -21,6 +21,15 @@ class IdpPresetTest {
         assertThat(IdpPreset.MICROSOFT.issuerUri()).as("common endpoints: issuer varies per tenant").isNull();
     }
 
+    /** Facebook came from cua, where a merchant configures their own app; shoppers use it, staff do not. */
+    @Test
+    void facebookIsOauth2AndNamesTheGraphFieldsItNeeds() {
+        assertThat(IdpPreset.FACEBOOK.type()).isEqualTo(IdpType.OAUTH2);
+        assertThat(IdpPreset.FACEBOOK.issuerUri()).isNull();
+        // Unnamed, the Graph API answers with an id and nothing else, and the account has no email to link on.
+        assertThat(IdpPreset.FACEBOOK.userInfoUri()).contains("fields=", "email");
+    }
+
     @Test
     void appleIsTheOddOneOutAndSaysSo() {
         assertThat(IdpPreset.APPLE.formPost()).isTrue();
@@ -28,7 +37,7 @@ class IdpPresetTest {
         assertThat(IdpPreset.GOOGLE.pkce()).isTrue();
         assertThat(IdpPresetDto.of(IdpPreset.APPLE).verified()).isFalse();
         assertThat(IdpPresetDto.of(IdpPreset.GENERIC_OAUTH2).needsEndpoints()).isTrue();
-        assertThat(IdpPreset.catalogue()).hasSize(6);
+        assertThat(IdpPreset.catalogue()).hasSize(7);
     }
 
 }
