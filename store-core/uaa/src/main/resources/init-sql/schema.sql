@@ -20,6 +20,7 @@ create table if not exists uaa.oauth2_registered_client
 -- description, and when it last obtained a token. One row per registration, created with it.
 create table if not exists uaa.client_extension
 (
+    realm_id varchar(64) not null default 'platform',
     registered_client_id varchar(100) primary key references uaa.oauth2_registered_client (id) on delete cascade,
     enabled              boolean     not null default true,
     description          varchar(500),
@@ -34,6 +35,7 @@ create table if not exists uaa.client_extension
 -- without an outage. Hashed like the live secret; revoked early by an operator or retired by expiry.
 create table if not exists uaa.client_secret_history
 (
+    realm_id varchar(64) not null default 'platform',
     id                   uuid primary key,
     registered_client_id varchar(100) not null references uaa.oauth2_registered_client (id) on delete cascade,
     secret_hash          varchar(200) not null,
@@ -104,8 +106,9 @@ create table if not exists uaa.oauth2_authorization_consent
 create table if not exists uaa.users
 (
     id                     uuid PRIMARY KEY,
-    email                  VARCHAR(254) NOT NULL UNIQUE,
-    username               VARCHAR(190) NOT NULL UNIQUE,
+    realm_id               varchar(64)  NOT NULL DEFAULT 'platform',
+    email                  VARCHAR(254) NOT NULL,
+    username               VARCHAR(190) NOT NULL,
     first_name             VARCHAR(50),
     last_name              VARCHAR(50),
     password_hash          VARCHAR(100),
@@ -124,8 +127,9 @@ create table if not exists uaa.users
     last_sign_in_via       VARCHAR(60),
     created_at             timestamptz  NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at             timestamptz  NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    constraint UK6dotkott2kjsp8vw4d0m25fb7 unique (email),
-    constraint UKr43af9ap4edm43mmtq01oddj6 unique (username)
+    -- Scoped to the realm, not global: one email address is a different person in each store cua serves.
+    constraint uk_users_realm_email unique (realm_id, email),
+    constraint uk_users_realm_username unique (realm_id, username)
 );
 
 CREATE INDEX IF NOT EXISTS idx_users_metadata ON uaa.users USING gin (metadata);
@@ -136,6 +140,7 @@ CREATE INDEX IF NOT EXISTS idx_users_username_lower ON uaa.users (lower(username
 create table if not exists uaa.roles
 (
     id               uuid PRIMARY KEY,
+    realm_id         varchar(64) NOT NULL DEFAULT 'platform',
     name             VARCHAR(80) NOT NULL,
     description      VARCHAR(255),
     scope            VARCHAR(20) NOT NULL DEFAULT 'REALM',
@@ -143,7 +148,7 @@ create table if not exists uaa.roles
     inherits_from_id uuid REFERENCES uaa.roles (id),
     created_at       timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at       timestamptz,
-    constraint UKofx66keruapi6vyqpv6f2or37 unique (name),
+    constraint uk_roles_realm_name unique (realm_id, name),
     constraint roles_scope_ck check (scope in ('REALM', 'ORGANIZATION', 'CLIENT'))
 );
 
@@ -168,6 +173,7 @@ create table if not exists uaa.user_roles
 -- The previous hashes a user may not reuse; trimmed to settings.password_history_count on every change.
 create table if not exists uaa.password_history
 (
+    realm_id varchar(64) not null default 'platform',
     id            uuid PRIMARY KEY,
     user_id       uuid         NOT NULL REFERENCES uaa.users (id) ON DELETE CASCADE,
     password_hash VARCHAR(100) NOT NULL,
@@ -179,6 +185,7 @@ CREATE INDEX IF NOT EXISTS idx_password_history_user ON uaa.password_history (us
 -- administrator and handed to the delivery consumer through the outbox. One live invitation per account.
 create table if not exists uaa.invitations
 (
+    realm_id varchar(64) not null default 'platform',
     id          uuid PRIMARY KEY,
     user_id     uuid         NOT NULL REFERENCES uaa.users (id) ON DELETE CASCADE,
     email       VARCHAR(254) NOT NULL,
@@ -196,6 +203,7 @@ CREATE INDEX IF NOT EXISTS idx_invitations_status ON uaa.invitations (status, cr
 -- An administrator-issued password-reset link, same handling as an invitation: hash only, used once, short-lived.
 create table if not exists uaa.password_reset_tokens
 (
+    realm_id varchar(64) not null default 'platform',
     id         uuid PRIMARY KEY,
     user_id    uuid        NOT NULL REFERENCES uaa.users (id) ON DELETE CASCADE,
     token_hash VARCHAR(64) NOT NULL UNIQUE,
@@ -210,6 +218,7 @@ CREATE INDEX IF NOT EXISTS idx_password_reset_tokens_user ON uaa.password_reset_
 -- Realm-wide policy: exactly one row.
 create table if not exists uaa.settings
 (
+    realm_id varchar(64) not null default 'platform',
     id                                smallint PRIMARY KEY DEFAULT 1 CHECK (id = 1),
     display_name                      VARCHAR(100) NOT NULL DEFAULT 'cvhome ID',
     support_email                     VARCHAR(254),
@@ -248,6 +257,7 @@ create table if not exists uaa.settings
 -- Append-only record of every authentication and administrative event. Never updated, trimmed by retention.
 create table if not exists uaa.audit_events
 (
+    realm_id varchar(64) not null default 'platform',
     id          BIGSERIAL PRIMARY KEY,
     occurred_at timestamptz  NOT NULL DEFAULT CURRENT_TIMESTAMP,
     event_type  VARCHAR(60)  NOT NULL,
@@ -302,7 +312,8 @@ create index if not exists idx_signing_keys_status on uaa.signing_keys (status);
 create table if not exists uaa.identity_providers
 (
     id                   uuid primary key,
-    alias                varchar(50)  not null unique,
+    realm_id             varchar(64)  not null default 'platform',
+    alias                varchar(50)  not null,
     display_name         varchar(100) not null,
     type                 varchar(16)  not null check (type in ('OIDC', 'OAUTH2')),
     preset               varchar(24)  not null
@@ -327,12 +338,15 @@ create table if not exists uaa.identity_providers
     trust_email_verified boolean      not null default true,
     attribute_mapping    varchar(1000),
     created_at           timestamptz  not null,
-    updated_at           timestamptz  not null
+    updated_at           timestamptz  not null,
+    -- The alias is a Spring registrationId; two stores may both call their provider 'google'.
+    constraint uk_idp_realm_alias unique (realm_id, alias)
 );
 
 -- One row per (provider, subject): which external identity signs in as which account.
 create table if not exists uaa.user_identities
 (
+    realm_id varchar(64) not null default 'platform',
     id            uuid primary key,
     user_id       uuid         not null references uaa.users (id) on delete cascade,
     provider_id   uuid         not null references uaa.identity_providers (id) on delete cascade,

@@ -19,8 +19,10 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 
 import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.TenantId;
 import org.hibernate.type.SqlTypes;
 
 import com.asrevo.cvhome.commons.domain.Permission;
@@ -38,7 +40,7 @@ import lombok.NoArgsConstructor;
  * </p>
  */
 @Entity
-@Table(name = "roles")
+@Table(name = "roles", uniqueConstraints = {@UniqueConstraint(name = "uk_roles_realm_name", columnNames = {"realm_id", "name"})})
 @Data
 @NoArgsConstructor
 public class Role {
@@ -49,7 +51,15 @@ public class Role {
     @Id
     private UUID id;
 
-    @Column(nullable = false, unique = true, length = 80)
+    /**
+     * The realm this row belongs to. Hibernate fills it on insert and adds it to every query; no repository
+     * method mentions it. uaa writes one constant value here forever, cua one per store.
+     */
+    @TenantId
+    @Column(name = "realm_id", nullable = false, length = 64)
+    private String realmId;
+
+    @Column(nullable = false, length = 80)
     private String name;
 
     @Column(length = 255)

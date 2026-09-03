@@ -13,6 +13,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.TenantId;
 import org.hibernate.type.SqlTypes;
 
 import lombok.Getter;
@@ -30,6 +31,14 @@ public class AuditEventEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    /**
+     * The realm this row belongs to. Hibernate fills it on insert and adds it to every query; no repository
+     * method mentions it. uaa writes one constant value here forever, cua one per store.
+     */
+    @TenantId
+    @Column(name = "realm_id", nullable = false, length = 64)
+    private String realmId;
 
     @Column(name = "occurred_at", nullable = false)
     private Instant occurredAt;

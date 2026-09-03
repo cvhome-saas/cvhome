@@ -46,6 +46,13 @@ com:
     cvhome:
       admin:
         password: ${UAA_ADMIN_PASSWORD}
+      sso:
+        # uaa is the single-realm deployment of the SSO server; cua is the same server with one realm per store.
+        # Stated explicitly because the property has no default: a deployment that forgot to say would otherwise
+        # pick one, and the two look a user up in very different places.
+        realm:
+          mode: SINGLE
+          fixed: platform
       uaa:
         seed:
           apply-on-boot: false

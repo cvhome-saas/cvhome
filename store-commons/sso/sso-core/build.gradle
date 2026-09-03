@@ -13,7 +13,6 @@ plugins {
  */
 dependencies {
     api project(':store-commons:commons')
-    api project(':store-commons:sso:sso-commons')
     api project(':store-commons:sso:sso-events')
     api project(':store-commons:autoconfigure')
     // UaaErrors and the condition types it names live here, shared with the admin SDK: the client catalog keys on

@@ -9,6 +9,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
+import org.hibernate.annotations.TenantId;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -21,6 +23,14 @@ public class PasswordHistory {
 
     @Id
     private UUID id;
+
+    /**
+     * The realm this row belongs to. Hibernate fills it on insert and adds it to every query; no repository
+     * method mentions it. uaa writes one constant value here forever, cua one per store.
+     */
+    @TenantId
+    @Column(name = "realm_id", nullable = false, length = 64)
+    private String realmId;
 
     @Column(name = "user_id", nullable = false)
     private UUID userId;

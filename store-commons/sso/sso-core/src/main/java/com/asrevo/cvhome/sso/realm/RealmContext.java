@@ -60,6 +60,21 @@ public final class RealmContext {
     }
 
     /**
+     * Enters {@code realm} at the outermost boundary of a request. Package-private, and deliberately so: it is
+     * half of a pair that only {@link RealmFilter} is positioned to complete, because a servlet filter's chain
+     * throws checked exceptions that {@link #runIn}'s {@code Runnable} cannot carry. Everything else uses
+     * {@link #runIn}, which cannot be left un-exited.
+     */
+    static void enter(RealmId realm) {
+        CURRENT.set(realm);
+    }
+
+    /** The other half of {@link #enter}, to be called from a {@code finally} and nowhere else. */
+    static void leave() {
+        CURRENT.remove();
+    }
+
+    /**
      * Runs {@code work} with {@code realm} as the current realm, restoring whatever was current before.
      *
      * <p>

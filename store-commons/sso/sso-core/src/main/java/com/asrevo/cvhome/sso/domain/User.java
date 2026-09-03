@@ -17,8 +17,10 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 
 import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.TenantId;
 import org.hibernate.type.SqlTypes;
 import org.springframework.data.domain.AbstractAggregateRoot;
 
@@ -44,7 +46,9 @@ import lombok.ToString;
  * </p>
  */
 @Entity
-@Table(name = "users")
+@Table(name = "users", uniqueConstraints = {
+        @UniqueConstraint(name = "uk_users_realm_username", columnNames = {"realm_id", "username"}),
+        @UniqueConstraint(name = "uk_users_realm_email", columnNames = {"realm_id", "email"})})
 @Data
 @EqualsAndHashCode(callSuper = false)
 @ToString(callSuper = false)
@@ -54,10 +58,18 @@ public class User extends AbstractAggregateRoot<User> {
     @Id
     private UUID id;
 
-    @Column(nullable = false, unique = true, length = 190)
+    /**
+     * The realm this row belongs to. Hibernate fills it on insert and adds it to every query; no repository
+     * method mentions it. uaa writes one constant value here forever, cua one per store.
+     */
+    @TenantId
+    @Column(name = "realm_id", nullable = false, length = 64)
+    private String realmId;
+
+    @Column(nullable = false, length = 190)
     private String username;
 
-    @Column(nullable = false, unique = true, length = 254)
+    @Column(nullable = false, length = 254)
     private String email;
 
     @Column(name = "first_name", length = 50)

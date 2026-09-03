@@ -9,6 +9,9 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
+
+import org.hibernate.annotations.TenantId;
 
 import com.asrevo.cvhome.sso.idp.IdpPreset;
 
@@ -20,7 +23,8 @@ import lombok.Setter;
  * An external login brokered through uaa. The credentials are envelopes; the mapper is the only thing that opens them.
  */
 @Entity
-@Table(name = "identity_providers")
+@Table(name = "identity_providers", uniqueConstraints = {
+        @UniqueConstraint(name = "uk_idp_realm_alias", columnNames = {"realm_id", "alias"})})
 @Getter
 @Setter
 @NoArgsConstructor
@@ -29,7 +33,15 @@ public class IdentityProvider {
     @Id
     private UUID id;
 
-    @Column(nullable = false, unique = true, length = 50)
+    /**
+     * The realm this row belongs to. Hibernate fills it on insert and adds it to every query; no repository
+     * method mentions it. uaa writes one constant value here forever, cua one per store.
+     */
+    @TenantId
+    @Column(name = "realm_id", nullable = false, length = 64)
+    private String realmId;
+
+    @Column(nullable = false, length = 50)
     private String alias;
 
     @Column(name = "display_name", nullable = false, length = 100)

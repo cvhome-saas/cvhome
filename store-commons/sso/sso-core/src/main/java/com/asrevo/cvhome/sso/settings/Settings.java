@@ -8,11 +8,18 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
 
+import org.hibernate.annotations.TenantId;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
  * The realm's one row of policy. Column defaults live in {@code schema.sql}; the seed inserts the row.
+ */
+/*
+ * Still a singleton row (id = 1) even though it now carries a realm. That is correct for uaa, which has one realm
+ * and always will, and it is the one thing here that a MULTI deployment cannot use as-is: two realms cannot both
+ * hold id = 1. Making the realm the key belongs with cua, where a second realm exists to test it against.
  */
 @Entity
 @Table(name = "settings")
@@ -24,6 +31,14 @@ public class Settings {
 
     @Id
     private short id = SINGLETON_ID;
+
+    /**
+     * The realm this row belongs to. Hibernate fills it on insert and adds it to every query; no repository
+     * method mentions it. uaa writes one constant value here forever, cua one per store.
+     */
+    @TenantId
+    @Column(name = "realm_id", nullable = false, length = 64)
+    private String realmId;
 
     @Column(name = "display_name", nullable = false, length = 100)
     private String displayName = "cvhome ID";
