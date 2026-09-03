@@ -57,6 +57,14 @@ public class CuaSecurityConfig {
                         .requestMatchers("/error").permitAll()
                         .requestMatchers("/oauth2/authorization/**", "/login/oauth2/**").permitAll()
                         .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/api-docs/**").permitAll()
+                        /*
+                         * sso-core's platform administration is scanned into cua along with everything else, and
+                         * cua has no administrators — its principals are shoppers. Each of those endpoints
+                         * already carries its own @PreAuthorize and this chain's decoder would reject a uaa
+                         * token anyway, so they are unreachable twice over; denying them outright says so, rather
+                         * than leaving a console's worth of endpoints inert by coincidence.
+                         */
+                        .requestMatchers("/api/v1/admin/**").denyAll()
                         .anyRequest().authenticated())
                 /*
                  * loginPage is kept even though cua renders none: it is what stops Spring generating one, and what
