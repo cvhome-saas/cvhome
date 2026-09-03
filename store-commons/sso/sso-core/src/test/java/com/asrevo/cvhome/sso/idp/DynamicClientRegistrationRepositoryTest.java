@@ -7,8 +7,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 
+import com.asrevo.cvhome.commons.domain.RealmId;
 import com.asrevo.cvhome.sso.domain.AccountLinking;
 import com.asrevo.cvhome.sso.domain.IdentityProvider;
+import com.asrevo.cvhome.sso.realm.RealmContext;
+import com.asrevo.cvhome.sso.realm.RealmMode;
+import com.asrevo.cvhome.sso.realm.SsoRealmProperties;
+import com.asrevo.cvhome.sso.realm.SsoTenantIdentifierResolver;
 import com.asrevo.cvhome.sso.repo.IdentityProviderRepository;
 import com.asrevo.cvhome.sso.support.FakeCrypto;
 
@@ -27,12 +32,21 @@ class DynamicClientRegistrationRepositoryTest {
 
     private final IdentityProviderRepository providers = mock(IdentityProviderRepository.class);
 
+    /** SINGLE mode: the resolver answers with the one realm, so the cache key is stable. */
+    private final SsoTenantIdentifierResolver realms = new SsoTenantIdentifierResolver(singleRealm());
+
     private final IdentityProviderMapper mapper = new IdentityProviderMapper(new FakeCrypto((byte) 0x07));
 
     private final DynamicClientRegistrationRepository repository = new DynamicClientRegistrationRepository(
             Map.of(CONFIGURED, ClientRegistration.withRegistrationId(CONFIGURED).clientId(CONFIGURED_CLIENT)
                     .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS).tokenUri("https://t").build()),
-            providers, new ClientRegistrationFactory(mapper));
+            providers, new ClientRegistrationFactory(mapper), realms);
+
+    private static SsoRealmProperties singleRealm() {
+        SsoRealmProperties properties = new SsoRealmProperties();
+        properties.setMode(RealmMode.SINGLE);
+        return properties;
+    }
 
     private IdentityProvider stored(boolean enabled) {
         IdentityProvider p = mapper.toNewEntity(IdpFixtures.request(IdpPreset.GENERIC_OIDC, AccountLinking.CONFIRM, true), 0,
@@ -57,6 +71,33 @@ class DynamicClientRegistrationRepositoryTest {
 
         repository.evict(IdpFixtures.ALIAS);
         assertThat(repository.findByRegistrationId(IdpFixtures.ALIAS)).isNotSameAs(first);
+    }
+
+    /**
+     * The leak this key exists to stop: two stores both call their provider "google", and a cache keyed on the
+     * alias alone would hand the first store's client id, secret and redirect to the second.
+     */
+    @Test
+    void oneRealmsProviderIsNeverServedToAnother() {
+        SsoTenantIdentifierResolver multi = new SsoTenantIdentifierResolver(multiRealm());
+        DynamicClientRegistrationRepository shared = new DynamicClientRegistrationRepository(
+                Map.of(), providers, new ClientRegistrationFactory(mapper), multi);
+        when(providers.findByAlias(IdpFixtures.ALIAS)).thenReturn(Optional.of(stored(true)));
+
+        ClientRegistration inA = RealmContext.callIn(RealmId.of("store-a"),
+                () -> shared.findByRegistrationId(IdpFixtures.ALIAS));
+        ClientRegistration inB = RealmContext.callIn(RealmId.of("store-b"),
+                () -> shared.findByRegistrationId(IdpFixtures.ALIAS));
+
+        assertThat(inA).isNotSameAs(inB);
+        // Built once per realm rather than once in total: the second store did not read the first store's entry.
+        verify(providers, times(2)).findByAlias(IdpFixtures.ALIAS);
+    }
+
+    private static SsoRealmProperties multiRealm() {
+        SsoRealmProperties properties = new SsoRealmProperties();
+        properties.setMode(RealmMode.MULTI);
+        return properties;
     }
 
     @Test

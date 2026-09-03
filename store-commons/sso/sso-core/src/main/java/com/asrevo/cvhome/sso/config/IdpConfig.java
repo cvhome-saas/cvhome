@@ -12,6 +12,7 @@ import org.springframework.security.oauth2.server.authorization.settings.Authori
 
 import com.asrevo.cvhome.sso.idp.ClientRegistrationFactory;
 import com.asrevo.cvhome.sso.idp.DynamicClientRegistrationRepository;
+import com.asrevo.cvhome.sso.realm.SsoTenantIdentifierResolver;
 import com.asrevo.cvhome.sso.repo.IdentityProviderRepository;
 
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +29,8 @@ public class IdpConfig {
     @Bean
     DynamicClientRegistrationRepository clientRegistrationRepository(OAuth2ClientProperties properties,
                                                                      IdentityProviderRepository providers,
-                                                                     ClientRegistrationFactory factory) {
+                                                                     ClientRegistrationFactory factory,
+                                                                     SsoTenantIdentifierResolver realms) {
         Map<String, ClientRegistration> configured;
         try {
             configured = new OAuth2ClientPropertiesMapper(properties).asClientRegistrations();
@@ -36,7 +38,7 @@ public class IdpConfig {
             log.warn("The configured OAuth2 client registrations could not be mapped and are skipped: {}", e.getMessage());
             configured = Map.of();
         }
-        return new DynamicClientRegistrationRepository(configured, providers, factory);
+        return new DynamicClientRegistrationRepository(configured, providers, factory, realms);
     }
 
     /** The issuer the redirect URIs are shown under: the same pinned value every token names. */
