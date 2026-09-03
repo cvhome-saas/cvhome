@@ -69,13 +69,13 @@ public class AccountController {
     @GetMapping("sessions")
     public List<SessionSummary> sessions(Authentication authentication, HttpSession session)
             throws NotAUserPrincipalException {
-        return sessions.list(currentUser.resolve(authentication).getUsername(), session == null ? null : session.getId());
+        return sessions.list(currentUser.resolve(authentication), session == null ? null : session.getId());
     }
 
     @DeleteMapping("sessions/{sessionId}")
     public void revokeSession(@PathVariable String sessionId, Authentication authentication)
             throws NotAUserPrincipalException, SessionNotFoundException {
-        sessions.revoke(currentUser.resolve(authentication).getUsername(), sessionId);
+        sessions.revoke(currentUser.resolve(authentication), sessionId);
     }
 
     /** The external logins linked to this account. */
@@ -95,7 +95,7 @@ public class AccountController {
     @DeleteMapping("sessions")
     public Map<String, Integer> revokeOtherSessions(Authentication authentication, HttpSession session)
             throws NotAUserPrincipalException {
-        return Map.of("revoked", sessions.revokeAll(currentUser.resolve(authentication).getUsername(),
+        return Map.of("revoked", sessions.revokeAll(currentUser.resolve(authentication),
                 session == null ? null : session.getId()));
     }
 

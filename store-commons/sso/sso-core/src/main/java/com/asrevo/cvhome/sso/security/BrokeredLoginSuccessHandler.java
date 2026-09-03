@@ -97,7 +97,7 @@ public class BrokeredLoginSuccessHandler extends SavedRequestAwareAuthentication
         SessionMetadata.stamp(session, request, via);
         session.setMaxInactiveInterval(policy.idleSeconds());
         if (policy.singleSessionPerUser()) {
-            sessions.revokeAll(username, session.getId());
+            sessions.revokeOthers(details.getUsername(), session.getId());
         }
         lockout.succeeded(username, AuditRequestContext.current().ip(), via);
         audit.recordDetached(AuditRecord.of(AuditEventType.USER_LOGIN)

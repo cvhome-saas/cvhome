@@ -32,6 +32,9 @@ class LoginFlowIntegrationTest {
     /** One of the redirect URIs the boot-time initializer registers for web-app from common-config.yml. */
     private static final String REDIRECT = "http://gateway.com:8000/login/oauth2/code/uaa";
 
+    /** The seeded account behind {@link UaaClient#ORG1_STORE1_ADMIN}, which is now also its subject. */
+    private static final String ORG1_STORE1_ADMIN_ID = "60ab49a5-7f06-4b5a-be81-9b30bb6559ae";
+
     private static final String VERIFIER = "0123456789abcdef0123456789abcdef0123456789abcdef";
 
     private static final String AUTHORIZE = "/oauth2/authorize";
@@ -85,8 +88,11 @@ class LoginFlowIntegrationTest {
         JsonNode body = UaaClient.body(tokens);
         assertThat(body.get("expires_in").asInt()).isLessThanOrEqualTo(900);
         JsonNode claims = UaaClient.claims(body.get("access_token").asText());
-        assertThat(claims.get("sub").asText()).isEqualTo(UaaClient.ORG1_STORE1_ADMIN);
-        assertThat(claims.get("uid").asText()).isEqualTo("60ab49a5-7f06-4b5a-be81-9b30bb6559ae");
+        // sub is the account id, not the username: the principal name became the id so that a username, which is
+        // unique only within a realm, could never key a session or an authorization across realms. It is also what
+        // OIDC asks of a subject — stable and never reassigned — and the username travels as preferred_username.
+        assertThat(claims.get("sub").asText()).isEqualTo(ORG1_STORE1_ADMIN_ID);
+        assertThat(claims.get("uid").asText()).isEqualTo(ORG1_STORE1_ADMIN_ID);
         assertThat(claims.get("org").asText()).isEqualTo("21f023932bc66470c104b76f");
         assertThat(claims.get("store").asText()).isEqualTo("65f023632bc46470c104b76f");
         assertThat(claims.get("roles").toString()).contains("STORE_ADMIN");
@@ -95,6 +101,7 @@ class LoginFlowIntegrationTest {
         JsonNode idToken = UaaClient.claims(body.get("id_token").asText());
         assertThat(idToken.get("email").asText()).isEqualTo("org1-store1-admin@mail.com");
         assertThat(idToken.get("given_name").asText()).isEqualTo("Store1");
+        assertThat(idToken.get("preferred_username").asText()).isEqualTo(UaaClient.ORG1_STORE1_ADMIN);
     }
 
     @Test

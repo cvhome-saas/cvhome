@@ -129,8 +129,8 @@ public class PasswordResetService {
     }
 
     private void revokeEverything(User user) {
-        sessions.revokeAll(user.getUsername(), null);
-        authorizations.revokeAllForUser(user.getUsername());
+        sessions.revokeAll(user, null);
+        authorizations.revokeAllForUser(user);
     }
 
     private PasswordResetToken usable(String token) throws ResetTokenNotUsableException {

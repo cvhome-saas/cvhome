@@ -25,6 +25,7 @@ import com.asrevo.cvhome.sso.realm.RealmMode;
 import com.asrevo.cvhome.sso.realm.SsoRealmProperties;
 import com.asrevo.cvhome.sso.realm.SsoTenantIdentifierResolver;
 import com.asrevo.cvhome.sso.repo.UserRepository;
+import com.asrevo.cvhome.sso.security.PrincipalNames;
 import com.asrevo.cvhome.sso.settings.RealmSettings;
 import com.asrevo.cvhome.sso.settings.SettingsService;
 
@@ -82,13 +83,15 @@ class JwtCustomizerConfigTest {
 
     private final UserRepository users = mock(UserRepository.class);
 
+    private final PrincipalNames principals = new PrincipalNames(users);
+
     private final SettingsService settings = mock(SettingsService.class);
 
     private final RealmSettings realm = mock(RealmSettings.class);
 
     private final KeyRotationService keys = mock(KeyRotationService.class);
 
-    private final JwtCustomizerConfig config = new JwtCustomizerConfig(users, settings, keys, Clock.systemUTC(),
+    private final JwtCustomizerConfig config = new JwtCustomizerConfig(principals, settings, keys, Clock.systemUTC(),
             SINGLE_REALM, new SsoTenantIdentifierResolver(SINGLE_REALM));
 
     private static SsoRealmProperties singleRealm() {
@@ -117,7 +120,9 @@ class JwtCustomizerConfigTest {
         return user;
     }
 
-    private static JwtEncodingContext context(OAuth2TokenType type, Map<String, Object> clientSettings) {
+    /** The principal name is the account id — {@code JpaUserDetailsService} — or a client id for a client. */
+    private static JwtEncodingContext context(OAuth2TokenType type, Map<String, Object> clientSettings,
+                                              String principalName) {
         RegisteredClient client = RegisteredClient.withId("id").clientId("web-app")
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
                 .redirectUri("http://localhost/cb")
@@ -125,7 +130,7 @@ class JwtCustomizerConfigTest {
                 .build();
         return JwtEncodingContext.with(JwsHeader.with(() -> "RS256"), JwtClaimsSet.builder().subject(USERNAME))
                 .registeredClient(client)
-                .principal(UsernamePasswordAuthenticationToken.authenticated(USERNAME, null, Set.of()))
+                .principal(UsernamePasswordAuthenticationToken.authenticated(principalName, null, Set.of()))
                 .tokenType(type)
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
                 .build();
@@ -139,9 +144,9 @@ class JwtCustomizerConfigTest {
     @Test
     void accessTokenCarriesRolesUidAndOnlyTheTenancyMetadata() {
         User user = user(Map.of(ORG, ORG_ID, STORE, STORE_ID, NOTE, "ignored"), STORE_ADMIN);
-        when(users.findByUsername(USERNAME)).thenReturn(Optional.of(user));
+        when(users.findById(user.getId())).thenReturn(Optional.of(user));
 
-        Map<String, Object> claims = claims(context(OAuth2TokenType.ACCESS_TOKEN, Map.of()));
+        Map<String, Object> claims = claims(context(OAuth2TokenType.ACCESS_TOKEN, Map.of(), user.getId().toString()));
 
         assertThat(claims).containsEntry(ORG, ORG_ID).containsEntry(STORE, STORE_ID)
                 .containsEntry(JwtCustomizerConfig.UID, user.getId().toString())
@@ -154,9 +159,9 @@ class JwtCustomizerConfigTest {
     void metadataCannotOverrideTheRolesClaim() {
         User user = user(Map.of(JwtCustomizerConfig.ROLES, Set.of("SUPER_ADMIN"), SCOPE, "super_admin", AUD, X),
                 STORE_MODERATOR);
-        when(users.findByUsername(USERNAME)).thenReturn(Optional.of(user));
+        when(users.findById(user.getId())).thenReturn(Optional.of(user));
 
-        Map<String, Object> claims = claims(context(OAuth2TokenType.ACCESS_TOKEN, Map.of()));
+        Map<String, Object> claims = claims(context(OAuth2TokenType.ACCESS_TOKEN, Map.of(), user.getId().toString()));
 
         assertThat(claims.get(JwtCustomizerConfig.ROLES)).asInstanceOf(InstanceOfAssertFactories.COLLECTION)
                 .containsExactly(STORE_MODERATOR);
@@ -165,10 +170,10 @@ class JwtCustomizerConfigTest {
 
     @Test
     void clientSettingsBecomeClaimsOnlyUnderThePrefixOrAsResource() {
-        when(users.findByUsername(USERNAME)).thenReturn(Optional.empty());
         Map<String, Object> settings = Map.of(RESOURCE, POD, TIER, GOLD, KNOWN_SETTING, X, INTERNAL, "no");
 
-        Map<String, Object> claims = claims(context(OAuth2TokenType.ACCESS_TOKEN, settings));
+        // A client_credentials principal: a client id, which is no account id, so no user claims are added.
+        Map<String, Object> claims = claims(context(OAuth2TokenType.ACCESS_TOKEN, settings, "admin-sdk"));
 
         assertThat(claims).containsEntry(RESOURCE, POD).containsEntry(TIER, GOLD)
                 .doesNotContainKey(KNOWN_SETTING).doesNotContainKey(INTERNAL);
@@ -177,9 +182,10 @@ class JwtCustomizerConfigTest {
     @Test
     void idTokenCarriesProfileClaimsAndNoTenancyMetadata() {
         User user = user(Map.of(ORG, ORG_ID), "ORG_ADMIN");
-        when(users.findByUsername(USERNAME)).thenReturn(Optional.of(user));
+        when(users.findById(user.getId())).thenReturn(Optional.of(user));
 
-        Map<String, Object> claims = claims(context(new OAuth2TokenType(OidcParameterNames.ID_TOKEN), Map.of()));
+        Map<String, Object> claims = claims(context(new OAuth2TokenType(OidcParameterNames.ID_TOKEN), Map.of(),
+                user.getId().toString()));
 
         assertThat(claims).containsEntry("email", EMAIL).containsEntry("given_name", FIRST)
                 .containsEntry("family_name", LAST).containsEntry("name", String.format("%s %s", FIRST, LAST))

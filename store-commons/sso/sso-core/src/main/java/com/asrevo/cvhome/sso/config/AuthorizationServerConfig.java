@@ -43,7 +43,7 @@ import com.nimbusds.jose.proc.SecurityContext;
  * <p>
  * <strong>Authorizations are in the database.</strong> Without an {@code OAuth2AuthorizationService} bean the server
  * kept every issued token in memory, so a restart invalidated every refresh token and nothing could ever be revoked —
- * disabling a user left their tokens working until they expired. {@code uaa.oauth2_authorization} is now real.
+ * disabling a user left their tokens working until they expired. {@code oauth2_authorization} is now real.
  * </p>
  *
  * <p>

@@ -30,6 +30,7 @@ import com.asrevo.cvhome.sso.dto.ClientStats;
 import com.asrevo.cvhome.sso.dto.ClientSummary;
 import com.asrevo.cvhome.sso.dto.CreatedClient;
 import com.asrevo.cvhome.sso.dto.RotatedSecret;
+import com.asrevo.cvhome.sso.security.PrincipalNames;
 import com.asrevo.cvhome.sso.service.AdminClientService;
 import com.asrevo.cvhome.sso.service.ClientAuthMethod;
 import com.asrevo.cvhome.sso.service.OAuthGrantType;
@@ -57,6 +58,8 @@ public class AdminClientController {
     private static final String ADMIN = "hasAuthority('SCOPE_super_admin') or hasRole('SUPER_ADMIN')";
 
     private final AdminClientService adminClientService;
+
+    private final PrincipalNames principals;
 
     @PreAuthorize(ADMIN)
     @GetMapping
@@ -108,7 +111,8 @@ public class AdminClientController {
     @PreAuthorize(ADMIN)
     @PostMapping("{id}/disable")
     public ClientDetails disable(@PathVariable String id, Authentication authentication) throws ClientNotFoundException {
-        return adminClientService.disable(id, authentication == null ? null : authentication.getName());
+        return adminClientService.disable(id,
+                authentication == null ? null : principals.display(authentication.getName()));
     }
 
     /** A new random secret with a grace window for the old one, answered once. */

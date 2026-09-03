@@ -46,7 +46,7 @@ public class LoginSuccessHandler extends SavedRequestAwareAuthenticationSuccessH
         SessionMetadata.stamp(session, request, LockoutService.VIA_PASSWORD);
         session.setMaxInactiveInterval(policy.idleSeconds());
         if (policy.singleSessionPerUser()) {
-            sessions.revokeAll(authentication.getName(), session.getId());
+            sessions.revokeOthers(authentication.getName(), session.getId());
         }
         super.onAuthenticationSuccess(request, response, authentication);
     }

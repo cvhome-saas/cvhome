@@ -12,6 +12,7 @@ import com.asrevo.cvhome.sso.audit.AuditEventType;
 import com.asrevo.cvhome.sso.audit.AuditRecord;
 import com.asrevo.cvhome.sso.audit.AuditService;
 import com.asrevo.cvhome.sso.audit.AuditTargetType;
+import com.asrevo.cvhome.sso.domain.User;
 
 import lombok.RequiredArgsConstructor;
 
@@ -25,13 +26,19 @@ import lombok.RequiredArgsConstructor;
  * resource server validates locally lives until its (fifteen-minute) expiry.
  * </p>
  */
+/*
+ * The table is unqualified on purpose. Hikari sets the connection's schema to the service's own name
+ * (`spring.datasource.hikari.schema`), so `oauth2_authorization` resolves to uaa's copy in uaa and cua's in cua.
+ * Naming the schema here was a bug carried in with the extraction: the two deployments share one database, so a
+ * cua revocation was reading — and deleting from — uaa's table.
+ */
 @Service
 @RequiredArgsConstructor
 public class TokenRevocationService {
 
-    private static final String IDS_BY_PRINCIPAL = "select id from uaa.oauth2_authorization where principal_name = ?";
+    private static final String IDS_BY_PRINCIPAL = "select id from oauth2_authorization where principal_name = ?";
 
-    private static final String IDS_BY_CLIENT = "select id from uaa.oauth2_authorization where registered_client_id = ?";
+    private static final String IDS_BY_CLIENT = "select id from oauth2_authorization where registered_client_id = ?";
 
     private static final String COUNT = "%d authorization(s)";
 
@@ -41,11 +48,18 @@ public class TokenRevocationService {
 
     private final AuditService audit;
 
+    /**
+     * {@code principal_name} is the account id, not the username — see {@code JpaUserDetailsService}. Keying this
+     * on the username would have revoked the tokens of every same-named account on the deployment, which on cua
+     * means every store on the pod.
+     */
     @Transactional
-    public int revokeAllForUser(String username) {
-        int removed = removeAll(jdbc.queryForList(IDS_BY_PRINCIPAL, String.class, username));
+    public int revokeAllForUser(User user) {
+        String principalName = user.getId().toString();
+        int removed = removeAll(jdbc.queryForList(IDS_BY_PRINCIPAL, String.class, principalName));
         if (removed > 0) {
-            audit.record(AuditRecord.of(AuditEventType.TOKEN_REVOKED).target(AuditTargetType.USER, null, username)
+            audit.record(AuditRecord.of(AuditEventType.TOKEN_REVOKED)
+                    .target(AuditTargetType.USER, principalName, user.getUsername())
                     .detail(String.format(COUNT, removed)));
         }
         return removed;

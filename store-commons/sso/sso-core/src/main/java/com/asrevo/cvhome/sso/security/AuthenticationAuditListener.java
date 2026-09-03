@@ -44,6 +44,8 @@ public class AuthenticationAuditListener {
 
     private final LockoutService lockout;
 
+    private final PrincipalNames principals;
+
     private final AuditService audit;
 
     @EventListener
@@ -51,7 +53,8 @@ public class AuthenticationAuditListener {
         if (!(event.getAuthentication() instanceof UsernamePasswordAuthenticationToken)) {
             return;
         }
-        String username = event.getAuthentication().getName();
+        // The principal name is the account id; lockout counters and audit rows are both keyed by the username.
+        String username = principals.display(event.getAuthentication().getName());
         lockout.succeeded(username, AuditRequestContext.current().ip(), LockoutService.VIA_PASSWORD);
         audit.recordDetached(AuditRecord.of(AuditEventType.USER_LOGIN)
                 .actor(new AuditActor(AuditActorType.USER, null, username))
@@ -80,7 +83,7 @@ public class AuthenticationAuditListener {
         if (event.getAuthentication() == null) {
             return;
         }
-        String username = event.getAuthentication().getName();
+        String username = principals.display(event.getAuthentication().getName());
         audit.recordDetached(AuditRecord.of(AuditEventType.USER_LOGOUT)
                 .actor(new AuditActor(AuditActorType.USER, null, username))
                 .user(null, username));

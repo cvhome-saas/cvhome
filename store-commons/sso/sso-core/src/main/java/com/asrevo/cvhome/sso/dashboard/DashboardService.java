@@ -74,30 +74,30 @@ public class DashboardService {
             select date_trunc(?, occurred_at) as bucket,
                    count(*) filter (where outcome = 'SUCCESS') as ok,
                    count(*) filter (where outcome = 'FAILURE') as bad
-            from uaa.audit_events
+            from audit_events
             where occurred_at >= ? and event_type in ('user.login', 'user.login.failed')
             group by bucket order by bucket""";
 
     private static final String TOP_CLIENTS_SQL = """
-            select client_id, count(*) from uaa.audit_events
+            select client_id, count(*) from audit_events
             where occurred_at >= ? and event_type = 'token.issued' and client_id is not null
             group by client_id order by count(*) desc limit ?""";
 
     private static final String COUNT_SINCE = """
-            select count(*) from uaa.audit_events where occurred_at >= ? and event_type = ?""";
+            select count(*) from audit_events where occurred_at >= ? and event_type = ?""";
 
     private static final String SECRETS_EXPIRING = """
-            select count(*) from uaa.oauth2_registered_client
+            select count(*) from oauth2_registered_client
             where client_secret_expires_at is not null and client_secret_expires_at < ?""";
 
     private static final String CLIENTS_WITHOUT_PKCE = """
-            select count(*) from uaa.oauth2_registered_client
+            select count(*) from oauth2_registered_client
             where authorization_grant_types like '%authorization_code%' and client_settings not like '%require-proof-key":true%'""";
 
-    private static final String USERS_WITHOUT_PASSWORD = "select count(*) from uaa.users where password_hash is null";
+    private static final String USERS_WITHOUT_PASSWORD = "select count(*) from users where password_hash is null";
 
     /** Live sessions, counted from Spring Session's own table: there is no API that answers "how many". */
-    private static final String ACTIVE_SESSIONS = "select count(*) from uaa.spring_session where expiry_time > ?";
+    private static final String ACTIVE_SESSIONS = "select count(*) from spring_session where expiry_time > ?";
 
     private final JdbcTemplate jdbc;
 
@@ -150,7 +150,7 @@ public class DashboardService {
     }
 
     private long clientCount() {
-        Long count = jdbc.queryForObject("select count(*) from uaa.oauth2_registered_client", Long.class);
+        Long count = jdbc.queryForObject("select count(*) from oauth2_registered_client", Long.class);
         return count == null ? 0 : count;
     }
 

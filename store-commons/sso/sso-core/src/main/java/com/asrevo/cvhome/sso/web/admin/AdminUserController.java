@@ -41,7 +41,6 @@ import com.asrevo.cvhome.sso.idp.UserIdentityService;
 import com.asrevo.cvhome.sso.invitation.InvitationService;
 import com.asrevo.cvhome.sso.invitation.PasswordResetService;
 import com.asrevo.cvhome.sso.service.AdminService;
-import com.asrevo.cvhome.sso.session.SessionAdminService;
 import com.asrevo.cvhome.sso.session.SessionSummary;
 import com.asrevo.cvhome.uaa.errors.EmailTakenException;
 import com.asrevo.cvhome.uaa.errors.IdentityNotFoundException;
@@ -80,8 +79,6 @@ public class AdminUserController {
     private static final String METADATA_PREFIX = "metadata[";
 
     private final AdminService adminService;
-
-    private final SessionAdminService sessions;
 
     private final InvitationService invitations;
 
@@ -232,21 +229,21 @@ public class AdminUserController {
     @PreAuthorize(ADMIN)
     @GetMapping("/{id}/sessions")
     public List<SessionSummary> sessions(@PathVariable UUID id) throws UserNotFoundException {
-        return sessions.list(adminService.getUser(id).username(), null);
+        return adminService.listSessions(id);
     }
 
     @PreAuthorize(ADMIN)
     @DeleteMapping("/{id}/sessions/{sessionId}")
     public void revokeSession(@PathVariable UUID id, @PathVariable String sessionId)
             throws UserNotFoundException, SessionNotFoundException {
-        sessions.revoke(adminService.getUser(id).username(), sessionId);
+        adminService.revokeSession(id, sessionId);
     }
 
     /** Signs the account out everywhere. */
     @PreAuthorize(ADMIN)
     @DeleteMapping("/{id}/sessions")
     public Map<String, Integer> revokeSessions(@PathVariable UUID id) throws UserNotFoundException {
-        return Map.of("revoked", sessions.revokeAll(adminService.getUser(id).username(), null));
+        return Map.of("revoked", adminService.revokeSessions(id));
     }
 
     // --- roles ----------------------------------------------------------------------------------------------------

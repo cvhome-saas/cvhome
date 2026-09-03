@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.asrevo.cvhome.sso.security.PrincipalNames;
 import com.asrevo.cvhome.sso.settings.RealmSettings;
 import com.asrevo.cvhome.sso.settings.SettingsService;
 import com.asrevo.cvhome.uaa.errors.SettingsConflictException;
@@ -25,6 +26,8 @@ public class AdminSettingsController {
 
     private final SettingsService settings;
 
+    private final PrincipalNames principals;
+
     @PreAuthorize("hasAuthority('SCOPE_super_admin') or hasRole('SUPER_ADMIN')")
     @GetMapping
     public RealmSettings get() {
@@ -35,7 +38,7 @@ public class AdminSettingsController {
     @PutMapping
     public RealmSettings update(@RequestBody RealmSettings requested, Authentication authentication)
             throws SettingsInvalidException, SettingsConflictException {
-        return settings.update(requested, authentication.getName());
+        return settings.update(requested, principals.display(authentication.getName()));
     }
 
 }

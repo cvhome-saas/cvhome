@@ -22,7 +22,7 @@ import com.asrevo.cvhome.sso.domain.User;
 import com.asrevo.cvhome.sso.keys.KeyRotationService;
 import com.asrevo.cvhome.sso.realm.SsoRealmProperties;
 import com.asrevo.cvhome.sso.realm.SsoTenantIdentifierResolver;
-import com.asrevo.cvhome.sso.repo.UserRepository;
+import com.asrevo.cvhome.sso.security.PrincipalNames;
 import com.asrevo.cvhome.sso.settings.SettingsService;
 
 /**
@@ -75,7 +75,7 @@ public class JwtCustomizerConfig {
     /** The same value, under the name resource servers already read. */
     static final String CLIENT_ID = "clientId";
 
-    private final UserRepository userRepository;
+    private final PrincipalNames principals;
 
     private final SettingsService settings;
 
@@ -87,9 +87,9 @@ public class JwtCustomizerConfig {
 
     private final SsoTenantIdentifierResolver realms;
 
-    public JwtCustomizerConfig(UserRepository userRepository, SettingsService settings, KeyRotationService keys,
+    public JwtCustomizerConfig(PrincipalNames principals, SettingsService settings, KeyRotationService keys,
                                Clock clock, SsoRealmProperties realmProperties, SsoTenantIdentifierResolver realms) {
-        this.userRepository = userRepository;
+        this.principals = principals;
         this.settings = settings;
         this.keys = keys;
         this.clock = clock;
@@ -135,7 +135,8 @@ public class JwtCustomizerConfig {
         if (principal == null) {
             return;
         }
-        userRepository.findByUsername(principal.getName()).ifPresent(user -> {
+        // By id: the principal name is the account id, and on cua a username matches in every realm at once.
+        principals.account(principal.getName()).ifPresent(user -> {
             context.getClaims().claim(UID, user.getId().toString());
             addRealmClaims(context, user);
             if (profile) {

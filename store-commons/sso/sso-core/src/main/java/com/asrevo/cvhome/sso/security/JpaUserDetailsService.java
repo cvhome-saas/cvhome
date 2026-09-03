@@ -61,7 +61,12 @@ public class JpaUserDetailsService implements UserDetailsService {
                 .map(p -> new SimpleGrantedAuthority(String.format("PERM_%s", p.key())))
                 .forEach(authorities::add);
 
-        return org.springframework.security.core.userdetails.User.withUsername(u.getUsername())
+        // The principal name is the account id, not the typed username. Spring Session's PRINCIPAL_NAME index and
+        // oauth2_authorization.principal_name are both looked up by this value, and a username is unique only
+        // within its realm: on cua, where every store is a realm, two shoppers called "user" in two stores shared
+        // one principal name, so listing or revoking one account's sessions reached the other store's. The human
+        // name stays on the User row and travels in tokens as `username`.
+        return org.springframework.security.core.userdetails.User.withUsername(u.getId().toString())
                 .password(u.getPasswordHash() == null ? NO_PASSWORD : u.getPasswordHash())
                 .authorities(authorities)
                 .disabled(!u.isEnabled())

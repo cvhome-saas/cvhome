@@ -81,11 +81,11 @@ public class AdminClientService {
     private static final String LIST = """
             select c.id, c.client_id, c.client_name, c.client_authentication_methods, c.authorization_grant_types,
                    c.client_secret_expires_at, coalesce(e.enabled, true), e.last_token_issued_at
-            from uaa.oauth2_registered_client c
-            left join uaa.client_extension e on e.registered_client_id = c.id
+            from oauth2_registered_client c
+            left join client_extension e on e.registered_client_id = c.id
             order by c.client_id""";
 
-    private static final String DELETE = "delete from uaa.oauth2_registered_client where id = ?";
+    private static final String DELETE = "delete from oauth2_registered_client where id = ?";
 
     private static final String GRACE_UNTIL = "previous secret valid until %s";
 
@@ -235,7 +235,7 @@ public class AdminClientService {
 
     /** A disabled client is invisible to {@code findByClientId}, so the uniqueness check has to read the table. */
     private boolean existsByClientId(String clientId) {
-        Integer n = jdbc.queryForObject("select count(*) from uaa.oauth2_registered_client where client_id = ?",
+        Integer n = jdbc.queryForObject("select count(*) from oauth2_registered_client where client_id = ?",
                 Integer.class, clientId);
         return n != null && n > 0;
     }

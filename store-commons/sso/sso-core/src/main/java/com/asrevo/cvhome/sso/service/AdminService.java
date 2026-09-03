@@ -3,6 +3,7 @@ package com.asrevo.cvhome.sso.service;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -33,6 +34,7 @@ import com.asrevo.cvhome.sso.repo.UserRepository;
 import com.asrevo.cvhome.sso.repo.UserSpecifications;
 import com.asrevo.cvhome.sso.security.LockoutService;
 import com.asrevo.cvhome.sso.session.SessionAdminService;
+import com.asrevo.cvhome.sso.session.SessionSummary;
 import com.asrevo.cvhome.sso.token.TokenRevocationService;
 import com.asrevo.cvhome.uaa.errors.EmailTakenException;
 import com.asrevo.cvhome.uaa.errors.PasswordCompromisedException;
@@ -40,6 +42,7 @@ import com.asrevo.cvhome.uaa.errors.PasswordPolicyViolationException;
 import com.asrevo.cvhome.uaa.errors.PasswordReusedException;
 import com.asrevo.cvhome.uaa.errors.RoleNotAssignableException;
 import com.asrevo.cvhome.uaa.errors.RoleNotFoundException;
+import com.asrevo.cvhome.uaa.errors.SessionNotFoundException;
 import com.asrevo.cvhome.uaa.errors.SuperAdminImmutableException;
 import com.asrevo.cvhome.uaa.errors.UserNotFoundException;
 import com.asrevo.cvhome.uaa.errors.UsernameTakenException;
@@ -336,8 +339,24 @@ public class AdminService {
     }
 
     private void revokeEverything(User u) {
-        sessions.revokeAll(u.getUsername(), null);
-        tokens.revokeAllForUser(u.getUsername());
+        sessions.revokeAll(u, null);
+        tokens.revokeAllForUser(u);
+    }
+
+    @Transactional(readOnly = true)
+    public List<SessionSummary> listSessions(UUID id) throws UserNotFoundException {
+        return sessions.list(findUser(id), null);
+    }
+
+    @Transactional
+    public void revokeSession(UUID id, String sessionId) throws UserNotFoundException, SessionNotFoundException {
+        sessions.revoke(findUser(id), sessionId);
+    }
+
+    /** Signs the account out everywhere. */
+    @Transactional
+    public int revokeSessions(UUID id) throws UserNotFoundException {
+        return sessions.revokeAll(findUser(id), null);
     }
 
     @Transactional(readOnly = true)

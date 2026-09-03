@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.asrevo.cvhome.sso.dto.KeyStatus;
 import com.asrevo.cvhome.sso.dto.SigningKeyDto;
 import com.asrevo.cvhome.sso.keys.KeyRotationService;
+import com.asrevo.cvhome.sso.security.PrincipalNames;
 
 import lombok.RequiredArgsConstructor;
 
@@ -24,6 +25,8 @@ public class AdminKeyController {
     private static final String ADMIN = "hasAuthority('SCOPE_super_admin') or hasRole('SUPER_ADMIN')";
 
     private final KeyRotationService keys;
+
+    private final PrincipalNames principals;
 
     @PreAuthorize(ADMIN)
     @GetMapping
@@ -40,7 +43,7 @@ public class AdminKeyController {
     @PreAuthorize(ADMIN)
     @PostMapping("/rotate")
     public SigningKeyDto rotate(Authentication authentication) {
-        return keys.rotate(authentication == null ? "unknown" : authentication.getName());
+        return keys.rotate(authentication == null ? "unknown" : principals.display(authentication.getName()));
     }
 
 }

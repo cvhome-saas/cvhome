@@ -107,8 +107,8 @@ class PasswordResetServiceTest {
 
         service.createLink(user.getId(), true);
 
-        verify(sessions).revokeAll(USERNAME, null);
-        verify(authorizations).revokeAllForUser(USERNAME);
+        verify(sessions).revokeAll(user, null);
+        verify(authorizations).revokeAllForUser(user);
     }
 
     @Test
@@ -120,8 +120,8 @@ class PasswordResetServiceTest {
 
         verify(passwords).setPassword(user, PASSWORD);
         assertThat(token.getUsedAt()).isEqualTo(NOW);
-        verify(sessions).revokeAll(USERNAME, null);
-        verify(authorizations).revokeAllForUser(USERNAME);
+        verify(sessions).revokeAll(user, null);
+        verify(authorizations).revokeAllForUser(user);
     }
 
     @Test

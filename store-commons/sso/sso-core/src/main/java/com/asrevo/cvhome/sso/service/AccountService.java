@@ -46,8 +46,8 @@ public class AccountService {
         }
         passwords.setPassword(user, newPassword);
         users.save(user);
-        sessions.revokeAll(user.getUsername(), keepSessionId);
-        tokens.revokeAllForUser(user.getUsername());
+        sessions.revokeAll(user, keepSessionId);
+        tokens.revokeAllForUser(user);
         audit.record(AuditRecord.of(AuditEventType.USER_PASSWORD_CHANGED).user(user.getId(), user.getUsername()));
     }
 

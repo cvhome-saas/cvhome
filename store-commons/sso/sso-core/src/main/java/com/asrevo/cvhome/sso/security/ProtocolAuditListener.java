@@ -50,6 +50,8 @@ public class ProtocolAuditListener {
 
     private final AuditService audit;
 
+    private final PrincipalNames principals;
+
     private final ClientExtensionRepository extensions;
 
     private final Clock clock;
@@ -65,7 +67,7 @@ public class ProtocolAuditListener {
         OAuth2AccessToken accessToken = token.getAccessToken();
         String scopes = accessToken.getScopes().isEmpty() ? "" : String.join(" ", sorted(accessToken.getScopes()));
         // The token's principal is the client for client_credentials and the person for an authorization code.
-        String principal = token.getPrincipal() instanceof Authentication who ? who.getName() : null;
+        String principal = token.getPrincipal() instanceof Authentication who ? principals.display(who.getName()) : null;
         audit.recordDetached(AuditRecord.of(AuditEventType.TOKEN_ISSUED)
                 .actor(new AuditActor(AuditActorType.CLIENT, client.getId(), client.getClientId()))
                 .client(client.getClientId())

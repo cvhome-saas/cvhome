@@ -28,7 +28,9 @@ import lombok.RequiredArgsConstructor;
  * Turns whatever authenticated the request into the account behind it.
  *
  * <p>
- * Two shapes reach it: a form-login session, whose principal name is the username, and a bearer JWT.
+ * Two shapes reach it: a form-login session and a bearer JWT. Neither is keyed by username — the principal name
+ * a session carries is the account id ({@code JpaUserDetailsService}), because a username is unique only within
+ * a realm.
  * </p>
  *
  * <p>
@@ -81,7 +83,7 @@ public class CurrentUserResolver {
             }
             return users.findById(accountId(uid, name)).orElseThrow(() -> NotAUserPrincipalException.of(name));
         }
-        return users.findByUsername(name).orElseThrow(() -> NotAUserPrincipalException.of(name));
+        return users.findById(accountId(name, name)).orElseThrow(() -> NotAUserPrincipalException.of(name));
     }
 
     private static UUID accountId(String uid, String name) throws NotAUserPrincipalException {
