@@ -186,7 +186,6 @@ public class JwtCustomizerConfig {
         }
         String realm = realms.resolveCurrentTenantIdentifier();
         context.getClaims().claim(REALM, realm);
-        context.getClaims().claim(CLIENT_ID, realm);
         context.getClaims().subject(user.getId().toString());
     }
 

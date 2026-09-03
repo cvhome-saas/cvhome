@@ -172,8 +172,10 @@ against a live stack on 2026-09-03.
 ### RLM-05 — The token says which store, which role, and who · critical · [verified]
 
 - **Steps** — decode the access token from RLM-04.
-- **Expect** — `iss` is the pod's one issuer (`…/cua`), never the store host; `realm` and `clientId` both carry
-  the store id; `roles` is `["CUSTOMER"]`; `sub` is the account **UUID**, not the username.
+- **Expect** — `iss` is the pod's one issuer (`…/cua`), never the store host; `realm` carries the store id;
+  `roles` is `["CUSTOMER"]`; `sub` is the account **UUID**, not the username. There is no `clientId` claim: it
+  was emitted alongside `realm` while the readers moved over, and it held the same value only because a store had
+  exactly one client.
 - **Why each matters** — without `roles` the pods' `ROLE_CUSTOMER` ceiling admits nothing and every shopper call
   to checkout is refused. Without the store claim the store check fails even with the role. And `sub` must not be
   the username: all four demo shoppers are called `user`, and checkout joins its customer records on `sub`, so
@@ -221,6 +223,56 @@ against a live stack on 2026-09-03.
 > **Known gap.** `LINK` still falls back to a confirmation when the provider does *not* vouch for the email, and
 > cua cannot complete that either — the shopper sees `?error=social` with no explanation. A storefront
 > confirmation step, and an error token distinct from `social`, is outstanding work.
+
+### RLM-10 — A shopper sees their own sessions, and only their own · critical · [unit only]
+
+- **Setup** — register the same username on store 1 and store 2 (RLM-03 leaves you with exactly this), and sign
+  in as each, in two browsers or two private windows.
+- **Steps** — `GET /cua/api/v1/account/sessions?store=<own store>` as each shopper. Then ask as the *other*
+  store: `GET /cua/api/v1/account/sessions?store=<other store>` with the first shopper's cookie.
+- **Expect** — one session each, its own. The cross-store ask is `403`, not that store's sessions. Then
+  `DELETE /cua/api/v1/account/sessions` as shopper 1 and confirm shopper 2 is still signed in.
+- **Why** — one `cua.spring_session` table holds every store's sessions and one index answers "which are this
+  account's". That index used to hold the username, which is unique only within a realm, so two shoppers called
+  `user` shared it: each listed the other's address, browser and start time, and could end them. The principal
+  name is the account id now. Pinned by `LoginHandoffIntegrationTest.sameNamedShoppersOfTwoStoresDoNotShareSessions`,
+  which sees two sessions where one belongs when the old keying is put back. **The browser walk above has not
+  been run by hand.**
+
+### RLM-11 — A password change signs out one store's shopper, not the other's · high · [not verified]
+
+- **Setup** — as RLM-10.
+- **Steps** — change shopper 1's password. Check shopper 2's session and access token still work.
+- **Expect** — shopper 2 is untouched. Revocation reads `oauth2_authorization` by principal name, which is the
+  same index the sessions use and was keyed the same wrong way.
+
+### RLM-12 — A store cannot set a policy past the platform's limits · high · [unit only]
+
+- **Steps** — as a merchant, `PUT` the realm's settings with `lockout.threshold` of `1000000`, then with a
+  refresh-token TTL of ten years, then with `auditRetentionDays` of `1`.
+- **Expect** — `400 UAA.SETTINGS.INVALID` each time, naming the field. A value inside the ceiling
+  (`lockout.threshold` of 20) is accepted.
+- **Why** — the pod is shared. A store that turns lockout off by setting a threshold nobody reaches, or mints a
+  token that outlives the store, is weakening a deployment other merchants' shoppers sign in to. The ceilings are
+  deployment configuration: no API returns them, and the merchant sees only that the value was refused.
+
+### RLM-13 — One store cannot spend another store's login budget · medium · [unit only]
+
+- **Steps** — from one address, post wrong passwords at store 1 until `429`. Immediately try a *correct* sign-in
+  at store 2 from the same address.
+- **Expect** — store 2 still signs in. Keep spraying across stores and the address is refused on its own after
+  `spread` times the limit (5× by default).
+- **Why** — one deployment serves every store on the pod, so counting an address once let a burst aimed at one
+  store lock every other store's shoppers out. Pinned by `RateLimitFilterTest`.
+
+### RLM-14 — Audit retention actually runs · medium · [not verified]
+
+- **Steps** — set a realm's `auditRetentionDays` to its floor, insert an older `cua.audit_events` row for that
+  realm, and run the nightly job (`0 17 3 * * *`) or invoke `AuditRetentionJob.trim()`.
+- **Expect** — the row is gone, and rows of *other* realms are untouched.
+- **Why** — audit rows are `@TenantId` rows and the job ran in no realm at all, so the delete was filtered to the
+  sentinel realm and matched nothing: retention a merchant configured did nothing, quietly, while the table grew.
+  It sweeps realm by realm now, each in its own transaction.
 
 ## CLI — The dynamic client, and the port that must survive
 

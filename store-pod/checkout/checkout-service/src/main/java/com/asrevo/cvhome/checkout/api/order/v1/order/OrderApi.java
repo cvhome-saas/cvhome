@@ -50,6 +50,7 @@ import com.asrevo.cvhome.inventory.api.errors.InventoryApiUnavailableException;
 import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
 import com.asrevo.cvhome.merchant.model.merchant.ReadableMerchantStore;
 import com.asrevo.cvhome.payment.api.errors.PaymentApiUnavailableException;
+import com.asrevo.cvhome.s2s.utils.SecurityUtils;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.utils.LocaleUtils;
 
@@ -67,7 +68,8 @@ import static com.asrevo.cvhome.commons.utils.DefaultStoresConstants.DEFAULT_ORG
 @Slf4j
 public class OrderApi {
 
-    private static final String CLIENT_ID_ATTRIBUTE = "clientId";
+    /** The store a shopper token belongs to; {@code clientId} held the same value only by coincidence. */
+    private static final String REALM_ATTRIBUTE = SecurityUtils.USER_REALM_CLAIM;
 
     private final OrderFacade orderFacade;
 
@@ -182,7 +184,7 @@ public class OrderApi {
         if (auth == null || !auth.isAuthenticated()) {
             throw OrderLoginRequiredException.of(merchantStore);
         }
-        if (!merchantStore.getId().equals(auth.getTokenAttributes().get(CLIENT_ID_ATTRIBUTE))) {
+        if (!merchantStore.getId().equals(auth.getTokenAttributes().get(REALM_ATTRIBUTE))) {
             throw ForeignStoreTokenException.of(merchantStore);
         }
     }

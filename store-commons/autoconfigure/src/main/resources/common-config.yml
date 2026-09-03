@@ -181,7 +181,11 @@ spring:
             user-info-uri: ${com.asrevo.cvhome.services.uaa.schema}://${com.asrevo.cvhome.services.uaa.domain}:${com.asrevo.cvhome.services.uaa.port}/userinfo
             token-uri: ${com.asrevo.cvhome.services.uaa.schema}://${com.asrevo.cvhome.services.uaa.domain}:${com.asrevo.cvhome.services.uaa.port}/oauth2/token
             end-session-endpoint: ${com.asrevo.cvhome.services.uaa.schema}://${com.asrevo.cvhome.services.uaa.domain}:${com.asrevo.cvhome.services.uaa.port}/connect/logout
-            user-name-attribute: sub
+            # preferred_username, not sub. The subject is the account id — stable and never reassigned, which is
+            # what OIDC asks of it and what the identity layer needs, since a username is unique only within a
+            # realm. It is not a name to show anybody: console-ui reads the principal's name straight into its
+            # toolbar, and sub would put a UUID there. uaa writes preferred_username into every ID token.
+            user-name-attribute: preferred_username
       resourceserver:
         jwt:
           issuers:

@@ -184,9 +184,20 @@ on 2026-09-03.
 - **Steps** — mint a service token:
   `curl -u 'store-core@service.store-core.internal:<lcl secret>' -d 'grant_type=client_credentials&scope=store_core'
   http://uaa.gateway.com:8001/oauth2/token`, then decode it.
-- **Expect** — `iss` is `http://uaa.gateway.com:8001`, `scope` is `["store_core"]`, and there is **no** `realm` or
-  `clientId` claim. Those two are the multi-realm deployment's business: a username is already unique in a single
-  realm, and the gateway's OIDC client pins `user-name-attribute: sub`, so uaa's `sub` stays the username.
+- **Expect** — `iss` is `http://uaa.gateway.com:8001`, `scope` is `["store_core"]`, and there is **no** `realm`
+  claim: that is the multi-realm deployment's business, and a username is already unique in a single realm.
+
+### SSO-01b — A user token's subject is the account, and the console still shows a name · critical · [not verified]
+
+- **Steps** — sign in at `http://gateway.com:8000/` as `org1-admin`, decode the ID token, and look at the
+  console toolbar.
+- **Expect** — `sub` and `uid` are both the account **UUID**; `preferred_username` is `org1-admin`; the toolbar
+  reads a name, never a UUID.
+- **Why** — the principal name became the account id so that a username, which is unique only within a realm,
+  could never key a session or an authorization across realms. That made `sub` an id, and the gateway's OIDC
+  client used to pin `user-name-attribute: sub` and hand it straight to console-ui's toolbar; it pins
+  `preferred_username` now. **This has not been run against a live stack** — it is the case most likely to
+  catch a mistake in that change, so run it first.
 
 ### SSO-02 — The issuer is still pinned to uaa's own host · critical · [verified]
 
@@ -209,6 +220,21 @@ on 2026-09-03.
   `default-roles` is unset.
 - **Expect** — uaa's principals carry only the roles granted to them as rows. `CUSTOMER` is cua's default, set
   because every account in a store's realm is a shopper by construction.
+
+### SSO-05 — A platform ceiling bounds what settings may be set · high · [unit only]
+
+- **Steps** — `PUT /api/v1/admin/settings` with `lockout.threshold` of `1000000`, then `auditRetentionDays` of 1.
+- **Expect** — `400 UAA.SETTINGS.INVALID` naming the field. uaa is single-realm, so the operator here *is* the
+  platform, but the ceilings apply to both deployments: one code path, one behaviour, and defaults that sit above
+  what a realm starts with so an untouched deployment never meets one.
+
+### SSO-06 — Audit rows still name people, not ids · medium · [not verified]
+
+- **Steps** — change a setting, rotate a key, then read `/api/v1/admin/audit`.
+- **Expect** — `actorName` is `org1-admin`, and `settings.updated_by` likewise. `actorId` is the account id.
+- **Why** — the principal name is that id now, and every place that read it as a username goes through
+  `PrincipalNames`. The one that would have failed *silently* is `LockoutService`: it is keyed by username, and a
+  lookup handed a UUID finds nobody and clears no counter.
 
 ## ADM — The admin API
 

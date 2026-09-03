@@ -18,9 +18,11 @@ import org.springframework.security.oauth2.server.authorization.client.Registere
 import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
 import org.springframework.security.oauth2.server.authorization.token.JwtEncodingContext;
 
+import com.asrevo.cvhome.commons.domain.RealmId;
 import com.asrevo.cvhome.sso.domain.Role;
 import com.asrevo.cvhome.sso.domain.User;
 import com.asrevo.cvhome.sso.keys.KeyRotationService;
+import com.asrevo.cvhome.sso.realm.RealmContext;
 import com.asrevo.cvhome.sso.realm.RealmMode;
 import com.asrevo.cvhome.sso.realm.SsoRealmProperties;
 import com.asrevo.cvhome.sso.realm.SsoTenantIdentifierResolver;
@@ -153,6 +155,29 @@ class JwtCustomizerConfigTest {
                 .doesNotContainKey(NOTE);
         assertThat(claims.get(JwtCustomizerConfig.ROLES)).asInstanceOf(InstanceOfAssertFactories.COLLECTION)
                 .containsExactly(STORE_ADMIN);
+    }
+
+    /**
+     * The claim a store-scoped endpoint checks a shopper against. It used to be read from {@code clientId}, which
+     * held the store id only because a store had exactly one client; the name says what the value means now, and
+     * the old one is gone rather than left to drift.
+     */
+    @Test
+    void aMultiRealmTokenNamesItsRealmAndNothingElse() {
+        SsoRealmProperties multi = new SsoRealmProperties();
+        multi.setMode(RealmMode.MULTI);
+        JwtCustomizerConfig perStore = new JwtCustomizerConfig(principals, settings, keys, Clock.systemUTC(), multi,
+                new SsoTenantIdentifierResolver(multi));
+        User user = user(Map.of(), STORE_ADMIN);
+        when(users.findById(user.getId())).thenReturn(Optional.of(user));
+
+        JwtEncodingContext context = context(OAuth2TokenType.ACCESS_TOKEN, Map.of(), user.getId().toString());
+        RealmContext.runIn(RealmId.of(STORE_ID), () -> perStore.oauth2TokenCustomizer().customize(context));
+        Map<String, Object> claims = context.getClaims().build().getClaims();
+
+        assertThat(claims).containsEntry(JwtCustomizerConfig.REALM, STORE_ID)
+                .containsEntry("sub", user.getId().toString())
+                .doesNotContainKey("clientId");
     }
 
     @Test

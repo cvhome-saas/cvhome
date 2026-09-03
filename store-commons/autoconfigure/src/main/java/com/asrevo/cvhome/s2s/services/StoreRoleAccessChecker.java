@@ -210,8 +210,19 @@ public class StoreRoleAccessChecker {
         return true;
     }
 
+    /**
+     * The store a shopper token belongs to.
+     *
+     * <p>
+     * The {@code realm} claim, which is what the authorization server calls the user pool a token was minted
+     * against. It used to be read from {@code clientId}, which happened to hold the same value because a store had
+     * exactly one client — a coincidence of the old shape, and one that would have quietly stopped being true the
+     * first time a store was given a second client (a mobile app on the same shopper pool). The name now says what
+     * the value means.
+     * </p>
+     */
     private String getStoreId(JwtAuthenticationToken authentication) {
-        return authentication.getTokenAttributes().getOrDefault("clientId", "").toString();
+        return authentication.getTokenAttributes().getOrDefault(SecurityUtils.USER_REALM_CLAIM, "").toString();
     }
 
 }
