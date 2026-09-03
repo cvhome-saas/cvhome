@@ -64,13 +64,11 @@ public class CuaSecurityConfig {
                         .requestMatchers("/oauth2/authorization/**", "/login/oauth2/**").permitAll()
                         .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/api-docs/**").permitAll()
                         /*
-                         * sso-core's platform administration is scanned into cua along with everything else, and
-                         * cua has no administrators — its principals are shoppers. Each of those endpoints
-                         * already carries its own @PreAuthorize and this chain's decoder would reject a uaa
-                         * token anyway, so they are unreachable twice over; denying them outright says so, rather
-                         * than leaving a console's worth of endpoints inert by coincidence.
+                         * sso-core's platform administration is no longer denied here: it is claimed by the staff
+                         * chain below, which is ordered ahead of this one and authenticates a uaa token. This
+                         * chain never sees those paths, so a matcher for them here would be dead code that reads
+                         * like a guard.
                          */
-                        .requestMatchers("/api/v1/admin/**").denyAll()
                         .anyRequest().authenticated())
                 /*
                  * loginPage is kept even though cua renders none: it is what stops Spring generating one, and what
@@ -99,13 +97,27 @@ public class CuaSecurityConfig {
     }
 
     /**
-     * The merchant-facing configuration API, addressed from the console with a uaa token — hence the multi-issuer
-     * decoder: this is the one chain in cua that authenticates staff rather than shoppers.
+     * The staff-facing API: the merchant configuration endpoints, addressed from the console, and sso-core's
+     * platform administration. Both are reached with a uaa token — hence the multi-issuer decoder — and this is
+     * the one chain in cua that authenticates staff rather than shoppers.
+     *
+     * <p>
+     * The administration endpoints are here rather than denied because a platform operator has to be able to see
+     * a pod's own SSO state. Two things bound what that opens. Authentication is a uaa token, so a shopper
+     * principal — the only kind cua mints — can never satisfy this chain whatever it presents; and each endpoint
+     * keeps its own {@code @PreAuthorize}, so reaching the chain is not reaching the data.
+     * </p>
+     *
+     * <p>
+     * They stay realm-scoped. {@code StoreRealmResolver} reads {@code ?store=}, so an operator sees one store's
+     * realm at a time and the {@code @TenantId} filter does the scoping — an operator who names no store gets
+     * {@code NO_REALM} and therefore nothing, which is the safe direction to fail.
+     * </p>
      */
     @Bean
     @Order(2)
     SecurityFilterChain merchantApiSecurity(HttpSecurity http, MultiIssuerJwtDecoder decoder) throws Exception {
-        http.securityMatcher("/api/v1/private/**")
+        http.securityMatcher("/api/v1/private/**", "/api/v1/admin/**")
                 .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

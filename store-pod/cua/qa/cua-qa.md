@@ -291,6 +291,23 @@ against a live stack on 2026-09-03.
   (`spring.datasource.hikari.schema`), and `SsoSqlSchemaTest` fails the build if a qualifier comes back.
   Verified 2026-09-03: uaa stayed at 10 rows while cua went 1 → 0.
 
+### RLM-19 — A platform operator reads a pod's SSO dashboard, one store at a time · high · [verified]
+
+- **Setup** — a uaa token with `scope=super_admin` (`admin-sdk` client credentials), and a second uaa token
+  with `scope=store_pod`.
+- **Steps** — `GET {cua}/api/v1/admin/dashboard?store={STORE_1}` with no token, then with the super-admin
+  token, then for `STORE_2`, then with no `?store=`, then with the `store_pod` token.
+- **Expect** — 401 · 200 · 200 with **different** `users.total` · 200 with `users.total = 0` · 403.
+  Verified 2026-09-03: 401, then `users.total` 2 for STORE_1 and 1 for STORE_2, 0 with no store, 403 for
+  `store_pod`.
+- **Why** — the admin endpoints used to be `denyAll` in cua. They are now claimed by the staff chain, which
+  authenticates a uaa token, so a shopper principal cannot reach them whatever it presents, and each endpoint
+  keeps its own `@PreAuthorize`. The realm comes from `?store=`; naming no store yields `NO_REALM` and
+  therefore nothing, which is the safe direction to fail.
+- **Expected to fail** — `activeSessions`, `tokensIssued`, `topClients` and `recentFailures` are **the same
+  whatever store is named**, including with no store at all. See gap 99-RLM-19 below: those come from raw SQL
+  that carries no realm predicate. Only `users` is realm-scoped today.
+
 ### RLM-16 — A provider endpoint pointing inside the network is refused · critical · [verified]
 
 - **Steps** — as a merchant, save an identity provider whose issuer is `https://169.254.169.254/`, then
@@ -447,6 +464,23 @@ unchanged, but it now constructs the merged `StoreMerchantId` type.
 ---
 
 ## 99 — Known gaps
+
+**99-RLM-19 — the dashboard's numbers are pod-wide, not per store.** `DashboardService` counts from raw SQL,
+and `@TenantId` does not reach raw SQL. Three of its queries carry no realm predicate:
+
+| Query | Table | Fixable today? |
+|---|---|---|
+| sign-ins, tokens issued, top clients, recent failures | `audit_events` | **yes** — the table has `realm_id`, the SQL simply does not use it |
+| `activeSessions` | `spring_session` | no — Spring Session's table has no realm column |
+| client counts | `oauth2_registered_client` | no — the table has no realm column; only `client_extension` does |
+
+On uaa this was never wrong: one realm, so unfiltered and filtered are the same set, which is why it survived
+the extraction unnoticed. On cua a realm is a store, so a viewer of any one store's dashboard sees pod-wide
+session and token counts, and `recentFailures` returns **audit rows belonging to other stores**. That last one
+is the sharp edge — it is row data, not just a count.
+
+Scope the `audit_events` queries by the current realm identifier before this endpoint is shown to anyone who
+should not see the whole pod. The other two need a schema change first.
 
 **Only the public endpoints have `http/` blocks** (`public-registration-controller.http`,
 `public-social-login-controller.http`). The OAuth2 endpoints and the form-login POST are browser flows, walked
