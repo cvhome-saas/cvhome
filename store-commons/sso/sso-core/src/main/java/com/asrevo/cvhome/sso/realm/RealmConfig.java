@@ -73,9 +73,9 @@ public class RealmConfig {
      * session has to be reachable for this to read it, and gone before authentication reads it.
      */
     @Bean
-    FilterRegistrationBean<SessionRealmFilter> sessionRealmFilter() {
+    FilterRegistrationBean<SessionRealmFilter> sessionRealmFilter(ProblemDetailFactory problems, ObjectMapper json) {
         FilterRegistrationBean<SessionRealmFilter> registration =
-                new FilterRegistrationBean<>(new SessionRealmFilter());
+                new FilterRegistrationBean<>(new SessionRealmFilter(problems, json));
         registration.setOrder(Ordered.HIGHEST_PRECEDENCE + 60);
         return registration;
     }

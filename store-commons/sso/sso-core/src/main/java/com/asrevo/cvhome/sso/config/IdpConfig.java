@@ -12,6 +12,7 @@ import org.springframework.security.oauth2.server.authorization.settings.Authori
 
 import com.asrevo.cvhome.sso.idp.ClientRegistrationFactory;
 import com.asrevo.cvhome.sso.idp.DynamicClientRegistrationRepository;
+import com.asrevo.cvhome.sso.idp.egress.EgressPolicy;
 import com.asrevo.cvhome.sso.realm.SsoTenantIdentifierResolver;
 import com.asrevo.cvhome.sso.repo.IdentityProviderRepository;
 
@@ -22,7 +23,7 @@ import lombok.extern.slf4j.Slf4j;
  * platform's own entries, mapped the way Boot would), then the identity providers in the database.
  */
 @Configuration
-@EnableConfigurationProperties(OAuth2ClientProperties.class)
+@EnableConfigurationProperties({OAuth2ClientProperties.class, EgressPolicy.class})
 @Slf4j
 public class IdpConfig {
 

@@ -26,7 +26,9 @@ import com.asrevo.cvhome.sso.idp.IdpPreset;
 import com.asrevo.cvhome.uaa.errors.IdpAliasTakenException;
 import com.asrevo.cvhome.uaa.errors.IdpConfigInvalidException;
 import com.asrevo.cvhome.uaa.errors.IdpDiscoveryFailedException;
+import com.asrevo.cvhome.uaa.errors.IdpEndpointRefusedException;
 import com.asrevo.cvhome.uaa.errors.IdpNotFoundException;
+import com.asrevo.cvhome.uaa.errors.IdpTestThrottledException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -62,14 +64,15 @@ public class AdminIdentityProviderController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public IdentityProviderDto create(@Valid @RequestBody IdentityProviderRequest req)
-            throws IdpAliasTakenException, IdpConfigInvalidException {
+            throws IdpAliasTakenException, IdpConfigInvalidException, IdpEndpointRefusedException {
         return providers.create(req);
     }
 
     @PreAuthorize(ADMIN)
     @PutMapping("{id}")
     public IdentityProviderDto update(@PathVariable UUID id, @Valid @RequestBody IdentityProviderRequest req)
-            throws IdpNotFoundException, IdpAliasTakenException, IdpConfigInvalidException {
+            throws IdpNotFoundException, IdpAliasTakenException, IdpConfigInvalidException,
+            IdpEndpointRefusedException {
         return providers.update(id, req);
     }
 
@@ -94,8 +97,8 @@ public class AdminIdentityProviderController {
     /** Reaches the provider: discovery for OIDC, the authorization endpoint otherwise. 502 carries the provider. */
     @PreAuthorize(ADMIN)
     @PostMapping("{id}/test")
-    public IdpTestResult test(@PathVariable UUID id)
-            throws IdpNotFoundException, IdpDiscoveryFailedException, IdpConfigInvalidException {
+    public IdpTestResult test(@PathVariable UUID id) throws IdpNotFoundException, IdpDiscoveryFailedException,
+            IdpConfigInvalidException, IdpEndpointRefusedException, IdpTestThrottledException {
         return providers.test(id);
     }
 

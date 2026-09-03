@@ -3,6 +3,7 @@ package com.asrevo.cvhome.sso.idp;
 import java.time.Clock;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.web.client.RestClient;
@@ -11,6 +12,11 @@ import com.asrevo.cvhome.sso.audit.AuditService;
 import com.asrevo.cvhome.sso.domain.AccountLinking;
 import com.asrevo.cvhome.sso.domain.IdentityProvider;
 import com.asrevo.cvhome.sso.dto.PublicIdpDto;
+import com.asrevo.cvhome.sso.idp.egress.EgressGuard;
+import com.asrevo.cvhome.sso.idp.egress.EgressPolicy;
+import com.asrevo.cvhome.sso.realm.RealmMode;
+import com.asrevo.cvhome.sso.realm.SsoRealmProperties;
+import com.asrevo.cvhome.sso.realm.SsoTenantIdentifierResolver;
 import com.asrevo.cvhome.sso.repo.IdentityProviderRepository;
 import com.asrevo.cvhome.sso.support.FakeCrypto;
 
@@ -31,7 +37,15 @@ class IdentityProviderServiceTest {
 
     private final IdentityProviderService service = new IdentityProviderService(providers, mapper,
             new ClientRegistrationFactory(mapper), mock(DynamicClientRegistrationRepository.class), mock(AuditService.class),
-            Clock.systemUTC(), "https://uaa.example/", RestClient.builder());
+            Clock.systemUTC(), egress(), "https://uaa.example/", RestClient.builder());
+
+    /** Permissive on purpose: what the guard refuses is EgressGuardTest's subject, not this file's. */
+    private static EgressGuard egress() {
+        SsoRealmProperties realm = new SsoRealmProperties();
+        realm.setMode(RealmMode.SINGLE);
+        return new EgressGuard(new EgressPolicy(Set.of("http", "https"), true, null, 0, 0),
+                new SsoTenantIdentifierResolver(realm));
+    }
 
     @Test
     void discoversByLongestSuffixAndIgnoresNonMatches() {

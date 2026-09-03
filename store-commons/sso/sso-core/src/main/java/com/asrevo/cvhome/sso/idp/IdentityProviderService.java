@@ -24,11 +24,14 @@ import com.asrevo.cvhome.sso.dto.IdentityProviderDto;
 import com.asrevo.cvhome.sso.dto.IdentityProviderRequest;
 import com.asrevo.cvhome.sso.dto.IdpTestResult;
 import com.asrevo.cvhome.sso.dto.PublicIdpDto;
+import com.asrevo.cvhome.sso.idp.egress.EgressGuard;
 import com.asrevo.cvhome.sso.repo.IdentityProviderRepository;
 import com.asrevo.cvhome.uaa.errors.IdpAliasTakenException;
 import com.asrevo.cvhome.uaa.errors.IdpConfigInvalidException;
 import com.asrevo.cvhome.uaa.errors.IdpDiscoveryFailedException;
+import com.asrevo.cvhome.uaa.errors.IdpEndpointRefusedException;
 import com.asrevo.cvhome.uaa.errors.IdpNotFoundException;
+import com.asrevo.cvhome.uaa.errors.IdpTestThrottledException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -41,6 +44,10 @@ import lombok.extern.slf4j.Slf4j;
 public class IdentityProviderService {
 
     static final String OIDC_DISCOVERY = "/.well-known/openid-configuration";
+
+    private static final String ISSUER_URI = "issuerUri";
+
+    private static final String AUTHORIZATION_URI = "authorizationUri";
 
     private static final String TRAILING_SLASHES = "/+$";
 
@@ -60,11 +67,14 @@ public class IdentityProviderService {
 
     private final RestClient http;
 
+    private final EgressGuard egress;
+
     public IdentityProviderService(IdentityProviderRepository providers, IdentityProviderMapper mapper,
                                    ClientRegistrationFactory factory, DynamicClientRegistrationRepository registrations,
-                                   AuditService audit, Clock clock,
+                                   AuditService audit, Clock clock, EgressGuard egress,
                                    @Qualifier("uaaIssuer") String issuer,
                                    @Qualifier("defaultRestClientBuilder") RestClient.Builder httpBuilder) {
+        this.egress = egress;
         this.providers = providers;
         this.mapper = mapper;
         this.factory = factory;
@@ -133,7 +143,8 @@ public class IdentityProviderService {
     // ---------------------------------------------------------------- write
 
     @Transactional
-    public IdentityProviderDto create(IdentityProviderRequest req) throws IdpAliasTakenException, IdpConfigInvalidException {
+    public IdentityProviderDto create(IdentityProviderRequest req)
+            throws IdpAliasTakenException, IdpConfigInvalidException, IdpEndpointRefusedException {
         String alias = req.alias().trim().toLowerCase(Locale.ROOT);
         if (providers.existsByAlias(alias)) {
             throw IdpAliasTakenException.of(alias);
@@ -149,7 +160,7 @@ public class IdentityProviderService {
 
     @Transactional
     public IdentityProviderDto update(UUID id, IdentityProviderRequest req)
-            throws IdpNotFoundException, IdpAliasTakenException, IdpConfigInvalidException {
+            throws IdpNotFoundException, IdpAliasTakenException, IdpConfigInvalidException, IdpEndpointRefusedException {
         IdentityProvider p = find(id);
         IdentityProviderDto before = toDto(p);
         String alias = req.alias().trim().toLowerCase(Locale.ROOT);
@@ -216,10 +227,15 @@ public class IdentityProviderService {
      * failure is typed as the provider's, with its status carried as an extension.
      */
     @Transactional(readOnly = true)
-    public IdpTestResult test(UUID id) throws IdpNotFoundException, IdpDiscoveryFailedException, IdpConfigInvalidException {
+    public IdpTestResult test(UUID id) throws IdpNotFoundException, IdpDiscoveryFailedException,
+            IdpConfigInvalidException, IdpEndpointRefusedException, IdpTestThrottledException {
         IdentityProvider p = find(id);
         factory.build(p);
         String url = testUrl(p);
+        // Checked again, after the save that already checked it: this is the one call a merchant can make on
+        // demand, and a name that resolved publicly an hour ago need not still.
+        egress.check(ISSUER_URI, url);
+        egress.takeTestBudget(p.getAlias());
         try {
             Map<?, ?> body = http.get().uri(URI.create(url)).retrieve().body(Map.class);
             Object issuerClaim = body == null ? null : body.get("issuer");
@@ -241,14 +257,30 @@ public class IdentityProviderService {
         String url = p.getType() == IdpType.OIDC && StringUtils.hasText(p.getIssuerUri())
                 ? String.format("%s%s", p.getIssuerUri().replaceAll(TRAILING_SLASHES, ""), OIDC_DISCOVERY) : p.getAuthorizationUri();
         if (!StringUtils.hasText(url)) {
-            throw IdpConfigInvalidException.of("authorizationUri", "Nothing to test: no issuer and no authorization endpoint.");
+            throw IdpConfigInvalidException.of(AUTHORIZATION_URI, "Nothing to test: no issuer and no authorization endpoint.");
         }
         return url;
     }
 
     // ---------------------------------------------------------------- helpers
 
-    private void validate(IdentityProvider p) throws IdpConfigInvalidException {
+    /**
+     * Refuses a provider this server should not be built from, on two counts.
+     *
+     * <p>
+     * {@code factory.build} answers the first — settings that cannot produce a working registration. The egress
+     * check answers the second, which only exists because these URLs are a merchant's: the server fetches every
+     * one of them, at sign-in if never before, so an endpoint pointing inside the network must not be stored in
+     * the first place. Checked here rather than at the controller because create and update both come through
+     * it, and a path that skipped it would be silently unguarded.
+     * </p>
+     */
+    private void validate(IdentityProvider p) throws IdpConfigInvalidException, IdpEndpointRefusedException {
+        egress.check(ISSUER_URI, p.getIssuerUri());
+        egress.check(AUTHORIZATION_URI, p.getAuthorizationUri());
+        egress.check("tokenUri", p.getTokenUri());
+        egress.check("userInfoUri", p.getUserInfoUri());
+        egress.check("jwkSetUri", p.getJwkSetUri());
         factory.build(p);
     }
 

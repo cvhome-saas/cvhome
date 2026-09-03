@@ -72,6 +72,7 @@ abstract BaseException extends Exception implements ErrorCodeAware     ← check
  ├── abstract ResourceNotFoundException        404
  ├── abstract DuplicateResourceException       409
  ├── abstract OperationNotAllowedException
+ ├── abstract TooManyRequestsException           429, the same call succeeds later
  ├── abstract AccessDeniedStoreException       403
  ├── abstract ConversionException              400
  ├── abstract StoreIOException                 500, wraps java.io.IOException
@@ -92,7 +93,7 @@ transparently, so one that escapes still renders correctly instead of becoming a
 
 `ErrorCategory` holds the status as a plain `int` (no Spring in this module): `VALIDATION`/`MALFORMED`/`CONVERSION`
 400, `UNAUTHENTICATED` 401, `FORBIDDEN` 403, `NOT_FOUND` 404, `CONFLICT` 409, `PAYLOAD_TOO_LARGE` 413,
-`UNPROCESSABLE` 422, `STORAGE`/`INTERNAL` 500, `REMOTE_SERVICE` 502, `TIMEOUT` 504.
+`UNPROCESSABLE` 422, `TOO_MANY_REQUESTS` 429, `STORAGE`/`INTERNAL` 500, `REMOTE_SERVICE` 502, `TIMEOUT` 504.
 
 ## The rules
 

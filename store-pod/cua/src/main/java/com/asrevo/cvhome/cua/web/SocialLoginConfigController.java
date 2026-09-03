@@ -15,6 +15,7 @@ import com.asrevo.cvhome.cua.web.dto.PersistableSocialLoginConfig;
 import com.asrevo.cvhome.cua.web.dto.ReadableSocialLoginConfig;
 import com.asrevo.cvhome.uaa.errors.IdpAliasTakenException;
 import com.asrevo.cvhome.uaa.errors.IdpConfigInvalidException;
+import com.asrevo.cvhome.uaa.errors.IdpEndpointRefusedException;
 import com.asrevo.cvhome.uaa.errors.IdpNotFoundException;
 
 import lombok.RequiredArgsConstructor;
@@ -35,7 +36,8 @@ public class SocialLoginConfigController {
     @PostMapping
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CUA.*')")
     public void saveConfigs(StoreMerchantId merchantStore, @RequestBody List<PersistableSocialLoginConfig> configs)
-            throws IdpAliasTakenException, IdpConfigInvalidException, IdpNotFoundException {
+            throws IdpAliasTakenException, IdpConfigInvalidException, IdpNotFoundException,
+            IdpEndpointRefusedException {
         service.saveConfigs(configs);
     }
 

@@ -62,6 +62,13 @@ host to a store and injects `Store-Id`, and cua's realm filter reads that. A `cl
 `?store=` parameter is checked *against* it, never trusted as the source — letting the client name its own
 tenant is what the header replaced.
 
+**A signed-in session belongs to one realm.** It is stamped at sign-in and checked on every request
+(`SessionRealmFilter`); a mismatch refuses the request and leaves the session standing, because a session anybody
+can destroy by naming another store in a query parameter is a forced-logout button. Anonymous sessions — the one
+`/oauth2/authorize` creates to hold the saved request — carry no stamp and are not checked. This is the second
+lock: the first is that the cookie is host-scoped, which is why a `Domain` on the shared parent
+(`.spg-<pod>.gateway.com`) must never be set.
+
 **Background work has no request, so it has no realm.** `RealmContext.runIn` is how a scheduled job enters one,
 and jobs that sweep every realm (audit retention) iterate `RealmRegistry.all()`. Outside a realm the resolver
 answers a sentinel that matches nothing, so a mistake reads no rows rather than every realm's.
@@ -76,6 +83,21 @@ The signing key is **one per deployment**, which on cua means one per pod. Its r
 platform realm's settings, never from whichever realm a background thread happened to be in. State this plainly
 in merchant-facing material: "your own SSO" does not mean cryptographic isolation, and a merchant who genuinely
 requires it needs a dedicated pod.
+
+**Merchant-supplied endpoints are fetched by this server**, so they are guarded rather than trusted. Every URL on
+an identity provider — issuer, authorization, token, userinfo, JWKS — is checked before it is stored and again
+before the `test` action fetches one: HTTPS only, no credentials in the URL, and no name that resolves inside the
+server's own network (loopback, RFC1918, link-local, unique-local, carrier-grade NAT, and the cloud metadata
+address). A name that does not resolve is refused rather than allowed, because an address that cannot be checked
+has not been. `test` is rationed per realm, since an unlimited one is a port scanner with a progress bar.
+
+The gap worth naming: between the check and the socket, the name is resolved again by the HTTP client, and
+nothing pins those two answers together. Every static case is closed; what remains needs an attacker who runs a
+DNS server and wins a race. Closing it means owning the connection factory.
+
+`allow-private-addresses` is the one way to lose this, and it is off by default — set only by the `lcl` slices and
+by the integration test whose stub provider answers on localhost. `EgressGuardTest` holds the defaults to being
+the strict ones.
 
 Rate limiting counts an attempt twice — once against the realm it was aimed at, once against the address it
 came from (at `spread` times the limit) — so one store cannot spend another's budget and spraying a thousand

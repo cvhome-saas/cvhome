@@ -164,6 +164,15 @@ public enum UaaErrors implements ErrorCode {
     /** The provider's discovery document or endpoints could not be reached. Carries the provider. */
     IDP_DISCOVERY_FAILED("UAA.IDP.DISCOVERY_FAILED", ErrorCategory.REMOTE_SERVICE),
 
+    /**
+     * An endpoint the server refuses to reach: not HTTPS, or resolving to an address inside the network the
+     * server itself runs in. A merchant supplies these URLs, and the server fetches them.
+     */
+    IDP_ENDPOINT_REFUSED("UAA.IDP.ENDPOINT_REFUSED", ErrorCategory.VALIDATION),
+
+    /** The test action, used more times in an hour than one realm is allowed. */
+    IDP_TEST_THROTTLED("UAA.IDP.TEST_THROTTLED", ErrorCategory.TOO_MANY_REQUESTS),
+
     /** No linked identity with the given id on that account. */
     IDENTITY_NOT_FOUND("UAA.IDENTITY.NOT_FOUND", ErrorCategory.NOT_FOUND),
 

@@ -17,6 +17,7 @@ import com.asrevo.cvhome.sso.idp.IdentityProviderService;
 import com.asrevo.cvhome.sso.idp.IdpPreset;
 import com.asrevo.cvhome.uaa.errors.IdpAliasTakenException;
 import com.asrevo.cvhome.uaa.errors.IdpConfigInvalidException;
+import com.asrevo.cvhome.uaa.errors.IdpEndpointRefusedException;
 import com.asrevo.cvhome.uaa.errors.IdpNotFoundException;
 
 import lombok.RequiredArgsConstructor;
@@ -78,7 +79,8 @@ public class SocialLoginConfigService {
 
     @Transactional
     public void saveConfigs(List<PersistableSocialLoginConfig> configs)
-            throws IdpAliasTakenException, IdpConfigInvalidException, IdpNotFoundException {
+            throws IdpAliasTakenException, IdpConfigInvalidException, IdpNotFoundException,
+            IdpEndpointRefusedException {
         for (PersistableSocialLoginConfig config : configs) {
             IdpPreset preset = IdpPreset.valueOf(config.providerId().toUpperCase());
             Optional<IdentityProvider> existing = stored(preset);

@@ -291,6 +291,32 @@ against a live stack on 2026-09-03.
   (`spring.datasource.hikari.schema`), and `SsoSqlSchemaTest` fails the build if a qualifier comes back.
   Verified 2026-09-03: uaa stayed at 10 rows while cua went 1 → 0.
 
+### RLM-16 — A provider endpoint pointing inside the network is refused · critical · [unit only]
+
+- **Steps** — as a merchant, save an identity provider whose issuer is `https://169.254.169.254/`, then
+  `https://127.0.0.1/`, then `https://10.0.0.5/`, then `http://accounts.google.com/` (plain HTTP), then
+  `https://accounts.google.com@127.0.0.1/`.
+- **Expect** — `400 UAA.IDP.ENDPOINT_REFUSED` every time, naming the field. The message says only that the
+  endpoint is not allowed: a merchant who can tell "private address" from "bad scheme" has been handed a port
+  scanner, because the difference in the answer *is* the scan result.
+- **Then** — press `test` more than 30 times in an hour on one store and expect
+  `429 UAA.IDP.TEST_THROTTLED`; a second store's budget is untouched.
+- **Why** — these URLs are merchant-entered and this server fetches every one of them: on save, on test, and on
+  every sign-in through the provider. Unbounded that is a request forger inside the pod's network, with cloud
+  metadata one hop away. Pinned by `EgressGuardTest`.
+- **Expected to fail locally** — the `lcl` slice sets `allow-private-addresses: true`, because the demo providers
+  answer on localhost. Run this against a stack without that override, or read the unit test.
+
+### RLM-17 — A signed-in session is refused in another store, not ended · high · [unit only]
+
+- **Setup** — a shopper signed in on store 1.
+- **Steps** — call `GET /cua/api/v1/account/sessions?store=<store 2>` with that session cookie. Then call it
+  again with `?store=<store 1>`.
+- **Expect** — `403 UAA.REALM.CROSS_STORE_REQUEST`, and then `200`: the session survives the refusal.
+- **Why** — a session that any request can destroy by naming another store in a query parameter is a
+  forced-logout button for anyone who can make a browser follow a link. Refusing costs the caller the request and
+  the owner nothing.
+
 ## CLI — The dynamic client, and the port that must survive
 
 ### CLI-01 — The `redirect_uri` is derived from the request's real host · critical · [not verified]

@@ -1,15 +1,22 @@
 package com.asrevo.cvhome.sso.realm;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.http.ProblemDetail;
 import org.springframework.mock.web.MockFilterChain;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockHttpSession;
 
 import com.asrevo.cvhome.commons.domain.RealmId;
+import com.asrevo.cvhome.errors.web.ProblemDetailFactory;
 import com.asrevo.cvhome.sso.session.SessionMetadata;
 
+import tools.jackson.databind.json.JsonMapper;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * The second lock on a boundary the browser is supposed to hold on its own.
@@ -26,47 +33,72 @@ class SessionRealmFilterTest {
 
     private static final RealmId STORE_B = RealmId.of("65f023632bc46470c104b75f");
 
-    private final SessionRealmFilter filter = new SessionRealmFilter();
+    private final ProblemDetailFactory problems = mock(ProblemDetailFactory.class);
 
-    private MockHttpSession run(RealmId realm, MockHttpSession session) {
+    private final SessionRealmFilter filter = new SessionRealmFilter(problems, JsonMapper.builder().build());
+
+    SessionRealmFilterTest() {
+        when(problems.create(any(), any(), any(), any(), any())).thenReturn(ProblemDetail.forStatus(403));
+    }
+
+    private MockHttpServletResponse run(RealmId realm, MockHttpSession session) {
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/api/v1/account/sessions");
-        request.setSession(session);
+        if (session != null) {
+            request.setSession(session);
+        }
+        MockHttpServletResponse response = new MockHttpServletResponse();
         RealmContext.runIn(realm, () -> {
             try {
-                filter.doFilter(request, new MockHttpServletResponse(), new MockFilterChain());
+                filter.doFilter(request, response, new MockFilterChain());
             } catch (Exception e) {
                 throw new IllegalStateException(e);
             }
         });
+        return response;
+    }
+
+    private static MockHttpSession signedInTo(RealmId realm) {
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute(SessionMetadata.REALM, realm.getId());
         return session;
     }
 
     @Test
-    void aSessionThatArrivesInAnotherRealmIsEnded() {
-        MockHttpSession session = new MockHttpSession();
-        session.setAttribute(SessionMetadata.REALM, STORE_A.getId());
+    void aSessionThatArrivesInAnotherRealmIsRefused() {
+        MockHttpSession session = signedInTo(STORE_A);
+
+        MockHttpServletResponse response = run(STORE_B, session);
+
+        assertThat(response.getStatus()).as("store B must not be served with store A's session").isEqualTo(403);
+    }
+
+    /**
+     * And the session survives it. A session that any request can destroy by naming another store in a query
+     * parameter is a forced-logout button for anyone who can make the browser follow a link.
+     */
+    @Test
+    void refusingDoesNotEndTheSession() {
+        MockHttpSession session = signedInTo(STORE_A);
 
         run(STORE_B, session);
 
-        assertThat(session.isInvalid()).as("store B must not be served with store A's session").isTrue();
-    }
-
-    @Test
-    void aSessionInItsOwnRealmIsLeftAlone() {
-        MockHttpSession session = new MockHttpSession();
-        session.setAttribute(SessionMetadata.REALM, STORE_A.getId());
-
-        run(STORE_A, session);
-
         assertThat(session.isInvalid()).isFalse();
     }
 
-    /** An unstamped session adopts the realm it is seen in; the stamp is written again at sign-in anyway. */
     @Test
-    void anUnstampedSessionAdoptsTheRealmRatherThanBeingEnded() {
-        MockHttpSession session = run(STORE_A, new MockHttpSession());
-
-        assertThat(session.isInvalid()).isFalse();
-        assertThat(session.getAttribute(SessionMetadata.REALM)).isEqualTo(STORE_A.getId());
+    void aSessionInItsOwnRealmIsServed() {
+        assertThat(run(STORE_A, signedInTo(STORE_A)).getStatus()).isEqualTo(200);
     }
+
+    /**
+     * The hand-off session {@code /oauth2/authorize} creates before anyone has signed in carries no stamp and no
+     * tenant data. Checking it would break the hand-off itself, where the realm is resolved from the form the
+     * browser is about to post.
+     */
+    @Test
+    void anAnonymousSessionIsNotTheFiltersBusiness() {
+        assertThat(run(STORE_B, new MockHttpSession()).getStatus()).isEqualTo(200);
+        assertThat(run(STORE_B, null).getStatus()).isEqualTo(200);
+    }
+
 }
