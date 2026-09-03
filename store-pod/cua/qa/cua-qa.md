@@ -130,6 +130,11 @@ Logs: `.lcl/<stack>/logs/cua.log`.
 
 ---
 
+> **Before any of these:** cua runs the shared server from `store-commons/sso/sso-core`, and `bootRun` puts that
+> module's jar on its classpath. If you rebuilt `sso-core` while the stack was up, restart **both** deployments —
+> `lcl restart uaa cua` — before trusting anything below. The symptom otherwise is a `ClassNotFoundException` for
+> a class that plainly exists, because the jar was replaced under a running JVM.
+
 ## RLM — Realms: one per store
 
 cua is the multi-realm deployment of the SSO server in `store-commons/sso/sso-core`; uaa is the same code with a

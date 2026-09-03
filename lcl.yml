@@ -140,6 +140,11 @@ services:
     # dependsOn ':store-commons:ui-kit:build' — the app links the library's dist as a file: dependency.
     # (cua has no frontend at all to install: it renders no pages — the shopper's login and register pages are
     # landing-ui theme pages, cua only redirects to them and processes the form POST — and it has no package.json.)
+    # uaa and cua both run the SSO server from store-commons/sso/sso-core, and bootRun puts that module's *jar*
+    # on the classpath. Rebuilding sso-core while either is running replaces the file underneath the JVM, and the
+    # next class it had not yet loaded fails with a ClassNotFoundException for a class that plainly exists —
+    # `com.asrevo.cvhome.sso.session.SessionMetadata` on the login POST is the usual one. Restart both after
+    # touching sso-core: `lcl restart uaa cua`. It is not a stale build; it is a live one swapped mid-flight.
     command: [./gradlew, ":store-core:uaa:bootRun", "--args=--spring.profiles.active=lcl,test-stores", "--project-cache-dir=${stack.dir}/gradle", --console=plain]
     ports: { http: 8001 }
     depends-on: [postgres]
