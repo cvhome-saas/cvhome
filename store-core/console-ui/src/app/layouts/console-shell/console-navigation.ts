@@ -65,6 +65,8 @@ export const CONSOLE_NAVIGATION: readonly NavigationSection[] = [
     items: [
       // Was routeless — this app's marker for "not built". Module 9 built it.
       {labelKey: 'shell.nav.item.customers', icon: 'user', route: '/customers'},
+      // Accounts, not order records — the two are different sets. See the route's own note.
+      {labelKey: 'shell.nav.item.shoppers', icon: 'users', route: '/shoppers'},
       {labelKey: 'shell.nav.item.contentManagement', icon: 'fileEdit', route: '/content'},
     ],
   },

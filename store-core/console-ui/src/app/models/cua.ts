@@ -43,3 +43,4 @@ export interface PersistableSocialLoginConfig {
   readonly appSecret: string;
   readonly enabled: boolean;
 }
+

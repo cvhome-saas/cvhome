@@ -286,6 +286,24 @@ export const routes: Routes = [
      * than segments because neither is a different view of the page — and `?q=` is how another
      * screen links *in*, there being no endpoint that fetches a customer by id.
      */
+    path: 'shoppers',
+    loadComponent: () => import('@layouts/console-shell/console-shell').then((layout) => layout.ConsoleShell),
+    canActivate: [canAccessSecuredPages, consoleContext, merchantOnly, requiresStore],
+    children: [
+      {
+        path: '',
+        loadComponent: () => import('@features/shoppers/shoppers').then((page) => page.Shoppers),
+        data: {titleKey: 'route.shoppers.title', breadcrumbKey: 'shell.breadcrumb.shoppers'},
+      },
+    ],
+  },
+  {
+    /*
+     * Who has an *account* on this store, which is not who has ordered from it. Customers above is
+     * checkout's record of a person; this is cua's, and the two are different sets — a guest
+     * checkout leaves a customer and no account, and a shopper who registered and never bought is
+     * here and not there.
+     */
     path: 'customers',
     loadComponent: () => import('@layouts/console-shell/console-shell').then((layout) => layout.ConsoleShell),
     canActivate: [canAccessSecuredPages, consoleContext, merchantOnly, requiresStore],

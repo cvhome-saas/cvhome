@@ -117,6 +117,9 @@
     },
     "builder": {
       "title": "Home page builder"
+    },
+    "shoppers": {
+      "title": "Shoppers"
     }
   },
   "notFound": {
@@ -895,7 +898,8 @@
       "platformBilling": "Billing",
       "plans": "Plans",
       "content": "Content management",
-      "builder": "Home page builder"
+      "builder": "Home page builder",
+      "shoppers": "Shoppers"
     },
     "toolbar": {
       "breadcrumbNav": "Breadcrumb",
@@ -940,7 +944,8 @@
         "pods": "Pods",
         "platformUsers": "Accounts",
         "platformBilling": "Billing",
-        "plans": "Plans"
+        "plans": "Plans",
+        "shoppers": "Shoppers"
       }
     },
     "planBanner": {
@@ -3415,6 +3420,66 @@
       "urlHint": "/sale or https://…",
       "categoryHint": "Category code",
       "productHint": "Product id or slug"
+    }
+  },
+  "shoppers": {
+    "heading": {
+      "title": "Shoppers",
+      "context": "Who can sign in to this store"
+    },
+    "panel": {
+      "title": "Shoppers",
+      "subtitle": "Accounts that sign in to your storefront. Guests who checked out without registering are under Customers."
+    },
+    "loading": "Loading shoppers",
+    "unit": "shoppers",
+    "paginationLabel": "Shopper pages",
+    "totalLabel": "{total} shoppers",
+    "filter": {
+      "searchLabel": "Search shoppers",
+      "searchPlaceholder": "Name, username or email",
+      "clear": "Clear the search",
+      "statusLabel": "Filter by status",
+      "anyStatus": "Any status"
+    },
+    "status": {
+      "active": "Active",
+      "locked": "Locked",
+      "disabled": "Disabled"
+    },
+    "empty": {
+      "title": "No shoppers yet",
+      "message": "Accounts appear here when someone registers on your storefront or signs in with a provider."
+    },
+    "noMatches": {
+      "title": "No shoppers match",
+      "message": "Try a different search or clear the status filter."
+    },
+    "sessions": {
+      "title": "Where {name} is signed in",
+      "description": "Each entry is one browser. Signing out everywhere ends them all; the shopper can sign in again straight away.",
+      "started": "Started {at}",
+      "unknownAddress": "Address not recorded",
+      "unknownBrowser": "Browser not recorded",
+      "signOutEverywhere": "Sign out everywhere",
+      "failed": "Those sessions could not be loaded.",
+      "none": {
+        "title": "Not signed in anywhere",
+        "message": "This account has no active session right now."
+      }
+    },
+    "delete": {
+      "title": "Delete this shopper?",
+      "message": "This removes {name}'s account and their sign-in credentials. Their orders and invoices are your store's records and are not affected. There is no undo.",
+      "confirmationLabel": "Type the username to confirm",
+      "confirm": "Delete shopper"
+    },
+    "toast": {
+      "enabled": "{name} can sign in again.",
+      "disabled": "{name} is disabled and signed out.",
+      "unlocked": "{name} is unlocked.",
+      "deleted": "{name} has been deleted.",
+      "signedOut": "Signed out of {count} session(s)."
     }
   }
 }
