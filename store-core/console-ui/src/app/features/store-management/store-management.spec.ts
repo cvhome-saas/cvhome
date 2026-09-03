@@ -55,29 +55,6 @@ const SETTINGS: StoreSettings = {
     {domain: 'shop.acmesupply.co', type: 'CUSTOM_DOMAIN', hostname: 'shop.acmesupply.co'},
   ],
   podTarget: 'myshop-p1.example.io',
-  socialLogin: [
-    {
-      providerId: 'GOOGLE',
-      icon: 'google',
-      appId: '8841027-acme.apps.googleusercontent.com',
-      // Empty on a read, with hasAppSecret saying one is stored: the API never sends the secret back.
-      appSecret: '',
-      hasAppSecret: true,
-      callbackUrl: 'https://acme.example.io/login/oauth2/code/google',
-      enabled: true,
-      configured: true,
-    },
-    {
-      providerId: 'GITHUB',
-      icon: 'github',
-      appId: '',
-      appSecret: '',
-      hasAppSecret: false,
-      callbackUrl: 'https://acme.example.io/login/oauth2/code/github',
-      enabled: false,
-      configured: false,
-    },
-  ],
   payments: [
     {
       paymentType: 'STRIPE',
@@ -387,8 +364,9 @@ describe('StoreManagement', () => {
     const {element} = load();
 
     const links = Array.from(element.querySelectorAll<HTMLAnchorElement>('.nav-item[href]'));
-    // Four sections (appearance is the content hub's now) plus the storefront builder's own route.
-    expect(links.length).toBe(5);
+    // Three sections plus the storefront builder's own route. Appearance is the content hub's, and
+    // sign-in providers left for a page of their own when the three-preset section became a manager.
+    expect(links.length).toBe(4);
     expect(links.map((link) => link.getAttribute('href'))).toContain('/store-management/payments');
     expect(links.map((link) => link.getAttribute('href'))).toContain('/store-management/builder');
   }));
@@ -630,60 +608,6 @@ describe('StoreManagement', () => {
     expect(patch['STRIPE']['apiKey']).toBe('pk_live_rotated');
     // Sent whole: the secret the operator did not touch still has to go, or PUT would blank it.
     expect(patch['STRIPE']['secretKey']).toBe('sk_live_7c31');
-  }));
-
-  it('will not let an operator enable a login provider without its credentials', fakeAsync(() => {
-    const {fixture, element} = load('social-login');
-
-    // GitHub has never been configured, so turning it on leaves both fields empty.
-    const github = Array.from(
-      element.querySelectorAll<HTMLElement>('.provider-card'),
-    ).find((card) => card.textContent?.includes('GitHub'))!;
-    github.querySelector<HTMLButtonElement>('[role="switch"]')!.click();
-    settle(fixture);
-
-    expect(saveButton(element).disabled).toBeTrue();
-    expect(github.querySelector('.cross-field-error')?.textContent).toContain('app ID');
-    expect(api.saves.length).toBe(0);
-
-    type(element, '#app-id-GITHUB', 'Iv1.acme');
-    type(element, '#app-secret-GITHUB', 'ghs_acme');
-    settle(fixture);
-
-    expect(saveButton(element).disabled).toBeFalse();
-    saveButton(element).click();
-    settle(fixture);
-
-    const patch = api.saves[0].patch as Record<string, Record<string, unknown>>;
-    expect(patch['GITHUB']['appId']).toBe('Iv1.acme');
-    // Every provider goes out, not only the one that changed — the endpoint upserts what it is given.
-    expect(patch['GOOGLE']['appId']).toBe('8841027-acme.apps.googleusercontent.com');
-    // Google's secret goes out blank because the read never returned it, and blank means "keep the
-    // stored one" — sending back a secret the browser was never given is what this replaced.
-    expect(patch['GOOGLE']['appSecret']).toBe('');
-  }));
-
-  it('reports a provider that arrived broken without blocking the rest of the section', fakeAsync(() => {
-    api.settingsWith({
-      socialLogin: SETTINGS.socialLogin.map((config) =>
-        config.providerId === 'GOOGLE' ? {...config, appId: ''} : config,
-      ),
-    });
-    const {fixture, element} = load('social-login');
-
-    /*
-     * A credential written before encryption reads back as nothing, so stores genuinely load in
-     * this state. Saying so is right; refusing every other edit on the page because of it is not.
-     */
-    const google = Array.from(
-      element.querySelectorAll<HTMLElement>('.provider-card'),
-    ).find((card) => card.textContent?.includes('Google'))!;
-    expect(google.querySelector('.cross-field-error')).not.toBeNull();
-
-    type(element, '#app-secret-GOOGLE', 'gsec-rotated');
-    settle(fixture);
-    // Touched now, so the rule bites — but only because the operator went near it.
-    expect(saveButton(element).disabled).toBeTrue();
   }));
 
   it('checks the typed domain on its own, without being asked', fakeAsync(() => {

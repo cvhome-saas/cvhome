@@ -286,6 +286,19 @@ export const routes: Routes = [
      * than segments because neither is a different view of the page — and `?q=` is how another
      * screen links *in*, there being no endpoint that fetches a customer by id.
      */
+    path: 'identity-providers',
+    loadComponent: () => import('@layouts/console-shell/console-shell').then((layout) => layout.ConsoleShell),
+    canActivate: [canAccessSecuredPages, consoleContext, merchantOnly, requiresStore],
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('@features/identity-providers/identity-providers').then((page) => page.IdentityProviders),
+        data: {titleKey: 'route.identityProviders.title', breadcrumbKey: 'shell.breadcrumb.identityProviders'},
+      },
+    ],
+  },
+  {
     path: 'shoppers',
     loadComponent: () => import('@layouts/console-shell/console-shell').then((layout) => layout.ConsoleShell),
     canActivate: [canAccessSecuredPages, consoleContext, merchantOnly, requiresStore],

@@ -120,6 +120,9 @@
     },
     "shoppers": {
       "title": "Shoppers"
+    },
+    "identityProviders": {
+      "title": "Sign-in providers"
     }
   },
   "notFound": {
@@ -358,11 +361,6 @@
       "yourDomain": "your domain"
     },
     "loading": "Loading store settings…",
-    "loginProvider": {
-      "google": "Google",
-      "facebook": "Facebook",
-      "github": "GitHub"
-    },
     "nav": {
       "ariaLabel": "Store settings sections",
       "heading": "Settings",
@@ -401,29 +399,15 @@
     "section": {
       "domain": "Store domain",
       "details": "Store details",
-      "socialLogin": "Store social login",
       "payments": "Store payment config"
     },
     "sectionSaved": "{section} saved.",
     "sectionShort": {
       "domain": "Domain",
       "details": "Details",
-      "socialLogin": "Social login",
       "payments": "Payment config"
     },
     "sectionsLabel": "Store settings sections",
-    "socialLogin": {
-      "appId": "App ID",
-      "appSecret": "App secret",
-      "appSecretHint": "Stored encrypted and never sent back. Leave blank to keep the saved one.",
-      "callbackHint": "Paste this into the provider's redirect URI allow-list",
-      "callbackUrl": "Callback URL",
-      "credentialsRequired": "An enabled provider needs both an app ID and an app secret.",
-      "notConfigured": "Not set up yet",
-      "signInWith": "Sign in with {provider}",
-      "subtitle": "Let customers sign in with an external provider.",
-      "title": "Store social login"
-    },
     "state": {
       "enabled": "Enabled",
       "disabled": "Disabled",
@@ -899,7 +883,8 @@
       "plans": "Plans",
       "content": "Content management",
       "builder": "Home page builder",
-      "shoppers": "Shoppers"
+      "shoppers": "Shoppers",
+      "identityProviders": "Sign-in providers"
     },
     "toolbar": {
       "breadcrumbNav": "Breadcrumb",
@@ -945,7 +930,8 @@
         "platformUsers": "Accounts",
         "platformBilling": "Billing",
         "plans": "Plans",
-        "shoppers": "Shoppers"
+        "shoppers": "Shoppers",
+        "identityProviders": "Sign-in"
       }
     },
     "planBanner": {
@@ -3480,6 +3466,72 @@
       "unlocked": "{name} is unlocked.",
       "deleted": "{name} has been deleted.",
       "signedOut": "Signed out of {count} session(s)."
+    }
+  },
+  "identityProviders": {
+    "heading": {
+      "title": "Sign-in providers",
+      "context": "How shoppers sign in to this store"
+    },
+    "panel": {
+      "title": "Providers",
+      "subtitle": "Let shoppers sign in with an account they already have. Each provider is yours: your application, your credentials."
+    },
+    "loading": "Loading providers",
+    "notice": {
+      "endpoints": "This server fetches every endpoint below — when you save, when you press Test, and each time a shopper signs in. It will only reach public HTTPS addresses, so an internal or plain-HTTP URL is refused."
+    },
+    "action": {
+      "add": "Add a provider",
+      "test": "Test",
+      "toggle": "Enable {name}"
+    },
+    "state": {
+      "on": "On",
+      "off": "Off",
+      "noSecret": "No secret set"
+    },
+    "empty": {
+      "title": "No providers yet",
+      "message": "Add one to let shoppers sign in with an account they already have."
+    },
+    "field": {
+      "kind": "Kind",
+      "alias": "Alias",
+      "aliasHint": "Lower-case letters, digits and dashes. It is part of the redirect URI, so it cannot change later.",
+      "displayName": "Name shown to shoppers",
+      "clientId": "Client ID",
+      "clientSecret": "Client secret",
+      "clientSecretHint": "Stored encrypted and never sent back. Leave blank to keep the saved one.",
+      "issuerUri": "Issuer URL",
+      "issuerHint": "For OIDC, this alone is usually enough — the rest is discovered.",
+      "authorizationUri": "Authorization URL",
+      "tokenUri": "Token URL",
+      "userInfoUri": "User info URL",
+      "jwkSetUri": "JWKS URL",
+      "redirectUri": "Redirect URI",
+      "emailDomains": "Email domains",
+      "emailDomainsHint": "Comma separated. A shopper whose address matches is sent straight here.",
+      "jit": "Create an account on first sign-in",
+      "trustEmailVerified": "Trust the address this provider reports",
+      "trustEmail": "Trust the address this provider reports"
+    },
+    "form": {
+      "addTitle": "Add a provider",
+      "editTitle": "Edit provider",
+      "description": "Register the redirect URI shown on the card with your provider before testing."
+    },
+    "test": {
+      "reached": "Answered at {url}",
+      "failed": "No answer from {url}"
+    },
+    "delete": {
+      "title": "Remove this provider?",
+      "message": "Shoppers will no longer be able to sign in with {name}. Accounts already created through it keep working with their other sign-in methods."
+    },
+    "toast": {
+      "saved": "{name} saved.",
+      "deleted": "{name} removed."
     }
   }
 }

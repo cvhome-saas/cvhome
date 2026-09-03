@@ -16,7 +16,6 @@ import type {ConsoleLocale, IconName, Tone} from '@cvhome-saas/ui-kit';
 export type SettingsSectionKey =
   | 'domain'
   | 'details'
-  | 'social-login'
   | 'payments';
 
 /** `DomainType` in `commons`. A store always has the first and may add the second. */
@@ -156,44 +155,6 @@ export type UnbackedDetailField = (typeof UNBACKED_DETAIL_FIELDS)[number];
  * `appSecret`, `secretKey` and `webhookSecret` are encrypted at rest and write-only, so the
  * console can only say how the stored one ends and when it was last changed.
  */
-/**
- * `ReadableSocialLoginConfig`. Display name resolved from `LOGIN_PROVIDER_LABEL_KEY`.
- *
- * `appSecret` is the secret itself, not a hint about it. The mockup's `SecretHint` — last four
- * characters and a rotation date — described an API that writes secrets and never returns them.
- * This one decrypts before serialising, so the console has the real value and no rotation date
- * exists anywhere to show. Both fields read empty when nothing is stored **and** when what is
- * stored predates encryption; the two are indistinguishable from here.
- */
-export interface SocialLoginConfig {
-  readonly providerId: string;
-  readonly icon: IconName;
-  readonly appId: string;
-  /** Always empty on a read: the API never returns it. Filled in only when the seller types a new one. */
-  readonly appSecret: string;
-  /** Whether a secret is stored, which an empty `appSecret` cannot say on its own. */
-  readonly hasAppSecret: boolean;
-  /** Where the provider sends the shopper back to. Derived by the console — see `callbackUrlFor`. */
-  readonly callbackUrl: string;
-  readonly enabled: boolean;
-  /** False for a provider the store has never configured, which is not the same as one turned off. */
-  readonly configured: boolean;
-}
-
-/** The marks the login rows are drawn with, and the known set the labels are guarded by. */
-export const LOGIN_PROVIDER_ICON: Readonly<Record<LoginProvider, IconName>> = {
-  GOOGLE: 'google',
-  FACEBOOK: 'facebook',
-  GITHUB: 'github',
-};
-
-/** For a provider `cua` supports and the console has not been taught a mark for yet. */
-export const LOGIN_PROVIDER_FALLBACK_ICON: IconName = 'link';
-
-export function isLoginProvider(value: string): value is LoginProvider {
-  return value in LOGIN_PROVIDER_ICON;
-}
-
 /** The gateways that carry credentials — `PaymentType.attrs` is non-empty for exactly these two. */
 export const PAYMENT_TYPE_ICON: Readonly<Record<PaymentType, IconName>> = {
   COD: 'dollar',
@@ -209,11 +170,7 @@ export function isPaymentType(value: string): value is PaymentType {
 /** `PaymentType.attrs` is empty for these, so there is nothing to configure beyond the switch. */
 export const PAYMENT_TYPES_WITHOUT_CREDENTIALS: readonly string[] = ['COD', 'MANUAL_TRANSFER'];
 
-export const LOGIN_PROVIDER_LABEL_KEY: Readonly<Record<LoginProvider, string>> = {
-  GOOGLE: 'storeSettings.loginProvider.google',
-  FACEBOOK: 'storeSettings.loginProvider.facebook',
-  GITHUB: 'storeSettings.loginProvider.github',
-};
+
 
 /**
  * The credential half of a gateway, as the endpoint actually returns it: in cleartext.
@@ -258,7 +215,6 @@ export interface StoreSettings {
   readonly storeName: string;
   readonly domains: readonly StoreDomain[];
   readonly details: StoreDetails;
-  readonly socialLogin: readonly SocialLoginConfig[];
   readonly payments: readonly PaymentGatewayConfig[];
   /**
    * The hostname a custom domain must CNAME to — `{alis}-{pod}.{apex}`.
@@ -301,7 +257,6 @@ export interface SettingsSection {
 export const SECTIONS: readonly SettingsSection[] = [
   {key: 'domain', labelKey: 'storeSettings.section.domain', shortLabelKey: 'storeSettings.sectionShort.domain', icon: 'globe'},
   {key: 'details', labelKey: 'storeSettings.section.details', shortLabelKey: 'storeSettings.sectionShort.details', icon: 'building'},
-  {key: 'social-login', labelKey: 'storeSettings.section.socialLogin', shortLabelKey: 'storeSettings.sectionShort.socialLogin', icon: 'signIn'},
   {key: 'payments', labelKey: 'storeSettings.section.payments', shortLabelKey: 'storeSettings.sectionShort.payments', icon: 'creditCard'},
 ];
 

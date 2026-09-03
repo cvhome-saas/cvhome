@@ -68,6 +68,10 @@ export const serverRoutes: ServerRoute[] = [
     renderMode: RenderMode.Client,
   },
   {
+    path: 'identity-providers/**',
+    renderMode: RenderMode.Client,
+  },
+  {
     path: 'users/**',
     renderMode: RenderMode.Client,
   },

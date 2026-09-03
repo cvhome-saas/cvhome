@@ -67,6 +67,7 @@ export const CONSOLE_NAVIGATION: readonly NavigationSection[] = [
       {labelKey: 'shell.nav.item.customers', icon: 'user', route: '/customers'},
       // Accounts, not order records — the two are different sets. See the route's own note.
       {labelKey: 'shell.nav.item.shoppers', icon: 'users', route: '/shoppers'},
+      {labelKey: 'shell.nav.item.identityProviders', icon: 'signIn', route: '/identity-providers'},
       {labelKey: 'shell.nav.item.contentManagement', icon: 'fileEdit', route: '/content'},
     ],
   },

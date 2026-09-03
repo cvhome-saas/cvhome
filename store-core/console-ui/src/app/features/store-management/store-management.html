@@ -90,12 +90,6 @@
                   (deleteRequested)="facade.deleteStore()"
                 />
               }
-              @case ('social-login') {
-                <app-social-login-section
-                  [form]="forms['social-login']"
-                  [providers]="store.socialLogin"
-                />
-              }
               @case ('payments') {
                 <app-payments-section [form]="forms.payments" [gateways]="store.payments" />
               }

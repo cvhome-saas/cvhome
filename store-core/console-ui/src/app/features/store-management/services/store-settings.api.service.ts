@@ -1,14 +1,12 @@
 import {Injectable, inject} from '@angular/core';
 import {Observable, catchError, forkJoin, map, of, switchMap} from 'rxjs';
 
-import {SocialLoginConfigService} from '@api/cua/social-login-config.service';
 import {DnsCheckService, type CnameOutcome} from '@api/dns/dns-check.service';
 import {MerchantRouterService} from '@api/merchant/router.service';
 import {MerchantStoreService} from '@api/merchant/store.service';
 import {PaymentConfigurationService} from '@api/payment/payment-configuration.service';
 import {ManagerStoreService} from '@api/tenancy/manager-store.service';
 import {SaasService, podHostname} from '@api/tenancy/saas.service';
-import type {PersistableSocialLoginConfig, ReadableSocialLoginConfig} from '@models/cua';
 import type {
   PersistablePaymentConfiguration,
   ReadablePaymentConfiguration,
@@ -20,17 +18,13 @@ import type {
   StoreAddress,
 } from '@models/merchant';
 import {
-  LOGIN_PROVIDER_FALLBACK_ICON,
-  LOGIN_PROVIDER_ICON,
   PAYMENT_TYPES_WITHOUT_CREDENTIALS,
   PAYMENT_TYPE_ICON,
-  isLoginProvider,
   isPaymentType,
   type DomainStatus,
   type SettingsChoices,
   type SettingsSectionKey,
   type PaymentGatewayConfig,
-  type SocialLoginConfig,
   type StoreDetails,
   type StoreDomain,
   type StoreSettings,
@@ -86,7 +80,6 @@ export class StoreSettingsApi {
   private readonly router = inject(MerchantRouterService);
   private readonly saas = inject(SaasService);
   private readonly dns = inject(DnsCheckService);
-  private readonly socialLogin = inject(SocialLoginConfigService);
   private readonly payments = inject(PaymentConfigurationService);
 
   /**
@@ -150,19 +143,16 @@ export class StoreSettingsApi {
       saas: this.optionalOne(this.saas.saasProperties()),
       pod: this.optionalOne(this.saas.storePod()),
       /*
-       * Four legs on two other pods. Each is optional for the same reason as the rest: cua being
-       * down is not a reason the store's own details cannot be edited. A failed provider list
-       * leaves that section showing only what the store has already configured.
+       * Two legs on another pod, optional for the same reason as the rest: payment being down is not
+       * a reason the store's own details cannot be edited.
        */
-      loginProviders: this.optional(this.socialLogin.supportedProviders()),
-      loginConfigs: this.optionalList(this.socialLogin.configs()),
       paymentTypes: this.optional(this.payments.supportedTypes()),
       paymentConfigs: this.optionalList(this.payments.configs()),
     }).pipe(
       map((loaded) => {
         const {store, themes, colorThemes, socialLinkProviders, languages} = loaded;
         const {allocations, saas, pod} = loaded;
-        const {loginProviders, loginConfigs, paymentTypes, paymentConfigs} = loaded;
+        const {paymentTypes, paymentConfigs} = loaded;
         this.loadedStore = store;
         this.loadedPayments = paymentConfigs;
         this.podTarget = podHostname(saas, pod);
@@ -195,7 +185,6 @@ export class StoreSettingsApi {
           details: this.details(store),
           domains,
           podTarget: this.podTarget,
-          socialLogin: this.socialLoginConfigs(loginProviders, loginConfigs, store, storefront),
           payments: this.paymentGateways(paymentTypes, paymentConfigs, store.id, storefront),
           choices,
         };
@@ -227,16 +216,6 @@ export class StoreSettingsApi {
         }
         return this.router.allocate(domain).pipe(switchMap(() => this.loadSettings()));
       }
-
-      /*
-       * One POST for the lot. cua takes a list and upserts each entry by `(store, provider)`, so
-       * there is no create-versus-update to work out — and no delete either, which is why turning a
-       * provider off is `enabled: false` rather than removing its row.
-       */
-      case 'social-login':
-        return this.socialLogin
-          .save(this.loginConfigsBody(patch))
-          .pipe(switchMap(() => this.loadSettings()));
 
       /*
        * One call per gateway, and which call depends on whether it already has a row: `POST` builds
@@ -475,70 +454,6 @@ export class StoreSettingsApi {
   }
 
   /**
-   * One row per provider cua can broker, whether or not this store has configured it.
-   *
-   * The provider list is the enum; the configs are only the ones with a row. A provider absent from
-   * the configs is `configured: false` — which the section shows, because "never set up" and
-   * "turned off" look identical once both render as an off switch.
-   *
-   * `appId` arrives as stored; `appSecret` never does, so the form starts empty and an empty field
-   * on save means "keep the stored one". `hasAppSecret` is what says a secret exists — without it an
-   * empty field and an unset credential look identical, and a fully configured provider is reported
-   * as incomplete.
-   */
-  private socialLoginConfigs(
-    providers: readonly string[],
-    configs: readonly ReadableSocialLoginConfig[],
-    store: ReadableMerchantStore,
-    storefront: string | null,
-  ): readonly SocialLoginConfig[] {
-    const stored = new Map(configs.map((config) => [config.providerId, config]));
-    const known = providers.length > 0 ? providers : [...stored.keys()];
-
-    return known.map((providerId) => {
-      const config = stored.get(providerId);
-      return {
-        providerId,
-        icon: isLoginProvider(providerId) ? LOGIN_PROVIDER_ICON[providerId] : LOGIN_PROVIDER_FALLBACK_ICON,
-        appId: config?.appId ?? '',
-        appSecret: '',
-        hasAppSecret: config?.hasAppSecret ?? false,
-        callbackUrl: this.callbackUrl(storefront, providerId),
-        enabled: config?.enabled ?? false,
-        configured: config !== undefined,
-      };
-    });
-  }
-
-  /**
-   * Where a provider sends the shopper back to.
-   *
-   * Assembled here because no endpoint answers it, and every part of it comes from somewhere else:
-   *
-   * - `/cua` is the gateway's own prefix. The pod's Caddyfile uses `handle /cua*` — not
-   *   `handle_path` — and sets `X-Forwarded-Prefix: /cua`, so Spring resolves its `{baseUrl}` with
-   *   that segment included. seller-ui showed exactly this path and it is why.
-   * - `/login/oauth2/code/{registrationId}` is `Constants.DEFAULT_REDIRECT_URI`, Spring Security's
-   *   own shape.
-   * - `{registrationId}` is `{store}.{provider}` in lower case —
-   *   `SocialLoginConfigId.toRegistrationId()`.
-   * - The host is the store's actual storefront, which is the subdomain the domain section works
-   *   out from `saas-properties` and the pod. It is *not* derivable from the store id: an earlier
-   *   version guessed `{storeId}.{podTarget}` and produced a URL no provider would ever call back
-   *   to.
-   *
-   * Answers the path alone when the host is unknown — the pod lookup is refused for a suspended
-   * store — because a path an operator can still recognise beats a URL built on a guess.
-   */
-  private callbackUrl(storefront: string | null, providerId: string): string {
-    // The registration id is the bare provider alias now, not `{store}.{provider}`: aliases are unique within a
-    // store's own realm, and the realm is decided by the host. The URL is still per-store, because it is built on
-    // the store's own domain — which is what the merchant registers with Google.
-    const path = `/cua/login/oauth2/code/${providerId.toLowerCase()}`;
-    return storefront ? `https://${storefront}${path}` : path;
-  }
-
-  /**
    * Where a gateway should post its events.
    *
    * Assembled rather than served, like the social-login callback and for the same reason: the route
@@ -589,27 +504,6 @@ export class StoreSettingsApi {
             }
           : null,
         configured: config !== undefined,
-      };
-    });
-  }
-
-  /**
-   * The social-login save body.
-   *
-   * Every provider goes out, including the ones being turned off — the endpoint upserts what it is
-   * given and deletes nothing, so a provider left out of the list simply keeps whatever it had.
-   * `appId` and `appSecret` are never omitted: `APP_ID` and `APP_SECRET` are `nullable = false` and
-   * `saveConfigs` builds a fresh entity, so an absent field is a constraint violation the server
-   * answers as a 500.
-   */
-  private loginConfigsBody(patch: SectionPatch): PersistableSocialLoginConfig[] {
-    return Object.entries(patch).map(([providerId, raw]) => {
-      const slice = this.slice(raw);
-      return {
-        providerId,
-        appId: this.text(slice['appId'], ''),
-        appSecret: this.text(slice['appSecret'], ''),
-        enabled: this.flag(slice['enabled'], false),
       };
     });
   }

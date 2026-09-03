@@ -103,7 +103,6 @@ export type PaymentsForm = FormGroup<Record<string, GatewayForm>>;
 export interface SettingsForms {
   domain: DomainForm;
   details: DetailsForm;
-  'social-login': SocialLoginForm;
   payments: PaymentsForm;
 }
 
@@ -163,7 +162,6 @@ export class StoreSettingsFormService {
         }),
       }),
       details: this.details(),
-      'social-login': new FormGroup<SocialLoginForm['controls']>({}),
       payments: new FormGroup<PaymentsForm['controls']>({}),
     });
   }
@@ -183,43 +181,6 @@ export class StoreSettingsFormService {
     this.podTarget.set(settings.podTarget);
     this.dnsCheckUnavailable.set(false);
     form.controls.domain.reset({customDomain: ''});
-
-    const login = form.controls['social-login'];
-    this.syncKeys(
-      login,
-      settings.socialLogin.map((config) => config.providerId),
-      () =>
-        this.fb.group(
-          {
-            enabled: this.fb.control(false),
-            appId: this.fb.control(''),
-            appSecret: this.fb.control(''),
-            hasAppSecret: this.fb.control(false),
-          },
-          /*
-           * Required only while the provider is on. `APP_ID` and `APP_SECRET` are `nullable = false`
-           * and `saveConfigs` builds a fresh entity, so an enabled provider missing either is a 500
-           * rather than a validation error — but a provider that is off has no credentials to
-           * demand, and demanding them would make the section unsavable for any store that has not
-           * set up all three.
-           */
-          /*
-           * The secret is not in this list: the read never returns it, so an enabled provider whose
-           * secret is stored has an empty field and would otherwise fail validation forever. What a
-           * blank secret means is "keep the stored one"; `missingCredentials` is what warns when
-           * there is genuinely none, using `hasAppSecret`.
-           */
-          {validators: [credentialsWhenEnabled(['appId'])]},
-        ),
-    );
-    for (const config of settings.socialLogin) {
-      login.controls[config.providerId].reset({
-        enabled: config.enabled,
-        appId: config.appId,
-        appSecret: config.appSecret,
-        hasAppSecret: config.hasAppSecret,
-      });
-    }
 
     const payments = form.controls.payments;
     this.syncKeys(

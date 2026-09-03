@@ -7,7 +7,6 @@ import type {SettingsSectionKey} from '@models/store-settings';
 import {DetailsSection} from './components/details-section/details-section';
 import {DomainSection} from './components/domain-section/domain-section';
 import {PaymentsSection} from './components/payments-section/payments-section';
-import {SocialLoginSection} from './components/social-login-section/social-login-section';
 import {StoreSettingsFacade} from './facades/store-settings.facade';
 
 /**
@@ -34,7 +33,6 @@ import {StoreSettingsFacade} from './facades/store-settings.facade';
     PaymentsSection,
     RouterLink,
     SectionNav,
-    SocialLoginSection,
     TabSwitcher,
     TranslocoDirective,
   ],
