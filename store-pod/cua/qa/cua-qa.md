@@ -224,7 +224,7 @@ against a live stack on 2026-09-03.
 > cua cannot complete that either — the shopper sees `?error=social` with no explanation. A storefront
 > confirmation step, and an error token distinct from `social`, is outstanding work.
 
-### RLM-10 — A shopper sees their own sessions, and only their own · critical · [unit only]
+### RLM-10 — A shopper sees their own sessions, and only their own · critical · [verified]
 
 - **Setup** — register the same username on store 1 and store 2 (RLM-03 leaves you with exactly this), and sign
   in as each, in two browsers or two private windows.
@@ -236,17 +236,21 @@ against a live stack on 2026-09-03.
   account's". That index used to hold the username, which is unique only within a realm, so two shoppers called
   `user` shared it: each listed the other's address, browser and start time, and could end them. The principal
   name is the account id now. Pinned by `LoginHandoffIntegrationTest.sameNamedShoppersOfTwoStoresDoNotShareSessions`,
-  which sees two sessions where one belongs when the old keying is put back. **The browser walk above has not
-  been run by hand.**
+  which sees two sessions where one belongs when the old keying is put back. Run against a live stack on
+  2026-09-03 with two `qa-mia` accounts: one session each, and `403` for the cross-store ask.
 
-### RLM-11 — A password change signs out one store's shopper, not the other's · high · [not verified]
+### RLM-11 — A password change signs out one store's shopper, not the other's · high · [verified]
 
 - **Setup** — as RLM-10.
 - **Steps** — change shopper 1's password. Check shopper 2's session and access token still work.
-- **Expect** — shopper 2 is untouched. Revocation reads `oauth2_authorization` by principal name, which is the
-  same index the sessions use and was keyed the same wrong way.
+- **Expect** — shopper 2 is untouched: its session still answers, and only store 1's row has the later
+  `password_changed_at`. Revocation reads `oauth2_authorization` by principal name, which is the same index the
+  sessions use and was keyed the same wrong way.
 
 ### RLM-12 — A store cannot set a policy past the platform's limits · high · [unit only]
+
+> Exercised on uaa's admin settings API instead — see `store-core/uaa/qa/uaa-qa.md` **SSO-05**, which is the
+> same code path. cua has no merchant-facing settings endpoint yet; it arrives with the console screens.
 
 - **Steps** — as a merchant, `PUT` the realm's settings with `lockout.threshold` of `1000000`, then with a
   refresh-token TTL of ten years, then with `auditRetentionDays` of `1`.
@@ -273,6 +277,19 @@ against a live stack on 2026-09-03.
 - **Why** — audit rows are `@TenantId` rows and the job ran in no realm at all, so the delete was filtered to the
   sentinel realm and matched nothing: retention a merchant configured did nothing, quietly, while the table grew.
   It sweeps realm by realm now, each in its own transaction.
+
+### RLM-15 — cua reads and writes cua's tables, never uaa's · critical · [verified]
+
+- **Setup** — a signed-in shopper holding an access token, so `cua.oauth2_authorization` has a row.
+- **Steps** — count `uaa.oauth2_authorization` and `cua.oauth2_authorization`. Change the shopper's password,
+  which revokes every authorization the account holds. Count both again.
+- **Expect** — cua's row is gone and **uaa's count is unchanged**. Same for `audit_events`: cua's dashboard
+  counts cua's logins.
+- **Why** — the two deployments share one database and are separated by schema. The raw SQL extracted from uaa
+  still said `uaa.oauth2_authorization`, so cua's revocation read — and deleted from — uaa's table, and cua's
+  dashboard reported uaa's numbers. The connection's own schema decides now
+  (`spring.datasource.hikari.schema`), and `SsoSqlSchemaTest` fails the build if a qualifier comes back.
+  Verified 2026-09-03: uaa stayed at 10 rows while cua went 1 → 0.
 
 ## CLI — The dynamic client, and the port that must survive
 

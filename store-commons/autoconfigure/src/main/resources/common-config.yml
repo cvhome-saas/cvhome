@@ -181,11 +181,13 @@ spring:
             user-info-uri: ${com.asrevo.cvhome.services.uaa.schema}://${com.asrevo.cvhome.services.uaa.domain}:${com.asrevo.cvhome.services.uaa.port}/userinfo
             token-uri: ${com.asrevo.cvhome.services.uaa.schema}://${com.asrevo.cvhome.services.uaa.domain}:${com.asrevo.cvhome.services.uaa.port}/oauth2/token
             end-session-endpoint: ${com.asrevo.cvhome.services.uaa.schema}://${com.asrevo.cvhome.services.uaa.domain}:${com.asrevo.cvhome.services.uaa.port}/connect/logout
-            # preferred_username, not sub. The subject is the account id — stable and never reassigned, which is
+            # sub, and it stays sub. The subject is the account id now — stable and never reassigned, which is
             # what OIDC asks of it and what the identity layer needs, since a username is unique only within a
-            # realm. It is not a name to show anybody: console-ui reads the principal's name straight into its
-            # toolbar, and sub would put a UUID there. uaa writes preferred_username into every ID token.
-            user-name-attribute: preferred_username
+            # realm. preferred_username would read better, but it is a `profile` claim: uaa's userinfo only
+            # returns it when that scope is granted, web-app requires consent, and adding a scope would put a
+            # consent screen in front of every console sign-in. The display name is console-ui's problem, and
+            # it reads `preferredUsername` off the principal — see ui-kit's AuthService.
+            user-name-attribute: sub
       resourceserver:
         jwt:
           issuers:

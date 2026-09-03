@@ -187,7 +187,7 @@ on 2026-09-03.
 - **Expect** — `iss` is `http://uaa.gateway.com:8001`, `scope` is `["store_core"]`, and there is **no** `realm`
   claim: that is the multi-realm deployment's business, and a username is already unique in a single realm.
 
-### SSO-01b — A user token's subject is the account, and the console still shows a name · critical · [not verified]
+### SSO-01b — A user token's subject is the account, and the console still shows a name · critical · [verified]
 
 - **Steps** — sign in at `http://gateway.com:8000/` as `org1-admin`, decode the ID token, and look at the
   console toolbar.
@@ -196,8 +196,10 @@ on 2026-09-03.
 - **Why** — the principal name became the account id so that a username, which is unique only within a realm,
   could never key a session or an authorization across realms. That made `sub` an id, and the gateway's OIDC
   client used to pin `user-name-attribute: sub` and hand it straight to console-ui's toolbar; it pins
-  `preferred_username` now. **This has not been run against a live stack** — it is the case most likely to
-  catch a mistake in that change, so run it first.
+  `sub` — and console-ui reads `preferredUsername` off the principal instead, because `preferred_username` is a
+  `profile` claim that uaa's userinfo only returns under that scope, and `web-app` requires consent: adding a
+  scope would put a consent screen in front of every console sign-in. Verified 2026-09-03: `sub` is
+  `318f2fd5-…`, `preferred_username` is `org1-admin`, the toolbar reads "Org1 Admin".
 
 ### SSO-02 — The issuer is still pinned to uaa's own host · critical · [verified]
 
@@ -221,17 +223,20 @@ on 2026-09-03.
 - **Expect** — uaa's principals carry only the roles granted to them as rows. `CUSTOMER` is cua's default, set
   because every account in a store's realm is a shopper by construction.
 
-### SSO-05 — A platform ceiling bounds what settings may be set · high · [unit only]
+### SSO-05 — A platform ceiling bounds what settings may be set · high · [verified]
 
 - **Steps** — `PUT /api/v1/admin/settings` with `lockout.threshold` of `1000000`, then `auditRetentionDays` of 1.
 - **Expect** — `400 UAA.SETTINGS.INVALID` naming the field. uaa is single-realm, so the operator here *is* the
   platform, but the ceilings apply to both deployments: one code path, one behaviour, and defaults that sit above
   what a realm starts with so an untouched deployment never meets one.
 
-### SSO-06 — Audit rows still name people, not ids · medium · [not verified]
+### SSO-06 — Audit rows still name people, not ids · medium · [verified]
 
 - **Steps** — change a setting, rotate a key, then read `/api/v1/admin/audit`.
 - **Expect** — `actorName` is `org1-admin`, and `settings.updated_by` likewise. `actorId` is the account id.
+  Verified 2026-09-03, together with the failure this would have been: sign in wrongly twice, then correctly, and
+  `users.failed_login_attempts` goes 0 → 2 → **0**. Handed a UUID, `LockoutService` finds nobody and clears
+  nothing, so the counter climbs until the account locks itself out — with no error anywhere.
 - **Why** — the principal name is that id now, and every place that read it as a username goes through
   `PrincipalNames`. The one that would have failed *silently* is `LockoutService`: it is keyed by username, and a
   lookup handed a UUID finds nobody and clears no counter.

@@ -33,12 +33,13 @@ import {CrudService} from "../http/crud.service";
 interface AuthenticationResponse {
   principal?: {
     claims: IdTokenClaims;
-    /** OIDC standard fields. Present as keys, null in practice until uaa fills them in. */
+    /** OIDC standard fields, serialized as camelCase getters off the merged ID-token claims. */
     givenName: string | null;
     familyName: string | null;
     email: string | null;
+    /** The human handle. The account id is `name`, so this is what a person should be shown. */
     preferredUsername: string | null;
-    /** The username. The only identity actually populated today. */
+    /** The OIDC subject — the account id, not a name. */
     name: string;
   };
   /** Present on the *session* shape below, where the principal is not wrapped. */
@@ -85,7 +86,9 @@ export class AuthService {
             // The gateway's OAuth2AuthenticationToken.
             this.authUser = {
               sub: principal.claims.sub,
-              username: principal.name,
+              // `name` is the OIDC subject, which is the account id — a UUID, and not a thing to show
+              // anybody. `preferredUsername` is the human handle, and uaa writes it into every ID token.
+              username: principal.preferredUsername ?? principal.name,
               givenName: principal.givenName,
               familyName: principal.familyName,
               email: principal.email,
