@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.security.autoconfigure.actuate.web.servlet.EndpointRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -33,8 +34,9 @@ import com.asrevo.cvhome.sso.settings.SettingsService;
  * <li>Actuator is narrowed: health, info and prometheus are open, everything else needs a platform principal.</li>
  * <li>An anonymous call to {@code /api/**} gets a 401 rather than a redirect, and a refused one a problem+json 403
  * written directly: the SPA turns those into a login page or a message, where HTML arrives as a parse error.</li>
- * <li>{@code /logout} accepts GET as well as POST for now, because the shared {@code AuthService.logout()}
- * navigates rather than posts. Recorded as a known gap.</li>
+ * <li>{@code /logout} is POST-only. Reachable by GET it is a link or an {@code <img>} on any site, which signs
+ * the visitor out of this one; the SPA's logout route posts a form carrying the CSRF token instead of
+ * navigating.</li>
  * <li>Brokered logins use the same login page and request cache, so a login that started at
  * {@code /oauth2/authorize} resumes there whichever way the person authenticated.</li>
  * </ul>
@@ -84,7 +86,7 @@ public class UaaSecurityConfig {
                         .failureHandler(brokered.getFailure()))
                 .rememberMe(remember -> remember.rememberMeServices(rememberMe).key(rememberMe.getKey()))
                 .logout(logout -> logout
-                        .logoutRequestMatcher(PathPatternRequestMatcher.withDefaults().matcher(LOGOUT))
+                        .logoutRequestMatcher(PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.POST, LOGOUT))
                         .logoutSuccessUrl(LOGOUT_SUCCESS)
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID", "SESSION"))

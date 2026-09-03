@@ -68,4 +68,16 @@ public class RealmConfig {
         return registration;
     }
 
+    /**
+     * After Spring Session's filter (which sits at {@code MIN_VALUE + 50}) and before the security chain: the
+     * session has to be reachable for this to read it, and gone before authentication reads it.
+     */
+    @Bean
+    FilterRegistrationBean<SessionRealmFilter> sessionRealmFilter() {
+        FilterRegistrationBean<SessionRealmFilter> registration =
+                new FilterRegistrationBean<>(new SessionRealmFilter());
+        registration.setOrder(Ordered.HIGHEST_PRECEDENCE + 60);
+        return registration;
+    }
+
 }
