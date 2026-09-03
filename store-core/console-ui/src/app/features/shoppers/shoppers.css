@@ -1,33 +1,65 @@
-.shoppers-stack {
-  display: grid;
-  gap: var(--space-4);
+:host {
+  display: contents;
 }
 
+/* The page owns its own rhythm, as `customers.css` and `platform-users.css` do. */
+.shoppers-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-gutter);
+}
+
+/*
+ * Search and status sit in the panel header, beside the list they narrow rather than stacked above
+ * its first row. Capped so a long placeholder cannot push the panel's own title off the line, and
+ * allowed to wrap as one unit when the header runs out of room.
+ */
 .filters {
   display: flex;
-  gap: var(--space-2);
-  align-items: center;
   flex-wrap: wrap;
+  gap: var(--spacing-tight);
+  align-items: center;
 }
 
+.filters app-select {
+  inline-size: min(11rem, 45vw);
+}
+
+/*
+ * One browser, one row. A list rather than a table: three facts and no columns to align across
+ * rows, and the dialog is narrow enough that a table would scroll horizontally to say less.
+ */
 .sessions {
   display: grid;
-  gap: var(--space-3);
+  gap: var(--spacing-tight);
 }
 
 .session {
   display: grid;
-  gap: var(--space-1);
-  padding: var(--space-3);
+  gap: 0.15rem;
+  padding: var(--spacing-field);
   border: 1px solid var(--border);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
+  background: var(--card);
 }
 
 .session-where {
-  font-weight: 600;
+  color: var(--foreground-strong);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
 }
 
 .session-when {
   color: var(--muted-foreground);
-  font-size: 0.875rem;
+  font-size: var(--text-xs);
+}
+
+/*
+ * The one destructive control in the pane, and it ends every session at once — so it is separated
+ * from the list it acts on rather than sitting flush against the last row.
+ */
+.sessions-action {
+  display: flex;
+  justify-content: flex-end;
+  margin-block-start: var(--spacing-group);
 }

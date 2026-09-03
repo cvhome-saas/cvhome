@@ -98,9 +98,11 @@
             </div>
           }
         </div>
-        <button type="button" class="danger-action" [disabled]="facade.busy()" (click)="facade.signOutEverywhere()">
-          {{ t('shoppers.sessions.signOutEverywhere') }}
-        </button>
+        <div class="sessions-action">
+          <button type="button" class="danger-action" [disabled]="facade.busy()" (click)="facade.signOutEverywhere()">
+            {{ t('shoppers.sessions.signOutEverywhere') }}
+          </button>
+        </div>
       } @else {
         <app-empty-state
           icon="users"

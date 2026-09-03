@@ -1,7 +1,7 @@
 <ng-container *transloco="let t">
   <app-page-header [title]="t('identityProviders.heading.title')" [context]="t('identityProviders.heading.context')">
     <button type="button" class="primary-action" (click)="startCreate()">
-      {{ t('identityProviders.action.add') }}
+      <app-icon name="plus" />{{ t('identityProviders.action.add') }}
     </button>
   </app-page-header>
 
@@ -10,32 +10,32 @@
   }
 
   <app-busy-overlay reserve="page" [busy]="facade.isLoading()" [label]="t('identityProviders.loading')">
-    <app-panel [title]="t('identityProviders.panel.title')" [subtitle]="t('identityProviders.panel.subtitle')">
-      <!--
-        Said once, up front. The server fetches every endpoint on this screen — on save, on Test, and
-        on every sign-in through the provider — so it refuses anything that is not public HTTPS or
-        that resolves inside its own network. Stated here, a refusal reads as a rule rather than a bug.
-      -->
-      <app-notice-bar icon="info" tone="blue" [message]="t('identityProviders.notice.endpoints')" />
+    <div class="providers-stack">
+      <app-panel [title]="t('identityProviders.panel.title')" [subtitle]="t('identityProviders.panel.subtitle')">
+        <!--
+          Said once, up front. The server fetches every endpoint on this screen — on save, on Test, and
+          on every sign-in through the provider — so it refuses anything that is not public HTTPS or
+          that resolves inside its own network. Stated here, a refusal reads as a rule rather than a bug.
+        -->
+        <app-notice-bar icon="info" tone="blue" [message]="t('identityProviders.notice.endpoints')" />
 
-      @if (facade.providers().length) {
-        <div class="providers">
-          @for (provider of facade.providers(); track provider.id) {
-            <div class="provider">
-              <div class="provider-head">
-                <span class="provider-name">{{ provider.displayName || provider.alias }}</span>
-                <span class="provider-alias">{{ provider.alias }}</span>
-                <app-badge [tone]="provider.enabled ? 'green' : 'slate'">
-                  {{ provider.enabled ? t('identityProviders.state.on') : t('identityProviders.state.off') }}
-                </app-badge>
-                @if (!provider.hasClientSecret) {
-                  <app-badge tone="amber">{{ t('identityProviders.state.noSecret') }}</app-badge>
-                }
+        @if (facade.providers().length) {
+          <div class="providers">
+            @for (provider of facade.providers(); track provider.id) {
+              <div class="provider" [class.off]="!provider.enabled">
+                <div class="identity">
+                  <span class="provider-name">{{ provider.displayName || provider.alias }}</span>
+                  <span class="provider-alias">{{ provider.alias }}</span>
+                  @if (!provider.hasClientSecret) {
+                    <app-badge tone="amber">{{ t('identityProviders.state.noSecret') }}</app-badge>
+                  }
+                </div>
 
-                <div class="provider-actions">
+                <div class="actions">
                   <app-toggle
                     [checked]="provider.enabled"
-                    [ariaLabel]="t('identityProviders.action.toggle', {name: provider.alias})"
+                    [disabled]="facade.busy()"
+                    [label]="provider.enabled ? t('identityProviders.state.on') : t('identityProviders.state.off')"
                     (checkedChange)="facade.setEnabled(provider, $event)"
                   />
                   <button type="button" class="secondary-action" [disabled]="facade.busy()" (click)="facade.test(provider)">
@@ -48,34 +48,36 @@
                     {{ t('shared.actions.delete') }}
                   </button>
                 </div>
+
+                <div class="evidence">
+                  <!-- What the merchant registers at the provider. Theirs to copy, so it is copyable. -->
+                  <app-copy-field [value]="provider.redirectUri" [label]="t('identityProviders.field.redirectUri')" />
+
+                  @if (testResultFor(provider); as result) {
+                    <p class="result" [class.reached]="result.ok" [class.unreached]="!result.ok" role="status">
+                      <span>{{ result.ok ? t('identityProviders.test.reached') : t('identityProviders.test.failed') }}</span>
+                      <span class="result-url">{{ result.checked }}</span>
+                    </p>
+                  }
+                </div>
               </div>
-
-              <!-- What the merchant registers at the provider. Theirs to copy, so it is copyable. -->
-              <app-copy-field [value]="provider.redirectUri" [label]="t('identityProviders.field.redirectUri')" />
-
-              @if (testResultFor(provider); as result) {
-                <span class="provider-test" [class.ok]="result.ok" [class.bad]="!result.ok">
-                  {{ result.ok
-                    ? t('identityProviders.test.reached', {url: result.checked})
-                    : t('identityProviders.test.failed', {url: result.checked}) }}
-                </span>
-              }
-            </div>
-          }
-        </div>
-      } @else {
-        <app-empty-state
-          icon="signIn"
-          [title]="t('identityProviders.empty.title')"
-          [message]="t('identityProviders.empty.message')"
-        />
-      }
-    </app-panel>
+            }
+          </div>
+        } @else {
+          <app-empty-state
+            icon="signIn"
+            [title]="t('identityProviders.empty.title')"
+            [message]="t('identityProviders.empty.message')"
+          />
+        }
+      </app-panel>
+    </div>
   </app-busy-overlay>
 
   <!--
-    Created on demand rather than hidden: a closed `<dialog>` still lays out here, because the catalogue's
-    stylesheet gives it a box and the reset has already taken the user agent's `display: none` away.
+    Created on demand rather than hidden: a closed `<dialog>` still lays out here, because the
+    catalogue's stylesheet gives it a box and the reset has taken the user agent's `display: none`
+    away.
   -->
   @if (open()) {
     <app-form-dialog
@@ -86,8 +88,8 @@
       [closeLabel]="t('shared.actions.close')"
       (dismissed)="facade.dismiss()"
     >
-      <form class="form-grid" [formGroup]="form" (ngSubmit)="submit()">
-        <app-form-field [label]="t('identityProviders.field.kind')">
+      <form class="form" [formGroup]="form" (ngSubmit)="submit()">
+        <app-form-field [label]="t('identityProviders.field.kind')" [hint]="kindHint(t)">
           <app-select
             [value]="chosenPreset()"
             (valueChange)="chosenPreset.set($event)"
@@ -97,22 +99,31 @@
           />
         </app-form-field>
 
-        <!-- The alias is part of the redirect URI a merchant has registered with the provider, so it is
-             fixed after creation: changing it would silently break every sign-in through that provider. -->
+        <!--
+          The alias is part of the redirect URI a merchant has registered with the provider, so it is
+          fixed after creation: changing it would silently break every sign-in through that provider.
+        -->
         <app-form-field
           [label]="t('identityProviders.field.alias')"
           [hint]="t('identityProviders.field.aliasHint')"
           [control]="form.controls.alias"
+          [fallback]="t('identityProviders.field.aliasInvalid')"
           required
         >
           <app-text-field formControlName="alias" [disabled]="!!facade.editing()" latin />
         </app-form-field>
 
-        <app-form-field [label]="t('identityProviders.field.displayName')">
+        <app-form-field [label]="t('identityProviders.field.displayName')" [control]="form.controls.displayName">
           <app-text-field formControlName="displayName" />
         </app-form-field>
 
-        <app-form-field [label]="t('identityProviders.field.clientId')" [control]="form.controls.clientId" required>
+        <app-form-field
+          [label]="t('identityProviders.field.clientId')"
+          [hint]="t('identityProviders.field.clientIdHint')"
+          [control]="form.controls.clientId"
+          [fallback]="t('identityProviders.field.clientIdRequired')"
+          required
+        >
           <app-text-field formControlName="clientId" latin />
         </app-form-field>
 
@@ -131,34 +142,62 @@
 
         @if (needsEndpoints()) {
           <div class="endpoints">
-            <app-form-field [label]="t('identityProviders.field.issuerUri')" [hint]="t('identityProviders.field.issuerHint')">
+            <p class="endpoints-title">{{ t('identityProviders.field.endpointsTitle') }}</p>
+
+            <app-form-field
+              [label]="t('identityProviders.field.issuerUri')"
+              [hint]="t('identityProviders.field.issuerHint')"
+              [control]="form.controls.issuerUri"
+            >
               <app-text-field formControlName="issuerUri" latin />
             </app-form-field>
-            <app-form-field [label]="t('identityProviders.field.authorizationUri')">
+            <app-form-field
+              [label]="t('identityProviders.field.authorizationUri')"
+              [control]="form.controls.authorizationUri"
+            >
               <app-text-field formControlName="authorizationUri" latin />
             </app-form-field>
-            <app-form-field [label]="t('identityProviders.field.tokenUri')">
+            <app-form-field [label]="t('identityProviders.field.tokenUri')" [control]="form.controls.tokenUri">
               <app-text-field formControlName="tokenUri" latin />
             </app-form-field>
-            <app-form-field [label]="t('identityProviders.field.userInfoUri')">
+            <app-form-field [label]="t('identityProviders.field.userInfoUri')" [control]="form.controls.userInfoUri">
               <app-text-field formControlName="userInfoUri" latin />
             </app-form-field>
-            <app-form-field [label]="t('identityProviders.field.jwkSetUri')">
+            <app-form-field [label]="t('identityProviders.field.jwkSetUri')" [control]="form.controls.jwkSetUri">
               <app-text-field formControlName="jwkSetUri" latin />
             </app-form-field>
           </div>
         }
 
-        <app-form-field [label]="t('identityProviders.field.emailDomains')" [hint]="t('identityProviders.field.emailDomainsHint')">
+        <app-form-field
+          [label]="t('identityProviders.field.emailDomains')"
+          [hint]="t('identityProviders.field.emailDomainsHint')"
+          [control]="form.controls.emailDomains"
+        >
           <app-text-field formControlName="emailDomains" latin />
         </app-form-field>
 
-        <app-toggle formControlName="jitProvisioning" [label]="t('identityProviders.field.jit')" />
-        <app-toggle formControlName="trustEmailVerified" [label]="t('identityProviders.field.trustEmail')" />
+        <div class="switches">
+          <app-toggle
+            formControlName="jitProvisioning"
+            [label]="t('identityProviders.field.jit')"
+            [description]="t('identityProviders.field.jitHint')"
+          />
+          <app-toggle
+            formControlName="trustEmailVerified"
+            [label]="t('identityProviders.field.trustEmail')"
+            [description]="t('identityProviders.field.trustEmailHint')"
+          />
+        </div>
 
-        <button type="submit" class="primary-action" [disabled]="facade.busy()">
-          {{ facade.busy() ? t('shared.actions.saving') : t('shared.actions.save') }}
-        </button>
+        <div class="form-actions">
+          <button type="button" class="secondary-action" (click)="facade.dismiss()">
+            {{ t('shared.actions.cancel') }}
+          </button>
+          <button type="submit" class="primary-action" [disabled]="facade.busy()">
+            {{ facade.busy() ? t('shared.actions.saving') : t('shared.actions.save') }}
+          </button>
+        </div>
       </form>
     </app-form-dialog>
   }

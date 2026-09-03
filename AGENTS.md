@@ -246,7 +246,13 @@ the change does not touch, and treat a section you keep as mandatory. The `proje
 - [ ] `./gradlew test` (or the touched module's `:test`) clean — no Docker needed
 - [ ] `./gradlew integrationTest` clean with Docker running, if the change touches wiring, SQL, HTTP or security
 - [ ] New test in the module that owns the code (`-core` logic → `-core/src/test`), named `*Test` / `*IntegrationTest`
-- [ ] Touched frontend builds: `npm run build` in that `-ui` module
+- [ ] Touched frontend **builds and lints**: `npm run build` **and `npm run lint`** in that `-ui` module —
+      or `./gradlew :store-core:console-ui:check`, which runs the lint for you. `npm run build` alone proves
+      nothing about the design system: the token rule, the logical-property rule, the spacing scale and the
+      i18n key checks all live in `npm run lint`, and a stylesheet full of `var(--space-4)` — a property no
+      theme defines — compiles, renders with every gap collapsed to zero, and passes every other gate. That is
+      exactly how it got shipped once; the checker existed and was wired into `check`, and the task list here
+      said `npm run build`.
 - [ ] User-visible change exercised against a running stack, not just unit-tested
 
 ## Plans

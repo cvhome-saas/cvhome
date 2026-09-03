@@ -299,8 +299,6 @@
         "status": "Status",
         "user": "Account"
       },
-      "disabled": "Disabled",
-      "enabled": "Enabled",
       "noOrg": "No organization",
       "unnamed": "No name recorded",
       "status": {

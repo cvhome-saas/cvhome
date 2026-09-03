@@ -1137,6 +1137,20 @@ stack on 2026-09-03.
   plain-HTTP URL is refused with one identical message. See `store-pod/cua/qa/cua-qa.md` **RLM-16**, including
   why the local stack has to be put back to the defaults for it to bite.
 
+### SSO-UI-05 — Both screens are built from the design system, not around it · high · [verified]
+
+- **Steps** — open **Shoppers** and **Sign-in**. Read the spacing between the panel, its filters and its rows;
+  open the provider form and submit it empty; switch Kind between Google and OpenID Connect.
+- **Expect** — the console's own rhythm, required fields marked and refused inline, and the endpoint fields
+  appearing only for a kind that needs them, inside their own bordered group with the hint that says this
+  server will fetch them.
+- **How it failed the first time** — every gap and padding was `var(--space-1..4)`, a scale this app does not
+  have. The properties resolved to nothing, so the pages rendered with no spacing at all. `ng build` was
+  happy, the specs were happy, and `npm run lint` — which has caught exactly this since `--surface-sunken` —
+  was never run, because the gate list in AGENTS.md said `npm run build`. It says both now.
+- **The rule** — spacing is `--spacing-inline` / `-tight` / `-field` / `-group` / `-section` / `-gutter`, each
+  named for the job it does; `DESIGN.md` is the source and `npm run lint` is the enforcement.
+
 ## 99 — Known gaps
 
 **`app-load-error` shows a developer string.** See KIT-04b. `[message]="failure.message"` on ~15 pages

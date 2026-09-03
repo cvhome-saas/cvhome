@@ -3483,8 +3483,7 @@
     },
     "action": {
       "add": "Add a provider",
-      "test": "Test",
-      "toggle": "Enable {name}"
+      "test": "Test"
     },
     "state": {
       "on": "On",
@@ -3496,25 +3495,32 @@
       "message": "Add one to let shoppers sign in with an account they already have."
     },
     "field": {
-      "kind": "Kind",
       "alias": "Alias",
-      "aliasHint": "Lower-case letters, digits and dashes. It is part of the redirect URI, so it cannot change later.",
-      "displayName": "Name shown to shoppers",
+      "aliasHint": "Part of the redirect URI, so it cannot change later.",
+      "aliasInvalid": "Lower-case letters, digits and dashes only.",
+      "authorizationUri": "Authorization URL",
       "clientId": "Client ID",
+      "clientIdHint": "From the application you registered with the provider.",
+      "clientIdRequired": "The provider will not accept a sign-in without it.",
       "clientSecret": "Client secret",
       "clientSecretHint": "Stored encrypted and never sent back. Leave blank to keep the saved one.",
-      "issuerUri": "Issuer URL",
-      "issuerHint": "For OIDC, this alone is usually enough — the rest is discovered.",
-      "authorizationUri": "Authorization URL",
-      "tokenUri": "Token URL",
-      "userInfoUri": "User info URL",
-      "jwkSetUri": "JWKS URL",
-      "redirectUri": "Redirect URI",
+      "displayName": "Name shown to shoppers",
       "emailDomains": "Email domains",
       "emailDomainsHint": "Comma separated. A shopper whose address matches is sent straight here.",
+      "endpointsTitle": "Endpoints",
+      "issuerHint": "For OIDC, this alone is usually enough — the rest is discovered.",
+      "issuerUri": "Issuer URL",
       "jit": "Create an account on first sign-in",
-      "trustEmailVerified": "Trust the address this provider reports",
-      "trustEmail": "Trust the address this provider reports"
+      "jitHint": "Off means only people who already have an account here can use this provider.",
+      "jwkSetUri": "JWKS URL",
+      "kind": "Kind",
+      "kindGeneric": "You supply the endpoints. This server will fetch them.",
+      "kindPreset": "The endpoints are known; you only supply your application's credentials.",
+      "redirectUri": "Redirect URI",
+      "tokenUri": "Token URL",
+      "trustEmail": "Trust the address this provider reports",
+      "trustEmailHint": "Only turn this on for a provider that verifies addresses itself.",
+      "userInfoUri": "User info URL"
     },
     "form": {
       "addTitle": "Add a provider",

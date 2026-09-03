@@ -11,6 +11,7 @@ import {
   EmptyState,
   FormDialog,
   FormField,
+  Icon,
   LoadError,
   NoticeBar,
   PageHeader,
@@ -49,6 +50,7 @@ import {IDENTITY_PROVIDERS_PROVIDERS} from './services/identity-providers.api.se
     EmptyState,
     FormDialog,
     FormField,
+    Icon,
     LoadError,
     NoticeBar,
     PageHeader,
@@ -156,6 +158,15 @@ export class IdentityProviders {
       attributeMapping: {},
     };
     this.facade.save(request);
+  }
+
+  /** What the chosen kind means, so the endpoint block's appearing and disappearing is explained. */
+  protected kindHint(t: (key: string) => string): string {
+    const preset = this.facade.presetOf(this.chosenPreset());
+    if (!preset) {
+      return '';
+    }
+    return preset.generic ? t('identityProviders.field.kindGeneric') : t('identityProviders.field.kindPreset');
   }
 
   protected testResultFor(provider: IdentityProviderDto) {

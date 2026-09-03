@@ -299,8 +299,6 @@
         "status": "الحالة",
         "user": "الحساب"
       },
-      "disabled": "معطّل",
-      "enabled": "مفعّل",
       "noOrg": "بلا مؤسسة",
       "unnamed": "لا اسم مسجّل",
       "status": {
