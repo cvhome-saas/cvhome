@@ -1,0 +1,20 @@
+# PublicIdpController — com.asrevo.cvhome.uaa.web.pub
+#
+# What the sign-in page asks before anyone is signed in. On uaa's own origin, anonymous, stateless.
+# A hidden provider is not in the list but still answers discovery: hiding is about the button.
+
+### the buttons — 200 PublicIdpDto[] {alias, displayName, preset, type, authorizationUrl}
+GET {{UAA_URL}}/api/v1/public/idps
+
+### home-realm discovery — 200 {"provider": PublicIdpDto | null}; never says whether an account exists
+POST {{UAA_URL}}/api/v1/public/idps/discover
+Content-Type: application/json
+
+{"email": "someone@example.com"}
+
+### why the sign-in page is shown — 200 LoginContext {clientId, clientName, pendingLink}
+# Reads the session's saved authorization request and any brokered login waiting for its password.
+GET {{UAA_URL}}/api/v1/public/login/context
+
+### start a brokered login — 302 to the provider's authorization endpoint (open in a browser)
+# GET {{UAA_URL}}/oauth2/authorization/google?login_hint=someone@example.com

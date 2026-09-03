@@ -1,3 +1,11 @@
+/*
+ * The screen's header and panels are the page column's own children, so the shell's rhythm applies
+ * between them and this stylesheet never sets a gap of its own. See admin-shell.css, `.page`.
+ */
+:host {
+  display: contents;
+}
+
 .stack {
   display: grid;
   gap: var(--spacing-section);
@@ -91,4 +99,127 @@
   display: flex;
   flex-wrap: wrap;
   gap: var(--spacing-tight) var(--spacing-field);
+}
+
+
+/* --- the security section of the dialog ----------------------------------------------------------- */
+.security {
+  display: grid;
+  gap: var(--spacing-tight);
+  padding: var(--spacing-field);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.security-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-tight);
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.2rem var(--spacing-group);
+  margin: 0;
+  font-size: var(--text-3xs);
+}
+
+.facts dt {
+  color: var(--foreground-subtle);
+}
+
+.facts dd {
+  margin: 0;
+  color: var(--foreground-strong);
+}
+
+.via {
+  color: var(--muted-foreground);
+}
+
+.sessions {
+  display: grid;
+  gap: var(--spacing-inline);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.session {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-tight);
+  padding: 0.35rem 0.5rem;
+  border-radius: var(--radius-md);
+  background: var(--input);
+  font-size: var(--text-3xs);
+}
+
+.session-main {
+  display: grid;
+  min-inline-size: 0;
+}
+
+.session-meta {
+  color: var(--muted-foreground);
+}
+
+.agent {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--primary);
+  font: inherit;
+  font-size: var(--text-3xs);
+  cursor: pointer;
+}
+
+.link.danger {
+  color: var(--destructive);
+}
+
+/* --- the panel head and the two tab rows ----------------------------------------------------------- */
+.head-actions {
+  display: flex;
+  gap: var(--spacing-tight);
+}
+
+/* --- the invitations table ------------------------------------------------------------------------- */
+.cell {
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+  font-size: var(--text-3xs);
+}
+
+.cell.who {
+  overflow-wrap: anywhere;
+}
+
+.sub {
+  color: var(--muted-foreground);
+  font-family: var(--font-mono);
+  font-size: var(--text-4xs);
+}
+
+.row-actions {
+  flex-direction: row;
+  gap: var(--spacing-field);
+}
+
+/* --- the email badge beside its field -------------------------------------------------------------- */
+.verified {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-field);
+  margin-block-start: calc(-1 * var(--spacing-tight));
 }

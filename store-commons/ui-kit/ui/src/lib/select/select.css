@@ -21,10 +21,11 @@
   /*
    * The height is a custom property because a consumer cannot reach this element any other way:
    * `.select-trigger` lives in this component's template and carries this component's encapsulation
-   * attribute, so a rule written on `app-select` from a feature stylesheet matches nothing. The
-   * products filter row needs 2.25rem to line up with the search box beside it.
+   * attribute, so a rule written on `app-select` from a feature stylesheet matches nothing. It
+   * defaults to the shared control height, so a select lines up with the search box and the buttons
+   * beside it without the consumer arranging anything; the override remains for a denser row.
    */
-  block-size: var(--select-height, 2.375rem);
+  block-size: var(--select-height, var(--field-height));
   padding: 0 .7rem;
   border: 1px solid var(--border);
   border-radius: var(--radius-md);

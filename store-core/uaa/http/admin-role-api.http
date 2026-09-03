@@ -9,7 +9,8 @@
 #
 # Requires a running stack: lcl start -d
 
-### list roles — 200 Page<Role>
+### list roles — 200 Page<RoleDto>
+# Each row carries description, scope, systemRole, inheritsFrom, permissions, effectivePermissions and userCount.
 # `count`, not Spring's `size`: uaa depends on store-commons:autoconfigure like every other service.
 GET {{SELLER_UI_URL}}/uaa/api/v1/admin/roles?page=0&count=20
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
@@ -21,17 +22,33 @@ Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
     });
 %}
 
-### create a role — 200 Role
+### the permission catalogue — 200 PermissionDto[]
+# Static on the server (the Permission enum in store-commons:commons), so a form driven by it cannot
+# offer a key a grant would refuse.
+GET {{SELLER_UI_URL}}/uaa/api/v1/admin/roles/permissions
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+
+### create a role — 200 RoleDto
+# The name is normalised to upper case and must be A-Z, 0-9 and _ (it is the token claim). The
+# parent's permissions are inherited: `effectivePermissions` is the union, `permissions` the own set.
 # @name createRole
 POST {{SELLER_UI_URL}}/uaa/api/v1/admin/roles
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
 Content-Type: application/json
 
-{"name": "ROLE_HTTP_DEMO"}
+{
+  "name": "regional_buyer",
+  "description": "Buys for one region",
+  "scope": "ORGANIZATION",
+  "inheritsFromId": "4ca169a8-e8ac-4874-acae-795bf7b27832",
+  "permissions": ["users:read"]
+}
 
 > {%
     client.test("created", function () {
         client.assert(response.status === 200, "status " + response.status);
+        client.assert(response.body.name === "REGIONAL_BUYER", "name " + response.body.name);
+        client.assert(response.body.effectivePermissions.indexOf("users:invite") >= 0, "not inherited");
         client.global.set("ROLE_ID", response.body.id);
     });
 %}
@@ -40,13 +57,31 @@ Content-Type: application/json
 GET {{SELLER_UI_URL}}/uaa/api/v1/admin/roles/{{ROLE_ID}}
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
 
-### rename it — 200
-# Note the leading slash on the controller's @PutMapping("/{id}"), unlike its siblings.
+### change its permissions and drop the parent — 200, audited as role.permissions.updated
 PUT {{SELLER_UI_URL}}/uaa/api/v1/admin/roles/{{ROLE_ID}}
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
 Content-Type: application/json
 
-{"name": "ROLE_HTTP_DEMO_RENAMED"}
+{"permissions": ["users:read", "audit:read"], "clearInheritsFrom": true}
+
+### an unknown permission — 400 UAA.PERMISSION.UNKNOWN
+PUT {{SELLER_UI_URL}}/uaa/api/v1/admin/roles/{{ROLE_ID}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{"permissions": ["users:fly"]}
+
+### rename a system role — 403 UAA.ROLE.SYSTEM_IMMUTABLE
+# ORG_ADMIN's name is what every service authorises on. Its description and permissions stay editable.
+PUT {{SELLER_UI_URL}}/uaa/api/v1/admin/roles/4ca169a8-e8ac-4874-acae-795bf7b27832
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{"name": "OWNER"}
+
+### delete a system role — 403 UAA.ROLE.SYSTEM_IMMUTABLE
+DELETE {{SELLER_UI_URL}}/uaa/api/v1/admin/roles/4ca169a8-e8ac-4874-acae-795bf7b27832
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
 
 ### a malformed id — 400 at binding, not 404
 # Every path variable is declared UUID, so a wrong-shaped id never reaches the service.

@@ -1,0 +1,103 @@
+<div class="wrap" *transloco="let t">
+  <main class="card-wrap">
+    <div class="brand">
+      <span class="mark"><app-icon name="shield" /></span>
+      <span class="brand-name">{{ t('brand') }}</span>
+    </div>
+
+    @switch (phase()) {
+      @case ('loading') {
+        <app-panel class="card" padded [title]="t('linkAccept.title.' + kind())">
+          <p class="muted" role="status">{{ t('linkAccept.loading') }}</p>
+        </app-panel>
+      }
+      @case ('noToken') {
+        <app-panel class="card" padded [title]="t('linkAccept.unusable.title')">
+          <p class="muted">{{ t('linkAccept.noToken') }}</p>
+        </app-panel>
+      }
+      @case ('unusable') {
+        <!-- One message for missing, expired, revoked and spent: an anonymous visitor can act on none of them differently. -->
+        <app-panel class="card" padded [title]="t('linkAccept.unusable.title')">
+          <p class="notice warn" role="alert">
+            <app-icon name="alertCircle" />
+            <span>{{ t('linkAccept.unusable.message.' + kind()) }}</span>
+          </p>
+          <a class="back" href="/login">{{ t('linkAccept.done.signIn') }}</a>
+        </app-panel>
+      }
+      @case ('failed') {
+        <app-panel class="card" padded [title]="t('linkAccept.failed.title')">
+          <p class="notice warn" role="alert">
+            <app-icon name="alertCircle" />
+            <span>{{ t('linkAccept.failed.message') }}</span>
+          </p>
+        </app-panel>
+      }
+      @case ('done') {
+        <app-panel class="card" padded [title]="t('linkAccept.done.title.' + kind())">
+          <p class="notice ok" role="status">
+            <app-icon name="checkCircle" />
+            <span>{{ t('linkAccept.done.message', {name: accepted()?.username ?? ''}) }}</span>
+          </p>
+          <!-- A full navigation, not a router link: /login is served by uaa and the session starts there. -->
+          <a class="submit" [href]="accepted()?.loginUrl || '/login'">
+            <span>{{ t('linkAccept.done.signIn') }}</span>
+            <app-icon name="arrowRight" />
+          </a>
+        </app-panel>
+      }
+      @case ('ready') {
+        @if (preview(); as preview) {
+          <app-panel class="card" padded [title]="t('linkAccept.title.' + kind())" [subtitle]="t('linkAccept.subtitle.' + kind())">
+            <dl class="who">
+              @if (preview.firstName) {
+                <dt>{{ t('linkAccept.greeting') }}</dt>
+                <dd>{{ preview.firstName }}</dd>
+              }
+              <dt>{{ t('linkAccept.account') }}</dt>
+              <dd class="latin">{{ preview.email || preview.username }}</dd>
+              <dt>{{ t('linkAccept.expires') }}</dt>
+              <dd>{{ when(preview.expiresAt) }}</dd>
+            </dl>
+
+            <form class="form" [formGroup]="form" (ngSubmit)="submit()">
+              <!-- The username travels as a hidden field so a password manager files the new credential under it. -->
+              <input type="hidden" name="username" autocomplete="username" [value]="preview.username" />
+
+              <app-form-field controlId="password" required [label]="t('linkAccept.password')" [control]="form.controls.password">
+                <app-text-field
+                  formControlName="password"
+                  id="password"
+                  type="password"
+                  autocomplete="new-password"
+                  [revealLabel]="t('linkAccept.reveal')"
+                />
+              </app-form-field>
+
+              <app-form-field
+                controlId="repeat-password"
+                required
+                [label]="t('linkAccept.repeatPassword')"
+                [control]="form.controls.repeatPassword"
+              >
+                <app-text-field formControlName="repeatPassword" id="repeat-password" type="password" autocomplete="new-password" />
+              </app-form-field>
+
+              <ul class="rules" [attr.aria-label]="t('linkAccept.rulesLabel')">
+                @for (rule of rules(); track rule.key) {
+                  <li>{{ t('linkAccept.rules.' + rule.key, rule.params) }}</li>
+                }
+              </ul>
+
+              <button class="submit" type="submit" [disabled]="submitting()">
+                <span>{{ submitting() ? t('linkAccept.submitting') : t('linkAccept.submit.' + kind()) }}</span>
+                <app-icon name="arrowRight" />
+              </button>
+            </form>
+          </app-panel>
+        }
+      }
+    }
+  </main>
+</div>

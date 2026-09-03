@@ -71,3 +71,50 @@ button,
 a {
   -webkit-tap-highlight-color: transparent;
 }
+
+/*
+ * Moving between screens.
+ *
+ * `withViewTransitions()` on the router hands the browser both frames and it cross-fades them; this
+ * only shapes the result — a short fade with a few pixels of travel, the same motion the kit's own
+ * entrances use. Without it a screen change was an instantaneous repaint, which reads as a flicker
+ * on a console where the rail and the header stay put and only the middle changes.
+ *
+ * The rail, the top bar and the breadcrumb are outside the transitioned area by construction: the
+ * browser animates the whole document, so anything identical in both frames simply does not appear
+ * to move.
+ *
+ * **The two frames do not overlap.** Both are painted at once during a transition, so fading them
+ * simultaneously shows the old screen *through* the new one — a double exposure of two different
+ * tables, which is worse than no animation. The outgoing frame finishes leaving before the incoming
+ * one starts arriving, which is why the incoming animation carries a delay equal to the outgoing
+ * duration.
+ */
+::view-transition-old(root) {
+  animation: view-fade-out 0.1s ease-in both;
+}
+
+::view-transition-new(root) {
+  animation: view-fade-in 0.2s 0.1s var(--ease-emphasis) both;
+}
+
+@keyframes view-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes view-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.35rem);
+  }
+}
+
+/* A reader who asked for less motion gets the change without the travel. */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+  }
+}

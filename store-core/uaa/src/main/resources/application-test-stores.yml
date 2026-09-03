@@ -1,6 +1,42 @@
+# Integration tests run this slice alone (no lcl), so it carries the same local secrets and turns the seed writers
+# on: the tests obtain real tokens from the seeded clients.
+UAA_ADMIN_PASSWORD: admin
+UAA_ADMIN_SDK_SECRET: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
+UAA_STORE_POD_SECRET: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
+UAA_STORE_CORE_SECRET: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
+UAA_WEB_APP_SECRET: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
+
 com:
   asrevo:
     cvhome:
+      uaa:
+        seed:
+          apply-on-boot: true
+        remember-me:
+          key: test-remember-me-key
+        # Every integration test signs in from 127.0.0.1; the suite would trip a real limit in a minute.
+        # RateLimitIntegrationTest lowers it again for its own context.
+        rate-limit:
+          enabled: true
+          login: { limit: 1000, window: 1m }
+          token: { limit: 1000, window: 1m }
+          public-api: { limit: 1000, window: 1m }
+        links:
+          log-links: true
+        # The stack's console and pods answer on plain http under *.gateway.com.
+        clients:
+          plain-http-hosts:
+            - localhost
+            - 127.0.0.1
+            - gateway.com
+            - .gateway.com
+      # The key that wraps the signing keys' private halves at rest. Static and committed for a local stack — like every
+      # other local secret in this slice — so a restart can still read them. Without it the shared LOCAL provider falls
+      # back to a random key per boot, and every stored signing key becomes unreadable at the next start.
+      crypto:
+        local:
+          key-provider-type: STATIC
+          key: ${UAA_CRYPTO_KEY:6b8d7f2a9c4e1d3b5a7f9e2c4d6b8a1f3e5d7c9b2a4f6e8d1c3b5a7f9e2d4c6b}
       test-store:
         users:
           - id: 65D8419C-8765-4B8B-A15F-910DCE959931

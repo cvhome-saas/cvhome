@@ -6,45 +6,178 @@
   }
 
   <app-busy-overlay reserve="page" [busy]="facade.isLoading()" [label]="t('users.loading')">
-    @if (!facade.isEmpty()) {
+    <!-- Nothing but the error when the list refused: an empty state under a 403 would read as "no accounts". -->
+    @if (!facade.error()) {
       <div class="stack">
-        <!--
-          Said once at the top rather than as a search box that would narrow nothing: uaa's admin
-          list matches metadata equality and has no text query at all.
-        -->
-        <app-notice-bar icon="info" tone="blue" [message]="t('users.notice.noSearch')" />
+        @if (facade.tiles().length) {
+          <app-kpi-grid [data]="facade.tiles()" [label]="t('users.tiles.label')" [columns]="4" />
+        }
 
         <app-panel [title]="t('users.panel.title')">
-          <button panelAction class="primary-action" type="button" (click)="facade.startCreate()">
-            {{ t('users.action.create') }}
-          </button>
+          <div panelAction class="head-actions">
+            <button class="secondary-action" type="button" (click)="facade.startCreate()">
+              {{ t('users.action.create') }}
+            </button>
+            <button class="primary-action" type="button" (click)="facade.startInvite()">
+              {{ t('users.action.invite') }}
+            </button>
+          </div>
 
-          @if (facade.rows().length) {
-            <app-user-admin-table
-              [rows]="facade.rows()"
-              [label]="t('users.panel.title')"
-              [busy]="facade.busy()"
-              [roleList]="roleList"
-              [selectable]="true"
-              (picked)="facade.select($event)"
-              (act)="onAction($event)"
-            />
+          <app-tab-switcher
+            class="views"
+            [tabs]="facade.viewTabs()"
+            [active]="facade.view()"
+            [label]="t('users.view.label')"
+            (activeChange)="facade.setView($event)"
+          />
 
-            <app-pagination
-              [page]="facade.pageIndex()"
-              [totalPages]="facade.totalPages()"
-              [totalElements]="facade.totalElements()"
-              [pageSize]="pageSize"
-              [unit]="t('users.unit')"
-              [label]="t('users.paginationLabel')"
-              (pageChange)="facade.goToPage($event)"
-            />
+          @if (facade.view() === 'accounts') {
+            <div class="filter-bar">
+              <app-tab-switcher
+                [tabs]="facade.statusTabs()"
+                [active]="facade.status()"
+                [label]="t('users.filter.label')"
+                (activeChange)="facade.setStatus($event)"
+              />
+              <app-search-box
+                [value]="facade.query()"
+                [label]="t('users.filter.search')"
+                [placeholder]="t('users.filter.search')"
+                [clearLabel]="t('users.filter.clear')"
+                width="18rem"
+                (valueChange)="facade.setQuery($event)"
+              />
+            </div>
+
+            @if (facade.rows().length) {
+              <app-user-admin-table
+                [rows]="facade.rows()"
+                [label]="t('users.panel.title')"
+                [busy]="facade.busy()"
+                [roleList]="roleList"
+                [selectable]="true"
+                (picked)="facade.select($event)"
+                (act)="onAction($event)"
+              />
+
+              <app-pagination
+                [page]="facade.pageIndex()"
+                [totalPages]="facade.totalPages()"
+                [totalElements]="facade.totalElements()"
+                [pageSize]="pageSize"
+                [unit]="t('users.unit')"
+                [label]="t('users.paginationLabel')"
+                (pageChange)="facade.goToPage($event)"
+              />
+            } @else if (!facade.isLoading()) {
+              <app-empty-state
+                icon="users"
+                [title]="
+                  t(
+                    facade.query() || facade.status() !== 'ALL'
+                      ? 'users.empty.noMatch'
+                      : 'users.empty.title'
+                  )
+                "
+                [message]="
+                  t(
+                    facade.query() || facade.status() !== 'ALL'
+                      ? 'users.empty.noMatchMessage'
+                      : 'users.empty.message'
+                  )
+                "
+              />
+            }
           } @else {
-            <app-empty-state
-              icon="users"
-              [title]="t('users.empty.title')"
-              [message]="t('users.empty.message')"
-            />
+            <div class="filter-bar">
+              <app-tab-switcher
+                [tabs]="facade.invitationTabs()"
+                [active]="facade.invitationStatus()"
+                [label]="t('users.invitations.filter.label')"
+                (activeChange)="facade.setInvitationStatus($event)"
+              />
+            </div>
+
+            <!--
+            Only the hash of a token is stored, so no row here can show its link again. Resend issues
+            a new one — and revokes the old — which is why it opens the same show-once dialog.
+          -->
+            @if (facade.invitationRows().length) {
+              <app-data-table
+                [columns]="invitationColumns(t)"
+                [label]="t('users.view.invitations')"
+              >
+                @for (invitation of facade.invitationRows(); track invitation.id) {
+                  <app-table-row>
+                    <span class="cell who" [attr.data-label]="t('users.invitations.column.who')">
+                      <span class="latin">{{ invitation.email }}</span>
+                      @if (invitation.username !== invitation.email) {
+                        <span class="sub latin">{{ invitation.username }}</span>
+                      }
+                    </span>
+                    <span class="cell" [attr.data-label]="t('users.invitations.column.status')">
+                      <app-badge [tone]="invitationTone(invitation)" shape="square">
+                        {{ t('users.invitations.status.' + invitation.status) }}
+                      </app-badge>
+                    </span>
+                    <span class="cell" [attr.data-label]="t('users.invitations.column.expires')">
+                      {{
+                        invitation.status === 'ACCEPTED'
+                          ? when(invitation.acceptedAt)
+                          : when(invitation.expiresAt)
+                      }}
+                    </span>
+                    <span
+                      class="cell latin"
+                      [attr.data-label]="t('users.invitations.column.createdBy')"
+                    >
+                      {{ invitation.createdBy || '—' }}
+                    </span>
+                    <span
+                      class="cell row-actions"
+                      [attr.data-label]="t('users.invitations.column.actions')"
+                    >
+                      @if (invitation.status === 'PENDING' || invitation.status === 'EXPIRED') {
+                        <button
+                          class="link"
+                          type="button"
+                          [disabled]="facade.busy()"
+                          (click)="facade.resendInvitation(invitation)"
+                        >
+                          {{ t('users.invitations.resend') }}
+                        </button>
+                      }
+                      @if (invitation.status === 'PENDING') {
+                        <button
+                          class="link danger"
+                          type="button"
+                          [disabled]="facade.busy()"
+                          (click)="facade.askRevokeInvitation(invitation)"
+                        >
+                          {{ t('users.invitations.revoke') }}
+                        </button>
+                      }
+                    </span>
+                  </app-table-row>
+                }
+              </app-data-table>
+
+              <app-pagination
+                [page]="facade.invitationPage()"
+                [totalPages]="facade.invitationTotalPages()"
+                [totalElements]="facade.invitationTotalElements()"
+                [pageSize]="pageSize"
+                [unit]="t('users.invitations.unit')"
+                [label]="t('users.invitations.paginationLabel')"
+                (pageChange)="facade.goToInvitationPage($event)"
+              />
+            } @else if (!facade.invitationsLoading()) {
+              <app-empty-state
+                icon="envelope"
+                [title]="t('users.invitations.empty.title')"
+                [message]="t('users.invitations.empty.message')"
+              />
+            }
           }
         </app-panel>
       </div>
@@ -61,8 +194,8 @@
       (dismissed)="facade.dismiss()"
     >
       <form class="form" [formGroup]="facade.form" (ngSubmit)="facade.save()">
-        @if (target === 'new') {
-          <div class="pair">
+        <div class="pair">
+          @if (target === 'new') {
             <app-form-field
               controlId="username"
               required
@@ -72,14 +205,49 @@
             >
               <app-text-field formControlName="username" id="username" latin mono />
             </app-form-field>
+          } @else {
+            <!--
+              Read-only, and said so: the username is the identity a JWT `sub` carries, so renaming
+              is not a field change. See lessons.md, "Users — email and username cannot be changed here".
+            -->
+            <div class="meta">
+              <span class="meta-label">{{ t('users.detail.username') }}</span>
+              <span class="meta-value">{{ target.username }}</span>
+              <span class="readonly-note">{{ t('users.detail.usernameLocked') }}</span>
+            </div>
+          }
 
-            <app-form-field
-              controlId="email"
-              [label]="t('users.detail.email')"
-              [control]="facade.form.controls.email"
-            >
-              <app-text-field formControlName="email" id="email" latin />
-            </app-form-field>
+          <app-form-field
+            controlId="email"
+            [label]="t('users.detail.email')"
+            [control]="facade.form.controls.email"
+            [hint]="target === 'new' ? null : t('users.detail.emailHint')"
+          >
+            <app-text-field formControlName="email" id="email" latin />
+          </app-form-field>
+        </div>
+
+        @if (target !== 'new') {
+          <div class="verified">
+            <app-badge [tone]="target.emailVerified ? 'green' : 'amber'" shape="square">
+              {{
+                t(
+                  target.emailVerified
+                    ? 'users.detail.emailVerified'
+                    : 'users.detail.emailUnverified'
+                )
+              }}
+            </app-badge>
+            @if (!target.emailVerified) {
+              <button
+                class="link"
+                type="button"
+                [disabled]="facade.busy()"
+                (click)="facade.verifyEmail(target)"
+              >
+                {{ t('users.detail.markVerified') }}
+              </button>
+            }
           </div>
         }
 
@@ -102,29 +270,109 @@
         </div>
 
         @if (target !== 'new') {
-          <!--
-            Read-only, and said so. `UpdateUserRequest` carries neither: the username is the identity
-            a JWT `sub` holds, and uaa exposes no way to change an email here. Rendering them as
-            fields that silently fail to save would be worse than not rendering them. See
-            lessons.md, "Users — email and username cannot be changed here".
-          -->
-          <div class="readonly">
-            <div class="meta">
-              <span class="meta-label">{{ t('users.detail.username') }}</span>
-              <span class="meta-value">{{ target.username }}</span>
-            </div>
-            <div class="meta">
-              <span class="meta-label">{{ t('users.detail.email') }}</span>
-              <span class="meta-value">{{ target.email || '—' }}</span>
-            </div>
-            <p class="readonly-note">{{ t('users.detail.readOnlyNote') }}</p>
-          </div>
-
           <app-toggle
             formControlName="enabled"
             [label]="t('users.detail.enabledLabel')"
             [description]="t('users.detail.enabledHint')"
           />
+
+          <!-- What uaa knows about how this account signs in. Read-only facts, three actions. -->
+          <section class="security" [attr.aria-label]="t('users.security.title')">
+            <div class="security-head">
+              <span class="group-label">{{ t('users.security.title') }}</span>
+              <app-badge
+                [tone]="
+                  target.status === 'ACTIVE'
+                    ? 'green'
+                    : target.status === 'LOCKED'
+                      ? 'red'
+                      : target.status === 'PENDING'
+                        ? 'amber'
+                        : 'slate'
+                "
+                shape="square"
+              >
+                {{ t('shared.userAdmin.status.' + target.status) }}
+              </app-badge>
+            </div>
+            <dl class="facts">
+              <dt>{{ t('users.security.lastSignIn') }}</dt>
+              <dd>
+                {{ when(target.lastSignInAt) }}
+                @if (target.lastSignInVia) {
+                  <span class="via">· {{ target.lastSignInVia }}</span>
+                }
+              </dd>
+              <dt>{{ t('users.security.passwordChanged') }}</dt>
+              <dd>
+                {{
+                  target.passwordChangedAt
+                    ? when(target.passwordChangedAt)
+                    : t('users.security.noPassword')
+                }}
+              </dd>
+              <dt>{{ t('users.security.failedAttempts') }}</dt>
+              <dd>{{ target.failedLoginAttempts }}</dd>
+              @if (target.status === 'LOCKED') {
+                <dt>{{ t('users.security.lockedUntil') }}</dt>
+                <dd>
+                  {{
+                    target.lockedUntil
+                      ? when(target.lockedUntil)
+                      : t('users.security.lockedPermanently')
+                  }}
+                  <button
+                    class="link"
+                    type="button"
+                    [disabled]="facade.busy()"
+                    (click)="facade.unlock(target)"
+                  >
+                    {{ t('users.security.unlock') }}
+                  </button>
+                </dd>
+              }
+            </dl>
+
+            <div class="security-head">
+              <span class="group-label">{{ t('users.security.sessions') }}</span>
+              @if (facade.sessions()?.length) {
+                <button class="link danger" type="button" (click)="facade.revokeSessions(target)">
+                  {{ t('users.security.signOutEverywhere') }}
+                </button>
+              }
+            </div>
+            @if (facade.sessions(); as sessions) {
+              @if (sessions.length) {
+                <ul class="sessions">
+                  @for (session of sessions; track session.id) {
+                    <li class="session">
+                      <span class="session-main">
+                        <span class="latin">{{ session.ip || '—' }}</span>
+                        <span class="session-meta"
+                          >{{ session.via || '' }} · {{ when(session.lastAccessedAt) }}</span
+                        >
+                        <span class="session-meta agent" [title]="session.userAgent || ''">{{
+                          session.userAgent || ''
+                        }}</span>
+                      </span>
+                      <button
+                        class="link"
+                        type="button"
+                        [attr.aria-label]="t('users.security.revoke')"
+                        (click)="facade.revokeSession(target, session)"
+                      >
+                        {{ t('users.security.revoke') }}
+                      </button>
+                    </li>
+                  }
+                </ul>
+              } @else {
+                <p class="readonly-note">{{ t('users.security.noSessions') }}</p>
+              }
+            } @else {
+              <p class="readonly-note">{{ t('users.security.loadingSessions') }}</p>
+            }
+          </section>
         }
 
         <div class="roles">
@@ -142,11 +390,10 @@
           </div>
         </div>
 
+        <!-- A removed row goes out as `key: null`, which is uaa's word for "unset". -->
         <app-pair-list
           [array]="facade.form.controls.metadata"
           [label]="t('users.detail.metadata')"
-          [lockedKeys]="facade.lockedMetadataKeys()"
-          [lockedHint]="t('users.detail.metadataLocked')"
           (add)="facade.addMetadata()"
           (remove)="facade.removeMetadata($event)"
         />
@@ -156,6 +403,9 @@
           @if (target !== 'new') {
             <button class="secondary-action" type="button" (click)="facade.askReset(target)">
               {{ t('users.detail.setPassword') }}
+            </button>
+            <button class="secondary-action" type="button" (click)="facade.askResetLink(target)">
+              {{ t('users.detail.resetLink') }}
             </button>
             <div class="grow"></div>
             <button class="danger-action" type="button" (click)="facade.askDelete(target)">
@@ -175,11 +425,164 @@
     </app-form-dialog>
   }
 
+  @if (facade.inviting()) {
+    <app-form-dialog
+      open
+      wide
+      [title]="t('users.invite.title')"
+      [description]="t('users.invite.hint')"
+      [closeLabel]="t('shared.actions.cancel')"
+      (dismissed)="facade.dismiss()"
+    >
+      <form class="form" [formGroup]="facade.inviteForm" (ngSubmit)="facade.invite()">
+        <div class="pair">
+          <app-form-field
+            controlId="invite-email"
+            required
+            [label]="t('users.detail.email')"
+            [control]="facade.inviteForm.controls.email"
+          >
+            <app-text-field formControlName="email" id="invite-email" latin autocomplete="off" />
+          </app-form-field>
+
+          <app-form-field
+            controlId="invite-username"
+            [label]="t('users.detail.username')"
+            [control]="facade.inviteForm.controls.username"
+            [hint]="t('users.invite.usernameHint')"
+          >
+            <app-text-field
+              formControlName="username"
+              id="invite-username"
+              latin
+              mono
+              autocomplete="off"
+            />
+          </app-form-field>
+        </div>
+
+        <div class="pair">
+          <app-form-field
+            controlId="invite-first-name"
+            [label]="t('users.detail.firstName')"
+            [control]="facade.inviteForm.controls.firstName"
+          >
+            <app-text-field formControlName="firstName" id="invite-first-name" />
+          </app-form-field>
+
+          <app-form-field
+            controlId="invite-last-name"
+            [label]="t('users.detail.lastName')"
+            [control]="facade.inviteForm.controls.lastName"
+          >
+            <app-text-field formControlName="lastName" id="invite-last-name" />
+          </app-form-field>
+        </div>
+
+        <div class="roles">
+          <p class="group-label">{{ t('users.detail.roles') }}</p>
+          <div class="chips">
+            @for (role of facade.roleOptions(); track role.value) {
+              <app-checkbox
+                [checked]="facade.inviteRoles().includes(role.value)"
+                [label]="role.label"
+                (checkedChange)="facade.toggleInviteRole(role.value)"
+              />
+            } @empty {
+              <p class="readonly-note">{{ t('users.roles.empty') }}</p>
+            }
+          </div>
+        </div>
+
+        <app-pair-list
+          [array]="facade.inviteForm.controls.metadata"
+          [label]="t('users.detail.metadata')"
+          (add)="facade.addInviteMetadata()"
+          (remove)="facade.removeInviteMetadata($event)"
+        />
+
+        <p class="readonly-note">{{ t('users.invite.delivery') }}</p>
+
+        <div class="actions">
+          <div class="grow"></div>
+          <button class="secondary-action" type="button" (click)="facade.dismiss()">
+            {{ t('shared.actions.cancel') }}
+          </button>
+          <button class="primary-action" type="submit" [disabled]="facade.busy()">
+            {{ facade.busy() ? t('users.invite.busy') : t('users.invite.confirm') }}
+          </button>
+        </div>
+      </form>
+    </app-form-dialog>
+  }
+
+  @if (facade.issuingResetLink(); as target) {
+    <app-form-dialog
+      open
+      [title]="t('users.resetLink.title')"
+      [description]="t('users.resetLink.message', { name: target.username })"
+      [closeLabel]="t('shared.actions.cancel')"
+      (dismissed)="facade.dismiss()"
+    >
+      <div class="form">
+        <!--
+          Off by default: someone who forgot their password keeps their other sessions, someone whose
+          account may be compromised does not. The operator knows which case this is.
+        -->
+        <app-toggle
+          [checked]="facade.resetLinkRevokes()"
+          [label]="t('users.resetLink.revokeLabel')"
+          [description]="t('users.resetLink.revokeHint')"
+          (checkedChange)="facade.resetLinkRevokes.set($event)"
+        />
+        <p class="readonly-note">{{ t('users.resetLink.validity') }}</p>
+        <div class="actions">
+          <div class="grow"></div>
+          <button class="secondary-action" type="button" (click)="facade.dismiss()">
+            {{ t('shared.actions.cancel') }}
+          </button>
+          <button
+            class="primary-action"
+            type="button"
+            [disabled]="facade.busy()"
+            (click)="facade.confirmResetLink()"
+          >
+            {{ facade.busy() ? t('users.resetLink.busy') : t('users.resetLink.confirm') }}
+          </button>
+        </div>
+      </div>
+    </app-form-dialog>
+  }
+
+  <!--
+    Shown once because it exists once: only the token's hash is stored, and nothing on the platform
+    emails it. The link is also handed to the outbox for a delivery service that does not exist yet.
+  -->
+  @if (facade.shownLink(); as shown) {
+    <app-one-time-link-dialog
+      [open]="true"
+      [title]="
+        t(shown.kind === 'INVITATION' ? 'users.issued.inviteTitle' : 'users.issued.resetTitle')
+      "
+      [message]="
+        t('users.issued.message', {
+          name: shown.issued.user.email || shown.issued.user.username,
+          expires: when(shown.issued.expiresAt),
+        })
+      "
+      [linkLabel]="t('users.issued.linkLabel')"
+      [link]="shown.issued.link"
+      [warning]="t('users.issued.warning')"
+      [doneLabel]="t('users.issued.done')"
+      (dismissed)="facade.dismissLink()"
+    />
+  }
+
   <app-set-password-dialog
     [open]="!!facade.resetting()"
     [busy]="facade.busy()"
     [title]="t('users.reset.title')"
-    [message]="t('users.reset.message', {name: facade.resetting()?.username ?? ''})"
+    [message]="t('users.reset.message', { name: facade.resetting()?.username ?? '' })"
     [passwordLabel]="t('users.reset.password')"
     [repeatLabel]="t('users.reset.repeatPassword')"
     [hint]="t('users.reset.hint')"
@@ -200,12 +603,22 @@
   <app-confirm-dialog
     [open]="!!facade.deleting()"
     [title]="t('users.delete.title')"
-    [message]="t('users.delete.message', {name: facade.deleting()?.username ?? ''})"
+    [message]="t('users.delete.message', { name: facade.deleting()?.username ?? '' })"
     [confirmationText]="facade.deleting()?.username ?? null"
     [confirmationLabel]="t('users.delete.confirmationLabel')"
     [confirmLabel]="t('users.delete.confirm')"
     [cancelLabel]="t('shared.actions.cancel')"
     (confirmed)="facade.confirmDelete()"
+    (dismissed)="facade.dismiss()"
+  />
+
+  <app-confirm-dialog
+    [open]="!!facade.revokingInvitation()"
+    [title]="t('users.revoke.title')"
+    [message]="t('users.revoke.message', { email: facade.revokingInvitation()?.email ?? '' })"
+    [confirmLabel]="t('users.revoke.confirm')"
+    [cancelLabel]="t('shared.actions.cancel')"
+    (confirmed)="facade.confirmRevokeInvitation()"
     (dismissed)="facade.dismiss()"
   />
 </ng-container>

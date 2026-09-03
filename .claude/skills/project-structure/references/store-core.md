@@ -17,15 +17,28 @@ store-core/
 
 ## `uaa` — identity for staff/admins
 
-The OAuth2 **Authorization Server** (`spring-boot-starter-oauth2-authorization-server`) and OIDC provider that
-every other service trusts. JDBC-backed sessions, Thymeleaf login pages, and an embedded Angular admin SPA.
+The OAuth2 **Authorization Server** (Spring Security's authorization server, merged into `spring-security` as of
+7.0) and OIDC provider that every other service trusts. JDBC-backed sessions **and a JDBC authorization store**, so
+refresh tokens survive a restart and can be revoked; the signing keys are rotated on a schedule and their private
+halves are encrypted at rest with `secret-crypto`.
 
 - Main class: `com.asrevo.cvhome.uaa.UaaApplication`
-- Web layer: `web/AuthController`, `web/StaticController`, `web/oidc/UserInfoController`,
-  `web/admin/{AdminUserController, AdminClientController, AdminRoleController}`
-- Embedded frontend: `src/main/resources/uaa-fe` (Angular 20, Nebular, module-federation) — see
-  `frontends.md` for the exact build wiring.
-- Depends on `store-commons:commons`, `store-commons:autoconfigure`, and both `ecs-commons` modules.
+- Web layer: `web/{AuthController, LinkConfirmController, StaticController}`,
+  `web/admin/{AdminUserController, AdminRoleController, AdminClientController, AdminSettingsController,
+  AdminKeyController, AdminIdentityProviderController, AdminAuditController, AdminDashboardController,
+  AdminSessionController}`, `web/account/AccountController`, `web/pub/*` for the endpoints a signed-out browser
+  needs (invitation and reset-link acceptance, the sign-in page's providers and context)
+- Behind them: `audit/`, `settings/`, `security/`, `password/`, `ratelimit/`, `session/`, `token/`, `invitation/`,
+  `client/`, `keys/`, `idp/`, `dashboard/`
+- **Brokered login**: uaa is an OAuth2 *client* as well as a server. `idp/` registers external providers (OIDC and
+  OAuth 2.0 — Google, Microsoft, GitHub, Apple scaffolded, plus generic) whose client secrets are encrypted, and
+  `security/Brokered*` turns an external identity into a local account by linking, confirming with a password, or
+  provisioning. SAML is not built.
+- Embedded frontend: `src/main/resources/uaa-fe` (Angular 20 on `@cvhome-saas/ui-kit`, no Nebular, no
+  module federation) — see `frontends.md` for the build wiring, and `uaa-fe/lessons.md` for what the console
+  deliberately does not draw.
+- Depends on `store-commons:commons`, `store-commons:autoconfigure`, `store-commons:ui-kit` (frontend),
+  `secret-crypto-autoconfigure`, and both `ecs-commons` modules.
 
 **Contrast with `cua`** (`store-pod/cua`, :8124): same technology, different realm. `uaa` authenticates
 platform staff and merchants; `cua` authenticates storefront shoppers.

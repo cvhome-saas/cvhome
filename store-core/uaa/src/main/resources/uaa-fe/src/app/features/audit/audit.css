@@ -1,0 +1,205 @@
+/*
+ * The screen's header and panels are the page column's own children, so the shell's rhythm applies
+ * between them and this stylesheet never sets a gap of its own. See admin-shell.css, `.page`.
+ */
+:host {
+  display: contents;
+}
+
+.panel-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-field);
+}
+
+.chip {
+  padding: 0.3rem 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--card);
+  color: var(--muted-foreground);
+  font: inherit;
+  font-size: var(--text-3xs);
+  cursor: pointer;
+}
+
+.chip.on {
+  border-color: var(--chart-5-foreground);
+  background: var(--chart-5-wash);
+  color: var(--chart-5-foreground);
+}
+
+.pivot {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-tight);
+  /* Inside the same unpadded panel as the filter bar, so it takes the same interior. */
+  margin: 0 var(--spacing-gutter) var(--spacing-group);
+  padding: 0.4rem 0.65rem;
+  border-radius: var(--radius-md);
+  background: var(--input);
+  font-size: var(--text-3xs);
+}
+
+.link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--primary);
+  font: inherit;
+  font-size: var(--text-3xs);
+  cursor: pointer;
+}
+
+.row {
+  cursor: pointer;
+}
+
+.cell {
+  display: inline-flex;
+  align-items: center;
+  min-inline-size: 0;
+  font-size: var(--text-3xs);
+}
+
+.cell.event {
+  gap: var(--spacing-tight);
+}
+
+.cell.actor,
+.cell.target {
+  display: grid;
+}
+
+.event-name {
+  overflow: hidden;
+  color: var(--foreground-strong);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.who {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.muted {
+  color: var(--muted-foreground);
+  font-size: var(--text-4xs);
+}
+
+.when {
+  color: var(--muted-foreground);
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- the detail panel ---------------------------------------------------------------------------------- */
+.detail {
+  position: fixed;
+  inset-block: 0;
+  inset-inline-end: 0;
+  z-index: 30;
+  display: grid;
+  align-content: start;
+  gap: var(--spacing-group);
+  overflow-y: auto;
+  inline-size: min(26rem, 100vw);
+  padding: var(--spacing-section);
+  border-inline-start: 1px solid var(--border);
+  background: var(--card);
+  box-shadow: var(--shadow-lg);
+}
+
+.detail-head {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: var(--spacing-tight);
+}
+
+.detail-title {
+  margin: 0;
+  font-size: var(--text-base);
+}
+
+.detail-when {
+  margin: 0.15rem 0 0;
+  color: var(--muted-foreground);
+  font-size: var(--text-3xs);
+}
+
+.icon-action {
+  display: grid;
+  place-items: center;
+  inline-size: 1.9rem;
+  block-size: 1.9rem;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--card);
+  color: var(--muted-foreground);
+  cursor: pointer;
+}
+
+.facts {
+  display: grid;
+  gap: 0.3rem var(--spacing-field);
+  grid-template-columns: minmax(6rem, auto) minmax(0, 1fr);
+  margin: 0;
+  font-size: var(--text-3xs);
+}
+
+.facts dt {
+  color: var(--foreground-subtle);
+}
+
+.facts dd {
+  margin: 0;
+  color: var(--foreground-strong);
+  min-inline-size: 0;
+}
+
+.wrap {
+  overflow-wrap: anywhere;
+}
+
+.section-title {
+  margin: 0 0 var(--spacing-tight);
+  font-size: var(--text-sm);
+}
+
+.diff {
+  inline-size: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-4xs);
+}
+
+.diff th,
+.diff td {
+  padding: 0.3rem 0.4rem;
+  border-block-end: 1px solid var(--border);
+  text-align: start;
+  vertical-align: top;
+  overflow-wrap: anywhere;
+}
+
+.diff th {
+  color: var(--foreground-subtle);
+  font-weight: 600;
+}
+
+.was {
+  color: var(--muted-foreground);
+  text-decoration: line-through;
+}
+
+.is {
+  color: var(--foreground-strong);
+}
+
+.detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-tight);
+}

@@ -1,8 +1,7 @@
 <div class="wrap" *transloco="let t">
   <!--
-    The brand half. Decorative only — every claim on it is about what cvhome ID *is*, not about
-    capability the platform does not have. The mock's passkey / SSO / session bullets were removed
-    with the features they describe; see lessons.md, "Sign-in — one step, password only".
+    The brand half. Decorative only — every claim on it is about what cvhome ID *is*, not about capability the
+    platform does not have. See lessons.md, "Sign-in — one step, password only".
   -->
   <aside class="brand-panel">
     <div class="brand">
@@ -20,39 +19,146 @@
 
   <main class="form-panel">
     <app-panel class="card" padded [title]="t('signIn.title')" [subtitle]="t('signIn.subtitle')">
-      @if (failed) {
-        <p class="failed" role="alert">
-          <app-icon name="alertCircle" />
-          <span>{{ t('signIn.failed') }}</span>
+      <!-- Which application asked, when uaa knows: a sign-in with no context is a sign-in nobody can place. -->
+      @if (context()?.clientName; as client) {
+        <p class="client" role="note">{{ t('signIn.continueTo', {client: client}) }}</p>
+      }
+
+      @if (notice(); as key) {
+        <p class="failed" [class.info]="key === 'signedOut' || key === 'expired'" role="alert">
+          <app-icon [name]="key === 'signedOut' || key === 'expired' ? 'info' : 'alertCircle'" />
+          <span>
+            {{ t('signIn.' + key, {minutes: realm()?.lockoutMinutes ?? 15}) }}
+            @if (key === 'failed' && attemptsLeft !== null && attemptsLeft > 0) {
+              {{ t('signIn.attemptsLeft', {count: attemptsLeft, minutes: realm()?.lockoutMinutes ?? 15}) }}
+            }
+          </span>
         </p>
       }
 
-      <form class="form" method="post" [action]="action" (submit)="onSubmit()">
-        <app-form-field controlId="username" required [label]="t('signIn.username')">
-          <app-text-field
-            autocomplete="username"
-            id="username"
-            latin
-            name="username"
-            [placeholder]="t('signIn.usernamePlaceholder')"
-          />
-        </app-form-field>
+      @switch (step()) {
+        @case ('identity') {
+          @if (providers().length) {
+            <div class="providers">
+              @for (provider of providers(); track provider.alias) {
+                <a class="provider" [href]="providerUrl(provider)">
+                  <span class="glyph" aria-hidden="true">{{ glyph(provider) }}</span>
+                  <span>{{ t('signIn.continueWith', {name: provider.displayName}) }}</span>
+                </a>
+              }
+            </div>
+            <p class="or">{{ t('signIn.orEmail') }}</p>
+          }
 
-        <app-form-field controlId="password" required [label]="t('signIn.password')">
-          <app-text-field
-            autocomplete="current-password"
-            id="password"
-            name="password"
-            type="password"
-            [placeholder]="t('signIn.passwordPlaceholder')"
-          />
-        </app-form-field>
+          <!-- Step one asks only for the address: uaa decides whether it belongs to a provider or to a password. -->
+          <form class="form" (submit)="continueWithEmail($event)">
+            <app-form-field controlId="identity-email" required [label]="t('signIn.email')" [hint]="t('signIn.emailHint')">
+              <app-text-field
+                [value]="email()"
+                (valueChange)="email.set($event)"
+                autocomplete="username"
+                id="identity-email"
+                latin
+                inputmode="email"
+                [placeholder]="t('signIn.emailPlaceholder')"
+              />
+            </app-form-field>
+            <button class="submit" type="submit" [disabled]="checking()">
+              <span>{{ checking() ? t('signIn.checking') : t('signIn.continue') }}</span>
+              <app-icon name="arrowRight" />
+            </button>
+          </form>
+        }
 
-        <button class="submit" type="submit" [disabled]="submitting()">
-          <span>{{ submitting() ? t('signIn.submitting') : t('signIn.submit') }}</span>
-          <app-icon name="arrowRight" />
+        @case ('password') {
+          @if (email()) {
+            <p class="identity-chip">
+              <span class="chip-email latin">{{ email() }}</span>
+              <button class="link" type="button" (click)="back()">{{ t('signIn.notYou') }}</button>
+            </p>
+          }
+
+          <form class="form" method="post" [action]="action" (submit)="onSubmit()">
+            <!-- Spring Security's CSRF token, read from the XSRF-TOKEN cookie the page response planted. -->
+            <input type="hidden" name="_csrf" [value]="csrf()" />
+            <app-form-field controlId="username" required [label]="t('signIn.username')">
+              <app-text-field
+                autocomplete="username"
+                id="username"
+                latin
+                name="username"
+                [value]="email()"
+                (valueChange)="email.set($event)"
+                [placeholder]="t('signIn.usernamePlaceholder')"
+              />
+            </app-form-field>
+
+            <app-form-field controlId="password" required [label]="t('signIn.password')">
+              <app-text-field
+                autocomplete="current-password"
+                id="password"
+                name="password"
+                type="password"
+                [placeholder]="t('signIn.passwordPlaceholder')"
+                [revealLabel]="t('signIn.reveal')"
+              />
+            </app-form-field>
+
+            @if (realm()?.rememberMeEnabled) {
+              <!-- A real checkbox with a name: the form posts it, and Spring's remember-me reads `remember-me`. -->
+              <label class="remember">
+                <input type="checkbox" name="remember-me" value="true" [checked]="rememberMe()" (change)="rememberMe.set(!rememberMe())" />
+                <span>{{ t('signIn.rememberMe') }}</span>
+              </label>
+            }
+
+            <button class="submit" type="submit" [disabled]="submitting()">
+              <span>{{ submitting() ? t('signIn.submitting') : t('signIn.submit') }}</span>
+              <app-icon name="arrowRight" />
+            </button>
+          </form>
+        }
+
+        @case ('link') {
+          <!--
+            A brokered login matched an account that has never used this provider. One password confirms that the
+            two are the same person; after that the provider signs them in on its own.
+          -->
+          @if (pending(); as link) {
+            <p class="failed info" role="status">
+              <app-icon name="info" />
+              <span>{{ t('signIn.link.explain', {provider: link.providerName, email: link.email}) }}</span>
+            </p>
+
+            <form class="form" (submit)="confirmLink($event)">
+              <app-form-field controlId="link-password" required [label]="t('signIn.link.password')" [error]="linkError()">
+                <app-text-field
+                  [value]="linkPassword()"
+                  (valueChange)="linkPassword.set($event)"
+                  autocomplete="current-password"
+                  id="link-password"
+                  type="password"
+                  [revealLabel]="t('signIn.reveal')"
+                />
+              </app-form-field>
+              <button class="submit" type="submit" [disabled]="submitting()">
+                <span>{{ submitting() ? t('signIn.submitting') : t('signIn.link.confirm') }}</span>
+                <app-icon name="arrowRight" />
+              </button>
+            </form>
+          }
+        }
+      }
+
+      <!-- Not a link to a form: resets are issued by an administrator, and the page says so. -->
+      <div class="forgot">
+        <button class="forgot-toggle" type="button" [attr.aria-expanded]="forgotOpen()" (click)="forgotOpen.set(!forgotOpen())">
+          {{ t('signIn.forgot') }}
         </button>
-      </form>
+        @if (forgotOpen()) {
+          <p class="forgot-copy" role="note">{{ t('signIn.forgotCopy') }}</p>
+        }
+      </div>
     </app-panel>
   </main>
 </div>

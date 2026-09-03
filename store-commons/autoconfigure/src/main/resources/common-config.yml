@@ -170,7 +170,8 @@ spring:
             scope: openid
             redirect-uri: "{baseUrl}/login/oauth2/code/uaa"
             provider: uaa
-            client-secret: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
+            # The gateway's half of uaa's web-app client. Overridable per environment; the default is the local seed.
+            client-secret: ${UAA_WEB_APP_SECRET:hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7}
         provider:
           uaa:
             #            comment issuer-uri to skip validation
@@ -228,7 +229,9 @@ management:
   endpoints:
     web:
       exposure:
-        include: [ '*' ]
+        # A placeholder so one service can narrow it (uaa does, in its application.yml): an imported config file
+        # outranks the file that imports it, so a plain override there would lose.
+        include: ${MANAGEMENT_ENDPOINTS_EXPOSURE:*}
 info:
   app:
     name: ${spring.application.name}

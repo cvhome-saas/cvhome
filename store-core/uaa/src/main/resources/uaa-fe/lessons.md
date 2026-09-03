@@ -22,6 +22,9 @@ MFA" rather than "we cannot tell".
   see its lessons.md, "Shell — no sidebar badge counts".
 - **Expected contract:** `GET /api/v1/admin/counts` → `{users: n, roles: n, clients: n}`, one call
   rather than three, since it exists only to paint a rail.
+- **Still open after feat/uaa-sso, deliberately:** the counts now exist (`GET /api/v1/admin/dashboard` answers
+  users, roles, clients and providers in one read), so the badge is buildable. It stays unbuilt because a number
+  in a rail is read as *needing attention*, and none of these do; the dashboard is where a count belongs.
 
 ## Shell — no realm switcher
 
@@ -47,6 +50,12 @@ MFA" rather than "we cannot tell".
   The rail is a map of the product, and hiding them would make it a map of this sprint. Each is a
   place an operator will eventually go.
 - **Expected contract:** four separate features, not one.
+- **Partly closed by feat/uaa-sso (phase 2):** Settings is built (`/settings`, `GET/PUT
+  /api/v1/admin/settings`). Dashboard, Audit log and Identity providers stay disabled until their
+  phases.
+- **Closed by feat/uaa-sso (phase 7), for Identity providers:** the rail entry is a real route now. Dashboard and
+  Audit log are still disabled; they arrive with the audit query API.
+- **Closed by feat/uaa-sso (phase 8):** Dashboard and Audit log are routes now, over `GET /api/v1/admin/dashboard` and `GET /api/v1/admin/audit`. With Identity providers (phase 7) that is every disabled row gone; what the design still draws and this console does not have is the realm switcher and the notification bell, both of which need a store that does not exist.
 
 ## Users — no MFA state
 
@@ -63,6 +72,9 @@ MFA" rather than "we cannot tell".
 - **What is missing:** uaa records no authentication timestamp on the user.
 - **Decision:** column removed.
 - **Expected contract:** `UserDto.lastSignInAt: string | null`, ISO-8601.
+- **Closed by feat/uaa-sso (phase 3):** `users.last_sign_in_at` is written on every successful authentication,
+  along with the client and how the person got in, and the detail pane shows all three. The table keeps the
+  column out on purpose — a timestamp per row crowds out the identity, and the pane is one click away.
 
 ## Users — no session list
 
@@ -72,6 +84,10 @@ MFA" rather than "we cannot tell".
   offering it — an operator would believe a compromised session had been revoked.
 - **Expected contract:** `GET /api/v1/admin/users/{id}/sessions` and
   `DELETE /api/v1/admin/users/{id}/sessions`.
+- **Closed by feat/uaa-sso (phase 3):** `GET`/`DELETE /api/v1/admin/users/{id}/sessions[/{sid}]` exist over
+  Spring Session's store, and the detail pane lists each live session with where it came from and revokes one or
+  all of them. Disabling or deleting an account revokes its sessions and its tokens too, so *sign out everywhere*
+  means what it says.
 
 ## Users — email and username cannot be changed here
 
@@ -83,6 +99,9 @@ MFA" rather than "we cannot tell".
   Editable-looking fields that silently fail to save are the worse failure.
 - **Expected contract:** `UpdateUserRequest.email`, and a rename flow that decides what happens to a
   JWT `sub` — the username *is* the identity, so this is not a field change.
+- **Closed by feat/uaa-sso (phase 4), for email:** `UpdateUserRequest.email` exists and the dialog
+  edits it; a changed address is marked unverified, with a badge and a "Mark verified" action beside it.
+  The username stays read-only, on purpose — it is what a JWT `sub` carries.
 
 ## Users — metadata is merged, never replaced
 
@@ -97,6 +116,11 @@ MFA" rather than "we cannot tell".
   Editing a stored key and adding a new one both work and are offered.
 - **Expected contract:** either `PUT /users/{id}/metadata` replacing the map wholesale, or a
   documented null-value convention meaning "unset".
+- **Closed by feat/uaa-sso (phase 1):** the null-value convention. A key sent with `null` in
+  `UpdateUserRequest.metadata` is removed. The pane still disables the remove button on stored keys
+  until it learns to send that.
+- **Closed by feat/uaa-sso (phase 4):** the pane sends `key: null` for every stored key whose row was
+  removed, so the remove button is live again and `lockedKeys` is no longer passed.
 
 ## Users — creating an account is two calls, and there are no invites
 
@@ -112,6 +136,11 @@ MFA" rather than "we cannot tell".
   Invite and CSV import are not built.
 - **Expected contract:** for invites, `POST /api/v1/admin/invitations` returning a one-time token,
   which is roughly what tenancy already does for store members.
+- **Closed by feat/uaa-sso (phase 4), for invites:** `POST /api/v1/admin/users/invitations` creates a
+  pending account and answers a one-time link once; the console shows it in the kit's
+  `app-one-time-link-dialog`, lists invitations with resend/revoke, and `/accept-invitation` takes the
+  password. Admin-issued reset links (`POST /users/{id}/password-reset-links`, `/reset-password`) use the
+  same mechanism. Create-then-set-password stays as the fast path. CSV import is still not built.
 
 ## Roles — a role is a name
 
@@ -123,6 +152,10 @@ MFA" rather than "we cannot tell".
   design draws would be inventing a permission model in the UI that no service reads.
 - **Expected contract:** a real model — `Role.description`, `Role.permissions[]`, `Role.parentId` —
   and services that consult it. That is a platform decision, not a screen.
+- **Closed by feat/uaa-sso (phase 2):** `RoleDto` carries description, scope, systemRole, the parent,
+  own and effective permissions and the holder count; the catalogue is `GET /roles/permissions`; the
+  token carries `permissions`. Services still authorise on the role name — the second half of the
+  contract is theirs to adopt.
 
 ## Clients — the list carries three fields
 
@@ -131,6 +164,9 @@ MFA" rather than "we cannot tell".
   detail endpoint, so a five-column table would be N+1 fetches to paint a list.
 - **Decision:** two columns; the rest appear in the detail pane, which fetches one client.
 - **Expected contract:** widen `ClientSummary`, or `GET /clients?expand=true`.
+- **Closed by feat/uaa-sso (phase 5):** `ClientSummary` carries the derived type, `enabled`, the grant
+  types, the secret's expiry and the last token, and the list takes `q`, `enabled` and `type`. The
+  table draws all five columns; the enable switch is a row action.
 
 ## Clients — no token metrics
 
@@ -141,6 +177,15 @@ MFA" rather than "we cannot tell".
   which the list already states.
 - **Expected contract:** counters on the authorization server, and `clientSecretExpiresAt` on the
   registration.
+- **Partly closed by feat/uaa-sso (phase 5):** `clientSecretExpiresAt` is set on every registration and
+  rotation, so the *Secrets expiring · 30d* tile is live from `GET /clients/stats`. The 24h token and
+  failure counters wait for phase 8's audit hooks; `lastTokenIssuedAt` exists on the row and is null
+  until then.
+- **Closed by feat/uaa-sso (phase 8):** the authorization server's own events are audited, so `token.issued` and
+  `client.auth.failed` are countable and `client_extension.last_token_issued_at` is stamped on every issuance.
+  The client page shows the last token; the busiest-applications list and the failure feed live on the dashboard,
+  where a count has a range attached to it. Per-client 24h tiles on the clients list stay out: the same number in
+  two places drifts.
 
 ## Sign-in — one step, password only
 
@@ -153,6 +198,12 @@ MFA" rather than "we cannot tell".
   resumes the OAuth2 authorization flow.
 - **Expected contract:** each is its own feature. Social login already exists in **cua** (shoppers)
   and is the closest precedent for uaa gaining it.
+- **Partly closed by feat/uaa-sso (phase 3–4):** remember-me when the realm enables it, lockout and
+  attempts-left states, and a "Forgot password?" that explains resets are issued by an administrator
+  (there is no self-service reset, deliberately). Providers and MFA remain open.
+- **Closed by feat/uaa-sso (phase 7), for providers:** the page is identity-first — provider buttons, an email step
+  that asks uaa which realm the address belongs to, then the password with the identity shown above it. A brokered
+  login that matches an existing account confirms with that password once. Passkeys and MFA remain open.
 
 ## Clients — a custom setting's value is a string
 
@@ -166,3 +217,38 @@ MFA" rather than "we cannot tell".
   for a bag nobody documents would cost more than it is worth and would still be guessing.
 - **Expected contract:** a documented list of the settings uaa reads, with their types — at which
   point these become real fields rather than an open map.
+
+## Spacing — the tokens were there, the rhythms were not
+
+- **Screen:** every list screen's filter row, and the gap between a page header and its panels.
+- **What was wrong:** not a missing `--spacing-*` variable — those all resolve. Two other things did not
+  exist. There was no **control height**, so a filter row's buttons (2.25rem), select (2.375rem), search box
+  and tab track (whatever their padding produced) were four different heights; and there was no **page
+  rhythm**, because no screen set `:host` and `.page` had no gap, so the vertical spacing was whatever margins
+  each screen happened to declare.
+- **Decision:** name both. `--control-height` (2.25rem) and `--field-height` (2.5rem) in the theme, applied by
+  the kit's own controls; `.page` is a flex column with `--spacing-section` and every screen is
+  `:host { display: contents }`. The copied filter row became `.filter-bar` in `controls.css`, beside the
+  action vocabulary, for the same reason that file exists.
+- **What this closes elsewhere:** console-ui's products and order-details screens each carried
+  `--select-height: 2.25rem` by hand — the token is now what they point at, and their filter rows line up
+  without the patch.
+- **Still true:** `--muted` is the *panel* surface, which is white on this theme. A chip or row inside a panel
+  wants `--input`. Painting one `--muted` is invisible, and that is how several of them shipped.
+
+## Shell — the rail promised what the API refuses
+
+- **Screen:** the navigation rail, and whatever screen a non-administrator first landed on.
+- **What was wrong:** every `/api/v1/admin/**` endpoint is behind `SCOPE_super_admin`/`ROLE_SUPER_ADMIN`,
+  but the rail drew all seven admin sections for anyone who could sign in. An org administrator — who
+  holds real permissions like `users:read` and uses them in the seller console — arrived at an admin
+  screen, an access-denied bar, and a full navigation rail inviting them to try six more.
+- **Decision:** the console asks the question the server will ask (`isRealmAdmin`), in one place. An
+  administrator gets the console; everyone else gets their own account page, and a rail with one entry.
+- **Not gated on permissions, deliberately:** `users:read` in the token does not open this API, and a
+  rail built from permissions would offer screens that answer 403. When the admin gate becomes
+  permission-based, `realm-admin.ts` is the single place that changes.
+- **The landing is a `canMatch`, not a redirect function:** a redirect is resolved while the URL is
+  matched, before `canAccessSecuredPages` has fetched `/me`. Asked at that moment every visitor looks
+  like a non-administrator, and a super admin opening `/` was sent to their own account.
+

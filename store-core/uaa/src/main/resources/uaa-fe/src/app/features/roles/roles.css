@@ -1,3 +1,11 @@
+/*
+ * The screen's header and panels are the page column's own children, so the shell's rhythm applies
+ * between them and this stylesheet never sets a gap of its own. See admin-shell.css, `.page`.
+ */
+:host {
+  display: contents;
+}
+
 .stack {
   display: grid;
   gap: var(--spacing-section);
@@ -98,4 +106,103 @@
   .cell.go {
     display: none;
   }
+}
+
+.cell.name {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.15rem;
+}
+
+.role-name {
+  font-family: var(--font-mono);
+  unicode-bidi: plaintext;
+}
+
+.role-description {
+  color: var(--muted-foreground);
+  font-family: var(--font-sans);
+  font-size: var(--text-3xs);
+}
+
+.cell.num {
+  font-variant-numeric: tabular-nums;
+}
+
+.two-up {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: var(--spacing-group);
+}
+
+/* --- the permission matrix --------------------------------------------------------------------------- */
+.matrix {
+  display: grid;
+  gap: var(--spacing-tight);
+  padding: var(--spacing-field);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.matrix-head,
+.group-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--spacing-tight);
+}
+
+.matrix-title {
+  color: var(--foreground-strong);
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.matrix-count,
+.group-name {
+  color: var(--muted-foreground);
+  font-size: var(--text-3xs);
+}
+
+.group-name {
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.group {
+  display: grid;
+  gap: var(--spacing-inline);
+  padding-block-start: var(--spacing-inline);
+  border-block-start: 1px dashed var(--border);
+}
+
+.chips {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  gap: 0.25rem var(--spacing-tight);
+  font-family: var(--font-mono);
+  font-size: var(--text-3xs);
+}
+
+.link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--primary);
+  font: inherit;
+  font-size: var(--text-3xs);
+  cursor: pointer;
+}
+
+.readonly-note {
+  margin: 0;
+  color: var(--muted-foreground);
+  font-size: var(--text-3xs);
+}
+
+.meta {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--spacing-inline) var(--spacing-tight);
 }

@@ -1,0 +1,109 @@
+<ng-container *transloco="let t">
+  <app-page-header [title]="t('account.title')" [context]="facade.me()?.username ?? ''" />
+
+  <div class="grid">
+    <!--
+      Who you are. For an administrator this is context; for everyone else it is the whole console —
+      the admin API is behind SUPER_ADMIN, so this page is where they land and the only thing uaa can
+      tell them about themselves.
+    -->
+    <app-panel padded [title]="t('account.profile.title')" [subtitle]="t('account.profile.subtitle')">
+      <dl class="facts">
+        <dt>{{ t('account.profile.name') }}</dt>
+        <dd>{{ facade.fullName() || '—' }}</dd>
+        <dt>{{ t('account.profile.username') }}</dt>
+        <dd class="latin">{{ facade.me()?.username }}</dd>
+        <dt>{{ t('account.profile.email') }}</dt>
+        <dd class="latin">{{ facade.me()?.email || '—' }}</dd>
+        <dt>{{ t('account.profile.roles') }}</dt>
+        <dd>
+          @for (role of facade.roles(); track role) {
+            <app-badge tone="slate">{{ role }}</app-badge>
+          } @empty {
+            {{ t('account.profile.noRoles') }}
+          }
+        </dd>
+        @if (facade.permissions().length) {
+          <dt>{{ t('account.profile.permissions') }}</dt>
+          <dd class="permissions latin">{{ facade.permissions().join(' · ') }}</dd>
+        }
+      </dl>
+      <p class="readonly-note">{{ t('account.profile.note') }}</p>
+    </app-panel>
+
+    <app-panel padded [title]="t('account.password.title')" [subtitle]="t('account.password.subtitle')">
+      <app-notice-bar icon="info" tone="amber" [message]="t('account.password.notice')" />
+      <form class="form" [formGroup]="facade.form" (ngSubmit)="facade.changePassword()">
+        <app-form-field controlId="a-current" required [label]="t('account.password.current')" [control]="facade.form.controls.currentPassword">
+          <app-text-field id="a-current" formControlName="currentPassword" type="password" autocomplete="current-password" />
+        </app-form-field>
+        <app-form-field controlId="a-new" required [label]="t('account.password.new')" [control]="facade.form.controls.password" [hint]="t('account.password.hint')">
+          <app-text-field id="a-new" formControlName="password" type="password" autocomplete="new-password" />
+        </app-form-field>
+        <app-form-field controlId="a-repeat" required [label]="t('account.password.repeat')" [control]="facade.form.controls.repeatPassword" [error]="facade.form.hasError('passwordMismatch') && facade.form.controls.repeatPassword.touched ? t('account.password.mismatch') : null">
+          <app-text-field id="a-repeat" formControlName="repeatPassword" type="password" autocomplete="new-password" />
+        </app-form-field>
+        <div class="actions">
+          <button class="primary-action" type="submit" [disabled]="facade.busy()">
+            {{ facade.busy() ? t('account.password.saving') : t('account.password.save') }}
+          </button>
+        </div>
+      </form>
+    </app-panel>
+
+    <!-- The external logins that can sign this account in, and the one thing its owner may do to one. -->
+    <app-panel padded [title]="t('account.identities.title')" [subtitle]="t('account.identities.subtitle')">
+      <app-busy-overlay reserve="panel" [busy]="facade.identitiesLoading()" [label]="t('account.identities.loading')">
+        @if (facade.identities().length) {
+          <ul class="identities">
+            @for (identity of facade.identities(); track identity.id) {
+              <li class="identity">
+                <span class="identity-main">
+                  <strong>{{ identity.providerName || identity.providerAlias }}</strong>
+                  <span class="identity-meta latin">{{ identity.email || identity.subject }}</span>
+                  <span class="identity-meta">{{ t('account.identities.since', {when: when(identity.linkedAt)}) }}</span>
+                </span>
+                <button class="link danger" type="button" [disabled]="facade.busy()" (click)="facade.unlink(identity)">
+                  {{ t('account.identities.unlink') }}
+                </button>
+              </li>
+            }
+          </ul>
+        } @else {
+          <p class="muted">{{ t('account.identities.none') }}</p>
+        }
+      </app-busy-overlay>
+    </app-panel>
+
+    <app-panel padded [title]="t('account.sessions.title')" [subtitle]="t('account.sessions.subtitle')">
+      @if (facade.others() > 0) {
+        <button panelAction class="danger-action" type="button" (click)="facade.revokeOthers()">
+          {{ t('account.sessions.signOutOthers', {count: facade.others()}) }}
+        </button>
+      }
+      @if (facade.sessionsError(); as failure) {
+        <app-load-error [message]="failure.message" (retry)="facade.reloadSessions()" />
+      }
+      <app-busy-overlay reserve="panel" [busy]="facade.sessionsLoading()" [label]="t('account.sessions.loading')">
+        @if (facade.sessions().length) {
+          <ul class="sessions">
+            @for (session of facade.sessions(); track session.id) {
+              <li class="session" [class.current]="session.current">
+                <span class="session-main">
+                  <span class="latin">{{ session.ip || '—' }} @if (session.current) { <span class="you">{{ t('account.sessions.thisDevice') }}</span> }</span>
+                  <span class="session-meta">{{ session.via || '' }} · {{ t('account.sessions.lastActive') }} {{ when(session.lastAccessedAt) }}</span>
+                  <span class="session-meta agent" [title]="session.userAgent || ''">{{ session.userAgent || '' }}</span>
+                </span>
+                @if (!session.current) {
+                  <button class="link" type="button" (click)="facade.revoke(session)">{{ t('account.sessions.revoke') }}</button>
+                }
+              </li>
+            }
+          </ul>
+        } @else {
+          <app-empty-state icon="users" [title]="t('account.sessions.none')" [message]="t('account.sessions.noneHint')" />
+        }
+      </app-busy-overlay>
+    </app-panel>
+  </div>
+</ng-container>

@@ -43,6 +43,16 @@
               >
                 <app-text-field formControlName="clientName" id="client-name" />
               </app-form-field>
+
+              <app-form-field
+                controlId="client-description"
+                wide
+                [label]="t('clientForm.description')"
+                [hint]="t('clientForm.descriptionHint')"
+                [control]="facade.form.controls.description"
+              >
+                <app-textarea formControlName="description" id="client-description" [rows]="2" />
+              </app-form-field>
             </div>
           </app-panel>
 
@@ -309,13 +319,61 @@
             </dl>
           </app-panel>
 
-          @if (!facade.isNew()) {
+          @if (facade.status(); as status) {
+            <!-- What uaa knows about the registration beyond its settings. Read-only facts, one switch. -->
+            <app-panel padded [title]="t('clientForm.section.status')">
+              <dl class="facts">
+                <dt>{{ t('clientForm.status.type') }}</dt>
+                <dd><app-badge [tone]="status.type === 'MACHINE' ? 'cyan' : status.type === 'CONFIDENTIAL' ? 'violet' : 'slate'">{{ t('clients.type.' + status.type) }}</app-badge></dd>
+                <dt>{{ t('clientForm.status.registered') }}</dt>
+                <dd>{{ when(status.clientIdIssuedAt) }}</dd>
+                <dt>{{ t('clientForm.status.lastToken') }}</dt>
+                <dd>{{ status.lastTokenIssuedAt ? when(status.lastTokenIssuedAt) : t('clientForm.status.noToken') }}</dd>
+                @if (!status.enabled) {
+                  <dt>{{ t('clientForm.status.disabledSince') }}</dt>
+                  <dd>{{ when(status.disabledAt) }} · {{ status.disabledBy || '—' }}</dd>
+                }
+              </dl>
+              <app-toggle
+                [checked]="status.enabled"
+                [label]="t('clientForm.status.enabledLabel')"
+                [description]="t('clientForm.status.enabledHint')"
+                (checkedChange)="facade.toggleEnabled()"
+              />
+            </app-panel>
+
+            <!-- The secret: masked because it is not readable, with the two dates that govern it. -->
+            @if (status.type !== 'PUBLIC') {
+              <app-panel padded [title]="t('clientForm.section.secret')">
+                <div class="secret">
+                  <code class="masked" aria-hidden="true">••••••••••••••••••••••••</code>
+                  <p class="secret-line">
+                    @if (status.clientSecretExpiresAt) {
+                      {{ t('clientForm.secret.expires', {when: when(status.clientSecretExpiresAt)}) }}
+                    } @else {
+                      {{ t('clientForm.secret.neverExpires') }}
+                    }
+                  </p>
+                  @if (status.previousSecretUntil) {
+                    <p class="secret-line grace">
+                      {{ t('clientForm.secret.previousUntil', {when: when(status.previousSecretUntil)}) }}
+                      <button class="link danger" type="button" [disabled]="facade.busy()" (click)="facade.revokingPrevious.set(true)">
+                        {{ t('clientForm.secret.revokePrevious') }}
+                      </button>
+                    </p>
+                  }
+                  <button class="secondary-action" type="button" [disabled]="facade.busy()" (click)="facade.rotating.set(true)">
+                    {{ t('clients.action.rotate') }}
+                  </button>
+                  <p class="readonly-note">{{ t('clientForm.secret.rotateHint') }}</p>
+                </div>
+              </app-panel>
+            } @else {
+              <app-notice-bar icon="info" tone="blue" [message]="t('clientForm.secret.publicNote')" />
+            }
+
             <app-panel padded [title]="t('clientForm.section.danger')">
               <div class="danger-zone">
-                <app-notice-bar icon="lock" tone="amber" [message]="t('clients.notice.secret')" />
-                <button class="secondary-action" type="button" (click)="facade.rotating.set(true)">
-                  {{ t('clients.action.rotate') }}
-                </button>
                 <button class="danger-action" type="button" (click)="facade.deleting.set(true)">
                   {{ t('clients.action.delete') }}
                 </button>
@@ -339,23 +397,43 @@
     </form>
   </app-busy-overlay>
 
-  <app-set-password-dialog
+  <!-- Rotation is a confirmation, not a form: uaa generates the secret. -->
+  <app-confirm-dialog
     [open]="facade.rotating()"
-    [busy]="facade.busy()"
     [title]="t('clients.rotate.title')"
     [message]="t('clients.rotate.message', {clientId: facade.summary().clientId})"
-    [passwordLabel]="t('clients.rotate.secret')"
-    [repeatLabel]="t('clients.rotate.repeatSecret')"
-    [hint]="t('clients.rotate.hint')"
-    [handoverHint]="t('clients.rotate.handoverHint')"
-    [weakMessage]="t('clients.rotate.weak')"
-    [mismatchMessage]="t('clients.rotate.mismatch')"
     [confirmLabel]="t('clients.rotate.confirm')"
-    [busyLabel]="t('clients.rotate.busy')"
     [cancelLabel]="t('shared.actions.cancel')"
-    (submitted)="facade.rotateSecret($event)"
+    (confirmed)="facade.rotateSecret()"
     (dismissed)="facade.rotating.set(false)"
   />
+
+  <app-confirm-dialog
+    [open]="facade.revokingPrevious()"
+    [title]="t('clients.revokePrevious.title')"
+    [message]="t('clients.revokePrevious.message', {clientId: facade.summary().clientId})"
+    [confirmLabel]="t('clients.revokePrevious.confirm')"
+    [cancelLabel]="t('shared.actions.cancel')"
+    (confirmed)="facade.revokePreviousSecret()"
+    (dismissed)="facade.revokingPrevious.set(false)"
+  />
+
+  <!--
+    Shown once because it exists once: only the hash is stored. After a registration, closing this
+    is what moves the page to the new client.
+  -->
+  @if (facade.shownSecret(); as shown) {
+    <app-one-time-link-dialog
+      [open]="true"
+      [title]="t('clients.issued.title', {clientId: shown.clientId})"
+      [message]="shown.previousUntil ? t('clients.issued.messageWithGrace', {expires: when(shown.expiresAt), previous: when(shown.previousUntil)}) : t('clients.issued.message', {expires: shown.expiresAt ? when(shown.expiresAt) : t('clientForm.secret.never')})"
+      [linkLabel]="t('clients.issued.linkLabel')"
+      [link]="shown.secret"
+      [warning]="t('clients.issued.warning')"
+      [doneLabel]="t('clients.issued.done')"
+      (dismissed)="facade.dismissSecret()"
+    />
+  }
 
   <app-confirm-dialog
     [open]="facade.deleting()"

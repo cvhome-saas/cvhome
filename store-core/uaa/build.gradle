@@ -34,6 +34,7 @@ dependencies {
     implementation libs.spring.boot.starter.oauth2.authorization.server
     implementation libs.spring.boot.starter.security.oauth2.resource.server
     implementation libs.spring.boot.starter.security
+    implementation libs.spring.boot.starter.oauth2.client
     implementation libs.spring.boot.starter.thymeleaf
     implementation libs.spring.boot.starter.web
     implementation libs.spring.boot.starter.validation
@@ -41,6 +42,7 @@ dependencies {
     implementation libs.spring.cloud.starter
     implementation libs.thymeleaf.extras.springsecurity6
     implementation libs.springdoc.openapi.starter.webmvc.ui
+    implementation libs.caffeine
 
     implementation project(':store-commons:ecs-commons:fargate-task-info')
     implementation project(':store-commons:ecs-commons:ecs-service-discoveryclient')
@@ -50,6 +52,10 @@ dependencies {
     // enum constants, so server and client must compile against the same ones.
     implementation project(':store-commons:uaa-client')
     implementation project(':store-commons:autoconfigure')
+    // The published event contracts, and the outbox that carries them (namastack, JPA flavour — uaa is JPA).
+    implementation project(':store-core:uaa:uaa-events')
+    implementation libs.namastack.outbox.starter.jpa
+    implementation project(':store-commons:secret-crypto:secret-crypto-autoconfigure')
 
     compileOnly libs.lombok
     runtimeOnly libs.postgresql
@@ -58,6 +64,7 @@ dependencies {
     implementation libs.io.opentelemetry.instrumentation.opentelemetry.spring.boot.starter
 
     annotationProcessor libs.lombok
+    testImplementation project(':store-commons:test-support')
     integrationTestImplementation libs.spring.boot.starter.actuator.test
     integrationTestImplementation libs.spring.boot.starter.data.jpa.test
     integrationTestImplementation libs.spring.boot.starter.security.oauth2.authorization.server.test

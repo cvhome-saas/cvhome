@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.uaa.web.admin;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
@@ -15,49 +16,67 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.asrevo.cvhome.uaa.domain.Role;
 import com.asrevo.cvhome.uaa.dto.CreateRoleRequest;
+import com.asrevo.cvhome.uaa.dto.PermissionDto;
+import com.asrevo.cvhome.uaa.dto.RoleDto;
 import com.asrevo.cvhome.uaa.dto.UpdateRoleRequest;
+import com.asrevo.cvhome.uaa.errors.DuplicateRoleNameException;
+import com.asrevo.cvhome.uaa.errors.PermissionUnknownException;
+import com.asrevo.cvhome.uaa.errors.RoleInUseException;
+import com.asrevo.cvhome.uaa.errors.RoleInheritanceCycleException;
+import com.asrevo.cvhome.uaa.errors.RoleNameInvalidException;
+import com.asrevo.cvhome.uaa.errors.RoleNotFoundException;
+import com.asrevo.cvhome.uaa.errors.SystemRoleImmutableException;
 import com.asrevo.cvhome.uaa.service.RoleService;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("/api/v1/admin/roles")
 @RequiredArgsConstructor
-@Slf4j
 public class AdminRoleController {
 
     private final RoleService roleService;
 
     @PreAuthorize("hasAuthority('SCOPE_super_admin') or hasRole('SUPER_ADMIN')")
     @GetMapping
-    public Page<Role> roles(@PageableDefault Pageable pageable) {
+    public Page<RoleDto> roles(@PageableDefault Pageable pageable) {
         return roleService.findAll(pageable);
+    }
+
+    /** The catalogue every role picks from; static, so the form cannot offer a key the server would refuse. */
+    @PreAuthorize("hasAuthority('SCOPE_super_admin') or hasRole('SUPER_ADMIN')")
+    @GetMapping("permissions")
+    public List<PermissionDto> permissions() {
+        return RoleService.catalogue();
     }
 
     @PreAuthorize("hasAuthority('SCOPE_super_admin') or hasRole('SUPER_ADMIN')")
     @GetMapping("{id}")
-    public Role role(@PathVariable UUID id) {
-        return roleService.findBy(id);
+    public RoleDto role(@PathVariable UUID id) throws RoleNotFoundException {
+        return roleService.findOne(id);
     }
 
     @PreAuthorize("hasAuthority('SCOPE_super_admin') or hasRole('SUPER_ADMIN')")
     @DeleteMapping("{id}")
-    public void delete(@PathVariable UUID id) {
+    public void delete(@PathVariable UUID id)
+            throws RoleNotFoundException, SystemRoleImmutableException, RoleInUseException {
         roleService.delete(id);
     }
 
     @PreAuthorize("hasAuthority('SCOPE_super_admin') or hasRole('SUPER_ADMIN')")
     @PostMapping
-    public Role create(@RequestBody CreateRoleRequest request) {
+    public RoleDto create(@RequestBody CreateRoleRequest request)
+            throws DuplicateRoleNameException, PermissionUnknownException, RoleNotFoundException,
+            RoleInheritanceCycleException, RoleNameInvalidException {
         return roleService.create(request);
     }
 
     @PreAuthorize("hasAuthority('SCOPE_super_admin') or hasRole('SUPER_ADMIN')")
-    @PutMapping("/{id}")
-    public Role update(@PathVariable UUID id, @RequestBody UpdateRoleRequest request) {
+    @PutMapping("{id}")
+    public RoleDto update(@PathVariable UUID id, @RequestBody UpdateRoleRequest request)
+            throws RoleNotFoundException, SystemRoleImmutableException, DuplicateRoleNameException,
+            PermissionUnknownException, RoleInheritanceCycleException, RoleNameInvalidException {
         return roleService.update(id, request);
     }
 

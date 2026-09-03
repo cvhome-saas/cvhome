@@ -11,13 +11,18 @@
 ### the options a client form may offer — 200
 # Built from ClientAuthMethod, OAuthGrantType and SignatureAlgorithm on the server, so a form driven
 # by this cannot offer a grant type uaa would reject. `scopes` is the one hand-written list.
+# Gated like every other method here (it used to rely on the filter chain alone).
 GET {{SELLER_UI_URL}}/uaa/api/v1/admin/clients/options
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
 
 ### list clients — 200 Page<ClientSummary>
-# The list is {id, clientId, clientName} only. Grant types and scopes need the detail endpoint, which
-# is why the console's table cannot show them without a fetch per row.
-GET {{SELLER_UI_URL}}/uaa/api/v1/admin/clients?page=0&count=20
+# A row carries type (PUBLIC | MACHINE | CONFIDENTIAL, derived, never stored), enabled, grant types,
+# the secret's expiry and the last token time. Filters: q (client id or name), enabled, type.
+GET {{SELLER_UI_URL}}/uaa/api/v1/admin/clients?page=0&count=20&q=store&enabled=true&type=MACHINE
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+
+### the tiles — 200 ClientStats
+GET {{SELLER_UI_URL}}/uaa/api/v1/admin/clients/stats
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
 
 > {%
@@ -26,7 +31,9 @@ Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
     });
 %}
 
-### register a client — 200 ClientDetails
+### register a client — 201 CreatedClient {client, clientSecret}
+# The secret is generated here and this response is the only place it ever appears; a public client
+# (auth method `none` alone) gets null. `status.description` is the one writable status field.
 # @name createClient
 POST {{SELLER_UI_URL}}/uaa/api/v1/admin/clients
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
@@ -50,28 +57,114 @@ Content-Type: application/json
     "reuseRefreshTokens": false,
     "x509CertificateBoundAccessTokens": false,
     "customSettings": {}
-  }
+  },
+  "status": {"description": "Registered from the .http file"}
 }
 
 > {%
     client.test("registered", function () {
-        client.assert(response.status === 200, "status " + response.status);
-        client.global.set("CLIENT_RECORD_ID", response.body.id);
+        client.assert(response.status === 201, "status " + response.status);
+        client.assert(response.body.clientSecret, "no secret in the creation response");
+        client.global.set("CLIENT_RECORD_ID", response.body.client.id);
     });
 %}
 
-### read it back — 200 ClientDetails
-# The secret is NOT here, and never is: creation does not echo it and reset-secret answers void. The
-# only moment a caller can show a secret is the one it supplied.
+### a taken client id — 409 UAA.CLIENT.ID_TAKEN, fieldErrors[0].field == clientId
+POST {{SELLER_UI_URL}}/uaa/api/v1/admin/clients
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{"clientId": "admin-sdk", "clientName": "dup", "clientAuthenticationMethods": ["client_secret_basic"],
+ "authorizationGrantTypes": ["client_credentials"], "scopes": ["store_core"]}
+
+### plain http off a local host — 400 UAA.CLIENT.INVALID_REDIRECT_URI (params.reason PLAIN_HTTP)
+# Under lcl `gateway.com` and `*.gateway.com` are allowed over http; anything else must be https.
+POST {{SELLER_UI_URL}}/uaa/api/v1/admin/clients
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{"clientId": "http-bad-redirect", "clientName": "bad", "clientAuthenticationMethods": ["none"],
+ "authorizationGrantTypes": ["authorization_code"], "redirectUris": ["http://evil.example/cb"], "scopes": ["openid"],
+ "clientSettings": {"requireProofKey": true, "requireAuthorizationConsent": false, "customSettings": {}}}
+
+### an access-token lifetime over the realm's ceiling — 400 UAA.CLIENT.TOKEN_TTL_EXCEEDS_POLICY
+POST {{SELLER_UI_URL}}/uaa/api/v1/admin/clients
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{"clientId": "http-long-ttl", "clientName": "long", "clientAuthenticationMethods": ["client_secret_basic"],
+ "authorizationGrantTypes": ["client_credentials"], "scopes": ["store_core"],
+ "tokenSettings": {"accessTokenTimeToLive": "PT48H", "reuseRefreshTokens": false, "x509CertificateBoundAccessTokens": false}}
+
+### read it back — 200 ClientDetails, with status {type, enabled, clientSecretExpiresAt, previousSecretUntil, …}
+# The secret is NOT here, and never is: only creation and rotate-secret ever carry one.
 GET {{SELLER_UI_URL}}/uaa/api/v1/admin/clients/{{CLIENT_RECORD_ID}}
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
 
-### rotate its secret — 200, empty body
+### update it under the PATH id — 200; the body's own id is ignored
+# `PUT /clients/A` writes client A whatever `id` the body carries. It used to write whichever id was in
+# the body, so a request for A could rewrite B.
+PUT {{SELLER_UI_URL}}/uaa/api/v1/admin/clients/{{CLIENT_RECORD_ID}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{
+  "id": "b6d8f3d1-8f8f-9060-d3e3-8f8f9060d3e3",
+  "clientId": "http-demo-client",
+  "clientName": "HTTP demo client (renamed)",
+  "clientAuthenticationMethods": ["client_secret_basic"],
+  "authorizationGrantTypes": ["authorization_code", "refresh_token"],
+  "redirectUris": ["http://gateway.com:8000/login/oauth2/code/demo"],
+  "postLogoutRedirectUris": [],
+  "scopes": ["openid", "profile"],
+  "clientSettings": {"requireProofKey": true, "requireAuthorizationConsent": true, "customSettings": {}},
+  "tokenSettings": {"accessTokenTimeToLive": "PT15M", "reuseRefreshTokens": false,
+    "x509CertificateBoundAccessTokens": false, "customSettings": {}}
+}
+
+> {%
+    client.test("path wins", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        client.assert(response.body.id === client.global.get("CLIENT_RECORD_ID"), "wrote " + response.body.id);
+    });
+%}
+
+### rotate its secret — 200 RotatedSecret {clientSecret, clientSecretExpiresAt, previousSecretUntil}
+# A new random secret, shown once. The one it replaced keeps authenticating until previousSecretUntil
+# (the realm's clientSecretGraceHours), so an integration can be reconfigured without an outage.
+POST {{SELLER_UI_URL}}/uaa/api/v1/admin/clients/{{CLIENT_RECORD_ID}}/rotate-secret
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+
+> {%
+    client.test("rotated", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        client.assert(response.body.clientSecret, "no secret");
+    });
+%}
+
+### end the grace window now — 200; a second call is 404 UAA.CLIENT.NO_PREVIOUS_SECRET
+DELETE {{SELLER_UI_URL}}/uaa/api/v1/admin/clients/{{CLIENT_RECORD_ID}}/previous-secret
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+
+### set a chosen secret, no grace — 200, empty body (the alias the SDK calls)
 POST {{SELLER_UI_URL}}/uaa/api/v1/admin/clients/{{CLIENT_RECORD_ID}}/reset-secret
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
 Content-Type: application/json
 
 {"newSecret": "http-demo-secret"}
+
+### disable it — 200 ClientDetails with status.enabled false; its tokens are revoked and the token endpoint answers invalid_client
+POST {{SELLER_UI_URL}}/uaa/api/v1/admin/clients/{{CLIENT_RECORD_ID}}/disable
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+
+### enable it again — 200
+POST {{SELLER_UI_URL}}/uaa/api/v1/admin/clients/{{CLIENT_RECORD_ID}}/enable
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+
+### danger zone: rotate every secret-holding client — 200 RotatedSecret[]; do not run this on a shared stack
+# Every s2s client on the stack must be reconfigured within the grace window afterwards.
+# POST {{SELLER_UI_URL}}/uaa/api/v1/admin/clients/rotate-all
+# Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
 
 ### an unknown id — 404 ClientNotFoundException
 # Ids here are plain strings, not UUIDs like the user and role APIs, so a wrong id reaches the

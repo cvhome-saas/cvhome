@@ -56,8 +56,10 @@ app consume the libs as built output. Building `app` alone compiles against yest
 
 ## 2. Embedded Angular inside Spring Boot — `uaa-fe`
 
-`store-core/uaa/src/main/resources/uaa-fe` is a complete Angular 20 CLI app (Nebular, module-federation,
-ngx-toastr) that lives **inside** the Java module's resources tree. It is **not** a Gradle module — it never
+`store-core/uaa/src/main/resources/uaa-fe` is a complete Angular 20 CLI app that lives **inside** the Java
+module's resources tree. It is built on `@cvhome-saas/ui-kit` — the same component library and uaa API services
+console-ui uses — with Transloco for English and Arabic; the Nebular, module-federation and ngx-toastr stack it
+started from is gone. It renders both the signed-out sign-in page and the admin console. It is **not** a Gradle module — it never
 appears in `settings.gradle` and has no `build.gradle`. It is driven entirely by tasks in
 `store-core/uaa/build.gradle`:
 

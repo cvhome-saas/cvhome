@@ -44,6 +44,7 @@ export * from './lib/load-error/load-error';
 export * from './lib/locale-switcher/locale-switcher';
 export * from './lib/notice-bar/notice-bar';
 export * from './lib/number-field/number-field';
+export * from './lib/one-time-link-dialog/one-time-link-dialog';
 export * from './lib/page-header/page-header';
 export * from './lib/pagination/pagination';
 export * from './lib/panel/panel';

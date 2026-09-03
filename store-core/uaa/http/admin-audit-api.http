@@ -1,0 +1,60 @@
+# AdminAuditController — com.asrevo.cvhome.uaa.web.admin
+#
+# The audit log, read. Nothing here writes a row: every event is a side effect of the action it
+# describes, so a log with a gap means the action did not happen, not that the log missed it.
+# Addressed through store-core-gateway (`/uaa/**`).
+#
+# Behind SCOPE_super_admin / ROLE_SUPER_ADMIN. Requires a running stack: lcl start -d
+
+### the newest events — 200 Page<AuditEventDto>, newest first, 50 a page
+GET {{SELLER_UI_URL}}/uaa/api/v1/admin/audit
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+
+### one type — 200; `type` repeats for several
+GET {{SELLER_UI_URL}}/uaa/api/v1/admin/audit?type=user.login.failed&size=20
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+
+### a whole category — 200; AUTHENTICATION | ADMIN | TOKENS | SECURITY
+# A category is a set of types, not a column: the grouping lives on the enum, so a new event type
+# lands in its category the moment it exists.
+GET {{SELLER_UI_URL}}/uaa/api/v1/admin/audit?category=SECURITY&outcome=FAILURE&size=20
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+
+### everything one person did — 200; `actor` takes the uid or the name, `target` likewise
+GET {{SELLER_UI_URL}}/uaa/api/v1/admin/audit?actor=super-admin&size=20
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+
+### everything from one address, in a window — 200
+GET {{SELLER_UI_URL}}/uaa/api/v1/admin/audit?ip=127.0.0.1&from=2026-01-01T00:00:00Z&to=2027-01-01T00:00:00Z
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+
+### free text over actor, target and the note — 200
+GET {{SELLER_UI_URL}}/uaa/api/v1/admin/audit?q=reset&size=20
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+
+### a range that runs backwards — 400 UAA.AUDIT.QUERY_INVALID with fieldErrors[0].field = "from"
+GET {{SELLER_UI_URL}}/uaa/api/v1/admin/audit?from=2030-01-01T00:00:00Z&to=2020-01-01T00:00:00Z
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+
+### the type catalogue, for the filter chips — 200 [{type, category}]
+GET {{SELLER_UI_URL}}/uaa/api/v1/admin/audit/types
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+
+### one event, with its before/after diff — 200 AuditEventDto
+GET {{SELLER_UI_URL}}/uaa/api/v1/admin/audit/1
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+
+### an event that is gone — 404 UAA.AUDIT.NOT_FOUND
+# Retention trims the log nightly to settings.auditRetentionDays, so an old id is a 404, not an error.
+GET {{SELLER_UI_URL}}/uaa/api/v1/admin/audit/99999999
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+
+### the same query as CSV — 200 text/csv, streamed a thousand rows at a time
+# Oldest first here: an export is read as a story. Over 100 000 rows it refuses with
+# UAA.AUDIT.EXPORT_TOO_LARGE rather than writing half a file — narrow the range instead.
+GET {{SELLER_UI_URL}}/uaa/api/v1/admin/audit/export?category=SECURITY
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+
+### as an org admin — 403
+GET {{SELLER_UI_URL}}/uaa/api/v1/admin/audit
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}

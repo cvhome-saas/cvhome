@@ -68,7 +68,9 @@
     ".next-cua-login/types/**/*.ts",
     ".next-cua-login/dev/types/**/*.ts",
     ".next-shifted/types/**/*.ts",
-    ".next-shifted/dev/types/**/*.ts"
+    ".next-shifted/dev/types/**/*.ts",
+    ".next-uaa-sso/types/**/*.ts",
+    ".next-uaa-sso/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"

@@ -10,7 +10,7 @@ spring:
           s2s:
             provider: uaa
             client-id: store-core@service.store-core.internal
-            client-secret: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
+            client-secret: ${UAA_STORE_CORE_SECRET}
             authorization-grant-type: client_credentials
             scope: store_core
   sql:
@@ -18,21 +18,63 @@ spring:
       schema-locations: classpath:init-sql/schema.sql
       data-locations: classpath:init-sql/data-common.sql
 
+# The transactional outbox every uaa event goes through (uaa-events). The tables live in the uaa schema and come from
+# schema.sql like everything else; the starter's own DDL is off.
+namastack:
+  outbox:
+    multicaster:
+      enabled: true
+    polling:
+      fixed:
+        interval: 2s
+      batch-size: 10
+    jpa:
+      schema-initialization:
+        enabled: false
+      schema-name: ${spring.application.name}
+
+# uaa is the one service whose actuator must not be wide open: a heap dump of an authorization server contains its
+# signing key. Only health, info and prometheus are mapped; common-config.yml reads this placeholder, because an
+# imported config file outranks the one that imports it and a direct override here would lose.
+MANAGEMENT_ENDPOINTS_EXPOSURE: health,info,prometheus
+
+# Every secret below is an environment variable with NO default here. The lcl and test-stores slices supply the local
+# values; a deployment that forgets one fails to start rather than running on a committed secret. The seed writers
+# that push these values into the database on every boot are off unless a slice turns them on (SeedProperties).
 com:
   asrevo:
     cvhome:
       admin:
-        password: admin
+        password: ${UAA_ADMIN_PASSWORD}
+      uaa:
+        seed:
+          apply-on-boot: false
+        remember-me:
+          key: ${UAA_REMEMBER_ME_KEY}
+        rate-limit:
+          enabled: true
+        # One-time links: how long an invitation and a reset link stay usable, and whether the logging consumer
+        # writes the link itself (never in a deployment — the link is a credential).
+        links:
+          invitation-validity: P7D
+          reset-validity: PT1H
+          log-links: false
+        # Registered clients: the hosts a redirect URI may use over plain http. Everything else must be https.
+        # An entry starting with a dot matches every subdomain. Local slices add the stack's own hosts.
+        clients:
+          plain-http-hosts:
+            - localhost
+            - 127.0.0.1
       oauth2:
         clients:
           admin-sdk:
-            secret: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
+            secret: ${UAA_ADMIN_SDK_SECRET}
           store-pod-507f1f77@service.store-pod.internal:
-            secret: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
+            secret: ${UAA_STORE_POD_SECRET}
           store-core@service.store-core.internal:
-            secret: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
+            secret: ${UAA_STORE_CORE_SECRET}
           web-app:
-            secret: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
+            secret: ${UAA_WEB_APP_SECRET}
             redirect-uri-paths:
               - "/login/oauth2/code/uaa"
             post-logout-redirect-uri-paths:

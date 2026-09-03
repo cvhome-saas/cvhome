@@ -3,6 +3,7 @@ package com.asrevo.cvhome.uaa.config;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Component
+@ConditionalOnProperty(name = SeedProperties.APPLY_ON_BOOT, havingValue = "true")
 @RequiredArgsConstructor
 @Slf4j
 public class OAuth2ClientDatabaseInitializer {

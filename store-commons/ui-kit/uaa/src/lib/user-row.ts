@@ -6,7 +6,7 @@
  * — it is `UserDto` reshaped, so it belongs with the client that fetches it and with the table that
  * draws it, where a second console administering the same uaa can reach all three.
  */
-import {USER_METADATA_ORG, USER_METADATA_STORE, metadataString, type UserDto} from './uaa.models';
+import {USER_METADATA_ORG, USER_METADATA_STORE, metadataString, type UserDto, type UserStatus} from './uaa.models';
 
 /**
  * One account, platform-wide.
@@ -22,6 +22,9 @@ export interface PlatformUserRow {
   readonly name: string;
   readonly roles: readonly string[];
   readonly enabled: boolean;
+  /** Derived by uaa; `enabled` is only one of its inputs. */
+  readonly status: UserStatus;
+  readonly lastSignInAt: string | null;
   readonly org: string | null;
   readonly store: string | null;
   /** A monogram for the row's avatar, from the name where there is one and the username where not. */
@@ -44,6 +47,8 @@ export function toPlatformUserRow(user: UserDto): PlatformUserRow {
     name,
     roles: user.roles ?? [],
     enabled: user.enabled,
+    status: user.status ?? (user.enabled ? 'ACTIVE' : 'DISABLED'),
+    lastSignInAt: user.lastSignInAt ?? null,
     org: metadataString(user.metadata, USER_METADATA_ORG),
     store: metadataString(user.metadata, USER_METADATA_STORE),
     initials: initialsOf(name || username),

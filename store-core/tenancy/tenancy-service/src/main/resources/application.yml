@@ -10,7 +10,7 @@ spring:
           s2s:
             provider: uaa
             client-id: store-core@service.store-core.internal
-            client-secret: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
+            client-secret: ${UAA_ADMIN_SDK_SECRET:hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7}
             authorization-grant-type: client_credentials
             scope: store_core
 com:
@@ -19,7 +19,7 @@ com:
       uaa:
         client:
           client-id: admin-sdk
-          client-secret: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
+          client-secret: ${UAA_ADMIN_SDK_SECRET:hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7}
           base-url: ${com.asrevo.cvhome.services.uaa.schema}://${com.asrevo.cvhome.services.uaa.domain}:${com.asrevo.cvhome.services.uaa.port}
 namastack:
   outbox:

@@ -118,6 +118,13 @@
   font-size: var(--text-sm);
 }
 
+/* The same strip in a neutral tone, for "signed out" and "expired" rather than a refusal. */
+.failed.info {
+  color: var(--muted-foreground);
+  background: var(--input);
+  border-color: var(--border);
+}
+
 .submit {
   display: inline-flex;
   align-items: center;
@@ -156,4 +163,119 @@
   .legal {
     display: none;
   }
+}
+
+
+.remember {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-inline);
+  color: var(--muted-foreground);
+  font-size: var(--text-sm);
+}
+
+/* --- "Forgot password?" — an explanation, since there is no self-service reset ------------------------ */
+.forgot {
+  display: grid;
+  gap: var(--spacing-tight);
+  margin-block-start: var(--spacing-group);
+}
+
+.forgot-toggle {
+  justify-self: start;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--primary);
+  font: inherit;
+  font-size: var(--text-xs);
+  cursor: pointer;
+}
+
+.forgot-copy {
+  margin: 0;
+  padding: 0.6rem 0.75rem;
+  border-radius: var(--radius-md);
+  background: var(--input);
+  color: var(--muted-foreground);
+  font-size: var(--text-xs);
+  line-height: 1.6;
+}
+
+/* --- identity-first: the provider buttons, the divider and the identity chip --------------------------- */
+.client {
+  margin: 0 0 var(--spacing-group);
+  color: var(--muted-foreground);
+  font-size: var(--text-xs);
+}
+
+.providers {
+  display: grid;
+  gap: var(--spacing-tight);
+  margin-block-end: var(--spacing-group);
+}
+
+.provider {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-tight);
+  padding: 0.6rem 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--card);
+  color: var(--foreground-strong);
+  font-size: var(--text-sm);
+  text-decoration: none;
+}
+
+.provider:hover {
+  border-color: var(--primary);
+}
+
+.glyph {
+  display: grid;
+  flex: none;
+  place-items: center;
+  inline-size: 1.6rem;
+  block-size: 1.6rem;
+  border-radius: var(--radius-md);
+  background: var(--input);
+  font-size: var(--text-4xs);
+  font-weight: 700;
+}
+
+.or {
+  margin: 0 0 var(--spacing-group);
+  color: var(--foreground-subtle);
+  font-size: var(--text-4xs);
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.identity-chip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-tight);
+  margin: 0 0 var(--spacing-group);
+  padding: 0.45rem 0.65rem;
+  border-radius: var(--radius-md);
+  background: var(--input);
+  font-size: var(--text-xs);
+}
+
+.chip-email {
+  overflow-wrap: anywhere;
+  color: var(--foreground-strong);
+  unicode-bidi: plaintext;
+}
+
+.link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--primary);
+  font: inherit;
+  font-size: var(--text-3xs);
+  cursor: pointer;
 }

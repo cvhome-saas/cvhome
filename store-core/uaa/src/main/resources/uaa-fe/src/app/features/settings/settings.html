@@ -1,0 +1,253 @@
+<ng-container *transloco="let t">
+  <app-page-header [title]="t('settings.title')" [context]="t('settings.context')">
+    <div class="header-actions">
+      @if (facade.dirty()) {
+        <button class="secondary-action" type="button" [disabled]="facade.busy()" (click)="facade.discard()">
+          {{ t('settings.action.discard') }}
+        </button>
+      }
+      <button class="primary-action" type="button" [disabled]="!facade.dirty() || facade.busy()" (click)="facade.save()">
+        {{ facade.busy() ? t('settings.action.saving') : facade.dirty() ? t('settings.action.save') : t('settings.action.saved') }}
+      </button>
+    </div>
+  </app-page-header>
+
+  @if (facade.error(); as failure) {
+    <app-load-error [message]="failure.message" (retry)="facade.reload()" />
+  }
+
+  <app-busy-overlay reserve="page" [busy]="facade.isLoading()" [label]="t('settings.loading')">
+    @if (facade.current(); as current) {
+      <form class="layout" [formGroup]="facade.form" (ngSubmit)="facade.save()">
+        <nav class="subnav" [attr.aria-label]="t('settings.sections')">
+          @for (section of sections; track section) {
+            <button
+              class="subnav-link"
+              type="button"
+              [class.active]="facade.section() === section"
+              [attr.aria-current]="facade.section() === section ? 'true' : null"
+              (click)="show(section)"
+            >
+              {{ t('settings.section.' + section) }}
+            </button>
+          }
+          <span class="subnav-link disabled" [title]="t('settings.email.notBuilt')">{{ t('settings.section.email') }}</span>
+        </nav>
+
+        <div class="sections">
+          <app-panel id="settings-general" formGroupName="general" padded [title]="t('settings.section.general')" [subtitle]="t('settings.general.subtitle')">
+            <div class="grid">
+              <app-form-field controlId="s-display" required [label]="t('settings.general.displayName')" [hint]="t('settings.general.displayNameHint')" [control]="facade.form.controls.general.controls.displayName">
+                <app-text-field id="s-display" formControlName="displayName" />
+              </app-form-field>
+              <app-form-field controlId="s-support" [label]="t('settings.general.supportEmail')" [control]="facade.form.controls.general.controls.supportEmail">
+                <app-text-field id="s-support" formControlName="supportEmail" latin type="email" />
+              </app-form-field>
+              <app-form-field controlId="s-locale" [label]="t('settings.general.defaultLocale')">
+                <app-select id="s-locale" formControlName="defaultLocale" [options]="facade.localeOptions()" />
+              </app-form-field>
+            </div>
+            <div class="toggles">
+              <app-toggle [checked]="false" [disabled]="true" [label]="t('settings.general.selfRegistration')" [description]="t('settings.general.selfRegistrationHint')" />
+              <app-toggle formControlName="requireEmailVerification" [label]="t('settings.general.requireVerification')" [description]="t('settings.general.requireVerificationHint')" />
+            </div>
+          </app-panel>
+
+          <app-panel id="settings-authentication" padded [title]="t('settings.section.authentication')" [subtitle]="t('settings.authentication.subtitle')">
+            <h3 class="sub">{{ t('settings.password.title') }}</h3>
+            <div class="grid" formGroupName="password">
+              <app-form-field controlId="s-minlen" [label]="t('settings.password.minLength')" [control]="facade.form.controls.password.controls.minLength">
+                <app-number-field id="s-minlen" formControlName="minLength" [min]="8" [max]="128" compact />
+              </app-form-field>
+              <app-form-field controlId="s-expiry" [label]="t('settings.password.expiryDays')" [hint]="t('settings.zeroNever')" [control]="facade.form.controls.password.controls.expiryDays">
+                <app-number-field id="s-expiry" formControlName="expiryDays" [min]="0" compact [suffix]="t('settings.unit.days')" />
+              </app-form-field>
+              <app-form-field controlId="s-history" [label]="t('settings.password.historyCount')" [control]="facade.form.controls.password.controls.historyCount">
+                <app-number-field id="s-history" formControlName="historyCount" [min]="0" [max]="50" compact />
+              </app-form-field>
+            </div>
+            <div class="toggles" formGroupName="password">
+              <app-toggle formControlName="requireUpper" [label]="t('settings.password.requireUpper')" />
+              <app-toggle formControlName="requireLower" [label]="t('settings.password.requireLower')" />
+              <app-toggle formControlName="requireDigit" [label]="t('settings.password.requireDigit')" />
+              <app-toggle formControlName="requireSpecial" [label]="t('settings.password.requireSpecial')" />
+              <app-toggle formControlName="rejectBreached" [label]="t('settings.password.rejectBreached')" [description]="t('settings.password.rejectBreachedHint')" />
+            </div>
+
+            <h3 class="sub">{{ t('settings.lockout.title') }}</h3>
+            <div class="grid" formGroupName="lockout">
+              <app-form-field controlId="s-lock-threshold" [label]="t('settings.lockout.threshold')" [control]="facade.form.controls.lockout.controls.threshold">
+                <app-number-field id="s-lock-threshold" formControlName="threshold" [min]="1" [max]="100" compact />
+              </app-form-field>
+              <app-form-field controlId="s-lock-duration" [label]="t('settings.lockout.duration')" [control]="facade.form.controls.lockout.controls.durationMinutes">
+                <app-number-field id="s-lock-duration" formControlName="durationMinutes" [min]="1" compact [suffix]="t('settings.unit.minutes')" />
+              </app-form-field>
+              <app-form-field controlId="s-lock-permanent" [label]="t('settings.lockout.permanentAfter')" [hint]="t('settings.lockout.permanentAfterHint')" [control]="facade.form.controls.lockout.controls.permanentAfter">
+                <app-number-field id="s-lock-permanent" formControlName="permanentAfter" [min]="0" [max]="100" compact />
+              </app-form-field>
+            </div>
+          </app-panel>
+
+          <app-panel id="settings-sessions" padded [title]="t('settings.section.sessions')" [subtitle]="t('settings.sessions.subtitle')">
+            <app-notice-bar icon="info" tone="slate" [message]="t('settings.sessions.notice')" />
+            <div class="grid" formGroupName="sessions">
+              <app-form-field controlId="s-idle" [label]="t('settings.sessions.idle')" [hint]="t('settings.sessions.idleHint')" [control]="facade.form.controls.sessions.controls.idleMinutes">
+                <app-number-field id="s-idle" formControlName="idleMinutes" [min]="1" compact [suffix]="t('settings.unit.minutes')" />
+              </app-form-field>
+              <app-form-field controlId="s-max" [label]="t('settings.sessions.max')" [hint]="t('settings.sessions.maxHint')" [control]="facade.form.controls.sessions.controls.maxHours">
+                <app-number-field id="s-max" formControlName="maxHours" [min]="1" compact [suffix]="t('settings.unit.hours')" />
+              </app-form-field>
+              <app-form-field controlId="s-remember-days" [label]="t('settings.sessions.rememberMeDays')" [control]="facade.form.controls.sessions.controls.rememberMeDays">
+                <app-number-field id="s-remember-days" formControlName="rememberMeDays" [min]="1" [max]="365" compact [suffix]="t('settings.unit.days')" />
+              </app-form-field>
+            </div>
+            <div class="toggles" formGroupName="sessions">
+              <app-toggle formControlName="rememberMeEnabled" [label]="t('settings.sessions.rememberMe')" [description]="t('settings.sessions.rememberMeHint')" />
+              <app-toggle formControlName="singleSessionPerUser" [label]="t('settings.sessions.single')" [description]="t('settings.sessions.singleHint')" />
+            </div>
+
+            <h3 class="sub">{{ t('settings.tokens.title') }}</h3>
+            <div class="grid" formGroupName="tokens">
+              <app-form-field controlId="s-access" [label]="t('settings.tokens.defaultAccess')" [control]="facade.form.controls.tokens.controls.defaultAccessMinutes">
+                <app-number-field id="s-access" formControlName="defaultAccessMinutes" [min]="1" compact [suffix]="t('settings.unit.minutes')" />
+              </app-form-field>
+              <app-form-field controlId="s-access-max" [label]="t('settings.tokens.maxAccess')" [hint]="t('settings.tokens.maxAccessHint')" [control]="facade.form.controls.tokens.controls.maxAccessMinutes">
+                <app-number-field id="s-access-max" formControlName="maxAccessMinutes" [min]="1" compact [suffix]="t('settings.unit.minutes')" />
+              </app-form-field>
+              <app-form-field controlId="s-refresh" [label]="t('settings.tokens.defaultRefresh')" [control]="facade.form.controls.tokens.controls.defaultRefreshHours">
+                <app-number-field id="s-refresh" formControlName="defaultRefreshHours" [min]="1" compact [suffix]="t('settings.unit.hours')" />
+              </app-form-field>
+              <app-form-field controlId="s-secret-validity" [label]="t('settings.tokens.secretValidity')" [hint]="t('settings.zeroNever')" [control]="facade.form.controls.tokens.controls.clientSecretValidityDays">
+                <app-number-field id="s-secret-validity" formControlName="clientSecretValidityDays" [min]="0" compact [suffix]="t('settings.unit.days')" />
+              </app-form-field>
+              <app-form-field controlId="s-secret-grace" [label]="t('settings.tokens.secretGrace')" [hint]="t('settings.tokens.secretGraceHint')" [control]="facade.form.controls.tokens.controls.clientSecretGraceHours">
+                <app-number-field id="s-secret-grace" formControlName="clientSecretGraceHours" [min]="0" compact [suffix]="t('settings.unit.hours')" />
+              </app-form-field>
+            </div>
+          </app-panel>
+
+          <app-panel id="settings-keys" padded [title]="t('settings.section.keys')" [subtitle]="t('settings.keys.subtitle')">
+            <div class="grid" formGroupName="keys">
+              <app-form-field controlId="s-rotation" [label]="t('settings.keys.rotationDays')" [hint]="t('settings.keys.rotationHint')" [control]="facade.form.controls.keys.controls.rotationDays">
+                <app-number-field id="s-rotation" formControlName="rotationDays" [min]="0" compact [suffix]="t('settings.unit.days')" />
+              </app-form-field>
+              <app-form-field controlId="s-retire" [label]="t('settings.keys.retireDays')" [hint]="t('settings.keys.retireHint')" [control]="facade.form.controls.keys.controls.retireDays">
+                <app-number-field id="s-retire" formControlName="retireDays" [min]="1" compact [suffix]="t('settings.unit.days')" />
+              </app-form-field>
+            </div>
+            <!-- What signs right now, what still verifies, and the one action. Never the key material. -->
+            @if (facade.keyStatus(); as keys) {
+              <div class="key-status">
+                <div>
+                  <p class="key-line"><span class="key-label">{{ t('settings.keys.activeKey') }}</span> <code class="latin">{{ keys.activeKid }}</code> · {{ keys.algorithm }}</p>
+                  <p class="key-hint">
+                    {{ t('settings.keys.since', {when: when(keys.activatedAt)}) }}
+                    @if (keys.nextRotationAt) {
+                      · {{ t('settings.keys.nextRotation', {when: when(keys.nextRotationAt)}) }}
+                    } @else {
+                      · {{ t('settings.keys.manualOnly') }}
+                    }
+                    @if (keys.retiringCount) {
+                      · {{ t('settings.keys.retiringCount', {count: keys.retiringCount}) }}
+                    }
+                  </p>
+                  @if (keys.unusableCount) {
+                    <app-notice-bar icon="alertCircle" tone="red" [message]="t('settings.keys.unusable', {count: keys.unusableCount})" />
+                  }
+                </div>
+                <button class="secondary-action" type="button" [disabled]="facade.busy()" (click)="facade.rotatingKey.set(true)">
+                  {{ t('settings.keys.rotateNow') }}
+                </button>
+              </div>
+
+              <app-data-table [columns]="keyColumns(t)" [label]="t('settings.keys.tableLabel')">
+                @for (key of facade.keyList(); track key.id) {
+                  <app-table-row>
+                    <span class="cell mono latin" [attr.data-label]="t('settings.keys.column.kid')">{{ key.kid }}</span>
+                    <span class="cell" [attr.data-label]="t('settings.keys.column.algorithm')">{{ key.algorithm }}</span>
+                    <span class="cell" [attr.data-label]="t('settings.keys.column.status')">
+                      <app-badge [tone]="key.status === 'ACTIVE' ? 'green' : key.status === 'RETIRING' ? 'amber' : 'slate'" shape="square">
+                        {{ t('settings.keys.status.' + key.status) }}
+                      </app-badge>
+                    </span>
+                    <span class="cell" [attr.data-label]="t('settings.keys.column.activated')">{{ when(key.activatedAt) }}</span>
+                    <span class="cell" [attr.data-label]="t('settings.keys.column.retire')">
+                      {{ key.status === 'RETIRED' ? when(key.retiredAt) : key.retireAfter ? when(key.retireAfter) : '—' }}
+                    </span>
+                  </app-table-row>
+                }
+              </app-data-table>
+            }
+
+            <div class="grid">
+              <app-form-field controlId="s-audit" [label]="t('settings.audit.retention')" [hint]="t('settings.audit.retentionHint')" [control]="facade.form.controls.auditRetentionDays">
+                <app-number-field id="s-audit" formControlName="auditRetentionDays" [min]="1" compact [suffix]="t('settings.unit.days')" />
+              </app-form-field>
+            </div>
+            <p class="stamp">
+              @if (current.updatedAt) {
+                {{ t('settings.updatedBy', {who: current.updatedBy ?? '', when: current.updatedAt}) }}
+              } @else {
+                {{ t('settings.neverUpdated') }}
+              }
+            </p>
+          </app-panel>
+
+          <!-- Incident response. Nothing here is undoable, and each action says what it costs. -->
+          <app-panel id="settings-danger" padded [title]="t('settings.section.danger')" [subtitle]="t('settings.danger.subtitle')">
+            <div class="danger-row">
+              <div>
+                <p class="danger-title">{{ t('settings.danger.rotateAll') }}</p>
+                <p class="danger-hint">{{ t('settings.danger.rotateAllHint', {hours: facade.form.controls.tokens.controls.clientSecretGraceHours.value}) }}</p>
+              </div>
+              <button class="danger-action" type="button" [disabled]="facade.busy()" (click)="facade.rotatingAll.set(true)">
+                {{ t('settings.danger.rotateAllAction') }}
+              </button>
+            </div>
+          </app-panel>
+        </div>
+      </form>
+    }
+  </app-busy-overlay>
+
+  <app-confirm-dialog
+    [open]="facade.rotatingKey()"
+    [title]="t('settings.keys.confirmTitle')"
+    [message]="t('settings.keys.confirmMessage', {days: facade.form.controls.keys.controls.retireDays.value})"
+    [confirmLabel]="t('settings.keys.rotateNow')"
+    [cancelLabel]="t('shared.actions.cancel')"
+    (confirmed)="facade.rotateKey()"
+    (dismissed)="facade.rotatingKey.set(false)"
+  />
+
+  <app-confirm-dialog
+    [open]="facade.rotatingAll()"
+    [title]="t('settings.danger.confirmTitle')"
+    [message]="t('settings.danger.confirmMessage')"
+    confirmationText="ROTATE"
+    [confirmationLabel]="t('settings.danger.confirmLabel')"
+    [confirmLabel]="t('settings.danger.rotateAllAction')"
+    [cancelLabel]="t('shared.actions.cancel')"
+    (confirmed)="facade.rotateAllSecrets()"
+    (dismissed)="facade.rotatingAll.set(false)"
+  />
+
+  <!-- The new secrets, once. Closing this is the last time any of them is readable. -->
+  @if (facade.rotatedAll(); as rotated) {
+    <app-form-dialog
+      open
+      wide
+      [title]="t('settings.danger.rotatedTitle', {count: rotated.length})"
+      [description]="t('settings.danger.rotatedMessage')"
+      [closeLabel]="t('shared.actions.close')"
+      (dismissed)="facade.rotatedAll.set(null)"
+    >
+      <div class="secrets">
+        @for (item of rotated; track item.id) {
+          <app-copy-field [value]="item.clientSecret" [label]="item.clientId" />
+          <p class="secret-owner">{{ item.clientId }}</p>
+        }
+      </div>
+    </app-form-dialog>
+  }
+</ng-container>

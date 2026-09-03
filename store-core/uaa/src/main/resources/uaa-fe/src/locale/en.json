@@ -11,7 +11,8 @@
       "overview": "Overview",
       "identity": "Identity",
       "applications": "Applications",
-      "system": "System"
+      "system": "System",
+      "you": "You"
     },
     "dashboard": "Dashboard",
     "audit": "Audit log",
@@ -21,7 +22,8 @@
     "breadcrumb": "Breadcrumb",
     "open": "Open navigation",
     "close": "Close navigation",
-    "signedIn": "Signed in"
+    "signedIn": "Signed in",
+    "account": "My account"
   },
   "route": {
     "signIn": "Sign in",
@@ -29,7 +31,15 @@
     "roles": "Roles",
     "clients": "OAuth2 clients",
     "clientCreate": "Register a client",
-    "clientEdit": "Client"
+    "clientEdit": "Client",
+    "signOut": "Signing out",
+    "settings": "Settings",
+    "account": "My account",
+    "acceptInvitation": "Accept your invitation",
+    "resetPassword": "Choose a new password",
+    "providers": "Identity providers",
+    "dashboard": "Dashboard",
+    "audit": "Audit log"
   },
   "signIn": {
     "title": "Sign in",
@@ -45,7 +55,36 @@
       "title": "One account for every cvhome app.",
       "copy": "Sign in once to reach the seller console and the services behind it.",
       "legal": "© 2026 cvhome"
-    }
+    },
+    "expired": "That page had expired. Please sign in again.",
+    "signedOut": "You have been signed out.",
+    "signingOut": "Signing you out…",
+    "locked": "This account is locked after too many failed attempts. Try again in {{minutes}} minutes, or ask an administrator.",
+    "disabled": "This account has been disabled. Ask an administrator.",
+    "expiredPassword": "Your password has expired. Ask an administrator for a reset link.",
+    "attemptsLeft": "{{count}} attempt(s) left before a {{minutes}}-minute lock.",
+    "rememberMe": "Keep me signed in",
+    "forgot": "Forgot your password?",
+    "forgotCopy": "There is no self-service reset on this platform. Ask an administrator: they can issue you a one-time link from the console, and it will bring you back here with a new password.",
+    "continueTo": "Continuing to {{client}}.",
+    "continueWith": "Continue with {{name}}",
+    "orEmail": "or with email",
+    "email": "Email or username",
+    "emailPlaceholder": "you@example.com",
+    "continue": "Continue",
+    "checking": "Checking…",
+    "notYou": "Not you?",
+    "reveal": "Show password",
+    "idpRejected": "An account with this email already exists here. Sign in with your password instead, or ask an administrator to link the two.",
+    "idpUnknownUser": "That login is not connected to an account here. Ask an administrator to invite you first.",
+    "idpNoEmail": "The provider did not share an email address, so we cannot tell which account this is.",
+    "idpFailed": "That sign-in could not be completed. Try again, or use your password.",
+    "link": {
+      "explain": "You already have an account for {{email}}. Enter its password once and {{provider}} will sign you in from now on.",
+      "password": "Your cvhome password",
+      "confirm": "Confirm and link"
+    },
+    "emailHint": "An email at an organisation with its own sign-in goes straight there."
   },
   "users": {
     "title": "Users",
@@ -56,12 +95,11 @@
     "panel": {
       "title": "Accounts"
     },
-    "notice": {
-      "noSearch": "uaa matches accounts on metadata equality and offers no text search, so this list is not filtered."
-    },
     "empty": {
       "title": "No accounts",
-      "message": "uaa has no accounts registered yet."
+      "message": "uaa has no accounts registered yet.",
+      "noMatch": "No matching accounts",
+      "noMatchMessage": "Nothing matches that search and status. Clear one or both."
     },
     "reset": {
       "title": "Set a new password",
@@ -91,7 +129,14 @@
       "rolesSaved": "Roles updated for {{name}}.",
       "deleted": "{{name}} was deleted.",
       "saved": "{{name}} was saved.",
-      "created": "{{name}} created."
+      "created": "{{name}} created.",
+      "unlocked": "{{name}} was unlocked.",
+      "signedOut": "{{name}} was signed out of {{count}} session(s).",
+      "invited": "{{name}} invited.",
+      "resent": "A new link was issued for {{name}}.",
+      "invitationRevoked": "The invitation for {{email}} was revoked.",
+      "resetLinkIssued": "A reset link was issued for {{name}}.",
+      "emailVerified": "{{name}}'s email is now marked verified."
     },
     "detail": {
       "firstName": "First name",
@@ -99,27 +144,134 @@
       "username": "Username",
       "email": "Email",
       "roles": "Roles",
-      "readOnlyNote": "uaa does not allow either to be changed here.",
       "setPassword": "Set password",
       "save": "Save",
       "saving": "Saving…",
       "createTitle": "Create a user",
       "editTitle": "Edit user",
-      "createHint": "uaa stores the account without a password — you will set one next.",
+      "createHint": "Creates the account and asks you for its password next. To let the person choose their own, invite them instead.",
       "usernameHint": "What the account signs in with. It cannot be changed afterwards.",
       "enabledLabel": "Account enabled",
       "enabledHint": "A disabled account keeps its roles and cannot sign in.",
       "metadata": "Metadata",
-      "metadataHint": "uaa merges metadata on save, so a key that is already stored cannot be removed here — only edited, or joined by a new one.",
-      "metadataLocked": "Stored keys cannot be removed through uaa's update."
+      "metadataHint": "Removing a row unsets that key on save. `org` and `store` are written by tenancy and read by other services.",
+      "usernameLocked": "The username is the identity tokens carry; it cannot be changed.",
+      "emailHint": "Changing the address marks it unverified again.",
+      "emailVerified": "Email verified",
+      "emailUnverified": "Email unverified",
+      "markVerified": "Mark verified",
+      "resetLink": "Issue reset link"
     },
     "action": {
-      "create": "Create user"
+      "create": "Create user",
+      "invite": "Invite user"
+    },
+    "security": {
+      "title": "Security",
+      "lastSignIn": "Last sign-in",
+      "passwordChanged": "Password changed",
+      "noPassword": "No password set",
+      "failedAttempts": "Failed attempts",
+      "lockedUntil": "Locked until",
+      "lockedPermanently": "permanently — an administrator must unlock",
+      "unlock": "Unlock",
+      "sessions": "Active sessions",
+      "signOutEverywhere": "Sign out everywhere",
+      "revoke": "End",
+      "noSessions": "No active sessions.",
+      "loadingSessions": "Loading sessions…"
+    },
+    "tiles": {
+      "label": "Account totals",
+      "total": "Accounts",
+      "activeOf": "{{count}} active",
+      "pending": "Pending invitations",
+      "pendingHint": "no password yet",
+      "locked": "Locked",
+      "lockedHint": "after failed attempts",
+      "disabled": "Disabled",
+      "disabledHint": "by an administrator"
+    },
+    "view": {
+      "label": "Accounts or invitations",
+      "accounts": "Accounts",
+      "invitations": "Invitations"
+    },
+    "filter": {
+      "label": "Filter accounts by status",
+      "search": "Search by name, username or email",
+      "clear": "Clear the search",
+      "ALL": "All",
+      "ACTIVE": "Active",
+      "PENDING": "Pending",
+      "LOCKED": "Locked",
+      "DISABLED": "Disabled"
+    },
+    "invitations": {
+      "filter": {
+        "label": "Filter invitations by status",
+        "ALL": "All",
+        "PENDING": "Pending",
+        "ACCEPTED": "Accepted",
+        "REVOKED": "Revoked",
+        "EXPIRED": "Expired"
+      },
+      "column": {
+        "who": "Invitee",
+        "status": "Status",
+        "expires": "Expires / accepted",
+        "createdBy": "Issued by",
+        "actions": "Actions"
+      },
+      "status": {
+        "PENDING": "Pending",
+        "ACCEPTED": "Accepted",
+        "REVOKED": "Revoked",
+        "EXPIRED": "Expired"
+      },
+      "resend": "Resend",
+      "revoke": "Revoke",
+      "unit": "invitations",
+      "paginationLabel": "Invitation pages",
+      "empty": {
+        "title": "No invitations",
+        "message": "Nothing here with that status. Invite someone from the button above."
+      }
+    },
+    "invite": {
+      "title": "Invite a user",
+      "hint": "The account is created without a password. You will get a one-time link for them to choose one.",
+      "usernameHint": "Optional — the email address when left blank.",
+      "delivery": "Nothing emails the link yet. You will be shown it once, to pass on yourself; it is valid for seven days.",
+      "confirm": "Create invitation",
+      "busy": "Creating…"
+    },
+    "resetLink": {
+      "title": "Issue a reset link",
+      "message": "A one-time link for {{name}} to choose a new password. Their current password keeps working until they do.",
+      "revokeLabel": "Also sign them out everywhere",
+      "revokeHint": "Ends every session and token now. For a suspected compromise, not for a forgotten password.",
+      "validity": "The link is valid for one hour and is shown once.",
+      "confirm": "Issue link",
+      "busy": "Issuing…"
+    },
+    "issued": {
+      "inviteTitle": "Invitation link",
+      "resetTitle": "Password reset link",
+      "message": "Send this to {{name}}. It works once and expires {{expires}}.",
+      "linkLabel": "link",
+      "warning": "This is the only time the link is shown. Copy it before closing — only its hash is stored, and a resend issues a different one.",
+      "done": "Done"
+    },
+    "revoke": {
+      "title": "Revoke this invitation",
+      "message": "The link sent to {{email}} will stop working. The pending account stays and can be re-invited.",
+      "confirm": "Revoke invitation"
     }
   },
   "roles": {
     "title": "Roles",
-    "context": "The authorities uaa can grant",
+    "context": "Named sets of permissions, issued in tokens as the roles claim",
     "loading": "Loading roles…",
     "unit": "roles",
     "paginationLabel": "Role pages",
@@ -128,14 +280,42 @@
     },
     "column": {
       "name": "Role",
+      "scope": "Scope",
+      "users": "Users",
+      "perms": "Perms",
+      "type": "Type",
       "id": "Id"
+    },
+    "permsHint": "{{direct}} granted directly; the number shown includes what is inherited",
+    "filter": {
+      "label": "Show",
+      "all": "All",
+      "system": "System",
+      "custom": "Custom",
+      "search": "Search roles…"
+    },
+    "scope": {
+      "REALM": "Realm",
+      "ORGANIZATION": "Organization",
+      "CLIENT": "Client"
+    },
+    "type": {
+      "system": "System",
+      "custom": "Custom"
+    },
+    "group": {
+      "IDENTITY": "Identity",
+      "CLIENTS": "Clients",
+      "IDENTITY_PROVIDERS": "Identity providers",
+      "SYSTEM": "System"
     },
     "notice": {
       "rename": "Renaming a role does not re-issue anyone's token: whoever is signed in keeps the old authority until they sign in again."
     },
     "empty": {
       "title": "No roles",
-      "message": "uaa has no roles registered yet."
+      "message": "uaa has no roles registered yet.",
+      "filtered": "No roles match this filter."
     },
     "action": {
       "create": "New role",
@@ -143,23 +323,36 @@
     },
     "form": {
       "createTitle": "New role",
-      "renameTitle": "Rename role",
-      "name": "Name",
-      "namePlaceholder": "ROLE_STORE_ADMIN",
-      "nameHint": "The authority string itself. Services match on it exactly.",
-      "save": "Save",
+      "name": "Role name",
+      "namePlaceholder": "REGIONAL_BUYER",
+      "nameHint": "Appears verbatim in the token's roles claim. Upper-case letters, digits and underscores.",
+      "scope": "Scope",
+      "scopeHint": "Realm: across every client. Organization: inside one seller organization. Client: only through one application.",
+      "descriptionLabel": "Description",
+      "inherits": "Inherits from",
+      "inheritsHint": "Everything the parent grants is granted here too.",
+      "noParent": "No parent",
+      "permissions": "Permissions",
+      "permissionCount": "{{direct}} direct · {{effective}} effective",
+      "selectGroup": "Select all",
+      "clearGroup": "Clear",
+      "catalogueUnavailable": "The permission catalogue could not be loaded; name, scope and parent can still be saved.",
+      "save": "Save role",
       "saving": "Saving…",
       "id": "Role id",
-      "description": "A role is a name. What it grants is decided by each service, not stored here."
+      "assigned": "Assigned",
+      "assignedCount": "{{count}} account(s) hold this role directly",
+      "description": "What the role grants is issued in the token as the permissions claim; services still authorise on the role name.",
+      "systemNotice": "A system role: its name and scope are fixed because services key on them. Its description, parent and permissions can still change."
     },
     "delete": {
       "title": "Delete this role",
-      "message": "{{name}} will be removed, and every account holding it loses that authority.",
+      "message": "{{name}} will be removed. uaa refuses if any account still holds it.",
       "confirmationLabel": "Type the role name to confirm"
     },
     "toast": {
       "created": "{{name}} was created.",
-      "renamed": "{{name}} was saved.",
+      "saved": "{{name}} was saved.",
       "deleted": "{{name}} was deleted."
     }
   },
@@ -173,19 +366,24 @@
       "title": "Registered clients"
     },
     "column": {
-      "clientId": "Client id",
-      "clientName": "Name"
+      "client": "Client",
+      "type": "Type",
+      "grants": "Grant types",
+      "secret": "Secret expires",
+      "status": "Status"
     },
     "notice": {
-      "secret": "uaa never returns a client secret. The only moment you can read one is the moment you set it — copy it before you close the dialog."
+      "secret": "uaa shows a client secret exactly twice — when the client is registered and when its secret is rotated — and never again. Copy it before you close the dialog."
     },
     "empty": {
       "title": "No clients",
-      "message": "No applications are registered against uaa yet."
+      "message": "No applications are registered against uaa yet.",
+      "noMatch": "No matching clients",
+      "noMatchMessage": "Nothing matches that search and filter. Clear one or both."
     },
     "action": {
       "register": "Register client",
-      "rotate": "New secret",
+      "rotate": "Rotate secret",
       "delete": "Delete"
     },
     "form": {
@@ -202,16 +400,9 @@
       "refreshTtl": "Refresh token"
     },
     "rotate": {
-      "title": "Set a new secret",
-      "message": "Choose a new secret for {{clientId}}. The old one stops working immediately.",
-      "secret": "New secret",
-      "repeatSecret": "Repeat secret",
-      "hint": "At least twenty characters. Treat it like a password.",
-      "handoverHint": "uaa will not show this again — copy it into the application's configuration now.",
-      "weak": "That secret is too easy to guess.",
-      "mismatch": "The two secrets do not match.",
-      "confirm": "Set secret",
-      "busy": "Setting…"
+      "title": "Rotate this secret",
+      "message": "uaa will generate a new secret for {{clientId}} and show it once. The current secret keeps working for the realm’s grace window, so the application can be reconfigured without an outage.",
+      "confirm": "Rotate secret"
     },
     "delete": {
       "title": "Delete this client",
@@ -221,8 +412,59 @@
     "toast": {
       "created": "{{clientId}} was registered.",
       "updated": "{{clientId}} was saved.",
-      "secretRotated": "A new secret was set for {{clientId}}.",
-      "deleted": "{{clientId}} was deleted."
+      "secretRotated": "A new secret was issued for {{clientId}}.",
+      "deleted": "{{clientId}} was deleted.",
+      "enabled": "{{clientId}} can obtain tokens again.",
+      "disabled": "{{clientId}} is disabled and its tokens were revoked.",
+      "previousRevoked": "The previous secret of {{clientId}} no longer works."
+    },
+    "tiles": {
+      "label": "Client totals",
+      "total": "Registered clients",
+      "enabledOf": "{{count}} enabled",
+      "expiring": "Secrets expiring · 30d",
+      "expiringHint": "rotate before expiry",
+      "machine": "Machine clients",
+      "machineHint": "client_credentials only",
+      "publicClients": "Public clients",
+      "publicHint": "PKCE, no secret"
+    },
+    "filter": {
+      "label": "Filter clients",
+      "search": "Search by client id or name",
+      "clear": "Clear the search",
+      "ALL": "All",
+      "ENABLED": "Enabled",
+      "DISABLED": "Disabled",
+      "MACHINE": "Machine",
+      "CONFIDENTIAL": "Confidential",
+      "PUBLIC": "Public"
+    },
+    "type": {
+      "PUBLIC": "Public",
+      "MACHINE": "Machine",
+      "CONFIDENTIAL": "Confidential"
+    },
+    "status": {
+      "enabled": "Enabled",
+      "disabled": "Disabled"
+    },
+    "secret": {
+      "none": "none (PKCE)",
+      "never": "never"
+    },
+    "revokePrevious": {
+      "title": "End the grace window",
+      "message": "The previous secret of {{clientId}} stops working immediately. Only do this once the application uses the new one.",
+      "confirm": "Revoke previous secret"
+    },
+    "issued": {
+      "title": "Client secret for {{clientId}}",
+      "message": "Put this in the application’s configuration now. It expires {{expires}}.",
+      "messageWithGrace": "Put this in the application’s configuration now. It expires {{expires}}; the secret it replaces keeps working until {{previous}}.",
+      "linkLabel": "client secret",
+      "warning": "This is the only time the secret is shown. Only its hash is stored; the next time you need it, rotate.",
+      "done": "Done"
     }
   },
   "brandSub": "Single sign-on",
@@ -271,7 +513,9 @@
       "tokenSettings": "Token settings",
       "readiness": "Before you save",
       "summary": "Summary",
-      "danger": "Secret and removal"
+      "danger": "Secret and removal",
+      "status": "Status",
+      "secret": "Client secret"
     },
     "check": {
       "clientId": "Client id set, and in the accepted shape",
@@ -298,6 +542,26 @@
       "rowLabel": "{{label}} {{position}}",
       "invalid": "Enter an absolute URI, including its scheme.",
       "insecure": "Plain HTTP to a remote host — anything on the network path can read the code delivered here."
+    },
+    "description": "Description",
+    "descriptionHint": "What this application is, for the next operator.",
+    "status": {
+      "type": "Type",
+      "registered": "Registered",
+      "lastToken": "Last token",
+      "noToken": "never",
+      "disabledSince": "Disabled since",
+      "enabledLabel": "Client enabled",
+      "enabledHint": "Disabling revokes every token it holds and refuses new ones."
+    },
+    "secret": {
+      "expires": "Expires {{when}}.",
+      "neverExpires": "Never expires.",
+      "never": "never",
+      "previousUntil": "The previous secret still works until {{when}}.",
+      "revokePrevious": "Revoke it now",
+      "rotateHint": "The secret cannot be read back. Rotating issues a new one and shows it once.",
+      "publicNote": "A public client holds no secret: it authenticates with PKCE alone."
     }
   },
   "pairs": {
@@ -309,5 +573,540 @@
     "keyFor": "Setting {{position}} key",
     "valueFor": "Setting {{position}} value",
     "empty": "No custom settings defined."
+  },
+  "settings": {
+    "title": "Settings",
+    "context": "Realm-wide policy; changes apply to every client on save",
+    "loading": "Loading settings…",
+    "sections": "Settings sections",
+    "section": {
+      "general": "General",
+      "authentication": "Authentication",
+      "sessions": "Sessions & tokens",
+      "keys": "Signing keys",
+      "email": "Email",
+      "danger": "Danger zone"
+    },
+    "email": {
+      "notBuilt": "Not built: the platform has no mail sender. Links are handed to an event a delivery service will subscribe to."
+    },
+    "action": {
+      "save": "Save changes",
+      "saving": "Saving…",
+      "saved": "Saved",
+      "discard": "Discard"
+    },
+    "general": {
+      "subtitle": "How the realm presents itself",
+      "displayName": "Display name",
+      "displayNameHint": "Shown on the sign-in page.",
+      "supportEmail": "Support email",
+      "defaultLocale": "Default locale",
+      "selfRegistration": "Allow self-registration",
+      "selfRegistrationHint": "Not available: staff accounts are created by an administrator or by invitation.",
+      "requireVerification": "Require email verification",
+      "requireVerificationHint": "An unverified account cannot sign in."
+    },
+    "locale": {
+      "en": "English",
+      "ar": "العربية"
+    },
+    "authentication": {
+      "subtitle": "What a password must be, and what happens when it is guessed"
+    },
+    "password": {
+      "title": "Password policy",
+      "minLength": "Minimum length",
+      "expiryDays": "Expire after",
+      "historyCount": "Remember last passwords",
+      "requireUpper": "Require an upper-case letter",
+      "requireLower": "Require a lower-case letter",
+      "requireDigit": "Require a digit",
+      "requireSpecial": "Require a symbol",
+      "rejectBreached": "Reject breached passwords",
+      "rejectBreachedHint": "Checked against the Have I Been Pwned k-anonymity range API when a password is set."
+    },
+    "lockout": {
+      "title": "Brute-force protection",
+      "threshold": "Lock after failures",
+      "duration": "Lock duration",
+      "permanentAfter": "Permanent lock after lockouts",
+      "permanentAfterHint": "0 = never; an administrator must then unlock."
+    },
+    "sessions": {
+      "subtitle": "How long a sign-in lasts",
+      "notice": "Clients inherit the token defaults unless they override them in their own token settings.",
+      "idle": "Session idle timeout",
+      "idleHint": "Signs the user out after this period of inactivity.",
+      "max": "Session maximum",
+      "maxHint": "Absolute limit regardless of activity.",
+      "rememberMe": "Offer \"Remember me\"",
+      "rememberMeHint": "Extends the session with a remember-me cookie.",
+      "rememberMeDays": "Remember me for",
+      "single": "One session per user",
+      "singleHint": "A new sign-in revokes older sessions."
+    },
+    "tokens": {
+      "title": "Token defaults",
+      "defaultAccess": "Access token",
+      "maxAccess": "Access token ceiling",
+      "maxAccessHint": "No client may issue a longer access token.",
+      "defaultRefresh": "Refresh token",
+      "secretValidity": "Client secret validity",
+      "secretGrace": "Old secret grace after rotation",
+      "secretGraceHint": "The previous secret keeps working this long after a rotation."
+    },
+    "keys": {
+      "subtitle": "When the signing key rotates and how long retired keys stay verifiable",
+      "rotationDays": "Rotate automatically every",
+      "rotationHint": "0 = manual rotation only.",
+      "retireDays": "Keep retiring keys in the JWKS for",
+      "retireHint": "In-flight tokens still verify during this window.",
+      "activeKey": "Signing now",
+      "since": "since {{when}}",
+      "nextRotation": "next automatic rotation {{when}}",
+      "manualOnly": "rotation is manual",
+      "retiringCount": "{{count}} key(s) still verifying",
+      "unusable": "{{count}} stored key(s) cannot be read back — the crypto provider’s key changed underneath them. They still verify what they signed; nothing signs with them.",
+      "rotateNow": "Rotate now",
+      "tableLabel": "Signing keys",
+      "column": {
+        "kid": "Key id",
+        "algorithm": "Algorithm",
+        "status": "Status",
+        "activated": "Signing since",
+        "retire": "Leaves the JWKS"
+      },
+      "status": {
+        "ACTIVE": "Active",
+        "RETIRING": "Retiring",
+        "RETIRED": "Retired"
+      },
+      "confirmTitle": "Rotate the signing key?",
+      "confirmMessage": "New tokens are signed with a fresh key at once. Tokens already issued keep verifying for {{days}} day(s), then the old key leaves the JWKS.",
+      "toast": {
+        "rotated": "Signing key {{kid}} is active."
+      }
+    },
+    "audit": {
+      "retention": "Audit log retention",
+      "retentionHint": "Older events are removed nightly."
+    },
+    "unit": {
+      "days": "days",
+      "hours": "hours",
+      "minutes": "minutes"
+    },
+    "zeroNever": "0 = never",
+    "updatedBy": "Last saved by {{who}} at {{when}}",
+    "neverUpdated": "Never changed from the defaults.",
+    "toast": {
+      "saved": "Settings were saved."
+    },
+    "danger": {
+      "subtitle": "Actions for an incident, each with a cost the page states",
+      "rotateAll": "Rotate every client secret",
+      "rotateAllHint": "Every machine and confidential client gets a new secret. The old ones keep working for {{hours}} hours; every service must be reconfigured before then.",
+      "rotateAllAction": "Rotate all secrets",
+      "confirmTitle": "Rotate every client secret?",
+      "confirmMessage": "This is incident response. The new secrets are shown once, on the next screen, and every integration on the platform must be updated within the grace window.",
+      "confirmLabel": "Type ROTATE to confirm",
+      "rotatedTitle": "{{count}} new secret(s)",
+      "rotatedMessage": "Copy each into its application’s configuration. Closing this is the last time any of them is readable.",
+      "rotatedAll": "{{count}} client secret(s) rotated."
+    }
+  },
+  "account": {
+    "title": "My account",
+    "password": {
+      "title": "Change password",
+      "subtitle": "Prove it is you with the current one",
+      "notice": "Changing your password signs you out everywhere else and ends every token issued to you.",
+      "current": "Current password",
+      "new": "New password",
+      "hint": "At least the realm's minimum length, with the character classes it requires.",
+      "repeat": "Repeat new password",
+      "mismatch": "The passwords do not match.",
+      "save": "Change password",
+      "saving": "Changing…"
+    },
+    "sessions": {
+      "title": "Sessions",
+      "subtitle": "Where you are signed in",
+      "loading": "Loading sessions…",
+      "thisDevice": "this device",
+      "lastActive": "last active",
+      "revoke": "End",
+      "signOutOthers": "Sign out the other {{count}}",
+      "none": "No sessions",
+      "noneHint": "uaa lists nothing for this account."
+    },
+    "toast": {
+      "passwordChanged": "Your password was changed.",
+      "signedOutOthers": "{{count}} other session(s) ended."
+    },
+    "identities": {
+      "title": "Linked logins",
+      "subtitle": "External accounts that can sign you in here",
+      "loading": "Loading linked logins…",
+      "since": "linked {{when}}",
+      "unlink": "Unlink",
+      "none": "No external logins are linked to this account.",
+      "toast": {
+        "unlinked": "{{name}} can no longer sign you in."
+      }
+    },
+    "profile": {
+      "title": "Who you are",
+      "subtitle": "What cvhome identity holds about this account",
+      "name": "Name",
+      "username": "Username",
+      "email": "Email",
+      "roles": "Roles",
+      "noRoles": "No roles",
+      "permissions": "Permissions",
+      "note": "Your name, email and roles are set by an administrator. Ask one to change them."
+    }
+  },
+  "linkAccept": {
+    "title": {
+      "INVITATION": "Welcome",
+      "PASSWORD_RESET": "Choose a new password"
+    },
+    "subtitle": {
+      "INVITATION": "Choose a password to finish setting up your account.",
+      "PASSWORD_RESET": "Your old password stops working once you save the new one."
+    },
+    "loading": "Checking your link…",
+    "greeting": "Hello",
+    "account": "Account",
+    "expires": "Link valid until",
+    "password": "New password",
+    "repeatPassword": "Repeat password",
+    "reveal": "Show password",
+    "rulesLabel": "Password rules",
+    "rules": {
+      "minLength": "At least {{count}} characters",
+      "upper": "An upper-case letter",
+      "lower": "A lower-case letter",
+      "digit": "A digit",
+      "special": "A symbol"
+    },
+    "submit": {
+      "INVITATION": "Activate my account",
+      "PASSWORD_RESET": "Save new password"
+    },
+    "submitting": "Saving…",
+    "noToken": "This page needs the link you were sent. Open it from there.",
+    "unusable": {
+      "title": "This link cannot be used",
+      "message": {
+        "INVITATION": "It has expired, was revoked, or was already used. Ask the administrator who invited you for a new one.",
+        "PASSWORD_RESET": "It has expired, was revoked, or was already used. Ask an administrator for a new one."
+      }
+    },
+    "failed": {
+      "title": "Something went wrong",
+      "message": "The link could not be checked right now. Try again in a moment."
+    },
+    "done": {
+      "title": {
+        "INVITATION": "Your account is ready",
+        "PASSWORD_RESET": "Password saved"
+      },
+      "message": "Sign in as {{name}} with the password you just chose.",
+      "signIn": "Go to sign in"
+    }
+  },
+  "idps": {
+    "title": "Identity providers",
+    "context": "External logins people can pick on the sign-in page, brokered through cvhome identity",
+    "loading": "Loading providers…",
+    "panel": {
+      "title": "Sign-in page order",
+      "subtitle": "Top to bottom is how the buttons appear. A disabled provider is no button and no login."
+    },
+    "action": {
+      "add": "Add provider",
+      "up": "Move up",
+      "down": "Move down",
+      "delete": "Delete provider"
+    },
+    "column": {
+      "provider": "Provider",
+      "protocol": "Protocol",
+      "policy": "When the email matches",
+      "status": "Status",
+      "order": "Order"
+    },
+    "status": {
+      "enabled": "Enabled",
+      "hidden": "Enabled, hidden",
+      "disabled": "Disabled"
+    },
+    "jitShort": "creates accounts",
+    "linking": {
+      "CONFIRM": "Ask for the password once",
+      "LINK": "Link when the provider vouches for the email",
+      "REJECT": "Refuse"
+    },
+    "empty": {
+      "title": "No providers yet",
+      "message": "People sign in with a password only. Add a provider to offer another way in."
+    },
+    "preview": {
+      "title": "Sign-in page preview",
+      "subtitle": "What an enabled, unhidden provider adds to the page",
+      "heading": "Sign in to cvhome",
+      "continueWith": "Continue with {{name}}",
+      "none": "No provider buttons.",
+      "or": "or with email",
+      "email": "Email"
+    },
+    "choose": {
+      "title": "Choose a provider type",
+      "subtitle": "Well-known providers come pre-configured; the generic ones take an issuer or the endpoints by hand.",
+      "unverified": "scaffolded, unverified",
+      "notBuilt": "Not built",
+      "samlHint": "SAML brokering is not built. OpenID Connect and OAuth 2.0 are."
+    },
+    "form": {
+      "createTitle": "New {{name}} login",
+      "subtitle": "Register the redirect URI at the provider, then paste its client id and secret here.",
+      "sections": "Provider settings",
+      "displayName": "Display name",
+      "alias": "Alias",
+      "aliasHint": "Lower case, digits and dashes. It is the last part of the redirect URI, so changing it means re-registering at the provider.",
+      "redirectUri": "redirect URI",
+      "redirectHint": "Register this at the provider as the callback / redirect URI.",
+      "clientId": "Client ID",
+      "clientSecret": "Client secret",
+      "secretHint": "Stored encrypted; never shown again.",
+      "secretStored": "A secret is stored. Leave blank to keep it.",
+      "issuerNote": "Give the issuer and uaa discovers the endpoints from it, or fill the endpoints by hand.",
+      "endpointsNote": "A plain OAuth 2.0 provider has no discovery: the authorization, token and user-info endpoints are needed.",
+      "issuerUri": "Issuer",
+      "issuerHint": "The URL whose /.well-known/openid-configuration describes the provider.",
+      "authorizationUri": "Authorization endpoint",
+      "tokenUri": "Token endpoint",
+      "userInfoUri": "User-info endpoint",
+      "jwkSetUri": "JWK Set URI",
+      "scopes": "Scopes",
+      "scopesHint": "Space-separated. Blank keeps the preset’s.",
+      "clientAuth": "Client authentication",
+      "presetDefault": "Preset default",
+      "userNameAttribute": "Subject attribute",
+      "userNameAttributeHint": "The user-info field that identifies the person stably, e.g. id.",
+      "test": "Test connection",
+      "testOk": "{{url}} answered. Issuer: {{issuer}}.",
+      "testFailed": "The provider did not answer: {{detail}}",
+      "mappingHint": "Which claim from the provider fills which field: email, firstName, lastName.",
+      "mapping": "Claim mapping",
+      "defaultRoles": "Roles granted on login",
+      "defaultRolesHint": "Granted at every login through this provider, never removed.",
+      "linking": "When the email matches an existing account",
+      "linkingHint": "Silent linking needs a provider that vouches for the email; otherwise the person confirms with their password once.",
+      "jit": "Create new users",
+      "jitHint": "Off: only pre-existing accounts may sign in through this provider.",
+      "trustEmail": "Trust email as verified",
+      "trustEmailHint": "Skip our verification when the provider says the address is verified.",
+      "hide": "Hide on the sign-in page",
+      "hideHint": "No button; still reachable through an email-domain rule.",
+      "domains": "Email domains",
+      "domainsHint": "Comma-separated. Someone typing an email at one of these domains is sent straight to this provider.",
+      "save": "Save provider",
+      "saving": "Saving…"
+    },
+    "section": {
+      "connection": "Connection",
+      "mapping": "Mapping",
+      "behaviour": "Behaviour"
+    },
+    "delete": {
+      "title": "Delete this provider",
+      "message": "{{name}} is removed and every identity linked through it with it. People who signed in only this way lose that way in.",
+      "confirmationLabel": "Type the alias to confirm"
+    },
+    "toast": {
+      "created": "{{name}} added.",
+      "saved": "{{name}} saved.",
+      "enabled": "{{name}} is on the sign-in page.",
+      "disabled": "{{name}} is off.",
+      "deleted": "{{name}} deleted."
+    }
+  },
+  "audit": {
+    "event": {
+      "user_login": "Signed in",
+      "user_login_failed": "Sign-in failed",
+      "user_logout": "Signed out",
+      "user_locked": "Account locked",
+      "user_unlocked": "Account unlocked",
+      "user_created": "Account created",
+      "user_updated": "Account updated",
+      "user_deleted": "Account deleted",
+      "user_enabled": "Account enabled",
+      "user_disabled": "Account disabled",
+      "user_activated": "Account activated",
+      "user_password_changed": "Password changed",
+      "user_password_reset": "Password reset",
+      "user_password_reset_link_issued": "Reset link issued",
+      "user_email_changed": "Email changed",
+      "user_email_verified": "Email verified",
+      "user_role_assigned": "Role granted",
+      "user_role_removed": "Role removed",
+      "token_issued": "Token issued",
+      "token_revoked": "Token revoked",
+      "token_refresh_rejected": "Refresh refused",
+      "client_created": "Application registered",
+      "client_updated": "Application changed",
+      "client_deleted": "Application deleted",
+      "client_enabled": "Application enabled",
+      "client_disabled": "Application disabled",
+      "client_secret_rotated": "Client secret rotated",
+      "client_auth_failed": "Application failed to authenticate",
+      "client_redirect_uri_mismatch": "Redirect URI refused",
+      "role_created": "Role created",
+      "role_updated": "Role changed",
+      "role_deleted": "Role deleted",
+      "role_permissions_updated": "Role permissions changed",
+      "idp_created": "Provider added",
+      "idp_updated": "Provider changed",
+      "idp_deleted": "Provider deleted",
+      "identity_linked": "External login linked",
+      "identity_unlinked": "External login unlinked",
+      "settings_updated": "Settings changed",
+      "key_rotated": "Signing key rotated",
+      "key_retired": "Signing key retired",
+      "session_revoked": "Session revoked",
+      "invitation_created": "Invitation issued",
+      "invitation_revoked": "Invitation revoked",
+      "invitation_accepted": "Invitation accepted",
+      "request_rate_limited": "Rate limited"
+    },
+    "title": "Audit log",
+    "context": "Every administrative action and every sign-in, as it happened",
+    "loading": "Loading events…",
+    "panel": {
+      "title": "Events",
+      "subtitle": "Newest first. Nothing here can be edited or deleted; retention trims the oldest."
+    },
+    "live": "Live",
+    "export": "Export CSV",
+    "unit": "events",
+    "pagination": "Audit log pages",
+    "filter": {
+      "category": "Category",
+      "range": "Range",
+      "failuresOnly": "Failures only",
+      "search": "Search events",
+      "searchPlaceholder": "Actor, target or note"
+    },
+    "category": {
+      "all": "All",
+      "AUTHENTICATION": "Sign-in",
+      "ADMIN": "Administration",
+      "TOKENS": "Tokens",
+      "SECURITY": "Security"
+    },
+    "range": {
+      "24h": "24 hours",
+      "7d": "7 days",
+      "30d": "30 days",
+      "all": "All time"
+    },
+    "column": {
+      "when": "When",
+      "event": "Event",
+      "actor": "Who",
+      "target": "What",
+      "source": "From"
+    },
+    "outcome": {
+      "SUCCESS": "Succeeded",
+      "FAILURE": "Failed"
+    },
+    "actor": {
+      "USER": "Person",
+      "CLIENT": "Application",
+      "SYSTEM": "uaa itself",
+      "ANONYMOUS": "Not signed in"
+    },
+    "empty": {
+      "title": "Nothing in this range",
+      "message": "Widen the range or clear the filters."
+    },
+    "pivot": {
+      "actor": "Everything {{actor}} did.",
+      "ip": "Everything from {{ip}}.",
+      "clear": "Clear"
+    },
+    "detail": {
+      "outcome": "Outcome",
+      "reason": "Reason",
+      "actor": "Who",
+      "target": "What",
+      "client": "Application",
+      "source": "From",
+      "agent": "Browser",
+      "note": "Note",
+      "trace": "Trace",
+      "changes": "What changed",
+      "field": "Field",
+      "before": "Was",
+      "after": "Is",
+      "allByActor": "All by this actor",
+      "allFromIp": "All from this address"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "context": "What this realm has been doing, and how it is set up",
+    "loading": "Loading…",
+    "kpis": "Realm metrics",
+    "filter": {
+      "range": "Range"
+    },
+    "range": {
+      "24h": "24 hours",
+      "7d": "7 days",
+      "30d": "30 days"
+    },
+    "kpi": {
+      "signIns": "Sign-ins",
+      "failures": "{count, plural, =0 {no failures} one {1 failed} other {# failed}}",
+      "tokens": "Tokens issued",
+      "sessions": "Active sessions",
+      "users": "Accounts",
+      "locked": "{count, plural, =0 {none locked} one {1 locked} other {# locked}}"
+    },
+    "chart": {
+      "title": "Sign-ins",
+      "subtitle": "Successes and failures over the range",
+      "success": "Succeeded",
+      "failure": "Failed",
+      "none": "No sign-ins in this range.",
+      "alt": "{{success}} sign-ins, {{failure}} of them failed"
+    },
+    "posture": {
+      "title": "Security posture",
+      "subtitle": "Checked against this realm’s own data on every read",
+      "keyAge": "The signing key is {detail, plural, =0 {new today} one {1 day old} other {# days old}}.",
+      "usersWithoutPassword": "{detail, plural, =0 {Every account has a password} one {1 account has no password} other {# accounts have no password}}.",
+      "clientsWithoutPkce": "{detail, plural, =0 {Every browser client requires PKCE} one {1 browser client does not require PKCE} other {# browser clients do not require PKCE}}.",
+      "secretsExpiring": "{detail, plural, =0 {No client secret expires within 30 days} one {1 client secret expires within 30 days} other {# client secrets expire within 30 days}}.",
+      "breachedPasswordCheck": "Breached-password checking is off; turn it on in Settings.",
+      "failedSignIns": "{detail, plural, =0 {No failed sign-ins in the range} one {1 failed sign-in in the range} other {# failed sign-ins in the range}}."
+    },
+    "clients": {
+      "title": "Busiest applications",
+      "meta": "tokens issued"
+    },
+    "failures": {
+      "title": "Recent failures",
+      "subtitle": "The last refusals, whoever they were",
+      "none": "No failures in this range.",
+      "all": "Open the audit log"
+    }
   }
 }

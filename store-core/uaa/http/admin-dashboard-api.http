@@ -1,0 +1,27 @@
+# AdminDashboardController — com.asrevo.cvhome.uaa.web.admin
+#
+# The overview screen in one read: what happened over the range, and what the realm's own data says
+# about how it is configured. Every number is counted from a table rather than kept as a statistic.
+# Addressed through store-core-gateway (`/uaa/**`).
+#
+# Behind SCOPE_super_admin / ROLE_SUPER_ADMIN. Requires a running stack: lcl start -d
+
+### the last 24 hours — 200 Dashboard
+# signIns[] is one bucket per hour (per day for the longer ranges) with successes and failures side by
+# side; posture[] is computed per request — a key older than its rotation interval, accounts with no
+# password, authorization-code clients without PKCE, secrets expiring within 30 days, breached-password
+# checking off, more failed sign-ins than the lockout threshold.
+GET {{SELLER_UI_URL}}/uaa/api/v1/admin/dashboard?range=24h
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+
+### a week, bucketed by day — 200
+GET {{SELLER_UI_URL}}/uaa/api/v1/admin/dashboard?range=7d
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+
+### a month — 200; an unknown range falls back to 24h rather than failing
+GET {{SELLER_UI_URL}}/uaa/api/v1/admin/dashboard?range=30d
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+
+### as an org admin — 403
+GET {{SELLER_UI_URL}}/uaa/api/v1/admin/dashboard
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}

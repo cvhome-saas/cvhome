@@ -1,0 +1,13 @@
+plugins {
+    alias(libs.plugins.java.library.conventions)
+}
+
+/*
+ * uaa's published event contracts, and nothing else: a consumer — the future delivery service, tenancy's membership
+ * reconciliation — depends on this module alone and gets the records, their outbox keys and the Event envelope, with
+ * no repositories, no security configuration and no database driver behind them.
+ */
+dependencies {
+    api project(':store-commons:commons')
+    api libs.namastack.outbox.api
+}

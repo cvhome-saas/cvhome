@@ -11,7 +11,9 @@
   gap: var(--spacing-tight);
   inline-size: 100%;
   min-inline-size: 0;
-  padding: .4rem .7rem;
+  /* The shared control height, so the box lines up with the tabs, selects and buttons beside it. */
+  block-size: var(--control-height);
+  padding-inline: .7rem;
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   background: var(--input);

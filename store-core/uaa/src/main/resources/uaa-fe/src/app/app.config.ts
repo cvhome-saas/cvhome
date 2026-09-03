@@ -8,7 +8,7 @@ import {
   provideZoneChangeDetection,
 } from '@angular/core';
 import {provideHttpClient, withInterceptors} from '@angular/common/http';
-import {TitleStrategy, provideRouter, withComponentInputBinding} from '@angular/router';
+import {TitleStrategy, provideRouter, withComponentInputBinding, withViewTransitions} from '@angular/router';
 import {TranslocoService, provideTransloco, provideTranslocoMissingHandler} from '@jsverse/transloco';
 import {provideTranslocoLocale} from '@jsverse/transloco-locale';
 import {provideTranslocoMessageformat} from '@jsverse/transloco-messageformat';
@@ -31,7 +31,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({eventCoalescing: true}),
-    provideRouter(routes, withComponentInputBinding()),
+    provideRouter(routes, withComponentInputBinding(), withViewTransitions()),
     provideHttpClient(withInterceptors([apiErrorInterceptor])),
     provideTheme(),
     /*

@@ -6,7 +6,7 @@ import {ActionMenu, Badge, DataTable, type MenuAction, type TableColumn, TableRo
 
 /** What a row action asks the host to do. The host owns the dialogs and the writes. */
 export interface UserAdminIntent {
-  readonly kind: 'toggleEnabled' | 'resetPassword' | 'editRoles' | 'delete';
+  readonly kind: 'toggleEnabled' | 'unlock' | 'resetPassword' | 'editRoles' | 'delete';
   readonly row: PlatformUserRow;
 }
 
@@ -112,6 +112,9 @@ export class UserAdminTable {
    */
   protected actionsFor(row: PlatformUserRow): readonly MenuAction[] {
     return [
+      ...(row.status === 'LOCKED'
+        ? [{key: 'unlock', icon: 'lock' as const, label: this.transloco.translate('shared.userAdmin.action.unlock')}]
+        : []),
       {
         key: 'toggleEnabled',
         icon: row.enabled ? 'eyeOff' : 'eye',
@@ -144,7 +147,21 @@ export class UserAdminTable {
     ];
   }
 
-  /** Only the four keys that are real intents reach the host; `impersonate` is inert by design. */
+  /** The status badge's tone: the one word uaa derives for the account. */
+  protected statusTone(row: PlatformUserRow): 'green' | 'amber' | 'red' | 'slate' {
+    switch (row.status) {
+      case 'ACTIVE':
+        return 'green';
+      case 'PENDING':
+        return 'amber';
+      case 'LOCKED':
+        return 'red';
+      default:
+        return 'slate';
+    }
+  }
+
+  /** Only the real intents reach the host; `impersonate` is inert by design. */
   protected onPick(action: MenuAction, row: PlatformUserRow): void {
     if (action.key === 'impersonate') {
       return;

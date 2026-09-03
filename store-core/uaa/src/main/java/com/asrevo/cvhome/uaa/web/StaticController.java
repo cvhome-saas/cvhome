@@ -16,16 +16,20 @@ import static org.springframework.web.servlet.function.RouterFunctions.route;
 @RequiredArgsConstructor
 public class StaticController {
 
+    private static final String ERROR = "/error";
+
     @Bean
     RouterFunction<ServerResponse> indexRouter() {
         return route(request -> {
-            if (request.path().startsWith("/api/")) {
+            String path = request.path();
+            if (path.startsWith("/api/") || path.startsWith("/oauth2/") || path.startsWith("/actuator")) {
                 return false;
             }
-            if (request.path().startsWith("/oauth2/")) {
+            // The container's error dispatch. Answering it with the app would turn every refusal into a 200 page.
+            if (ERROR.equals(path)) {
                 return false;
             }
-            return !request.path().contains(".");
+            return !path.contains(".");
         }, request -> ServerResponse.ok().body(new ClassPathResource("static/index.html")));
     }
 

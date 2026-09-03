@@ -25,6 +25,21 @@ public enum UaaErrors implements ErrorCode {
     /** No OAuth2 registered client exists with the given id. */
     CLIENT_NOT_FOUND("UAA.CLIENT.NOT_FOUND", ErrorCategory.NOT_FOUND),
 
+    /** Another registration already uses that {@code client_id}. */
+    CLIENT_ID_TAKEN("UAA.CLIENT.ID_TAKEN", ErrorCategory.CONFLICT),
+
+    /** The operation needs a client that holds a secret; a public client has none to rotate. */
+    CLIENT_NOT_CONFIDENTIAL("UAA.CLIENT.NOT_CONFIDENTIAL", ErrorCategory.UNPROCESSABLE),
+
+    /** The requested access-token lifetime is longer than the realm allows. */
+    CLIENT_TOKEN_TTL_EXCEEDS_POLICY("UAA.CLIENT.TOKEN_TTL_EXCEEDS_POLICY", ErrorCategory.VALIDATION),
+
+    /** A redirect URI is not absolute, carries a fragment or a wildcard, or is plain HTTP on a host that is not local. */
+    INVALID_REDIRECT_URI("UAA.CLIENT.INVALID_REDIRECT_URI", ErrorCategory.VALIDATION),
+
+    /** No previous secret is still inside its grace window, so there is nothing to revoke. */
+    CLIENT_NO_PREVIOUS_SECRET("UAA.CLIENT.NO_PREVIOUS_SECRET", ErrorCategory.NOT_FOUND),
+
     /**
      * The target of the mutation is the built-in super administrator.
      *
@@ -34,7 +49,124 @@ public enum UaaErrors implements ErrorCode {
      * grants privileges.
      * </p>
      */
-    SUPER_ADMIN_IMMUTABLE("UAA.USER.SUPER_ADMIN_IMMUTABLE", ErrorCategory.FORBIDDEN);
+    SUPER_ADMIN_IMMUTABLE("UAA.USER.SUPER_ADMIN_IMMUTABLE", ErrorCategory.FORBIDDEN),
+
+    /** No role exists with the given id or name. */
+    ROLE_NOT_FOUND("UAA.ROLE.NOT_FOUND", ErrorCategory.NOT_FOUND),
+
+    /**
+     * The role exists but may not be granted through the admin API — today only {@code SUPER_ADMIN}, which is held by
+     * exactly one seeded account and is what grants every other privilege.
+     */
+    ROLE_NOT_ASSIGNABLE("UAA.ROLE.NOT_ASSIGNABLE", ErrorCategory.FORBIDDEN),
+
+    /**
+     * The caller authenticated as an OAuth2 client, not a person, and asked for something only a person has — a
+     * profile, a session list, a password. A {@code client_credentials} token has no user behind it.
+     */
+    NOT_A_USER_PRINCIPAL("UAA.AUTH.NOT_A_USER_PRINCIPAL", ErrorCategory.FORBIDDEN),
+
+    /** A role name that is not upper-case letters, digits and underscores. */
+    ROLE_NAME_INVALID("UAA.ROLE.NAME_INVALID", ErrorCategory.VALIDATION),
+
+    /** A role with that name already exists. */
+    ROLE_NAME_TAKEN("UAA.ROLE.NAME_TAKEN", ErrorCategory.CONFLICT),
+
+    /** The role is seeded by the platform: its name and scope are fixed and it cannot be deleted. */
+    SYSTEM_ROLE_IMMUTABLE("UAA.ROLE.SYSTEM_IMMUTABLE", ErrorCategory.FORBIDDEN),
+
+    /** The role is still held by at least one account, so deleting it would silently change their authority. */
+    ROLE_IN_USE("UAA.ROLE.IN_USE", ErrorCategory.CONFLICT),
+
+    /** Setting that parent would make the role inherit from itself, directly or through a chain. */
+    ROLE_INHERITANCE_CYCLE("UAA.ROLE.INHERITANCE_CYCLE", ErrorCategory.UNPROCESSABLE),
+
+    /** A permission key that is not in the catalogue. */
+    PERMISSION_UNKNOWN("UAA.PERMISSION.UNKNOWN", ErrorCategory.VALIDATION),
+
+    /** A settings value outside the range the server accepts. */
+    SETTINGS_INVALID("UAA.SETTINGS.INVALID", ErrorCategory.VALIDATION),
+
+    /** The settings were changed by someone else since the caller read them. */
+    SETTINGS_CONFLICT("UAA.SETTINGS.CONFLICT", ErrorCategory.CONFLICT),
+
+    /** The new password breaks the realm's policy; the field errors name each rule it breaks. */
+    PASSWORD_POLICY_VIOLATION("UAA.PASSWORD.POLICY_VIOLATION", ErrorCategory.VALIDATION),
+
+    /** The new password is one of the account's recent ones. */
+    PASSWORD_REUSED("UAA.PASSWORD.REUSED", ErrorCategory.UNPROCESSABLE),
+
+    /** The new password appears in a known breach corpus. */
+    PASSWORD_COMPROMISED("UAA.PASSWORD.COMPROMISED", ErrorCategory.UNPROCESSABLE),
+
+    /** A self-service password change named a current password that does not match. */
+    CURRENT_PASSWORD_MISMATCH("UAA.PASSWORD.CURRENT_MISMATCH", ErrorCategory.VALIDATION),
+
+    /** No session with that id belongs to the account. */
+    SESSION_NOT_FOUND("UAA.SESSION.NOT_FOUND", ErrorCategory.NOT_FOUND),
+
+    /** Too many attempts from one address in the window. */
+    RATE_LIMITED("UAA.AUTH.RATE_LIMITED", ErrorCategory.TOO_MANY_REQUESTS),
+
+    /**
+     * No usable invitation for that token — missing, expired, revoked or already accepted, one code for all four so
+     * the public endpoint cannot be used to tell which tokens ever existed.
+     */
+    INVITATION_NOT_USABLE("UAA.INVITATION.NOT_USABLE", ErrorCategory.NOT_FOUND),
+
+    /** The account already has a live invitation; resend rotates it instead. */
+    INVITATION_ALREADY_PENDING("UAA.INVITATION.ALREADY_PENDING", ErrorCategory.CONFLICT),
+
+    /** An invitation action on an account that is not pending — it already has a password. */
+    USER_NOT_PENDING("UAA.USER.NOT_PENDING", ErrorCategory.UNPROCESSABLE),
+
+    /** No usable reset link for that token; the same single code as {@link #INVITATION_NOT_USABLE}, for the same reason. */
+    RESET_TOKEN_NOT_USABLE("UAA.PASSWORD.RESET_TOKEN_NOT_USABLE", ErrorCategory.NOT_FOUND),
+
+    /** Another account already signs in with that username. */
+    USERNAME_TAKEN("UAA.USER.USERNAME_TAKEN", ErrorCategory.CONFLICT),
+
+    /** Another account already carries that email. */
+    EMAIL_TAKEN("UAA.USER.EMAIL_TAKEN", ErrorCategory.CONFLICT),
+
+    /** A stored signing key's private half could not be read back; it is excluded from signing. */
+    SIGNING_KEY_UNUSABLE("UAA.KEY.UNUSABLE", ErrorCategory.INTERNAL),
+
+    /** No signing key is active and a new one could not be made, so no token can be minted. */
+    NO_ACTIVE_SIGNING_KEY("UAA.KEY.NO_ACTIVE", ErrorCategory.INTERNAL),
+
+    /** No identity provider exists with the given id or alias. */
+    IDP_NOT_FOUND("UAA.IDP.NOT_FOUND", ErrorCategory.NOT_FOUND),
+
+    /** Another provider already uses that alias, which is the registration id in every redirect URI. */
+    IDP_ALIAS_TAKEN("UAA.IDP.ALIAS_TAKEN", ErrorCategory.CONFLICT),
+
+    /** The provider's settings are incomplete for its type: a generic OAuth2 provider with no token endpoint, say. */
+    IDP_CONFIG_INVALID("UAA.IDP.CONFIG_INVALID", ErrorCategory.VALIDATION),
+
+    /** The provider's discovery document or endpoints could not be reached. Carries the provider. */
+    IDP_DISCOVERY_FAILED("UAA.IDP.DISCOVERY_FAILED", ErrorCategory.REMOTE_SERVICE),
+
+    /** No linked identity with the given id on that account. */
+    IDENTITY_NOT_FOUND("UAA.IDENTITY.NOT_FOUND", ErrorCategory.NOT_FOUND),
+
+    /** That external identity is already linked to another account. */
+    IDENTITY_ALREADY_LINKED("UAA.IDENTITY.ALREADY_LINKED", ErrorCategory.CONFLICT),
+
+    /** Unlinking would leave a password-less account with no way to sign in. */
+    LAST_CREDENTIAL("UAA.IDENTITY.LAST_CREDENTIAL", ErrorCategory.UNPROCESSABLE),
+
+    /** No brokered login is waiting to be confirmed, or the password given for it was wrong. */
+    LINK_CONFIRMATION_INVALID("UAA.IDENTITY.LINK_CONFIRMATION_INVALID", ErrorCategory.VALIDATION),
+
+    /** No audit event with that id. */
+    AUDIT_EVENT_NOT_FOUND("UAA.AUDIT.NOT_FOUND", ErrorCategory.NOT_FOUND),
+
+    /** The export would be larger than the cap; narrow the range or the filters. */
+    AUDIT_EXPORT_TOO_LARGE("UAA.AUDIT.EXPORT_TOO_LARGE", ErrorCategory.VALIDATION),
+
+    /** The audit query cannot be answered as asked — a range that runs backwards, say. */
+    AUDIT_QUERY_INVALID("UAA.AUDIT.QUERY_INVALID", ErrorCategory.VALIDATION);
 
     private final String code;
 

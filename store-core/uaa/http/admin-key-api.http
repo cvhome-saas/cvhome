@@ -1,0 +1,35 @@
+# AdminKeyController — com.asrevo.cvhome.uaa.web.admin
+#
+# The signing keys: which one signs, which still verify, and "rotate now". No call here ever answers
+# key material — the JWKS endpoint serves the public halves, and the private halves are encrypted at
+# rest and never read back over HTTP. Addressed through store-core-gateway (`/uaa/**`).
+#
+# Behind SCOPE_super_admin / ROLE_SUPER_ADMIN. Requires a running stack: lcl start -d
+
+### the posture — 200 KeyStatus {activeKid, activatedAt, rotationDays, nextRotationAt, retireDays, retiringCount, unusableCount}
+GET {{SELLER_UI_URL}}/uaa/api/v1/admin/keys/status
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+
+### every key, newest first — 200 SigningKeyDto[] (kid, algorithm, status ACTIVE|RETIRING|RETIRED, the four instants)
+GET {{SELLER_UI_URL}}/uaa/api/v1/admin/keys
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+
+### rotate now — 200 the new ACTIVE key; the previous one is RETIRING for settings.keys.retireDays
+# Tokens signed by the previous key keep verifying until it retires. Resource servers that cache the
+# JWKS refetch on the unknown kid the next token carries.
+POST {{SELLER_UI_URL}}/uaa/api/v1/admin/keys/rotate
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+
+> {%
+    client.test("rotated", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        client.assert(response.body.status === "ACTIVE", "status " + response.body.status);
+    });
+%}
+
+### the public halves, as every resource server reads them — 200, never a `d`, `p` or `q` member
+GET {{UAA_URL}}/oauth2/jwks
+
+### as a non-super-admin — 403
+GET {{SELLER_UI_URL}}/uaa/api/v1/admin/keys
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}

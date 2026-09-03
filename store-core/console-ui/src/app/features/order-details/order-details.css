@@ -508,7 +508,7 @@
 .status-picker app-select {
   inline-size: 9.5rem;
   /* Matches the button beside it. The one hook the component offers — see select.css. */
-  --select-height: 2.25rem;
+  --select-height: var(--control-height);
 }
 
 /* ---- Side panels ------------------------------------------------------------------------ */

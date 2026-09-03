@@ -11,7 +11,7 @@ somewhere else entirely — that is [cua](../../../store-pod/cua/qa/cua-qa.md).
   is where the platform's sign-in page lives
 - **Runs on** — `lcl start -d --stack <name>`; uaa is `http://uaa.gateway.com:8001` and is the **first**
   service the stack brings up, because it issues the tokens. Read the live port from `lcl urls`
-- **Cases** — 47 (33 verified, 3 unit only, 11 not verified)
+- **Cases** — 143 (114 verified, 14 unit only, 14 not verified; one case is a walkthrough with no single outcome)
 - **Also see** — [gateway](../../gateway/gateway-service/qa/gateway-qa.md) (which relays the token and holds
   the session), [tenancy](../../tenancy/tenancy-service/qa/tenancy-qa.md) (which owns the *store-scoped*
   accounts and calls uaa to create them),
@@ -23,9 +23,11 @@ Each case is tagged:
 - **[unit only]** — covered by the named test; nobody drove it through the stack.
 - **[not verified]** — never run end to end by anyone.
 
-Most of this file is **[not verified]**: uaa has had no QA document of its own until now, and the cases below
-were written from `AppSecurityConfig`, the admin controllers and the seed. That is exactly where the bugs will
-be.
+This file started as a set of **[not verified]** cases written from the code, because uaa had no QA document at
+all. Most of it has since been run: the `feat/uaa-sso` work drove every section against a live stack and tagged
+what it actually executed. What is still **[not verified]** is named and explains why — mostly the paths that
+need a third party nobody has credentials for (a real Google or GitHub application, Apple's developer account)
+or a state a healthy realm will not enter.
 
 ---
 
@@ -42,12 +44,25 @@ authorization-code flow. uaa's own login page is `http://uaa.gateway.com:8001`.
 `super-admin`, `org1-admin`, `org1-store1-admin`, `org1-store1-moderator`, `org1-store2-admin`, `org2-admin`.
 Only `super-admin` can reach `/api/v1/admin/**`.
 
-**Seeded clients** — `web-app` (the console's authorization-code client) and
+**Seeded clients** — `web-app` (the console's authorization-code client, PKCE required) and
 `store-core@service.store-core.internal` (client credentials, scope `store_core`). On a shifted stack the
 `web-app` redirect URIs are rewritten by an `after-up` hook; `lcl events` records `uaa.redirects.patched`.
 
+**Secrets come from the environment.** `application.yml` reads every client secret and the super admin's password
+from `UAA_*` variables with no default; the `lcl` and `test-stores` slices supply the local values (the shared
+`hLwOF…` secret, password `admin`) and turn the boot-time seed writers on (`com.asrevo.cvhome.uaa.seed.apply-on-boot`).
+Anywhere else the writers are off, so a password an operator changed survives a restart — and a missing variable
+fails the start rather than running on a committed secret.
+
+**CSRF is on.** Every session-authenticated write to uaa needs the `XSRF-TOKEN` cookie's value back in
+`X-XSRF-TOKEN` (Angular does that on its own) and the sign-in form carries it as `_csrf`. A bearer-token call is
+exempt, and so are the protocol endpoints (`/oauth2/token`, `/oauth2/introspect`, `/oauth2/revoke`).
+
+**Token lifetimes** — access 15 min, refresh 12 h, authorization code 5 min. A day-long access token is what the
+seed used to hand out.
+
 ```bash
-# a service-to-service token
+# a service-to-service token (the shared lcl secret is UAA_STORE_CORE_SECRET in application-lcl.yml)
 TOK=$(curl -s -u 'store-core@service.store-core.internal:<the shared lcl secret>' \
   -d 'grant_type=client_credentials&scope=store_core' \
   http://uaa.gateway.com:8001/oauth2/token | jq -r .access_token)
@@ -65,7 +80,12 @@ docker exec cvhome-postgres-1 psql -U postgres -d cvhome -c \
 ... "select * from uaa.user_roles;"
 ... "select id, client_id, client_authentication_methods, authorization_grant_types, redirect_uris, scopes
        from uaa.oauth2_registered_client;"
+... "select principal_name, authorization_grant_type, access_token_expires_at from uaa.oauth2_authorization;"
 ```
+
+Tokens are rows now (`uaa.oauth2_authorization`): a token endpoint call adds one, a restart keeps them, a
+revocation invalidates one in place. An empty table after a login is a regression — it means the in-memory
+authorization service is back.
 
 Logs: `.lcl/<stack>/logs/uaa.log`. **If a login fails, the stack almost certainly came up without
 `test-stores`.**
@@ -95,6 +115,9 @@ session and relays the token inward. Everything in this section is that path.
   Spring Security answers with the redirect that resumes the OAuth2 flow. A browser only submits inputs that
   carry a `name`, which is why `app-text-field` has a `name` input at all. Posting through `HttpClient`
   instead would authenticate and then strand the flow.
+- **And the token** — the form also posts `_csrf`, read from the `XSRF-TOKEN` cookie the page response set.
+  Without it the post comes back as `/login?error=expired` (SEC-05); a page that says "expired" on a fresh
+  load means the cookie was never planted, which is `CsrfCookieFilter`'s job.
 - **Note** — the form does not submit from a synthetic click in some automation tools. Use
   `document.querySelector('form').requestSubmit()`, or type into the password field and press Enter. A tool
   that appears to hang on the login page is almost always this, not uaa.
@@ -124,16 +147,21 @@ session and relays the token inward. Everything in this section is that path.
 ### AUT-06 — The token carries the claims the pods scope on · critical · [not verified]
 
 - **Steps** — decode an operator token obtained through the console.
-- **Expect** — an `org` claim and the role authorities the permission evaluator reads. A missing `org` claim is
-  tolerated by `ManagerOrgId`'s lenient `String` constructor (see
+- **Expect** — an `org` claim, a `store` claim where the account has one, `uid` (the account's UUID — `sub` stays
+  the username, which every service keys on), `roles`, and **nothing else from metadata**: the customizer copies only
+  `org` and `store`, so a metadata key named `roles` or `scope` cannot shadow the real claim (SEC-09). A missing
+  `org` claim is tolerated by `ManagerOrgId`'s lenient `String` constructor (see
   [tenancy-qa.md](../../tenancy/tenancy-service/qa/tenancy-qa.md) 99) — `SecurityUtils` relies on it, so do not
   "fix" it.
+- **Seen** — `LoginFlowIntegrationTest` walks form login → `/oauth2/authorize` with PKCE → code → token for
+  `org1-store1-admin` and asserts exactly these claims, plus `email`/`given_name` on the ID token.
 
 ### AUT-07 — `/userinfo` answers for a signed-in operator · [not verified]
 
 - **Steps** — call `/userinfo` with an operator token.
-- **Expect** — 200 with the subject, and **not** a password hash, a client secret or an internal id the console
-  has no business seeing.
+- **Expect** — 200 with the subject and the ID-token profile claims, and **not** a password hash, a client secret
+  or an internal id the console has no business seeing. This is the authorization server's own endpoint: the
+  hand-written `UserInfoController` that shadowed it was unreachable and is gone.
 
 ### AUT-08 — On a shifted stack the redirect URIs still point at this stack · high · [verified]
 
@@ -160,18 +188,21 @@ uaa's own guard is what keeps this safe, which is why the negative cases matter 
   path to index.html, so it answers **200 with the SPA's HTML**. That is why `UiKitConfig.uaaBasePath` exists,
   and why a mis-prefixed call shows up as `CLIENT.HTTP_200` rather than as a 404.
 
-### ADM-02 — An org admin is refused every admin endpoint · critical · [not verified]
+### ADM-02 — An org admin is refused every admin endpoint · critical · [unit only]
 
 - **Steps** — as `org1-admin`, repeat ADM-01, then attempt `POST /users`, `PUT /users/{id}`,
   `DELETE /users/{id}`, and the same across `/roles` and `/clients`.
-- **Expect** — **403** on every one. This is the case that proves the double gate; an org admin reaching any of
-  it is a platform-wide escalation.
+- **Expect** — **403** as `application/problem+json` (`COMMON.ACCESS_DENIED`) on every one. This is the case that
+  proves the double gate; an org admin reaching any of it is a platform-wide escalation.
+- **Seen** — `AdminUserApiIntegrationTest` proves the half a service token can reach: a `store_core` token gets
+  403, `admin-sdk` gets 200, anonymous 401. The org-admin session half is still to be driven through the console.
 
-### ADM-03 — Anonymous is refused · critical · [not verified]
+### ADM-03 — Anonymous is refused · critical · [unit only]
 
 - **Steps** — call any `/api/v1/admin/**` path with no token.
-- **Expect** — **401**. `/.well-known/**`, the actuator endpoints, the login page and the swagger paths are
-  deliberately open; nothing else is.
+- **Expect** — **401** as `application/problem+json`, never a redirect to `/login`. `/.well-known/**`, the login
+  page, `/actuator/health`, `/actuator/info` and the swagger paths are deliberately open; nothing else is — the
+  rest of the actuator needs a platform principal and is not even mapped (SEC-01).
 
 ### ADM-04 — Enable and disable actually take effect · high · [not verified]
 
@@ -182,7 +213,7 @@ uaa's own guard is what keeps this safe, which is why the negative cases matter 
 ### ADM-05 — Roles created here appear to the console · high · [verified]
 
 - **Steps** — add a role through `/api/v1/admin/roles`, then open the console's role picker.
-- **Expect** — the console renders the unknown role rather than crashing or dropping it — see U-11 below,
+- **Expect** — the console renders the unknown role rather than crashing or dropping it — see ACC-03 below,
   which is the console's half of the same assertion.
 
 ### ADM-06 — A client's secret is never read back · critical · [verified]
@@ -202,20 +233,33 @@ uaa's own guard is what keeps this safe, which is why the negative cases matter 
   parses an auth method, so only reading or saving one client reached it. Fixed, with
   `ClientAuthMethodTest` — uaa's first unit test — holding it.
 
+### ADM-08 — Search, status filters and counts · high · [verified]
+
+- **Steps** — `GET /users?q=store2%20mod`, `?status=PENDING`, `?role=ORG_ADMIN`, `?metadata[org]=<id>`, then
+  `GET /users/counts`. `http/admin-user-api.http` has each.
+- **Expect** — `q` is a case-insensitive contains over username, email **and the full name** ("Store2 Mod" finds
+  `org1-store2-moderator` and `org2-store2-moderator`); the filters AND together; `counts` answers
+  `{total, active, pending, locked, disabled}` and `active + pending + locked + disabled == total` on the seed.
+- **Mind the NULLs.** `locked_until` is null on every never-locked row, so a filter written as
+  `NOT (locked_permanently OR locked_until > now)` matched nothing; `UserSpecifications.hasStatus` is null-safe on
+  purpose. `UserSearchIntegrationTest` holds it.
+- **Gate** — a `store_core` token gets 403 on `/counts`, `/invitations` and `POST /invitations`; anonymous 401.
+
 ---
 
 ## ACC — Accounts, as the console drives them
 
 _From `qa/console-ui-users-and-profile.md` — the cases whose assertion is **uaa's**, not the console's. The
-screens are [console-ui-qa.md](../../console-ui/qa/console-ui-qa.md)._
+screens are [console-ui-qa.md](../../console-ui/qa/console-ui-qa.md). Was PERM-02 / U-10 / U-11 / P-02 / P-03;
+renumbered to ACC-01…05 because a prefix must be unique within the file and those were the console's._
 
-### PERM-02 — The new password actually signs in · critical · [not verified]
+### ACC-01 — The new password actually signs in · critical · [not verified]
 
-After PERM-01, sign out and sign in as `org1-store1-moderator` / `Passw0rdQA`.
+After console-ui's PERM-01, sign out and sign in as `org1-store1-moderator` / `Passw0rdQA`.
 
 **Expect** — the console opens. Set it back to `admin` afterwards, or note that you changed it.
 
-### U-10 — The role picker never offers platform superuser · critical · [unit only]
+### ACC-02 — The role picker never offers platform superuser · critical · [unit only]
 
 Open the create form.
 
@@ -225,7 +269,7 @@ removing only `USER` and `ORG_ADMIN`. The console intersects rather than filters
 uaa later cannot appear unreviewed either. **This is defence in depth, not a fix**: `lessons.md`, "Users —
 assignable-roles offers SUPER_ADMIN to an org admin".
 
-### U-11 — A role the console has never seen · high · [unit only]
+### ACC-03 — A role the console has never seen · high · [unit only]
 
 Add a role to `uaa.roles` and grant it to a user.
 
@@ -234,14 +278,14 @@ Transloco throws on a missing key and a role is a database row, not an enum.
 
 ---
 
-### P-02 — What it shows, and what it says instead · high · [not verified]
+### ACC-04 — What it shows, and what it says instead · high · [not verified]
 
 **Expect** — the username, the roles, and a notice explaining that the console can see nothing else.
 **No name, email, avatar, phone, job title, timezone, date format or bio** — none has a column anywhere, and
 the account record is unreachable twice over (`lessons.md`, "Users — the JWT carries no user id"). Empty
 fields would read as "you have not filled these in"; the notice is the honest version.
 
-### P-03 — No password control · high · [unit only]
+### ACC-05 — No password control · high · [unit only]
 
 **Expect** — nothing about passwords on `/profile`. A self-service change needs the caller's own user id and
 the JWT carries the username instead, so the action lives on `/users` where a row has a real id.
@@ -317,11 +361,11 @@ to `/clients` reaches the router rather than 404ing.
   three lists fail. `GET /api/v1/admin/{users,roles,clients}` each answer **403**, which is ADM-02 verified
   from the console's side.
 - **The refusal is rendered, but as a code.** The strip reads `CLIENT.HTTP_403 [403]` where the string
-  "You do not have permission to do that." already exists in the kit's dictionary. Two things combine: the
-  filter chain's 403 carries **no problem+json body**, so the parser synthesises
-  `code: CLIENT.HTTP_403, category: FORBIDDEN` — correctly — and then `app-load-error` is bound to
+  "You do not have permission to do that." already exists in the kit's dictionary. The filter chain's 403 now
+  **does** carry a problem+json body (`COMMON.ACCESS_DENIED`, written by `ProblemAccessDeniedHandler` — see
+  SEC-11), so the parser no longer has to synthesise a code; what remains is `app-load-error` being bound to
   `failure.message`, which is developer text. See console-ui-qa.md KIT-04b; it is pre-existing and affects
-  both consoles.
+  both consoles. **[not verified]** since the body change.
 
 ### CON-09 — The tab title is translated on a cold load · [verified]
 
@@ -355,6 +399,55 @@ to `/clients` reaches the router rather than 404ing.
   kit's `dist`, and rebuilding it replaces that directory underneath the watcher; the dev server can latch a
   resolution failure and show `TS2307: Cannot find module '@cvhome-saas/ui-kit'` over a page that is otherwise
   fine. Restart the app (`lcl restart console-ui`), do not go hunting for a broken import.
+- **A new kit export is a second trap.** Vite pre-bundles the kit into `.angular/cache/<version>/<app>/vite/deps/`
+  and a restart alone keeps that bundle: the page throws `does not provide an export named 'OneTimeLinkDialog'`
+  and renders nothing. `rm -rf store-core/console-ui/.angular/cache`, then restart. Seen when the one-time-link
+  dialog moved into the kit.
+
+---
+
+### CON-09 — One row, one height · high · [verified]
+
+- **Steps** — open Users, Roles, Clients and Audit log and look at the filter row: tabs, search box, and on
+  settings the selects and number fields.
+- **Expect** — every control on a filter row is **36px** (`--control-height`) and every form input is **40px**
+  (`--field-height`). Two rhythms, no thirds: a select used to be 2.375rem and land between them, which is why
+  two console-ui screens carried `--select-height: 2.25rem` by hand.
+- **Watch for** — a filter row that wraps. The tab track is inline: if a screen makes it `display: block` it
+  claims the whole line and pushes the search box onto a second one.
+
+### CON-10 — The page's rhythm belongs to the page · [verified]
+
+- **Steps** — every screen: measure the gap between the page header and the first panel, and between panels.
+- **Expect** — 20px (`--spacing-section`) everywhere, from `.page` in the shell. Screens set
+  `:host { display: contents }` so their panels are the page column's own children; none of them declares a gap
+  of its own, and a screen that does is drifting.
+
+### CON-11 — Settings sections scroll, they do not navigate · critical · [verified]
+
+- **Steps** — Settings → click each entry in the left sub-nav.
+- **Expect** — the page scrolls to that panel and marks it current; **the URL stays `/settings`**. It used to
+  leave the page entirely: the entries were `<a href="#settings-general">`, and a fragment-only href resolves
+  against the document base — `<base href="/">` — so every click landed on the console's landing route.
+
+---
+
+### CON-12 — Someone who is not an administrator · critical · [verified]
+
+- **Setup** — any account that is not a super admin: `org1-admin` (ORG_ADMIN) or
+  `org1-store1-moderator` (STORE_MODERATOR), password `admin`.
+- **Steps** — sign in at `/login`; then type `/users`, `/settings` and `/` into the address bar.
+- **Expect** — every one of them lands on **`/account`**. The rail holds a single entry, *My account*,
+  under **You**; the seven admin sections are not drawn. The page opens with *Who you are* — name,
+  username, email, roles and effective permissions — above the password form, the linked logins and
+  the sessions.
+- **Why it is the whole rail and not a subset** — every `/api/v1/admin/**` endpoint is behind
+  `SCOPE_super_admin`/`ROLE_SUPER_ADMIN`, so an org administrator holding `users:read` still reads
+  nothing here. A rail offering screens the API refuses is what this replaced: the person landed on an
+  admin screen and met an access-denied bar with the full navigation beside it.
+- **Watch for** — the landing decision is a `canMatch` guard, not a redirect function: a redirect is
+  resolved while the URL is matched, before `/me` has been fetched, and asked then *everyone* looks
+  like a non-administrator. A super admin opening `/` must reach `/users`.
 
 ---
 
@@ -516,6 +609,8 @@ checks every citation to it still names a real heading.
 - **Why** — `AdminService.updateUser` does `metadata.putAll(...)`. A key already stored cannot be
   unset through this API at any value, including by omitting it. An operator who believed a removal
   worked would be wrong about which store an account belongs to.
+- **Superseded by INV-06 (phase 4).** The remove button is live again: a removed row goes out as `key: null`,
+  which uaa now treats as "unset". Verified on the `team` key of a test account.
 
 ### DSN-16 — Creating a user is two calls · high · [verified]
 
@@ -527,6 +622,8 @@ checks every citation to it still names a real heading.
   in. Presenting create as one step is how that happens.
 - **[not verified]** — signing in as the created account. Everything up to and including
   set-password is verified.
+- **The alternative is INV-01.** *Invite user* creates the account pending and hands the person a one-time link
+  to choose their own password; the create-then-set-password path stays as the fast one.
 
 ### DSN-17 — Every table paginates · [verified]
 
@@ -536,6 +633,875 @@ checks every citation to it still names a real heading.
 - **Note** — none of the three has a search box, and Users says so in a notice: uaa's admin list
   matches metadata equality and offers no text query at all.
 
+
+---
+
+## SEC — Hardening
+
+_The security review that started the uaa work found seventeen defects; each row below is one of them, stated as
+the request that used to succeed and now must not. Every case has a matching integration test where one is
+possible; the tag says whether it has also been driven against a stack._
+
+### SEC-01 — The actuator is closed · critical · [verified]
+
+- **Steps** — anonymous `GET /actuator/env`, `/actuator/heapdump`, `/actuator/loggers`, `/actuator`; then the same
+  with a `store_core` token; then `/actuator/health` and `/actuator/info` anonymously.
+- **Expect** — 401, 401, 401, 401; **404** with the token (the endpoints are not mapped at all — uaa narrows
+  `management.endpoints.web.exposure.include` to `health,info,prometheus`); 200 and 200.
+- **Why it matters** — a heap dump of an authorization server contains its signing key, and all of it was public.
+- **Seen** — `ActuatorExposureIntegrationTest`. On the first stack pass the live uaa still listed every endpoint:
+  it had started before the exposure change. Restart uaa after touching `application.yml`.
+
+### SEC-02 — The super admin's password is not reset on every boot · critical · [not verified]
+
+- **Steps** — with `seed.apply-on-boot` off (any profile but `lcl`/`test-stores`), change the super admin's
+  password in the database, restart uaa, sign in with the new password.
+- **Expect** — the new password holds. With the flag on (a local stack) the configured one is written back, which
+  is the point of a local stack. `AdminUserDatabaseInitializer` and `OAuth2ClientDatabaseInitializer` are both
+  behind the flag.
+
+### SEC-03 — No committed secret · high · [verified]
+
+- **Steps** — `grep -rn hLwOF store-core/uaa/src/main/resources/application.yml`; start uaa without
+  `UAA_ADMIN_SDK_SECRET` set and without the `lcl` profile.
+- **Expect** — no match; uaa fails to start with an unresolved placeholder rather than booting on a default.
+- **Seen** — the grep is empty; the defaults live in `application-lcl.yml` and `application-test-stores.yml`, and
+  `common-config.yml` / tenancy's `application.yml` read the same `UAA_*` names with the local value as fallback.
+
+### SEC-04 — The super admin's password cannot be set through the API · critical · [verified]
+
+- **Steps** — as `super-admin` (or with an `admin-sdk` token), `PUT /api/v1/admin/users/65d8419c-…/reset-password`.
+- **Expect** — **403 `UAA.USER.SUPER_ADMIN_IMMUTABLE`**. Every other mutator already refused that account; this one
+  did not, so any `super_admin` token could take the platform owner over. The guard is now keyed on the account's
+  **id**, not its email, so renaming the account does not lift it.
+- **Seen** — `AdminServiceTest`, and the block in `http/admin-user-api.http`.
+
+### SEC-05 — CSRF is enforced · critical · [verified]
+
+- **Steps** — `POST /login` without `_csrf`; a session-authenticated `POST /api/v1/admin/roles` without the
+  `X-XSRF-TOKEN` header; the same with it.
+- **Expect** — `302 /login?error=expired`; **403 problem+json**; 200.
+- **Seen** — `CsrfLoginIntegrationTest`. The first version of the 403 came back as the **SPA's index page with a
+  200**: the default handler used `sendError`, the container dispatched to `/error`, and `StaticController`'s
+  catch-all served `index.html` for it. Both are fixed — the handler writes the body itself and the router
+  excludes `/error` — and REG has the row.
+
+### SEC-06 — Lockout, rate limiting, password policy, audit · [verified]
+
+- Built in phases 2 and 3: see `LCK`, `RL`, `PWD` and `SES` below; the audit query screen is phase 8 (`AUD`).
+
+### SEC-07 — Short tokens and PKCE · high · [verified]
+
+- **Steps** — decode an operator token and a service token; start the console login without `code_challenge`.
+- **Expect** — `exp - iat` ≤ 900 s; the seed's refresh token is 12 h and its authorization code 5 min;
+  `/oauth2/authorize` for `web-app` without a challenge is refused with `invalid_request`.
+- **Seen** — `LoginFlowIntegrationTest` (both). The gateway canary (AUT-01) is what proves the real client still
+  sends PKCE.
+
+### SEC-08 — Signing keys · [verified]
+
+- Phase 6 of the plan (`KEY`). For now: a key that fails to parse is **logged at ERROR** and left out of the JWK
+  set, where it used to disappear silently.
+- **Closed by phase 6** — see KEY-01…04: encrypted at rest, rotated with a retire window, scheduled, unreadable keys
+  replaced.
+### SEC-09 — The issuer is pinned · critical · [verified]
+
+- **Steps** — `GET /.well-known/openid-configuration` on `localhost:<port>`, not on `uaa.gateway.com`.
+- **Expect** — `issuer` is `http://uaa.gateway.com:<port>` from the service registry, whatever host the request
+  used. Left unpinned, a proxy's `X-Forwarded-Host` decided the issuer of every token.
+- **Seen** — `IssuerPinningIntegrationTest`; on the live stack `http://uaa.gateway.com:10001`.
+
+### SEC-10 — Metadata cannot forge a claim · critical · [verified]
+
+- **Steps** — as super-admin, `PUT /users/{id}` with `{"metadata": {"roles": ["SUPER_ADMIN"], "scope": "super_admin"}}`,
+  then obtain a token for that user.
+- **Expect** — the token's `roles` are the user's real roles and there is no `scope` from metadata. Only `org` and
+  `store` cross over.
+- **Seen** — `JwtCustomizerConfigTest.metadataCannotOverrideTheRolesClaim`.
+
+### SEC-11 — A refusal is a problem, not a page · high · [verified]
+
+- **Steps** — any 401 or 403 from the filter chain on `/api/**`.
+- **Expect** — `application/problem+json` with `COMMON.UNAUTHENTICATED` / `COMMON.ACCESS_DENIED`, no HTML, no
+  redirect. `/api/v1/auth/me` is the cheapest probe (`http/auth-api.http`).
+- **Seen** — `MeEndpointIntegrationTest`, `AdminUserApiIntegrationTest`.
+
+### SEC-12 — `PUT /clients/{id}` writes the path's client · high · [verified]
+
+- **Steps** — `PUT /api/v1/admin/clients/A` with a body whose `id` is B.
+- **Expect** — A is updated, B untouched, response `id` is A. It used to write B.
+- **Seen** — `AdminClientServiceTest`; the block in `http/admin-client-api.http`.
+
+### SEC-13 — `/api/v1/auth/me` is a DTO · high · [verified]
+
+- **Steps** — call it with a session, then with an `admin-sdk` token.
+- **Expect** — `{uid, username, email, firstName, lastName, roles, authorities[{authority}], authenticatedVia}`;
+  never the raw token or a `UserDetails`. The service token gets **403 `UAA.AUTH.NOT_A_USER_PRINCIPAL`**.
+- **Seen** — `MeEndpointIntegrationTest`.
+
+### SEC-14 — An account without a password fails cleanly · high · [verified]
+
+- **Steps** — create a user without `password`, try to sign in as it.
+- **Expect** — refused like a wrong password, not a 500 out of a null hash. Create **with** a password and the
+  account signs in at once — creation is one call now, not create-then-reset.
+- **Seen** — `AdminServiceTest` (create with/without); the sign-in half **[not verified]**.
+
+### SEC-15 — Role grants are exact · high · [verified]
+
+- **Steps** — grant `ROLE_STORE_ADMIN` (the authority spelling), then `SUPER_ADMIN`.
+- **Expect** — **404 `UAA.ROLE.NOT_FOUND`** and **403 `UAA.ROLE.NOT_ASSIGNABLE`**. Both used to answer 200 having
+  granted nothing.
+- **Seen** — `AdminServiceTest`; the blocks in `http/admin-user-api.http`.
+
+### SEC-16 — Tokens are rows · critical · [verified]
+
+- **Steps** — mint a service token; `select count(*) from uaa.oauth2_authorization`; `POST /oauth2/revoke`;
+  `POST /oauth2/introspect`.
+- **Expect** — the count grows by one; revocation keeps the row and introspection answers `active: false`.
+  Before the `JdbcOAuth2AuthorizationService` bean the table was always empty and revocation had nothing to act on.
+- **Seen** — `JdbcAuthorizationPersistenceIntegrationTest`.
+
+### SEC-17 — Metadata keys can be unset · [verified]
+
+- **Steps** — `PUT /users/{id}` with `{"metadata": {"store": null}}`.
+- **Expect** — `store` is gone from the response and from `uaa.users.metadata`. Merge is still the rule for every
+  non-null value.
+- **Seen** — `AdminServiceTest`; the block in `http/admin-user-api.http`. DSN-15's "stored keys cannot be removed"
+  is therefore stale on the console side until the pane learns the null convention.
+
+---
+
+## ROL — Roles and permissions
+
+_Phase 2 of the uaa SSO plan. A role is no longer only a name: it carries a description, a scope, an optional
+parent it inherits from, and a set of keys from the permission catalogue in `store-commons:commons`. The token
+now carries `permissions` (the effective set over the user's roles) beside `roles`; **services still authorise on
+the role name** — the claim is issued so they can start reading it without a token-format change._
+
+### ROL-01 — The catalogue is the enum · [verified]
+
+- **Steps** — `GET /uaa/api/v1/admin/roles/permissions`.
+- **Expect** — every value of `Permission` with its group and description, and nothing else. Grant a key that is not
+  in it and the role write is **400 `UAA.PERMISSION.UNKNOWN`** naming the key (ROL-04).
+- **Seen** — `AdminRoleApiIntegrationTest`.
+
+### ROL-02 — Inheritance is transitive and cycle-free · high · [verified]
+
+- **Steps** — create `REGIONAL_BUYER` inheriting from `ORG_ADMIN` with `users:read`; read it back; set `ORG_ADMIN`'s
+  parent to `REGIONAL_BUYER`.
+- **Expect** — `effectivePermissions` holds `users:read` plus everything `ORG_ADMIN` grants; the second write is
+  **422 `UAA.ROLE.INHERITANCE_CYCLE`**. Clearing the parent (`clearInheritsFrom: true`) drops the inherited keys.
+- **Seen** — `RoleServiceTest`, `AdminRoleApiIntegrationTest`.
+
+### ROL-03 — A system role keeps its name and cannot be deleted · critical · [verified]
+
+- **Steps** — `PUT /roles/{ORG_ADMIN}` with `{"name":"OWNER"}`; `DELETE /roles/{ORG_ADMIN}`; then
+  `PUT` with only `description` and `permissions`.
+- **Expect** — **403 `UAA.ROLE.SYSTEM_IMMUTABLE`** twice; the third write is 200. Renaming `STORE_ADMIN` would not
+  rename the `hasPermission` checks that read it.
+- **Seen** — `AdminRoleApiIntegrationTest`; the blocks in `http/admin-role-api.http`.
+
+### ROL-04 — Names are the claim, so they are normalised and validated · [verified]
+
+- **Steps** — create `" staff "`; create `store-admin`; create `STAFF` twice.
+- **Expect** — `STAFF`; **400 `UAA.ROLE.NAME_INVALID`** with a field error on `name`; **409 `UAA.ROLE.NAME_TAKEN`**.
+- **Seen** — `RoleServiceTest`.
+
+### ROL-05 — A held role cannot be deleted · high · [unit only]
+
+- **Steps** — delete a custom role after granting it to an account.
+- **Expect** — **409 `UAA.ROLE.IN_USE`** with the holder count. Remove it from the accounts first. Before this, a
+  delete silently stripped every holder.
+- **Seen** — `RoleServiceTest.aHeldRoleCannotBeDeleted`.
+
+### ROL-06 — The token carries `permissions` · critical · [verified]
+
+- **Steps** — obtain a token for `org1-store1-admin` (AUT-06); call `/api/v1/auth/me` as `org1-admin`.
+- **Expect** — `permissions` lists the effective keys (`users:read`, `users:write` for a store admin); `/me` carries
+  `permissions` and `PERM_<key>` authorities beside `ROLE_*`. Nothing authorises on them yet.
+- **Seen** — `LoginFlowIntegrationTest`, `MeEndpointIntegrationTest`.
+
+### ROL-07 — Every write leaves an audit row · high · [verified]
+
+- **Steps** — create, change permissions on, and delete a custom role; then
+  `select event_type, actor_name, target_name, before_json, after_json from uaa.audit_events order by id desc limit 5`.
+- **Expect** — `role.created`, `role.permissions.updated` (with the `permissions` before/after) and `role.deleted`,
+  each naming the actor (`admin-sdk` for a client token, the username for a session) and the role.
+- **Seen** — `AdminRoleApiIntegrationTest` counts the rows.
+
+### ROL-08 — The Roles screen · high · [verified]
+
+- **Steps** — open **Roles**; switch System / Custom; search; open `ORG_ADMIN`; open a custom role; create one with
+  a parent and a few permissions; switch to العربية.
+- **Expect** — five columns (Role with description, Scope, Users, Perms = effective count, Type); a system role's
+  name and scope are disabled with the notice; the matrix ticks by group with *Select all / Clear* and the count line
+  reads `N direct · M effective`; the parent select lists every other role; the delete button is absent on a
+  system role. Identifiers stay left-to-right under Arabic.
+- **Seen** — created `REGIONAL_BUYER` with two keys (row read `REALM 0 2 CUSTOM`), set its parent to `ORG_ADMIN`
+  (row read `4`, the union), deleted it with the typed confirmation; `role.created` and `role.updated` rows with
+  actor `super-admin` and ip; العربية mirrored the page (`dir=rtl`, «الأدوار») with the role names still
+  left-to-right.
+
+---
+
+## SET — Realm settings
+
+_Phase 2. One row, `uaa.settings`, read and written whole with a version. Lockout, password policy, session and
+token defaults, key rotation and audit retention **are stored here from this phase and enforced from the phases
+that build each mechanism** (LCK, PWD, SES, KEY) — until then a change is a change of record only._
+
+### SET-01 — The document round-trips and audits · high · [verified]
+
+- **Steps** — `GET /uaa/api/v1/admin/settings`, change `lockout.threshold`, `PUT` it back with its `version`.
+- **Expect** — 200 with `version + 1` and `updatedBy` = the caller; a `settings.updated` audit row whose diff holds
+  only `lockout`.
+- **Seen** — `AdminSettingsApiIntegrationTest`; `http/admin-settings-api.http`.
+
+### SET-02 — A stale version is refused · high · [verified]
+
+- **Steps** — `PUT` the document you read *before* SET-01's save.
+- **Expect** — **409 `UAA.SETTINGS.CONFLICT`**; nothing written. The screen asks for a reload rather than
+  overwriting someone else's change.
+
+### SET-03 — Ranges are checked on the way in · critical · [verified]
+
+- **Steps** — `PUT` with `lockout.threshold: 0`, then with `password.minLength: 4`, then with
+  `sessions.maxSeconds` shorter than `idleSeconds`.
+- **Expect** — **400 `UAA.SETTINGS.INVALID`** with the field named, every time. A threshold of zero would lock
+  every account on its first attempt, and the column would store it.
+- **Seen** — `SettingsServiceTest` (each rule), `AdminSettingsApiIntegrationTest` (the first).
+
+### SET-04 — The Settings screen · high · [verified]
+
+- **Steps** — open **Settings** (the rail row is a link now); change a number; watch the header; Discard; change
+  again and Save; reload.
+- **Expect** — sections General / Authentication / Sessions & tokens / Signing keys, with *Email* disabled and
+  titled as not built; the header reads *Saved* until a field changes, then *Save changes* + *Discard*; durations
+  are edited in minutes / hours / days and read back the same; *Allow self-registration* is disabled with its
+  note; the last-saved stamp names you.
+- **Seen** — *Saved* → edit the lockout threshold → *Discard* + *Save changes* → *Saved*, toast, the stamp
+  `Last saved by super-admin at …`, and the `settings.updated` audit row carrying only the `lockout` diff. The
+  first build of the page threw `Cannot read properties of null (reading '_rawValidators')`: the audit-retention
+  field sat inside the keys form group in the template. REG has the row.
+
+---
+
+## LCK — Lockout
+
+_Phase 3. Failed password sign-ins are counted per account; at the realm's threshold (`settings.lockout.threshold`,
+default 5) the account is locked for `durationSeconds` (default 15 min), and after `permanentAfter` lockouts (default
+5) it stays locked until an administrator unlocks it. Locked and disabled accounts fail **before** the password is
+compared, so a locked account learns nothing from a guess and never counts another attempt._
+
+### LCK-01 — Five wrong passwords lock, the right one is then refused, unlock restores · critical · [verified]
+
+- **Steps** — sign in as `org2-store2-moderator` with a wrong password five times, then with `admin`; as
+  super-admin read the account and `POST …/unlock`; sign in again.
+- **Expect** — the first four wrong attempts return to `/login?error&attemptsLeft=N` counting down to 1; the fifth
+  — the one that locks — already lands on `/login?error=locked` (never "0 attempts left"); the right password then
+  lands on `/login?error=locked` too; the admin API shows `status: LOCKED`; after the unlock the sign-in succeeds.
+  Audit: five `user.login.failed` (reason `BAD_CREDENTIALS`), one `user.locked`, one `user.unlocked`, one `user.login`.
+- **Seen** — `LockoutIntegrationTest`, `LockoutServiceTest`.
+
+### LCK-02 — A disabled account is told so · high · [verified]
+
+- **Steps** — disable an account, sign in as it.
+- **Expect** — `/login?error=disabled`. The page says the account is disabled and to contact an administrator; a
+  wrong password on a disabled account says the same, not "attempts left".
+- **Seen** — `AdminSessionsIntegrationTest`.
+
+### LCK-03 — The sign-in page explains the state · high · [verified]
+
+- **Steps** — drive LCK-01 in the browser, then unlock the account from the Users screen (row menu → *Unlock
+  account*).
+- **Expect** — "N attempt(s) left before a 15-minute lock" under the wrong-password message (the minutes come from
+  the realm's public login settings, not a literal); "This account is locked …" when it is; "signed out" after a
+  logout; the page never says which half of the credentials was wrong. On the Users screen the row's badge reads
+  **LOCKED**, the dialog's *Security* section shows the failed-attempt count, and *Unlock account* returns the badge
+  to ACTIVE, zeroes the counters and writes `user.unlocked` with the administrator as the actor.
+- **Seen** — EN and AR, stack `uaa-sso`, 2026-09-02. **Beware** — a failed sign-in attempt submitted from a browser
+  that already holds an administrator session ends that session (Spring clears the security context on any
+  authentication failure). That is the framework's default and is left as is; use a second browser profile for the
+  wrong-password half.
+
+---
+
+## RL — Rate limiting
+
+_Phase 3. A fixed window per address on the endpoints that take a secret: `/login` (10 a minute), `/oauth2/token`
+(60) and `/api/v1/public/**` (20). Refused before Spring Security runs, so a refused attempt costs no hash and locks
+nothing; POSTs only, so loading a page never counts. In memory, per instance — a brake on guessing, not accounting._
+
+### RL-01 — A burst of sign-ins is a 429 with a problem body · critical · [verified]
+
+- **Steps** — POST `/login` eleven times from one address within a minute (any username, even one that does not
+  exist).
+- **Expect** — ten 302s, then **429** `application/problem+json` `UAA.AUTH.RATE_LIMITED` with `Retry-After: 60` and
+  a `traceId`; `GET /login` still answers 200. Audit: one `request.rate_limited` row per refusal.
+- **Seen** — `RateLimitIntegrationTest` (limit lowered to 3 for its context), `RateLimiterTest`.
+
+### RL-02 — The token endpoint is limited too · high · [not verified]
+
+- **Steps** — 61 `client_credentials` calls from one address in a minute.
+- **Expect** — the 61st is 429. Services that legitimately mint that often share an address only behind a proxy
+  that forwards the client's, which `forward-headers-strategy: NATIVE` honours.
+
+---
+
+## PWD — Password policy
+
+_Phase 3. Every password set through the API — admin reset, self-service change, and later the invitation and
+reset-link flows — goes through one funnel: the realm's rules (length, character classes, not the username or the
+email's local part), the account's recent hashes, and, when enabled, the Have I Been Pwned range check. Seeds and
+boot initializers write hashes directly and are the deliberate exception; that is why `admin` still signs in._
+
+### PWD-01 — Every broken rule is reported at once · high · [verified]
+
+- **Steps** — reset a password to `short`.
+- **Expect** — **400 `UAA.PASSWORD.POLICY_VIOLATION`** with one field error on `password` per rule: `minLength`,
+  `upper`, `digit` (the defaults require 12 characters, upper, lower, digit).
+- **Seen** — `PasswordPolicyValidatorTest`, `AccountApiIntegrationTest`.
+
+### PWD-02 — A recent password cannot come back · high · [unit only]
+
+- **Steps** — change a password to A, then B, then A again.
+- **Expect** — **422 `UAA.PASSWORD.REUSED`** naming how many are remembered (`settings.password.historyCount`).
+- **Seen** — `PasswordServiceTest`.
+
+### PWD-03 — Expiry forces a change · [unit only]
+
+- **Steps** — set `password.expiryDays` to 1, backdate `uaa.users.password_changed_at` by two days, sign in.
+- **Expect** — `/login?error=expired-password`; the account is told to ask for a reset.
+- **Seen** — `PasswordServiceTest.expiryFollowsTheChangeDate` for the rule; the sign-in path is not driven.
+
+### PWD-04 — The breach check is a check, not a decision · [not verified]
+
+- **Steps** — enable `password.rejectBreached`, set `password123456` (in every breach corpus), then set a strong one
+  with the network cut.
+- **Expect** — the first is **422 `UAA.PASSWORD.COMPROMISED`**; the second is accepted with a WARN in the log — an
+  outage at the corpus must not block a reset.
+
+### PWD-05 — New hashes are bcrypt 12 · [verified]
+
+- **Steps** — reset a password, `select password_hash from uaa.users where …`.
+- **Expect** — `{bcrypt}$2a$12$…`; the seeded `$2a$10$` hashes still verify.
+
+---
+
+## SES — Sessions and revocation
+
+_Phase 3. Sessions are Spring Session rows indexed by principal, stamped at sign-in with ip, user agent, how the
+sign-in happened and when. Ending a session deletes its row. Disabling, deleting or resetting an account, and a
+self-service password change, end its sessions **and** its OAuth2 authorizations (`uaa.oauth2_authorization`),
+which makes its refresh tokens unusable at once; a self-contained access token lives out its fifteen minutes._
+
+### SES-01 — Two sessions, end one · high · [verified]
+
+- **Steps** — sign in twice (two browsers) as `org2-store1-moderator`; as super-admin `GET /users/{id}/sessions`;
+  `DELETE` one of them.
+- **Expect** — two rows with ip, `via: PASSWORD` and timestamps; after the delete one browser is signed out
+  (`/api/v1/auth/me` 401) and the other is not. A session id that is not the account's is **404**, never a hint.
+- **Seen** — `AdminSessionsIntegrationTest`.
+
+### SES-02 — Disabling signs the account out everywhere · critical · [verified]
+
+- **Steps** — with the sessions of SES-01 alive, `POST /users/{id}/disable`.
+- **Expect** — both browsers get 401; a fresh sign-in says `disabled`; `uaa.oauth2_authorization` holds no row for
+  the account. Re-enable afterwards.
+- **Seen** — `AdminSessionsIntegrationTest`, `AdminServiceTest`.
+
+### SES-03 — Changing my password keeps only my session · critical · [verified]
+
+- **Steps** — sign in twice as `org1-store2-admin`; from one, `PUT /api/v1/account/password` with the current and a
+  new password.
+- **Expect** — that session stays, the other is gone, the old password no longer signs in, the new one does; a wrong
+  current password is **400 `UAA.PASSWORD.CURRENT_MISMATCH`** and changes nothing.
+- **Seen** — `AccountApiIntegrationTest`. **Restore** — this leaves the account on the new password until the
+  database is reset.
+
+### SES-04 — A service client has no account · [verified]
+
+- **Steps** — `GET /api/v1/account/sessions` with a `client_credentials` token.
+- **Expect** — **403 `UAA.AUTH.NOT_A_USER_PRINCIPAL`**.
+
+### SES-06 — The account page · high · [verified]
+
+- **Steps** — from the who-chip open `/account` as `super-admin`, in English and Arabic.
+- **Expect** — the breadcrumb reads *My account*; *Change password* asks for the current password, a new one and its
+  repeat, states the realm's rules in the hint and warns that the change signs every other session out; *Sessions*
+  lists this device with its ip, `PASSWORD`, last-active time and user agent, marked *this device*. Arabic mirrors
+  the layout; the user agent and ip stay left-to-right.
+- **Seen** — the screen; the password change itself is SES-03 (`AccountApiIntegrationTest`).
+
+### SES-05 — Idle and absolute timeouts, remember-me, single session · [not verified]
+
+- **Steps** — set `sessions.idleSeconds` to 60 and wait; set `sessions.maxSeconds` to 120 and keep clicking; turn
+  remember-me on and sign in with the box ticked, then delete the `SESSION` cookie; turn *one session per user* on
+  and sign in twice.
+- **Expect** — signed out after a minute idle; signed out after two minutes however active; still signed in from
+  the remember-me cookie (and not when the setting is off); the first session ends when the second begins.
+  Mechanisms: `LoginSuccessHandler`, `SessionMaxAgeFilter`, `SettingsAwareRememberMeServices`.
+
+---
+
+## INV — Invitations and one-time links
+
+An invitation creates the account **pending** — no password hash, `activated_at` null — and issues a 256-bit
+token whose SHA-256 is the only thing stored (`uaa.invitations.token_hash`). The plaintext link is answered
+**once** by the admin call and, in the same transaction, registered on the `User` aggregate as an
+`InvitationIssuedEvent` that the namastack outbox delivers to `LoggingLinkDeliveryHandler`. Nothing emails it: the
+console shows it in `app-one-time-link-dialog` and the operator carries it. A password-reset link is the same
+mechanism for an account that already has a password (`uaa.password_reset_tokens`, one hour). The public pages
+are `/accept-invitation?token=` and `/reset-password?token=`, served by uaa itself, anonymous, rate-limited.
+
+### INV-01 — Invite, accept, sign in · critical · [verified]
+
+- **Steps** — uaa console → Users → **Invite user**: email `ada.qa@mail.com`, name, tick `USER`, *Create
+  invitation*. Copy the link from the dialog. In a private window open it; type `alllowercase12` twice and submit;
+  then `Welcome-Passw0rd-2026` twice. Follow *Go to sign in* and sign in as `ada.qa@mail.com`.
+- **Expect** — the tiles go to *Pending invitations 1*, the row shows `PENDING`, the Invitations tab lists it
+  *Pending* with *Resend* / *Revoke*. The accept page greets by first name, shows the account and expiry, lists
+  the realm's rules. The weak password is refused by the server with **"Add an upper-case letter."** bound to the
+  field (`UAA.PASSWORD.POLICY_VIOLATION`, `params.rule=upper`). The strong one answers *Your account is ready*;
+  signing in works; the row is `ACTIVE`, `email_verified` true, the invitation *Accepted*.
+- **Truth underneath** — `select status from uaa.invitations` → `ACCEPTED`; `select status, count(*) from
+  uaa.outbox_record group by status` → `COMPLETED`; `uaa.log` carries `One-time invitation link issued for …`
+  and, because `com.asrevo.cvhome.uaa.links.log-links=true` under `lcl`, the link itself. Audit rows
+  `user.created`, `invitation.created`, `invitation.accepted`, `user.activated`.
+- **Also** — `InvitationFlowIntegrationTest`.
+
+### INV-02 — A link works once · critical · [verified]
+
+- **Steps** — reload the accepted link from INV-01; open `/accept-invitation` with no token; open it with a made-up
+  token; call `GET /api/v1/public/password-resets/nope`.
+- **Expect** — *This link cannot be used* with *Go to sign in* for the first three (one message for expired,
+  revoked and spent: an anonymous visitor can act on none of them differently); the API answers **404**
+  `application/problem+json` (`UAA.INVITATION.NOT_USABLE` / `UAA.PASSWORD.RESET_TOKEN_NOT_USABLE`). Never a 401
+  and never a login redirect — the public chain is stateless.
+
+### INV-03 — Resend rotates, revoke withdraws · high · [verified]
+
+- **Steps** — invite a second address; Invitations tab → *Resend* on it (a new link dialog), then *Revoke* and
+  confirm. Then `POST /users/{id}/invitations/resend` on the account from INV-01.
+- **Expect** — after resend the **old** link answers 404 and the new one previews; only one `PENDING` row per
+  user exists (`uq_invitations_one_pending`), the previous is `REVOKED` with detail *superseded by a resend*.
+  After revoke the row is *Revoked*, the tile drops, the pending account remains (delete it from its row, or
+  re-invite). Resend on an activated account answers **422** `UAA.USER.NOT_PENDING`.
+- **Also** — the invitation status tabs (*Pending / Accepted / Revoked / Expired / All*) each re-query the server.
+- **[verified]** for the API half and the *Accepted* / *Pending* tabs; the console's *Resend* and *Revoke* buttons
+  were driven once each on an earlier build and are **[not verified]** on this one.
+
+### INV-04 — Inviting a taken address is a 409 with a field · high · [verified]
+
+- **Steps** — invite `org1-admin@mail.com`.
+- **Expect** — **409** `UAA.USER.EMAIL_TAKEN` with `fieldErrors[0].field == "email"`; the dialog marks the email
+  field. The username defaults to the email, so the email check fires before the username one.
+- **Also** — `InvitationFlowIntegrationTest`.
+
+### INV-05 — An admin-issued reset link · critical · [verified]
+
+- **Steps** — Users → open `org1-store1-moderator` → **Issue reset link**, leave *Also sign them out everywhere*
+  off, *Issue link*. Open the link in a private window; type two different passwords; then
+  `Reset-Passw0rd-2026` twice. Sign in with it. Repeat with the toggle **on** while the account has a live
+  session.
+- **Expect** — the dialog is the same show-once one. The page says *Choose a new password*; the mismatch is caught
+  locally (*The two passwords do not match.*) without a request; the strong password answers *Password saved* and
+  the old password stops working. With the toggle on, `GET /users/{id}/sessions` is empty after issuing and every
+  `oauth2_authorization` row for the user is gone (`SES-*` mechanisms). A live link becomes unusable once a second
+  one is issued, and the link is single-use. Audit `user.password.reset_link.issued`, then `user.password.reset`
+  with reason `RESET_LINK`.
+- **Also** — `PasswordResetLinkIntegrationTest` (leaves `org1-store1-moderator` on `Reset-Passw0rd-2026`
+  inside the test database only).
+- **[verified]** without the revoke toggle; **[unit only]** with it.
+
+### INV-06 — Metadata rows can be removed · high · [verified]
+
+- **Steps** — open a user, *Add* a metadata row `team = qa`, Save; reopen, *Remove* it, Save; reopen.
+- **Expect** — the key is present after the first save and **absent** after the second. The pane sends
+  `{"team": null}` for a stored key whose row was removed (SEC-17 is the API half).
+
+### INV-07 — "Forgot password?" explains, it does not promise · [verified]
+
+- **Steps** — `/login` → *Forgot your password?*.
+- **Expect** — a note that there is no self-service reset and an administrator issues a one-time link. No form,
+  no request. Arabic reads the same.
+
+---
+
+## VER — Email verification and editing
+
+### VER-01 — Changing the email un-verifies it · high · [verified]
+
+- **Steps** — open the account from INV-01 (verified by accepting): change the email to `ada.qa2@mail.com`,
+  Save, reopen.
+- **Expect** — the list shows the new address; the dialog's badge is **Email unverified** with a *Mark verified*
+  action beside it. Saving without touching the address sends no `email` at all (the request is diffed), so a
+  plain name edit does not un-verify. Audit `user.email.changed`. `EMAIL_TAKEN` (409) when the address belongs to
+  another account.
+
+### VER-02 — An operator can vouch for an address · [verified]
+
+- **Steps** — *Mark verified* on the account from VER-01.
+- **Expect** — the badge flips to **Email verified** in place; `POST /users/{id}/email/verify` answers the DTO;
+  the super admin's own row is refused (`SuperAdminImmutableException`).
+
+### VER-03 — The username is not a field · [verified]
+
+- **Steps** — open any account.
+- **Expect** — the username is read-only with *The username is the identity tokens carry; it cannot be changed.*
+  It is what a JWT `sub` holds; renaming it is not an edit, and this console does not offer one.
+
+---
+
+## CLI — Registered clients
+
+A registration is Spring's `oauth2_registered_client` row plus uaa's `client_extension` (enabled, description, last
+token) and `client_secret_history` (the grace window). The **type** — `PUBLIC` (auth method `none` alone), `MACHINE`
+(`client_credentials` only) or `CONFIDENTIAL` — is derived on every read, never stored. A secret is answered exactly
+twice, at registration and at rotation, and can never be read back; the realm's *Sessions & tokens* settings decide
+how long a new secret lives (`clientSecretValidityDays`) and how long the one it replaced keeps working
+(`clientSecretGraceHours`). `http/admin-client-api.http` runs every call below.
+
+### CLI-01 — Registration answers the secret once · critical · [verified]
+
+- **Steps** — uaa console → Clients → *Register client*: id `qa-machine`, name, description, `client_secret_basic`
+  + `client_credentials`, scope `store_core`, Save. Copy the secret from the dialog; *Done* lands on the client's page.
+  Mint a token with it (`POST /oauth2/token`, basic auth, `grant_type=client_credentials&scope=store_core`).
+- **Expect** — **201** `{client, clientSecret}`; the page shows type *Machine*, *Registered* now, the secret card with
+  *Expires* a year out; `GET /clients/{id}` and the list never carry `"clientSecret"`; the token endpoint answers 200.
+  A client registered with `none` alone gets `clientSecret: null` and no secret card.
+- **Also** — `AdminClientApiIntegrationTest`.
+
+### CLI-02 — The list carries type and status, and filters on the server · high · [verified]
+
+- **Steps** — Clients: the four tiles; segments *All / Enabled / Disabled / Machine / Confidential / Public*; search
+  `store`; `GET /clients?q=store&enabled=true&type=MACHINE`; `GET /clients/stats`.
+- **Expect** — every row shows client + id, a type badge, the grant types, when the secret expires (amber inside
+  thirty days, red past it, *none (PKCE)* for a public client) and an enable switch. The segments carry counts from
+  `/stats`; `active + …` add up. The seed answers `total 4, enabled 4, machine 3, confidential 1`.
+
+### CLI-03 — Rotation keeps the old secret alive for the grace window · critical · [verified]
+
+- **Steps** — on `qa-machine`: *Rotate secret*, confirm; copy the new secret. Mint a token with the **old** secret,
+  then with the new one. Then *Revoke it now* on the *previous secret still works until …* line, confirm, and mint
+  with the old secret again.
+- **Expect** — the dialog says both dates: the new secret's expiry and *the secret it replaces keeps working until*
+  (now + `clientSecretGraceHours`). Old → 200, new → 200, wrong → 401. After the revocation old → **401**
+  `invalid_client`, new → 200; a second revocation answers **404** `UAA.CLIENT.NO_PREVIOUS_SECRET`. Audit
+  `client.secret.rotated` twice, the second with detail *previous secret revoked early*.
+- **Mechanism** — `GraceAwareClientSecretAuthenticationProvider` hands Spring's own provider a one-client view carrying
+  the retired hash; nothing about Spring's checks is re-implemented. `ClientSecretRotationIntegrationTest`.
+- **Watch for** — `bcrypt` strength upgrades: Spring re-encodes and *saves* a hash whose strength is below the
+  encoder's. On the grace view that save is a no-op on purpose (it would write the old hash back onto the
+  registration).
+
+### CLI-04 — Disable revokes and refuses; enable restores · critical · [verified]
+
+- **Steps** — with a live token for `qa-machine`, switch it off in the list (or the Status card). Mint again. Read the
+  client. Switch it on. Mint again.
+- **Expect** — the toast says the tokens were revoked; `oauth2_authorization` has no rows for the client; the token
+  endpoint answers **401** `invalid_client`; `GET /clients/{id}` still answers 200 (an operator can read and re-enable
+  it: `findById` is not filtered, only `findByClientId` is); after enabling the token endpoint answers 200. Audit
+  `client.disabled` with the revoked count, then `client.enabled`.
+- **Also** — `ClientDisableIntegrationTest`, `EnabledAwareRegisteredClientRepositoryTest`.
+
+### CLI-05 — Registration rules answer typed problems · high · [verified]
+
+- **Steps** — register with client id `admin-sdk`; with redirect `http://evil.example/cb`; with access-token lifetime
+  `PT48H` while the realm's ceiling is 3600 s; with a wildcard redirect.
+- **Expect** — **409** `UAA.CLIENT.ID_TAKEN` with `fieldErrors[0].field == clientId`; **400**
+  `UAA.CLIENT.INVALID_REDIRECT_URI` with `params.reason` `PLAIN_HTTP` (`WILDCARD`, `FRAGMENT`, `NOT_ABSOLUTE` for the
+  others); **400** `UAA.CLIENT.TOKEN_TTL_EXCEEDS_POLICY` on `tokenSettings.accessTokenTimeToLive`. Under `lcl`,
+  `gateway.com` and `*.gateway.com` are allowed over plain http (`com.asrevo.cvhome.uaa.clients.plain-http-hosts`);
+  `localhost` always is; a native `com.example.app:/cb` passes.
+- **Also** — `RedirectUriRulesTest`, `AdminClientServiceTest`.
+
+### CLI-06 — The realm's ceiling clamps every token · high · [unit only]
+
+- **Steps** — Settings → *Sessions & tokens* → max access-token lifetime 60 s, Save. Mint a token for `admin-sdk`
+  (whose own setting is 900 s). Decode `exp - iat`.
+- **Expect** — 60. Lowering the ceiling applies at the next token for every client, not only the ones re-saved.
+  Mechanism: `JwtCustomizerConfig.clampLifetime`.
+
+### CLI-07 — Rotate every secret · critical · [not verified]
+
+- **Steps** — Settings → *Danger zone* → *Rotate all secrets*, type `ROTATE`, confirm. Copy every secret from the
+  dialog into `application-lcl.yml`'s `UAA_*_SECRET` values (or the stack's env) and restart the services.
+- **Expect** — one new secret per machine and confidential client, shown once; every service on the stack keeps
+  working for `clientSecretGraceHours`, then fails with `invalid_client` unless reconfigured. `POST /rotate-all` as a
+  `store_core` token is **403**.
+- **Why not verified** — it invalidates the shared local secret for every service on the stack after the grace
+  window; run it on a throw-away stack.
+
+### CLI-08 — Delete revokes first · [verified]
+
+- **Steps** — delete `qa-machine` from its page, typing the id.
+- **Expect** — its authorizations are gone before the row is; `GET /clients/{id}` → 404. `reset-secret` (the SDK's
+  alias) still works and sets a chosen secret with no grace window; on a public client it answers **422**
+  `UAA.CLIENT.NOT_CONFIDENTIAL`.
+
+---
+
+## KEY — Signing keys
+
+One key signs (`ACTIVE`); a rotated-out key keeps verifying (`RETIRING`, public half only in the JWKS) until
+`settings.keys.retireDays` have passed, then leaves (`RETIRED`). The public JWK is stored plain; the private JWK is a
+secret-crypto envelope (`private_jwk_enc` starts with `ENC:`) and never leaves the row unencrypted. Every token carries
+the active `kid` in its header, which is how the encoder picks one key while two share the algorithm and how a resource
+server knows to refetch the JWKS. `http/admin-key-api.http` runs every call below.
+
+### KEY-01 — Rotation keeps in-flight tokens alive · critical · [verified]
+
+- **Steps** — mint a token, note its header `kid`. Settings → *Signing keys* → *Rotate now*, confirm (or
+  `POST /uaa/api/v1/admin/keys/rotate`). Call an admin endpoint with the old token; mint a new one; call with it.
+  `GET /oauth2/jwks`; `GET /keys`; `GET /keys/status`.
+- **Expect** — the old token still answers 200 (its key is *Retiring*, *leaves the JWKS* in `retireDays`); the new
+  token carries the new `kid` and answers 200; the JWKS lists both keys with no `d`, `p` or `q` member; the table shows
+  *Active* and *Retiring* with the dates; the status line names the active key, when it started signing and the next
+  automatic rotation. Audit `key.rotated` with *replaces <kid>, which verifies until <date>*.
+- **Truth underneath** — `select status, left(private_jwk_enc, 4) from uaa.signing_keys` → every row `ENC:`.
+- **Also** — `KeyRotationIntegrationTest` (with the test clock: eight days later `retireDue()` retires the old key and
+  the old token answers **401**; the JWKS is back to one key), `KeyRotationServiceTest`, `SigningKeyMaterialMapperTest`.
+
+### KEY-02 — Scheduled rotation and retirement · [unit only]
+
+- **Steps** — set *Rotate automatically every* to 1 day, wait past it (or advance the test clock) for the hourly tick.
+- **Expect** — `KeyRotationScheduler.tick()` retires what is past its window and rotates when the active key is older
+  than the interval; 0 means manual only, and the status line says so. Mechanism: `KeyRotationService.rotateIfDue`.
+
+### KEY-03 — An unreadable key is not an outage · high · [unit only]
+
+- **Steps** — change the crypto provider's key underneath a stored signing key (locally: edit
+  `com.asrevo.cvhome.crypto.local.key` in `application-lcl.yml` and restart).
+- **Expect** — the active key's private half cannot be opened: it is moved to *Retiring* (its public half still verifies
+  what it signed), a fresh key is generated and activated, the log says so, and the status line shows *1 stored key
+  cannot be read back*. No token request fails. `KeyRotationServiceTest.anUnreadableActiveKeyIsReplacedNotFatal`.
+- **Why the lcl slice pins a static crypto key** — the shared `com.asrevo.cvhome.crypto` config is `LOCAL` with no
+  key, which falls back to a *random key per boot*: without `key-provider-type: STATIC` every restart would do exactly
+  this to every stored key. A deployment must give the provider a stable key (KMS, or `CVHOME_CRYPTO_KEY`).
+
+### KEY-04 — The gate holds, and nothing answers key material · critical · [verified]
+
+- **Steps** — `POST /keys/rotate` as a `store_core` token; `GET /keys` anonymous; read `GET /keys` and `GET /keys/status`
+  as super admin.
+- **Expect** — **403**, **401**; the admin reads carry `kid`, algorithm, status and dates only — never a JWK, never
+  `ENC:`.
+
+---
+
+## IDP — Identity providers and brokered logins
+
+A provider is a registration uaa brokers a login through: its `alias` is Spring's registration id and the last
+segment of the redirect URI to register at the provider, and its client id and secret are secret-crypto envelopes.
+`preset` fills the endpoints for a known provider; the generic ones take an issuer (discovered) or the endpoints by
+hand. A brokered login resolves to a local account by identity (provider + subject), then by email according to
+`accountLinking`, then — with `jitProvisioning` — by creating one. `http/admin-identity-provider-api.http` and
+`http/public-idp-api.http` run the calls.
+
+### IDP-01 — Register a provider, and it appears on the sign-in page · critical · [verified]
+
+- **Steps** — console → Identity providers → *Add provider* → Google. Alias `google`, a client id and secret, email
+  domain `example.com`, *Ask for the password once*, *Create new users* on. Save. Read `/login` in a private window.
+- **Expect** — 201; the row shows *OIDC* and the policy line; the preview panel and the real sign-in page both draw
+  *Continue with Google*; `GET /api/v1/public/idps` lists it. The detail dialog shows the redirect URI to register
+  (`…/login/oauth2/code/google`) with a copy button, `hasClientSecret` true and **no secret**; `select client_id_enc,
+  client_secret_enc from uaa.identity_providers` → both `ENC:`.
+- **Also** — the endpoints came from the preset: `authorizationUri` is Google's, scopes `openid profile email`.
+
+### IDP-02 — The authorization redirect is real, with PKCE · critical · [verified]
+
+- **Steps** — `curl -i http://uaa.gateway.com:8001/oauth2/authorization/google` (or press the button).
+- **Expect** — **302** to `https://accounts.google.com/o/oauth2/v2/auth` carrying `client_id`, `state`, `nonce`,
+  `code_challenge` and `code_challenge_method=S256`, and `redirect_uri` on uaa's pinned issuer. Typing an email first
+  adds `login_hint`. Apple is the one preset without PKCE (it uses `response_mode=form_post`); it is **[not verified]**
+  and needs a developer account.
+
+### IDP-03 — Test connection · [verified]
+
+- **Steps** — the provider's dialog → *Test connection*. Then break the issuer and test again.
+- **Expect** — *…/.well-known/openid-configuration answered. Issuer: https://accounts.google.com.* A provider that does
+  not answer is **502** `UAA.IDP.DISCOVERY_FAILED` carrying `provider`, rendered as *The provider did not answer*.
+
+### IDP-04 — A brokered login, end to end · critical · [unit only]
+
+- **Covered by** `BrokeredLoginIntegrationTest` against an in-process stub OIDC provider: a new person is provisioned
+  (username = email, default roles granted, `email_verified` from the provider), a second login reuses the identity,
+  an existing account confirms with its password once and is linked thereafter, `REJECT` refuses with
+  `idp_rejected`, and a disabled provider is no registration at all. Driving a real Google or GitHub app is
+  **[not verified]** — it needs credentials nobody has committed.
+- **What the person sees** — `link_required` is not an error page: the sign-in page shows *You already have an account
+  for … Enter its password once*, and posts to `/api/v1/auth/link-confirm`, which answers where to go.
+
+### IDP-05 — Home-realm discovery · high · [verified]
+
+- **Steps** — `POST /api/v1/public/idps/discover {"email": "someone@example.com"}`; then an address at a domain no
+  provider claims; then a provider hidden from the page.
+- **Expect** — the first answers the provider, the second `{"provider": null}`, the third still answers (hiding is
+  about the button, not about discovery). The longest matching domain wins, so `eng.example.com` beats `example.com`.
+  Nothing here says whether an account exists.
+
+### IDP-06 — The gate, and what a secret never does · critical · [verified]
+
+- **Steps** — every `/api/v1/admin/identity-providers` call as a `store_core` token and anonymously; read a provider
+  as super admin; register the same alias twice; register a generic OAuth2 provider with no endpoints.
+- **Expect** — **403** and **401**; a read never carries `clientSecret`; **409** `UAA.IDP.ALIAS_TAKEN` with the field;
+  **400** `UAA.IDP.CONFIG_INVALID` naming the missing field.
+
+### IDP-07 — Linked logins, and the last credential · high · [unit only]
+
+- **Steps** — `/account` → *Linked logins* → *Unlink*; then try it on an account that has no password and only that
+  identity.
+- **Expect** — the row disappears and that provider can no longer sign the person in; the second case is **422**
+  `UAA.IDENTITY.LAST_CREDENTIAL` — set a password first. An administrator has the same two calls under
+  `/users/{id}/identities`.
+
+---
+
+## AUD — The audit log
+
+Every administrative write and every sign-in leaves a row in `uaa.audit_events`; the API reads them and nothing
+writes one from outside. `http/admin-audit-api.http` runs the calls. What an event *means* is the console's to say:
+uaa stores wire names like `user.login.failed`, and the screen translates them.
+
+### AUD-01 — A failed sign-in is recorded, and reads back · critical · [verified]
+
+- **Steps** — sign in with a wrong password, then console → Audit log.
+- **Expect** — the top row is *Sign-in failed*, FAILED, actor *Not signed in*, target the username, the address
+  filled in and a `reasonCode` of `BAD_CREDENTIALS`. Five in a row also writes *Account locked* with actor
+  **uaa itself** and reason `THRESHOLD` (see LCK-01).
+
+### AUD-02 — The protocol writes its own events · critical · [verified]
+
+- **Steps** — mint a token (`client_credentials`), then present a wrong client secret, then revoke a token.
+- **Expect** — `token.issued` with actor CLIENT, the client id, and a detail naming the grant, the scopes and the
+  TTL; `client.auth.failed` with the claimed client id and `INVALID_CLIENT`; `token.revoked`. Issuing also stamps
+  `client_extension.last_token_issued_at`, which is the "Last token" column on the Clients screen.
+
+### AUD-03 — Filters, and the two pivots · high · [verified]
+
+- **Steps** — filter by category, by range, *Failures only*, then free text; open an event and use
+  *All by this actor* and *All from this address*.
+- **Expect** — every filter narrows server-side and resets to page 1; a category is a set of types, so *Security*
+  includes lockouts, secret rotations and key rotations. The pivots set `actor` / `ip` and show a banner with a
+  Clear. A range that runs backwards is **400** `UAA.AUDIT.QUERY_INVALID` naming the `from` field.
+
+### AUD-04 — What one event knows · high · [verified]
+
+- **Steps** — open an event that changed something (a provider edit, a settings save).
+- **Expect** — the panel lists outcome, reason, who, what, client, address, browser, note and trace id, and a
+  *What changed* table with the before and after of each changed field. Secrets and password hashes never appear —
+  the diff is taken over DTO snapshots, not entities.
+
+### AUD-05 — The CSV export · high · [verified]
+
+- **Steps** — *Export CSV* with filters applied.
+- **Expect** — `text/csv`, `attachment; filename="uaa-audit.csv"`, the header row, and **the same filters as the
+  screen** — the link is built from the live query. Oldest first, because an export is read as a story. Every field
+  is quoted and a value starting `=`, `+`, `-` or `@` is prefixed with a quote so a spreadsheet does not run it as
+  a formula. Over 100 000 rows it refuses with `UAA.AUDIT.EXPORT_TOO_LARGE` rather than writing half a file —
+  **[unit only]**, nobody has generated that many.
+
+### AUD-06 — The gate · critical · [verified]
+
+- **Steps** — every audit call as a `store_core` token, then anonymously.
+- **Expect** — **403** and **401**. There is no write endpoint at all: the log cannot be edited or deleted through
+  the API, only trimmed by nightly retention.
+
+---
+
+## DSH — The dashboard
+
+One read (`GET /api/v1/admin/dashboard?range=`) answers the whole screen. Every figure is counted from a table at
+request time; nothing is a stored statistic, and nothing is carried over from a previous range.
+
+### DSH-01 — The numbers are the tables' · critical · [verified]
+
+- **Steps** — note the tiles, then compare with the audit log and the database: sign-ins and failures against
+  `user.login` / `user.login.failed` in the range, tokens against `token.issued`, sessions against
+  `uaa.spring_session` where `expiry_time > now`, accounts against `uaa.users`.
+- **Expect** — they agree. Switching the range re-reads everything; no tile keeps a figure from the previous one.
+  The chart's buckets are hours for 24h and days for the longer ranges, with a gap where nothing happened.
+
+### DSH-02 — The posture is computed, never declared · critical · [verified]
+
+- **Steps** — read the panel, then change something it measures: turn breached-password checking off in Settings,
+  or rotate the signing key.
+- **Expect** — six lines, each with OK / WARN / RISK from the data: signing-key age against the rotation interval,
+  accounts without a password, authorization-code clients without PKCE, client secrets expiring within 30 days,
+  breached-password checking, and failed sign-ins against the lockout threshold. A change is reflected on the next
+  read. With no active signing key at all the first line is **RISK** — **[unit only]**, that state needs a broken
+  realm.
+
+### DSH-03 — Busiest applications and recent failures · [verified]
+
+- **Steps** — mint tokens on two clients, fail a sign-in, reload.
+- **Expect** — the ranked list orders clients by tokens issued in the range; the failures list shows the last five
+  refusals with their translated event name, target, address and time, and links into the audit log.
+
+### DSH-04 — The gate and the rail · critical · [verified]
+
+- **Steps** — the dashboard as a `store_core` token; then check the rail.
+- **Expect** — **403**. Every rail row is a real route now — Dashboard, Audit log and Identity providers were the
+  three that were drawn disabled. `counts` in the same response feeds them.
+
+---
+
+## SIN — The sign-in page
+
+The page every operator meets, and the only screen a signed-out browser can reach. It is identity-first: an
+email or username step, the provider buttons an administrator enabled, then the password with the identity
+shown above it. The password step is a **native form POST** to `/login` carrying `_csrf`, not an API call —
+Spring Security's redirect is what resumes the authorization the console started, and an `HttpClient` POST
+would strand it.
+
+### SIN-01 — The two steps · critical · [verified]
+
+- **Steps** — open `/login`, type an address, press *Continue*, then the password.
+- **Expect** — step one shows the provider buttons and the email field; step two shows the identity as a chip
+  with a *Not you?* that returns to step one, and carries what was typed into the username field. A username
+  that is not an email works: the field takes either, and uaa authenticates on the username.
+- **Watch for** — the username field must be pre-filled from step one. An operator whose username is not their
+  address corrects it there; a page that silently sends the address instead fails the sign-in with no
+  explanation.
+
+### SIN-02 — Home-realm discovery · high · [verified]
+
+- **Setup** — a provider with `example.com` in its email domains (IDP-01).
+- **Steps** — type `someone@example.com` and press *Continue*.
+- **Expect** — the browser goes straight to `/oauth2/authorization/<alias>` carrying `login_hint`, without a
+  password step. An address at a domain nobody claims lands on the password step, and so does a *failure* of
+  the discovery call — a realm that cannot answer must not block a local sign-in.
+
+### SIN-03 — What the page says when something is wrong · critical · [verified]
+
+- **Steps** — a wrong password; five in a row; a disabled account; then a brokered login that is refused.
+- **Expect** — *invalid* with attempts-left when the server sent it, *locked* naming the lockout minutes,
+  *disabled*, and for the provider paths the specific message: an account that already exists locally
+  (`idp_rejected`), a person the provider does not know here (`idp_unknown_user`), a provider that shared no
+  address (`idp_no_email`). None of them says whether an account exists for an address nobody typed.
+
+### SIN-04 — Confirming a link · critical · [unit only]
+
+- **Steps** — sign in through a provider whose policy is *Ask for the password once*, using an address that
+  matches an existing account.
+- **Expect** — the page explains whose account it found and which provider is asking, takes that account's
+  password once, and posts to `/api/v1/auth/link-confirm`, which answers where to go. Afterwards that provider
+  signs the person in directly. Covered by `BrokeredLoginIntegrationTest`; the browser path is
+  **[not verified]** without a real provider.
+- **Watch for** — the confirmation POST needs the CSRF cookie, which only a page load plants. A client driving
+  the flow by hand must load `/login` first.
+
+### SIN-05 — Which application asked · [verified]
+
+- **Steps** — start at the console, get bounced to uaa, and read the card above the form.
+- **Expect** — *Continuing to <application>*, from `GET /api/v1/public/login/context`, which reads the saved
+  authorization request. Reaching `/login` directly shows no card rather than a guess.
+
+### SIN-06 — Arabic and right-to-left · high · [verified]
+
+- **Steps** — switch to العربية on the sign-in page and walk both steps.
+- **Expect** — every string translated, the layout mirrored, and the email and password fields still
+  left-to-right — an address and a password are Latin whatever the page's direction.
 
 ---
 
@@ -554,18 +1520,114 @@ a valid store id.
 
 ---
 
+## MIG — Resetting a database
+
+This project is not in production: **there are no migrations.** `schema.sql` is rewritten in place (the
+`oauth2_authorization` table changed shape for Spring Authorization Server 7 and the seed's token lifetimes and PKCE
+flag changed), so a database created before this branch is reset, not migrated:
+
+```bash
+lcl stop --hard --stack <name>          # drops the compose volumes, postgres included
+lcl start -d --stack <name>
+```
+
+or, keeping the other schemas, `drop schema uaa cascade;` and restart uaa. The seed writers then recreate the
+clients and accounts. Nothing in uaa carries an `alter table`.
+
+---
+
+## REG — Regression watchlist
+
+| What broke | How it looked | Caught by |
+|---|---|---|
+| `ClientAuthMethod.from` recursed into itself | `GET /clients/{id}` 500 with `StackOverflowError` | ADM-07, `ClientAuthMethodTest` |
+| A filter-chain 403 dispatched to `/error`, which the SPA router served as `index.html` | a forged POST and a `store_core` call to the admin API both answered **200 with the console's HTML** | SEC-05, SEC-11, `CsrfLoginIntegrationTest`, `AdminUserApiIntegrationTest` |
+| uaa's `management.endpoints.web.exposure.include` override lost to the imported `common-config.yml` | every actuator endpoint mapped on the live stack after the "fix" | SEC-01, `ActuatorExposureIntegrationTest` |
+| `admin-sdk` seeded with `refresh_token` and consent | a machine client with a grant it can never use | seed review |
+| The `roles` JWT claim was a `TreeSet`; the JDBC authorization store serialises claim values with type info the gateway's UserInfo parser refuses | gateway login died with `Could not resolve type id 'java.util.TreeSet'` | AUT-01, `LoginFlowIntegrationTest` |
+| A settings field placed inside the wrong `formGroupName` | the Settings page threw at render and showed skeletons for ever | SET-04 |
+| A `GET /api/…` was saved as the request to resume after login | signing in landed on raw JSON at `/api/v1/auth/me?continue` | AUT-02 (the request cache excludes `/api/**`) |
+| The realm's remember-me key sat one YAML level too high in the local slices | uaa refused to start: `Could not resolve placeholder 'UAA_REMEMBER_ME_KEY'` | boot |
+| The attempt that crossed the lockout threshold was reported as `attemptsLeft=0` | the sign-in page said "0 attempt(s) left before a 15-minute lock" on an account that was already locked | LCK-01, LCK-03, `LoginFailureHandlerTest` |
+| `/account` had no rail row, so the breadcrumb fell back to *Users* | "cvhome identity › Users" over the account page | SES-06 |
+| A password-policy field error carried only the rule key as its message | the accept page said **"upper"** under the password | INV-01 (`params.rule`, translated by the kit's `errors.code.UAA_PASSWORD_POLICY_VIOLATION`) |
+| The accept page's mismatch check was a `computed` over a reactive form | two different passwords submitted with no message, then the server's 400 | INV-05 |
+| The Users tiles and tabs translated once and never again | switching to Arabic left *ACCOUNTS* / *All 12* in English | CON-05 (the `computed`s read `activeLang()` first) |
+| The Users panel rendered its empty state under a 403 | a `USER`-role session saw *No accounts* beneath the error bar | CON-06 |
+| The CSRF cookie had no explicit path | a response from `/login/oauth2/code/…` minted a second `XSRF-TOKEN` scoped to that directory, and the next POST elsewhere sent the wrong one | IDP-04 (the repository now pins the cookie to `/`) |
+| The brokered-login failure handler saved the exception into the session | Spring Session JDBC could not serialise the HTTP response inside it: a refusal became a 500 | IDP-04 |
+| A non-administrator got the admin console | the rail drew all seven sections and the landing route was an admin screen, so an org admin or store moderator signed in to an access-denied bar | CON-12 |
+| The kit dropped the profile `/me` returns | uaa's `MeResponse` sends the name, the address and the derived roles; the client mapped none of them, so the account page reported no name for a person whose first name it had just received | CON-12 |
+| Panel controls sat flush against the panel | a table panel is deliberately unpadded, and the tabs and search above the table inherited that: no top inset, none at either edge | CON-09 |
+| A page-scale busy overlay collapsed the page rhythm | the dashboard's range tabs, tiles and panels all touched, because everything below the header lives inside one overlay | CON-10 |
+| Settings' left sub-nav left the page | fragment-only `href` resolves against `<base href="/">`, so a section link navigated to the landing route | CON-11 |
+| Four control heights on one row | buttons 2.25rem, select 2.375rem, search box and tab track whatever their padding made — the theme had no control-height token, so nothing lined up | CON-09 |
+| The tab track filled its row | its host was `display: block`, so on Users and Clients it pushed the search box onto a second line | CON-09 |
+| Every screen invented its own page spacing | no feature set `:host`, and `.page` had no gap; the rhythm was whatever margins a screen happened to declare | CON-10 |
+| Recessed surfaces were invisible | chips, session rows and glyph tiles were painted `var(--muted)`, which is the *panel* surface — white on white inside a panel. `--input` is the recessed tone | CON-10 |
+| Three stylesheets carried the same filter row | copied six declarations that had already drifted; now `.filter-bar` in the kit's `controls.css` | CON-09 |
+| `--success`, `--warning`, `--text-md` did not exist | invented in dashboard and audit CSS and resolved to nothing, so a WARN posture line read exactly like an OK | DSH-02 |
+| The identity-provider table scrolled sideways | the preview panel took a third of the width at 1440px and squeezed the five columns past their content | IDP-01 |
+| A provider's default role names were folded to lower case | `USER` was stored as `user`, matched no role, and every brokered login arrived with no roles | IDP-04 |
+| The grace-aware client-secret provider was a bean | Spring adopted the lone `AuthenticationProvider` bean as the global manager's provider: every form login failed and lockout stopped counting | AUT-02, LCK-01 (the provider is built inside the SAS chain, never a bean) |
+| Spring's provider saves an upgraded hash through the registry it was given | `UnsupportedOperationException` from the grace view's read-only `save` on the first token with a `{bcrypt}` strength-10 seed | CLI-03 (`SingleClientRepository.save` is a no-op) |
+
+---
+
 ## 99 — Known gaps
 
 **Members are not reconciled with tenancy.** A user deleted in uaa leaves a membership row behind in tenancy,
 and removing a member in tenancy does not remove their uaa user.
 
-**The client secret is in `application.yml` in plain text for `lcl`.** It is local seed configuration and never
-leaves the machine, but it means any local service can mint a `store_core` token. Do not copy that pattern to
-`fargate`.
+**The shared local secret is in the `lcl` slices in plain text.** It is local seed configuration and never leaves
+the machine, but it means any local service can mint a `store_core` token. `application.yml` itself has no default
+any more; `fargate` must set every `UAA_*` variable.
+
+**`/logout` accepts GET.** The kit's `AuthService.logout()` navigates rather than posts, so the logout matcher takes
+any method. A GET logout is a link that signs you out; it should become a POST once the kit posts.
+
+**Lessons closed by this branch.** `lessons.md` entries "Roles — a role is a name", "Users — metadata is merged,
+never replaced", "Users — creating an account is two calls, and there are no invites" and the email half of
+"Users — email and username cannot be changed here" now describe the old system; each carries its *Closed by*
+line. Still open: realm switcher, notifications, MFA, CSV import, SAML, and providers on the sign-in page.
+
+**The outbox row holds the plaintext link until it completes.** `uaa.outbox_record.payload` carries
+`InvitationIssuedEvent` / `PasswordResetLinkIssuedEvent` with the link in clear until the handler runs (seconds,
+under `lcl`). A stuck outbox would keep live links readable to anyone with the database. Encrypting the payload
+or carrying only the token hash plus a fetch is a follow-up for the delivery service.
+
+**The invitee's shell is empty.** A `USER`-role account that signs in to uaa's console reaches the shell and gets a
+403 bar on every admin screen (CON-06); `/account` is the only page it can use. A landing on `/account` for
+non-admins is a follow-up.
+
+**The audit log has no write API and no delete.** Rows arrive as a side effect of the action they describe, and
+the only removal is the nightly retention job trimming past `settings.auditRetentionDays`. If an event you expect is
+missing, the action did not happen — that is the point of the design, and it is why a gap here is evidence.
+
+**`token.issued` counts start when this build did.** The listener is new, so a realm upgraded mid-life shows a
+tokens figure that begins at the restart rather than at the beginning of the log. Sign-ins do not have this problem:
+they have been recorded since phase 3.
+
+**A brokered login never plants the CSRF cookie.** The OAuth2 redirects short-circuit before the filter that writes
+`XSRF-TOKEN`, so the confirmation POST works only after the browser has loaded `/login` — which it always does, because
+that is where the failure handler sends it. A client driving the flow by hand must fetch that page too (the integration
+test does).
+
+**Apple is scaffolded, not verified.** The preset carries the endpoints and `response_mode=form_post`, and takes the
+ES256 client-secret JWT as the stored secret rather than minting it from a `.p8` key. Nobody has run it against a
+developer account. SAML is not built at all, and the type chooser says so.
+
+**The signing keys' crypto key is the platform's LOCAL provider.** `common-config.yml` sets
+`com.asrevo.cvhome.crypto.type: LOCAL` with no key, which resolves ENV → FILE → *random per boot*. uaa's `lcl` and
+`test-stores` slices pin a static key so a restart can read the stored private halves (KEY-03); `fargate` must supply
+one. cua's social-login secrets sit on the same provider and have the same exposure.
+
+**Delivery is a log line.** `LoggingLinkDeliveryHandler` is the only consumer of the link events; the SMS /
+WhatsApp / email service that subscribes to `uaa-events` does not exist yet, so the operator carries every link.
 
 **~~uaa has no `http/` directory.~~** Closed: `http/admin-user-api.http`, `http/admin-role-api.http` and
 `http/admin-client-api.http` now cover all three admin controllers, each including the 403-as-org-admin case.
-A loose `req.http` remains at the module root and should be folded in or deleted.
+The loose `req.http` at the module root is gone (it held plaintext credentials).
 
 **`PermissionAccessChecker.hasReadAccessOnStore` never checks `isSuperAdmin`,** so a super admin gets 403 on
 `store-info`. Tracked with the `isOrgAdmin` gap in tenancy-qa.md 99.

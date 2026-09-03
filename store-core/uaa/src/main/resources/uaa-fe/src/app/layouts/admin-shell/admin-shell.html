@@ -29,7 +29,7 @@
     <app-section-nav
       basePath="/"
       [flat]="true"
-      [sections]="sections"
+      [sections]="sections()"
       [active]="active()"
       [(collapsed)]="collapsed"
       heading=""
@@ -63,13 +63,13 @@
       </div>
 
       @if (user; as principal) {
-        <div class="who">
+        <a class="who" routerLink="/account" [title]="t('nav.account')">
           <span class="avatar" aria-hidden="true">{{ principal.username.slice(0, 2).toUpperCase() }}</span>
           <span class="who-copy">
             <span class="who-name">{{ principal.username }}</span>
             <span class="who-role">{{ t('nav.signedIn') }}</span>
           </span>
-        </div>
+        </a>
       }
 
       <button class="sign-out" type="button" (click)="logout()">

@@ -1,3 +1,11 @@
+/*
+ * The screen's header and panels are the page column's own children, so the shell's rhythm applies
+ * between them and this stylesheet never sets a gap of its own. See admin-shell.css, `.page`.
+ */
+:host {
+  display: contents;
+}
+
 .stack {
   display: grid;
   gap: var(--spacing-section);
@@ -56,4 +64,40 @@
   .cell.go {
     display: none;
   }
+}
+
+/* --- the toolbar: segments on the left, search on the right ------------------------------------------- */
+.cell.client {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.1rem;
+}
+
+.cell .name {
+  color: var(--foreground-strong);
+}
+
+.cell .mono {
+  color: var(--muted-foreground);
+  font-family: var(--font-mono);
+  font-size: var(--text-4xs);
+  unicode-bidi: plaintext;
+}
+
+.cell.grants {
+  color: var(--muted-foreground);
+  font-family: var(--font-mono);
+  font-size: var(--text-4xs);
+  overflow-wrap: anywhere;
+}
+
+.muted {
+  color: var(--foreground-subtle);
+  font-size: var(--text-3xs);
+}
+
+/* A disabled client reads as switched off, not as missing. */
+.row.off .cell.client {
+  opacity: 0.6;
 }
