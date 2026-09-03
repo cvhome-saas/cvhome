@@ -1,0 +1,160 @@
+<ng-container *transloco="let t">
+  <app-page-header [title]="t('audit.title')" [context]="t('audit.context')" />
+
+  @if (facade.error(); as failure) {
+    <app-load-error [message]="failure.message" (retry)="facade.reload()" />
+  }
+
+  @if (!facade.error()) {
+    <app-panel [title]="t('audit.panel.title')" [subtitle]="t('audit.panel.subtitle')">
+      <div panelAction class="panel-actions">
+        <app-toggle [checked]="facade.live()" [label]="t('audit.live')" (checkedChange)="facade.live.set($event)" />
+        <!-- A link, not a button: the browser fetches the CSV itself so the file lands with its own name. -->
+        <a class="secondary-action" [href]="facade.exportUrl()" [attr.aria-label]="t('audit.export')">{{ t('audit.export') }}</a>
+      </div>
+
+      <div class="filters">
+        <app-tab-switcher [tabs]="categoryTabs(t)" [active]="facade.category() ?? 'all'" [label]="t('audit.filter.category')" (activeChange)="facade.setCategory($event)" />
+        <app-tab-switcher [tabs]="rangeTabs()" [active]="facade.range()" [label]="t('audit.filter.range')" (activeChange)="facade.setRange($event)" />
+        <button class="chip" type="button" [class.on]="facade.outcome() === 'FAILURE'" (click)="facade.toggleOutcome('FAILURE')">
+          {{ t('audit.filter.failuresOnly') }}
+        </button>
+        <app-search-box
+          [value]="facade.query()"
+          [label]="t('audit.filter.search')"
+          [placeholder]="t('audit.filter.searchPlaceholder')"
+          [clearLabel]="t('shared.actions.clear')"
+          width="16rem"
+          (valueChange)="facade.setQuery($event)"
+        />
+      </div>
+
+      @if (facade.hasPivot()) {
+        <p class="pivot" role="status">
+          {{ facade.actor() ? t('audit.pivot.actor', {actor: facade.actor()}) : t('audit.pivot.ip', {ip: facade.ip()}) }}
+          <button class="link" type="button" (click)="facade.clearPivots()">{{ t('audit.pivot.clear') }}</button>
+        </p>
+      }
+
+      <app-busy-overlay reserve="page" [busy]="facade.isLoading()" [label]="t('audit.loading')">
+        @if (facade.rows().length) {
+          <app-data-table [columns]="columns(t)" [label]="t('audit.panel.title')">
+            @for (event of facade.rows(); track event.id) {
+              <app-table-row class="row" [interactive]="true" (click)="facade.select(event)">
+                <span class="cell when" [attr.data-label]="t('audit.column.when')">
+                  {{ event.occurredAt | date: 'MMM d, HH:mm:ss' }}
+                </span>
+                <span class="cell event" [attr.data-label]="t('audit.column.event')">
+                  <app-badge [tone]="tone(event)">{{ event.outcome === 'FAILURE' ? t('audit.outcome.FAILURE') : t('audit.outcome.SUCCESS') }}</app-badge>
+                  <span class="event-name">{{ label(event, t) }}</span>
+                </span>
+                <span class="cell actor" [attr.data-label]="t('audit.column.actor')">
+                  <span class="who">{{ event.actorName || t('audit.actor.' + event.actorType) }}</span>
+                  <span class="muted">{{ t('audit.actor.' + event.actorType) }}</span>
+                </span>
+                <span class="cell target" [attr.data-label]="t('audit.column.target')">
+                  <span class="who">{{ event.targetName || '—' }}</span>
+                  @if (event.clientId) {
+                    <span class="muted latin">{{ event.clientId }}</span>
+                  }
+                </span>
+                <span class="cell muted latin" [attr.data-label]="t('audit.column.source')">{{ event.ip || '—' }}</span>
+              </app-table-row>
+            }
+          </app-data-table>
+
+          <app-pagination
+            [page]="facade.page()"
+            [totalPages]="facade.totalPages()"
+            [totalElements]="facade.total()"
+            [pageSize]="facade.pageSize"
+            [unit]="t('audit.unit')"
+            [label]="t('audit.pagination')"
+            (pageChange)="facade.goTo($event)"
+          />
+        } @else if (!facade.isLoading()) {
+          <app-empty-state icon="clock" [title]="t('audit.empty.title')" [message]="t('audit.empty.message')" />
+        }
+      </app-busy-overlay>
+    </app-panel>
+  }
+
+  <!-- One event, read closely: the facts, the change it made, and the two pivots that follow a thread. -->
+  @if (facade.selected(); as event) {
+    <aside class="detail" role="dialog" aria-modal="false" [attr.aria-label]="label(event, t)">
+      <header class="detail-head">
+        <div>
+          <h2 class="detail-title">{{ label(event, t) }}</h2>
+          <p class="detail-when">{{ event.occurredAt | date: 'medium' }}</p>
+        </div>
+        <button class="icon-action" type="button" [attr.aria-label]="t('shared.actions.close')" (click)="facade.dismiss()">
+          <app-icon name="x" [size]="16" />
+        </button>
+      </header>
+
+      <dl class="facts">
+        <dt>{{ t('audit.detail.outcome') }}</dt>
+        <dd><app-badge [tone]="tone(event)">{{ t('audit.outcome.' + event.outcome) }}</app-badge></dd>
+        @if (event.reasonCode) {
+          <dt>{{ t('audit.detail.reason') }}</dt>
+          <dd class="latin">{{ event.reasonCode }}</dd>
+        }
+        <dt>{{ t('audit.detail.actor') }}</dt>
+        <dd>{{ event.actorName || '—' }} · {{ t('audit.actor.' + event.actorType) }}</dd>
+        <dt>{{ t('audit.detail.target') }}</dt>
+        <dd>{{ event.targetName || '—' }}</dd>
+        @if (event.clientId) {
+          <dt>{{ t('audit.detail.client') }}</dt>
+          <dd class="latin">{{ event.clientId }}</dd>
+        }
+        <dt>{{ t('audit.detail.source') }}</dt>
+        <dd class="latin">{{ event.ip || '—' }}</dd>
+        @if (event.userAgent) {
+          <dt>{{ t('audit.detail.agent') }}</dt>
+          <dd class="latin wrap">{{ event.userAgent }}</dd>
+        }
+        @if (event.detail) {
+          <dt>{{ t('audit.detail.note') }}</dt>
+          <dd class="wrap">{{ event.detail }}</dd>
+        }
+        @if (event.traceId) {
+          <dt>{{ t('audit.detail.trace') }}</dt>
+          <dd class="latin">{{ event.traceId }}</dd>
+        }
+      </dl>
+
+      @if (facade.changes(event).length) {
+        <section class="changes" [attr.aria-label]="t('audit.detail.changes')">
+          <h3 class="section-title">{{ t('audit.detail.changes') }}</h3>
+          <table class="diff">
+            <thead>
+              <tr>
+                <th>{{ t('audit.detail.field') }}</th>
+                <th>{{ t('audit.detail.before') }}</th>
+                <th>{{ t('audit.detail.after') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (change of facade.changes(event); track change.field) {
+                <tr>
+                  <td class="latin">{{ change.field }}</td>
+                  <td class="was">{{ change.before }}</td>
+                  <td class="is">{{ change.after }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </section>
+      }
+
+      <div class="detail-actions">
+        @if (event.actorName || event.actorId) {
+          <button class="secondary-action" type="button" (click)="facade.pivotToActor(event)">{{ t('audit.detail.allByActor') }}</button>
+        }
+        @if (event.ip) {
+          <button class="secondary-action" type="button" (click)="facade.pivotToIp(event)">{{ t('audit.detail.allFromIp') }}</button>
+        }
+      </div>
+    </aside>
+  }
+</ng-container>

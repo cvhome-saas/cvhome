@@ -16,11 +16,10 @@ import {Icon, SectionNav, type NavSection} from '@cvhome-saas/ui-kit/ui';
  * console-ui's own sidebar could adopt later. Writing a second grouped rail here is exactly the
  * duplication the kit exists to prevent.
  *
- * **Two sections are rendered disabled.** Dashboard and Audit log are
- * in the design and have no backend at all — no endpoint, no data, nothing behind them. They are
- * shown rather than hidden so the rail is a map of the product rather than of this sprint, and each
- * says why on hover. See lessons.md, "Shell — four sections have no backend"; the count badge and
- * realm switcher the design also draws are in there too.
+ * **Every section in this rail is a real route.** Dashboard, Audit log and Identity providers were drawn
+ * disabled here because nothing stood behind them; feat/uaa-sso built all three, so the rail is now a map of
+ * the product with no dead rows. The count badge and the realm switcher the design also draws are still
+ * absent — see lessons.md, "Shell — four sections have no backend" and "Shell — no sidebar badge counts".
  */
 @Component({
   selector: 'app-admin-shell',
@@ -42,10 +41,8 @@ export class AdminShell {
    * (lessons.md, "Shell — no sidebar badge counts").
    */
   protected readonly sections: readonly NavSection[] = [
-    {key: 'dashboard', labelKey: 'nav.dashboard', icon: 'home', group: 'nav.group.overview',
-     disabled: true, disabledHintKey: 'nav.notBuilt'},
-    {key: 'audit', labelKey: 'nav.audit', icon: 'clock', group: 'nav.group.overview',
-     disabled: true, disabledHintKey: 'nav.notBuilt'},
+    {key: 'dashboard', labelKey: 'nav.dashboard', icon: 'home', group: 'nav.group.overview'},
+    {key: 'audit', labelKey: 'nav.audit', icon: 'clock', group: 'nav.group.overview'},
     {key: 'users', labelKey: 'nav.users', icon: 'users', group: 'nav.group.identity'},
     {key: 'roles', labelKey: 'nav.roles', icon: 'shield', group: 'nav.group.identity'},
     {key: 'identity-providers', labelKey: 'nav.providers', icon: 'signIn', group: 'nav.group.identity'},

@@ -36,7 +36,9 @@
     "account": "حسابي",
     "acceptInvitation": "قبول الدعوة",
     "resetPassword": "اختيار كلمة مرور جديدة",
-    "providers": "موفّرو الهوية"
+    "providers": "موفّرو الهوية",
+    "dashboard": "لوحة المعلومات",
+    "audit": "سجل التدقيق"
   },
   "signIn": {
     "title": "تسجيل الدخول",
@@ -919,6 +921,180 @@
       "enabled": "{{name}} على صفحة تسجيل الدخول.",
       "disabled": "{{name}} معطّل.",
       "deleted": "حُذف {{name}}."
+    }
+  },
+  "audit": {
+    "event": {
+      "user_login": "سجّل الدخول",
+      "user_login_failed": "أخفق تسجيل الدخول",
+      "user_logout": "سجّل الخروج",
+      "user_locked": "قُفل الحساب",
+      "user_unlocked": "فُتح قفل الحساب",
+      "user_created": "أُنشئ الحساب",
+      "user_updated": "حُدّث الحساب",
+      "user_deleted": "حُذف الحساب",
+      "user_enabled": "فُعّل الحساب",
+      "user_disabled": "عُطّل الحساب",
+      "user_activated": "نُشّط الحساب",
+      "user_password_changed": "غُيّرت كلمة المرور",
+      "user_password_reset": "أُعيد تعيين كلمة المرور",
+      "user_password_reset_link_issued": "أُصدر رابط إعادة تعيين",
+      "user_email_changed": "غُيّر البريد",
+      "user_email_verified": "وُثّق البريد",
+      "user_role_assigned": "مُنح دور",
+      "user_role_removed": "أُزيل دور",
+      "token_issued": "أُصدر رمز",
+      "token_revoked": "أُبطل رمز",
+      "token_refresh_rejected": "رُفض التجديد",
+      "client_created": "سُجّل تطبيق",
+      "client_updated": "تغيّر تطبيق",
+      "client_deleted": "حُذف تطبيق",
+      "client_enabled": "فُعّل تطبيق",
+      "client_disabled": "عُطّل تطبيق",
+      "client_secret_rotated": "دُوّر سر العميل",
+      "client_auth_failed": "أخفقت مصادقة التطبيق",
+      "client_redirect_uri_mismatch": "رُفض عنوان إعادة التوجيه",
+      "role_created": "أُنشئ دور",
+      "role_updated": "تغيّر دور",
+      "role_deleted": "حُذف دور",
+      "role_permissions_updated": "تغيّرت صلاحيات الدور",
+      "idp_created": "أُضيف موفّر",
+      "idp_updated": "تغيّر موفّر",
+      "idp_deleted": "حُذف موفّر",
+      "identity_linked": "رُبط دخول خارجي",
+      "identity_unlinked": "أُلغي ربط دخول خارجي",
+      "settings_updated": "تغيّرت الإعدادات",
+      "key_rotated": "دُوّر مفتاح التوقيع",
+      "key_retired": "تقاعد مفتاح توقيع",
+      "session_revoked": "أُبطلت جلسة",
+      "invitation_created": "أُصدرت دعوة",
+      "invitation_revoked": "أُلغيت دعوة",
+      "invitation_accepted": "قُبلت دعوة",
+      "request_rate_limited": "حُدّ المعدل"
+    },
+    "title": "سجل التدقيق",
+    "context": "كل إجراء إداري وكل تسجيل دخول، كما حدث",
+    "loading": "جارٍ تحميل الأحداث…",
+    "panel": {
+      "title": "الأحداث",
+      "subtitle": "الأحدث أولًا. لا يمكن تعديل شيء هنا أو حذفه؛ الاحتفاظ يقلّم الأقدم."
+    },
+    "live": "مباشر",
+    "export": "تصدير CSV",
+    "unit": "حدثًا",
+    "pagination": "صفحات سجل التدقيق",
+    "filter": {
+      "category": "الفئة",
+      "range": "المدى",
+      "failuresOnly": "الإخفاقات فقط",
+      "search": "بحث في الأحداث",
+      "searchPlaceholder": "الفاعل أو الهدف أو الملاحظة"
+    },
+    "category": {
+      "all": "الكل",
+      "AUTHENTICATION": "تسجيل الدخول",
+      "ADMIN": "الإدارة",
+      "TOKENS": "الرموز",
+      "SECURITY": "الأمان"
+    },
+    "range": {
+      "24h": "24 ساعة",
+      "7d": "7 أيام",
+      "30d": "30 يومًا",
+      "all": "كل الوقت"
+    },
+    "column": {
+      "when": "متى",
+      "event": "الحدث",
+      "actor": "من",
+      "target": "ماذا",
+      "source": "من أين"
+    },
+    "outcome": {
+      "SUCCESS": "نجح",
+      "FAILURE": "أخفق"
+    },
+    "actor": {
+      "USER": "شخص",
+      "CLIENT": "تطبيق",
+      "SYSTEM": "uaa نفسه",
+      "ANONYMOUS": "غير مسجّل الدخول"
+    },
+    "empty": {
+      "title": "لا شيء في هذا المدى",
+      "message": "وسّع المدى أو امسح عوامل التصفية."
+    },
+    "pivot": {
+      "actor": "كل ما فعله {{actor}}.",
+      "ip": "كل ما جاء من {{ip}}.",
+      "clear": "مسح"
+    },
+    "detail": {
+      "outcome": "النتيجة",
+      "reason": "السبب",
+      "actor": "من",
+      "target": "ماذا",
+      "client": "التطبيق",
+      "source": "من أين",
+      "agent": "المتصفح",
+      "note": "ملاحظة",
+      "trace": "التتبّع",
+      "changes": "ما تغيّر",
+      "field": "الحقل",
+      "before": "كان",
+      "after": "أصبح",
+      "allByActor": "كل ما فعله هذا الفاعل",
+      "allFromIp": "كل ما جاء من هذا العنوان"
+    }
+  },
+  "dashboard": {
+    "title": "لوحة المعلومات",
+    "context": "ما يفعله هذا المجال، وكيف هو مهيّأ",
+    "loading": "جارٍ التحميل…",
+    "kpis": "مقاييس المجال",
+    "filter": {
+      "range": "المدى"
+    },
+    "range": {
+      "24h": "24 ساعة",
+      "7d": "7 أيام",
+      "30d": "30 يومًا"
+    },
+    "kpi": {
+      "signIns": "عمليات الدخول",
+      "failures": "{count, plural, =0 {بلا إخفاقات} one {أخفقت واحدة} other {أخفقت #}}",
+      "tokens": "الرموز المُصدرة",
+      "sessions": "الجلسات النشطة",
+      "users": "الحسابات",
+      "locked": "{count, plural, =0 {لا مقفلة} one {واحد مقفل} other {# مقفلة}}"
+    },
+    "chart": {
+      "title": "عمليات تسجيل الدخول",
+      "subtitle": "الناجحة والمخفقة عبر المدى",
+      "success": "نجحت",
+      "failure": "أخفقت",
+      "none": "لا عمليات دخول في هذا المدى.",
+      "alt": "{{success}} عملية دخول، أخفق منها {{failure}}"
+    },
+    "posture": {
+      "title": "الوضع الأمني",
+      "subtitle": "يُفحص من بيانات هذا المجال نفسه عند كل قراءة",
+      "keyAge": "مفتاح التوقيع {detail, plural, =0 {جديد اليوم} one {عمره يوم} other {عمره # يومًا}}.",
+      "usersWithoutPassword": "{detail, plural, =0 {كل حساب له كلمة مرور} one {حساب واحد بلا كلمة مرور} other {# حسابات بلا كلمة مرور}}.",
+      "clientsWithoutPkce": "{detail, plural, =0 {كل عملاء المتصفح يشترطون PKCE} one {عميل متصفح واحد لا يشترط PKCE} other {# عملاء متصفح لا يشترطون PKCE}}.",
+      "secretsExpiring": "{detail, plural, =0 {لا سر عميل ينتهي خلال 30 يومًا} one {سر عميل واحد ينتهي خلال 30 يومًا} other {# أسرار عملاء تنتهي خلال 30 يومًا}}.",
+      "breachedPasswordCheck": "فحص كلمات المرور المخترقة معطّل؛ فعّله من الإعدادات.",
+      "failedSignIns": "{detail, plural, =0 {لا عمليات دخول مخفقة في المدى} one {عملية دخول مخفقة واحدة في المدى} other {# عمليات دخول مخفقة في المدى}}."
+    },
+    "clients": {
+      "title": "أكثر التطبيقات نشاطًا",
+      "meta": "رمزًا مُصدرًا"
+    },
+    "failures": {
+      "title": "الإخفاقات الأخيرة",
+      "subtitle": "آخر حالات الرفض، أيًّا كان صاحبها",
+      "none": "لا إخفاقات في هذا المدى.",
+      "all": "افتح سجل التدقيق"
     }
   }
 }

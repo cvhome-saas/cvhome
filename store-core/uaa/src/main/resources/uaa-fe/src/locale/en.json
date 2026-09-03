@@ -36,7 +36,9 @@
     "account": "My account",
     "acceptInvitation": "Accept your invitation",
     "resetPassword": "Choose a new password",
-    "providers": "Identity providers"
+    "providers": "Identity providers",
+    "dashboard": "Dashboard",
+    "audit": "Audit log"
   },
   "signIn": {
     "title": "Sign in",
@@ -919,6 +921,180 @@
       "enabled": "{{name}} is on the sign-in page.",
       "disabled": "{{name}} is off.",
       "deleted": "{{name}} deleted."
+    }
+  },
+  "audit": {
+    "event": {
+      "user_login": "Signed in",
+      "user_login_failed": "Sign-in failed",
+      "user_logout": "Signed out",
+      "user_locked": "Account locked",
+      "user_unlocked": "Account unlocked",
+      "user_created": "Account created",
+      "user_updated": "Account updated",
+      "user_deleted": "Account deleted",
+      "user_enabled": "Account enabled",
+      "user_disabled": "Account disabled",
+      "user_activated": "Account activated",
+      "user_password_changed": "Password changed",
+      "user_password_reset": "Password reset",
+      "user_password_reset_link_issued": "Reset link issued",
+      "user_email_changed": "Email changed",
+      "user_email_verified": "Email verified",
+      "user_role_assigned": "Role granted",
+      "user_role_removed": "Role removed",
+      "token_issued": "Token issued",
+      "token_revoked": "Token revoked",
+      "token_refresh_rejected": "Refresh refused",
+      "client_created": "Application registered",
+      "client_updated": "Application changed",
+      "client_deleted": "Application deleted",
+      "client_enabled": "Application enabled",
+      "client_disabled": "Application disabled",
+      "client_secret_rotated": "Client secret rotated",
+      "client_auth_failed": "Application failed to authenticate",
+      "client_redirect_uri_mismatch": "Redirect URI refused",
+      "role_created": "Role created",
+      "role_updated": "Role changed",
+      "role_deleted": "Role deleted",
+      "role_permissions_updated": "Role permissions changed",
+      "idp_created": "Provider added",
+      "idp_updated": "Provider changed",
+      "idp_deleted": "Provider deleted",
+      "identity_linked": "External login linked",
+      "identity_unlinked": "External login unlinked",
+      "settings_updated": "Settings changed",
+      "key_rotated": "Signing key rotated",
+      "key_retired": "Signing key retired",
+      "session_revoked": "Session revoked",
+      "invitation_created": "Invitation issued",
+      "invitation_revoked": "Invitation revoked",
+      "invitation_accepted": "Invitation accepted",
+      "request_rate_limited": "Rate limited"
+    },
+    "title": "Audit log",
+    "context": "Every administrative action and every sign-in, as it happened",
+    "loading": "Loading events…",
+    "panel": {
+      "title": "Events",
+      "subtitle": "Newest first. Nothing here can be edited or deleted; retention trims the oldest."
+    },
+    "live": "Live",
+    "export": "Export CSV",
+    "unit": "events",
+    "pagination": "Audit log pages",
+    "filter": {
+      "category": "Category",
+      "range": "Range",
+      "failuresOnly": "Failures only",
+      "search": "Search events",
+      "searchPlaceholder": "Actor, target or note"
+    },
+    "category": {
+      "all": "All",
+      "AUTHENTICATION": "Sign-in",
+      "ADMIN": "Administration",
+      "TOKENS": "Tokens",
+      "SECURITY": "Security"
+    },
+    "range": {
+      "24h": "24 hours",
+      "7d": "7 days",
+      "30d": "30 days",
+      "all": "All time"
+    },
+    "column": {
+      "when": "When",
+      "event": "Event",
+      "actor": "Who",
+      "target": "What",
+      "source": "From"
+    },
+    "outcome": {
+      "SUCCESS": "Succeeded",
+      "FAILURE": "Failed"
+    },
+    "actor": {
+      "USER": "Person",
+      "CLIENT": "Application",
+      "SYSTEM": "uaa itself",
+      "ANONYMOUS": "Not signed in"
+    },
+    "empty": {
+      "title": "Nothing in this range",
+      "message": "Widen the range or clear the filters."
+    },
+    "pivot": {
+      "actor": "Everything {{actor}} did.",
+      "ip": "Everything from {{ip}}.",
+      "clear": "Clear"
+    },
+    "detail": {
+      "outcome": "Outcome",
+      "reason": "Reason",
+      "actor": "Who",
+      "target": "What",
+      "client": "Application",
+      "source": "From",
+      "agent": "Browser",
+      "note": "Note",
+      "trace": "Trace",
+      "changes": "What changed",
+      "field": "Field",
+      "before": "Was",
+      "after": "Is",
+      "allByActor": "All by this actor",
+      "allFromIp": "All from this address"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "context": "What this realm has been doing, and how it is set up",
+    "loading": "Loading…",
+    "kpis": "Realm metrics",
+    "filter": {
+      "range": "Range"
+    },
+    "range": {
+      "24h": "24 hours",
+      "7d": "7 days",
+      "30d": "30 days"
+    },
+    "kpi": {
+      "signIns": "Sign-ins",
+      "failures": "{count, plural, =0 {no failures} one {1 failed} other {# failed}}",
+      "tokens": "Tokens issued",
+      "sessions": "Active sessions",
+      "users": "Accounts",
+      "locked": "{count, plural, =0 {none locked} one {1 locked} other {# locked}}"
+    },
+    "chart": {
+      "title": "Sign-ins",
+      "subtitle": "Successes and failures over the range",
+      "success": "Succeeded",
+      "failure": "Failed",
+      "none": "No sign-ins in this range.",
+      "alt": "{{success}} sign-ins, {{failure}} of them failed"
+    },
+    "posture": {
+      "title": "Security posture",
+      "subtitle": "Checked against this realm’s own data on every read",
+      "keyAge": "The signing key is {detail, plural, =0 {new today} one {1 day old} other {# days old}}.",
+      "usersWithoutPassword": "{detail, plural, =0 {Every account has a password} one {1 account has no password} other {# accounts have no password}}.",
+      "clientsWithoutPkce": "{detail, plural, =0 {Every browser client requires PKCE} one {1 browser client does not require PKCE} other {# browser clients do not require PKCE}}.",
+      "secretsExpiring": "{detail, plural, =0 {No client secret expires within 30 days} one {1 client secret expires within 30 days} other {# client secrets expire within 30 days}}.",
+      "breachedPasswordCheck": "Breached-password checking is off; turn it on in Settings.",
+      "failedSignIns": "{detail, plural, =0 {No failed sign-ins in the range} one {1 failed sign-in in the range} other {# failed sign-ins in the range}}."
+    },
+    "clients": {
+      "title": "Busiest applications",
+      "meta": "tokens issued"
+    },
+    "failures": {
+      "title": "Recent failures",
+      "subtitle": "The last refusals, whoever they were",
+      "none": "No failures in this range.",
+      "all": "Open the audit log"
     }
   }
 }

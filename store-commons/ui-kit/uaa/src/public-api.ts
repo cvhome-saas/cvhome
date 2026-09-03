@@ -19,5 +19,7 @@ export * from './lib/admin-key.service';
 export * from './lib/admin-idp.service';
 export * from './lib/public-login.service';
 export * from './lib/account.service';
+export * from './lib/admin-audit.service';
 export * from './lib/admin-client.service';
+export * from './lib/admin-dashboard.service';
 export * from './lib/user-admin-table/user-admin-table';

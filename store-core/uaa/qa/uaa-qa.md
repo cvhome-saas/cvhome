@@ -11,7 +11,7 @@ somewhere else entirely — that is [cua](../../../store-pod/cua/qa/cua-qa.md).
   is where the platform's sign-in page lives
 - **Runs on** — `lcl start -d --stack <name>`; uaa is `http://uaa.gateway.com:8001` and is the **first**
   service the stack brings up, because it issues the tokens. Read the live port from `lcl urls`
-- **Cases** — 122 (94 verified, 13 unit only, 15 not verified)
+- **Cases** — 132 (103 verified, 14 unit only, 15 not verified)
 - **Also see** — [gateway](../../gateway/gateway-service/qa/gateway-qa.md) (which relays the token and holds
   the session), [tenancy](../../tenancy/tenancy-service/qa/tenancy-qa.md) (which owns the *store-scoped*
   accounts and calls uaa to create them),
@@ -1310,6 +1310,95 @@ hand. A brokered login resolves to a local account by identity (provider + subje
 
 ---
 
+## AUD — The audit log
+
+Every administrative write and every sign-in leaves a row in `uaa.audit_events`; the API reads them and nothing
+writes one from outside. `http/admin-audit-api.http` runs the calls. What an event *means* is the console's to say:
+uaa stores wire names like `user.login.failed`, and the screen translates them.
+
+### AUD-01 — A failed sign-in is recorded, and reads back · critical · [verified]
+
+- **Steps** — sign in with a wrong password, then console → Audit log.
+- **Expect** — the top row is *Sign-in failed*, FAILED, actor *Not signed in*, target the username, the address
+  filled in and a `reasonCode` of `BAD_CREDENTIALS`. Five in a row also writes *Account locked* with actor
+  **uaa itself** and reason `THRESHOLD` (see LCK-01).
+
+### AUD-02 — The protocol writes its own events · critical · [verified]
+
+- **Steps** — mint a token (`client_credentials`), then present a wrong client secret, then revoke a token.
+- **Expect** — `token.issued` with actor CLIENT, the client id, and a detail naming the grant, the scopes and the
+  TTL; `client.auth.failed` with the claimed client id and `INVALID_CLIENT`; `token.revoked`. Issuing also stamps
+  `client_extension.last_token_issued_at`, which is the "Last token" column on the Clients screen.
+
+### AUD-03 — Filters, and the two pivots · high · [verified]
+
+- **Steps** — filter by category, by range, *Failures only*, then free text; open an event and use
+  *All by this actor* and *All from this address*.
+- **Expect** — every filter narrows server-side and resets to page 1; a category is a set of types, so *Security*
+  includes lockouts, secret rotations and key rotations. The pivots set `actor` / `ip` and show a banner with a
+  Clear. A range that runs backwards is **400** `UAA.AUDIT.QUERY_INVALID` naming the `from` field.
+
+### AUD-04 — What one event knows · high · [verified]
+
+- **Steps** — open an event that changed something (a provider edit, a settings save).
+- **Expect** — the panel lists outcome, reason, who, what, client, address, browser, note and trace id, and a
+  *What changed* table with the before and after of each changed field. Secrets and password hashes never appear —
+  the diff is taken over DTO snapshots, not entities.
+
+### AUD-05 — The CSV export · high · [verified]
+
+- **Steps** — *Export CSV* with filters applied.
+- **Expect** — `text/csv`, `attachment; filename="uaa-audit.csv"`, the header row, and **the same filters as the
+  screen** — the link is built from the live query. Oldest first, because an export is read as a story. Every field
+  is quoted and a value starting `=`, `+`, `-` or `@` is prefixed with a quote so a spreadsheet does not run it as
+  a formula. Over 100 000 rows it refuses with `UAA.AUDIT.EXPORT_TOO_LARGE` rather than writing half a file —
+  **[unit only]**, nobody has generated that many.
+
+### AUD-06 — The gate · critical · [verified]
+
+- **Steps** — every audit call as a `store_core` token, then anonymously.
+- **Expect** — **403** and **401**. There is no write endpoint at all: the log cannot be edited or deleted through
+  the API, only trimmed by nightly retention.
+
+---
+
+## DSH — The dashboard
+
+One read (`GET /api/v1/admin/dashboard?range=`) answers the whole screen. Every figure is counted from a table at
+request time; nothing is a stored statistic, and nothing is carried over from a previous range.
+
+### DSH-01 — The numbers are the tables' · critical · [verified]
+
+- **Steps** — note the tiles, then compare with the audit log and the database: sign-ins and failures against
+  `user.login` / `user.login.failed` in the range, tokens against `token.issued`, sessions against
+  `uaa.spring_session` where `expiry_time > now`, accounts against `uaa.users`.
+- **Expect** — they agree. Switching the range re-reads everything; no tile keeps a figure from the previous one.
+  The chart's buckets are hours for 24h and days for the longer ranges, with a gap where nothing happened.
+
+### DSH-02 — The posture is computed, never declared · critical · [verified]
+
+- **Steps** — read the panel, then change something it measures: turn breached-password checking off in Settings,
+  or rotate the signing key.
+- **Expect** — six lines, each with OK / WARN / RISK from the data: signing-key age against the rotation interval,
+  accounts without a password, authorization-code clients without PKCE, client secrets expiring within 30 days,
+  breached-password checking, and failed sign-ins against the lockout threshold. A change is reflected on the next
+  read. With no active signing key at all the first line is **RISK** — **[unit only]**, that state needs a broken
+  realm.
+
+### DSH-03 — Busiest applications and recent failures · [verified]
+
+- **Steps** — mint tokens on two clients, fail a sign-in, reload.
+- **Expect** — the ranked list orders clients by tokens issued in the range; the failures list shows the last five
+  refusals with their translated event name, target, address and time, and links into the audit log.
+
+### DSH-04 — The gate and the rail · critical · [verified]
+
+- **Steps** — the dashboard as a `store_core` token; then check the rail.
+- **Expect** — **403**. Every rail row is a real route now — Dashboard, Audit log and Identity providers were the
+  three that were drawn disabled. `counts` in the same response feeds them.
+
+---
+
 ## SID — The `"*"` wildcard
 
 _From `qa/unify-store-id-value-objects.md` §EDGE, reformatted into the case shape used everywhere else._
@@ -1392,6 +1481,14 @@ or carrying only the token hash plus a fetch is a follow-up for the delivery ser
 **The invitee's shell is empty.** A `USER`-role account that signs in to uaa's console reaches the shell and gets a
 403 bar on every admin screen (CON-06); `/account` is the only page it can use. A landing on `/account` for
 non-admins is a follow-up.
+
+**The audit log has no write API and no delete.** Rows arrive as a side effect of the action they describe, and
+the only removal is the nightly retention job trimming past `settings.auditRetentionDays`. If an event you expect is
+missing, the action did not happen — that is the point of the design, and it is why a gap here is evidence.
+
+**`token.issued` counts start when this build did.** The listener is new, so a realm upgraded mid-life shows a
+tokens figure that begins at the restart rather than at the beginning of the log. Sign-ins do not have this problem:
+they have been recorded since phase 3.
 
 **A brokered login never plants the CSRF cookie.** The OAuth2 redirects short-circuit before the filter that writes
 `XSRF-TOKEN`, so the confirmation POST works only after the browser has loaded `/login` — which it always does, because

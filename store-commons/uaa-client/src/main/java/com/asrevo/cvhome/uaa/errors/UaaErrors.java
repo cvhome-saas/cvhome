@@ -157,7 +157,16 @@ public enum UaaErrors implements ErrorCode {
     LAST_CREDENTIAL("UAA.IDENTITY.LAST_CREDENTIAL", ErrorCategory.UNPROCESSABLE),
 
     /** No brokered login is waiting to be confirmed, or the password given for it was wrong. */
-    LINK_CONFIRMATION_INVALID("UAA.IDENTITY.LINK_CONFIRMATION_INVALID", ErrorCategory.VALIDATION);
+    LINK_CONFIRMATION_INVALID("UAA.IDENTITY.LINK_CONFIRMATION_INVALID", ErrorCategory.VALIDATION),
+
+    /** No audit event with that id. */
+    AUDIT_EVENT_NOT_FOUND("UAA.AUDIT.NOT_FOUND", ErrorCategory.NOT_FOUND),
+
+    /** The export would be larger than the cap; narrow the range or the filters. */
+    AUDIT_EXPORT_TOO_LARGE("UAA.AUDIT.EXPORT_TOO_LARGE", ErrorCategory.VALIDATION),
+
+    /** The audit query cannot be answered as asked — a range that runs backwards, say. */
+    AUDIT_QUERY_INVALID("UAA.AUDIT.QUERY_INVALID", ErrorCategory.VALIDATION);
 
     private final String code;
 

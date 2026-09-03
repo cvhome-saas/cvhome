@@ -58,6 +58,16 @@ export const routes: Routes = [
         data: {titleKey: 'route.roles'},
       },
       {
+        path: 'dashboard',
+        loadComponent: () => import('@features/dashboard/dashboard').then((m) => m.DashboardScreen),
+        data: {titleKey: 'route.dashboard'},
+      },
+      {
+        path: 'audit',
+        loadComponent: () => import('@features/audit/audit').then((m) => m.Audit),
+        data: {titleKey: 'route.audit'},
+      },
+      {
         path: 'identity-providers',
         loadComponent: () => import('@features/identity-providers/identity-providers').then((m) => m.IdentityProviders),
         data: {titleKey: 'route.providers'},

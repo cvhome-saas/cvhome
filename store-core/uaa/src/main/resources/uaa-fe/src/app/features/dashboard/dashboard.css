@@ -1,0 +1,131 @@
+.range {
+  margin-block-end: var(--spacing-group);
+}
+
+.layout {
+  display: grid;
+  gap: var(--spacing-section);
+  grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+  margin-block-start: var(--spacing-section);
+}
+
+/* --- the sign-in chart ---------------------------------------------------------------------------------- */
+.chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  block-size: 8rem;
+  padding: var(--spacing-tight) 0;
+}
+
+.bar {
+  display: flex;
+  flex: 1;
+  align-items: flex-end;
+  min-inline-size: 2px;
+  block-size: 100%;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  inline-size: 100%;
+  block-size: 100%;
+}
+
+.success {
+  border-radius: 2px 2px 0 0;
+  background: var(--primary);
+}
+
+.failure {
+  border-radius: 2px 2px 0 0;
+  background: var(--destructive);
+}
+
+.axis {
+  display: flex;
+  justify-content: space-between;
+  color: var(--foreground-subtle);
+  font-size: var(--text-4xs);
+}
+
+.legend {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: var(--spacing-tight) 0 0;
+  color: var(--muted-foreground);
+  font-size: var(--text-4xs);
+}
+
+.swatch {
+  display: inline-block;
+  inline-size: 0.6rem;
+  block-size: 0.6rem;
+  border-radius: 2px;
+}
+
+.swatch.success {
+  background: var(--primary);
+}
+
+.swatch.failure {
+  margin-inline-start: var(--spacing-tight);
+  background: var(--destructive);
+}
+
+/* --- posture and failures ------------------------------------------------------------------------------- */
+.posture,
+.failures {
+  display: grid;
+  gap: var(--spacing-tight);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.check {
+  display: flex;
+  align-items: start;
+  gap: var(--spacing-tight);
+  font-size: var(--text-3xs);
+}
+
+.check .green {
+  color: var(--success, var(--primary));
+}
+
+.check .amber {
+  color: var(--warning, var(--foreground-strong));
+}
+
+.check .red {
+  color: var(--destructive);
+}
+
+.failure-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-tight);
+  font-size: var(--text-4xs);
+}
+
+.who {
+  overflow: hidden;
+  color: var(--foreground-strong);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.muted {
+  color: var(--muted-foreground);
+}
+
+.link {
+  display: inline-block;
+  margin-block-start: var(--spacing-tight);
+  color: var(--primary);
+  font-size: var(--text-3xs);
+}

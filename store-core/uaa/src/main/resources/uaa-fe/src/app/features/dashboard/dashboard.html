@@ -1,0 +1,79 @@
+<ng-container *transloco="let t">
+  <app-page-header [title]="t('dashboard.title')" [context]="t('dashboard.context')" />
+
+  @if (facade.error(); as failure) {
+    <app-load-error [message]="failure.message" (retry)="facade.reload()" />
+  }
+
+  @if (!facade.error()) {
+    <app-busy-overlay reserve="page" [busy]="facade.isLoading()" [label]="t('dashboard.loading')">
+      <div class="range">
+        <app-tab-switcher [tabs]="rangeTabs()" [active]="facade.range()" [label]="t('dashboard.filter.range')" (activeChange)="facade.setRange($event)" />
+      </div>
+
+      @if (facade.data(); as data) {
+        <app-kpi-grid [data]="facade.kpis()" [label]="t('dashboard.kpis')" />
+
+        <div class="layout">
+          <!-- Successes and failures share a column so a spike in one is read against the other. -->
+          <app-panel padded [title]="t('dashboard.chart.title')" [subtitle]="t('dashboard.chart.subtitle')">
+            @if (facade.chart().length) {
+              <div class="chart" role="img" [attr.aria-label]="t('dashboard.chart.alt', {success: data.signInsTotal, failure: data.signInFailures})">
+                @for (bucket of facade.chart(); track bucket.at) {
+                  <span class="bar" [title]="(bucket.at | date: 'medium') + ' · ' + bucket.success + ' / ' + bucket.failure">
+                    <span class="stack">
+                      <span class="failure" [style.height.%]="bucket.failureHeight"></span>
+                      <span class="success" [style.height.%]="bucket.successHeight"></span>
+                    </span>
+                  </span>
+                }
+              </div>
+              <div class="axis">
+                <span>{{ facade.chart()[0].at | date: bucketFormat() }}</span>
+                <span>{{ facade.chart()[facade.chart().length - 1].at | date: bucketFormat() }}</span>
+              </div>
+              <p class="legend">
+                <span class="swatch success"></span>{{ t('dashboard.chart.success') }}
+                <span class="swatch failure"></span>{{ t('dashboard.chart.failure') }}
+              </p>
+            } @else {
+              <p class="muted">{{ t('dashboard.chart.none') }}</p>
+            }
+          </app-panel>
+
+          <!-- Computed from the realm's own tables on every read, so it cannot claim a state we are not in. -->
+          <app-panel padded [title]="t('dashboard.posture.title')" [subtitle]="t('dashboard.posture.subtitle')">
+            <ul class="posture">
+              @for (check of facade.posture(); track check.id) {
+                <li class="check">
+                  <app-icon [name]="check.level === 'OK' ? 'checkCircle' : 'alertCircle'" [size]="14" [class]="check.tone" />
+                  <span>{{ check.text }}</span>
+                </li>
+              }
+            </ul>
+          </app-panel>
+
+          <app-ranked-list [title]="t('dashboard.clients.title')" [data]="facade.topClients()" [meta]="t('dashboard.clients.meta')" />
+
+          <app-panel padded [title]="t('dashboard.failures.title')" [subtitle]="t('dashboard.failures.subtitle')">
+            @if (facade.failures().length) {
+              <ul class="failures">
+                @for (event of facade.failures(); track event.id) {
+                  <li class="failure-row">
+                    <app-badge tone="red">{{ label(event, t) }}</app-badge>
+                    <span class="who">{{ event.targetName || event.actorName || '—' }}</span>
+                    <span class="muted latin">{{ event.ip }}</span>
+                    <span class="muted">{{ event.occurredAt | date: 'HH:mm' }}</span>
+                  </li>
+                }
+              </ul>
+              <a class="link" routerLink="/audit">{{ t('dashboard.failures.all') }}</a>
+            } @else {
+              <p class="muted">{{ t('dashboard.failures.none') }}</p>
+            }
+          </app-panel>
+        </div>
+      }
+    </app-busy-overlay>
+  }
+</ng-container>

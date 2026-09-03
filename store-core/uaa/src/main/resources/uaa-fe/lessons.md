@@ -52,6 +52,7 @@ MFA" rather than "we cannot tell".
   phases.
 - **Closed by feat/uaa-sso (phase 7), for Identity providers:** the rail entry is a real route now. Dashboard and
   Audit log are still disabled; they arrive with the audit query API.
+- **Closed by feat/uaa-sso (phase 8):** Dashboard and Audit log are routes now, over `GET /api/v1/admin/dashboard` and `GET /api/v1/admin/audit`. With Identity providers (phase 7) that is every disabled row gone; what the design still draws and this console does not have is the realm switcher and the notification bell, both of which need a store that does not exist.
 
 ## Users — no MFA state
 
