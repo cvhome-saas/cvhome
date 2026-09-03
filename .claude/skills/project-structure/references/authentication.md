@@ -21,6 +21,22 @@ code — the difference is *which realm they own*, not how they're built.
 **Practical consequence:** when you see an auth bug, first establish whether the actor is a seller/admin
 (→ `uaa`) or a shopper (→ `cua`). They have separate user tables, separate clients, separate issuers.
 
+## "Realm" means two different things — keep them apart
+
+The word is overloaded in this repo, and the two senses sit one layer apart:
+
+| Term | Where | Means | Values |
+|---|---|---|---|
+| **Issuer realm** | `store-commons/autoconfigure/.../s2s/jwt/IssuerRealm.java` | *Which authorization server minted this token.* What a resource server's trust list is written against, and what the `grants` ceiling and the `REALM_*` authority key on. | `uaa`, `cua` |
+| **Realm** | `store-commons/sso/sso-commons/.../RealmId.java` | *Which user pool a principal belongs to, inside one server.* What `users`, `roles`, `settings`, `identity_providers` and `audit_events` are scoped by. | `platform` (uaa) · one per store (cua) |
+
+They are independent: every realm lives inside exactly one issuer realm. uaa has one realm and always will —
+its staff and service accounts are a single pool, and there is no realm selector in its API or console. cua has
+one realm per store, which is what makes the same email address two different shoppers in two different stores.
+
+If you are reading `IssuerRegistry`, `MultiIssuerJwtDecoder` or `RealmAwareJwtGrantedAuthoritiesConverter`, the
+realm is the *server*. If you are reading anything under `sso-core`, it is the *user pool*.
+
 ## Pod services accept tokens from both
 
 A pod service is an OAuth2 **resource server** that must honour a seller token *and* a shopper token *and* an

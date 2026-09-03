@@ -1,0 +1,12 @@
+plugins {
+    alias(libs.plugins.java.library.conventions)
+}
+
+/*
+ * The realm vocabulary, and nothing else: the mode an SSO deployment runs in and the holder that carries the
+ * current realm across a request. Both shells (uaa, cua) and sso-core compile against this, so it deliberately
+ * has no Spring, no servlet API and no persistence behind it.
+ */
+dependencies {
+    api project(':store-commons:commons')
+}
