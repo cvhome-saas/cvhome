@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.uaa.service.impl;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -14,11 +15,17 @@ import com.asrevo.cvhome.uaa.api.errors.UaaApiUnavailableException;
 import com.asrevo.cvhome.uaa.api.errors.UaaConflictException;
 import com.asrevo.cvhome.uaa.api.errors.UaaOperationForbiddenException;
 import com.asrevo.cvhome.uaa.api.errors.UaaUserNotFoundException;
+import com.asrevo.cvhome.uaa.domain.user.InviteUserRequest;
+import com.asrevo.cvhome.uaa.domain.user.IssuedLink;
 import com.asrevo.cvhome.uaa.domain.user.PersistableUser;
 import com.asrevo.cvhome.uaa.domain.user.ReadableUser;
+import com.asrevo.cvhome.uaa.domain.user.ReadableUserList;
+import com.asrevo.cvhome.uaa.domain.user.UserCounts;
 import com.asrevo.cvhome.uaa.domain.user.UserPassword;
+import com.asrevo.cvhome.uaa.domain.user.UserSearchFilters;
 import com.asrevo.cvhome.uaa.sdk.AdminUserClient;
 import com.asrevo.cvhome.uaa.sdk.dto.CreateUserRequest;
+import com.asrevo.cvhome.uaa.sdk.dto.InvitationResponse;
 import com.asrevo.cvhome.uaa.sdk.dto.PageRequest;
 import com.asrevo.cvhome.uaa.sdk.dto.PageResponse;
 import com.asrevo.cvhome.uaa.sdk.dto.UpdateUserRequest;
@@ -71,6 +78,18 @@ class UserAccountServiceImplTest {
 
     private static final String NEW_PASSWORD = "n3w";
 
+    private static final String ACTIVE = "ACTIVE";
+
+    private static final Instant SIGNED_IN_AT = Instant.parse("2026-09-01T10:15:30Z");
+
+    private static final String LINK = "https://uaa.gateway.com/accept-invitation?token=opaque";
+
+    private static final String QUERY = "ada";
+
+    private static final String PENDING = "PENDING";
+
+    private static final String ORG_KEY = "org";
+
     private AdminUserClient client;
 
     private UserAccountServiceImpl service;
@@ -82,7 +101,8 @@ class UserAccountServiceImplTest {
     }
 
     private static UserDto dto(Map<String, Object> metadata) {
-        return new UserDto(USER_UUID, USERNAME, EMAIL, FIRST_NAME, LAST_NAME, true, Set.of(STORE_ADMIN), metadata);
+        return new UserDto(USER_UUID, USERNAME, EMAIL, FIRST_NAME, LAST_NAME, true, ACTIVE, true,
+                Set.of(STORE_ADMIN), metadata, SIGNED_IN_AT);
     }
 
     private static PersistableUser persistable() {
@@ -358,6 +378,107 @@ class UserAccountServiceImplTest {
         when(client.getUser(USER_ID)).thenThrow(unavailable);
 
         assertThatThrownBy(() -> service.findOne(USER_ID)).isSameAs(unavailable);
+    }
+
+
+    /**
+     * The lifecycle calls the console gained: a narrowed search, the state counts, and the two one-time links.
+     * What matters here is that a link is answered exactly once and that a failure the SDK cannot name leaves the
+     * outcome undecided rather than looking like a refusal.
+     */
+    @Nested
+    class Lifecycle {
+
+        @Test
+        void searchPassesEveryFilterThrough() throws Exception {
+            when(client.searchUsers(any(), any())).thenReturn(new PageResponse<>(List.of(dto(Map.of())), 0, 20, 1L, 1, true, true, false));
+
+            service.search(new UserSearchFilters(QUERY, PENDING, STORE_ADMIN, Map.of(ORG_KEY, ORG)), 0, 20);
+
+            org.mockito.ArgumentCaptor<com.asrevo.cvhome.uaa.sdk.dto.UserSearchFilters> filters =
+                    org.mockito.ArgumentCaptor.forClass(com.asrevo.cvhome.uaa.sdk.dto.UserSearchFilters.class);
+            verify(client).searchUsers(filters.capture(), any());
+            assertThat(filters.getValue().q()).isEqualTo(QUERY);
+            assertThat(filters.getValue().status()).isEqualTo(PENDING);
+            assertThat(filters.getValue().role()).isEqualTo(STORE_ADMIN);
+            assertThat(filters.getValue().metadata()).containsEntry(ORG_KEY, ORG);
+        }
+
+        @Test
+        void searchCarriesTheDerivedStateBack() throws Exception {
+            when(client.searchUsers(any(), any())).thenReturn(new PageResponse<>(List.of(dto(Map.of())), 0, 20, 1L, 1, true, true, false));
+
+            ReadableUserList list = service.search(UserSearchFilters.none(), 0, 20);
+
+            assertThat(list.getContent()).singleElement().satisfies(user -> {
+                assertThat(user.getStatus()).isEqualTo(ACTIVE);
+                assertThat(user.isEmailVerified()).isTrue();
+                assertThat(user.getLastSignInAt()).isEqualTo(SIGNED_IN_AT);
+            });
+        }
+
+        @Test
+        void countsAreCarriedThrough() throws Exception {
+            when(client.counts()).thenReturn(new com.asrevo.cvhome.uaa.sdk.dto.UserCounts(9, 5, 2, 1, 1));
+
+            UserCounts counts = service.counts();
+
+            assertThat(counts.total()).isEqualTo(9);
+            assertThat(counts.pending()).isEqualTo(2);
+            assertThat(counts.locked()).isEqualTo(1);
+        }
+
+        @Test
+        void inviteAnswersTheLinkAndTheAccountItBelongsTo() throws Exception {
+            when(client.inviteUser(any())).thenReturn(new InvitationResponse(dto(Map.of()), LINK, SIGNED_IN_AT));
+
+            IssuedLink issued = service.invite(new InviteUserRequest(EMAIL, USERNAME, FIRST_NAME, LAST_NAME,
+                    List.of(STORE_ADMIN), Map.of()));
+
+            assertThat(issued.link()).isEqualTo(LINK);
+            assertThat(issued.expiresAt()).isEqualTo(SIGNED_IN_AT);
+            assertThat(issued.user().getUserName()).isEqualTo(USERNAME);
+        }
+
+        @Test
+        void aConflictOnInviteStaysAConflict() throws Exception {
+            when(client.inviteUser(any())).thenThrow(UaaConflictException.from(
+                    new com.asrevo.cvhome.errors.remote.RemoteErrorContext("UAA.USER.EMAIL_TAKEN", "taken", Map.of(),
+                            List.of(), UAA, 409, null, null)));
+
+            assertThatThrownBy(() -> service.invite(new InviteUserRequest(EMAIL, USERNAME, FIRST_NAME, LAST_NAME,
+                    List.of(), Map.of()))).isInstanceOf(UaaConflictException.class);
+        }
+
+        @Test
+        void resetLinkAsksToRevokeSessionsAndAnswersOnce() throws Exception {
+            when(client.createResetLink(USER_ID, true))
+                    .thenReturn(new InvitationResponse(dto(Map.of()), LINK, SIGNED_IN_AT));
+
+            IssuedLink issued = service.createResetLink(USER_ID, true);
+
+            assertThat(issued.link()).isEqualTo(LINK);
+            verify(client).createResetLink(USER_ID, true);
+        }
+
+        @Test
+        void aMissingUserOnResetLinkStaysMissing() throws Exception {
+            when(client.createResetLink(USER_ID, false)).thenThrow(notFound());
+
+            assertThatThrownBy(() -> service.createResetLink(USER_ID, false))
+                    .isInstanceOf(UaaUserNotFoundException.class);
+        }
+
+        @Test
+        void anUnnamedFailureLeavesTheOutcomeUndecided() throws Exception {
+            when(client.counts()).thenThrow(undecidedFailure());
+            when(client.searchUsers(any(), any())).thenThrow(undecidedFailure());
+
+            assertThatThrownBy(() -> service.counts()).isInstanceOf(UaaApiUnavailableException.class);
+            assertThatThrownBy(() -> service.search(UserSearchFilters.none(), 0, 20))
+                    .isInstanceOf(UaaApiUnavailableException.class);
+        }
+
     }
 
 }

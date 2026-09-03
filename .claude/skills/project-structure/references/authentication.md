@@ -9,8 +9,9 @@ never share an identity realm.
 | Port | 8001 | 8124 |
 | Who it authenticates | Platform staff, org owners, merchants/sellers | **Storefront shoppers** |
 | Reached via | `store-core-gateway` (:8000) | `spg` at `/cua` |
-| Front end | Thymeleaf login + embedded Angular admin SPA (`uaa-fe`) | **None** — headless. The storefront (`landing-ui`) renders login and registration as theme pages; cua redirects to them and processes the posted form |
-| Self-registration | No — admin-provisioned (`AdminUserController`) | **Yes** — `POST /api/v1/public/registration` (JSON, `?store=`), social login |
+| Front end | Embedded Angular SPA (`uaa-fe`) — the identity-first sign-in page and the admin console | **None** — headless. The storefront (`landing-ui`) renders login and registration as theme pages; cua redirects to them and processes the posted form |
+| Self-registration | No — admin-provisioned or **invited**: the account is created pending and its owner sets a password through a one-time link | **Yes** — `POST /api/v1/public/registration` (JSON, `?store=`), social login |
+| External providers | OIDC and OAuth 2.0 brokering, per-realm, with linking policy and just-in-time provisioning | Social login per store |
 | Serves tokens to | console-ui, tenancy, gateway, all `-service` s2s clients | landing-ui storefront sessions |
 | Deployment | One shared instance for the whole SaaS | One per pod |
 
@@ -157,10 +158,12 @@ its own clients.
 
 ## Managing users (as opposed to authenticating them)
 
-Creating, listing, enabling or role-assigning a **staff/seller** account means calling `uaa`'s admin API, and
-that goes through the `store-commons:uaa-client` / `uaa-client-impl` SDK (`UserAccountService` →
+Creating, listing, enabling, inviting or role-assigning a **staff/seller** account means calling `uaa`'s admin
+API, and that goes through the `store-commons:uaa-client` / `uaa-client-impl` SDK (`UserAccountService` →
 `AdminUserClient` → `/api/v1/admin/users`), authenticated by its own `admin-sdk` `client_credentials` token with
-scope `super_admin` — not the `s2s` registration. Because that scope is platform-wide, the caller is responsible
+scope `super_admin` — not the `s2s` registration. The contract covers the whole lifecycle, including
+`search(...)`, `counts()`, `invite(...)` and `createResetLink(...)`; a one-time link is answered once and must
+never be logged. Because that scope is platform-wide, the caller is responsible
 for tenant scoping via the `org`/`store` user metadata. Full guide: `uaa-client.md`.
 
 ## Related

@@ -11,7 +11,7 @@ somewhere else entirely — that is [cua](../../../store-pod/cua/qa/cua-qa.md).
   is where the platform's sign-in page lives
 - **Runs on** — `lcl start -d --stack <name>`; uaa is `http://uaa.gateway.com:8001` and is the **first**
   service the stack brings up, because it issues the tokens. Read the live port from `lcl urls`
-- **Cases** — 132 (103 verified, 14 unit only, 15 not verified)
+- **Cases** — 139 (110 verified, 14 unit only, 14 not verified; one case is a walkthrough with no single outcome)
 - **Also see** — [gateway](../../gateway/gateway-service/qa/gateway-qa.md) (which relays the token and holds
   the session), [tenancy](../../tenancy/tenancy-service/qa/tenancy-qa.md) (which owns the *store-scoped*
   accounts and calls uaa to create them),
@@ -23,9 +23,11 @@ Each case is tagged:
 - **[unit only]** — covered by the named test; nobody drove it through the stack.
 - **[not verified]** — never run end to end by anyone.
 
-Most of this file is **[not verified]**: uaa has had no QA document of its own until now, and the cases below
-were written from `AppSecurityConfig`, the admin controllers and the seed. That is exactly where the bugs will
-be.
+This file started as a set of **[not verified]** cases written from the code, because uaa had no QA document at
+all. Most of it has since been run: the `feat/uaa-sso` work drove every section against a live stack and tagged
+what it actually executed. What is still **[not verified]** is named and explains why — mostly the paths that
+need a third party nobody has credentials for (a real Google or GitHub application, Apple's developer account)
+or a state a healthy realm will not enter.
 
 ---
 
@@ -1396,6 +1398,65 @@ request time; nothing is a stored statistic, and nothing is carried over from a 
 - **Steps** — the dashboard as a `store_core` token; then check the rail.
 - **Expect** — **403**. Every rail row is a real route now — Dashboard, Audit log and Identity providers were the
   three that were drawn disabled. `counts` in the same response feeds them.
+
+---
+
+## SIN — The sign-in page
+
+The page every operator meets, and the only screen a signed-out browser can reach. It is identity-first: an
+email or username step, the provider buttons an administrator enabled, then the password with the identity
+shown above it. The password step is a **native form POST** to `/login` carrying `_csrf`, not an API call —
+Spring Security's redirect is what resumes the authorization the console started, and an `HttpClient` POST
+would strand it.
+
+### SIN-01 — The two steps · critical · [verified]
+
+- **Steps** — open `/login`, type an address, press *Continue*, then the password.
+- **Expect** — step one shows the provider buttons and the email field; step two shows the identity as a chip
+  with a *Not you?* that returns to step one, and carries what was typed into the username field. A username
+  that is not an email works: the field takes either, and uaa authenticates on the username.
+- **Watch for** — the username field must be pre-filled from step one. An operator whose username is not their
+  address corrects it there; a page that silently sends the address instead fails the sign-in with no
+  explanation.
+
+### SIN-02 — Home-realm discovery · high · [verified]
+
+- **Setup** — a provider with `example.com` in its email domains (IDP-01).
+- **Steps** — type `someone@example.com` and press *Continue*.
+- **Expect** — the browser goes straight to `/oauth2/authorization/<alias>` carrying `login_hint`, without a
+  password step. An address at a domain nobody claims lands on the password step, and so does a *failure* of
+  the discovery call — a realm that cannot answer must not block a local sign-in.
+
+### SIN-03 — What the page says when something is wrong · critical · [verified]
+
+- **Steps** — a wrong password; five in a row; a disabled account; then a brokered login that is refused.
+- **Expect** — *invalid* with attempts-left when the server sent it, *locked* naming the lockout minutes,
+  *disabled*, and for the provider paths the specific message: an account that already exists locally
+  (`idp_rejected`), a person the provider does not know here (`idp_unknown_user`), a provider that shared no
+  address (`idp_no_email`). None of them says whether an account exists for an address nobody typed.
+
+### SIN-04 — Confirming a link · critical · [unit only]
+
+- **Steps** — sign in through a provider whose policy is *Ask for the password once*, using an address that
+  matches an existing account.
+- **Expect** — the page explains whose account it found and which provider is asking, takes that account's
+  password once, and posts to `/api/v1/auth/link-confirm`, which answers where to go. Afterwards that provider
+  signs the person in directly. Covered by `BrokeredLoginIntegrationTest`; the browser path is
+  **[not verified]** without a real provider.
+- **Watch for** — the confirmation POST needs the CSRF cookie, which only a page load plants. A client driving
+  the flow by hand must load `/login` first.
+
+### SIN-05 — Which application asked · [verified]
+
+- **Steps** — start at the console, get bounced to uaa, and read the card above the form.
+- **Expect** — *Continuing to <application>*, from `GET /api/v1/public/login/context`, which reads the saved
+  authorization request. Reaching `/login` directly shows no card rather than a guess.
+
+### SIN-06 — Arabic and right-to-left · high · [verified]
+
+- **Steps** — switch to العربية on the sign-in page and walk both steps.
+- **Expect** — every string translated, the layout mirrored, and the email and password fields still
+  left-to-right — an address and a password are Latin whatever the page's direction.
 
 ---
 

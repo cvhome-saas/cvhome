@@ -11,12 +11,17 @@ import com.asrevo.cvhome.uaa.api.errors.UaaApiUnavailableException;
 import com.asrevo.cvhome.uaa.api.errors.UaaConflictException;
 import com.asrevo.cvhome.uaa.api.errors.UaaOperationForbiddenException;
 import com.asrevo.cvhome.uaa.api.errors.UaaUserNotFoundException;
+import com.asrevo.cvhome.uaa.domain.user.InviteUserRequest;
+import com.asrevo.cvhome.uaa.domain.user.IssuedLink;
 import com.asrevo.cvhome.uaa.domain.user.PersistableUser;
 import com.asrevo.cvhome.uaa.domain.user.ReadableUser;
 import com.asrevo.cvhome.uaa.domain.user.ReadableUserList;
+import com.asrevo.cvhome.uaa.domain.user.UserCounts;
 import com.asrevo.cvhome.uaa.domain.user.UserPassword;
+import com.asrevo.cvhome.uaa.domain.user.UserSearchFilters;
 import com.asrevo.cvhome.uaa.sdk.AdminUserClient;
 import com.asrevo.cvhome.uaa.sdk.dto.CreateUserRequest;
+import com.asrevo.cvhome.uaa.sdk.dto.InvitationResponse;
 import com.asrevo.cvhome.uaa.sdk.dto.PageRequest;
 import com.asrevo.cvhome.uaa.sdk.dto.PageResponse;
 import com.asrevo.cvhome.uaa.sdk.dto.UpdateUserRequest;
@@ -66,8 +71,21 @@ public class UserAccountServiceImpl implements UserAccountService {
         readableUser.setOrg((String) u.metadata().getOrDefault(ORG_KEY, null));
         readableUser.setStore((String) u.metadata().getOrDefault(STORE_KEY, null));
         readableUser.setActive(u.enabled());
+        readableUser.setStatus(u.status());
+        readableUser.setEmailVerified(u.emailVerified());
+        readableUser.setLastSignInAt(u.lastSignInAt());
         readableUser.setRoles(u.roles());
         return readableUser;
+    }
+
+    private static ReadableUserList toReadableList(PageResponse<UserDto> response) {
+        ReadableUserList list = new ReadableUserList();
+        list.setTotalElements(response.totalElements());
+        list.setTotalPages(response.totalPages());
+        list.setSize(response.size());
+        list.setPageNumber(response.number());
+        list.setContent(response.content().stream().map(UserAccountServiceImpl::toReadableUser).toList());
+        return list;
     }
 
     /**
@@ -151,13 +169,61 @@ public class UserAccountServiceImpl implements UserAccountService {
             // A listing names no failure of its own: either uaa answered or the caller found nothing out.
             throw undecided(e);
         }
-        ReadableUserList list = new ReadableUserList();
-        list.setTotalElements(response.totalElements());
-        list.setTotalPages(response.totalPages());
-        list.setSize(response.size());
-        list.setPageNumber(response.number());
-        list.setContent(response.content().stream().map(UserAccountServiceImpl::toReadableUser).toList());
-        return list;
+        return toReadableList(response);
+    }
+
+    @Override
+    public ReadableUserList search(UserSearchFilters filters, Integer pageNumber, Integer pageSize)
+            throws UaaApiUnavailableException {
+        try {
+            return toReadableList(client.searchUsers(toSdk(filters), new PageRequest(pageNumber, pageSize)));
+        } catch (UaaApiException e) {
+            // A search names no failure of its own: either uaa answered or the caller found nothing out.
+            throw undecided(e);
+        }
+    }
+
+    @Override
+    public UserCounts counts() throws UaaApiUnavailableException {
+        try {
+            var counts = client.counts();
+            return new UserCounts(counts.total(), counts.active(), counts.pending(), counts.locked(), counts.disabled());
+        } catch (UaaApiException e) {
+            throw undecided(e);
+        }
+    }
+
+    @Override
+    public IssuedLink invite(InviteUserRequest request) throws UaaConflictException, UaaApiUnavailableException {
+        try {
+            InvitationResponse response = client.inviteUser(new com.asrevo.cvhome.uaa.sdk.dto.InviteUserRequest(
+                    request.email(), request.username(), request.firstName(), request.lastName(), request.roles(),
+                    request.metadata()));
+            return new IssuedLink(toReadableUser(response.user()), response.link(), response.expiresAt());
+        } catch (UaaConflictException e) {
+            throw e;
+        } catch (UaaApiException e) {
+            throw undecided(e);
+        }
+    }
+
+    @Override
+    public IssuedLink createResetLink(String userId, boolean revokeSessions)
+            throws UaaUserNotFoundException, UaaOperationForbiddenException, UaaApiUnavailableException {
+        try {
+            InvitationResponse response = client.createResetLink(userId, revokeSessions);
+            return new IssuedLink(toReadableUser(response.user()), response.link(), response.expiresAt());
+        } catch (UaaUserNotFoundException | UaaOperationForbiddenException e) {
+            throw e;
+        } catch (UaaApiException e) {
+            throw undecided(e);
+        }
+    }
+
+    private static com.asrevo.cvhome.uaa.sdk.dto.UserSearchFilters toSdk(UserSearchFilters filters) {
+        UserSearchFilters held = filters == null ? UserSearchFilters.none() : filters;
+        return new com.asrevo.cvhome.uaa.sdk.dto.UserSearchFilters(held.q(), held.status(), held.role(),
+                held.metadata());
     }
 
     @Override

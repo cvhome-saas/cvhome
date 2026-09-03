@@ -22,6 +22,9 @@ MFA" rather than "we cannot tell".
   see its lessons.md, "Shell — no sidebar badge counts".
 - **Expected contract:** `GET /api/v1/admin/counts` → `{users: n, roles: n, clients: n}`, one call
   rather than three, since it exists only to paint a rail.
+- **Still open after feat/uaa-sso, deliberately:** the counts now exist (`GET /api/v1/admin/dashboard` answers
+  users, roles, clients and providers in one read), so the badge is buildable. It stays unbuilt because a number
+  in a rail is read as *needing attention*, and none of these do; the dashboard is where a count belongs.
 
 ## Shell — no realm switcher
 
@@ -69,6 +72,9 @@ MFA" rather than "we cannot tell".
 - **What is missing:** uaa records no authentication timestamp on the user.
 - **Decision:** column removed.
 - **Expected contract:** `UserDto.lastSignInAt: string | null`, ISO-8601.
+- **Closed by feat/uaa-sso (phase 3):** `users.last_sign_in_at` is written on every successful authentication,
+  along with the client and how the person got in, and the detail pane shows all three. The table keeps the
+  column out on purpose — a timestamp per row crowds out the identity, and the pane is one click away.
 
 ## Users — no session list
 
@@ -78,6 +84,10 @@ MFA" rather than "we cannot tell".
   offering it — an operator would believe a compromised session had been revoked.
 - **Expected contract:** `GET /api/v1/admin/users/{id}/sessions` and
   `DELETE /api/v1/admin/users/{id}/sessions`.
+- **Closed by feat/uaa-sso (phase 3):** `GET`/`DELETE /api/v1/admin/users/{id}/sessions[/{sid}]` exist over
+  Spring Session's store, and the detail pane lists each live session with where it came from and revokes one or
+  all of them. Disabling or deleting an account revokes its sessions and its tokens too, so *sign out everywhere*
+  means what it says.
 
 ## Users — email and username cannot be changed here
 
@@ -171,6 +181,11 @@ MFA" rather than "we cannot tell".
   rotation, so the *Secrets expiring · 30d* tile is live from `GET /clients/stats`. The 24h token and
   failure counters wait for phase 8's audit hooks; `lastTokenIssuedAt` exists on the row and is null
   until then.
+- **Closed by feat/uaa-sso (phase 8):** the authorization server's own events are audited, so `token.issued` and
+  `client.auth.failed` are countable and `client_extension.last_token_issued_at` is stamped on every issuance.
+  The client page shows the last token; the busiest-applications list and the failure feed live on the dashboard,
+  where a count has a range attached to it. Per-client 24h tiles on the clients list stay out: the same number in
+  two places drifts.
 
 ## Sign-in — one step, password only
 
