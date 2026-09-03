@@ -5,20 +5,24 @@
  */
 
 /**
- * One provider's sign-in credentials for this store, **in cleartext**.
+ * One provider's sign-in credentials for this store.
  *
- * `SocialLoginConfigMapper.toDTO` decrypts `appId` and `appSecret` before serialising, so a `GET`
- * hands the browser the live OAuth app secret. The console shows it behind a reveal toggle rather
- * than hiding what the endpoint already sent. See lessons.md, "Store management — payment and
- * social-login reads return secrets in cleartext".
+ * `appSecret` is always `null`: the read no longer returns it. `appId` still comes back, because an
+ * OAuth2 client id travels in the authorization URL and is public by construction, and a seller has
+ * to be able to see which application their store is wired to.
  *
- * Both fields read `null` when the stored value predates encryption, because the mapper only sets
- * them when the stored form is encrypted — which is indistinguishable from "not configured".
+ * That is what `hasAppSecret` is for. Without it the console cannot tell "no secret" from "secret
+ * withheld", and warns that a fully configured provider is incomplete. An empty secret field means
+ * "keep the stored one", never "clear it".
+ *
+ * `appId` reads `null` when the stored credentials cannot be decrypted — a key that has since
+ * changed, say — which the API reports as unconfigured rather than failing the whole screen.
  */
 export interface ReadableSocialLoginConfig {
   readonly providerId: string;
   readonly appId: string | null;
   readonly appSecret: string | null;
+  readonly hasAppSecret: boolean;
   readonly enabled: boolean;
 }
 

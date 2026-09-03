@@ -38,7 +38,9 @@ class PublicSocialLoginControllerIntegrationTest {
 
         expect(response, HttpStatus.OK);
         JsonNode logins = json(response);
-        assertThat(logins.findValuesAsString("providerId")).containsExactlyInAnyOrder(GOOGLE, "github", "facebook");
+        // Facebook is a supported preset but is not seeded: its demo credentials were never real
+        // secret-crypto envelopes, and a row this deployment cannot decrypt is not a useful fixture.
+        assertThat(logins.findValuesAsString("providerId")).containsExactlyInAnyOrder(GOOGLE, "github");
         // The alias alone: it is unique within the realm, and the realm comes from the host.
         assertThat(logins.findValuesAsString("registrationId")).contains(GOOGLE);
         assertThat(logins.findValuesAsString("name")).contains("Google");

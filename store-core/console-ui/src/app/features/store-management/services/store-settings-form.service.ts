@@ -78,6 +78,11 @@ export type LoginProviderForm = FormGroup<{
   enabled: FormControl<boolean>;
   appId: FormControl<string>;
   appSecret: FormControl<string>;
+  /**
+   * Whether a secret is already stored. Not editable — it mirrors what the read said, and it is what
+   * lets an empty `appSecret` mean "keep the stored one" rather than "there is none".
+   */
+  hasAppSecret: FormControl<boolean>;
 }>;
 
 /** Same again for a gateway: all three fields round-trip, so all three are editable. */
@@ -189,6 +194,7 @@ export class StoreSettingsFormService {
             enabled: this.fb.control(false),
             appId: this.fb.control(''),
             appSecret: this.fb.control(''),
+            hasAppSecret: this.fb.control(false),
           },
           /*
            * Required only while the provider is on. `APP_ID` and `APP_SECRET` are `nullable = false`
@@ -197,7 +203,13 @@ export class StoreSettingsFormService {
            * demand, and demanding them would make the section unsavable for any store that has not
            * set up all three.
            */
-          {validators: [credentialsWhenEnabled(['appId', 'appSecret'])]},
+          /*
+           * The secret is not in this list: the read never returns it, so an enabled provider whose
+           * secret is stored has an empty field and would otherwise fail validation forever. What a
+           * blank secret means is "keep the stored one"; `missingCredentials` is what warns when
+           * there is genuinely none, using `hasAppSecret`.
+           */
+          {validators: [credentialsWhenEnabled(['appId'])]},
         ),
     );
     for (const config of settings.socialLogin) {
@@ -205,6 +217,7 @@ export class StoreSettingsFormService {
         enabled: config.enabled,
         appId: config.appId,
         appSecret: config.appSecret,
+        hasAppSecret: config.hasAppSecret,
       });
     }
 

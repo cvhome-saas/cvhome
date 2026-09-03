@@ -169,7 +169,10 @@ export interface SocialLoginConfig {
   readonly providerId: string;
   readonly icon: IconName;
   readonly appId: string;
+  /** Always empty on a read: the API never returns it. Filled in only when the seller types a new one. */
   readonly appSecret: string;
+  /** Whether a secret is stored, which an empty `appSecret` cannot say on its own. */
+  readonly hasAppSecret: boolean;
   /** Where the provider sends the shopper back to. Derived by the console — see `callbackUrlFor`. */
   readonly callbackUrl: string;
   readonly enabled: boolean;

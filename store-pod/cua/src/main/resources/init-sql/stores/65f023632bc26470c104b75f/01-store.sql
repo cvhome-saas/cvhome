@@ -30,10 +30,6 @@ values
     (gen_random_uuid(), '65f023632bc26470c104b75f', 'github', 'GitHub', 'OAUTH2', 'GITHUB', true, false, 1,
      'ENC:1:default-key:AES-256-GCM:2ky6qTJ7Q526PUMh:Gtagmo7cH99rrfzHjhZwRvCamcbwU8Q8/gPghV3dUMbdMk8u',
      'ENC:1:default-key:AES-256-GCM:gWao1lpRxoqZqqry:/qV5PXK+AM9ETM13Qs/SFhAbgxzcGH/qftlcAPT2GGeVmcXgHWEExTv/DN6mwMNPZm8u0uhq4qA=',
-     'CONFIRM', true, true, now(), now()),
-    (gen_random_uuid(), '65f023632bc26470c104b75f', 'facebook', 'Facebook', 'OAUTH2', 'FACEBOOK', true, false, 2,
-     'facebook-app-id-2',
-     'facebook-secret-2',
      'CONFIRM', true, true, now(), now())
 on conflict do nothing;
 

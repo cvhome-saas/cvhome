@@ -22,12 +22,11 @@ import type {
  *
  * A disabled provider collapses its credentials.
  *
- * The secret **is** shown, behind a reveal toggle, and that is a deliberate answer to what the API
- * does rather than a relaxation. `SocialLoginConfigMapper.toDTO` decrypts `appSecret` before
- * serialising, so the browser has already been handed the live value by the time this renders —
- * masking it as unknowable would be theatre, and would leave an operator unable to check a key they
- * can read in the network tab. See lessons.md, "Store management — payment and social-login reads
- * return secrets in cleartext".
+ * The secret is never sent back. It used to be — the old mapper decrypted `appSecret` before
+ * serialising, so masking it would have been theatre — but the read no longer returns it, and an
+ * empty field now means "keep the stored one" rather than "no secret set". The app id is still
+ * shown: an OAuth2 client id travels in the authorization URL and is public by construction, and a
+ * merchant has to be able to see which application their store is wired to.
  */
 @Component({
   selector: 'app-social-login-section',
@@ -156,7 +155,8 @@ export class SocialLoginSection {
     if (!group.controls.enabled.value) {
       return false;
     }
-    return !group.controls.appId.value.trim() || !group.controls.appSecret.value.trim();
+    const secretMissing = !group.controls.appSecret.value.trim() && !group.controls.hasAppSecret.value;
+    return !group.controls.appId.value.trim() || secretMissing;
   }
 
   /**

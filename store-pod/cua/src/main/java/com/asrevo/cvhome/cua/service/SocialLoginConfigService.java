@@ -11,6 +11,7 @@ import com.asrevo.cvhome.cua.web.dto.ReadableSocialLogin;
 import com.asrevo.cvhome.cua.web.dto.ReadableSocialLoginConfig;
 import com.asrevo.cvhome.sso.domain.AccountLinking;
 import com.asrevo.cvhome.sso.domain.IdentityProvider;
+import com.asrevo.cvhome.sso.dto.IdentityProviderDto;
 import com.asrevo.cvhome.sso.dto.IdentityProviderRequest;
 import com.asrevo.cvhome.sso.idp.IdentityProviderService;
 import com.asrevo.cvhome.sso.idp.IdpPreset;
@@ -19,6 +20,7 @@ import com.asrevo.cvhome.uaa.errors.IdpConfigInvalidException;
 import com.asrevo.cvhome.uaa.errors.IdpNotFoundException;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * The merchant console's social-login screen, over the shared identity-provider store.
@@ -37,6 +39,7 @@ import lombok.RequiredArgsConstructor;
  * </p>
  */
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class SocialLoginConfigService {
 
@@ -60,13 +63,17 @@ public class SocialLoginConfigService {
                 .toList();
     }
 
-    /** One row per provider the console offers, whether or not this store has configured it. */
+    /**
+     * One row per provider the console offers, whether or not this store has configured it.
+     *
+     * <p>
+     * The app id comes back; the app secret does not. An OAuth2 client id travels in the authorization URL and is
+     * public by construction, and a merchant has to be able to see which application their store is wired to. The
+     * secret is the credential, and an API that returns it undoes the encryption it is stored under.
+     * </p>
+     */
     public List<ReadableSocialLoginConfig> getConfigs() {
-        return SOCIAL.stream()
-                .map(preset -> stored(preset)
-                        .map(p -> ReadableSocialLoginConfig.of(preset.name(), preset.displayName(), null, p.isEnabled()))
-                        .orElseGet(() -> ReadableSocialLoginConfig.of(preset.name(), preset.displayName(), null, false)))
-                .toList();
+        return SOCIAL.stream().map(this::readable).toList();
     }
 
     @Transactional
@@ -87,6 +94,33 @@ public class SocialLoginConfigService {
     /** The providers the console screen knows how to draw. */
     public List<String> supportedProviders() {
         return SOCIAL.stream().map(Enum::name).toList();
+    }
+
+    /**
+     * One provider, and never an exception for the others' sake.
+     *
+     * <p>
+     * Reading the app id decrypts it, and a row this deployment cannot decrypt — written under a key that has
+     * since changed, or seeded by hand — would otherwise take the whole screen down with a 500, leaving the
+     * merchant unable to see or repair any of their providers. It reports as unconfigured instead, which is what
+     * an unreadable credential effectively is.
+     * </p>
+     */
+    private ReadableSocialLoginConfig readable(IdpPreset preset) {
+        Optional<IdentityProvider> provider = stored(preset);
+        if (provider.isEmpty()) {
+            return ReadableSocialLoginConfig.of(preset.name(), preset.displayName(), null, false, false);
+        }
+        IdentityProvider p = provider.get();
+        try {
+            IdentityProviderDto dto = providers.toDto(p);
+            return ReadableSocialLoginConfig.of(preset.name(), preset.displayName(), dto.clientId(),
+                    dto.hasClientSecret(), p.isEnabled());
+        } catch (RuntimeException unreadable) {
+            log.warn("Identity provider {} cannot be read back and is reported as unconfigured: {}", preset,
+                    unreadable.getMessage());
+            return ReadableSocialLoginConfig.of(preset.name(), preset.displayName(), null, false, false);
+        }
     }
 
     private Optional<IdentityProvider> stored(IdpPreset preset) {

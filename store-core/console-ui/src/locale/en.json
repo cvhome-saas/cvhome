@@ -412,7 +412,7 @@
     "socialLogin": {
       "appId": "App ID",
       "appSecret": "App secret",
-      "appSecretHint": "Stored encrypted. It is shown here because the API returns it decrypted.",
+      "appSecretHint": "Stored encrypted and never sent back. Leave blank to keep the saved one.",
       "callbackHint": "Paste this into the provider's redirect URI allow-list",
       "callbackUrl": "Callback URL",
       "credentialsRequired": "An enabled provider needs both an app ID and an app secret.",

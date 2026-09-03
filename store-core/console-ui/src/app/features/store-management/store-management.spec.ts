@@ -60,8 +60,10 @@ const SETTINGS: StoreSettings = {
       providerId: 'GOOGLE',
       icon: 'google',
       appId: '8841027-acme.apps.googleusercontent.com',
-      appSecret: 'gsec-4f2a',
-      callbackUrl: 'https://acme.example.io/login/oauth2/code/acme.google',
+      // Empty on a read, with hasAppSecret saying one is stored: the API never sends the secret back.
+      appSecret: '',
+      hasAppSecret: true,
+      callbackUrl: 'https://acme.example.io/login/oauth2/code/google',
       enabled: true,
       configured: true,
     },
@@ -70,7 +72,8 @@ const SETTINGS: StoreSettings = {
       icon: 'github',
       appId: '',
       appSecret: '',
-      callbackUrl: 'https://acme.example.io/login/oauth2/code/acme.github',
+      hasAppSecret: false,
+      callbackUrl: 'https://acme.example.io/login/oauth2/code/github',
       enabled: false,
       configured: false,
     },
@@ -654,7 +657,10 @@ describe('StoreManagement', () => {
     const patch = api.saves[0].patch as Record<string, Record<string, unknown>>;
     expect(patch['GITHUB']['appId']).toBe('Iv1.acme');
     // Every provider goes out, not only the one that changed — the endpoint upserts what it is given.
-    expect(patch['GOOGLE']['appSecret']).toBe('gsec-4f2a');
+    expect(patch['GOOGLE']['appId']).toBe('8841027-acme.apps.googleusercontent.com');
+    // Google's secret goes out blank because the read never returned it, and blank means "keep the
+    // stored one" — sending back a secret the browser was never given is what this replaced.
+    expect(patch['GOOGLE']['appSecret']).toBe('');
   }));
 
   it('reports a provider that arrived broken without blocking the rest of the section', fakeAsync(() => {

@@ -481,11 +481,10 @@ export class StoreSettingsApi {
    * the configs is `configured: false` — which the section shows, because "never set up" and
    * "turned off" look identical once both render as an off switch.
    *
-   * `appId` and `appSecret` arrive decrypted, which is why they are carried straight into the form
-   * rather than reduced to a hint. They also read empty when the stored value predates encryption —
-   * `SocialLoginConfigMapper` only sets a field it can decrypt — and the console cannot tell that
-   * apart from "not configured". See lessons.md, "Store management — a credential written before
-   * encryption reads back as nothing".
+   * `appId` arrives as stored; `appSecret` never does, so the form starts empty and an empty field
+   * on save means "keep the stored one". `hasAppSecret` is what says a secret exists — without it an
+   * empty field and an unset credential look identical, and a fully configured provider is reported
+   * as incomplete.
    */
   private socialLoginConfigs(
     providers: readonly string[],
@@ -502,7 +501,8 @@ export class StoreSettingsApi {
         providerId,
         icon: isLoginProvider(providerId) ? LOGIN_PROVIDER_ICON[providerId] : LOGIN_PROVIDER_FALLBACK_ICON,
         appId: config?.appId ?? '',
-        appSecret: config?.appSecret ?? '',
+        appSecret: '',
+        hasAppSecret: config?.hasAppSecret ?? false,
         callbackUrl: this.callbackUrl(storefront, providerId),
         enabled: config?.enabled ?? false,
         configured: config !== undefined,
