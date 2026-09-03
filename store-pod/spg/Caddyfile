@@ -99,6 +99,14 @@
             response X-Trace-Id {http.vars.trace_id}
             response X-Span-Id {http.vars.span_id}
         }
+        # The same host-to-store lookup the storefront route does, so cua learns which store a shopper is on from
+        # the host rather than from the login form. cua serves one realm per store and used to take that realm
+        # from the form's client_id — a value the request supplies. Store-Id is the one source it cannot choose.
+        # Cached, so this costs a lookup per host per cache_ttl and not one per sign-in.
+        domain_lookup {
+            lookup_url {$DOMAIN_LOOKUP_URL}
+            cache_ttl  {$DOMAIN_LOOKUP_TTL:5m}
+        }
         reverse_proxy http://cua.{$NAMESPACE}:{$LCL_PORT_CUA:8124} {
             header_up X-Forwarded-Prefix /cua
         }

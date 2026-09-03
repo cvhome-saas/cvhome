@@ -1,13 +1,15 @@
 package com.asrevo.cvhome.cua.realm;
 
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.oauth2.server.authorization.client.JdbcRegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 
 import com.asrevo.cvhome.cua.config.StorefrontClientRepository;
-import com.asrevo.cvhome.sso.realm.RealmRepository;
+import com.asrevo.cvhome.sso.realm.RealmRegistry;
 import com.asrevo.cvhome.sso.realm.RealmResolver;
 
 /**
@@ -27,12 +29,23 @@ public class CuaRealmConfig {
     }
 
     /**
+     * Just inside sso-core's realm filter, so the realm is entered before this asks whether it exists.
+     */
+    @Bean
+    FilterRegistrationBean<EdgeVerifiedRealmFilter> edgeVerifiedRealmFilter(RealmRegistry realms) {
+        FilterRegistrationBean<EdgeVerifiedRealmFilter> registration =
+                new FilterRegistrationBean<>(new EdgeVerifiedRealmFilter(realms));
+        registration.setOrder(Ordered.HIGHEST_PRECEDENCE + 1);
+        return registration;
+    }
+
+    /**
      * Replaces sso-core's JDBC-backed client registry. uaa's clients are rows an administrator manages; a
      * storefront's is derived from the store, because its valid redirect URIs span every domain and language the
      * store is reached on.
      */
     @Bean
-    RegisteredClientRepository registeredClientRepository(JdbcTemplate jdbcTemplate, RealmRepository realms) {
+    RegisteredClientRepository registeredClientRepository(JdbcTemplate jdbcTemplate, RealmRegistry realms) {
         return new StorefrontClientRepository(new JdbcRegisteredClientRepository(jdbcTemplate), realms);
     }
 

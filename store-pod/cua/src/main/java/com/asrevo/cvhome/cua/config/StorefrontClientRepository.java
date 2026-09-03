@@ -11,8 +11,9 @@ import org.springframework.security.oauth2.server.authorization.client.Registere
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import com.asrevo.cvhome.commons.domain.RealmId;
 import com.asrevo.cvhome.cua.security.StorefrontUrls;
-import com.asrevo.cvhome.sso.realm.RealmRepository;
+import com.asrevo.cvhome.sso.realm.RealmRegistry;
 
 /**
  * The storefront's OAuth2 client: one per store, and only for a store this pod actually serves.
@@ -45,9 +46,9 @@ public class StorefrontClientRepository implements RegisteredClientRepository {
 
     private final RegisteredClientRepository delegate;
 
-    private final RealmRepository realms;
+    private final RealmRegistry realms;
 
-    public StorefrontClientRepository(RegisteredClientRepository delegate, RealmRepository realms) {
+    public StorefrontClientRepository(RegisteredClientRepository delegate, RealmRegistry realms) {
         this.delegate = delegate;
         this.realms = realms;
     }
@@ -69,7 +70,7 @@ public class StorefrontClientRepository implements RegisteredClientRepository {
 
     @Override
     public @Nullable RegisteredClient findByClientId(String clientId) {
-        if (Objects.isNull(clientId) || !realms.existsByIdAndEnabledTrue(clientId)) {
+        if (Objects.isNull(clientId) || !realms.exists(RealmId.of(clientId))) {
             return null;
         }
         return withStorefrontRedirects(delegate.findByClientId(clientId));
