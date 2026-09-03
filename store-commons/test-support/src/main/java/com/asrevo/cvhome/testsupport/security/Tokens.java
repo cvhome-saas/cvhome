@@ -12,7 +12,21 @@ import java.util.Map;
  */
 public final class Tokens {
 
-    public static final String ORG_1 = "32a034a43cd77581d105c87a";
+    /**
+     * The organization that owns {@link #STORE_1} and {@link #STORE_2} in the seed data.
+     *
+     * <p>
+     * <strong>This value is not free to choose.</strong> It has to be the {@code ORG} column of those stores in
+     * {@code merchant-service/src/main/resources/init-sql/stores/}, and the {@code org} claim uaa seeds for
+     * org1-admin in {@code uaa/src/main/resources/init-sql/data-test-stores.sql}. An org admin's token is now
+     * checked against the store's actual owner, so a made-up value here does not fail as "wrong fixture" — it
+     * fails as a 403 on a test that is asserting the permitted case.
+     * </p>
+     */
+    public static final String ORG_1 = "21f023932bc66470c104b76f";
+
+    /** The organization that owns {@link #STORE_3} and {@link #STORE_4}. Same constraint as {@link #ORG_1}. */
+    public static final String ORG_2 = "352023632b046970c104b76f";
 
     public static final String ROLE_STORE_ADMIN = "ROLE_STORE_ADMIN";
 
