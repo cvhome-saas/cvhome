@@ -1,23 +1,25 @@
-package com.asrevo.cvhome.inventory.config;
+package com.asrevo.cvhome.cua.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.asrevo.cvhome.checkout.services.order.ExternalOrderService;
 import com.asrevo.cvhome.errors.remote.RemoteErrorCatalog;
 import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
 import com.asrevo.cvhome.s2s.config.internal.RestClientBuilder;
 
+/**
+ * The one client this service has, and it is not for reading anything of its own.
+ *
+ * <p>
+ * One, and not to read a store: it is what tells the authorization layer which organization owns the store a
+ * request names. That is the question an org admin's token cannot answer on its own — the token says which
+ * organization the person administers and nothing about who owns the store in the query parameter — so without
+ * this client every org admin is refused. See {@code MerchantStoreOrgOwnerAutoConfiguration}, which turns having
+ * the client into having the answer.
+ * </p>
+ */
 @Configuration
-public class ClientsConfig {
-
-    /**
-     * The only outbound call: telling checkout that a reservation expired before it was committed.
-     */
-    @Bean
-    public ExternalOrderService externalOrderService(RestClientBuilder restClientBuilder) {
-        return restClientBuilder.buildClient("checkout", ExternalOrderService.class, RemoteErrorCatalog.none());
-    }
+public class StoreOrgLookupConfig {
 
     /**
      * Not for reading a store — this service never does. It is what tells the authorization layer which

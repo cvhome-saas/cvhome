@@ -57,7 +57,10 @@ class StoreRoleAccessCheckerTest {
 
     private static final String UAA = "uaa";
 
-    private final StoreRoleAccessChecker checker = new StoreRoleAccessChecker();
+    /** STORE belongs to ORG; every other store this file names belongs to nobody it asks about. */
+    private final StoreRoleAccessChecker checker =
+            new StoreRoleAccessChecker(() -> store -> STORE.equals(store) ? new ManagerOrgId(ORG) : null,
+                    StoreOwnershipPolicy.ENFORCED);
 
     private static Authentication principal(Map<String, Object> claims, Roles... roles) {
         Jwt jwt = Jwt.withTokenValue("token")
@@ -119,6 +122,49 @@ class StoreRoleAccessCheckerTest {
         void aSharedPodConstrainsNobody() {
             assertThat(checker.isOrgAdmin(principal(Map.of(ORG_CLAIM, ORG), Roles.ROLE_ORG_ADMIN), STORE, pod(null)))
                     .isTrue();
+        }
+
+        /**
+         * The store is the one thing the token cannot vouch for.
+         *
+         * <p>
+         * An org admin's token names the organization they administer and says nothing about who owns the store
+         * in the query parameter — and on a shared pod every other tenant's store is one query parameter away.
+         * This used to pass, under a {@code @TODO} saying it should not: an org admin of one organization could
+         * read another's store, and the tenancy was never wrong about it — the realm switched correctly and
+         * returned exactly that realm's rows, to somebody who should not have been asking.
+         * </p>
+         */
+        @Test
+        void anOrgAdminIsRefusedOnAStoreItsOrganizationDoesNotOwn() {
+            assertThat(checker.isOrgAdmin(principal(Map.of(ORG_CLAIM, ORG), Roles.ROLE_ORG_ADMIN), OTHER_STORE))
+                    .isFalse();
+        }
+
+        /**
+         * A service that checks for itself keeps the gate out of it.
+         *
+         * <p>
+         * Tenancy is the one, and it earns it: it answers a foreign store with "not found" rather than
+         * "forbidden", so asking about somebody else's store does not confirm the store exists — which a gate
+         * that can only say yes or no cannot express. Declaring this is declaring that the check happens
+         * elsewhere.
+         * </p>
+         */
+        @Test
+        void aServiceThatChecksForItselfIsLeftToIt() {
+            StoreRoleAccessChecker delegating = new StoreRoleAccessChecker(() -> null, StoreOwnershipPolicy.DELEGATED);
+
+            assertThat(delegating.isOrgAdmin(principal(Map.of(ORG_CLAIM, ORG), Roles.ROLE_ORG_ADMIN), OTHER_STORE))
+                    .isTrue();
+        }
+
+        /** A check that cannot be made has not passed, so a service with no lookup admits no org admin. */
+        @Test
+        void anOrgAdminIsRefusedWhereTheOwnerCannotBeEstablished() {
+            StoreRoleAccessChecker blind = new StoreRoleAccessChecker(() -> null, StoreOwnershipPolicy.ENFORCED);
+
+            assertThat(blind.isOrgAdmin(principal(Map.of(ORG_CLAIM, ORG), Roles.ROLE_ORG_ADMIN), STORE)).isFalse();
         }
     }
 

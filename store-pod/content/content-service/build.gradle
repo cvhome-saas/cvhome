@@ -52,6 +52,7 @@ dependencies {
     implementation libs.commons.validator
     implementation libs.commons.io
 
+    implementation project(':store-pod:merchant:merchant-external-api')
     implementation project(':store-pod:content:content-core')
     implementation project(':store-pod:content:content-external-api')
     implementation project(':store-commons:ecs-commons:fargate-task-info')

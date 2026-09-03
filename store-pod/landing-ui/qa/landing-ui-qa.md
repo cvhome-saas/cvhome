@@ -12,7 +12,7 @@ text direction, behind the pod's edge.
 - **Runs on** — `lcl start -d --stack <name>` (`npm run dev` alone is not enough — it needs the backend).
   Always reach it through the edge at `http://<store>.spg-507f1f77.gateway.com`; read the live port from
   `lcl urls`
-- **Cases** — 27 (15 verified, 1 unit only, 11 not verified)
+- **Cases** — 37 (25 verified, 1 unit only, 14 not verified; 3 cases have split verification tags)
 - **Also see** — [spg](../../spg/qa/spg-qa.md) (the edge in front of it), content, catalog, inventory,
   [checkout](../../checkout/checkout-service/qa/checkout-qa.md),
   [cua](../../cua/qa/cua-qa.md) (shopper login)
@@ -236,11 +236,24 @@ from a past run.
 - **Expect** — it falls back to the store's default and says so where a translation is missing, rather than
   rendering an empty page or a raw key.
 
-### THM-04 — The workspace builds as one · critical · [not verified]
+### THM-04 — The workspace builds as one · critical · [verified]
 
 - **Steps** — `cd store-pod/landing-ui && npm run build`.
 - **Expect** — libs → templates → app all build. Building `storefront/` alone compiles against stale types and
   is the usual cause of a type error that "does not reproduce".
+
+### THM-05 — Pink's CJK fonts compile and load without Google fetch races · critical · [verified]
+
+- **Setup** — run landing-ui through the stack, then select the pink theme with `/en?theme=pink` in development.
+- **Steps** — load the page from a cold browser context; inspect the console and font requests. In DevTools,
+  run `await document.fonts.load('400 16px "M PLUS Rounded 1c"', 'Магазин')` to exercise Cyrillic too.
+- **Expect** — the page returns 200 with `data-theme="pink"`; body text resolves to M PLUS Rounded 1c and
+  display text to Dela Gothic One; every font comes from `/_next/static/media/` with 200. There is no
+  `@vercel/turbopack-next/internal/font/google/font` resolution error and no request to `fonts.gstatic.com` for
+  either Japanese family.
+- **Seen** — production `npm run build` passed. Browser QA loaded the Latin 400/500/700/800 M PLUS files, Dela
+  Gothic One Latin 400 and a forced M PLUS Cyrillic 400 file from the storefront origin, all with 200; the
+  browser console was clean.
 
 ---
 
@@ -431,6 +444,14 @@ cua renders no pages any more. `/{locale}/login` starts the OAuth2 flow; cua sen
 
 - **Expect** — `libs/theme/test/define-theme.test.ts`: a theme with neither `Login` nor `Register` validates, a
   theme with both keeps them, and a required page is still required. `npm test --workspace=libs/theme`.
+
+---
+
+## REG — Regression watchlist
+
+| What broke | How it looked | Caught by |
+|---|---|---|
+| Pink's Google CJK font fan-out | Turbopack could not resolve its virtual font module. | THM-05; pink font source test |
 
 ---
 

@@ -30,6 +30,12 @@ namastack:
 com:
   asrevo:
     cvhome:
+      s2s:
+        # Billing scopes every store query by the caller's organization and answers a neighbour's store with
+        # "not found" rather than "forbidden", so that asking about somebody else's store does not confirm it
+        # exists — see SubscriptionApiIntegrationTest's cross-org cases, which are what make this honest. A
+        # permission gate can only say yes or no, so it stays out of this one.
+        store-ownership: DELEGATED
       billing:
         # How long the org's one trial runs. Per store in shape, but granted once per org: the first store an org
         # creates gets it, later ones start unpaid.

@@ -1,6 +1,7 @@
 package com.asrevo.cvhome.s2s.services;
 
 import java.util.Objects;
+import java.util.function.Supplier;
 
 import org.springframework.security.core.Authentication;
 
@@ -8,14 +9,16 @@ import com.asrevo.cvhome.commons.domain.Pod;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.s2s.utils.SecurityUtils;
 
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-@AllArgsConstructor
 @Slf4j
 public class PermissionAccessChecker {
 
-    private final StoreRoleAccessChecker storeRoleAccessChecker = new StoreRoleAccessChecker();
+    private final StoreRoleAccessChecker storeRoleAccessChecker;
+
+    public PermissionAccessChecker(Supplier<StoreOrgOwnerRetriever> owners, StoreOwnershipPolicy policy) {
+        this.storeRoleAccessChecker = new StoreRoleAccessChecker(owners, policy);
+    }
 
     public boolean hasAccessOnStoreUsersList(Authentication authentication, StoreMerchantId requestedStoreId) {
         return hasReadAccessOnStore(authentication, requestedStoreId);

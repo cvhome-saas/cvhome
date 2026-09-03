@@ -16,6 +16,12 @@ spring:
 com:
   asrevo:
     cvhome:
+      s2s:
+        # Tenancy owns the store records and checks an org admin's store itself, in
+        # InternalStoreService#getManagerStoreEntity — and answers a foreign store with "not found" rather than
+        # "forbidden", so that asking about somebody else's store does not confirm it exists. A permission gate
+        # can only say yes or no, so it stays out of this one. Every other service leaves this at ENFORCED.
+        store-ownership: DELEGATED
       uaa:
         client:
           client-id: admin-sdk

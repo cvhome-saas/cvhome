@@ -1,3 +1,5 @@
+@import './self-hosted-fonts.css';
+
 /*
  * pink — "TOKYO GIRLS ISSUE", fused to a mixed girly-lifestyle store.
  * The shop is this month's issue of a Japanese girls' fashion magazine. The stock is paper; whole regions
@@ -9,7 +11,9 @@
  * explains; Cairo leads both roles in Arabic. One motion: a flag snaps onto the page.
  */
 [data-theme="pink"] {
-    /* fonts — fonts.ts exports the variables; Cairo trails so Arabic glyphs fall through to it */
+    /* Cairo trails the self-hosted Japanese families so Arabic glyphs fall through to it. */
+    --font-pink-display: 'Dela Gothic One';
+    --font-pink-sans: 'M PLUS Rounded 1c';
     --font-body: var(--font-pink-sans), var(--font-pink-arabic), ui-sans-serif, system-ui, sans-serif;
     --font-heading: var(--font-pink-display), var(--font-pink-arabic), var(--font-pink-sans), sans-serif;
     --font-code: ui-monospace, SFMono-Regular, Menlo, monospace;
