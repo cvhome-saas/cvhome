@@ -192,7 +192,19 @@
   color: var(--foreground-strong);
 }
 
+/*
+ * The page's vertical rhythm, owned here rather than by each screen.
+ *
+ * Every routed screen renders a page header and then one or more panels, and until this existed the
+ * gap between them was whatever margins that particular screen happened to declare — which is why
+ * no two of them lined up. The screens set `:host { display: contents }` so their header and panels
+ * become this column's own children and inherit one gap; a screen that needs a different rhythm
+ * inside a panel still owns that.
+ */
 .page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-section);
   min-inline-size: 0;
 }
 

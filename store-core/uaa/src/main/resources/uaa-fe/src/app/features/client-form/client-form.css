@@ -1,3 +1,11 @@
+/*
+ * The screen's header and panels are the page column's own children, so the shell's rhythm applies
+ * between them and this stylesheet never sets a gap of its own. See admin-shell.css, `.page`.
+ */
+:host {
+  display: contents;
+}
+
 .back {
   display: inline-flex;
   align-items: center;
@@ -207,7 +215,7 @@
 .masked {
   padding: 0.35rem 0.6rem;
   border-radius: var(--radius-md);
-  background: var(--muted);
+  background: var(--input);
   color: var(--muted-foreground);
   font-family: var(--font-mono);
   letter-spacing: 0.1em;

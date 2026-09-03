@@ -1,12 +1,20 @@
+/*
+ * The screen's header and panels are the page column's own children, so the shell's rhythm applies
+ * between them and this stylesheet never sets a gap of its own. See admin-shell.css, `.page`.
+ */
+:host {
+  display: contents;
+}
+
 .range {
-  margin-block-end: var(--spacing-group);
+  display: flex;
 }
 
 .layout {
   display: grid;
+  align-items: start;
   gap: var(--spacing-section);
   grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
-  margin-block-start: var(--spacing-section);
 }
 
 /* --- the sign-in chart ---------------------------------------------------------------------------------- */
@@ -93,28 +101,60 @@
   font-size: var(--text-3xs);
 }
 
+/*
+ * The three postures, in the theme's own chart palette: it is the only semantic colour family the
+ * kit defines, and every identity ships all six. `--success` and `--warning` were invented here and
+ * resolved to nothing, so a warning read exactly like an OK.
+ */
 .check .green {
-  color: var(--success, var(--primary));
+  color: var(--chart-1-foreground);
 }
 
 .check .amber {
-  color: var(--warning, var(--foreground-strong));
+  color: var(--chart-4-foreground);
 }
 
 .check .red {
-  color: var(--destructive);
+  color: var(--chart-5-foreground);
 }
 
+/*
+ * A refusal reads as a line, not as a label: what happened, then who it was about, then when. The
+ * event name used to be a red pill wide enough to wrap onto two lines and push everything else into
+ * an ellipsis — colour belongs on the mark, and the mark can be four pixels wide.
+ */
 .failure-row {
   display: flex;
   align-items: center;
   gap: var(--spacing-tight);
-  font-size: var(--text-4xs);
+  font-size: var(--text-3xs);
 }
 
-.who {
+.failure-mark {
+  flex: none;
+  inline-size: 0.25rem;
+  block-size: 1.9rem;
+  border-radius: var(--radius-full);
+  background: var(--chart-5-foreground);
+}
+
+.failure-copy {
+  display: grid;
+  flex: 1;
+  min-inline-size: 0;
+}
+
+.failure-what {
   overflow: hidden;
   color: var(--foreground-strong);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.failure-who {
+  overflow: hidden;
+  color: var(--muted-foreground);
+  font-size: var(--text-4xs);
   text-overflow: ellipsis;
   white-space: nowrap;
 }

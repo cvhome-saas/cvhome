@@ -157,6 +157,32 @@
   --spacing-section: 1.25rem; /* one panel and the next; a card's block interior */
   --spacing-gutter: 1.5rem; /* a card's inline interior */
 
+  /*
+   * The height every control on one row shares.
+   *
+   * A filter row is a search box, a tab track, a select and a button standing side by side, and
+   * before this token each of them arrived at its own height: the buttons 2.25rem from a literal in
+   * controls.css, the select 2.375rem from its own default, the search box and the tab track
+   * whatever their padding happened to add up to. The result was a row of controls off by one or
+   * two pixels from each other, which reads as sloppiness rather than as a bug, and which two
+   * console-ui screens had already patched by hand with `--select-height: 2.25rem`.
+   *
+   * 2.25rem because that is what the action buttons have always been and what those patches chose.
+   * A control that must be shorter — a dense table filter — overrides it locally; the point is that
+   * lining up is the default rather than something each screen has to arrange.
+   */
+  --control-height: 2.25rem;
+
+  /*
+   * The height a form input shares with the input beside it.
+   *
+   * Taller than a toolbar control on purpose: a field is typed into, and its shell carries a label,
+   * a hint and an error underneath. The two rhythms are what the kit already had in practice — the
+   * text and number shells land here from their padding — and naming the second one is what stops a
+   * select from sitting between them, which is what 2.375rem was.
+   */
+  --field-height: 2.5rem;
+
   /* ------------------------------------------------------------------ motion ---- */
 
   /* Hover, focus and colour changes. Tailwind's default is 150ms. */

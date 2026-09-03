@@ -1,3 +1,11 @@
+/*
+ * The screen's header and panels are the page column's own children, so the shell's rhythm applies
+ * between them and this stylesheet never sets a gap of its own. See admin-shell.css, `.page`.
+ */
+:host {
+  display: contents;
+}
+
 .stack {
   display: grid;
   gap: var(--spacing-section);
@@ -98,52 +106,6 @@
   .cell.go {
     display: none;
   }
-}
-
-/* --- the toolbar: segments on the left, search on the right ------------------------------------------- */
-.toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--spacing-tight);
-  margin-block-end: var(--spacing-group);
-}
-
-.segments {
-  display: inline-flex;
-  padding: 2px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  background: var(--muted);
-}
-
-.segment {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--spacing-inline);
-  padding: 0.35rem 0.75rem;
-  border: 0;
-  border-radius: calc(var(--radius-md) - 2px);
-  background: transparent;
-  color: var(--muted-foreground);
-  font: inherit;
-  font-size: var(--text-sm);
-  cursor: pointer;
-}
-
-.segment.active {
-  background: var(--card);
-  color: var(--foreground-strong);
-  box-shadow: var(--shadow-sm);
-}
-
-.segment .count {
-  padding: 0 0.4rem;
-  border-radius: 999px;
-  background: var(--muted);
-  font-size: var(--text-4xs);
-  font-variant-numeric: tabular-nums;
 }
 
 .cell.name {

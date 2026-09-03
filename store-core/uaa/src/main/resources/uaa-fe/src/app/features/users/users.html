@@ -32,7 +32,7 @@
           />
 
           @if (facade.view() === 'accounts') {
-            <div class="toolbar">
+            <div class="filter-bar">
               <app-tab-switcher
                 [tabs]="facade.statusTabs()"
                 [active]="facade.status()"
@@ -89,7 +89,7 @@
               />
             }
           } @else {
-            <div class="toolbar">
+            <div class="filter-bar">
               <app-tab-switcher
                 [tabs]="facade.invitationTabs()"
                 [active]="facade.invitationStatus()"

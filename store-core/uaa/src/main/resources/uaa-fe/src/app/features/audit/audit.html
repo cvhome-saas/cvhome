@@ -13,7 +13,7 @@
         <a class="secondary-action" [href]="facade.exportUrl()" [attr.aria-label]="t('audit.export')">{{ t('audit.export') }}</a>
       </div>
 
-      <div class="filters">
+      <div class="filter-bar">
         <app-tab-switcher [tabs]="categoryTabs(t)" [active]="facade.category() ?? 'all'" [label]="t('audit.filter.category')" (activeChange)="facade.setCategory($event)" />
         <app-tab-switcher [tabs]="rangeTabs()" [active]="facade.range()" [label]="t('audit.filter.range')" (activeChange)="facade.setRange($event)" />
         <button class="chip" type="button" [class.on]="facade.outcome() === 'FAILURE'" (click)="facade.toggleOutcome('FAILURE')">
@@ -44,8 +44,14 @@
                 <span class="cell when" [attr.data-label]="t('audit.column.when')">
                   {{ event.occurredAt | date: 'MMM d, HH:mm:ss' }}
                 </span>
+                <!--
+                  Only a refusal is marked. Nearly every row succeeded, and a green pill on each of
+                  them is noise a reader has to look past to find the one that did not.
+                -->
                 <span class="cell event" [attr.data-label]="t('audit.column.event')">
-                  <app-badge [tone]="tone(event)">{{ event.outcome === 'FAILURE' ? t('audit.outcome.FAILURE') : t('audit.outcome.SUCCESS') }}</app-badge>
+                  @if (event.outcome === 'FAILURE') {
+                    <app-badge tone="red">{{ t('audit.outcome.FAILURE') }}</app-badge>
+                  }
                   <span class="event-name">{{ label(event, t) }}</span>
                 </span>
                 <span class="cell actor" [attr.data-label]="t('audit.column.actor')">
@@ -94,7 +100,7 @@
 
       <dl class="facts">
         <dt>{{ t('audit.detail.outcome') }}</dt>
-        <dd><app-badge [tone]="tone(event)">{{ t('audit.outcome.' + event.outcome) }}</app-badge></dd>
+        <dd><app-badge [tone]="event.outcome === 'FAILURE' ? 'red' : 'green'">{{ t('audit.outcome.' + event.outcome) }}</app-badge></dd>
         @if (event.reasonCode) {
           <dt>{{ t('audit.detail.reason') }}</dt>
           <dd class="latin">{{ event.reasonCode }}</dd>

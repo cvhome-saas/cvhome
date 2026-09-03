@@ -60,10 +60,12 @@
               <ul class="failures">
                 @for (event of facade.failures(); track event.id) {
                   <li class="failure-row">
-                    <app-badge tone="red">{{ label(event, t) }}</app-badge>
-                    <span class="who">{{ event.targetName || event.actorName || '—' }}</span>
-                    <span class="muted latin">{{ event.ip }}</span>
-                    <span class="muted">{{ event.occurredAt | date: 'HH:mm' }}</span>
+                    <span class="failure-mark" aria-hidden="true"></span>
+                    <span class="failure-copy">
+                      <span class="failure-what">{{ label(event, t) }}</span>
+                      <span class="failure-who">{{ event.targetName || event.actorName || '—' }}<span class="muted latin"> · {{ event.ip }}</span></span>
+                    </span>
+                    <time class="muted">{{ event.occurredAt | date: 'HH:mm' }}</time>
                   </li>
                 }
               </ul>

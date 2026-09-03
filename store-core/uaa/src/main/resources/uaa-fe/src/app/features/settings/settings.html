@@ -21,9 +21,15 @@
       <form class="layout" [formGroup]="facade.form" (ngSubmit)="facade.save()">
         <nav class="subnav" [attr.aria-label]="t('settings.sections')">
           @for (section of sections; track section) {
-            <a class="subnav-link" [class.active]="facade.section() === section" [href]="'#settings-' + section" (click)="facade.section.set(section)">
+            <button
+              class="subnav-link"
+              type="button"
+              [class.active]="facade.section() === section"
+              [attr.aria-current]="facade.section() === section ? 'true' : null"
+              (click)="show(section)"
+            >
               {{ t('settings.section.' + section) }}
-            </a>
+            </button>
           }
           <span class="subnav-link disabled" [title]="t('settings.email.notBuilt')">{{ t('settings.section.email') }}</span>
         </nav>

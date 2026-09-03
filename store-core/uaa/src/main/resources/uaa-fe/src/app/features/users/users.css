@@ -1,3 +1,11 @@
+/*
+ * The screen's header and panels are the page column's own children, so the shell's rhythm applies
+ * between them and this stylesheet never sets a gap of its own. See admin-shell.css, `.page`.
+ */
+:host {
+  display: contents;
+}
+
 .stack {
   display: grid;
   gap: var(--spacing-section);
@@ -146,7 +154,7 @@
   gap: var(--spacing-tight);
   padding: 0.35rem 0.5rem;
   border-radius: var(--radius-md);
-  background: var(--muted);
+  background: var(--input);
   font-size: var(--text-3xs);
 }
 
@@ -185,17 +193,11 @@
   gap: var(--spacing-tight);
 }
 
+/*
+ * The view tabs hug their labels rather than stretching across the panel: a track whose grey band
+ * runs the full width reads as a header bar, not as a choice between two views.
+ */
 .views {
-  display: block;
-  margin-block-end: var(--spacing-group);
-}
-
-.toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--spacing-tight);
   margin-block-end: var(--spacing-group);
 }
 

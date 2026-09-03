@@ -18,7 +18,6 @@ import {
   Toggle,
   type TabItem,
   type TableColumn,
-  type Tone,
 } from '@cvhome-saas/ui-kit/ui';
 import type {AuditEventDto} from '@cvhome-saas/ui-kit/uaa';
 
@@ -68,11 +67,6 @@ export class Audit {
 
   protected rangeTabs(): readonly TabItem[] {
     return this.facade.rangeOptions().map(({key, label}) => ({key, label}));
-  }
-
-  /** Failure is the only outcome worth colouring: a log of successes in red teaches nothing. */
-  protected tone(event: AuditEventDto): Tone {
-    return event.outcome === 'FAILURE' ? 'red' : 'slate';
   }
 
   /**

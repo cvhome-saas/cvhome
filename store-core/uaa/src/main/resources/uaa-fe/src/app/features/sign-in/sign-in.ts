@@ -44,8 +44,17 @@ export class SignIn {
   protected readonly submitting = signal(false);
   protected readonly csrf = signal(readCookie('XSRF-TOKEN'));
 
-  /** Which step the page is on. `link` is the confirmation a brokered login asked for. */
-  protected readonly step = signal<'identity' | 'password' | 'link'>(readNotice() ? 'password' : 'identity');
+  /**
+   * Which step the page is on. `link` is the confirmation a brokered login asked for.
+   *
+   * A *failure* opens on the password step, because the person was already past the first one and
+   * sending them back to type their address again would lose what they told us. Signing out is not
+   * a failure: it starts over, on the first step, which is where "You have been signed out" belongs.
+   */
+  protected readonly step = signal<'identity' | 'password' | 'link'>(
+    readNotice() && readNotice() !== 'signedOut' ? 'password' : 'identity',
+  );
+
   protected readonly email = signal('');
   protected readonly checking = signal(false);
   protected readonly rememberMe = signal(false);

@@ -68,7 +68,7 @@
   align-items: center;
   justify-content: center;
   gap: var(--spacing-tight);
-  min-block-size: 2.25rem;
+  min-block-size: var(--control-height);
   padding: .5rem .95rem;
   border-radius: var(--radius-md);
   font-size: var(--text-xs);
@@ -196,4 +196,74 @@
 .secondary-action[aria-busy='true'],
 .danger-action[aria-busy='true'] {
   cursor: progress;
+}
+
+/* ------------------------------------------------------------------ filter bar ---- */
+
+/*
+ * The row of filters above a table: tabs or chips on one side, a search box on the other.
+ *
+ * Three uaa screens and several console-ui ones had each written this same flex row into their own
+ * stylesheet — same six declarations, copied — and they had already drifted: one wrapped, one did
+ * not, one carried a bottom margin that fought the page's own rhythm. It is a layout every list
+ * screen needs and no component owns, which is what this file is for.
+ *
+ * The search box is pushed to the end rather than ordered there, so the markup can stay in reading
+ * order: filters first, then the thing you type into.
+ *
+ * It carries the gap to whatever it filters, because a filter bar always sits above something —
+ * that margin was the one part of the copied rule that had already drifted between screens.
+ */
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-tight) var(--spacing-field);
+  margin-block-end: var(--spacing-group);
+}
+
+.filter-bar > app-search-box {
+  margin-inline-start: auto;
+}
+
+/*
+ * A select on a filter bar is a control, not a field: it stands beside tabs and buttons rather than
+ * above a label and a hint, so it takes the shorter of the two rhythms. Two console-ui screens were
+ * already saying this by hand with `--select-height: 2.25rem`.
+ */
+.filter-bar app-select {
+  --select-height: var(--control-height);
+}
+
+/* ------------------------------------------------------------------ entrance ---- */
+
+/*
+ * The one entrance in the vocabulary: content that has just arrived rises a few pixels as it fades.
+ *
+ * `kpi-grid` already animates this way and nothing else did, so a screen's tiles moved while its
+ * table below them appeared instantly. Opt-in by class rather than applied to every panel, because
+ * a dialog that re-runs it on every keystroke is worse than no animation at all.
+ *
+ * Honour `prefers-reduced-motion`: the content still arrives, it just does not travel.
+ */
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.4rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.rise {
+  animation: rise-in 0.32s var(--ease-emphasis) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rise {
+    animation: none;
+  }
 }

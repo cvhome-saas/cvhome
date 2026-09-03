@@ -11,7 +11,7 @@ somewhere else entirely — that is [cua](../../../store-pod/cua/qa/cua-qa.md).
   is where the platform's sign-in page lives
 - **Runs on** — `lcl start -d --stack <name>`; uaa is `http://uaa.gateway.com:8001` and is the **first**
   service the stack brings up, because it issues the tokens. Read the live port from `lcl urls`
-- **Cases** — 139 (110 verified, 14 unit only, 14 not verified; one case is a walkthrough with no single outcome)
+- **Cases** — 142 (113 verified, 14 unit only, 14 not verified; one case is a walkthrough with no single outcome)
 - **Also see** — [gateway](../../gateway/gateway-service/qa/gateway-qa.md) (which relays the token and holds
   the session), [tenancy](../../tenancy/tenancy-service/qa/tenancy-qa.md) (which owns the *store-scoped*
   accounts and calls uaa to create them),
@@ -403,6 +403,32 @@ to `/clients` reaches the router rather than 404ing.
   and a restart alone keeps that bundle: the page throws `does not provide an export named 'OneTimeLinkDialog'`
   and renders nothing. `rm -rf store-core/console-ui/.angular/cache`, then restart. Seen when the one-time-link
   dialog moved into the kit.
+
+---
+
+### CON-09 — One row, one height · high · [verified]
+
+- **Steps** — open Users, Roles, Clients and Audit log and look at the filter row: tabs, search box, and on
+  settings the selects and number fields.
+- **Expect** — every control on a filter row is **36px** (`--control-height`) and every form input is **40px**
+  (`--field-height`). Two rhythms, no thirds: a select used to be 2.375rem and land between them, which is why
+  two console-ui screens carried `--select-height: 2.25rem` by hand.
+- **Watch for** — a filter row that wraps. The tab track is inline: if a screen makes it `display: block` it
+  claims the whole line and pushes the search box onto a second one.
+
+### CON-10 — The page's rhythm belongs to the page · [verified]
+
+- **Steps** — every screen: measure the gap between the page header and the first panel, and between panels.
+- **Expect** — 20px (`--spacing-section`) everywhere, from `.page` in the shell. Screens set
+  `:host { display: contents }` so their panels are the page column's own children; none of them declares a gap
+  of its own, and a screen that does is drifting.
+
+### CON-11 — Settings sections scroll, they do not navigate · critical · [verified]
+
+- **Steps** — Settings → click each entry in the left sub-nav.
+- **Expect** — the page scrolls to that panel and marks it current; **the URL stays `/settings`**. It used to
+  leave the page entirely: the entries were `<a href="#settings-general">`, and a fragment-only href resolves
+  against the document base — `<base href="/">` — so every click landed on the console's landing route.
 
 ---
 
@@ -1511,6 +1537,14 @@ clients and accounts. Nothing in uaa carries an `alter table`.
 | The Users panel rendered its empty state under a 403 | a `USER`-role session saw *No accounts* beneath the error bar | CON-06 |
 | The CSRF cookie had no explicit path | a response from `/login/oauth2/code/…` minted a second `XSRF-TOKEN` scoped to that directory, and the next POST elsewhere sent the wrong one | IDP-04 (the repository now pins the cookie to `/`) |
 | The brokered-login failure handler saved the exception into the session | Spring Session JDBC could not serialise the HTTP response inside it: a refusal became a 500 | IDP-04 |
+| Settings' left sub-nav left the page | fragment-only `href` resolves against `<base href="/">`, so a section link navigated to the landing route | CON-11 |
+| Four control heights on one row | buttons 2.25rem, select 2.375rem, search box and tab track whatever their padding made — the theme had no control-height token, so nothing lined up | CON-09 |
+| The tab track filled its row | its host was `display: block`, so on Users and Clients it pushed the search box onto a second line | CON-09 |
+| Every screen invented its own page spacing | no feature set `:host`, and `.page` had no gap; the rhythm was whatever margins a screen happened to declare | CON-10 |
+| Recessed surfaces were invisible | chips, session rows and glyph tiles were painted `var(--muted)`, which is the *panel* surface — white on white inside a panel. `--input` is the recessed tone | CON-10 |
+| Three stylesheets carried the same filter row | copied six declarations that had already drifted; now `.filter-bar` in the kit's `controls.css` | CON-09 |
+| `--success`, `--warning`, `--text-md` did not exist | invented in dashboard and audit CSS and resolved to nothing, so a WARN posture line read exactly like an OK | DSH-02 |
+| The identity-provider table scrolled sideways | the preview panel took a third of the width at 1440px and squeezed the five columns past their content | IDP-01 |
 | A provider's default role names were folded to lower case | `USER` was stored as `user`, matched no role, and every brokered login arrived with no roles | IDP-04 |
 | The grace-aware client-secret provider was a bean | Spring adopted the lone `AuthenticationProvider` bean as the global manager's provider: every form login failed and lockout stopped counting | AUT-02, LCK-01 (the provider is built inside the SAS chain, never a bean) |
 | Spring's provider saves an upgraded hash through the registry it was given | `UnsupportedOperationException` from the grace view's read-only `save` on the first token with a `{bcrypt}` strength-10 seed | CLI-03 (`SingleClientRepository.save` is a no-op) |

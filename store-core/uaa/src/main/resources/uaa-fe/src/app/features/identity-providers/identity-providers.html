@@ -27,7 +27,7 @@
                   <span class="cell" [attr.data-label]="t('idps.column.protocol')">
                     <app-badge tone="slate">{{ provider.type === 'OIDC' ? 'OIDC' : 'OAuth 2.0' }}</app-badge>
                   </span>
-                  <span class="cell muted" [attr.data-label]="t('idps.column.policy')">{{ policy(provider, t) }}</span>
+                  <span class="cell policy muted" [attr.data-label]="t('idps.column.policy')" [title]="policy(provider, t)">{{ policy(provider, t) }}</span>
                   <span class="cell status" [attr.data-label]="t('idps.column.status')">
                     <app-toggle
                       [checked]="provider.enabled"

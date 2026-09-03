@@ -19,21 +19,13 @@
             {{ t('roles.action.create') }}
           </button>
 
-          <div class="toolbar">
-            <div class="segments" role="group" [attr.aria-label]="t('roles.filter.label')">
-              @for (filter of filters; track filter) {
-                <button
-                  class="segment"
-                  type="button"
-                  [class.active]="facade.filter() === filter"
-                  [attr.aria-pressed]="facade.filter() === filter"
-                  (click)="facade.filter.set(filter)"
-                >
-                  <span>{{ t('roles.filter.' + filter) }}</span>
-                  <span class="count">{{ count(filter) }}</span>
-                </button>
-              }
-            </div>
+          <div class="filter-bar">
+            <app-tab-switcher
+              [tabs]="filterTabs(t)"
+              [active]="facade.filter()"
+              [label]="t('roles.filter.label')"
+              (activeChange)="facade.filter.set($any($event))"
+            />
             <app-search-box
               [value]="facade.query()"
               [label]="t('roles.filter.search')"

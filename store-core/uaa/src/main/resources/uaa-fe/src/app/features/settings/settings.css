@@ -1,5 +1,15 @@
+/*
+ * The screen's header and panels are the page column's own children, so the shell's rhythm applies
+ * between them and this stylesheet never sets a gap of its own. See admin-shell.css, `.page`.
+ */
+:host {
+  display: contents;
+}
+
 .header-actions {
   display: flex;
+  flex-wrap: wrap;
+  align-items: center;
   gap: var(--spacing-tight);
 }
 
@@ -18,16 +28,30 @@
 }
 
 .subnav-link {
-  padding: 0.4rem 0.6rem;
+  padding: 0.45rem 0.6rem;
+  border: 0;
   border-radius: var(--radius-md);
+  background: none;
   color: var(--muted-foreground);
+  font: inherit;
   font-size: var(--text-sm);
+  text-align: start;
   text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color var(--default-transition-duration),
+    color var(--default-transition-duration);
+}
+
+.subnav-link:hover:not(.disabled) {
+  background: var(--input);
+  color: var(--foreground-strong);
 }
 
 .subnav-link.active {
-  background: var(--muted);
-  color: var(--foreground-strong);
+  background: var(--input);
+  color: var(--primary-emphasis);
+  font-weight: 600;
 }
 
 .subnav-link.disabled {

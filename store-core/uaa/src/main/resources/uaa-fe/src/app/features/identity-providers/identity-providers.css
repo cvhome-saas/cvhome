@@ -1,12 +1,31 @@
-.layout {
-  display: grid;
-  gap: var(--spacing-section);
-  grid-template-columns: minmax(0, 2fr) minmax(16rem, 1fr);
+/*
+ * The screen's header and panels are the page column's own children, so the shell's rhythm applies
+ * between them and this stylesheet never sets a gap of its own. See admin-shell.css, `.page`.
+ */
+:host {
+  display: contents;
 }
 
-@media (max-width: 60rem) {
+/*
+ * One column until there is genuinely room for two.
+ *
+ * The preview is a nice-to-have beside the list and a scrollbar in front of it: at 1440px it took a
+ * third of the width, which squeezed the five-column table below its content width and put a
+ * horizontal scrollbar under the one screen whose whole job is to be read at a glance. It only
+ * earns a column of its own on a wide display.
+ */
+.layout {
+  display: grid;
+  /* Each panel is as tall as its own content: a list of two providers should not be stretched to
+     match the preview beside it, which is what a grid does by default. */
+  align-items: start;
+  gap: var(--spacing-section);
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 90rem) {
   .layout {
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: minmax(0, 3fr) minmax(15rem, 1fr);
   }
 }
 
@@ -45,6 +64,14 @@
   color: var(--muted-foreground);
 }
 
+/* The policy line is a summary: it truncates rather than widening the table past its container. */
+.cell.policy {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .cell.order {
   gap: 0.15rem;
 }
@@ -75,7 +102,7 @@
   inline-size: 2rem;
   block-size: 2rem;
   border-radius: var(--radius-md);
-  background: var(--muted);
+  background: var(--input);
   color: var(--foreground-strong);
   font-size: var(--text-4xs);
   font-weight: 700;

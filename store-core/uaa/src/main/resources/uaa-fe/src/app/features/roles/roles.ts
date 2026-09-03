@@ -19,9 +19,11 @@ import {
   Panel,
   SearchBox,
   Select,
+  TabSwitcher,
   TableRow,
   TextField,
   TextareaField,
+  type TabItem,
   type TableColumn,
 } from '@cvhome-saas/ui-kit/ui';
 import {PAGE_SIZE, RolesFacade, type RoleFilter} from './facades/roles.facade';
@@ -48,6 +50,7 @@ import {PAGE_SIZE, RolesFacade, type RoleFilter} from './facades/roles.facade';
     Checkbox,
     Badge,
     SearchBox,
+    TabSwitcher,
     ConfirmDialog,
     Icon,
   ],
@@ -78,6 +81,20 @@ export class Roles {
       ...this.keys.map(({key, width}) => ({key, width, label: t('roles.column.' + key)})),
       {key: 'go', width: '2rem', label: ''},
     ];
+  }
+
+  /**
+   * The filters as the kit's tab track: the same control the users, clients and audit screens use,
+   * with the counts as its badges. This screen used to draw its own segmented buttons — the same
+   * idea one shade off in height, radius and type — which is exactly the drift a shared control
+   * exists to prevent.
+   */
+  protected filterTabs(t: (key: string) => string): readonly TabItem[] {
+    return this.filters.map((filter) => ({
+      key: filter,
+      label: t('roles.filter.' + filter),
+      badge: String(this.count(filter)),
+    }));
   }
 
   protected count(filter: RoleFilter): number {

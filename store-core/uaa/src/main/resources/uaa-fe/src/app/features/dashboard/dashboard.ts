@@ -3,14 +3,14 @@ import {Component, inject} from '@angular/core';
 import {RouterLink} from '@angular/router';
 import {TranslocoDirective} from '@jsverse/transloco';
 
-import {Badge, BusyOverlay, Icon, KpiGrid, LoadError, PageHeader, Panel, RankedList, TabSwitcher, type TabItem} from '@cvhome-saas/ui-kit/ui';
+import {BusyOverlay, Icon, KpiGrid, LoadError, PageHeader, Panel, RankedList, TabSwitcher, type TabItem} from '@cvhome-saas/ui-kit/ui';
 import type {AuditEventDto} from '@cvhome-saas/ui-kit/uaa';
 
 import {DashboardFacade} from './facades/dashboard.facade';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [DatePipe, RouterLink, TranslocoDirective, PageHeader, Panel, KpiGrid, RankedList, TabSwitcher, BusyOverlay, LoadError, Badge, Icon],
+  imports: [DatePipe, RouterLink, TranslocoDirective, PageHeader, Panel, KpiGrid, RankedList, TabSwitcher, BusyOverlay, LoadError, Icon],
   providers: [DashboardFacade],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',

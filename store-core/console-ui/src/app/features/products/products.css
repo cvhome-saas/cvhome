@@ -77,7 +77,7 @@
   flex: none;
   inline-size: 11rem;
   /* The one hook the component offers — see select.css. */
-  --select-height: 2.25rem;
+  --select-height: var(--control-height);
 }
 
 /* ---- Cells ------------------------------------------------------------------------- */

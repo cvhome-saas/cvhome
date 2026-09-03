@@ -21,7 +21,7 @@ import {
   TableRow,
   type TableColumn,
 } from '@cvhome-saas/ui-kit/ui';
-import {SETTINGS_SECTIONS, SettingsFacade} from './facades/settings.facade';
+import {SETTINGS_SECTIONS, SettingsFacade, type SettingsSection} from './facades/settings.facade';
 
 /**
  * Realm-wide policy. Six sections in the design; four are built (General, Authentication, Sessions
@@ -75,4 +75,21 @@ export class Settings {
 
   protected readonly facade = inject(SettingsFacade);
   protected readonly sections = SETTINGS_SECTIONS;
+
+  /**
+   * Scrolls a section into view and marks it current.
+   *
+   * **Not a link.** These were `<a href="#settings-general">`, and a fragment-only href resolves
+   * against the document's base URI — which is `<base href="/">` — so every click left the settings
+   * page for the console's landing route. Nothing about the markup looked wrong; the URL it
+   * produced was `/#settings-general`. A button that scrolls has no URL to get wrong.
+   *
+   * Smooth unless the reader asked for less motion, in which case it jumps.
+   */
+  protected show(section: SettingsSection): void {
+    this.facade.section.set(section);
+    const panel = document.getElementById('settings-' + section);
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    panel?.scrollIntoView({behavior: reduced ? 'auto' : 'smooth', block: 'start'});
+  }
 }

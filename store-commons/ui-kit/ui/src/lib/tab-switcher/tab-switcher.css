@@ -1,12 +1,22 @@
 :host {
-  display: block;
+  /*
+   * Inline, because a tab track's job on a filter row is to stand beside a search box rather than
+   * to claim the row. As a block it filled the line and pushed everything after it onto the next
+   * one — which is what uaa's users and clients screens were doing. A consumer that wants the full
+   * width says so (`display: block` on the host, or a stretched grid cell).
+   */
+  display: inline-flex;
+  max-inline-size: 100%;
   min-width: 0;
 }
 
 .tab-track {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 0.15rem;
+  /* One control tall, so the row it sits on lines up. */
+  min-block-size: var(--control-height);
   padding: 0.2rem;
   border-radius: var(--radius-lg);
   background: var(--input);

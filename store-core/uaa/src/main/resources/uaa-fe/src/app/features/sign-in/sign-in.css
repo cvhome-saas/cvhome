@@ -121,7 +121,7 @@
 /* The same strip in a neutral tone, for "signed out" and "expired" rather than a refusal. */
 .failed.info {
   color: var(--muted-foreground);
-  background: var(--muted);
+  background: var(--input);
   border-color: var(--border);
 }
 
@@ -196,7 +196,7 @@
   margin: 0;
   padding: 0.6rem 0.75rem;
   border-radius: var(--radius-md);
-  background: var(--muted);
+  background: var(--input);
   color: var(--muted-foreground);
   font-size: var(--text-xs);
   line-height: 1.6;
@@ -239,7 +239,7 @@
   inline-size: 1.6rem;
   block-size: 1.6rem;
   border-radius: var(--radius-md);
-  background: var(--muted);
+  background: var(--input);
   font-size: var(--text-4xs);
   font-weight: 700;
 }
@@ -260,7 +260,7 @@
   margin: 0 0 var(--spacing-group);
   padding: 0.45rem 0.65rem;
   border-radius: var(--radius-md);
-  background: var(--muted);
+  background: var(--input);
   font-size: var(--text-xs);
 }
 

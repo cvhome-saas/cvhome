@@ -1,3 +1,11 @@
+/*
+ * The screen's header and panels are the page column's own children, so the shell's rhythm applies
+ * between them and this stylesheet never sets a gap of its own. See admin-shell.css, `.page`.
+ */
+:host {
+  display: contents;
+}
+
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(22rem, 1fr));
@@ -31,7 +39,7 @@
   gap: var(--spacing-tight);
   padding: 0.5rem 0.65rem;
   border-radius: var(--radius-md);
-  background: var(--muted);
+  background: var(--input);
   font-size: var(--text-sm);
 }
 
@@ -86,7 +94,7 @@
   gap: var(--spacing-tight);
   padding: 0.5rem 0.65rem;
   border-radius: var(--radius-md);
-  background: var(--muted);
+  background: var(--input);
   font-size: var(--text-3xs);
 }
 

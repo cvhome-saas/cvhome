@@ -217,3 +217,22 @@ MFA" rather than "we cannot tell".
   for a bag nobody documents would cost more than it is worth and would still be guessing.
 - **Expected contract:** a documented list of the settings uaa reads, with their types — at which
   point these become real fields rather than an open map.
+
+## Spacing — the tokens were there, the rhythms were not
+
+- **Screen:** every list screen's filter row, and the gap between a page header and its panels.
+- **What was wrong:** not a missing `--spacing-*` variable — those all resolve. Two other things did not
+  exist. There was no **control height**, so a filter row's buttons (2.25rem), select (2.375rem), search box
+  and tab track (whatever their padding produced) were four different heights; and there was no **page
+  rhythm**, because no screen set `:host` and `.page` had no gap, so the vertical spacing was whatever margins
+  each screen happened to declare.
+- **Decision:** name both. `--control-height` (2.25rem) and `--field-height` (2.5rem) in the theme, applied by
+  the kit's own controls; `.page` is a flex column with `--spacing-section` and every screen is
+  `:host { display: contents }`. The copied filter row became `.filter-bar` in `controls.css`, beside the
+  action vocabulary, for the same reason that file exists.
+- **What this closes elsewhere:** console-ui's products and order-details screens each carried
+  `--select-height: 2.25rem` by hand — the token is now what they point at, and their filter rows line up
+  without the patch.
+- **Still true:** `--muted` is the *panel* surface, which is white on this theme. A chip or row inside a panel
+  wants `--input`. Painting one `--muted` is invisible, and that is how several of them shipped.
+
