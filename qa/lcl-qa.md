@@ -81,6 +81,47 @@ Stop through the tool (`lcl stop`), never with a manual `kill`.
 - **Steps** — `lcl restart -d`.
 - **Expect** — old supervisor gone, new supervisor pid, all services `up`, same ports.
 
+> ### Known gap — `lcl restart` of the whole stack can leave half of it `crashed`
+>
+> **Symptom.** Six or so services exit 1 within a minute of each other, all with the same Gradle failure:
+>
+> ```
+> Could not create service of type FileAccessTimeJournal …
+>   Timeout waiting to lock journal cache (~/.gradle/caches/journal-1).
+>   It is currently in use by another process. Owner PID: …
+> ```
+>
+> `lcl status` shows them `crashed`, and everything downstream reads `blocked by dependency` — `landing-ui` waits
+> on content/catalog/checkout/inventory, so **the storefronts 502 while the platform services look fine**.
+>
+> **Cause.** Every service runs its own `./gradlew … bootRun`, and each Gradle client needs the *shared*
+> `~/.gradle/caches/journal-1` lock at startup. `--project-cache-dir` is per stack; the Gradle user home is not.
+> A restart stops the services but the Gradle daemons they spawned outlive the build, so a restart briefly has the
+> old daemons and the new clients competing. The pod services have no ordering between them — they all depend only
+> on uaa and postgres — so six start at once and lose the race. The lock timeout is
+> `DefaultFileLockManager.DEFAULT_LOCK_TIMEOUT`, a hard-coded 60 s constant with no system property behind it, so
+> it cannot be raised.
+>
+> **What works.**
+>
+> ```bash
+> lcl stop --stack <name>
+> ./gradlew --stop          # only if no other stack is running: this stops every daemon in the shared user home
+> lcl start -d --stack <name>
+> ```
+>
+> A cold `lcl start` is reliable because there are no leftover daemons. `lcl start --parallel 1` does **not**
+> recover an already-crashed service — `start` skips services in a terminal state, and `lcl restart <svc>` on one
+> does not retry either; the events log still shows the original crash. Stop and start the stack.
+>
+> **Do not** run `./gradlew --stop` while another worktree's stack is up: daemons are shared across stacks, and a
+> `bootRun` daemon never finishes on its own, so stopping them takes that stack's services down too.
+>
+> **Not fixed in `lcl.yml`.** The available levers are all worse than the problem: a per-stack `GRADLE_USER_HOME`
+> gives every stack its own multi-gigabyte dependency cache, a daemon-stopping `before-start`/`after-stop` hook
+> would kill other worktrees' stacks, and a sleep-based stagger is a guess dressed as configuration. Recorded here
+> instead.
+
 ## 06 — Stop / start / restart one service [verified]
 
 - **Steps** — `lcl stop payment`; `lcl status`; `lcl start payment`; `lcl restart payment`.

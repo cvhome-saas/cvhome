@@ -70,7 +70,9 @@
     ".next-shifted/types/**/*.ts",
     ".next-shifted/dev/types/**/*.ts",
     ".next-uaa-sso/types/**/*.ts",
-    ".next-uaa-sso/dev/types/**/*.ts"
+    ".next-uaa-sso/dev/types/**/*.ts",
+    ".next-sso-unify/types/**/*.ts",
+    ".next-sso-unify/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"
