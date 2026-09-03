@@ -71,7 +71,9 @@ Logs: `.lcl/<stack>/logs/cua.log`.
 - **Expect** — refused. The client is derived from the **host**, so there is no client to authenticate
   against. Record it as expected rather than raising it.
 
-### LGN-03 — A shopper of one store cannot sign in to another · critical · [not verified]
+### LGN-03 — A shopper of one store cannot sign in to another · critical · [verified]
+
+> Also covered from the token side by RLM-03 and RLM-04.
 
 - **Steps** — sign in on org1-store1, then present that session on `org2-store1.spg-507f1f77.gateway.com`.
 - **Expect** — not signed in. Two stores on one pod share the service and must not share shoppers; this is the
@@ -128,6 +130,65 @@ Logs: `.lcl/<stack>/logs/cua.log`.
 
 ---
 
+## RLM — Realms: one per store
+
+cua is the multi-realm deployment of the SSO server in `store-commons/sso/sso-core`; uaa is the same code with a
+single realm. A realm here **is** a store, and these are the cases that prove the boundary holds. All were run
+against a live stack on 2026-09-03.
+
+### RLM-01 — The host decides which store a request belongs to · critical · [verified]
+
+- **Steps** — the pod edge resolves the storefront host to a store and sets `Store-Id`; `spg`'s `/cua*` route does
+  the same lookup the storefront route does. Sign in normally at `org1-store1.spg-507f1f77.gateway.com`.
+- **Expect** — the realm is the store the host resolved to, not the `client_id` on the form. cua used to take the
+  tenant straight out of that form field, which let the request name its own tenant.
+
+### RLM-02 — A request that names another store is refused · critical · [verified]
+
+- **Steps** — `POST /cua/api/v1/public/registration?store=<store-2-id>` at **store 1's** host. Same again against
+  `POST /cua/oauth2/token`.
+- **Expect** — `403` `UAA.REALM.CROSS_STORE_REQUEST`, as `application/problem+json`, naming both stores. Not a
+  500: the refusal comes from a filter, which throws outside the `@ControllerAdvice`, so `RealmFilter` renders the
+  problem body itself. It answered a bare 500 the first time this was run.
+
+### RLM-03 — One username is a different person in each store · critical · [verified]
+
+- **Steps** — register `qa-shopper-1` on store 1, then the same username **and** email on store 2.
+- **Expect** — both `201`. A third attempt on store 1 is `409 UAA.USER.USERNAME_TAKEN`. Uniqueness is
+  `(realm_id, username)` and `(realm_id, email)`, never global.
+
+### RLM-04 — A shopper token is accepted at its own store and refused at another · critical · [verified]
+
+- **Steps** — sign in on store 1, take the access token, and call
+  `GET /checkout/api/v1/private/customer/orders?store=…` first with store 1, then with store 2, then with no token.
+- **Expect** — `200`, then `403`, then `401`. This is the whole tenant boundary in three requests:
+  `StoreRoleAccessChecker.isStoreCustomer` matches the token's store claim against the `?store=` of the request.
+
+### RLM-05 — The token says which store, which role, and who · critical · [verified]
+
+- **Steps** — decode the access token from RLM-04.
+- **Expect** — `iss` is the pod's one issuer (`…/cua`), never the store host; `realm` and `clientId` both carry
+  the store id; `roles` is `["CUSTOMER"]`; `sub` is the account **UUID**, not the username.
+- **Why each matters** — without `roles` the pods' `ROLE_CUSTOMER` ceiling admits nothing and every shopper call
+  to checkout is refused. Without the store claim the store check fails even with the role. And `sub` must not be
+  the username: all four demo shoppers are called `user`, and checkout joins its customer records on `sub`, so
+  two stores' shoppers would merge. All three were wrong the first time this was run.
+
+### RLM-06 — A rejected registration leaves no account behind · high · [verified]
+
+- **Steps** — register with a password the realm's policy refuses (`secret1`), then look for the row.
+- **Expect** — `400 UAA.PASSWORD.POLICY_VIOLATION` and **no** `cua.users` row. The account is saved before the
+  password so password history has a row to point at, and every refusal is a checked exception — which Spring
+  does not roll back for by default. It left an enabled, password-less account holding the username against the
+  person trying to claim it.
+
+### RLM-07 — Shoppers get the realm's password policy · high · [verified]
+
+- **Steps** — register with `secret1`, then with `Str0ng-Passphrase!`.
+- **Expect** — refused naming the rules that failed (`minLength`, `upper`), then `201`. Registration goes through
+  the same `PasswordService` as every other password in the server; cua used to encode it directly, so shoppers
+  had no policy, no history and no breach check.
+
 ## CLI — The dynamic client, and the port that must survive
 
 ### CLI-01 — The `redirect_uri` is derived from the request's real host · critical · [not verified]
@@ -157,10 +218,13 @@ Logs: `.lcl/<stack>/logs/cua.log`.
   `X-Forwarded-Prefix: /cua`; `PathPrefixFilter` accounts for it when building absolute URLs. Catalog, by
   contrast, sees its path with the prefix stripped.
 
-### CLI-04 — An unknown store host gets no client · critical · [not verified]
+### CLI-04 — An unknown store gets no client · critical · [verified]
 
-- **Steps** — send an authorization request with a `Host` no store owns.
-- **Expect** — refused. It must **not** fall back to another store's client, and it must not 500.
+- **Steps** — start an authorize flow with a `client_id` that is not a store this pod serves.
+- **Expect** — no client at all, so the request is a plain "no such client". The old repository
+  answered every `client_id` with a freshly built client, and only the user lookup failing later
+  stopped an unknown store — defence by accident. A row in `cua.realms` is what makes a store real
+  now, written on the first request the edge vouches for.
 
 ### LGN-10 — The form is CSRF-protected, and a stale one is not a dead end · high · [verified]
 

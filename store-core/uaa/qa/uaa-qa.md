@@ -172,6 +172,44 @@ session and relays the token inward. Everything in this section is that path.
 
 ---
 
+## SSO — uaa as one deployment of the shared SSO server
+
+uaa's server now lives in `store-commons/sso/sso-core`, shared with `store-pod/cua`, which is the same code
+deployed with one realm per store. uaa stays single-realm and always will. These cases exist to prove that
+sharing the code changed nothing here; run them after any change to `sso-core`. All were run against a live stack
+on 2026-09-03.
+
+### SSO-01 — uaa's tokens are byte-compatible · critical · [verified]
+
+- **Steps** — mint a service token:
+  `curl -u 'store-core@service.store-core.internal:<lcl secret>' -d 'grant_type=client_credentials&scope=store_core'
+  http://uaa.gateway.com:8001/oauth2/token`, then decode it.
+- **Expect** — `iss` is `http://uaa.gateway.com:8001`, `scope` is `["store_core"]`, and there is **no** `realm` or
+  `clientId` claim. Those two are the multi-realm deployment's business: a username is already unique in a single
+  realm, and the gateway's OIDC client pins `user-name-attribute: sub`, so uaa's `sub` stays the username.
+
+### SSO-02 — The issuer is still pinned to uaa's own host · critical · [verified]
+
+- **Steps** — `GET http://uaa.gateway.com:8001/.well-known/openid-configuration`.
+- **Expect** — `issuer` is `http://uaa.gateway.com:8001` and `jwks_uri` sits under it. uaa pins from the service
+  registry, cua pins one per pod; both refuse to start unpinned.
+
+### SSO-03 — The console canary · critical · [verified]
+
+- **Steps** — sign in at `http://gateway.com:8000/` as `org1-admin` / `admin` and load `/dashboard`.
+- **Expect** — the identity-first page at `uaa.gateway.com:8001/login`, then the console with the org's stores in
+  the switcher. **Run this after every change to `sso-core`** — the gateway login is what breaks first on issuer,
+  CSRF, PKCE and principal-type changes.
+- **Known trap** — a `ClassNotFoundException` here usually means `sso-core` was rebuilt while uaa was running.
+  `lcl restart uaa` rather than hunting the class.
+
+### SSO-04 — uaa serves no shopper surface · high · [verified]
+
+- **Steps** — confirm `com.asrevo.cvhome.sso.realm.mode` is `SINGLE` in `application.yml`, and that
+  `default-roles` is unset.
+- **Expect** — uaa's principals carry only the roles granted to them as rows. `CUSTOMER` is cua's default, set
+  because every account in a store's realm is a shopper by construction.
+
 ## ADM — The admin API
 
 `/api/v1/admin/**` is gated twice: at the filter chain on `SCOPE_super_admin` or `ROLE_SUPER_ADMIN`, and again
