@@ -128,6 +128,13 @@ Stop through the tool (`lcl stop`), never with a manual `kill`.
 - **Expect** — only payment changes state (`stopped` → `up`), new pid each time, other services keep their
   pids and uptime; `events` shows `service.stopping/stopped/starting/up` for payment only; infra untouched.
 
+> **Restarting an `-ui` service after changing `ui-kit` needs its Vite cache cleared.** console-ui links the
+> shared library as a `file:` dependency and Vite pre-bundles it into
+> `store-core/console-ui/.angular/cache/…/vite/deps/`. That copy is not invalidated when the library is rebuilt,
+> so the app loads the old one and fails at the first new export — the symptom is a route that silently refuses
+> to navigate, with `does not provide an export named …` in the browser console and nothing in the server log.
+> `rm -rf store-core/console-ui/.angular/cache` before `lcl restart console-ui`. It cost half an hour once.
+
 ## 07 — Crash isolation and `why` [verified]
 
 - **Steps** — `kill -9 $(lsof -t -iTCP:8125 -sTCP:LISTEN)`; wait 5 s; `lcl status`; `lcl why payment`.

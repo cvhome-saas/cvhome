@@ -1098,6 +1098,45 @@ product form, variant-aware product rows and order lines. The model is
 
 ---
 
+## SSO — Shoppers and sign-in providers
+
+Two screens the merchant console gained when uaa and cua became one server: who can sign in to this store, and
+how. Both talk to cua through the seller gateway with the operator's uaa token; both were run against a live
+stack on 2026-09-03.
+
+### SSO-UI-01 — The shoppers list is this store's accounts · critical · [verified]
+
+- **Steps** — sign in as `org1-admin`, open **Shoppers** under Storefront.
+- **Expect** — the store's registered accounts, with search, a status filter and a row menu. Not the Customers
+  page: that is checkout's record of who has ordered, this is cua's record of who has an account, and a guest
+  checkout appears in one and not the other.
+
+### SSO-UI-02 — The row menu offers only what a merchant may do · critical · [verified]
+
+- **Steps** — open a row's action menu.
+- **Expect** — unlock (on a locked account only), disable, delete, and the disabled impersonate placeholder.
+  **No password reset and no role editing**: cua exposes neither for a shopper, so a menu entry would answer 404.
+  Verified by reading the rendered menu, not by eye.
+
+### SSO-UI-03 — The sessions pane says where an account is signed in · high · [verified]
+
+- **Steps** — click a row. Sign the shopper in from the storefront first, or the pane is legitimately empty.
+- **Expect** — one entry per browser with address, browser and start time, and one control that ends them all.
+  A load failure is shown inside the pane, never as an empty list.
+- **Known trap** — a session created before this change carries no stamp and reads "address not recorded"
+  honestly. cua's own login handler used to skip stamping entirely; every session started after the fix has it.
+
+### SSO-UI-04 — Sign-in providers, including one a merchant types · critical · [verified]
+
+- **Steps** — open **Sign-in**. Press Test on a configured provider. Add a generic OIDC provider with
+  `https://accounts.google.com` as the issuer.
+- **Expect** — the store's providers with their redirect URIs to copy; Test reports "Answered at
+  https://accounts.google.com/.well-known/openid-configuration"; the new provider is created and its response
+  carries `hasClientSecret` and **no secret**.
+- **And the refusal** — an issuer of `https://169.254.169.254/`, `https://127.0.0.1/`, a private address, or a
+  plain-HTTP URL is refused with one identical message. See `store-pod/cua/qa/cua-qa.md` **RLM-16**, including
+  why the local stack has to be put back to the defaults for it to bite.
+
 ## 99 — Known gaps
 
 **`app-load-error` shows a developer string.** See KIT-04b. `[message]="failure.message"` on ~15 pages

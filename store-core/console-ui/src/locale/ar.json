@@ -3420,7 +3420,7 @@
     "loading": "جارٍ تحميل المتسوقين",
     "unit": "متسوقون",
     "paginationLabel": "صفحات المتسوقين",
-    "totalLabel": "{total} متسوقًا",
+    "totalLabel": "{total, plural, zero {لا متسوقين} one {متسوق واحد} two {متسوقان} few {# متسوقين} many {# متسوقًا} other {# متسوق}}",
     "filter": {
       "searchLabel": "بحث في المتسوقين",
       "searchPlaceholder": "الاسم أو اسم المستخدم أو البريد",

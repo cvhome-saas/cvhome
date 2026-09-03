@@ -1,6 +1,5 @@
 import {Injectable, computed, inject, linkedSignal, signal} from '@angular/core';
 import {TranslocoService} from '@jsverse/transloco';
-import {TranslocoLocaleService} from '@jsverse/transloco-locale';
 
 import {ApiErrorService, snapshot} from '@cvhome-saas/ui-kit';
 import type {PlatformUserRow, SessionSummary, UserStatus} from '@cvhome-saas/ui-kit/uaa';
@@ -24,7 +23,6 @@ export class ShoppersFacade {
   private readonly apiErrors = inject(ApiErrorService);
   private readonly toast = inject(ToastService);
   private readonly transloco = inject(TranslocoService);
-  private readonly localeFormat = inject(TranslocoLocaleService);
 
   readonly busy = signal(false);
 
@@ -65,9 +63,9 @@ export class ShoppersFacade {
       return null;
     }
     this.transloco.activeLang();
-    return this.transloco.translate('shoppers.totalLabel', {
-      total: this.localeFormat.localizeNumber(this.totalElements(), 'decimal'),
-    });
+    // The count goes in as a number, not a formatted string: messageformat picks the plural rule from it,
+    // and Arabic has six. A pre-formatted "1,024" would be a string and always take `other`.
+    return this.transloco.translate('shoppers.totalLabel', {total: this.totalElements()});
   });
 
   readonly statusOptions = computed<readonly SelectOption[]>(() => {

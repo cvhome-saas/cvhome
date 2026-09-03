@@ -3420,7 +3420,7 @@
     "loading": "Loading shoppers",
     "unit": "shoppers",
     "paginationLabel": "Shopper pages",
-    "totalLabel": "{total} shoppers",
+    "totalLabel": "{total, plural, one {# shopper} other {# shoppers}}",
     "filter": {
       "searchLabel": "Search shoppers",
       "searchPlaceholder": "Name, username or email",

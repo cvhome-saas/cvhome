@@ -291,7 +291,7 @@ against a live stack on 2026-09-03.
   (`spring.datasource.hikari.schema`), and `SsoSqlSchemaTest` fails the build if a qualifier comes back.
   Verified 2026-09-03: uaa stayed at 10 rows while cua went 1 → 0.
 
-### RLM-16 — A provider endpoint pointing inside the network is refused · critical · [unit only]
+### RLM-16 — A provider endpoint pointing inside the network is refused · critical · [verified]
 
 - **Steps** — as a merchant, save an identity provider whose issuer is `https://169.254.169.254/`, then
   `https://127.0.0.1/`, then `https://10.0.0.5/`, then `http://accounts.google.com/` (plain HTTP), then
@@ -305,7 +305,10 @@ against a live stack on 2026-09-03.
   every sign-in through the provider. Unbounded that is a request forger inside the pod's network, with cloud
   metadata one hop away. Pinned by `EgressGuardTest`.
 - **Expected to fail locally** — the `lcl` slice sets `allow-private-addresses: true`, because the demo providers
-  answer on localhost. Run this against a stack without that override, or read the unit test.
+  answer on localhost. Flip that slice back to the defaults, restart cua, and it bites.
+- **Verified 2026-09-03** exactly that way: all four refused with `UAA.IDP.ENDPOINT_REFUSED` naming `issuerUri`
+  and one identical message, and a real provider (`https://accounts.google.com`) was accepted in the same
+  breath — `201`, with `hasClientSecret: true` and no `clientSecret` anywhere in the response.
 
 ### RLM-17 — A signed-in session is refused in another store, not ended · high · [unit only]
 
@@ -316,6 +319,23 @@ against a live stack on 2026-09-03.
 - **Why** — a session that any request can destroy by naming another store in a query parameter is a
   forced-logout button for anyone who can make a browser follow a link. Refusing costs the caller the request and
   the owner nothing.
+
+### RLM-18 — An org admin reaches another org's store on the same pod · critical · [verified] · **known gap**
+
+- **Steps** — signed in as `org1-admin`, call
+  `GET /spg/cua/api/v1/private/shoppers?store=<a store of org 2>&pod=…` through the seller gateway.
+- **Expect today** — `200`, and **it is that other org's shopper**. Verified 2026-09-03: store 1 answered the
+  account ending `cdd4` and org 2's store answered `cdd1`, which are different rows in different realms.
+- **What is actually wrong** — not the tenancy. The realm switched correctly and `@TenantId` returned exactly the
+  rows of the realm asked for; every isolation case here still holds. What fails is the authorization question
+  *may this operator administer this store*: `StoreRoleAccessChecker.isOrgAdmin` answers yes for any store on a
+  pod the org is allowed on, and says so — `// @TODO find better way to know if requested store created by this
+  org admin`. `StoreOrgOwnerRetriever` is the seam left for the fix: an interface with no implementation and no
+  callers.
+- **Not this feature's** — the same call against `customer`'s pre-existing
+  `/spg/customer/api/v1/private/customers` answers `200` for the same foreign store. It is platform-wide, it
+  predates the SSO work, and closing it means giving every pod service a store→org lookup — its own change, with
+  its own QA. Recorded here because this is where it was found.
 
 ## CLI — The dynamic client, and the port that must survive
 

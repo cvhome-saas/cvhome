@@ -94,11 +94,11 @@
             <div class="session">
               <span class="session-where">{{ session.ip ?? t('shoppers.sessions.unknownAddress') }}</span>
               <span class="session-when">{{ session.userAgent ?? t('shoppers.sessions.unknownBrowser') }}</span>
-              <span class="session-when">{{ t('shoppers.sessions.started', {at: session.createdAt}) }}</span>
+              <span class="session-when">{{ t('shoppers.sessions.started', {at: started(session)}) }}</span>
             </div>
           }
         </div>
-        <button type="button" class="btn danger" [disabled]="facade.busy()" (click)="facade.signOutEverywhere()">
+        <button type="button" class="danger-action" [disabled]="facade.busy()" (click)="facade.signOutEverywhere()">
           {{ t('shoppers.sessions.signOutEverywhere') }}
         </button>
       } @else {

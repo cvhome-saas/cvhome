@@ -1,6 +1,6 @@
 <ng-container *transloco="let t">
   <app-page-header [title]="t('identityProviders.heading.title')" [context]="t('identityProviders.heading.context')">
-    <button type="button" class="btn primary" (click)="startCreate()">
+    <button type="button" class="primary-action" (click)="startCreate()">
       {{ t('identityProviders.action.add') }}
     </button>
   </app-page-header>
@@ -38,13 +38,13 @@
                     [ariaLabel]="t('identityProviders.action.toggle', {name: provider.alias})"
                     (checkedChange)="facade.setEnabled(provider, $event)"
                   />
-                  <button type="button" class="btn" [disabled]="facade.busy()" (click)="facade.test(provider)">
+                  <button type="button" class="secondary-action" [disabled]="facade.busy()" (click)="facade.test(provider)">
                     {{ t('identityProviders.action.test') }}
                   </button>
-                  <button type="button" class="btn" (click)="startEdit(provider)">
+                  <button type="button" class="secondary-action" (click)="startEdit(provider)">
                     {{ t('shared.actions.edit') }}
                   </button>
-                  <button type="button" class="btn danger" (click)="facade.deleting.set(provider)">
+                  <button type="button" class="danger-action" (click)="facade.deleting.set(provider)">
                     {{ t('shared.actions.delete') }}
                   </button>
                 </div>
@@ -73,89 +73,95 @@
     </app-panel>
   </app-busy-overlay>
 
-  <app-form-dialog
-    [open]="open()"
-    [wide]="true"
-    [title]="facade.editing() ? t('identityProviders.form.editTitle') : t('identityProviders.form.addTitle')"
-    [description]="t('identityProviders.form.description')"
-    [closeLabel]="t('shared.actions.close')"
-    (dismissed)="facade.dismiss()"
-  >
-    <form class="form-grid" [formGroup]="form" (ngSubmit)="submit()">
-      <app-form-field [label]="t('identityProviders.field.kind')">
-        <app-select
-          [value]="chosenPreset()"
-          (valueChange)="chosenPreset.set($event)"
-          [options]="presetOptions()"
-          [disabled]="!!facade.editing()"
-          [ariaLabel]="t('identityProviders.field.kind')"
-        />
-      </app-form-field>
+  <!--
+    Created on demand rather than hidden: a closed `<dialog>` still lays out here, because the catalogue's
+    stylesheet gives it a box and the reset has already taken the user agent's `display: none` away.
+  -->
+  @if (open()) {
+    <app-form-dialog
+      [open]="true"
+      [wide]="true"
+      [title]="facade.editing() ? t('identityProviders.form.editTitle') : t('identityProviders.form.addTitle')"
+      [description]="t('identityProviders.form.description')"
+      [closeLabel]="t('shared.actions.close')"
+      (dismissed)="facade.dismiss()"
+    >
+      <form class="form-grid" [formGroup]="form" (ngSubmit)="submit()">
+        <app-form-field [label]="t('identityProviders.field.kind')">
+          <app-select
+            [value]="chosenPreset()"
+            (valueChange)="chosenPreset.set($event)"
+            [options]="presetOptions()"
+            [disabled]="!!facade.editing()"
+            [ariaLabel]="t('identityProviders.field.kind')"
+          />
+        </app-form-field>
 
-      <!-- The alias is part of the redirect URI a merchant has registered with the provider, so it is
-           fixed after creation: changing it would silently break every sign-in through that provider. -->
-      <app-form-field
-        [label]="t('identityProviders.field.alias')"
-        [hint]="t('identityProviders.field.aliasHint')"
-        [control]="form.controls.alias"
-        required
-      >
-        <app-text-field formControlName="alias" [disabled]="!!facade.editing()" latin />
-      </app-form-field>
-
-      <app-form-field [label]="t('identityProviders.field.displayName')">
-        <app-text-field formControlName="displayName" />
-      </app-form-field>
-
-      <app-form-field [label]="t('identityProviders.field.clientId')" [control]="form.controls.clientId" required>
-        <app-text-field formControlName="clientId" latin />
-      </app-form-field>
-
-      <app-form-field
-        [label]="t('identityProviders.field.clientSecret')"
-        [hint]="t('identityProviders.field.clientSecretHint')"
-      >
-        <app-secret-field
-          [label]="t('identityProviders.field.clientSecret')"
-          [value]="form.controls.clientSecret.value"
-          [notSet]="t('identityProviders.state.noSecret')"
+        <!-- The alias is part of the redirect URI a merchant has registered with the provider, so it is
+             fixed after creation: changing it would silently break every sign-in through that provider. -->
+        <app-form-field
+          [label]="t('identityProviders.field.alias')"
+          [hint]="t('identityProviders.field.aliasHint')"
+          [control]="form.controls.alias"
+          required
         >
-          <input id="idp-client-secret" type="text" autocomplete="off" formControlName="clientSecret" />
-        </app-secret-field>
-      </app-form-field>
+          <app-text-field formControlName="alias" [disabled]="!!facade.editing()" latin />
+        </app-form-field>
 
-      @if (needsEndpoints()) {
-        <div class="endpoints">
-          <app-form-field [label]="t('identityProviders.field.issuerUri')" [hint]="t('identityProviders.field.issuerHint')">
-            <app-text-field formControlName="issuerUri" latin />
-          </app-form-field>
-          <app-form-field [label]="t('identityProviders.field.authorizationUri')">
-            <app-text-field formControlName="authorizationUri" latin />
-          </app-form-field>
-          <app-form-field [label]="t('identityProviders.field.tokenUri')">
-            <app-text-field formControlName="tokenUri" latin />
-          </app-form-field>
-          <app-form-field [label]="t('identityProviders.field.userInfoUri')">
-            <app-text-field formControlName="userInfoUri" latin />
-          </app-form-field>
-          <app-form-field [label]="t('identityProviders.field.jwkSetUri')">
-            <app-text-field formControlName="jwkSetUri" latin />
-          </app-form-field>
-        </div>
-      }
+        <app-form-field [label]="t('identityProviders.field.displayName')">
+          <app-text-field formControlName="displayName" />
+        </app-form-field>
 
-      <app-form-field [label]="t('identityProviders.field.emailDomains')" [hint]="t('identityProviders.field.emailDomainsHint')">
-        <app-text-field formControlName="emailDomains" latin />
-      </app-form-field>
+        <app-form-field [label]="t('identityProviders.field.clientId')" [control]="form.controls.clientId" required>
+          <app-text-field formControlName="clientId" latin />
+        </app-form-field>
 
-      <app-toggle formControlName="jitProvisioning" [label]="t('identityProviders.field.jit')" />
-      <app-toggle formControlName="trustEmailVerified" [label]="t('identityProviders.field.trustEmail')" />
+        <app-form-field
+          [label]="t('identityProviders.field.clientSecret')"
+          [hint]="t('identityProviders.field.clientSecretHint')"
+        >
+          <app-secret-field
+            [label]="t('identityProviders.field.clientSecret')"
+            [value]="form.controls.clientSecret.value"
+            [notSet]="t('identityProviders.state.noSecret')"
+          >
+            <input id="idp-client-secret" type="text" autocomplete="off" formControlName="clientSecret" />
+          </app-secret-field>
+        </app-form-field>
 
-      <button type="submit" class="btn primary" [disabled]="facade.busy()">
-        {{ facade.busy() ? t('shared.actions.saving') : t('shared.actions.save') }}
-      </button>
-    </form>
-  </app-form-dialog>
+        @if (needsEndpoints()) {
+          <div class="endpoints">
+            <app-form-field [label]="t('identityProviders.field.issuerUri')" [hint]="t('identityProviders.field.issuerHint')">
+              <app-text-field formControlName="issuerUri" latin />
+            </app-form-field>
+            <app-form-field [label]="t('identityProviders.field.authorizationUri')">
+              <app-text-field formControlName="authorizationUri" latin />
+            </app-form-field>
+            <app-form-field [label]="t('identityProviders.field.tokenUri')">
+              <app-text-field formControlName="tokenUri" latin />
+            </app-form-field>
+            <app-form-field [label]="t('identityProviders.field.userInfoUri')">
+              <app-text-field formControlName="userInfoUri" latin />
+            </app-form-field>
+            <app-form-field [label]="t('identityProviders.field.jwkSetUri')">
+              <app-text-field formControlName="jwkSetUri" latin />
+            </app-form-field>
+          </div>
+        }
+
+        <app-form-field [label]="t('identityProviders.field.emailDomains')" [hint]="t('identityProviders.field.emailDomainsHint')">
+          <app-text-field formControlName="emailDomains" latin />
+        </app-form-field>
+
+        <app-toggle formControlName="jitProvisioning" [label]="t('identityProviders.field.jit')" />
+        <app-toggle formControlName="trustEmailVerified" [label]="t('identityProviders.field.trustEmail')" />
+
+        <button type="submit" class="primary-action" [disabled]="facade.busy()">
+          {{ facade.busy() ? t('shared.actions.saving') : t('shared.actions.save') }}
+        </button>
+      </form>
+    </app-form-dialog>
+  }
 
   <app-confirm-dialog
     [open]="!!facade.deleting()"

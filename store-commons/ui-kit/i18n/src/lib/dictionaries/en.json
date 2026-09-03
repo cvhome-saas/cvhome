@@ -2,7 +2,12 @@
   "shared": {
     "actions": {
       "cancel": "Cancel",
-      "retry": "Try again"
+      "close": "Close",
+      "delete": "Delete",
+      "edit": "Edit",
+      "retry": "Try again",
+      "save": "Save",
+      "saving": "Saving…"
     },
     "autocomplete": {
       "searching": "Searching…",

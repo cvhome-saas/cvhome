@@ -1,7 +1,8 @@
 import {Component, inject} from '@angular/core';
 import {TranslocoDirective} from '@jsverse/transloco';
+import {TranslocoLocaleService} from '@jsverse/transloco-locale';
 
-import type {PlatformUserRow, UserAdminAction, UserAdminIntent} from '@cvhome-saas/ui-kit/uaa';
+import type {PlatformUserRow, SessionSummary, UserAdminAction, UserAdminIntent} from '@cvhome-saas/ui-kit/uaa';
 import {UserAdminTable} from '@cvhome-saas/ui-kit/uaa';
 import {
   BusyOverlay,
@@ -51,6 +52,8 @@ import {SHOPPERS_PROVIDERS} from './services/shoppers.api.service';
   styleUrl: './shoppers.css',
 })
 export class Shoppers {
+  private readonly localeFormat = inject(TranslocoLocaleService);
+
   protected readonly facade = inject(ShoppersFacade);
 
   protected readonly pageSize = PAGE_SIZE;
@@ -84,5 +87,10 @@ export class Shoppers {
 
   protected nameOf(row: PlatformUserRow | null): string {
     return row?.username ?? '';
+  }
+
+  /** The reader's own clock and calendar; the wire carries UTC ISO-8601, which is nobody's. */
+  protected started(session: SessionSummary): string {
+    return this.localeFormat.localizeDate(session.createdAt, undefined, {dateStyle: 'medium', timeStyle: 'short'});
   }
 }

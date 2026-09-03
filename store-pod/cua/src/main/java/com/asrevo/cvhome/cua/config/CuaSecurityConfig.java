@@ -21,6 +21,8 @@ import com.asrevo.cvhome.s2s.jwt.MultiIssuerJwtDecoder;
 import com.asrevo.cvhome.sso.config.SsoSecurityDefaults;
 import com.asrevo.cvhome.sso.security.BrokeredLogin;
 import com.asrevo.cvhome.sso.security.BrokeredLoginSuccessHandler;
+import com.asrevo.cvhome.sso.session.SessionAdminService;
+import com.asrevo.cvhome.sso.settings.SettingsService;
 
 /**
  * cua's application chain: a headless authorization server behind a storefront.
@@ -46,7 +48,8 @@ public class CuaSecurityConfig {
     @Order(3)
     SecurityFilterChain appSecurity(HttpSecurity http, SsoSecurityDefaults defaults, RequestCache requestCache,
                                     CookieCsrfTokenRepository csrfCookies, BrokeredLogin brokered,
-                                    BrokeredLoginSuccessHandler brokeredSuccess) throws Exception {
+                                    BrokeredLoginSuccessHandler brokeredSuccess, SettingsService settings,
+                                    SessionAdminService sessions) throws Exception {
         defaults.applyTo(http)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/.well-known/**").permitAll()
@@ -76,7 +79,7 @@ public class CuaSecurityConfig {
                  * storefront".
                  */
                 .formLogin(login -> login.loginPage(LOGIN_PAGE)
-                        .successHandler(new StorefrontLoginSuccessHandler(requestCache))
+                        .successHandler(new StorefrontLoginSuccessHandler(settings, sessions, requestCache))
                         .failureHandler(new StorefrontLoginFailureHandler(requestCache,
                                 StorefrontLoginFailureHandler.INVALID)))
                 .oauth2Login(login -> login.loginPage(LOGIN_PAGE)
