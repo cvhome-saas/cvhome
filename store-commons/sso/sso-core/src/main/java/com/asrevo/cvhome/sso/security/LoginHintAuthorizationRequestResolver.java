@@ -39,6 +39,10 @@ public class LoginHintAuthorizationRequestResolver implements OAuth2Authorizatio
         this.pkce = new DefaultOAuth2AuthorizationRequestResolver(registrations, base);
         this.pkce.setAuthorizationRequestCustomizer(OAuth2AuthorizationRequestCustomizers.withPkce());
         this.plain = new DefaultOAuth2AuthorizationRequestResolver(registrations, base);
+        // Explicitly customizer-free: since Spring Security 7 the default resolver applies PKCE itself, so a
+        // resolver that merely omits `withPkce()` is no longer plain and Apple was being sent a code_challenge.
+        this.plain.setAuthorizationRequestCustomizer(builder -> {
+        });
         this.providers = providers;
     }
 

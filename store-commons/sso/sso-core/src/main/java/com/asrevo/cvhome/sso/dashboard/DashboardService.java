@@ -175,8 +175,7 @@ public class DashboardService {
         checks.add(new Dashboard.PostureCheck("clientsWithoutPkce", withoutPkce > 0 ? WARN : OK,
                 String.valueOf(withoutPkce)));
 
-        long expiring = jdbc.queryForObject(SECRETS_EXPIRING, Long.class,
-                Timestamp.from(now.plus(EXPIRING_DAYS, ChronoUnit.DAYS)));
+        long expiring = count(SECRETS_EXPIRING, Timestamp.from(now.plus(EXPIRING_DAYS, ChronoUnit.DAYS)));
         checks.add(new Dashboard.PostureCheck("secretsExpiring", expiring > 0 ? WARN : OK, String.valueOf(expiring)));
 
         checks.add(new Dashboard.PostureCheck("breachedPasswordCheck", realm.password().rejectBreached() ? OK : WARN, ""));
