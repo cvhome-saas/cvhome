@@ -84,6 +84,11 @@ class AdminServiceTest {
     private static final String SESSION_ID = "s-1";
 
     private static final String NOBODY = "nobody";
+    private static final String ADA = "Ada";
+    private static final String LOVELACE = "Lovelace";
+    private static final String GRACE = "Grace";
+    private static final String HOPPER = "Hopper";
+    private static final String OLD_EXAMPLE_COM = "old@example.com";
 
     private final UserRepository users = mock(UserRepository.class);
 
@@ -346,4 +351,178 @@ class AdminServiceTest {
 
         verify(users).findAll(any(org.springframework.data.jpa.domain.Specification.class), any(Pageable.class));
     }
+
+    @Test
+    void createAccountMakesAnAccountWithNoPasswordSoAnInvitationCanSetIt() throws Exception {
+        var created = service.createAccount(
+                new CreateUserRequest(NEW_USERNAME, NEW_EMAIL, ADA, LOVELACE, NEW_PASSWORD, Set.of(), Map.of()));
+
+        // The password in the body is ignored on purpose: the invitation link is what sets one.
+        assertThat(created.username()).isEqualTo(NEW_USERNAME);
+        verify(passwords, never()).setPassword(any(), anyString());
+    }
+
+    @Test
+    void createAccountAssignsTheRolesItWasGiven() throws Exception {
+        when(roles.findByName(STORE_ADMIN)).thenReturn(Optional.of(role(STORE_ADMIN)));
+
+        var created = service.createAccount(
+                new CreateUserRequest(NEW_USERNAME, NEW_EMAIL, null, null, null, Set.of(STORE_ADMIN), Map.of()));
+
+        assertThat(created.roles()).containsExactly(STORE_ADMIN);
+    }
+
+    @Test
+    void ausernameAlreadyTakenIsRefused() {
+        when(users.existsByUsernameIgnoreCase(NEW_USERNAME)).thenReturn(true);
+
+        assertThatThrownBy(() -> service.createAccount(
+                new CreateUserRequest(NEW_USERNAME, NEW_EMAIL, null, null, null, Set.of(), Map.of())))
+                .isInstanceOf(com.asrevo.cvhome.uaa.errors.UsernameTakenException.class);
+    }
+
+    @Test
+    void anEmailAlreadyTakenIsRefused() {
+        when(users.existsByEmailIgnoreCase(NEW_EMAIL)).thenReturn(true);
+
+        assertThatThrownBy(() -> service.createAccount(
+                new CreateUserRequest(NEW_USERNAME, NEW_EMAIL, null, null, null, Set.of(), Map.of())))
+                .isInstanceOf(com.asrevo.cvhome.uaa.errors.EmailTakenException.class);
+    }
+
+    @Test
+    void anAccountWithNoEmailAtAllIsNotCheckedAgainstTheEmailIndex() throws Exception {
+        service.createAccount(new CreateUserRequest(NEW_USERNAME, null, null, null, null, Set.of(), Map.of()));
+
+        verify(users, never()).existsByEmailIgnoreCase(anyString());
+    }
+
+    @Test
+    void updateLeavesAnAbsentFieldAlone() throws Exception {
+        ordinary.setFirstName(ADA);
+        ordinary.setLastName(LOVELACE);
+        ordinary.setEnabled(true);
+
+        service.updateUser(ordinary.getId(), new UpdateUserRequest(null, null, null, null, null, null));
+
+        assertThat(ordinary.getFirstName()).isEqualTo(ADA);
+        assertThat(ordinary.getLastName()).isEqualTo(LOVELACE);
+        assertThat(ordinary.isEnabled()).isTrue();
+    }
+
+    @Test
+    void updateWritesEveryFieldItWasGiven() throws Exception {
+        when(roles.findByName(USER)).thenReturn(Optional.of(role(USER)));
+        ordinary.getRoles().add(role(STORE_ADMIN));
+
+        service.updateUser(ordinary.getId(),
+                new UpdateUserRequest(GRACE, HOPPER, null, false, Set.of(USER), null));
+
+        assertThat(ordinary.getFirstName()).isEqualTo(GRACE);
+        assertThat(ordinary.getLastName()).isEqualTo(HOPPER);
+        assertThat(ordinary.isEnabled()).isFalse();
+        // The role set is replaced, not merged: an update that only added could never take a role away.
+        assertThat(ordinary.getRoles()).extracting(Role::getName).containsExactly(USER);
+    }
+
+    @Test
+    void anewEmailIsUnverifiedUntilAlinkReachesIt() throws Exception {
+        ordinary.setEmail(OLD_EXAMPLE_COM);
+        ordinary.setEmailVerified(true);
+
+        service.updateUser(ordinary.getId(), new UpdateUserRequest(null, null, NEW_EMAIL, null, null, null));
+
+        assertThat(ordinary.getEmail()).isEqualTo(NEW_EMAIL);
+        assertThat(ordinary.isEmailVerified()).isFalse();
+    }
+
+    @Test
+    void thesameEmailInDifferentCaseIsNotTreatedAsAchange() throws Exception {
+        ordinary.setEmail(NEW_EMAIL);
+        ordinary.setEmailVerified(true);
+
+        service.updateUser(ordinary.getId(),
+                new UpdateUserRequest(null, null, NEW_EMAIL.toUpperCase(java.util.Locale.ROOT), null, null, null));
+
+        // Re-sending the same address must not silently unverify it.
+        assertThat(ordinary.isEmailVerified()).isTrue();
+        verify(users, never()).existsByEmailIgnoreCaseAndIdNot(anyString(), any(UUID.class));
+    }
+
+    @Test
+    void anEmailAlreadyOnAnotherAccountIsRefused() {
+        ordinary.setEmail(OLD_EXAMPLE_COM);
+        when(users.existsByEmailIgnoreCaseAndIdNot(eq(NEW_EMAIL), any(UUID.class))).thenReturn(true);
+
+        assertThatThrownBy(() -> service.updateUser(ordinary.getId(),
+                new UpdateUserRequest(null, null, NEW_EMAIL, null, null, null)))
+                .isInstanceOf(com.asrevo.cvhome.uaa.errors.EmailTakenException.class);
+    }
+
+    @Test
+    void anUnknownRoleInAnUpdateIsRefusedRatherThanSkipped() {
+        when(roles.findByName(MISSPELLED)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.updateUser(ordinary.getId(),
+                new UpdateUserRequest(null, null, null, null, Set.of(MISSPELLED), null)))
+                .isInstanceOf(RoleNotFoundException.class);
+    }
+
+    @Test
+    void thesuperAdminRoleCannotBeGrantedByAnUpdateEither() {
+        assertThatThrownBy(() -> service.updateUser(ordinary.getId(), new UpdateUserRequest(null, null, null, null,
+                Set.of(UaaConstants.SUPER_ADMIN_ROLE), null)))
+                .isInstanceOf(RoleNotAssignableException.class);
+    }
+
+    @Test
+    void removingArolePutsTheRemainderInTheAuditChange() throws Exception {
+        ordinary.getRoles().add(role(STORE_ADMIN));
+        ordinary.getRoles().add(role(USER));
+
+        service.removeRoles(ordinary.getId(), Set.of(STORE_ADMIN));
+
+        assertThat(ordinary.getRoles()).extracting(Role::getName).containsExactly(USER);
+    }
+
+    @Test
+    void removingNoRolesAtAllIsAnoOp() throws Exception {
+        ordinary.getRoles().add(role(STORE_ADMIN));
+
+        service.removeRoles(ordinary.getId(), Set.of());
+        service.removeRoles(ordinary.getId(), null);
+
+        assertThat(ordinary.getRoles()).hasSize(1);
+        verify(audit, never()).record(any());
+    }
+
+    @Test
+    void rolesCannotBeRemovedFromTheSuperAdmin() {
+        assertThatThrownBy(() -> service.removeRoles(superAdmin.getId(), Set.of(STORE_ADMIN)))
+                .isInstanceOf(SuperAdminImmutableException.class);
+    }
+
+    @Test
+    void unlockingIsRefusedForTheSuperAdminAndDelegatedForAnyoneElse() throws Exception {
+        assertThatThrownBy(() -> service.unlock(superAdmin.getId()))
+                .isInstanceOf(SuperAdminImmutableException.class);
+
+        service.unlock(ordinary.getId());
+    }
+
+    @Test
+    void anEmptySearchStillYieldsAusableSpecification() {
+        when(users.findAll(any(org.springframework.data.jpa.domain.Specification.class), any(Pageable.class)))
+                .thenReturn(Page.empty());
+
+        assertThat(service.getUsers(null, Pageable.unpaged())).isEmpty();
+    }
+
+    private static Role role(String name) {
+        Role role = new Role();
+        role.setId(UUID.randomUUID());
+        role.setName(name);
+        return role;
+    }
+
 }
