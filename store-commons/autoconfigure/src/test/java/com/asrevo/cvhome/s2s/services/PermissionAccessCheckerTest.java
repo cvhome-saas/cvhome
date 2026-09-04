@@ -263,4 +263,46 @@ class PermissionAccessCheckerTest {
             assertThat(checker.isCustomerInSameStore(staff(Roles.ROLE_STORE_ADMIN), STORE)).isFalse();
         }
     }
+
+    @Nested
+    class ReadingAStoreOnAPod {
+
+        @Test
+        void thePodAwareReadAdmitsTheSameAudienceAsThePodlessOne() {
+            assertThat(checker.hasReadAccessOnStore(orgAdmin(ORG), STORE, null)).isTrue();
+            assertThat(checker.hasReadAccessOnStore(staff(Roles.ROLE_STORE_ADMIN), STORE, null)).isTrue();
+            assertThat(checker.hasReadAccessOnStore(staff(Roles.ROLE_STORE_MODERATOR), STORE, null)).isTrue();
+            assertThat(checker.hasReadAccessOnStore(service(Roles.SCOPE_STORE_CORE), STORE, null)).isTrue();
+        }
+
+        @Test
+        void aStorePodPrincipalIsRefusedWhenNoPodIsSuppliedToCheckItAgainst() {
+            // isScopeStorePod requires the caller's resource to match a pod and returns false outright for a null
+            // one. That is the trap hasAccessOnBillingEntitlementRead documents: routing through it from
+            // store-core, which has no pod, denied every pod that asked for the ceilings it enforces.
+            assertThat(checker.hasReadAccessOnStore(service(Roles.SCOPE_STORE_POD), STORE, null)).isFalse();
+            assertThat(checker.hasAccessOnStoreFindOne(service(Roles.SCOPE_STORE_POD), STORE)).isFalse();
+
+            // The same principal is admitted where the check is on the scope claim rather than the pod match.
+            assertThat(checker.hasAccessOnBillingEntitlementRead(service(Roles.SCOPE_STORE_POD), STORE)).isTrue();
+        }
+
+        @Test
+        void aCustomerIsStillRefusedOnEitherShape() {
+            assertThat(checker.hasReadAccessOnStore(staff(Roles.ROLE_CUSTOMER), STORE, null)).isFalse();
+            assertThat(checker.hasAccessOnStoreFindOne(staff(Roles.ROLE_CUSTOMER), STORE)).isFalse();
+        }
+
+        @Test
+        void aPrincipalWithNoPodScopeIsNotOnTheSamePod() {
+            assertThat(checker.isSameStorePod(staff(Roles.ROLE_STORE_ADMIN), STORE, null)).isFalse();
+            assertThat(checker.isSameStorePod(service(Roles.SCOPE_STORE_CORE), STORE, null)).isFalse();
+        }
+
+        @Test
+        void aCustomerOfThisStoreIsRecognisedAsOne() {
+            // isCustomerInSameStore is the shopper gate; its false arm is the one every storefront call takes.
+            assertThat(checker.isCustomerInSameStore(staff(Roles.ROLE_ORG_ADMIN), STORE)).isFalse();
+        }
+    }
 }

@@ -42,4 +42,9 @@ dependencies {
     // EcsTaskHealthIndicator is a HealthIndicator over an EcsTask; both are compileOnly above.
     testImplementation libs.spring.boot.starter.actuator
     testImplementation project(":store-commons:ecs-commons:fargate-task-info")
+    // The reactive decoder and the gateway's logout handler are Mono-shaped; StepVerifier is how they are
+    // asserted without blocking.
+    testImplementation libs.spring.webflux
+    testImplementation libs.reactor.test
+    testImplementation libs.spring.data.commons
 }
