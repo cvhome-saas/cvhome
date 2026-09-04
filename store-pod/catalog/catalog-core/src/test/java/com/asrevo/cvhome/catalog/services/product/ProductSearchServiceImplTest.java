@@ -24,6 +24,10 @@ import com.asrevo.cvhome.catalog.entity.Manufacturer;
 import com.asrevo.cvhome.catalog.entity.ManufacturerDescription;
 import com.asrevo.cvhome.catalog.entity.Product;
 import com.asrevo.cvhome.catalog.entity.ProductDescription;
+import com.asrevo.cvhome.catalog.entity.ProductOption;
+import com.asrevo.cvhome.catalog.entity.ProductOptionDescription;
+import com.asrevo.cvhome.catalog.entity.ProductOptionValue;
+import com.asrevo.cvhome.catalog.entity.ProductOptionValueDescription;
 import com.asrevo.cvhome.catalog.entity.ProductType;
 import com.asrevo.cvhome.catalog.entity.ProductVariant;
 import com.asrevo.cvhome.catalog.model.product.ProductSearchCriteria;
@@ -44,6 +48,7 @@ import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -70,6 +75,16 @@ class ProductSearchServiceImplTest {
     private static final String EN_CODE = "en";
 
     private static final LanguageCode EN = new LanguageCode(EN_CODE);
+
+    private static final String LABEL_COUNT = "%s:%d";
+
+    private static final String SIZE_NAME = "Size";
+
+    private static final String COLOUR_CODE = "colour";
+
+    private static final String COLOUR_NAME = "Colour";
+
+    private static final String RED = "red";
 
     private static final Pageable PAGE = PageRequest.of(0, 24);
 
@@ -327,7 +342,7 @@ class ProductSearchServiceImplTest {
 
         ReadableProductSearchResult result = service.search(STORE, criteria, EN, PAGE);
 
-        assertThat(result.getFacets().getBrands()).extracting(b -> "%s:%d".formatted(b.getName(), b.getCount()))
+        assertThat(result.getFacets().getBrands()).extracting(b -> LABEL_COUNT.formatted(b.getName(), b.getCount()))
                 .containsExactly("Zara:5", "Nike:2");
         assertThat(result.getFacets().getBrands()).filteredOn(b -> b.getId() == 7L)
                 .allMatch(b -> b.isSelected());
@@ -502,5 +517,104 @@ class ProductSearchServiceImplTest {
         productType.setId(id);
         productType.setCode(code);
         return productType;
+    }
+
+    private static ProductOptionValue optionValue(long id, ProductOption option, Integer sortOrder, String code,
+                                                  String name) {
+        ProductOptionValue value = new ProductOptionValue(option);
+        value.setId(id);
+        value.setCode(code);
+        value.setSortOrder(sortOrder);
+        if (name != null) {
+            ProductOptionValueDescription description = new ProductOptionValueDescription(value);
+            description.setLanguageCode(EN);
+            description.setName(name);
+            value.getDescriptions().add(description);
+        }
+        option.getValues().add(value);
+        return value;
+    }
+
+    private static ProductOption option(long id, Integer sortOrder, String code, String name) {
+        ProductOption option = new ProductOption();
+        option.setId(id);
+        option.setStoreMerchantId(STORE);
+        option.setCode(code);
+        option.setSortOrder(sortOrder);
+        if (name != null) {
+            ProductOptionDescription description = new ProductOptionDescription(option);
+            description.setLanguageCode(EN);
+            description.setName(name);
+            option.getDescriptions().add(description);
+        }
+        return option;
+    }
+
+    @Test
+    void optionFacetsAreGroupedByOptionAndOrderedByTheMerchantsOwnSortOrder() {
+        hasProducts(product(1L, SKU_1, ONE));
+        ProductSearchCriteria criteria = criteria("");
+        criteria.setFacets(true);
+        criteria.setOptionValueIds(List.of(11L));
+
+        ProductOption size = option(1L, 1, "size", SIZE_NAME);
+        ProductOption colour = option(2L, 2, COLOUR_CODE, COLOUR_NAME);
+        ProductOptionValue small = optionValue(10L, size, 2, "s", "Small");
+        ProductOptionValue large = optionValue(11L, size, 1, "l", "Large");
+        ProductOptionValue red = optionValue(20L, colour, 1, RED, null);
+        when(facetRepository.countByOptionValue(any())).thenReturn(Map.of(10L, 3L, 11L, 5L, 20L, 1L));
+        when(optionValueRepository.findByIdsInStore(anyCollection(), eq(STORE)))
+                .thenReturn(List.of(small, red, large));
+
+        ReadableProductSearchResult result = service.search(STORE, criteria, EN, PAGE);
+
+        // Options in their own sort order, values in theirs -- not the order the count map or the query returned.
+        assertThat(result.getFacets().getOptions()).extracting(it -> it.getName()).containsExactly(SIZE_NAME, COLOUR_NAME);
+        assertThat(result.getFacets().getOptions().getFirst().getValues())
+                .extracting(it -> LABEL_COUNT.formatted(it.getName(), it.getCount()))
+                .containsExactly("Large:5", "Small:3");
+        // The value the shopper already chose comes back marked, so the console can keep the checkbox ticked.
+        assertThat(result.getFacets().getOptions().getFirst().getValues().getFirst().isSelected()).isTrue();
+    }
+
+    @Test
+    void anOptionOrValueWithNoCopyInThisLanguageFallsBackToItsCode() {
+        hasProducts(product(1L, SKU_1, ONE));
+        ProductSearchCriteria criteria = criteria("");
+        criteria.setFacets(true);
+
+        ProductOption colour = option(2L, 1, COLOUR_CODE, null);
+        ProductOptionValue red = optionValue(20L, colour, 1, RED, null);
+        when(facetRepository.countByOptionValue(any())).thenReturn(Map.of(20L, 1L));
+        when(optionValueRepository.findByIdsInStore(anyCollection(), eq(STORE))).thenReturn(List.of(red));
+
+        ReadableProductSearchResult result = service.search(STORE, criteria, EN, PAGE);
+
+        assertThat(result.getFacets().getOptions().getFirst().getName()).isEqualTo(COLOUR_CODE);
+        assertThat(result.getFacets().getOptions().getFirst().getValues().getFirst().getName()).isEqualTo(RED);
+    }
+
+    @Test
+    void noOptionCountsMeansNoOptionFacetsRatherThanAnEmptyGroup() {
+        hasProducts(product(1L, SKU_1, ONE));
+        ProductSearchCriteria criteria = criteria("");
+        criteria.setFacets(true);
+        when(facetRepository.countByOptionValue(any())).thenReturn(Map.of());
+
+        assertThat(service.search(STORE, criteria, EN, PAGE).getFacets().getOptions()).isEmpty();
+        verify(optionValueRepository, never()).findByIdsInStore(anyCollection(), any());
+    }
+
+    @Test
+    void theOldestSortIsTheNewestOneReversed() {
+        hasProducts(product(1L, SKU_1, ONE));
+        ProductSearchCriteria criteria = criteria("");
+        criteria.setSort(ProductSearchSort.OLDEST);
+
+        service.search(STORE, criteria, EN, PAGE);
+
+        verify(productRepository).findAll(any(Specification.class),
+                org.mockito.ArgumentMatchers.argThat((Pageable p) -> p.getSort().stream()
+                        .anyMatch(order -> order.isAscending())));
     }
 }

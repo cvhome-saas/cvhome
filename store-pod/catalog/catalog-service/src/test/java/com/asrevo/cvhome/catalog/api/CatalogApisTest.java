@@ -18,6 +18,7 @@ import com.asrevo.cvhome.catalog.api.v1.ProductGroupApi;
 import com.asrevo.cvhome.catalog.api.v1.ProductOptionApi;
 import com.asrevo.cvhome.catalog.api.v1.ProductTypeApi;
 import com.asrevo.cvhome.catalog.api.v2.ProductApiV2;
+import com.asrevo.cvhome.catalog.model.category.PersistableCategory;
 import com.asrevo.cvhome.catalog.model.manufacturer.PersistableManufacturer;
 import com.asrevo.cvhome.catalog.services.category.CategoryService;
 import com.asrevo.cvhome.catalog.services.group.ProductGroupService;
@@ -192,5 +193,71 @@ class CatalogApisTest {
         assertThat(Stream.of(CategoryApi.class.getDeclaredMethods())
                 .filter(m -> "hierarchy".equals(m.getName()) || "getByFriendlyUrl".equals(m.getName()))
                 .noneMatch(m -> m.isAnnotationPresent(PreAuthorize.class))).isTrue();
+    }
+
+    @Test
+    void creatingACategoryIgnoresAnyIdTheBodyCarried() throws Exception {
+        PersistableCategory body = new PersistableCategory();
+        body.setId(99L);
+
+        categoryApi.create(body, STORE);
+
+        // Otherwise a create with somebody else's id in the body would overwrite that category instead.
+        verify(categoryService).save(eq(STORE), Mockito.argThat(c -> c.getId() == null));
+    }
+
+    @Test
+    void updatingACategoryTakesItsIdFromThePathNotTheBody() throws Exception {
+        PersistableCategory body = new PersistableCategory();
+        body.setId(99L);
+
+        categoryApi.update(1L, body, STORE);
+
+        verify(categoryService).save(eq(STORE), Mockito.argThat(c -> c.getId() == 1L));
+    }
+
+    @Test
+    void theVisibilityPatchReadsOnlyTheFlagOutOfTheBody() throws Exception {
+        PersistableCategory body = new PersistableCategory();
+        body.setVisible(true);
+
+        categoryApi.setVisible(1L, body, STORE);
+
+        verify(categoryService).setVisible(STORE, 1L, true);
+    }
+
+    @Test
+    void theProductGroupWritesAreAllScopedToTheStore() throws Exception {
+        productGroupApi.save(null, STORE);
+        productGroupApi.delete(CODE, STORE);
+        productGroupApi.addProduct(CODE, 1L, STORE);
+        productGroupApi.removeProduct(CODE, 1L, STORE);
+
+        verify(productGroupService).save(STORE, null);
+        verify(productGroupService).delete(STORE, CODE);
+        verify(productGroupService).addProduct(STORE, CODE, 1L);
+        verify(productGroupService).removeProduct(STORE, CODE, 1L);
+    }
+
+    @Test
+    void theProductListingSearchAndDefinitionReadsAllCarryTheStoreAndLanguage() throws Exception {
+        productApiV2.list(null, STORE, ENGLISH, PageRequest.of(0, 20));
+        productApiV2.search(null, STORE, ENGLISH, PageRequest.of(0, 20));
+        productApiV2.getByFriendlyUrl(SLUG, STORE, ENGLISH);
+        productApiV2.get(1L, STORE, ENGLISH);
+        productApiV2.rebuildSearchIndex(STORE);
+
+        verify(productService).list(eq(STORE), eq(null), eq(ENGLISH), any());
+        verify(productSearchService).search(eq(STORE), eq(null), eq(ENGLISH), any());
+        verify(productService).getByFriendlyUrl(STORE, SLUG, ENGLISH);
+        verify(productService).getDefinition(STORE, 1L, ENGLISH);
+        verify(productSearchService).rebuildIndex(STORE);
+    }
+
+    @Test
+    void creatingAProductAnswersWithTheIdItWasGiven() throws Exception {
+        when(productService.create(eq(STORE), any())).thenReturn(7L);
+
+        assertThat(productApiV2.create(null, STORE).getId()).isEqualTo(7L);
     }
 }
