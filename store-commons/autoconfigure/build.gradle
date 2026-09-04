@@ -37,4 +37,6 @@ dependencies {
     testImplementation libs.jakarta.servlet.api
     testImplementation libs.jackson.databind
     testImplementation libs.spring.tx
+    // ConstraintViolationErrorHandler's advice is keyed on jakarta.validation types.
+    testImplementation libs.jakarta.validation.api
 }
