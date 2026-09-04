@@ -2,6 +2,9 @@ plugins {
     alias(libs.plugins.java.library.conventions)
 }
 
+// Reports with the authorization server it belongs to, not with the shared libraries.
+ext.coverageDomain = 'sso'
+
 /*
  * The SSO server's published event contracts, and nothing else: a consumer — the future delivery service,
  * tenancy's membership reconciliation — depends on this module alone and gets the records, their outbox keys and
