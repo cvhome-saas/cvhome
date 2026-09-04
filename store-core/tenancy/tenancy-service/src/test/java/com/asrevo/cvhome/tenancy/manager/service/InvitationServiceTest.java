@@ -10,7 +10,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.tenancy.commons.dto.CreatedInvitationDto;
+import com.asrevo.cvhome.tenancy.commons.dto.InvitationDto;
 import com.asrevo.cvhome.tenancy.commons.dto.InvitationStatus;
 import com.asrevo.cvhome.tenancy.errors.InvitationAlreadyExistsException;
 import com.asrevo.cvhome.tenancy.errors.InvitationNotUsableException;
@@ -47,6 +49,8 @@ class InvitationServiceTest {
     private static final String USER = "user-1";
 
     private static final String TOKEN = "token";
+
+    private static final String INVITATION_ID = "31f023932bc66470c104b76f";
 
     private OrgInvitationRepository invitations;
 
@@ -169,6 +173,42 @@ class InvitationServiceTest {
 
         assertThat(service.list(ORG)).hasSize(1)
                 .allSatisfy(it -> assertThat(it.toString()).doesNotContain(SECRET_HASH));
+    }
+
+    @Test
+    @DisplayName("an invitation id that belongs to no invitation of this org cannot be revoked")
+    void revokingAnUnknownInvitationIsRefused() {
+        when(invitations.findByOrgId(ORG)).thenReturn(List.of());
+
+        // Scoped by org first, so one organisation cannot revoke another's invitation by guessing its id.
+        assertThatThrownBy(() -> service.revoke(ORG, "no-such-id", ACTOR))
+                .isInstanceOf(InvitationNotUsableException.class);
+    }
+
+    @Test
+    @DisplayName("an invitation that is no longer pending cannot be revoked twice")
+    void revokingAnAlreadyRevokedInvitationIsRefused() {
+        OrgInvitationEntity revoked = OrgInvitationEntity.create(ORG, EMAIL, ROLE, SECRET_HASH,
+                Instant.now().plusSeconds(3600), ACTOR);
+        revoked.setId(new StoreMerchantId(INVITATION_ID));
+        revoked.setStatus(InvitationStatus.REVOKED);
+        when(invitations.findByOrgId(ORG)).thenReturn(List.of(revoked));
+
+        assertThatThrownBy(() -> service.revoke(ORG, INVITATION_ID, ACTOR))
+                .isInstanceOf(InvitationNotUsableException.class);
+    }
+
+    @Test
+    @DisplayName("revoking a pending invitation records the transition it made")
+    void revokingAPendingInvitationMarksItRevoked() throws Exception {
+        OrgInvitationEntity pending = OrgInvitationEntity.create(ORG, EMAIL, ROLE, SECRET_HASH,
+                Instant.now().plusSeconds(3600), ACTOR);
+        pending.setId(new StoreMerchantId(INVITATION_ID));
+        when(invitations.findByOrgId(ORG)).thenReturn(List.of(pending));
+
+        InvitationDto revoked = service.revoke(ORG, INVITATION_ID, ACTOR);
+
+        assertThat(revoked.status()).isEqualTo(InvitationStatus.REVOKED);
     }
 
 }
