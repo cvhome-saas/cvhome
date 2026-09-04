@@ -26,6 +26,7 @@ import static com.asrevo.cvhome.catalog.api.CatalogApiSupport.V1_PRIVATE;
 import static com.asrevo.cvhome.catalog.api.CatalogApiSupport.expect;
 import static com.asrevo.cvhome.catalog.api.CatalogApiSupport.json;
 import static com.asrevo.cvhome.catalog.api.CatalogApiSupport.path;
+import static com.asrevo.cvhome.catalog.api.CatalogApiSupport.query;
 import static com.asrevo.cvhome.catalog.api.CatalogApiSupport.scoped;
 import static com.asrevo.cvhome.catalog.api.CatalogApiSupport.slug;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -38,6 +39,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Import(ExternalClientsTestConfiguration.class)
 class ProductOptionApiIntegrationTest {
 
+    private static final String UNIQUE = "unique";
+    private static final String CODE_S = "code=%s";
     private static final String PRODUCT = "product";
 
     private static final String OPTION = "option";
@@ -240,4 +243,42 @@ class ProductOptionApiIntegrationTest {
                 BODY.formatted(slug("mod"))), HttpStatus.FORBIDDEN);
         expect(api.get(scoped(path(V1_PRIVATE, PRODUCT, OPTIONS), STORE_A), null), HttpStatus.UNAUTHORIZED);
     }
+
+    /**
+     * The pre-flight the console runs before saving a new option.
+     *
+     * <p>
+     * Here {@code exists} means literally that — the code is already taken. Note that content's identically shaped
+     * {@code slug-available} endpoint returns the <em>opposite</em> sense (its {@code exists} means the slug is
+     * free), so the two must not be read as one convention.
+     * </p>
+     *
+     * <p>
+     * The case with teeth is the last one: a code taken in another store must read as free here, or one merchant's
+     * option codes would constrain another's — and, read the other way, would tell them what their competitor uses.
+     * </p>
+     */
+    @Test
+    void theCodePreFlightIsScopedToTheStoreAskingIt() {
+        String code = slug("preflight");
+        create(code);
+
+        assertThat(exists(STORE_A, code)).isTrue();
+        assertThat(exists(STORE_A, slug("never-used"))).isFalse();
+        assertThat(exists(STORE_B, code)).isFalse();
+    }
+
+    @Test
+    void theCodePreFlightIsRefusedToAmoderator() {
+        expect(api.get(query(scoped(path(V1_PRIVATE, PRODUCT, OPTION, UNIQUE), STORE_A),
+                String.format(CODE_S, slug("x"))), api.token(MODERATOR, STORE_A)), HttpStatus.FORBIDDEN);
+    }
+
+    private boolean exists(String store, String code) {
+        var response = api.get(query(scoped(path(V1_PRIVATE, PRODUCT, OPTION, UNIQUE), store),
+                String.format(CODE_S, code)), api.token(ADMIN, store));
+        expect(response, HttpStatus.OK);
+        return json(response).get("exists").asBoolean();
+    }
+
 }

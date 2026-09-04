@@ -1,6 +1,5 @@
 package com.asrevo.cvhome.tenancy.manager.controller;
 
-import java.security.Principal;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -12,6 +11,7 @@ import org.mockito.Mockito;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 
@@ -158,10 +158,10 @@ class TenancyAdminApisTest {
 
     @Test
     void everyUserAccountEndpointCarriesTheIdentityAndTheStore() throws Exception {
-        Principal principal = () -> USER_ID;
+        Authentication authentication = new TestingAuthenticationToken(USER_ID, null, List.of());
 
-        userAccountApi.current(principal);
-        userAccountApi.list(principal, identity(), STORE, PageRequest.of(0, 20));
+        userAccountApi.current(authentication);
+        userAccountApi.list(identity(), STORE, PageRequest.of(0, 20));
         userAccountApi.findOne(identity(), STORE, USER_ID);
         userAccountApi.assignableRoles();
         userAccountApi.create(identity(), STORE, null);
@@ -184,10 +184,13 @@ class TenancyAdminApisTest {
     }
 
     @Test
-    void theCurrentPrincipalEndpointAnswersUnauthorizedRatherThanNull() {
-        Principal principal = () -> USER_ID;
+    void theCurrentPrincipalEndpointAnswersTheAuthenticationRatherThanRefusingIt() {
+        Authentication authentication = new TestingAuthenticationToken(USER_ID, null, List.of());
 
-        assertThat(authApi.current(principal).getBody()).isSameAs(principal);
+        // It takes the Authentication, not @AuthenticationPrincipal Principal: a JwtAuthenticationToken's
+        // principal is a Jwt, which is not a Principal, so the resolver passed null and this endpoint answered
+        // 401 to a caller who was signed in.
+        assertThat(authApi.current(authentication).getBody()).isSameAs(authentication);
         assertThat(authApi.current(null).getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
     }
 
