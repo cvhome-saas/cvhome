@@ -30,4 +30,11 @@ dependencies {
     // the value objects, and the resource-server types that make a JwtAuthenticationToken constructible.
     testImplementation project(":store-commons:commons")
     testImplementation libs.spring.boot.starter.security.oauth2.resource.server
+    // The error contract is the largest block of real logic here and none of it is constructible without the web
+    // stack: ProblemDetail and ResponseEntityExceptionHandler come from spring-webmvc, the handlers take a
+    // ServletRequest, and the bodies are asserted as JSON.
+    testImplementation libs.spring.webmvc
+    testImplementation libs.jakarta.servlet.api
+    testImplementation libs.jackson.databind
+    testImplementation libs.spring.tx
 }
