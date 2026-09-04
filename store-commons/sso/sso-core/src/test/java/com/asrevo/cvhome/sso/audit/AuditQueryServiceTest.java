@@ -12,11 +12,13 @@ import jakarta.persistence.criteria.Root;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 
 import com.asrevo.cvhome.uaa.errors.AuditEventNotFoundException;
@@ -52,6 +54,9 @@ class AuditQueryServiceTest {
     private static final String JANUARY_FIRST = "2026-01-01T00:00:00Z";
     private static final String JANUARY_SECOND = "2026-01-02T00:00:00Z";
     private static final String BLANK = "  ";
+    private static final String USER_LOGIN = "user.login";
+    private static final String SOMETHING_THIS_BUILD_FORGOT = "something.this.build.forgot";
+    private static final String OCCURREDAT = "occurredAt";
 
     private final AuditEventRepository repository = mock(AuditEventRepository.class);
     private final AuditQueryService service = new AuditQueryService(repository);
@@ -211,4 +216,65 @@ class AuditQueryServiceTest {
 
         assertThatCode(() -> build(forwards)).doesNotThrowAnyException();
     }
+
+    @Test
+    void asingleEventIsReadBackAsAdto() throws Exception {
+        when(repository.findById(7L)).thenReturn(java.util.Optional.of(event(USER_LOGIN)));
+
+        assertThat(service.findOne(7L).eventType()).isEqualTo(USER_LOGIN);
+    }
+
+    @Test
+    void anEventIdThatIsNotThereIsNotFound() {
+        when(repository.findById(7L)).thenReturn(java.util.Optional.empty());
+
+        assertThatThrownBy(() -> service.findOne(7L)).isInstanceOf(AuditEventNotFoundException.class);
+    }
+
+    @Test
+    void arowWrittenByAnOlderBuildStillReadsEvenThoughItsTypeIsUnknownNow() throws Exception {
+        when(repository.findById(7L)).thenReturn(java.util.Optional.of(event(SOMETHING_THIS_BUILD_FORGOT)));
+
+        // The category is dropped, not the row: an audit log that hides history is worse than one with a gap.
+        assertThat(service.findOne(7L).category()).isNull();
+        assertThat(service.findOne(7L).eventType()).isEqualTo(SOMETHING_THIS_BUILD_FORGOT);
+    }
+
+    @Test
+    void anUnsortedRequestIsAnsweredNewestFirstAndCappedAtTheMaximumPage() throws Exception {
+        when(repository.findAll(any(Specification.class), any(Pageable.class))).thenReturn(new PageImpl<>(List.of()));
+
+        service.search(AuditSearch.none(), PageRequest.of(2, 5_000));
+
+        ArgumentCaptor<Pageable> captor = ArgumentCaptor.forClass(Pageable.class);
+        verify(repository).findAll(any(Specification.class), captor.capture());
+        // An audit log is read from the top, and an uncapped page size is a way to pull the whole table.
+        assertThat(captor.getValue().getSort().getOrderFor(OCCURREDAT).isDescending()).isTrue();
+        assertThat(captor.getValue().getPageSize()).isLessThan(5_000);
+        assertThat(captor.getValue().getPageNumber()).isEqualTo(2);
+    }
+
+    @Test
+    void acallerThatAskedForAnOrderKeepsIt() throws Exception {
+        when(repository.findAll(any(Specification.class), any(Pageable.class))).thenReturn(new PageImpl<>(List.of()));
+        Pageable ascending = PageRequest.of(0, 20, Sort.by(OCCURREDAT).ascending());
+
+        service.search(AuditSearch.none(), ascending);
+
+        ArgumentCaptor<Pageable> captor = ArgumentCaptor.forClass(Pageable.class);
+        verify(repository).findAll(any(Specification.class), captor.capture());
+        assertThat(captor.getValue()).isEqualTo(ascending);
+    }
+
+    private static AuditEventEntity event(String eventType) {
+        AuditEventEntity event = new AuditEventEntity();
+        event.setId(7L);
+        event.setOccurredAt(Instant.parse(JANUARY_FIRST));
+        event.setEventType(eventType);
+        event.setOutcome(AuditOutcome.SUCCESS);
+        event.setActorType(AuditActorType.USER);
+        event.setTargetType(AuditTargetType.USER);
+        return event;
+    }
+
 }
