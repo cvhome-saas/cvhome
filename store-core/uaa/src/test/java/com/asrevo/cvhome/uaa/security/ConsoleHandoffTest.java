@@ -3,12 +3,22 @@ package com.asrevo.cvhome.uaa.security;
 import java.io.IOException;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfException;
+import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 
 import com.asrevo.cvhome.uaa.config.ConsoleProperties;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 /**
  * uaa's two front doors: which one answers, and what the console is told when it does.
@@ -34,6 +44,8 @@ class ConsoleHandoffTest {
     private static final String AUTHORIZE = "/oauth2/authorize";
 
     private static final String LOCKED = "/login?error=locked";
+
+    private static final String STALE = "stale";
 
     private final ConsoleUrls console = new ConsoleUrls(properties());
 
@@ -150,4 +162,75 @@ class ConsoleHandoffTest {
         assertThat(response.getRedirectedUrl()).isEqualTo(LOCKED);
     }
 
+    @Test
+    void behindTheConsoleAnUnauthenticatedRequestIsHandedOffRatherThanShownUaasOwnLoginPage() throws Exception {
+        AuthenticationEntryPoint handoff = Mockito.mock(AuthenticationEntryPoint.class);
+        AuthenticationEntryPoint own = Mockito.mock(AuthenticationEntryPoint.class);
+        ConsoleAwareEntryPoint entryPoint = new ConsoleAwareEntryPoint(console, handoff, own);
+
+        entryPoint.commence(behindConsole(), new MockHttpServletResponse(), null);
+
+        verify(handoff).commence(any(), any(), any());
+        verify(own, never()).commence(any(), any(), any());
+    }
+
+    @Test
+    void onUaasOwnHostTheSameRequestGetsUaasOwnLoginPage() throws Exception {
+        AuthenticationEntryPoint handoff = Mockito.mock(AuthenticationEntryPoint.class);
+        AuthenticationEntryPoint own = Mockito.mock(AuthenticationEntryPoint.class);
+        ConsoleAwareEntryPoint entryPoint = new ConsoleAwareEntryPoint(console, handoff, own);
+
+        // This is how a platform administrator still signs in at uaa's address.
+        entryPoint.commence(new MockHttpServletRequest(GET, LOGIN), new MockHttpServletResponse(), null);
+
+        verify(own).commence(any(), any(), any());
+        verify(handoff, never()).commence(any(), any(), any());
+    }
+
+    @Test
+    void onlyAcsrfFailureOnTheConsolesLoginPageIsHandedBackToTheConsole() throws Exception {
+        AccessDeniedHandler handoff = Mockito.mock(AccessDeniedHandler.class);
+        AccessDeniedHandler problems = Mockito.mock(AccessDeniedHandler.class);
+        ConsoleAwareAccessDeniedHandler handler =
+                new ConsoleAwareAccessDeniedHandler(console, handoff, problems);
+
+        handler.handle(behindConsole(), new MockHttpServletResponse(), new CsrfException(STALE));
+
+        // A stale login form is the console's to re-issue; anything else is a real 403 and renders as a problem.
+        verify(handoff).handle(any(), any(), any());
+        verify(problems, never()).handle(any(), any(), any());
+    }
+
+    @Test
+    void anyOtherAccessDenialRendersAsAProblemDocument() throws Exception {
+        AccessDeniedHandler handoff = Mockito.mock(AccessDeniedHandler.class);
+        AccessDeniedHandler problems = Mockito.mock(AccessDeniedHandler.class);
+        ConsoleAwareAccessDeniedHandler handler =
+                new ConsoleAwareAccessDeniedHandler(console, handoff, problems);
+
+        handler.handle(behindConsole(), new MockHttpServletResponse(), new AccessDeniedException("nope"));
+        handler.handle(new MockHttpServletRequest(GET, LOGIN), new MockHttpServletResponse(),
+                new CsrfException(STALE));
+
+        verify(problems, Mockito.times(2)).handle(any(), any(), any());
+        verify(handoff, never()).handle(any(), any(), any());
+    }
+
+    @Test
+    void theEdgeAssemblesTheThreeConsoleAwareCollaborators() {
+        ConsoleEdge edge = new ConsoleEdge(console, new HttpSessionRequestCache(),
+                CookieCsrfTokenRepository.withHttpOnlyFalse());
+
+        assertThat(edge.redirects()).isInstanceOf(ConsoleRedirectStrategy.class);
+        assertThat(edge.entryPoint()).isInstanceOf(ConsoleAwareEntryPoint.class);
+        assertThat(edge.accessDenied(Mockito.mock(AccessDeniedHandler.class)))
+                .isInstanceOf(ConsoleAwareAccessDeniedHandler.class);
+    }
+
+    private static MockHttpServletRequest behindConsole() {
+        MockHttpServletRequest request = new MockHttpServletRequest(GET, LOGIN);
+        request.setContextPath(PREFIX);
+        request.setServletPath(LOGIN);
+        return request;
+    }
 }
