@@ -33,8 +33,8 @@ ext.domainCoverageMinimum = [
         merchant      : [unit: 0.95, integration: 0.88, merged: 0.97],
         gateway       : [unit: 0.97, integration: 0.72, merged: 0.97],
         payment       : [unit: 0.98, integration: 0.62, merged: 0.99],
-        content       : [unit: 0.95, integration: 0.81, merged: 0.98],
-        tenancy       : [unit: 0.95, integration: 0.77, merged: 0.98],
+        content       : [unit: 0.95, integration: 0.87, merged: 0.99],
+        tenancy       : [unit: 0.95, integration: 0.78, merged: 0.98],
         catalog       : [unit: 0.95, integration: 0.94, merged: 0.99],
         billing       : [unit: 0.95, integration: 0.63, merged: 0.97],
         // sso = the authorization server shared by store-core/uaa and store-pod/cua. Its own domain since the

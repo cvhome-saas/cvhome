@@ -54,6 +54,17 @@ import static org.assertj.core.api.Assertions.assertThat;
         "com.asrevo.cvhome.content.scheduler.delay=PT24H"})
 class ContentPlatformIntegrationTest {
 
+    private static final String SLUG = "{\"slug\"";
+    private static final String VERSION_D_SLUG = "{\"version\":%d,\"slug\"";
+    private static final String PUBLISH_VERSION = "publish-version";
+    private static final String PREVIEW_TOKEN = "preview-token";
+    private static final String PREVIEW_S = "preview=%s";
+    private static final String TOKEN = "token";
+    private static final String REDIRECTS = "redirects";
+    private static final String TITLE = "title";
+    private static final String RENAMED = "Renamed";
+    private static final String PRIVACY = "PRIVACY";
+    private static final String TRANSLATIONS = "translations";
     private static final String FOLDERS2 = "folders";
 
     private static final String FILECOUNT = "fileCount";
@@ -509,9 +520,9 @@ class ContentPlatformIntegrationTest {
         // edit the text and publish again → version 2 live, version 1 archived, both readable
         int version = read.get(VERSION).asInt();
         String edited = String.format(POLICY, slug, FOURTEEN_DAYS)
-                .replace("{\"slug\"", String.format("{\"version\":%d,\"slug\"", version));
+                .replace(SLUG, String.format(VERSION_D_SLUG, version));
         expect(send(HttpMethod.PUT, one, edited), HttpStatus.OK);
-        var republished = send(HttpMethod.POST, path(one, "publish-version"), "{\"note\":\"Shorter window\"}");
+        var republished = send(HttpMethod.POST, path(one, PUBLISH_VERSION), "{\"note\":\"Shorter window\"}");
         expect(republished, HttpStatus.OK);
         assertThat(json(republished).get(VERSION).asInt()).isEqualTo(2);
         assertThat(json(republished).get("note").asString()).isEqualTo("Shorter window");
@@ -581,8 +592,8 @@ class ContentPlatformIntegrationTest {
         long id = json(created).get(ID).asLong();
         String sfPage = path(STOREFRONT, PAGES, slug);
         expect(getPublic(sfPage), HttpStatus.NOT_FOUND);
-        JsonNode token = json(send(HttpMethod.POST, path(PRIVATE, PAGES, id, "preview-token"), null));
-        var preview = getPublic(query(sfPage, String.format("preview=%s", token.get("token").asString())));
+        JsonNode token = json(send(HttpMethod.POST, path(PRIVATE, PAGES, id, PREVIEW_TOKEN), null));
+        var preview = getPublic(query(sfPage, String.format(PREVIEW_S, token.get(TOKEN).asString())));
         expect(preview, HttpStatus.OK);
         assertThat(json(preview).get(BODY).asString()).isEqualTo("<p>secret</p>");
         assertThat(json(preview).get("seo").get("metaDescription").asString()).isEqualTo("md");
@@ -593,6 +604,113 @@ class ContentPlatformIntegrationTest {
         assertThat(json(about).get("servedLocale").asString()).isEqualTo("ar");
         assertThat(about.getHeaders().getCacheControl()).contains("max-age=60");
         assertThat(json(get(path(PRIVATE, PAGES, id))).get(STATUS).asString()).isEqualTo("DRAFT");
+    }
+
+    // -------------------------------------------------------------------- storefront reads and media edits
+
+    /**
+     * Renaming a published item's slug leaves a redirect behind, which is the whole reason the redirect table
+     * exists: the old URL is in somebody's bookmarks and in a search index, and a 404 there loses the visit.
+     */
+    @Test
+    void arenamedSlugLeavesAredirectAndAnUnknownPathIsNotFound() {
+        String was = slug("moved-from");
+        String now = slug("moved-to");
+        long id = createAndPublish(PAGES, String.format("""
+                {"slug":"%s","translations":[{"language":"en","title":"Moved","body":"<p>x</p>"}]}""", was));
+        int version = json(get(path(PRIVATE, PAGES, id))).get(VERSION).asInt();
+        expect(send(HttpMethod.PUT, path(PRIVATE, PAGES, id), String.format("""
+                {"version":%d,"slug":"%s","translations":[{"language":"en","title":"Moved","body":"<p>x</p>"}]}""",
+                version, now)), HttpStatus.OK);
+
+        var moved = getPublic(query(path(STOREFRONT, REDIRECTS), String.format("path=/content/%s", was)));
+
+        expect(moved, HttpStatus.OK);
+        assertThat(json(moved).get("to").asString()).contains(now);
+        expect(getPublic(query(path(STOREFRONT, REDIRECTS), "path=/content/never-existed")), HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    void thestorefrontListsThePostCategoriesAsLinks() {
+        var categories = getPublic(path(STOREFRONT, "post-categories"));
+
+        expect(categories, HttpStatus.OK);
+        assertThat(json(categories).isArray()).isTrue();
+    }
+
+    /**
+     * A previewed post is served with {@code no-store}, unlike a published one. Caching a draft at the edge would
+     * publish it to everyone the moment a CDN kept a copy.
+     */
+    @Test
+    void apreviewedPostIsServedUncachedWhileApublishedOneIsCached() {
+        String postSlug = slug("draft-post");
+        var created = send(HttpMethod.POST, path(PRIVATE, POSTS), String.format("""
+                {"slug":"%s","translations":[{"language":"en","title":"Draft","body":"<p>unpublished</p>"}]}""",
+                postSlug));
+        expect(created, HttpStatus.CREATED);
+        long id = json(created).get(ID).asLong();
+        String sfPost = path(STOREFRONT, POSTS, postSlug);
+        expect(getPublic(sfPost), HttpStatus.NOT_FOUND);
+
+        JsonNode token = json(send(HttpMethod.POST, path(PRIVATE, POSTS, id, PREVIEW_TOKEN), null));
+        var preview = getPublic(query(sfPost, String.format(PREVIEW_S, token.get(TOKEN).asString())));
+
+        expect(preview, HttpStatus.OK);
+        assertThat(preview.getHeaders().getCacheControl()).contains("no-store");
+    }
+
+    /**
+     * A media asset's title, alt texts and tags are edited without re-uploading the bytes — the console's rename,
+     * and the only way an image gets alt text after the fact.
+     */
+    @Test
+    void amediaAssetsMetadataIsPatchedWithoutTouchingTheBytes() {
+        var uploaded = api.upload(scoped(MEDIA, STORE), admin, PIXEL_PNG, PNG);
+        expect(uploaded, HttpStatus.CREATED);
+        long id = json(uploaded).get(0).get(ID).asLong();
+
+        var patched = send(HttpMethod.PATCH, path(MEDIA, id), """
+                {"title":"Renamed","altTexts":{"en":"A single pixel"},"tags":["brand"]}""");
+
+        expect(patched, HttpStatus.OK);
+        assertThat(json(patched).get(TITLE).asString()).isEqualTo(RENAMED);
+        assertThat(json(get(path(MEDIA, id))).get(TITLE).asString()).isEqualTo(RENAMED);
+    }
+
+    // ------------------------------------------------------------------------------------- policy versions
+
+    /**
+     * A published version is readable on its own, an effective date can be recorded with the publish, and an old
+     * version's text can be brought back onto the head as a <em>new</em> draft rather than by mutating history.
+     * A policy's past versions are what a merchant shows a regulator, so nothing may edit one in place.
+     */
+    @Test
+    void apolicyVersionIsReadableOnItsOwnAndItsTextCanBeRestoredWithoutRewritingHistory() {
+        retireSeededPolicy(PRIVACY);
+        String policySlug = slug("privacy");
+        String first = String.format(POLICY, policySlug, THIRTY_DAYS).replace(RETURNS, PRIVACY);
+        long id = createAndPublish(POLICIES, first);
+        String one = path(PRIVATE, POLICIES, id);
+
+        JsonNode versionOne = json(get(path(one, VERSIONS, 1)));
+        assertThat(versionOne.get(VERSION).asInt()).isEqualTo(1);
+        assertThat(versionOne.get(TRANSLATIONS).toString()).contains(THIRTY_DAYS);
+
+        int version = json(get(one)).get(VERSION).asInt();
+        String edited = String.format(POLICY, policySlug, FOURTEEN_DAYS).replace(RETURNS, PRIVACY)
+                .replace(SLUG, String.format(VERSION_D_SLUG, version));
+        expect(send(HttpMethod.PUT, one, edited), HttpStatus.OK);
+        var republished = send(HttpMethod.POST, path(one, PUBLISH_VERSION),
+                "{\"effectiveFrom\":\"2030-01-01T00:00:00Z\",\"note\":\"Dated\"}");
+        expect(republished, HttpStatus.OK);
+        assertThat(json(republished).get(VERSION).asInt()).isEqualTo(2);
+
+        expect(send(HttpMethod.POST, path(one, VERSIONS, 1, "restore-text"), null), HttpStatus.OK);
+
+        // The head carries version 1's text again, and version 1 itself is untouched.
+        assertThat(json(get(one)).get(TRANSLATIONS).toString()).contains(THIRTY_DAYS);
+        assertThat(json(get(path(one, VERSIONS, 1))).get(TRANSLATIONS).toString()).contains(THIRTY_DAYS);
     }
 
 }
