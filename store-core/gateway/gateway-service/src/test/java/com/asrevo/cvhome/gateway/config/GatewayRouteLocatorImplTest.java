@@ -8,6 +8,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.webflux.autoconfigure.WebFluxProperties;
+import org.springframework.cloud.gateway.filter.factory.AddRequestHeaderGatewayFilterFactory;
 import org.springframework.cloud.gateway.filter.factory.PreserveHostHeaderGatewayFilterFactory;
 import org.springframework.cloud.gateway.filter.factory.StripPrefixGatewayFilterFactory;
 import org.springframework.cloud.gateway.filter.factory.TokenRelayGatewayFilterFactory;
@@ -43,6 +44,8 @@ class GatewayRouteLocatorImplTest {
 
     private static final String DASHBOARD = "/dashboard";
 
+    private static final String STRIP_PREFIX = "StripPrefix";
+
     private GenericApplicationContext context;
 
     private List<Route> routes;
@@ -68,6 +71,7 @@ class GatewayRouteLocatorImplTest {
         context.registerBean(PathRoutePredicateFactory.class);
         context.registerBean(HostRoutePredicateFactory.class);
         context.registerBean(StripPrefixGatewayFilterFactory.class);
+        context.registerBean(AddRequestHeaderGatewayFilterFactory.class);
         context.registerBean(PreserveHostHeaderGatewayFilterFactory.class);
         context.registerBean(TokenRelayGatewayFilterFactory.class,
                 () -> new TokenRelayGatewayFilterFactory(context.getBeanProvider(
@@ -88,15 +92,41 @@ class GatewayRouteLocatorImplTest {
         context.close();
     }
 
+    private static String filtersOf(Route route) {
+        return route.getFilters().toString();
+    }
+
     @Test
     void everyBackendPrefixHasARouteWithRelayAndStrip() {
         assertThat(routes).hasSize(5);
-        for (String backend : List.of("tenancy", "billing", "pod-registry", "uaa")) {
+        for (String backend : List.of("tenancy", "billing", "pod-registry")) {
             Route route = matching(request(LOCALHOST, "/%s/api/v1/x".formatted(backend)));
             assertThat(route).as(backend).isNotNull();
             assertThat(route.getUri()).hasToString("lb://%s".formatted(backend));
             assertThat(route.getFilters()).hasSize(3);
+            assertThat(filtersOf(route)).as(backend).contains(STRIP_PREFIX);
         }
+    }
+
+    /**
+     * uaa is the exception, and it has to stay one.
+     *
+     * <p>
+     * uaa builds absolute URLs — it redirects a browser to the console's sign-in page — so it reads
+     * {@code X-Forwarded-Prefix} and reports it as its context path. Spring requires the context path to be the
+     * literal start of the request path, so a route that strips the prefix and then names it in the header is a
+     * contradiction Spring rejects: {@code Invalid contextPath '/uaa': must match the start of requestPath}. That
+     * arrives as a 500 dispatched to {@code /error} on every browser hop of a sign-in, which is a slow thing to
+     * diagnose and an easy thing to reintroduce by making this route look like its neighbours.
+     * </p>
+     */
+    @Test
+    void theUaaRouteForwardsItsPrefixInsteadOfStrippingIt() {
+        Route route = matching(request(LOCALHOST, "/uaa/oauth2/authorize"));
+
+        assertThat(route).isNotNull();
+        assertThat(route.getUri()).hasToString("lb://uaa");
+        assertThat(filtersOf(route)).doesNotContain(STRIP_PREFIX).contains("X-Forwarded-Prefix");
     }
 
     /**

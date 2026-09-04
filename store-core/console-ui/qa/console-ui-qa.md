@@ -69,6 +69,100 @@ Log: `.lcl/<stack>/logs/console-ui.log`.
 
 ---
 
+## SGN — signing in
+
+The console renders the sign-in form now. uaa still authenticates: the browser posts to uaa's `/login` through
+the gateway's `/uaa` forward on **this origin**, and uaa answers with the redirect that resumes the
+authorization. The full server-side contract, the two-doors rule and the failure vocabulary are
+`store-core/uaa/qa/uaa-qa.md` §AUT — these cases are the page.
+
+### SGN-01 — The page asks who you are before it draws anything · critical · [verified]
+
+- **Steps** — signed **out**, open `http://gateway.com:8000/sign-in`. Then sign in, and open `/sign-in` again.
+- **Expect** — signed out: "Checking your session…", then the flow starts and comes back as `/sign-in?auth=1`
+  with the form. Signed in: **straight to `/dashboard`, with no form drawn on the way.**
+- **Why the waiting state exists** — without it the form rendered first and the redirect followed, so somebody
+  who was already signed in watched a sign-in form appear and then vanish. A form shown to a person who is
+  signed in was never true; the page waits for `/api/v1/auth/me` before it commits to either half.
+- **And it cannot loop** — the marker page never starts a flow of its own, and the starting page never renders
+  a form. Verified in Chrome both ways; the address bar never leaves `gateway.com:8000`.
+- **`/dashboard` suits every account** — `merchantOnly` forwards a platform operator to `/platform` and
+  `requiresStore` forwards a merchant with no store to `getting-started`, so the console routes on from there.
+
+### SGN-02 — One step: address and password together · high · [verified]
+
+- **Steps** — type `org1-admin` / `admin`, Sign in.
+- **Expect** — both fields on one card, "Forgot password?" beside them, and the console at `/dashboard` after.
+  Nothing says whether an account exists.
+- **One step on purpose** — uaa's own console asks for an address first and discovers the provider behind it;
+  the seller console asks for both at once, which is what its design calls for and what a merchant with a
+  password expects. Providers are still one click, below the form.
+- **"Keep me signed in" is conditional** — it renders only when the realm enables remember-me
+  (`GET /uaa/api/v1/public/login/settings` → `rememberMeEnabled`). It is **off** on the local stack, so the row
+  shows only "Forgot password?" there; that is the realm's setting, not a missing control.
+- **"Forgot password?" opens an explanation, not a form** — uaa has no self-service reset; an administrator
+  issues a one-time link (SGN-07). Saying so is more use than a form that cannot work.
+- **Seen** — screenshotted signed out and signed in.
+
+### SGN-03 — A refusal is rendered in the reader's language · critical · [verified]
+
+- **Steps** — sign in with a wrong password.
+- **Expect** — back on `/sign-in?auth=1&error=&attemptsLeft=N`, with "That username and password do not match."
+  and the attempts remaining. Switch to Arabic and repeat.
+- **Seen** — English verified in Chrome (`attemptsLeft=4`). **Arabic not walked** — the keys exist in `ar.json`
+  and the lint proves both locales resolve, but nobody has read the page in Arabic.
+- **The tokens are uaa's** — `?error` alone, `error=locked`, `error=disabled`, `error=expired-password`,
+  `error=expired`, `error=idp_*`, `?logout`. The console translates them and adds nothing; a token it does not
+  recognise falls back to the generic failure rather than rendering blank.
+
+### SGN-04 — The CSRF token comes from a cookie this page never set · critical · [verified]
+
+- **Steps** — on the form, delete the `XSRF-TOKEN` cookie in devtools and submit.
+- **Expect** — back with `error=expired`, a **fresh** cookie, and the retry succeeds. The cookie is planted by
+  uaa's hand-off redirect at `Path=/`, and read here at submit rather than at render, so a tab left open past a
+  rotation still posts the current token.
+- **Seen** — the cookie and its path verified with `curl`; the expired round trip is `unit only`
+  (`ConsoleHandoffTest`) — **not yet walked in a browser**.
+
+### SGN-05 — Identity providers · high · [not verified]
+
+- **Steps** — with a provider configured, open the form.
+- **Expect** — a button per provider under the identity step, linking to `/uaa/oauth2/authorization/<alias>` —
+  **with the `/uaa` prefix**, because that page is uaa's own and the console is not what serves it. An address
+  at a provider's domain skips the password step entirely.
+- **Not verified** — no provider is configured on the local stack, so the button row has never been rendered.
+
+### SGN-06 — Signing out actually signs out · critical · [verified]
+
+- **Steps** — sign in, sign out from the toolbar, then navigate to `/dashboard`.
+- **Expect** — the sign-in **form**, not the dashboard. Two sessions have to end, not one: the gateway's and
+  uaa's. uaa's now lives on this origin under `/uaa`, so the end-session call goes to `/uaa/connect/logout`
+  here; sent to uaa's own host instead it carries no cookie, ends nothing, and the next navigation is signed
+  straight back in — which reads as "logging out returned me to the page I just left".
+- **Seen** — walked with `curl`: after logout `/api/v1/auth/me` is empty and a fresh flow stops at
+  `/sign-in?auth=1` instead of issuing a code.
+
+### SGN-07 — One-time links land in the console · high · [verified]
+
+- **Steps** — open `/invitation?token=x` and `/reset-password?token=x` with a bogus token, then with a real one
+  from `POST /uaa/api/v1/admin/invitations`.
+- **Expect** — the bogus token shows "This link cannot be used" for both; a real one shows whose account it is
+  and the realm's password rules. The page is `LinkAccept` from `@cvhome-saas/ui-kit/uaa`, the same component
+  uaa's own console serves — one flow against one uaa, branded per console.
+- **`/invitation`, not `/accept-invitation`** — the console's `/accept-invitation` is a different token system
+  (an organization inviting a member, against tenancy, for somebody already signed in). Confusing the two is
+  the bug this naming exists to prevent.
+- **Seen** — the bogus-token state screenshotted on both origins. **A real token has only been exercised by
+  `InvitationFlowIntegrationTest`**, not through this page.
+
+### 99-SGN-01 — `ng serve` serves a stale kit after the library is rebuilt · gap
+
+`@cvhome-saas/ui-kit` is symlinked to `store-commons/ui-kit/dist/ui-kit`, and the dev server does not always
+notice that directory changing. After moving `LinkAccept` into the kit, `/reset-password` rendered an **empty
+router outlet with no console error at all** — the route matched, the title resolved, and nothing appeared.
+`rm -rf .angular/cache` and `lcl restart console-ui --stack <name>` fixed it with no code change. Worth knowing
+before debugging a component that looks correct; a blank outlet with a resolved title is the signature.
+
 ## U — the team list
 
 ### U-01 — The same people as the old console · critical · [verified]

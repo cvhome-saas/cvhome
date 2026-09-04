@@ -34,7 +34,11 @@ class RedirectingServerAuthenticationSuccessHandlerTest {
 
     private static final String REDIRECT_TO = "redirectTo";
 
-    private static final String ROOT = "/";
+    /**
+     * Where a sign-in with nothing to resume lands. Not {@code /} — that is the public marketing page, which
+     * still invites a signed-in person to sign in; the console routes on from {@code /dashboard} by itself.
+     */
+    private static final String CONSOLE_HOME = "/dashboard";
 
     private static final String SUB = "sub";
 
@@ -66,34 +70,34 @@ class RedirectingServerAuthenticationSuccessHandlerTest {
     }
 
     @Test
-    void missingStateFallsBackToRoot() {
+    void missingStateFallsBackToTheConsoleHome() {
         MockServerWebExchange exchange = MockServerWebExchange
                 .from(MockServerHttpRequest.get("http://localhost/login/oauth2/code/uaa?code=c").build());
 
-        assertThat(redirect(exchange, oauth2Login())).hasToString(ROOT);
+        assertThat(redirect(exchange, oauth2Login())).hasToString(CONSOLE_HOME);
     }
 
     @Test
-    void stateWithoutCapturedParametersFallsBackToRoot() {
+    void stateWithoutCapturedParametersFallsBackToTheConsoleHome() {
         MockServerWebExchange exchange = MockServerWebExchange
                 .from(MockServerHttpRequest.get(CALLBACK.formatted("unknown")).build());
 
-        assertThat(redirect(exchange, new TestingAuthenticationToken("u", "p"))).hasToString(ROOT);
+        assertThat(redirect(exchange, new TestingAuthenticationToken("u", "p"))).hasToString(CONSOLE_HOME);
     }
 
     @Test
     void capturedParametersWithoutRedirectToFallBackToRoot() {
         MockServerWebExchange exchange = callbackWithCaptured(new HashMap<>());
 
-        assertThat(redirect(exchange, oauth2Login())).hasToString(ROOT);
+        assertThat(redirect(exchange, oauth2Login())).hasToString(CONSOLE_HOME);
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"//evil.example/steal", "https://evil.example/steal", "http://[bad"})
-    void offSiteOrMalformedRedirectFallsBackToRoot(String redirectTo) {
+    void offSiteOrMalformedRedirectFallsBackToTheConsoleHome(String redirectTo) {
         MockServerWebExchange exchange = callbackWithCaptured(Map.of(REDIRECT_TO, redirectTo));
 
-        assertThat(redirect(exchange, oauth2Login())).hasToString(ROOT);
+        assertThat(redirect(exchange, oauth2Login())).hasToString(CONSOLE_HOME);
     }
 
     @Test

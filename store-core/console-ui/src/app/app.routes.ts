@@ -75,6 +75,25 @@ export const routes: Routes = [
     ],
   },
   {
+    /*
+     * The two pages a uaa one-time link lands on. Public and unguarded — whoever holds the link is who they are
+     * for, and they have no session yet — and served by the kit's component, the same one uaa's own console
+     * serves on its origin, because it is one flow against one uaa.
+     *
+     * `invitation`, not `accept-invitation`: the console already has a route by that name for an organization
+     * inviting a member, which is accepted against tenancy by somebody already signed in. Two unrelated token
+     * systems on one path is a bug waiting for the first person holding both kinds of link.
+     */
+    path: 'invitation',
+    loadComponent: () => import('@cvhome-saas/ui-kit/uaa').then((page) => page.LinkAccept),
+    data: {titleKey: 'route.invitation.title', kind: 'INVITATION', brand: 'cvhome'},
+  },
+  {
+    path: 'reset-password',
+    loadComponent: () => import('@cvhome-saas/ui-kit/uaa').then((page) => page.LinkAccept),
+    data: {titleKey: 'route.resetPassword.title', kind: 'PASSWORD_RESET', brand: 'cvhome'},
+  },
+  {
     path: 'sign-up',
     loadComponent: () => import('@layouts/auth-shell/auth-shell').then((layout) => layout.AuthShell),
     children: [

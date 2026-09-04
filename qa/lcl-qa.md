@@ -122,6 +122,33 @@ Stop through the tool (`lcl stop`), never with a manual `kill`.
 > would kill other worktrees' stacks, and a sleep-based stagger is a guess dressed as configuration. Recorded here
 > instead.
 
+## 05b — Rebuilding a shared library under a running stack [verified]
+
+Gradle writes `store-commons/*/build/libs/*.jar` **in place**, and every Java service opened that jar when it
+started. Replacing it under a live JVM does not reload it: classes already loaded keep working, and the first
+class loaded *lazily* afterwards fails with a `NoClassDefFoundError` for a class that is plainly there —
+
+```
+java.lang.IllegalArgumentException: Failed to evaluate expression 'hasPermission(...)'
+  Caused by: java.lang.NoClassDefFoundError: com/asrevo/cvhome/s2s/utils/SecurityUtils
+    at StoreRoleAccessChecker.wrongRealm(...)  [autoconfigure-1.0.16.jar]
+  Caused by: java.lang.ClassNotFoundException: com.asrevo.cvhome.s2s.utils.SecurityUtils
+```
+
+- **How it presents** — a 500 `COMMON.INTERNAL_ERROR` on one page, with the rest of the console working.
+  It was the catalogue, because `wrongRealm` is on the org-admin path and nothing had reached it since the
+  rebuild. It reads like a permission bug and is not one: the class is in the source *and* in the jar. Compare
+  the jar's mtime with the service's uptime (`lcl status`) and the answer is immediate.
+- **Steps** — start the stack, edit anything in `store-commons/autoconfigure`, `./gradlew :…:build`, then use a
+  page that calls a pod service.
+- **Expect** — the failure above until the services are restarted.
+- **The fix** — restart every service that was running when the jar changed:
+  `lcl restart tenancy billing pod-registry merchant content catalog checkout cua payment inventory --stack <name>`.
+  Which library was rebuilt decides the blast radius: `sso-core` is uaa and cua (see `cua-qa.md` §00),
+  **`autoconfigure` is every Java service**, because they all depend on it.
+- **Not a defect** — nothing here needs fixing in the code; it is what rebuilding a jar under a running JVM
+  does. Worth knowing before spending an afternoon on a `hasPermission` expression that is correct.
+
 ## 06 — Stop / start / restart one service [verified]
 
 - **Steps** — `lcl stop payment`; `lcl status`; `lcl start payment`; `lcl restart payment`.

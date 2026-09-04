@@ -11,6 +11,8 @@ import org.springframework.security.web.savedrequest.SavedRequest;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.asrevo.cvhome.commons.domain.LanguageCode;
+import com.asrevo.cvhome.sso.security.HandoffUrls;
+import com.asrevo.cvhome.sso.security.LoginPageLocator;
 
 /**
  * Where cua sends a shopper's browser: always the storefront, never a page of its own.
@@ -44,14 +46,6 @@ public final class StorefrontUrls {
 
     private static final String LOGIN_PAGE = "login";
 
-    private static final String HTTP = "http";
-
-    private static final String HTTPS = "https";
-
-    private static final int HTTP_PORT = 80;
-
-    private static final int HTTPS_PORT = 443;
-
     private StorefrontUrls() {
     }
 
@@ -62,16 +56,7 @@ public final class StorefrontUrls {
      * {@code X-Forwarded-*}, which is what keeps the port right on a shifted local stack.
      */
     public static String origin(HttpServletRequest request) {
-        String scheme = request.getScheme();
-        String serverName = request.getServerName();
-        int serverPort = request.getServerPort();
-
-        StringBuilder origin = new StringBuilder();
-        origin.append(scheme).append("://").append(serverName);
-        if (HTTP.equals(scheme) && serverPort != HTTP_PORT || HTTPS.equals(scheme) && serverPort != HTTPS_PORT) {
-            origin.append(":").append(serverPort);
-        }
-        return origin.toString();
+        return HandoffUrls.origin(request);
     }
 
     /** The storefront locale to send the shopper to: request param, then the saved request, then the default. */
@@ -100,6 +85,18 @@ public final class StorefrontUrls {
             builder.queryParam(ERROR_PARAM, error);
         }
         return builder.build().toUriString();
+    }
+
+    /**
+     * This deployment's answer to {@link LoginPageLocator}: always the storefront, on the request's own origin.
+     *
+     * <p>
+     * The cache is bound here rather than passed per call because the shared handlers do not know that cua reads
+     * the saved request at all — it does so only to recover the locale, which is cua's concern and not theirs.
+     * </p>
+     */
+    public static LoginPageLocator locator(RequestCache cache) {
+        return (request, response, pending, error) -> loginPage(request, response, cache, pending, error);
     }
 
     private static Optional<LanguageCode> fromParameter(String value) {

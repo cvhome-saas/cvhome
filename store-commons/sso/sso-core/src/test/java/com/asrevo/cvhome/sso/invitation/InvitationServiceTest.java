@@ -49,6 +49,9 @@ import static org.mockito.Mockito.when;
  */
 class InvitationServiceTest {
 
+    private static final LinksProperties LINK_PAGES =
+            new LinksProperties(Duration.ofDays(7), Duration.ofHours(1), false);
+
     private static final Instant NOW = Instant.parse("2026-09-02T12:00:00Z");
 
     private static final String EMAIL = "new@example.com";
@@ -82,7 +85,7 @@ class InvitationServiceTest {
     private final SettingsService settings = mock(SettingsService.class);
 
     private final InvitationService service = new InvitationService(users, invitations, admin, passwords, audit, actors,
-            settings, new LinkBuilder(AuthorizationServerSettings.builder().issuer("http://uaa.test").build()),
+            settings, new LinkBuilder(AuthorizationServerSettings.builder().issuer("http://uaa.test").build(), LINK_PAGES),
             new LinksProperties(Duration.ofDays(7), Duration.ofHours(1), false), Clock.fixed(NOW, ZoneOffset.UTC));
 
     private User user;

@@ -94,39 +94,102 @@ Logs: `.lcl/<stack>/logs/uaa.log`. **If a login fails, the stack almost certainl
 
 ## AUT — Signing in and getting a token
 
-The console never sees a password: it redirects to uaa, uaa authenticates, and the gateway holds the resulting
-session and relays the token inward. Everything in this section is that path.
+uaa has **two front doors**, and which one answers is decided by the context path — set from
+`X-Forwarded-Prefix` by `PathPrefixFilter`, and by nothing the caller can put in a query string:
 
-### AUT-01 — The authorization-code flow signs an operator in · critical · [verified]
+| Reached at | Sign-in page | Who uses it |
+|---|---|---|
+| `gateway.com:8000/uaa/**` (context path `/uaa`) | **console-ui's** `/sign-in`, same origin | every merchant |
+| `uaa.gateway.com:8001/**` (context path empty) | uaa's own embedded SPA `/login` | the platform administrator |
+
+Either way uaa authenticates and the gateway holds the resulting session and relays the token inward; the
+console never sees a password, and neither does uaa's own page hand one to the console. The pairing is the point
+of most cases below — a change that only gets one door right is the failure mode this section exists to catch.
+
+### AUT-01 — The authorization-code flow signs an operator in, without leaving the console's origin · critical · [verified]
 
 - **Steps** — open `http://gateway.com:8000/oauth2/authorization/uaa`, sign in as `org1-admin` / `admin`.
-- **Expect** — a redirect back to the console, which renders with the org's stores in the switcher. Going
-  straight to an `/api/**` URL instead returns **401 without** redirecting to a login page — that is by design,
-  not a broken redirect.
-- **Seen** — this is the path every other QA document in the repo starts with; it is verified continuously by
-  everything else being runnable.
+- **Expect** — the address bar goes `…/oauth2/authorization/uaa` → `…/uaa/oauth2/authorize` → `…/sign-in?auth=1`
+  → (POST) → `…/uaa/oauth2/authorize` → `…/login/oauth2/code/uaa` → the console, **never leaving
+  `gateway.com:8000`**. Going straight to an `/api/**` URL instead returns **401 without** redirecting to a
+  login page — that is by design, not a broken redirect.
+- **Why the origin matters** — uaa's session cookie is `Path=/uaa` on this host, and it is what carries the
+  saved authorize request across the form POST. Cross-origin it would not be sent, the saved request would be
+  gone, and the flow would restart instead of resuming.
+- **Seen** — walked in Chrome and with `curl`, landing on `?redirectTo=/products?page=2`.
+
+### AUT-01b — Starting on another console host comes home to that host · high · [verified]
+
+- **Steps** — open `http://console-ui.gateway.com:8000/oauth2/authorization/uaa`.
+- **Expect** — the authorize URL, the sign-in page and the callback are all on `console-ui.gateway.com:8000`.
+  The console answers on three hosts, so the origin is read off the request rather than configured.
+- **Seen** — `Location` compared for `gateway.com` and `console-ui.gateway.com`; both stay home.
 
 ### AUT-02 — The login form submits · critical · [verified]
 
-- **Steps** — open `/login`, type `super-admin` / `admin`, press Enter.
-- **Expect** — a 302 to `/`, then the console's Users page. A failed attempt comes back to `/login?error`.
+- **Steps** — on the console, reach `/sign-in?auth=1`, type `org1-admin` / `admin`, press Enter. Then repeat on
+  uaa's own door: open `http://uaa.gateway.com:8001/login`, type `super-admin` / `admin`.
+- **Expect** — both post to their server's `/login` and get a 302 that resumes the flow. A failed attempt comes
+  back to `/sign-in?auth=1&error&attemptsLeft=N` on the console, and to `/login?error` on uaa's own page.
 - **Why this is the case that breaks** — the page is Angular but the form is **not**: `AppSecurityConfig`
   declares `formLogin(loginPage("/login"))`, so the browser must post `username`/`password` as a real form and
   Spring Security answers with the redirect that resumes the OAuth2 flow. A browser only submits inputs that
   carry a `name`, which is why `app-text-field` has a `name` input at all. Posting through `HttpClient`
-  instead would authenticate and then strand the flow.
-- **And the token** — the form also posts `_csrf`, read from the `XSRF-TOKEN` cookie the page response set.
-  Without it the post comes back as `/login?error=expired` (SEC-05); a page that says "expired" on a fresh
-  load means the cookie was never planted, which is `CsrfCookieFilter`'s job.
+  instead would authenticate and then strand the flow. This is true of **both** pages: the console's form
+  posts to `/uaa/login`, uaa's own to `/login`.
+- **And the token** — the form also posts `_csrf`, read from the `XSRF-TOKEN` cookie. uaa's own page is served
+  by the response that plants it; the console's page never is, so the hand-off redirect plants it instead
+  (`HandoffLoginEntryPoint`) at `Path=/` where the console can read it. Without it the post comes back as
+  `error=expired` (SEC-05); a page that says "expired" on a fresh load means the cookie was never planted.
 - **Note** — the form does not submit from a synthetic click in some automation tools. Use
   `document.querySelector('form').requestSubmit()`, or type into the password field and press Enter. A tool
   that appears to hang on the login page is almost always this, not uaa.
 
-### AUT-03 — A wrong password is refused, and says nothing useful · high · [not verified]
+### AUT-03 — A wrong password is refused, and says nothing useful · high · [verified]
 
 - **Steps** — sign in with a valid username and a wrong password, then with a username that does not exist.
 - **Expect** — both are refused the same way, with no hint about which half was wrong, and no stack trace or
   root-cause text on the page.
+- **Seen** — on the console: `/sign-in?auth=1&error=&attemptsLeft=4`, rendered as "That username and password
+  do not match." with "4 attempt(s) left before the account is locked."
+
+### AUT-11 — uaa's own door still signs the platform administrator in · critical · [verified]
+
+- **Steps** — with a console session already open on `gateway.com:8000`, open
+  `http://uaa.gateway.com:8001/login`.
+- **Expect** — uaa's **own** embedded SPA sign-in ("cvhome identity", "One account for every cvhome app."),
+  not the console's page and not a redirect to it. Signing in there reaches uaa's admin console.
+- **Why it is critical** — this is the door that administers uaa itself, and the console hand-off must never
+  swallow it. The whole switch is one line: `ConsoleUrls.isHandoff` compares the request's context path with
+  the configured prefix, so a request that never went through the gateway cannot match.
+- **Seen** — screenshotted after a full console sign-in on the other host; the two sessions are independent.
+
+### AUT-12 — The failure vocabulary survives the hand-off intact · high · [unit only]
+
+- **Steps** — through the console, provoke each: a wrong password, five wrong passwords, a disabled account
+  (AUT via `AdminSessionsIntegrationTest`'s path), an expired password, a stale CSRF token.
+- **Expect** — `?error&attemptsLeft=N`, `?error=locked`, `?error=disabled`, `?error=expired-password`,
+  `?error=expired`, each rendered by the console in the reader's language. **The tokens are uaa's own and
+  unchanged**: only the page they land on moved, because `ConsoleRedirectStrategy` rewrites the target and
+  carries the query verbatim rather than re-deriving it. `?error` with no value is a wrong password and must
+  stay valueless-or-empty, never become `error=invalid`.
+- **Verified so far** — the wrong-password and attempts-left pair in a browser (AUT-03); the rest by
+  `ConsoleHandoffTest`, which pins the query is carried whole. The locked/disabled/expired-password trio has
+  not been walked through the console UI.
+
+### AUT-13 — The prefix, the cookies, and why the route does not strip · critical · [verified]
+
+- **Steps** — `curl -i "http://gateway.com:8000/uaa/oauth2/authorize?response_type=code&client_id=web-app&…"`.
+- **Expect** — `302` to `http://gateway.com:8000/sign-in?auth=1`, with **two** cookies:
+  `XSRF-TOKEN=…; Path=/` (the console must read it) and `SESSION=…; Path=/uaa` (scoped to uaa, out of the
+  console's way, and still sent on the form POST to `/uaa/login`).
+- **The trap** — the gateway's `/uaa/**` route is the one route that must **not** `stripPrefix(1)`. Spring
+  requires the context path to be the literal start of the request path, so stripping the prefix and then
+  announcing it in `X-Forwarded-Prefix` is rejected outright:
+  `IllegalArgumentException: Invalid contextPath '/uaa': must match the start of requestPath: '/oauth2/authorize'`
+  — dispatched to `/error`, so it surfaces as a 500 on every browser hop rather than as a bad URL. spg forwards
+  cua's path intact for the same reason (`handle /cua*`, never `handle_path`).
+- **Seen** — both the failure and the fix, on the running stack.
 
 ### AUT-04 — The client-credentials grant issues a service token · critical · [not verified]
 

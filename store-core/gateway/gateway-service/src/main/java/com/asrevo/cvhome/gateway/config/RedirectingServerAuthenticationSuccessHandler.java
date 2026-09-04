@@ -22,7 +22,18 @@ public class RedirectingServerAuthenticationSuccessHandler implements ServerAuth
 
     private final ServerRedirectStrategy redirectStrategy = new DefaultServerRedirectStrategy();
 
-    private final URI defaultRedirectUri = URI.create("/");
+    /**
+     * Where a sign-in with nothing to resume lands: the console, not the marketing page.
+     *
+     * <p>
+     * {@code /} is the public site — the one with "Sign in" still in its header — so a person who signed in and
+     * had no deep link to return to was put back where they started, looking at an invitation to do the thing
+     * they had just done. {@code /dashboard} is the console's home, and it is the right target for every kind of
+     * account because the console routes on from there: {@code merchantOnly} sends a platform operator to
+     * {@code /platform}, and {@code requiresStore} sends a merchant with no store yet to {@code getting-started}.
+     * </p>
+     */
+    private final URI defaultRedirectUri = URI.create("/dashboard");
 
     @Override
     public Mono<Void> onAuthenticationSuccess(WebFilterExchange webFilterExchange, Authentication authentication) {

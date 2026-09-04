@@ -13,3 +13,12 @@ spring:
             client-secret: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
             authorization-grant-type: client_credentials
             scope: store_core
+com:
+  asrevo:
+    cvhome:
+      gateway:
+        # The path this gateway forwards uaa under, and the reason logout works. uaa is reached on the console's
+        # own origin now, so its session cookie is scoped to `/uaa` here; an end-session call sent to uaa's own
+        # host carries no cookie, ends nothing, and leaves the next navigation signed straight back in. Read by
+        # ReactiveGatewaySecurityConfig; the route itself is GatewayRouteLocatorImpl.UAA_PREFIX.
+        uaa-path-prefix: /uaa

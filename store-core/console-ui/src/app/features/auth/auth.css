@@ -11,7 +11,11 @@
 .auth-shell { min-height: 100svh; display: grid; grid-template-columns: 1fr 1fr; background: var(--background); }
 
 .auth-entry { display: flex; align-items: center; justify-content: center; padding: 3rem; }
-form { width: 100%; max-width: 26rem; padding: 1.75rem; border: 1px solid var(--border); border-radius: var(--radius-2xl); background: var(--panel); animation: rise .55s .08s ease both; }
+/*
+ * The card is the wrapper, not the form. The page has three forms now — the identity step, the password step and
+ * the account-link confirmation — and only one card around whichever is showing.
+ */
+.auth-card { width: 100%; max-width: 26rem; padding: 1.75rem; border: 1px solid var(--border); border-radius: var(--radius-2xl); background: var(--panel); animation: rise .55s .08s ease both; }
 .auth-tabs { display: flex; gap: .2rem; padding: var(--spacing-inline); border-radius: var(--radius-full); background: var(--input); }
 .auth-tabs a { flex: 1; padding: .6rem 1rem; border-radius: var(--radius-full); color: var(--secondary-foreground); font-size: .8125rem; font-weight: 700; text-align: center; transition: background .2s ease, color .2s ease; }
 .auth-tabs a.active { background: var(--primary); color: var(--primary-foreground); }
@@ -19,7 +23,7 @@ form { width: 100%; max-width: 26rem; padding: 1.75rem; border: 1px solid var(--
 .auth-options { display: flex; align-items: center; gap: .7rem; }
 .remember { display: flex; align-items: center; gap: .55rem; color: var(--secondary-foreground); font-size: .8125rem; }
 .remember input { width: 16px; height: 16px; margin: 0; accent-color: var(--primary); }
-.auth-options a { margin-inline-start: auto; color: var(--primary-emphasis); font-size: .8125rem; font-weight: 600; }
+.auth-options a, .auth-options .link { margin-inline-start: auto; border: 0; background: none; color: var(--primary-emphasis); font-size: .8125rem; font-weight: 600; cursor: pointer; }
 .auth-submit { display: flex; align-items: center; justify-content: center; gap: .6rem; min-height: 48px; margin-top: var(--spacing-tight); padding: .8rem 1rem; border: 1px solid var(--primary); border-radius: var(--radius-full); background: var(--primary); color: var(--primary-foreground); font-size: .9375rem; font-weight: 700; cursor: pointer; transition: background .2s ease, box-shadow .2s ease; }
 .auth-submit:hover { background: var(--primary-emphasis); box-shadow: var(--lift-primary); }
 .auth-submit:disabled { border-color: var(--edge); background: var(--accent-strong); color: var(--primary-muted); box-shadow: none; cursor: default; }
@@ -28,11 +32,25 @@ form { width: 100%; max-width: 26rem; padding: 1.75rem; border: 1px solid var(--
 .divider { display: flex; align-items: center; gap: .85rem; color: var(--foreground-subtle); font-size: .75rem; }
 .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 .social-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: .6rem; }
-.social-actions button { display: grid; place-items: center; min-height: 42px; border: 1px solid var(--border); border-radius: var(--radius-lg); background: transparent; color: var(--secondary-foreground); }
-.social-actions button:disabled { opacity: .55; cursor: not-allowed; }
+.social-actions a { display: grid; place-items: center; min-height: 42px; border: 1px solid var(--border); border-radius: var(--radius-lg); background: transparent; color: var(--secondary-foreground); transition: border-color .2s ease, background .2s ease; }
+.social-actions a:hover { border-color: var(--primary); background: var(--input); }
 .social-actions svg { width: 16px; max-height: 18px; fill: currentColor; }
 .social-actions b { font-size: .9rem; }
-.legal { margin: -.15rem 0 0; color: var(--foreground-subtle); font-size: .75rem; font-weight: 350; line-height: 1.6; }
+.legal { margin: var(--spacing-group) 0 0; color: var(--foreground-subtle); font-size: .75rem; font-weight: 350; line-height: 1.6; }
+
+/* What uaa said about the last attempt. `.info` is not a failure — being signed out, or a link waiting to be confirmed. */
+.auth-notice { display: grid; gap: var(--spacing-inline); margin-top: var(--spacing-gutter); padding: .7rem .85rem; border: 1px solid var(--destructive); border-radius: var(--radius-lg); background: transparent; color: var(--destructive); font-size: .8125rem; line-height: 1.5; }
+.auth-notice.info { border-color: var(--border); background: var(--input); color: var(--secondary-foreground); }
+.auth-attempts { color: var(--foreground-subtle); font-size: .75rem; }
+
+/* Who the identity step decided this is, and the way back if it guessed wrong. */
+.identity-chip { display: flex; align-items: center; gap: .6rem; margin-top: var(--spacing-gutter); margin-bottom: 0; color: var(--secondary-foreground); font-size: .8125rem; }
+.identity-chip button { margin-inline-start: auto; border: 0; background: none; color: var(--primary-emphasis); font-size: .8125rem; font-weight: 600; cursor: pointer; }
+
+/* The moment before the browser leaves to start an authorization request. */
+.auth-starting { margin-top: var(--spacing-gutter); color: var(--foreground-subtle); font-size: .8125rem; }
+
+.divider { margin-top: var(--spacing-group); }
 
 @media (max-width: 800px) {
   .auth-shell { grid-template-columns: 1fr; }
@@ -41,17 +59,17 @@ form { width: 100%; max-width: 26rem; padding: 1.75rem; border: 1px solid var(--
   .auth-message ul { margin-top: 2rem; }
   .trust { display: none; }
   .auth-entry { padding: 0 1.5rem 3rem; }
-  form { max-width: 32rem; }
+  .auth-card { max-width: 32rem; }
 }
 
 @media (max-width: 480px) {
   .auth-message { margin: 3.5rem 0 2.5rem; }
   .auth-message ul { display: none; }
   .auth-entry { padding-inline: var(--spacing-group); }
-  form { padding: var(--spacing-section); }
+  .auth-card { padding: var(--spacing-section); }
   .auth-options { align-items: flex-start; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .auth-glow, .auth-message, form { animation: none; }
+  .auth-glow, .auth-message, .auth-card { animation: none; }
 }

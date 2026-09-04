@@ -17,7 +17,11 @@ import org.springframework.security.web.savedrequest.RequestCache;
 
 import com.asrevo.cvhome.commons.domain.RealmId;
 import com.asrevo.cvhome.sso.realm.RealmContext;
+import com.asrevo.cvhome.sso.security.HandoffCsrfDeniedHandler;
+import com.asrevo.cvhome.sso.security.HandoffLoginEntryPoint;
+import com.asrevo.cvhome.sso.security.HandoffLoginFailureHandler;
 import com.asrevo.cvhome.sso.security.LockoutService;
+import com.asrevo.cvhome.sso.security.LoginPageLocator;
 import com.asrevo.cvhome.sso.session.SessionAdminService;
 import com.asrevo.cvhome.sso.session.SessionMetadata;
 import com.asrevo.cvhome.sso.settings.RealmSettings;
@@ -50,6 +54,12 @@ class StorefrontLoginHandlersTest {
 
     private final CsrfTokenRepository csrfTokens = CookieCsrfTokenRepository.withHttpOnlyFalse();
 
+    /*
+     * The handlers are sso-core's now, shared with uaa; what stays cua's is this one line — the rule that every
+     * hand-off lands on the storefront. Binding it here is what these cases are really asserting.
+     */
+    private final LoginPageLocator loginPages = StorefrontUrls.locator(cache);
+
     private final MockHttpServletResponse response = new MockHttpServletResponse();
 
     private final Authentication shopper = new TestingAuthenticationToken("user", "revo");
@@ -74,7 +84,7 @@ class StorefrontLoginHandlersTest {
         MockHttpServletRequest authorize = request(GET, AUTHORIZE);
         authorize.setParameter(LANG, EN);
 
-        new StorefrontLoginEntryPoint(cache, csrfTokens).commence(authorize, response,
+        new HandoffLoginEntryPoint(loginPages, csrfTokens).commence(authorize, response,
                 new BadCredentialsException("anonymous"));
 
         assertThat(response.getRedirectedUrl()).isEqualTo("http://shop.example.com/en/login?auth=1");
@@ -83,7 +93,7 @@ class StorefrontLoginHandlersTest {
 
     @Test
     void aStaleFormIsSentBackWithAFreshCookieAndTheExpiredToken() throws IOException {
-        new StorefrontCsrfDeniedHandler(cache, csrfTokens)
+        new HandoffCsrfDeniedHandler(loginPages, cache, csrfTokens)
                 .handle(loginPost(EN), response, new org.springframework.security.access.AccessDeniedException("csrf"));
 
         assertThat(response.getRedirectedUrl()).isEqualTo("http://shop.example.com/en/login?error=expired");
@@ -92,7 +102,7 @@ class StorefrontLoginHandlersTest {
 
     @Test
     void aFailedLoginGoesBackToThePendingPageWithItsErrorToken() throws IOException {
-        new StorefrontLoginFailureHandler(cache, StorefrontLoginFailureHandler.INVALID)
+        new HandoffLoginFailureHandler(loginPages, HandoffLoginFailureHandler.INVALID)
                 .onAuthenticationFailure(loginPost("ar"), response, new BadCredentialsException("wrong"));
 
         assertThat(response.getRedirectedUrl()).isEqualTo("http://shop.example.com/ar/login?auth=1&error=invalid");

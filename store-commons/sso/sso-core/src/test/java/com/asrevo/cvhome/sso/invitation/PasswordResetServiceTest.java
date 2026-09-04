@@ -41,6 +41,9 @@ import static org.mockito.Mockito.when;
 
 class PasswordResetServiceTest {
 
+    private static final LinksProperties LINK_PAGES =
+            new LinksProperties(Duration.ofDays(7), Duration.ofHours(1), false);
+
     private static final Instant NOW = Instant.parse("2026-09-02T12:00:00Z");
 
     private static final String USERNAME = "someone";
@@ -71,7 +74,7 @@ class PasswordResetServiceTest {
 
     private final PasswordResetService service = new PasswordResetService(users, tokens, admin, passwords,
             mock(AuditService.class), actors, settings,
-            new LinkBuilder(AuthorizationServerSettings.builder().issuer("http://uaa.test").build()),
+            new LinkBuilder(AuthorizationServerSettings.builder().issuer("http://uaa.test").build(), LINK_PAGES),
             new LinksProperties(Duration.ofDays(7), Duration.ofHours(1), false), sessions, authorizations,
             Clock.fixed(NOW, ZoneOffset.UTC));
 

@@ -13,14 +13,16 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.savedrequest.RequestCache;
 
 import com.asrevo.cvhome.cua.security.StorefrontBrokeredLoginSuccessHandler;
-import com.asrevo.cvhome.cua.security.StorefrontCsrfDeniedHandler;
-import com.asrevo.cvhome.cua.security.StorefrontLoginEntryPoint;
-import com.asrevo.cvhome.cua.security.StorefrontLoginFailureHandler;
 import com.asrevo.cvhome.cua.security.StorefrontLoginSuccessHandler;
+import com.asrevo.cvhome.cua.security.StorefrontUrls;
 import com.asrevo.cvhome.s2s.jwt.MultiIssuerJwtDecoder;
 import com.asrevo.cvhome.sso.config.SsoSecurityDefaults;
 import com.asrevo.cvhome.sso.security.BrokeredLogin;
 import com.asrevo.cvhome.sso.security.BrokeredLoginSuccessHandler;
+import com.asrevo.cvhome.sso.security.HandoffCsrfDeniedHandler;
+import com.asrevo.cvhome.sso.security.HandoffLoginEntryPoint;
+import com.asrevo.cvhome.sso.security.HandoffLoginFailureHandler;
+import com.asrevo.cvhome.sso.security.LoginPageLocator;
 import com.asrevo.cvhome.sso.session.SessionAdminService;
 import com.asrevo.cvhome.sso.settings.SettingsService;
 
@@ -50,6 +52,7 @@ public class CuaSecurityConfig {
                                     CookieCsrfTokenRepository csrfCookies, BrokeredLogin brokered,
                                     BrokeredLoginSuccessHandler brokeredSuccess, SettingsService settings,
                                     SessionAdminService sessions) throws Exception {
+        LoginPageLocator loginPages = StorefrontUrls.locator(requestCache);
         defaults.applyTo(http)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/.well-known/**").permitAll()
@@ -78,8 +81,8 @@ public class CuaSecurityConfig {
                  */
                 .formLogin(login -> login.loginPage(LOGIN_PAGE)
                         .successHandler(new StorefrontLoginSuccessHandler(settings, sessions, requestCache))
-                        .failureHandler(new StorefrontLoginFailureHandler(requestCache,
-                                StorefrontLoginFailureHandler.INVALID)))
+                        .failureHandler(new HandoffLoginFailureHandler(loginPages,
+                                HandoffLoginFailureHandler.INVALID)))
                 .oauth2Login(login -> login.loginPage(LOGIN_PAGE)
                         .clientRegistrationRepository(brokered.getRegistrations())
                         .authorizationEndpoint(endpoint -> endpoint.authorizationRequestResolver(brokered.resolver()))
@@ -88,11 +91,11 @@ public class CuaSecurityConfig {
                         // Not the plain storefront handler: a brokered login has to swap its BrokeredPrincipal
                         // for the standard one before the authorization server writes it to oauth2_authorization.
                         .successHandler(new StorefrontBrokeredLoginSuccessHandler(requestCache, brokeredSuccess))
-                        .failureHandler(new StorefrontLoginFailureHandler(requestCache,
-                                StorefrontLoginFailureHandler.SOCIAL)))
+                        .failureHandler(new HandoffLoginFailureHandler(loginPages,
+                                HandoffLoginFailureHandler.SOCIAL)))
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint(storefrontEntryPoint(requestCache, csrfCookies))
-                        .accessDeniedHandler(new StorefrontCsrfDeniedHandler(requestCache, csrfCookies)));
+                        .accessDeniedHandler(new HandoffCsrfDeniedHandler(loginPages, requestCache, csrfCookies)));
         return http.build();
     }
 
@@ -133,7 +136,7 @@ public class CuaSecurityConfig {
     @Bean("authorizationServerEntryPoint")
     AuthenticationEntryPoint storefrontEntryPoint(RequestCache requestCacheRef,
                                                   CookieCsrfTokenRepository csrfCookies) {
-        return new StorefrontLoginEntryPoint(requestCacheRef, csrfCookies);
+        return new HandoffLoginEntryPoint(StorefrontUrls.locator(requestCacheRef), csrfCookies);
     }
 
 }

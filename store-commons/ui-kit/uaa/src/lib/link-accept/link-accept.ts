@@ -5,17 +5,23 @@ import {TranslocoDirective} from '@jsverse/transloco';
 import {ApiErrorService, isApiError} from '@cvhome-saas/ui-kit';
 import {notACommonPassword} from '@cvhome-saas/ui-kit/forms';
 import {FormField, Icon, Panel, TextField} from '@cvhome-saas/ui-kit/ui';
-import {PublicLinkService, type AcceptedLink, type LinkKind, type LinkPreview} from '@cvhome-saas/ui-kit/uaa';
+import {PublicLinkService, type LinkKind} from '../public-link.service';
+import type {AcceptedLink, LinkPreview} from '../uaa.models';
 
 /** Where the page is in its one job: reading the link, taking a password, or finished — or unable to. */
 type Phase = 'loading' | 'ready' | 'done' | 'unusable' | 'failed' | 'noToken';
 
 /**
- * The public page behind a one-time link: `/accept-invitation` and `/reset-password`.
+ * The public page behind a one-time link: an invitation and a password reset.
  *
  * One component for both because they are one flow — read the token, show whose account it is and
  * what the password must satisfy, take a password, say where to sign in — and differ only in the
  * words and in which public endpoint answers. The route's `data.kind` picks; `?token=` is the link.
+ *
+ * **In the kit because both consoles serve it.** uaa renders these pages on its own origin for a
+ * platform administrator, and the seller console renders them on its own for a merchant — one flow,
+ * one uaa behind it, and the copy lives in the kit's shared dictionaries so neither app restates it.
+ * The only thing an app supplies is `brand`, the name above the card.
  *
  * **Anonymous, and outside the shell.** `AppSecurityConfig` permits the two paths and the two
  * `/api/v1/public/**` resources; nothing here calls an authenticated endpoint, and a signed-in
@@ -41,6 +47,9 @@ export class LinkAccept {
   /** Route data and query parameter, bound by `withComponentInputBinding`. */
   readonly kind = input.required<LinkKind>();
   readonly token = input<string>();
+
+  /** The product name above the card. Each console names itself; empty hides the block. */
+  readonly brand = input('');
 
   protected readonly phase = signal<Phase>('loading');
   protected readonly preview = signal<LinkPreview | null>(null);

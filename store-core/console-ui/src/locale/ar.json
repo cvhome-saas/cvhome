@@ -123,7 +123,9 @@
     },
     "identityProviders": {
       "title": "مزوّدو تسجيل الدخول"
-    }
+    },
+    "invitation.title": "قبول الدعوة",
+    "resetPassword.title": "إعادة تعيين كلمة المرور"
   },
   "notFound": {
     "heading": "الصفحة غير موجودة",
@@ -143,8 +145,6 @@
     "signIn.point1": "تسجيل الدخول الموحد متاح في خطط Scale.",
     "signIn.point2": "سجل الجلسات وقائمة الأجهزة متاحان في ملفك الشخصي.",
     "signIn.point3": "يرد الدعم في أقل من أربع ساعات أيام العمل.",
-    "signIn.oauthCopy": "سجّل الدخول عبر cvhome UAA. يقوم خادم التفويض بتحديد مؤسستك ومتاجرك وصلاحياتك بعد التسليم.",
-    "signIn.continueWithUaa": "المتابعة عبر cvhome UAA",
     "signIn.twoFactorNote": "تُطبَّق المصادقة الثنائية حيثما تطلبها مؤسستك.",
     "signUp.heading": "اغرس رايتك.",
     "signUp.copy": "أنشئ الحساب، واختر أين تريد البيع أولًا، ويصبح متجرك جاهزًا قبل أن تنتهي من قراءة هذه الصفحة.",
@@ -163,7 +163,32 @@
     "signUp.passwordPersonal": "يجب ألا تحتوي كلمة المرور على اسمك أو بريدك الإلكتروني.",
     "signUp.creating": "جارٍ إنشاء الحساب…",
     "signUp.created": "تم إنشاء الحساب. سجّل الدخول للمتابعة.",
-    "signingOut": "جارٍ تسجيل خروجك…"
+    "signingOut": "جارٍ تسجيل خروجك…",
+    "signIn.starting": "جارٍ تحويلك لتسجيل الدخول…",
+    "signIn.email": "البريد الإلكتروني أو اسم المستخدم",
+    "signIn.emailPlaceholder": "you@company.com",
+    "signIn.or": "أو",
+    "signIn.password": "كلمة المرور",
+    "signIn.reveal": "إظهار كلمة المرور",
+    "signIn.rememberMe": "أبقني مسجّل الدخول",
+    "signIn.submitting": "جارٍ تسجيل الدخول…",
+    "signIn.attemptsLeft": "بقيت {{count}} محاولة قبل قفل الحساب.",
+    "signIn.notice.failed": "اسم المستخدم أو كلمة المرور غير صحيحة.",
+    "signIn.notice.expired": "بقيت الصفحة مفتوحة مدة طويلة. حاول مرة أخرى.",
+    "signIn.notice.signedOut": "تم تسجيل خروجك.",
+    "signIn.notice.locked": "هذا الحساب مقفل. حاول لاحقًا أو اطلب من المسؤول فتحه.",
+    "signIn.notice.disabled": "هذا الحساب معطّل. اطلب من المسؤول تفعيله.",
+    "signIn.notice.expiredPassword": "انتهت صلاحية كلمة المرور. اطلب من المسؤول رابط إعادة تعيين.",
+    "signIn.notice.idpRejected": "رفض مزوّد الهوية تسجيل الدخول.",
+    "signIn.notice.idpUnknownUser": "لا يوجد حساب cvhome مرتبط بهذه الهوية.",
+    "signIn.notice.idpNoEmail": "لم يشارك المزوّد بريدًا إلكترونيًا، وهو ما يحتاجه cvhome للتعرّف عليك.",
+    "signIn.notice.idpFailed": "تعذّر إكمال تسجيل الدخول عبر هذا المزوّد. حاول مرة أخرى.",
+    "signIn.link.explain": "لديك بالفعل حساب cvhome باسم {{email}}. أكّد كلمة مرورك مرة واحدة لربطه بـ {{provider}}.",
+    "signIn.link.password": "كلمة مرور cvhome الخاصة بك",
+    "signIn.link.confirm": "اربط وسجّل الدخول",
+    "signIn.forgot": "هل نسيت كلمة المرور؟",
+    "signIn.forgotCopy": "لا توجد إعادة تعيين ذاتية. اطلب من المسؤول إرسال رابط لمرة واحدة، واتبعه لاختيار كلمة مرور جديدة.",
+    "signIn.checkingSession": "جارٍ التحقق من جلستك…"
   },
   "dashboard": {
     "heading": {

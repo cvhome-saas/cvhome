@@ -1,9 +1,11 @@
 <div class="wrap" *transloco="let t">
   <main class="card-wrap">
-    <div class="brand">
-      <span class="mark"><app-icon name="shield" /></span>
-      <span class="brand-name">{{ t('brand') }}</span>
-    </div>
+    @if (brand()) {
+      <div class="brand">
+        <span class="mark"><app-icon name="shield" /></span>
+        <span class="brand-name">{{ brand() }}</span>
+      </div>
+    }
 
     @switch (phase()) {
       @case ('loading') {

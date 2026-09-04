@@ -35,13 +35,13 @@ export const routes: Routes = [
    */
   {
     path: 'accept-invitation',
-    loadComponent: () => import('@features/link-accept/link-accept').then((m) => m.LinkAccept),
-    data: {titleKey: 'route.acceptInvitation', kind: 'INVITATION'},
+    loadComponent: () => import('@cvhome-saas/ui-kit/uaa').then((m) => m.LinkAccept),
+    data: {titleKey: 'route.acceptInvitation', kind: 'INVITATION', brand: 'cvhome identity'},
   },
   {
     path: 'reset-password',
-    loadComponent: () => import('@features/link-accept/link-accept').then((m) => m.LinkAccept),
-    data: {titleKey: 'route.resetPassword', kind: 'PASSWORD_RESET'},
+    loadComponent: () => import('@cvhome-saas/ui-kit/uaa').then((m) => m.LinkAccept),
+    data: {titleKey: 'route.resetPassword', kind: 'PASSWORD_RESET', brand: 'cvhome identity'},
   },
   {
     path: '',

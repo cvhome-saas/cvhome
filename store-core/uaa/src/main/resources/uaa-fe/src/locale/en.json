@@ -768,56 +768,6 @@
       "note": "Your name, email and roles are set by an administrator. Ask one to change them."
     }
   },
-  "linkAccept": {
-    "title": {
-      "INVITATION": "Welcome",
-      "PASSWORD_RESET": "Choose a new password"
-    },
-    "subtitle": {
-      "INVITATION": "Choose a password to finish setting up your account.",
-      "PASSWORD_RESET": "Your old password stops working once you save the new one."
-    },
-    "loading": "Checking your link…",
-    "greeting": "Hello",
-    "account": "Account",
-    "expires": "Link valid until",
-    "password": "New password",
-    "repeatPassword": "Repeat password",
-    "reveal": "Show password",
-    "rulesLabel": "Password rules",
-    "rules": {
-      "minLength": "At least {{count}} characters",
-      "upper": "An upper-case letter",
-      "lower": "A lower-case letter",
-      "digit": "A digit",
-      "special": "A symbol"
-    },
-    "submit": {
-      "INVITATION": "Activate my account",
-      "PASSWORD_RESET": "Save new password"
-    },
-    "submitting": "Saving…",
-    "noToken": "This page needs the link you were sent. Open it from there.",
-    "unusable": {
-      "title": "This link cannot be used",
-      "message": {
-        "INVITATION": "It has expired, was revoked, or was already used. Ask the administrator who invited you for a new one.",
-        "PASSWORD_RESET": "It has expired, was revoked, or was already used. Ask an administrator for a new one."
-      }
-    },
-    "failed": {
-      "title": "Something went wrong",
-      "message": "The link could not be checked right now. Try again in a moment."
-    },
-    "done": {
-      "title": {
-        "INVITATION": "Your account is ready",
-        "PASSWORD_RESET": "Password saved"
-      },
-      "message": "Sign in as {{name}} with the password you just chose.",
-      "signIn": "Go to sign in"
-    }
-  },
   "idps": {
     "title": "Identity providers",
     "context": "External logins people can pick on the sign-in page, brokered through cvhome identity",

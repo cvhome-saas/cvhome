@@ -123,7 +123,9 @@
     },
     "identityProviders": {
       "title": "Sign-in providers"
-    }
+    },
+    "invitation.title": "Accept invitation",
+    "resetPassword.title": "Reset password"
   },
   "notFound": {
     "heading": "Page not found",
@@ -143,8 +145,6 @@
     "signIn.point1": "Single sign-on available on Scale plans.",
     "signIn.point2": "Session history and device list live in your profile.",
     "signIn.point3": "Support answers in under four hours on weekdays.",
-    "signIn.oauthCopy": "Sign in through cvhome UAA. Your organization, stores and permissions are resolved by the authorization server after the handoff.",
-    "signIn.continueWithUaa": "Continue with cvhome UAA",
     "signIn.twoFactorNote": "Two-factor authentication applies where your organization requires it.",
     "signUp.heading": "Plant your flag.",
     "signUp.copy": "Create the account, choose where you want to sell first, and your store is live before you finish reading this page.",
@@ -163,7 +163,32 @@
     "signUp.passwordPersonal": "Your password must not contain your name or email address.",
     "signUp.creating": "Creating account…",
     "signUp.created": "Account created. Sign in to continue.",
-    "signingOut": "Signing you out…"
+    "signingOut": "Signing you out…",
+    "signIn.starting": "Taking you to sign in…",
+    "signIn.email": "Email or username",
+    "signIn.emailPlaceholder": "you@company.com",
+    "signIn.or": "or",
+    "signIn.password": "Password",
+    "signIn.reveal": "Show password",
+    "signIn.rememberMe": "Keep me signed in",
+    "signIn.submitting": "Signing in…",
+    "signIn.attemptsLeft": "{{count}} attempt(s) left before the account is locked.",
+    "signIn.notice.failed": "That username and password do not match.",
+    "signIn.notice.expired": "That page had been open too long. Please try again.",
+    "signIn.notice.signedOut": "You have been signed out.",
+    "signIn.notice.locked": "This account is locked. Try again later, or ask an administrator to unlock it.",
+    "signIn.notice.disabled": "This account is disabled. Ask an administrator to enable it.",
+    "signIn.notice.expiredPassword": "This password has expired. Ask an administrator for a reset link.",
+    "signIn.notice.idpRejected": "Your provider refused the sign-in.",
+    "signIn.notice.idpUnknownUser": "There is no cvhome account for that provider identity.",
+    "signIn.notice.idpNoEmail": "Your provider did not share an email address, which cvhome needs to identify you.",
+    "signIn.notice.idpFailed": "We could not complete the sign-in with that provider. Please try again.",
+    "signIn.link.explain": "You already have a cvhome account for {{email}}. Confirm your password once to connect it to {{provider}}.",
+    "signIn.link.password": "Your cvhome password",
+    "signIn.link.confirm": "Connect and sign in",
+    "signIn.forgot": "Forgot password?",
+    "signIn.forgotCopy": "There is no self-service reset. Ask an administrator to send you a one-time link, and follow it to choose a new password.",
+    "signIn.checkingSession": "Checking your session…"
   },
   "dashboard": {
     "heading": {

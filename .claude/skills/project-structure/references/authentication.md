@@ -153,6 +153,40 @@ app holds no tokens and makes same-origin relative calls. Relevant gateway class
 `AuthController`, `LogoutController`, plus `security/UaaLogoutSuccessHandler` and
 `security/SecurityContextServerLogoutHandler` in `autoconfigure`.
 
+**The whole visible flow happens on the console's own origin, and the console renders the form.** uaa is
+reached through the gateway's `/uaa` forward rather than at its own address:
+
+```
+gateway.com:8000/oauth2/authorization/uaa   the gateway starts the flow
+gateway.com:8000/uaa/oauth2/authorize       uaa saves the request, plants XSRF-TOKEN, redirects
+gateway.com:8000/sign-in?auth=1             console-ui renders the form
+gateway.com:8000/uaa/login       (POST)     uaa authenticates, resumes the saved request
+gateway.com:8000/login/oauth2/code/uaa      the gateway takes the code
+```
+
+Three things make that work, and each fails quietly if it is undone:
+
+- **The `/uaa` route does not strip its prefix.** uaa reads `X-Forwarded-Prefix` in `PathPrefixFilter` and
+  reports it as its context path; Spring requires the context path to be the literal start of the request path,
+  so stripping and then announcing it is rejected as `Invalid contextPath '/uaa'` and dispatched to `/error` —
+  a 500 on every browser hop. spg forwards cua's path intact for exactly the same reason.
+- **The session cookie is `Path=/uaa` on the console's origin.** It is what carries the saved authorize request
+  across the form POST, and it is why the flow must not go cross-origin. `XSRF-TOKEN` stays at `Path=/` so the
+  console can read it and echo it as `_csrf`; uaa's `CsrfTokenRequestAttributeHandler` is the plain one, not the
+  XOR one, precisely so a page uaa never rendered can fill in a token equal to the cookie.
+- **Logout ends two sessions.** The gateway's, and uaa's — and uaa's now lives on this origin, so
+  `UaaLogoutSuccessHandler` rebuilds the end-session URL as `/uaa/connect/logout` here
+  (`com.asrevo.cvhome.gateway.uaa-path-prefix`). Sent to uaa's own host it carries no cookie, ends nothing, and
+  the next navigation signs straight back in.
+
+**uaa keeps its own door.** Reached at `uaa.gateway.com:8001` the context path is empty, `ConsoleUrls.isHandoff`
+is false, and uaa serves its own embedded SPA — sign-in page included. That is how a platform administrator
+signs in to administer uaa itself, and it is deliberately the one thing the hand-off must never swallow. The
+switch is the context path and nothing a caller can put in a query string.
+
+`LinkAccept` in `@cvhome-saas/ui-kit/uaa` serves the invitation and password-reset pages for **both** consoles;
+`com.asrevo.cvhome.uaa.links.base-url` decides which origin the emailed link points at.
+
 **Shopper (store-pod):** the storefront (`landing-ui`) is a PKCE public client whose `client_id` is the store
 id. `AuthService.login()` sends the browser to `/cua/oauth2/authorize?…&lang=<locale>`; cua saves that request
 and its `StorefrontLoginEntryPoint` redirects to `{origin}/{lang}/login?auth=1` — same origin, because spg

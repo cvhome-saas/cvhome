@@ -80,7 +80,14 @@ class InvitationFlowIntegrationTest {
         assertThat(link.get(USER).get(STATUS).asText()).isEqualTo(PENDING);
         assertThat(link.get("invitation").get(STATUS).asText()).isEqualTo(PENDING);
         String url = link.get("link").asText();
-        assertThat(url).contains("/accept-invitation?token=");
+        /*
+         * The console's route on the console's origin, not uaa's own page on the issuer. uaa still mints and
+         * redeems the token; only the page that collects the password moved, and a link that still pointed here
+         * would land a merchant on the identity server instead of their console. `/invitation` rather than
+         * `/accept-invitation` because the console already has a route by that name for organization member
+         * invitations, which are a different token system entirely.
+         */
+        assertThat(url).contains("/invitation?token=").doesNotContain("/accept-invitation");
         String token = url.substring(url.indexOf(TOKEN_PARAM) + TOKEN_PARAM.length());
         assertThat(jdbc.queryForObject("select token_hash from uaa.invitations where user_id = ?::uuid", String.class, userId))
                 .isNotEqualTo(token);
