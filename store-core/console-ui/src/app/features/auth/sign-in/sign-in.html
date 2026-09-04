@@ -2,20 +2,132 @@
   <app-auth-story [story]="facade.signInStory()" />
 
   <section class="auth-entry" [attr.aria-label]="t('auth.accountAccess')">
-    <form method="get" [action]="config.loginUrl">
+    <div class="auth-card">
       <div class="auth-tabs" role="group" [attr.aria-label]="t('auth.accountAction')">
         <a routerLink="/sign-up">{{ t('auth.createAccount') }}</a>
         <a routerLink="/sign-in" class="active" aria-current="page">{{ t('auth.signIn') }}</a>
       </div>
 
-      <div class="auth-fields">
-        <p class="oauth-copy">{{ t('auth.signIn.oauthCopy') }}</p>
-        <button class="auth-submit" type="submit">
-          {{ t('auth.signIn.continueWithUaa') }}
-          <span aria-hidden="true">→</span>
-        </button>
+      @if (resolving()) {
+        <p class="auth-starting" role="status">{{ t('auth.signIn.checkingSession') }}</p>
+      } @else if (!pendingFlow()) {
+        <p class="auth-starting" role="status">{{ t('auth.signIn.starting') }}</p>
+      } @else {
+        @if (notice(); as reason) {
+          <p class="auth-notice" [class.info]="reason === 'signedOut'" role="alert">
+            <span>{{ t('auth.signIn.notice.' + reason) }}</span>
+            @if (reason === 'failed' && attemptsLeft() !== null) {
+              <span class="auth-attempts">{{ t('auth.signIn.attemptsLeft', {count: attemptsLeft()}) }}</span>
+            }
+          </p>
+        }
+
+        @switch (step()) {
+          @case ('credentials') {
+            <form class="auth-fields" method="post" [action]="action" (submit)="onSubmit()">
+              <!-- Spring Security's CSRF token, read from the XSRF-TOKEN cookie uaa's hand-off planted. -->
+              <input type="hidden" name="_csrf" [value]="csrf()" />
+
+              <app-form-field controlId="username" required [label]="t('auth.signIn.email')">
+                <app-text-field
+                  autocomplete="username"
+                  id="username"
+                  latin
+                  name="username"
+                  [value]="email()"
+                  (valueChange)="email.set($event)"
+                  [placeholder]="t('auth.signIn.emailPlaceholder')"
+                />
+              </app-form-field>
+
+              <app-form-field controlId="password" required [label]="t('auth.signIn.password')">
+                <app-text-field
+                  autocomplete="current-password"
+                  id="password"
+                  name="password"
+                  type="password"
+                  [revealLabel]="t('auth.signIn.reveal')"
+                />
+              </app-form-field>
+
+              <div class="auth-options">
+                @if (realm()?.rememberMeEnabled) {
+                  <!-- A real checkbox with a name: the form posts it, and Spring's remember-me reads `remember-me`. -->
+                  <label class="remember">
+                    <input
+                      type="checkbox"
+                      name="remember-me"
+                      value="true"
+                      [checked]="rememberMe()"
+                      (change)="rememberMe.set(!rememberMe())"
+                    />
+                    <span>{{ t('auth.signIn.rememberMe') }}</span>
+                  </label>
+                }
+                <button class="link" type="button" [attr.aria-expanded]="forgotOpen()" (click)="forgotOpen.set(!forgotOpen())">
+                  {{ t('auth.signIn.forgot') }}
+                </button>
+              </div>
+
+              @if (forgotOpen()) {
+                <p class="integration-note" role="note">{{ t('auth.signIn.forgotCopy') }}</p>
+              }
+
+              <button class="auth-submit" type="submit" [disabled]="submitting()">
+                {{ submitting() ? t('auth.signIn.submitting') : t('auth.signIn') }}
+                <app-icon name="arrowRight" />
+              </button>
+            </form>
+
+            @if (providers().length) {
+              <p class="divider">{{ t('auth.signIn.or') }}</p>
+              <div class="social-actions">
+                @for (provider of providers(); track provider.alias) {
+                  <a [href]="providerUrl(provider)" [attr.aria-label]="provider.displayName">
+                    <b>{{ glyph(provider) }}</b>
+                  </a>
+                }
+              </div>
+            }
+          }
+
+          @case ('link') {
+            <!--
+              A brokered login matched an account that has never used this provider. One password confirms the two
+              are the same person; after that the provider signs them in on its own.
+            -->
+            @if (pending(); as link) {
+              <p class="auth-notice info" role="status">
+                {{ t('auth.signIn.link.explain', {provider: link.providerName, email: link.email}) }}
+              </p>
+
+              <form class="auth-fields" (submit)="confirmLink($event)">
+                <app-form-field
+                  controlId="link-password"
+                  required
+                  [label]="t('auth.signIn.link.password')"
+                  [error]="linkError()"
+                >
+                  <app-text-field
+                    autocomplete="current-password"
+                    id="link-password"
+                    type="password"
+                    [value]="linkPassword()"
+                    (valueChange)="linkPassword.set($event)"
+                    [revealLabel]="t('auth.signIn.reveal')"
+                  />
+                </app-form-field>
+                <button class="auth-submit" type="submit" [disabled]="submitting()">
+                  {{ submitting() ? t('auth.signIn.submitting') : t('auth.signIn.link.confirm') }}
+                  <app-icon name="arrowRight" />
+                </button>
+              </form>
+            }
+          }
+        }
+
         <p class="legal">{{ t('auth.signIn.twoFactorNote') }}</p>
-      </div>
-    </form>
+      }
+    </div>
   </section>
 </main>

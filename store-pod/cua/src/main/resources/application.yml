@@ -21,3 +21,29 @@ spring:
     properties:
       hibernate:
         default_schema: ${spring.application.name}
+com:
+  asrevo:
+    cvhome:
+      sso:
+        # cua is the multi-realm deployment of the SSO server: one realm per store, resolved from the storefront
+        # host the shopper is on. uaa is the same code with a single realm. Stated explicitly because the property
+        # has no default — a deployment that forgot to say would otherwise pick one, and picking SINGLE here would
+        # put every store's shoppers into one pool.
+        realm:
+          mode: MULTI
+          # Every account cua holds is a shopper, by construction — there is no other kind of principal in a
+          # store's realm. The old cua wrote this role into each token as a literal; it is configuration now, and
+          # it is what the pods' `grants: [ROLE_CUSTOMER]` ceiling and checkout's customer gate are written
+          # against.
+          default-roles:
+            - CUSTOMER
+      uaa:
+        # Shared with uaa's namespace because the settings belong to the server, not to either deployment.
+        # Registration is a shopper-facing flow here, so the links a store issues point at the storefront.
+        links:
+          invitation-validity: P7D
+          reset-validity: PT1H
+        rate-limit:
+          enabled: true
+        remember-me:
+          key: ${CUA_REMEMBER_ME_KEY:cua-local-remember-me-key-not-for-deployment}

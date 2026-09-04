@@ -81,11 +81,86 @@ Stop through the tool (`lcl stop`), never with a manual `kill`.
 - **Steps** — `lcl restart -d`.
 - **Expect** — old supervisor gone, new supervisor pid, all services `up`, same ports.
 
+> ### Known gap — `lcl restart` of the whole stack can leave half of it `crashed`
+>
+> **Symptom.** Six or so services exit 1 within a minute of each other, all with the same Gradle failure:
+>
+> ```
+> Could not create service of type FileAccessTimeJournal …
+>   Timeout waiting to lock journal cache (~/.gradle/caches/journal-1).
+>   It is currently in use by another process. Owner PID: …
+> ```
+>
+> `lcl status` shows them `crashed`, and everything downstream reads `blocked by dependency` — `landing-ui` waits
+> on content/catalog/checkout/inventory, so **the storefronts 502 while the platform services look fine**.
+>
+> **Cause.** Every service runs its own `./gradlew … bootRun`, and each Gradle client needs the *shared*
+> `~/.gradle/caches/journal-1` lock at startup. `--project-cache-dir` is per stack; the Gradle user home is not.
+> A restart stops the services but the Gradle daemons they spawned outlive the build, so a restart briefly has the
+> old daemons and the new clients competing. The pod services have no ordering between them — they all depend only
+> on uaa and postgres — so six start at once and lose the race. The lock timeout is
+> `DefaultFileLockManager.DEFAULT_LOCK_TIMEOUT`, a hard-coded 60 s constant with no system property behind it, so
+> it cannot be raised.
+>
+> **What works.**
+>
+> ```bash
+> lcl stop --stack <name>
+> ./gradlew --stop          # only if no other stack is running: this stops every daemon in the shared user home
+> lcl start -d --stack <name>
+> ```
+>
+> A cold `lcl start` is reliable because there are no leftover daemons. `lcl start --parallel 1` does **not**
+> recover an already-crashed service — `start` skips services in a terminal state, and `lcl restart <svc>` on one
+> does not retry either; the events log still shows the original crash. Stop and start the stack.
+>
+> **Do not** run `./gradlew --stop` while another worktree's stack is up: daemons are shared across stacks, and a
+> `bootRun` daemon never finishes on its own, so stopping them takes that stack's services down too.
+>
+> **Not fixed in `lcl.yml`.** The available levers are all worse than the problem: a per-stack `GRADLE_USER_HOME`
+> gives every stack its own multi-gigabyte dependency cache, a daemon-stopping `before-start`/`after-stop` hook
+> would kill other worktrees' stacks, and a sleep-based stagger is a guess dressed as configuration. Recorded here
+> instead.
+
+## 05b — Rebuilding a shared library under a running stack [verified]
+
+Gradle writes `store-commons/*/build/libs/*.jar` **in place**, and every Java service opened that jar when it
+started. Replacing it under a live JVM does not reload it: classes already loaded keep working, and the first
+class loaded *lazily* afterwards fails with a `NoClassDefFoundError` for a class that is plainly there —
+
+```
+java.lang.IllegalArgumentException: Failed to evaluate expression 'hasPermission(...)'
+  Caused by: java.lang.NoClassDefFoundError: com/asrevo/cvhome/s2s/utils/SecurityUtils
+    at StoreRoleAccessChecker.wrongRealm(...)  [autoconfigure-1.0.16.jar]
+  Caused by: java.lang.ClassNotFoundException: com.asrevo.cvhome.s2s.utils.SecurityUtils
+```
+
+- **How it presents** — a 500 `COMMON.INTERNAL_ERROR` on one page, with the rest of the console working.
+  It was the catalogue, because `wrongRealm` is on the org-admin path and nothing had reached it since the
+  rebuild. It reads like a permission bug and is not one: the class is in the source *and* in the jar. Compare
+  the jar's mtime with the service's uptime (`lcl status`) and the answer is immediate.
+- **Steps** — start the stack, edit anything in `store-commons/autoconfigure`, `./gradlew :…:build`, then use a
+  page that calls a pod service.
+- **Expect** — the failure above until the services are restarted.
+- **The fix** — restart every service that was running when the jar changed:
+  `lcl restart tenancy billing pod-registry merchant content catalog checkout cua payment inventory --stack <name>`.
+  Which library was rebuilt decides the blast radius: `sso-core` is uaa and cua (see `cua-qa.md` §00),
+  **`autoconfigure` is every Java service**, because they all depend on it.
+- **Not a defect** — nothing here needs fixing in the code; it is what rebuilding a jar under a running JVM
+  does. Worth knowing before spending an afternoon on a `hasPermission` expression that is correct.
+
 ## 06 — Stop / start / restart one service [verified]
 
 - **Steps** — `lcl stop payment`; `lcl status`; `lcl start payment`; `lcl restart payment`.
 - **Expect** — only payment changes state (`stopped` → `up`), new pid each time, other services keep their
   pids and uptime; `events` shows `service.stopping/stopped/starting/up` for payment only; infra untouched.
+
+> **Restarting an `-ui` service after changing `ui-kit` needs its Vite cache cleared.** console-ui links the
+> shared library as a `file:` dependency and Vite pre-bundles it into
+> `store-core/console-ui/.angular/cache/…/vite/deps/`. That copy is not invalidated when the library is rebuilt,
+> so the app loads the old one and fails at the first new export — the symptom is a route that silently refuses
+> to navigate, with `does not provide an export named …` in the browser console and nothing in the server log.
+> `rm -rf store-core/console-ui/.angular/cache` before `lcl restart console-ui`. It cost half an hour once.
 
 ## 07 — Crash isolation and `why` [verified]
 

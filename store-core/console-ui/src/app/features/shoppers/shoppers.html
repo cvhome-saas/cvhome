@@ -1,0 +1,132 @@
+<ng-container *transloco="let t">
+  <app-page-header [title]="t('shoppers.heading.title')" [context]="facade.totalLabel() ?? t('shoppers.heading.context')" />
+
+  @if (facade.error(); as failure) {
+    <app-load-error [message]="failure.message" (retry)="facade.reload()" />
+  }
+
+  <app-busy-overlay reserve="page" [busy]="facade.isLoading()" [label]="t('shoppers.loading')">
+    @if (!facade.isEmpty() || facade.filtered()) {
+      <div class="shoppers-stack">
+        <app-panel [title]="t('shoppers.panel.title')" [subtitle]="t('shoppers.panel.subtitle')">
+          <!-- Beside the list they narrow, rather than stacked above the first row. -->
+          <div panelAction class="filters">
+            <app-search-box
+              [value]="facade.query()"
+              (valueChange)="facade.setQuery($event)"
+              [label]="t('shoppers.filter.searchLabel')"
+              [placeholder]="t('shoppers.filter.searchPlaceholder')"
+              [clearLabel]="t('shoppers.filter.clear')"
+            />
+            <app-select
+              [value]="facade.status()"
+              (valueChange)="facade.setStatus($event)"
+              [options]="facade.statusOptions()"
+              [ariaLabel]="t('shoppers.filter.statusLabel')"
+            />
+          </div>
+
+          @if (facade.rows().length) {
+            <app-user-admin-table
+              [rows]="facade.rows()"
+              [label]="t('shoppers.panel.title')"
+              [busy]="facade.busy()"
+              [roleList]="roleList"
+              [showScope]="false"
+              [allow]="allowed"
+              [selectable]="true"
+              [selectedId]="facade.inspecting()?.id ?? null"
+              (picked)="onPick($event)"
+              (act)="onAction($event)"
+            />
+
+            <app-pagination
+              [page]="facade.pageIndex()"
+              [totalPages]="facade.totalPages()"
+              [totalElements]="facade.totalElements()"
+              [pageSize]="pageSize"
+              [unit]="t('shoppers.unit')"
+              [label]="t('shoppers.paginationLabel')"
+              (pageChange)="facade.setPage($event)"
+            />
+          } @else if (facade.filtered()) {
+            <app-empty-state
+              icon="filter"
+              [title]="t('shoppers.noMatches.title')"
+              [message]="t('shoppers.noMatches.message')"
+            />
+          } @else {
+            <app-empty-state
+              icon="users"
+              [title]="t('shoppers.empty.title')"
+              [message]="t('shoppers.empty.message')"
+            />
+          }
+        </app-panel>
+      </div>
+    } @else {
+      <app-empty-state
+        icon="users"
+        [title]="t('shoppers.empty.title')"
+        [message]="t('shoppers.empty.message')"
+      />
+    }
+  </app-busy-overlay>
+
+  <!--
+    Where an account is signed in, and the one action that ends it. A failure is shown inside the
+    pane rather than as a toast over a closed dialog: the merchant asked to see something, and an
+    empty list that means "could not load" is a lie.
+  -->
+  @if (facade.inspecting(); as target) {
+    <app-form-dialog
+      [open]="true"
+      [title]="t('shoppers.sessions.title', {name: nameOf(target)})"
+      [description]="t('shoppers.sessions.description')"
+      [closeLabel]="t('shared.actions.close')"
+      (dismissed)="facade.dismissDialogs()"
+    >
+      @if (facade.sessionsFailed()) {
+        <app-load-error [message]="t('shoppers.sessions.failed')" (retry)="facade.inspect(target)" />
+      } @else if (facade.sessions().length) {
+        <div class="sessions">
+          @for (session of facade.sessions(); track session.id) {
+            <div class="session">
+              <span class="session-where">{{ session.ip ?? t('shoppers.sessions.unknownAddress') }}</span>
+              <span class="session-when">{{ session.userAgent ?? t('shoppers.sessions.unknownBrowser') }}</span>
+              <span class="session-when">{{ t('shoppers.sessions.started', {at: started(session)}) }}</span>
+            </div>
+          }
+        </div>
+        <div class="sessions-action">
+          <button type="button" class="danger-action" [disabled]="facade.busy()" (click)="facade.signOutEverywhere()">
+            {{ t('shoppers.sessions.signOutEverywhere') }}
+          </button>
+        </div>
+      } @else {
+        <app-empty-state
+          icon="users"
+          [title]="t('shoppers.sessions.none.title')"
+          [message]="t('shoppers.sessions.none.message')"
+        />
+      }
+    </app-form-dialog>
+  }
+
+  <!--
+    Typed, because there is no undo: the account and its credentials go. Orders and invoices are the
+    store's own records and live in other services, which is what makes this answerable as an
+    erasure request rather than a data loss.
+  -->
+  <app-confirm-dialog
+    [open]="!!facade.deleting()"
+    [title]="t('shoppers.delete.title')"
+    [message]="t('shoppers.delete.message', {name: nameOf(facade.deleting())})"
+    [confirmationText]="facade.deleting()?.username ?? null"
+    [confirmationLabel]="t('shoppers.delete.confirmationLabel')"
+    [confirmLabel]="t('shoppers.delete.confirm')"
+    [cancelLabel]="t('shared.actions.cancel')"
+    (confirmed)="facade.confirmDelete()"
+    (dismissed)="facade.dismissDialogs()"
+  />
+</ng-container>

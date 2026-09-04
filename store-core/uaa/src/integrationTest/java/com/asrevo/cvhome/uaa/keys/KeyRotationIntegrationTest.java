@@ -11,6 +11,7 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import com.asrevo.cvhome.sso.keys.KeyRotationService;
 import com.asrevo.cvhome.testsupport.annotations.DatabaseIntegrationTest;
 import com.asrevo.cvhome.testsupport.time.MutableClock;
 import com.asrevo.cvhome.testsupport.time.TestClockConfiguration;

@@ -213,6 +213,17 @@ class MerchantStoreApiIntegrationTest {
         expect(privateRead(STORE_1, tokens.s2s(SCOPE_STORE_CORE)), HttpStatus.OK);
     }
 
+    /**
+     * The cross-organization refusal. An org admin's token names the organization the person administers and
+     * says nothing about who owns the store in the query parameter — and every store on the pod is one query
+     * parameter away. Without the ownership check this read succeeded, returning one organization's store to
+     * another's administrator: the tenancy was right and the authorization was not.
+     */
+    @Test
+    void anotherOrganizationsAdminCannotReadThisStore() {
+        expect(privateRead(STORE_1, tokens.orgAdmin(Tokens.ORG_2)), HttpStatus.FORBIDDEN);
+    }
+
     @Test
     void anotherStoresStaffCannotReadOrWriteThisStore() {
         String other = tokens.staff(ROLE_STORE_ADMIN, STORE_2);

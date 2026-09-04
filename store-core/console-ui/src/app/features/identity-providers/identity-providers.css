@@ -1,0 +1,161 @@
+:host {
+  display: contents;
+}
+
+/* The page owns its own rhythm, as `customers.css` and `platform-users.css` do. */
+.providers-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-gutter);
+}
+
+.providers {
+  display: grid;
+  gap: var(--spacing-group);
+}
+
+/*
+ * One provider, one row: identity on the start edge, state in the middle, actions on the end. A
+ * grid rather than a flex line because the three regions have to keep their columns when a display
+ * name is long — the first attempt let the actions drift row to row.
+ *
+ * Flat at rest, per DESIGN.md: a structural border and the surface tone, with the hover state as
+ * the only elevation.
+ */
+.provider {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--spacing-field) var(--spacing-group);
+  align-items: start;
+  padding: var(--spacing-gutter);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  background: var(--card);
+  transition: border-color var(--default-transition-duration) var(--ease-emphasis);
+}
+
+.provider:hover {
+  border-color: var(--border-soft);
+}
+
+.provider.off {
+  background: var(--muted);
+}
+
+.identity {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-tight);
+  align-items: baseline;
+  min-inline-size: 0;
+}
+
+.provider-name {
+  overflow: hidden;
+  color: var(--foreground-strong);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.provider-alias {
+  color: var(--muted-foreground);
+  font-size: var(--text-xs);
+}
+
+/*
+ * The switch first, then the two ordinary actions, then the destructive one last — the order the
+ * console uses everywhere, so the button under the pointer is the same button on every row.
+ */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-tight);
+  align-items: center;
+  justify-content: flex-end;
+}
+
+/* Spans both columns: the redirect URI is the row's evidence, not one of its three regions. */
+.evidence {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: var(--spacing-tight);
+  min-inline-size: 0;
+}
+
+/*
+ * What the last Test found, against the row it was run for. Kept until the next one rather than
+ * shown as a toast: a merchant reads it while checking the endpoints they just typed, and an
+ * answer that disappears is one they have to earn again.
+ */
+.result {
+  display: flex;
+  gap: var(--spacing-inline);
+  align-items: baseline;
+  font-size: var(--text-xs);
+}
+
+.result.reached {
+  color: var(--foreground-strong);
+}
+
+.result.unreached {
+  color: var(--destructive);
+}
+
+.result-url {
+  overflow: hidden;
+  color: var(--muted-foreground);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* The form's own rhythm: one field and the next. */
+.form {
+  display: grid;
+  gap: var(--spacing-group);
+}
+
+/*
+ * The endpoints only a generic provider needs. Set apart because they are the fields that carry the
+ * warning at the top of the page — the ones this server will actually fetch.
+ */
+.endpoints {
+  display: grid;
+  gap: var(--spacing-group);
+  padding: var(--spacing-gutter);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--muted);
+}
+
+.endpoints-title {
+  color: var(--foreground-strong);
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.switches {
+  display: grid;
+  gap: var(--spacing-field);
+}
+
+.form-actions {
+  display: flex;
+  gap: var(--spacing-tight);
+  justify-content: flex-end;
+  padding-block-start: var(--spacing-tight);
+}
+
+@media (width <= 40rem) {
+  .provider {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .actions {
+    justify-content: flex-start;
+  }
+}

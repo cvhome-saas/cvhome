@@ -11,6 +11,12 @@ mapping between them, and everything else — routing, TLS, data isolation, regi
 | **Store** | `StoreMerchantId` | tenancy + the pod's own DB | One storefront. The unit a shopper actually visits. |
 | **Pod** | `PodId` | tenancy (`org.pod` table) | A **physical deployment** of the whole `store-pod` stack. Hosts many stores. |
 
+A fourth unit exists inside the identity layer only: a **realm** (`RealmId`) is one user pool. On a pod's `cua`
+there is one per store, so the same email in two stores is two shoppers; on `uaa` there is exactly one,
+`platform`. It is the store id by value, and it is what Hibernate's `@TenantId` filters every identity query by.
+See `authentication.md` — and note that "realm" also names the *issuing server* elsewhere in that file, which is
+a different question entirely.
+
 **One store id everywhere.** `StoreMerchantId` (a `String`) is the store's identifier in tenancy, billing,
 pod-registry, the gateway and every pod alike. It used to be two types — store-core carried an `ObjectId`
 wrapper called `ManagerStoreId` and the pods a `String` wrapper — with the permission evaluator translating
@@ -217,7 +223,9 @@ public Page<Pod> findAllPods(@OrgStorePrincipalInfo UserOrgStoreIdentity identit
 | Concern | Isolation |
 |---|---|
 | Store data (products, orders, customers) | Per **pod** database; never crosses pods |
-| Shopper identity | Per pod — each pod runs its own `cua` |
+| Shopper identity | Per **store** — one `cua` per pod, one realm per store inside it |
+| Shopper sessions, tokens, lockout, identity providers | Per store, by `@TenantId` on every row |
+| Shopper signing key | Per **pod** — shared by every store on it, and not a merchant's to rotate |
 | Seller/admin identity | **Shared** — one `uaa` in store-core for the whole platform |
 | Billing, subscriptions, org/store registry | **Shared** — tenancy |
 | TLS certificates | Per pod (S3-backed Caddy storage, pod-local `ask` check) |
@@ -232,4 +240,5 @@ If it's about accounts, plans, provisioning, or which pod hosts what, it belongs
 - `StoreCreatedEvent` / `StoreProvisionedEvent` and the outbox — `events-outbox.md`
 - The `spg` Caddyfile routing table — `store-pod.md`
 - Local pod identity config (`pod-info.pod`, `com.asrevo.cvhome.pods`) — `configuration.md`
-- Why pods accept both `uaa` and `cua` tokens — `authentication.md`
+- Why pods accept both `uaa` and `cua` tokens, and what a realm is — `authentication.md`
+- The authorization server both deployments are built from — `shared-libraries.md`

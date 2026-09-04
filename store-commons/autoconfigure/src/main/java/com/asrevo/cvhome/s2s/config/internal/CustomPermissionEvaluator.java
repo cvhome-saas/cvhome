@@ -13,6 +13,8 @@ import com.asrevo.cvhome.commons.domain.Pod;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.s2s.model.PodInfoProperties;
 import com.asrevo.cvhome.s2s.services.PermissionAccessChecker;
+import com.asrevo.cvhome.s2s.services.StoreOrgOwnerRetriever;
+import com.asrevo.cvhome.s2s.services.StoreOwnershipPolicy;
 
 @Configuration
 public class CustomPermissionEvaluator implements PermissionEvaluator {
@@ -37,12 +39,35 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
     private static final String INVENTORY_RESERVE = "STORE-POD.INVENTORY.RESERVE";
     private static final String CUSTOMER_ALL = "STORE-POD.CUSTOMER.*";
 
-    private final PermissionAccessChecker checker = new PermissionAccessChecker();
+    private final PermissionAccessChecker checker;
 
     private final Pod pod;
 
     public CustomPermissionEvaluator(ApplicationContext context) {
         this.pod = getPod(context);
+        /*
+         * Optional, and its absence is a refusal rather than a pass. A service that authorizes org admins needs
+         * to know which organization owns the store being asked for, and only the pod's store registry knows;
+         * a service without the merchant client cannot answer, so it says no. See StoreRoleAccessChecker.
+         */
+        // A supplier, not the bean: this evaluator is built with the security configuration, before the
+        // retriever's own bean exists. Asking then answered null for good.
+        this.checker = new PermissionAccessChecker(
+                () -> context.getBeanProvider(StoreOrgOwnerRetriever.class).getIfAvailable(),
+                ownershipPolicy(context));
+    }
+
+    /**
+     * Whether this service checks an org admin's store for itself.
+     *
+     * <p>
+     * {@code ENFORCED} unless the service says otherwise, so a deployment that has not thought about it gets the
+     * gate's check — and, having no lookup, refuses org admins rather than admitting them everywhere.
+     * </p>
+     */
+    private static StoreOwnershipPolicy ownershipPolicy(ApplicationContext context) {
+        return context.getEnvironment().getProperty("com.asrevo.cvhome.s2s.store-ownership",
+                StoreOwnershipPolicy.class, StoreOwnershipPolicy.ENFORCED);
     }
 
     @Override

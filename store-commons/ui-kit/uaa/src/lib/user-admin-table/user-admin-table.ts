@@ -6,11 +6,22 @@ import {ActionMenu, Badge, DataTable, type MenuAction, type TableColumn, TableRo
 
 /** What a row action asks the host to do. The host owns the dialogs and the writes. */
 export interface UserAdminIntent {
-  readonly kind: 'toggleEnabled' | 'unlock' | 'resetPassword' | 'editRoles' | 'delete';
+  readonly kind: UserAdminAction;
   readonly row: PlatformUserRow;
 }
 
 /** The table's columns. Widths are grid tracks, read straight into the row layout. */
+/** What a host may offer on a row. Not every console may offer all of them — see {@link UserAdminTable.allow}. */
+export type UserAdminAction = 'toggleEnabled' | 'unlock' | 'resetPassword' | 'editRoles' | 'delete';
+
+const ALL_ACTIONS: readonly UserAdminAction[] = [
+  'unlock',
+  'toggleEnabled',
+  'resetPassword',
+  'editRoles',
+  'delete',
+];
+
 const COLUMN_KEYS: readonly {key: string; labelKey: string; width: string}[] = [
   {key: 'user', labelKey: 'shared.userAdmin.column.user', width: 'minmax(13rem, 2.2fr)'},
   {key: 'roles', labelKey: 'shared.userAdmin.column.roles', width: 'minmax(9rem, 1.3fr)'},
@@ -60,6 +71,16 @@ export class UserAdminTable {
   readonly orgLabel = input<(orgId: string | null) => string>((orgId) => orgId ?? '');
   /** Hides the organization column where every row is in the same organization. */
   readonly showScope = input(true);
+
+  /**
+   * Which row actions this console may offer. Everything, by default.
+   *
+   * A merchant administering their own store's shoppers may not set a password or assign a role:
+   * those accounts self-register, their roles are the deployment's configuration, and the server
+   * exposes no endpoint for either. A menu entry that answers 404 is worse than an absent one, so
+   * the host says what it can actually do rather than the table assuming.
+   */
+  readonly allow = input<readonly UserAdminAction[]>(ALL_ACTIONS);
 
 
   /**
@@ -111,6 +132,13 @@ export class UserAdminTable {
    * not. It carries no `kind`, so picking it cannot reach {@link act}.
    */
   protected actionsFor(row: PlatformUserRow): readonly MenuAction[] {
+    const allowed = this.allow();
+    return this.everyActionFor(row).filter(
+      (action) => action.key === 'impersonate' || allowed.includes(action.key as UserAdminAction),
+    );
+  }
+
+  private everyActionFor(row: PlatformUserRow): readonly MenuAction[] {
     return [
       ...(row.status === 'LOCKED'
         ? [{key: 'unlock', icon: 'lock' as const, label: this.transloco.translate('shared.userAdmin.action.unlock')}]

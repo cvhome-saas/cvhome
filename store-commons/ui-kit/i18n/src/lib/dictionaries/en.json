@@ -2,7 +2,12 @@
   "shared": {
     "actions": {
       "cancel": "Cancel",
-      "retry": "Try again"
+      "close": "Close",
+      "delete": "Delete",
+      "edit": "Edit",
+      "retry": "Try again",
+      "save": "Save",
+      "saving": "Saving…"
     },
     "autocomplete": {
       "searching": "Searching…",
@@ -294,8 +299,6 @@
         "status": "Status",
         "user": "Account"
       },
-      "disabled": "Disabled",
-      "enabled": "Enabled",
       "noOrg": "No organization",
       "unnamed": "No name recorded",
       "status": {
@@ -352,6 +355,56 @@
       "CATALOG_PRODUCT_VARIANT_OPTIONS_INVALID": "Every variant must pick exactly one value of each chosen option.",
       "CATALOG_PRODUCT_VARIANT_LIMIT_EXCEEDED": "A product can vary by at most 4 options and sell at most 100 variants.",
       "UAA_PASSWORD_POLICY_VIOLATION": "{rule, select, minLength {Too short for this realm's minimum.} upper {Add an upper-case letter.} lower {Add a lower-case letter.} digit {Add a digit.} special {Add a symbol.} notUsername {It must not contain the username.} notEmail {It must not contain the email address.} other {It does not meet the password policy.}}"
+    }
+  },
+  "linkAccept": {
+    "title": {
+      "INVITATION": "Welcome",
+      "PASSWORD_RESET": "Choose a new password"
+    },
+    "subtitle": {
+      "INVITATION": "Choose a password to finish setting up your account.",
+      "PASSWORD_RESET": "Your old password stops working once you save the new one."
+    },
+    "loading": "Checking your link…",
+    "greeting": "Hello",
+    "account": "Account",
+    "expires": "Link valid until",
+    "password": "New password",
+    "repeatPassword": "Repeat password",
+    "reveal": "Show password",
+    "rulesLabel": "Password rules",
+    "rules": {
+      "minLength": "At least {{count}} characters",
+      "upper": "An upper-case letter",
+      "lower": "A lower-case letter",
+      "digit": "A digit",
+      "special": "A symbol"
+    },
+    "submit": {
+      "INVITATION": "Activate my account",
+      "PASSWORD_RESET": "Save new password"
+    },
+    "submitting": "Saving…",
+    "noToken": "This page needs the link you were sent. Open it from there.",
+    "unusable": {
+      "title": "This link cannot be used",
+      "message": {
+        "INVITATION": "It has expired, was revoked, or was already used. Ask the administrator who invited you for a new one.",
+        "PASSWORD_RESET": "It has expired, was revoked, or was already used. Ask an administrator for a new one."
+      }
+    },
+    "failed": {
+      "title": "Something went wrong",
+      "message": "The link could not be checked right now. Try again in a moment."
+    },
+    "done": {
+      "title": {
+        "INVITATION": "Your account is ready",
+        "PASSWORD_RESET": "Password saved"
+      },
+      "message": "Sign in as {{name}} with the password you just chose.",
+      "signIn": "Go to sign in"
     }
   }
 }

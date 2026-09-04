@@ -28,6 +28,10 @@ include(
         'store-commons:errors',
         'store-commons:uaa-client',
         'store-commons:uaa-client-impl',
+        // The SSO server, built once and deployed twice: store-core/uaa (one realm) and store-pod/cua
+        // (one realm per store). Everything but the two deployment seams lives in sso-core.
+        'store-commons:sso:sso-events',
+        'store-commons:sso:sso-core',
         'store-commons:secret-crypto:secret-crypto-core',
         'store-commons:secret-crypto:secret-crypto-local',
         'store-commons:secret-crypto:secret-crypto-aws',
@@ -73,7 +77,6 @@ include(
         'store-pod:cua',
 
         'store-core:uaa',
-        'store-core:uaa:uaa-events',
         'store-core:gateway:gateway-service',
         'store-core:tenancy:tenancy-commons',
         'store-core:tenancy:tenancy-events',

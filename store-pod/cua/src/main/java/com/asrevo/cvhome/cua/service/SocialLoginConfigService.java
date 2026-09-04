@@ -1,51 +1,48 @@
 package com.asrevo.cvhome.cua.service;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.cua.domain.SocialLoginConfigId;
-import com.asrevo.cvhome.cua.repo.SocialLoginConfigRepository;
-import com.asrevo.cvhome.cua.web.dto.PersistableSocialLoginConfig;
 import com.asrevo.cvhome.cua.web.dto.ReadableSocialLogin;
-import com.asrevo.cvhome.cua.web.dto.ReadableSocialLoginConfig;
-import com.asrevo.cvhome.cua.web.mapper.SocialLoginConfigMapper;
+import com.asrevo.cvhome.sso.idp.IdentityProviderService;
 
 import lombok.RequiredArgsConstructor;
 
+/**
+ * The providers a storefront's login page offers, in the shape landing-ui already reads.
+ *
+ * <p>
+ * <strong>What is left of it.</strong> cua used to keep its own {@code social_login_configs} table with three
+ * providers and two fields each, and this class was the translation that let the old console screen go on
+ * working. The console addresses the identity-provider API directly now, so the writing half is gone; what
+ * remains is the storefront's own list, whose shape landing-ui reads and which is kept exactly as it was.
+ * </p>
+ *
+ * <p>
+ * Nothing here names a store. The realm is resolved from the request, and every query and write below is scoped to
+ * it by Hibernate's tenant filter — which is what makes one merchant's Google application invisible to another.
+ * </p>
+ */
 @Service
 @RequiredArgsConstructor
 public class SocialLoginConfigService {
 
-    private final SocialLoginConfigRepository repository;
-    private final SocialLoginConfigMapper mapper;
+    private final IdentityProviderService providers;
 
-    public List<ReadableSocialLoginConfig> getConfigs(StoreMerchantId merchantStore) {
-        return repository.findAllByIdStoreMerchantId(merchantStore).stream()
-                .map(mapper::toDTO)
+    /**
+     * The buttons a storefront's login page renders, for the store the request arrived for.
+     *
+     * <p>
+     * The registration id is the bare alias now, not {@code {store}.{provider}}. It no longer has to carry the
+     * store because the alias is unique within its realm and the realm comes from the host — and the callback URL
+     * a merchant registers with Google is still per-store, because it is built on their own domain.
+     * </p>
+     */
+    public List<ReadableSocialLogin> enabledLogins() {
+        return providers.visibleForLogin().stream()
+                .map(p -> new ReadableSocialLogin(p.alias(), p.displayName(), p.alias()))
                 .toList();
     }
 
-    @Transactional
-    public void saveConfigs(StoreMerchantId merchantStore, List<PersistableSocialLoginConfig> configs) {
-        configs.forEach(dto -> {
-            dto.setStoreMerchantId(merchantStore);
-            repository.save(mapper.toEntity(dto));
-        });
-    }
-
-    /** The providers switched on for a store, shaped for a login page: id, display name, registration id — no secrets. */
-    public List<ReadableSocialLogin> enabledLogins(StoreMerchantId merchantStore) {
-        return repository.findEnabledSocialLoginConfig(merchantStore).stream()
-                .map(id -> new ReadableSocialLogin(id.providerId().getProviderId(), id.providerId().getClientName(),
-                        id.toRegistrationId()))
-                .toList();
-    }
-
-    public Optional<ReadableSocialLoginConfig> findById(SocialLoginConfigId socialLoginConfigId) {
-        return repository.findById(socialLoginConfigId).map(mapper::toDTO);
-    }
 }

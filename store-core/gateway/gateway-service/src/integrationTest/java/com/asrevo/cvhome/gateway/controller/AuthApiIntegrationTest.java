@@ -43,14 +43,29 @@ class AuthApiIntegrationTest {
         client = WebTestClient.bindToServer().baseUrl("http://localhost:%d".formatted(port)).build();
     }
 
+    /**
+     * The authorize request goes to uaa <em>on this gateway's own origin</em>, not to uaa's address.
+     *
+     * <p>
+     * The console renders the sign-in page now, so the visible half of the flow has to stay on one origin: uaa's
+     * session cookie is scoped to it and is what carries the saved authorize request across the form POST, and the
+     * console can only read the CSRF cookie if it was set there. Cross-origin the flow still authenticates and then
+     * restarts instead of resuming, which is why this assertion is on the host and not only on the path.
+     * </p>
+     *
+     * <p>
+     * Only the browser-facing endpoint moves. {@code token-uri}, {@code jwk-set-uri} and {@code user-info-uri} are
+     * called by this gateway rather than by a browser and stay pointed at uaa's own address.
+     * </p>
+     */
     @Test
-    void startingALoginForwardsTheDeepLinkToUaaAndOpensASession() {
+    void startingALoginForwardsTheDeepLinkToUaaOnThisOriginAndOpensASession() {
         client.get().uri("/oauth2/authorization/uaa?redirectTo={to}", DEEP_LINK).exchange()
                 .expectStatus().isFound()
                 .expectCookie().exists("STORE-CORE-GATEWAY-JSESSIONID")
                 .expectHeader().value(HttpHeaders.LOCATION, location -> {
                     var query = UriComponentsBuilder.fromUri(URI.create(location)).build().getQueryParams();
-                    assertThat(location).startsWith("http://uaa.gateway.com:8001/oauth2/authorize");
+                    assertThat(location).startsWith("http://localhost:%d/uaa/oauth2/authorize".formatted(port));
                     assertThat(query.getFirst("client_id")).isEqualTo("web-app");
                     assertThat(query.getFirst("state")).isNotBlank();
                     assertThat(UriUtils.decode(query.getFirst("redirectTo"), StandardCharsets.UTF_8)).isEqualTo(DEEP_LINK);

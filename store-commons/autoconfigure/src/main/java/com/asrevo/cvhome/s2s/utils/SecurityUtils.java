@@ -28,6 +28,17 @@ public final class SecurityUtils {
     public static final String REALM_CUA = "cua";
 
     /**
+     * The claim naming the <em>user pool</em> a token was minted against — a store id, on cua.
+     *
+     * <p>
+     * Not {@link #REALM_UAA} or {@link #REALM_CUA}, which name the <em>server</em> that minted it. Two things are
+     * called realm in this platform and they answer different questions: which server do I trust this from, and
+     * whose users is it about. This is the second.
+     * </p>
+     */
+    public static final String USER_REALM_CLAIM = "realm";
+
+    /**
      * Stands for "every store", for a principal that is not confined to one. Deliberately not a valid store id — a
      * sentinel that can never collide with a real one — and deliberately kept here rather than on
      * {@link StoreMerchantId}, which is a tenant identifier and has no business knowing about authorization.

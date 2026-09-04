@@ -117,7 +117,15 @@
     },
     "builder": {
       "title": "Home page builder"
-    }
+    },
+    "shoppers": {
+      "title": "Shoppers"
+    },
+    "identityProviders": {
+      "title": "Sign-in providers"
+    },
+    "invitation.title": "Accept invitation",
+    "resetPassword.title": "Reset password"
   },
   "notFound": {
     "heading": "Page not found",
@@ -137,8 +145,6 @@
     "signIn.point1": "Single sign-on available on Scale plans.",
     "signIn.point2": "Session history and device list live in your profile.",
     "signIn.point3": "Support answers in under four hours on weekdays.",
-    "signIn.oauthCopy": "Sign in through cvhome UAA. Your organization, stores and permissions are resolved by the authorization server after the handoff.",
-    "signIn.continueWithUaa": "Continue with cvhome UAA",
     "signIn.twoFactorNote": "Two-factor authentication applies where your organization requires it.",
     "signUp.heading": "Plant your flag.",
     "signUp.copy": "Create the account, choose where you want to sell first, and your store is live before you finish reading this page.",
@@ -157,7 +163,32 @@
     "signUp.passwordPersonal": "Your password must not contain your name or email address.",
     "signUp.creating": "Creating account…",
     "signUp.created": "Account created. Sign in to continue.",
-    "signingOut": "Signing you out…"
+    "signingOut": "Signing you out…",
+    "signIn.starting": "Taking you to sign in…",
+    "signIn.email": "Email or username",
+    "signIn.emailPlaceholder": "you@company.com",
+    "signIn.or": "or",
+    "signIn.password": "Password",
+    "signIn.reveal": "Show password",
+    "signIn.rememberMe": "Keep me signed in",
+    "signIn.submitting": "Signing in…",
+    "signIn.attemptsLeft": "{{count}} attempt(s) left before the account is locked.",
+    "signIn.notice.failed": "That username and password do not match.",
+    "signIn.notice.expired": "That page had been open too long. Please try again.",
+    "signIn.notice.signedOut": "You have been signed out.",
+    "signIn.notice.locked": "This account is locked. Try again later, or ask an administrator to unlock it.",
+    "signIn.notice.disabled": "This account is disabled. Ask an administrator to enable it.",
+    "signIn.notice.expiredPassword": "This password has expired. Ask an administrator for a reset link.",
+    "signIn.notice.idpRejected": "Your provider refused the sign-in.",
+    "signIn.notice.idpUnknownUser": "There is no cvhome account for that provider identity.",
+    "signIn.notice.idpNoEmail": "Your provider did not share an email address, which cvhome needs to identify you.",
+    "signIn.notice.idpFailed": "We could not complete the sign-in with that provider. Please try again.",
+    "signIn.link.explain": "You already have a cvhome account for {{email}}. Confirm your password once to connect it to {{provider}}.",
+    "signIn.link.password": "Your cvhome password",
+    "signIn.link.confirm": "Connect and sign in",
+    "signIn.forgot": "Forgot password?",
+    "signIn.forgotCopy": "There is no self-service reset. Ask an administrator to send you a one-time link, and follow it to choose a new password.",
+    "signIn.checkingSession": "Checking your session…"
   },
   "dashboard": {
     "heading": {
@@ -355,11 +386,6 @@
       "yourDomain": "your domain"
     },
     "loading": "Loading store settings…",
-    "loginProvider": {
-      "google": "Google",
-      "facebook": "Facebook",
-      "github": "GitHub"
-    },
     "nav": {
       "ariaLabel": "Store settings sections",
       "heading": "Settings",
@@ -398,29 +424,15 @@
     "section": {
       "domain": "Store domain",
       "details": "Store details",
-      "socialLogin": "Store social login",
       "payments": "Store payment config"
     },
     "sectionSaved": "{section} saved.",
     "sectionShort": {
       "domain": "Domain",
       "details": "Details",
-      "socialLogin": "Social login",
       "payments": "Payment config"
     },
     "sectionsLabel": "Store settings sections",
-    "socialLogin": {
-      "appId": "App ID",
-      "appSecret": "App secret",
-      "appSecretHint": "Stored encrypted. It is shown here because the API returns it decrypted.",
-      "callbackHint": "Paste this into the provider's redirect URI allow-list",
-      "callbackUrl": "Callback URL",
-      "credentialsRequired": "An enabled provider needs both an app ID and an app secret.",
-      "notConfigured": "Not set up yet",
-      "signInWith": "Sign in with {provider}",
-      "subtitle": "Let customers sign in with an external provider.",
-      "title": "Store social login"
-    },
     "state": {
       "enabled": "Enabled",
       "disabled": "Disabled",
@@ -895,7 +907,9 @@
       "platformBilling": "Billing",
       "plans": "Plans",
       "content": "Content management",
-      "builder": "Home page builder"
+      "builder": "Home page builder",
+      "shoppers": "Shoppers",
+      "identityProviders": "Sign-in providers"
     },
     "toolbar": {
       "breadcrumbNav": "Breadcrumb",
@@ -940,7 +954,9 @@
         "pods": "Pods",
         "platformUsers": "Accounts",
         "platformBilling": "Billing",
-        "plans": "Plans"
+        "plans": "Plans",
+        "shoppers": "Shoppers",
+        "identityProviders": "Sign-in"
       }
     },
     "planBanner": {
@@ -3415,6 +3431,138 @@
       "urlHint": "/sale or https://…",
       "categoryHint": "Category code",
       "productHint": "Product id or slug"
+    }
+  },
+  "shoppers": {
+    "heading": {
+      "title": "Shoppers",
+      "context": "Who can sign in to this store"
+    },
+    "panel": {
+      "title": "Shoppers",
+      "subtitle": "Accounts that sign in to your storefront. Guests who checked out without registering are under Customers."
+    },
+    "loading": "Loading shoppers",
+    "unit": "shoppers",
+    "paginationLabel": "Shopper pages",
+    "totalLabel": "{total, plural, one {# shopper} other {# shoppers}}",
+    "filter": {
+      "searchLabel": "Search shoppers",
+      "searchPlaceholder": "Name, username or email",
+      "clear": "Clear the search",
+      "statusLabel": "Filter by status",
+      "anyStatus": "Any status"
+    },
+    "status": {
+      "active": "Active",
+      "locked": "Locked",
+      "disabled": "Disabled"
+    },
+    "empty": {
+      "title": "No shoppers yet",
+      "message": "Accounts appear here when someone registers on your storefront or signs in with a provider."
+    },
+    "noMatches": {
+      "title": "No shoppers match",
+      "message": "Try a different search or clear the status filter."
+    },
+    "sessions": {
+      "title": "Where {name} is signed in",
+      "description": "Each entry is one browser. Signing out everywhere ends them all; the shopper can sign in again straight away.",
+      "started": "Started {at}",
+      "unknownAddress": "Address not recorded",
+      "unknownBrowser": "Browser not recorded",
+      "signOutEverywhere": "Sign out everywhere",
+      "failed": "Those sessions could not be loaded.",
+      "none": {
+        "title": "Not signed in anywhere",
+        "message": "This account has no active session right now."
+      }
+    },
+    "delete": {
+      "title": "Delete this shopper?",
+      "message": "This removes {name}'s account and their sign-in credentials. Their orders and invoices are your store's records and are not affected. There is no undo.",
+      "confirmationLabel": "Type the username to confirm",
+      "confirm": "Delete shopper"
+    },
+    "toast": {
+      "enabled": "{name} can sign in again.",
+      "disabled": "{name} is disabled and signed out.",
+      "unlocked": "{name} is unlocked.",
+      "deleted": "{name} has been deleted.",
+      "signedOut": "Signed out of {count} session(s)."
+    }
+  },
+  "identityProviders": {
+    "heading": {
+      "title": "Sign-in providers",
+      "context": "How shoppers sign in to this store"
+    },
+    "panel": {
+      "title": "Providers",
+      "subtitle": "Let shoppers sign in with an account they already have. Each provider is yours: your application, your credentials."
+    },
+    "loading": "Loading providers",
+    "notice": {
+      "endpoints": "This server fetches every endpoint below — when you save, when you press Test, and each time a shopper signs in. It will only reach public HTTPS addresses, so an internal or plain-HTTP URL is refused."
+    },
+    "action": {
+      "add": "Add a provider",
+      "test": "Test"
+    },
+    "state": {
+      "on": "On",
+      "off": "Off",
+      "noSecret": "No secret set"
+    },
+    "empty": {
+      "title": "No providers yet",
+      "message": "Add one to let shoppers sign in with an account they already have."
+    },
+    "field": {
+      "alias": "Alias",
+      "aliasHint": "Part of the redirect URI, so it cannot change later.",
+      "aliasInvalid": "Lower-case letters, digits and dashes only.",
+      "authorizationUri": "Authorization URL",
+      "clientId": "Client ID",
+      "clientIdHint": "From the application you registered with the provider.",
+      "clientIdRequired": "The provider will not accept a sign-in without it.",
+      "clientSecret": "Client secret",
+      "clientSecretHint": "Stored encrypted and never sent back. Leave blank to keep the saved one.",
+      "displayName": "Name shown to shoppers",
+      "emailDomains": "Email domains",
+      "emailDomainsHint": "Comma separated. A shopper whose address matches is sent straight here.",
+      "endpointsTitle": "Endpoints",
+      "issuerHint": "For OIDC, this alone is usually enough — the rest is discovered.",
+      "issuerUri": "Issuer URL",
+      "jit": "Create an account on first sign-in",
+      "jitHint": "Off means only people who already have an account here can use this provider.",
+      "jwkSetUri": "JWKS URL",
+      "kind": "Kind",
+      "kindGeneric": "You supply the endpoints. This server will fetch them.",
+      "kindPreset": "The endpoints are known; you only supply your application's credentials.",
+      "redirectUri": "Redirect URI",
+      "tokenUri": "Token URL",
+      "trustEmail": "Trust the address this provider reports",
+      "trustEmailHint": "Only turn this on for a provider that verifies addresses itself.",
+      "userInfoUri": "User info URL"
+    },
+    "form": {
+      "addTitle": "Add a provider",
+      "editTitle": "Edit provider",
+      "description": "Register the redirect URI shown on the card with your provider before testing."
+    },
+    "test": {
+      "reached": "Answered at {url}",
+      "failed": "No answer from {url}"
+    },
+    "delete": {
+      "title": "Remove this provider?",
+      "message": "Shoppers will no longer be able to sign in with {name}. Accounts already created through it keep working with their other sign-in methods."
+    },
+    "toast": {
+      "saved": "{name} saved.",
+      "deleted": "{name} removed."
     }
   }
 }

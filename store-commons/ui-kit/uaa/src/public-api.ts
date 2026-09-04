@@ -23,3 +23,4 @@ export * from './lib/admin-audit.service';
 export * from './lib/admin-client.service';
 export * from './lib/admin-dashboard.service';
 export * from './lib/user-admin-table/user-admin-table';
+export * from './lib/link-accept/link-accept';

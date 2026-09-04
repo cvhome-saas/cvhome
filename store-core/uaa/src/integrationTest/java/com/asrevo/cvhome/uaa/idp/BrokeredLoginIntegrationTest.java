@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.TestPropertySource;
 
 import com.asrevo.cvhome.testsupport.annotations.DatabaseIntegrationTest;
 import com.asrevo.cvhome.uaa.support.UaaClient;
@@ -22,6 +23,16 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @DatabaseIntegrationTest
 @Import(StubIdpConfiguration.class)
+/*
+ * The stub provider answers on localhost over plain HTTP, which the egress guard refuses by default and should:
+ * a merchant-entered endpoint pointing inside the network is the thing it exists to stop. Relaxed here for the
+ * same reason the local stack relaxes it, and stated rather than defaulted — EgressGuardTest is what holds the
+ * default to being the strict one.
+ */
+@TestPropertySource(properties = {
+    "com.asrevo.cvhome.sso.egress.schemes=http,https",
+    "com.asrevo.cvhome.sso.egress.allow-private-addresses=true",
+})
 class BrokeredLoginIntegrationTest {
 
     private static final String IDPS = "/api/v1/admin/identity-providers";

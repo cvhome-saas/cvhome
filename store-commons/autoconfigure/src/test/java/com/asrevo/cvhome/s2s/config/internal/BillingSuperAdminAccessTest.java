@@ -15,8 +15,10 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
+import com.asrevo.cvhome.commons.domain.ManagerOrgId;
 import com.asrevo.cvhome.commons.domain.Roles;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.s2s.services.StoreOrgOwnerRetriever;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -54,7 +56,23 @@ class BillingSuperAdminAccessTest {
 
     private static final StoreMerchantId STORE = new StoreMerchantId("65f023632bc46470c104b76f");
 
-    private final CustomPermissionEvaluator evaluator = new CustomPermissionEvaluator(new StaticApplicationContext());
+    /**
+     * A context that knows STORE belongs to ORG.
+     *
+     * <p>
+     * An org admin's token names the organization, never the store, so the evaluator has to be told who owns the
+     * store before it can admit one — and a context that cannot answer refuses, which is what makes a service
+     * missing this lookup fail closed rather than open.
+     * </p>
+     */
+    private final CustomPermissionEvaluator evaluator = new CustomPermissionEvaluator(contextKnowing(STORE, ORG));
+
+    private static StaticApplicationContext contextKnowing(StoreMerchantId store, String org) {
+        StaticApplicationContext context = new StaticApplicationContext();
+        StoreOrgOwnerRetriever owners = asked -> store.equals(asked) ? new ManagerOrgId(org) : null;
+        context.getBeanFactory().registerSingleton("storeOrgOwnerRetriever", owners);
+        return context;
+    }
 
     @ParameterizedTest(name = "a super admin may {0} on any store")
     @DisplayName("a super admin holds both billing tokens for a store it does not own")

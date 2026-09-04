@@ -56,6 +56,13 @@ configured ones. Stop the stack before removing the worktree.
 | `lcl list` | every running stack |
 | `lcl stop [--hard]` | that stack only; `--hard` also deletes the compose volumes |
 
+**`lcl restart` of the whole stack is not reliable.** The services each run their own `./gradlew … bootRun`,
+and they compete for the shared `~/.gradle/caches/journal-1` lock — a restart has the previous run's daemons
+still alive while the new clients start, and the pod services, which have no ordering between them, lose the
+race and exit 1. The give-away is `Timeout waiting to lock journal cache` and a `landing-ui` stuck on
+`blocked by dependency`, so the storefronts are down while the platform services look healthy. Use
+`lcl stop` then `lcl start -d`; a cold start has no leftover daemons. Full write-up: `qa/lcl-qa.md` §05.
+
 **Check `lcl status` before starting another one.** A crashed service no longer takes the stack down: it is
 marked `crashed`, `status` shows it and `why` explains it. Stop with `lcl stop`, never with a manual `kill` of
 a supervised process. A foreground `lcl start` blocks and Ctrl-C shuts that stack down; `-d` is the usual form.

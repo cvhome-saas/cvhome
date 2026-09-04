@@ -16,6 +16,13 @@ UAA_WEB_APP_SECRET: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
 com:
   asrevo:
     cvhome:
+      sso:
+        # Local only. A provider under test here answers on localhost over plain HTTP, which the egress guard
+        # refuses everywhere else — and must, because these URLs are merchant-entered and this server fetches
+        # them. Neither the fargate slice nor the defaults relax it.
+        egress:
+          schemes: http,https
+          allow-private-addresses: true
       uaa:
         seed:
           # A fresh local database gets the known password and secrets on every start.

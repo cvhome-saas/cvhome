@@ -18,9 +18,22 @@ import reactor.core.publisher.Flux;
 @RequiredArgsConstructor
 public class GatewayRouteLocatorImpl implements RouteLocator {
 
+    /**
+     * The path uaa answers on through this gateway, and the value it is told to call its own.
+     *
+     * <p>
+     * Public because the authorization request resolver builds a browser-facing authorize URL on this same
+     * gateway and has to agree with the route about where uaa is; a disagreement here is a 404 in the middle of
+     * a sign-in.
+     * </p>
+     */
+    public static final String UAA_PREFIX = "/uaa";
+
     // Every path prefix that belongs to a backend. The array is negated below to build console-ui's catch-all, so a
     // service missing from here is not merely unrouted — its calls are answered with the console's shell HTML.
     private static final String[] backendServices = {"tenancy", "billing", "pod-registry", "uaa", "spg"};
+
+    private static final String FORWARDED_PREFIX = "X-Forwarded-Prefix";
 
     private static final String[] backendServicesPattern = Arrays.stream(backendServices)
             .map(it -> String.format("/%s/**", it))
@@ -59,8 +72,27 @@ public class GatewayRouteLocatorImpl implements RouteLocator {
                  * already a JWT resource server. This relays the operator's token unchanged; uaa's guard, not the
                  * gateway's, is what keeps the admin API safe.
                  */
-                .route(r -> r.path("/uaa/**")
-                        .filters(f -> f.stripPrefix(1).tokenRelay().preserveHostHeader())
+                .route(r -> r.path(String.format("%s/**", UAA_PREFIX))
+                        /*
+                         * The one route that does not strip its prefix, and the only one that must not.
+                         *
+                         * uaa builds absolute URLs now — it redirects a browser to the console's sign-in page and
+                         * has to say which origin to come back to — so it reads X-Forwarded-Prefix and reports it
+                         * as its context path. Spring requires the context path to be the literal start of the
+                         * request path, so stripping the prefix and then naming it in a header is a contradiction
+                         * it rejects outright:
+                         *
+                         *   IllegalArgumentException: Invalid contextPath '/uaa': must match the start of
+                         *   requestPath: '/oauth2/authorize'
+                         *
+                         * — which surfaces as a 500 dispatched to /error on every browser hop, not as a bad URL.
+                         * Forwarding the path intact is what spg already does for cua (`handle /cua*`, never
+                         * `handle_path`); uaa's PathPrefixFilter then takes the prefix back off for routing, so
+                         * the endpoints underneath are addressed exactly as before.
+                         */
+                        .filters(f -> f.tokenRelay()
+                                .preserveHostHeader()
+                                .addRequestHeader(FORWARDED_PREFIX, UAA_PREFIX))
                         .uri("lb://uaa"))
                 /*
                  * preserveHostHeader, like every route above. Without it the Host forwarded to console-ui is the

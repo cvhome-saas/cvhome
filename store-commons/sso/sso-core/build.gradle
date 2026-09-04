@@ -1,0 +1,51 @@
+plugins {
+    alias(libs.plugins.java.library.conventions)
+}
+
+/*
+ * The SSO server itself: users, roles and permissions, settings, audit, lockout, password policy, rate limiting,
+ * sessions, invitations and reset links, OAuth2 clients with secret rotation, signing keys, and identity-provider
+ * brokering. Everything except the two deployment seams — how the issuer is pinned, and how a realm is resolved —
+ * which the shells supply.
+ *
+ * The starters are `api` so the shells inherit them: store-core/uaa and store-pod/cua are meant to be thin, and a
+ * shell re-listing every Spring dependency is how the two drift apart again.
+ */
+dependencies {
+    api project(':store-commons:commons')
+    api project(':store-commons:sso:sso-events')
+    api project(':store-commons:autoconfigure')
+    // UaaErrors and the condition types it names live here, shared with the admin SDK: the client catalog keys on
+    // the enum constants, so server and client must compile against the same ones. The `uaa` name is historical —
+    // the codes are a wire contract that consoles already match on, so renaming them is a separate decision.
+    api project(':store-commons:uaa-client')
+    api project(':store-commons:secret-crypto:secret-crypto-autoconfigure')
+
+    api libs.spring.boot.starter.data.jpa
+    api libs.spring.boot.starter.oauth2.authorization.server
+    api libs.spring.boot.starter.security.oauth2.resource.server
+    api libs.spring.boot.starter.security
+    api libs.spring.boot.starter.oauth2.client
+    api libs.spring.boot.starter.web
+    api libs.spring.boot.starter.validation
+    api libs.spring.boot.starter.session.jdbc
+    api libs.spring.boot.starter.actuator
+    api libs.namastack.outbox.starter.jpa
+    api libs.caffeine
+    api libs.springdoc.openapi.starter.webmvc.ui
+
+    compileOnly libs.lombok
+    annotationProcessor libs.lombok
+
+    testImplementation project(':store-commons:test-support')
+}
+
+/*
+ * Spring resolves @RequestParam / @PathVariable names reflectively when the annotation does not spell one out.
+ * The Spring Boot Gradle plugin adds -parameters to application modules for exactly that reason; sso-core is a
+ * plain library and now owns every controller, so it has to ask for the flag itself. Without it the context
+ * still starts and every such endpoint answers 500 at the first request.
+ */
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs << '-parameters'
+}

@@ -123,6 +123,23 @@ public enum UaaErrors implements ErrorCode {
     /** No usable reset link for that token; the same single code as {@link #INVITATION_NOT_USABLE}, for the same reason. */
     RESET_TOKEN_NOT_USABLE("UAA.PASSWORD.RESET_TOKEN_NOT_USABLE", ErrorCategory.NOT_FOUND),
 
+    /**
+     * The request arrived for one store and named another.
+     *
+     * <p>
+     * Only a multi-realm deployment can raise it: the edge resolves the storefront host to a store before the
+     * request lands, so a form or query parameter naming a different one is either a misconfigured theme or an
+     * attempt to act in another merchant's realm. Refused rather than resolved to either store.
+     * </p>
+     */
+    CROSS_STORE_REQUEST("UAA.REALM.CROSS_STORE_REQUEST", ErrorCategory.FORBIDDEN),
+
+    /**
+     * Self-registration is off for this realm. A refusal rather than a 404 so a storefront can tell a shopper why
+     * the form did nothing; the realm's own setting is what decides it.
+     */
+    SELF_REGISTRATION_DISABLED("UAA.USER.SELF_REGISTRATION_DISABLED", ErrorCategory.FORBIDDEN),
+
     /** Another account already signs in with that username. */
     USERNAME_TAKEN("UAA.USER.USERNAME_TAKEN", ErrorCategory.CONFLICT),
 
@@ -146,6 +163,15 @@ public enum UaaErrors implements ErrorCode {
 
     /** The provider's discovery document or endpoints could not be reached. Carries the provider. */
     IDP_DISCOVERY_FAILED("UAA.IDP.DISCOVERY_FAILED", ErrorCategory.REMOTE_SERVICE),
+
+    /**
+     * An endpoint the server refuses to reach: not HTTPS, or resolving to an address inside the network the
+     * server itself runs in. A merchant supplies these URLs, and the server fetches them.
+     */
+    IDP_ENDPOINT_REFUSED("UAA.IDP.ENDPOINT_REFUSED", ErrorCategory.VALIDATION),
+
+    /** The test action, used more times in an hour than one realm is allowed. */
+    IDP_TEST_THROTTLED("UAA.IDP.TEST_THROTTLED", ErrorCategory.TOO_MANY_REQUESTS),
 
     /** No linked identity with the given id on that account. */
     IDENTITY_NOT_FOUND("UAA.IDENTITY.NOT_FOUND", ErrorCategory.NOT_FOUND),

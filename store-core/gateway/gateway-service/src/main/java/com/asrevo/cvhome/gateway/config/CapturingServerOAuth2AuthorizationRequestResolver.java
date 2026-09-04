@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.gateway.config;
 
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
@@ -40,6 +41,11 @@ public class CapturingServerOAuth2AuthorizationRequestResolver implements Server
     // Session key prefix to store the captured parameters
     public static final String CAPTURED_PARAMETERS_SESSION_KEY_PREFIX = "CAPTURED_OAUTH2_LOGIN_PARAMS_FOR_STATE_";
 
+    /** uaa's authorize endpoint, under the gateway's forward prefix. */
+    private static final String AUTHORIZE_PATH = "/oauth2/authorize";
+
+    private static final String CONCAT = "%s%s";
+
     private static final Logger logger = LoggerFactory
             .getLogger(CapturingServerOAuth2AuthorizationRequestResolver.class);
 
@@ -64,6 +70,7 @@ public class CapturingServerOAuth2AuthorizationRequestResolver implements Server
                 return Mono.empty();
             }
             return modifyAuthorizationRequestUriWithForwardedParam(exchange, authorizationRequest)
+                    .map(modifiedRequest -> onThisOrigin(exchange, modifiedRequest))
                     .flatMap(modifiedRequest -> captureParametersAndStoreInSession(exchange, modifiedRequest));
         });
     }
@@ -75,8 +82,46 @@ public class CapturingServerOAuth2AuthorizationRequestResolver implements Server
                 return Mono.empty();
             }
             return modifyAuthorizationRequestUriWithForwardedParam(exchange, authorizationRequest)
+                    .map(modifiedRequest -> onThisOrigin(exchange, modifiedRequest))
                     .flatMap(modifiedRequest -> captureParametersAndStoreInSession(exchange, modifiedRequest));
         });
+    }
+
+    /**
+     * Sends the browser to uaa on the origin it is already on, instead of to uaa's own host.
+     *
+     * <p>
+     * The console renders the sign-in page now, so the whole visible half of the flow has to happen on one
+     * origin: the authorize request, the redirect to {@code /sign-in}, the form POST back to {@code /uaa/login},
+     * and the callback. Cross-origin it still authenticates, but the session cookie uaa sets while holding the
+     * saved request belongs to uaa's host and does not ride along on the form POST, so the flow restarts instead
+     * of resuming — and the console cannot read the CSRF cookie to fill the form in the first place.
+     * </p>
+     *
+     * <p>
+     * Only the browser-facing endpoint moves. {@code token-uri}, {@code jwk-set-uri} and {@code user-info-uri}
+     * are called by this gateway, not by a browser, and stay pointed at uaa's own address — which is also why
+     * {@code authorization-uri} could be redirected at all: it is configured separately from them.
+     * </p>
+     *
+     * <p>
+     * The console answers on three hosts, so the origin is taken from the request rather than configured: a
+     * person who started on {@code console-ui.gateway.com} is sent to sign in there and comes back there.
+     * </p>
+     */
+    private OAuth2AuthorizationRequest onThisOrigin(ServerWebExchange exchange, OAuth2AuthorizationRequest request) {
+        URI incoming = exchange.getRequest().getURI();
+        if (Objects.isNull(incoming.getHost())) {
+            return request;
+        }
+        String rewritten = UriComponentsBuilder.fromUriString(request.getAuthorizationRequestUri())
+                .scheme(incoming.getScheme())
+                .host(incoming.getHost())
+                .port(incoming.getPort())
+                .replacePath(CONCAT.formatted(GatewayRouteLocatorImpl.UAA_PREFIX, AUTHORIZE_PATH))
+                .build(true)
+                .toUriString();
+        return OAuth2AuthorizationRequest.from(request).authorizationRequestUri(rewritten).build();
     }
 
     private Mono<OAuth2AuthorizationRequest> modifyAuthorizationRequestUriWithForwardedParam(ServerWebExchange exchange,
@@ -128,7 +173,7 @@ public class CapturingServerOAuth2AuthorizationRequestResolver implements Server
                 // state is missing
             }
 
-            String sessionKey = "%s%s".formatted(CAPTURED_PARAMETERS_SESSION_KEY_PREFIX, state);
+            String sessionKey = CONCAT.formatted(CAPTURED_PARAMETERS_SESSION_KEY_PREFIX, state);
             logger.info("Storing captured parameters in session with key '{}': {}", sessionKey, capturedParamsMap);
 
             return exchange.getSession().map(webSession -> {

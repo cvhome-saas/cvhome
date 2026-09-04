@@ -1,0 +1,80 @@
+# MerchantIdentityProviderController — com.asrevo.cvhome.cua.web
+#
+# A store's own identity providers, administered by its merchant. Addressed through the seller gateway, which is
+# how a console request actually travels: store-core-gateway (:8000) → the pod's spg → cua. Env vars come from
+# the repo-root http-client.env.json; the session id from http-client.private.env.json (gitignored).
+#
+# Requires a running stack: lcl start -d
+
+### the kinds a store may configure, and the fields each needs
+GET {{SELLER_UI_URL}}/spg/cua/api/v1/private/identity-providers/presets?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+### this store's providers — never a client secret, only whether one is set
+GET {{SELLER_UI_URL}}/spg/cua/api/v1/private/identity-providers?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+### add a generic OIDC provider — 201
+# @name createProvider
+POST {{SELLER_UI_URL}}/spg/cua/api/v1/private/identity-providers?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{
+  "alias": "partner-sso",
+  "displayName": "Partner SSO",
+  "preset": "GENERIC_OIDC",
+  "clientId": "cvhome-store",
+  "clientSecret": "not-a-real-secret",
+  "issuerUri": "https://accounts.google.com",
+  "accountLinking": "LINK",
+  "jitProvisioning": true,
+  "trustEmailVerified": true
+}
+
+> {%
+    client.test("created", function () {
+        client.assert(response.status === 201, "status " + response.status);
+        client.global.set("IDP_ID", response.body.id);
+    });
+%}
+
+### the egress guard: an endpoint inside the network is refused — 400 UAA.IDP.ENDPOINT_REFUSED
+### (expected to pass locally only on a stack without the lcl `allow-private-addresses` override)
+POST {{SELLER_UI_URL}}/spg/cua/api/v1/private/identity-providers?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{
+  "alias": "metadata",
+  "displayName": "Nope",
+  "preset": "GENERIC_OIDC",
+  "clientId": "x",
+  "issuerUri": "https://169.254.169.254/"
+}
+
+### reach the provider — rationed per store, 429 UAA.IDP.TEST_THROTTLED past the budget
+POST {{SELLER_UI_URL}}/spg/cua/api/v1/private/identity-providers/{{IDP_ID}}/test?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+### turn it off without deleting it
+POST {{SELLER_UI_URL}}/spg/cua/api/v1/private/identity-providers/{{IDP_ID}}/disable?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+### the order the storefront's sign-in page lists them in
+PUT {{SELLER_UI_URL}}/spg/cua/api/v1/private/identity-providers/order?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+["partner-sso"]
+
+### isolation: the same id, asked for as the second store — 404, because it is not that realm's row
+GET {{SELLER_UI_URL}}/spg/cua/api/v1/private/identity-providers/{{IDP_ID}}?store={{STORE_ID_2}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+### no session at all — 401
+GET {{SELLER_UI_URL}}/spg/cua/api/v1/private/identity-providers?store={{STORE_ID}}&lang={{LANG}}
+
+### tidy up
+DELETE {{SELLER_UI_URL}}/spg/cua/api/v1/private/identity-providers/{{IDP_ID}}?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}

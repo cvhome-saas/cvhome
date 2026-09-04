@@ -3,3 +3,14 @@ spring:
     import:
       - "classpath:lcl-config.yml"
       - "classpath:store-pod-lcl-config.yml"
+com:
+  asrevo:
+    cvhome:
+      sso:
+        # Local only. A merchant's identity provider under test here answers on localhost over plain HTTP, which
+        # the egress guard refuses everywhere else — and must, because these URLs are merchant-entered and this
+        # server fetches them, at every sign-in if never before. The fargate slice does not relax it, and neither
+        # do the defaults; EgressGuardTest is what holds those to being the strict ones.
+        egress:
+          schemes: http,https
+          allow-private-addresses: true

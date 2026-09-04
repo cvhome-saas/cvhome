@@ -75,6 +75,25 @@ export const routes: Routes = [
     ],
   },
   {
+    /*
+     * The two pages a uaa one-time link lands on. Public and unguarded — whoever holds the link is who they are
+     * for, and they have no session yet — and served by the kit's component, the same one uaa's own console
+     * serves on its origin, because it is one flow against one uaa.
+     *
+     * `invitation`, not `accept-invitation`: the console already has a route by that name for an organization
+     * inviting a member, which is accepted against tenancy by somebody already signed in. Two unrelated token
+     * systems on one path is a bug waiting for the first person holding both kinds of link.
+     */
+    path: 'invitation',
+    loadComponent: () => import('@cvhome-saas/ui-kit/uaa').then((page) => page.LinkAccept),
+    data: {titleKey: 'route.invitation.title', kind: 'INVITATION', brand: 'cvhome'},
+  },
+  {
+    path: 'reset-password',
+    loadComponent: () => import('@cvhome-saas/ui-kit/uaa').then((page) => page.LinkAccept),
+    data: {titleKey: 'route.resetPassword.title', kind: 'PASSWORD_RESET', brand: 'cvhome'},
+  },
+  {
     path: 'sign-up',
     loadComponent: () => import('@layouts/auth-shell/auth-shell').then((layout) => layout.AuthShell),
     children: [
@@ -285,6 +304,37 @@ export const routes: Routes = [
      * `?customer=` opens one and `?q=` carries the search term. Both are query parameters rather
      * than segments because neither is a different view of the page — and `?q=` is how another
      * screen links *in*, there being no endpoint that fetches a customer by id.
+     */
+    path: 'identity-providers',
+    loadComponent: () => import('@layouts/console-shell/console-shell').then((layout) => layout.ConsoleShell),
+    canActivate: [canAccessSecuredPages, consoleContext, merchantOnly, requiresStore],
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('@features/identity-providers/identity-providers').then((page) => page.IdentityProviders),
+        data: {titleKey: 'route.identityProviders.title', breadcrumbKey: 'shell.breadcrumb.identityProviders'},
+      },
+    ],
+  },
+  {
+    path: 'shoppers',
+    loadComponent: () => import('@layouts/console-shell/console-shell').then((layout) => layout.ConsoleShell),
+    canActivate: [canAccessSecuredPages, consoleContext, merchantOnly, requiresStore],
+    children: [
+      {
+        path: '',
+        loadComponent: () => import('@features/shoppers/shoppers').then((page) => page.Shoppers),
+        data: {titleKey: 'route.shoppers.title', breadcrumbKey: 'shell.breadcrumb.shoppers'},
+      },
+    ],
+  },
+  {
+    /*
+     * Who has an *account* on this store, which is not who has ordered from it. Customers above is
+     * checkout's record of a person; this is cua's, and the two are different sets — a guest
+     * checkout leaves a customer and no account, and a shopper who registered and never bought is
+     * here and not there.
      */
     path: 'customers',
     loadComponent: () => import('@layouts/console-shell/console-shell').then((layout) => layout.ConsoleShell),

@@ -42,6 +42,7 @@ dependencies {
     implementation libs.spring.boot.starter.opentelemetry
     implementation libs.io.opentelemetry.instrumentation.opentelemetry.spring.boot.starter
 
+    implementation project(':store-pod:merchant:merchant-external-api')
     implementation project(':store-pod:inventory:inventory-core')
     implementation project(':store-pod:inventory:inventory-external-api')
     implementation project(':store-commons:ecs-commons:fargate-task-info')

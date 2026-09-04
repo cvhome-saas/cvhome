@@ -46,7 +46,21 @@ com:
     cvhome:
       admin:
         password: ${UAA_ADMIN_PASSWORD}
+      sso:
+        # uaa is the single-realm deployment of the SSO server; cua is the same server with one realm per store.
+        # Stated explicitly because the property has no default: a deployment that forgot to say would otherwise
+        # pick one, and the two look a user up in very different places.
+        realm:
+          mode: SINGLE
+          fixed: platform
       uaa:
+        # The seller console's half of uaa's two front doors. `path-prefix` is store-core-gateway's forward route
+        # for uaa and doubles as the switch: a request whose context path is this arrived behind the console, and
+        # the console owns every page shown before somebody is signed in. Reached on uaa's own host the context
+        # path is empty, nothing here applies, and uaa serves its own SPA — which is how a platform administrator
+        # still signs in at uaa's address. Set `path-prefix` to "" to turn the hand-off off entirely.
+        console:
+          path-prefix: /uaa
         seed:
           apply-on-boot: false
         remember-me:
@@ -55,10 +69,18 @@ com:
           enabled: true
         # One-time links: how long an invitation and a reset link stay usable, and whether the logging consumer
         # writes the link itself (never in a deployment — the link is a credential).
+        # `base-url` and the two page paths point the one-time links at the console, which renders those pages
+        # now. `invitation-page` is deliberately not `/accept-invitation`: the console already has a route by that
+        # name for a different thing — an organization inviting a member, accepted against tenancy by somebody
+        # already signed in — and two token systems on one path is a bug waiting for the first person holding both
+        # kinds of link. Leave `base-url` empty and the links fall back to the issuer and uaa's own pages.
         links:
           invitation-validity: P7D
           reset-validity: PT1H
           log-links: false
+          base-url: ${com.asrevo.cvhome.services.store-core-gateway.schema}://${com.asrevo.cvhome.services.store-core-gateway.domain}:${com.asrevo.cvhome.services.store-core-gateway.port}
+          invitation-page: /invitation
+          reset-password-page: /reset-password
         # Registered clients: the hosts a redirect URI may use over plain http. Everything else must be https.
         # An entry starting with a dot matches every subdomain. Local slices add the stack's own hosts.
         clients:

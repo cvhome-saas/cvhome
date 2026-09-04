@@ -1,4 +1,4 @@
-import {Injectable, inject} from '@angular/core';
+import {InjectionToken, Injectable, inject} from '@angular/core';
 import {Observable} from 'rxjs';
 
 import {CrudService, UI_KIT_CONFIG} from '@cvhome-saas/ui-kit';
@@ -11,6 +11,20 @@ import {CrudService, UI_KIT_CONFIG} from '@cvhome-saas/ui-kit';
  * on an update keeps the stored one.
  */
 export const ADMIN_IDP_API_PATH = '/api/v1/admin/identity-providers';
+
+/**
+ * Where this client points, so the same one can serve both consoles.
+ *
+ * uaa's platform administration is the default. cua exposes the identical contract per store at
+ * {@code /spg/cua/api/v1/private/identity-providers} — the same DTOs, because it is the same service
+ * behind both — so a merchant screen overrides this token in its own `providers` and re-provides
+ * {@link AdminIdpService} beside it. Re-implementing the client for the second path is what this
+ * exists to prevent, and hand-written DTOs for it is how the two drift.
+ */
+export const IDP_API_BASE = new InjectionToken<string>('IDP_API_BASE', {
+  providedIn: 'root',
+  factory: () => `${inject(UI_KIT_CONFIG).uaaBasePath}${ADMIN_IDP_API_PATH}`,
+});
 
 export type IdpType = 'OIDC' | 'OAUTH2';
 export type IdpPreset = 'GOOGLE' | 'MICROSOFT' | 'APPLE' | 'GITHUB' | 'GENERIC_OIDC' | 'GENERIC_OAUTH2';
@@ -106,7 +120,7 @@ export interface UserIdentityDto {
 @Injectable({providedIn: 'root'})
 export class AdminIdpService {
   private readonly crudService = inject(CrudService);
-  private readonly base = `${inject(UI_KIT_CONFIG).uaaBasePath}${ADMIN_IDP_API_PATH}`;
+  private readonly base = inject(IDP_API_BASE);
 
   list(): Observable<readonly IdentityProviderDto[]> {
     return this.crudService.get(this.base);

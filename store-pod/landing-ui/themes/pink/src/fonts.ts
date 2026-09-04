@@ -1,4 +1,4 @@
-import {Cairo, Dela_Gothic_One, M_PLUS_Rounded_1c} from 'next/font/google';
+import {Cairo} from 'next/font/google';
 import type {ThemeFonts} from '@store-front/theme';
 
 /**
@@ -7,24 +7,16 @@ import type {ThemeFonts} from '@store-front/theme';
  * section openers, prices and every flag. M PLUS Rounded 1c (Latin, Latin-ext, Cyrillic) is the running
  * text of the issue — the rounded gothic of Japanese stationery and captions — for names, facts and prose.
  * Cairo is the Arabic companion on both roles: neither Latin cut carries Arabic, so Arabic falls through
- * to Cairo per glyph while Latin inside an Arabic page keeps its own voice. Both Latin cuts ship without
- * next/font's Arial-based metric fallback, which carries Arabic glyphs and would catch them before Cairo.
+ * to Cairo per glyph while Latin inside an Arabic page keeps its own voice.
  *
- * `preload: false` on every face: all themes' font CSS lands in the SAME layout entry, so a preload
- * here fires on every storefront whatever theme is active. @font-face still fetches the faces the page
- * actually uses; `display: swap` covers the extra hop.
+ * The two Japanese families are self-hosted in self-hosted-fonts.css. Their Google stylesheets contain
+ * hundreds of CJK shards per weight, which can exhaust Turbopack's concurrent font fetches and leave its
+ * internal font module unresolved. The CSS keeps only the Latin, Latin-ext and Cyrillic files the storefront
+ * locales use. Cairo stays on next/font because its small Arabic/Latin set does not trigger that failure.
  */
-const display = Dela_Gothic_One({
-    weight: '400', subsets: ['latin', 'latin-ext'], display: 'swap', preload: false,
-    variable: '--font-pink-display', adjustFontFallback: false,
-});
-const sans = M_PLUS_Rounded_1c({
-    weight: ['400', '500', '700', '800'], subsets: ['latin', 'latin-ext', 'cyrillic'], display: 'swap', preload: false,
-    variable: '--font-pink-sans', adjustFontFallback: false,
-});
 const arabic = Cairo({subsets: ['arabic', 'latin'], display: 'swap', preload: false, variable: '--font-pink-arabic'});
 
 export const fonts: ThemeFonts = {
-    variables: [display.variable, sans.variable, arabic.variable].join(' '),
+    variables: arabic.variable,
     roles: {sans: 'M PLUS Rounded 1c', display: 'Dela Gothic One'},
 };

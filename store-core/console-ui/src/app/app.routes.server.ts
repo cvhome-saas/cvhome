@@ -19,12 +19,26 @@ export const serverRoutes: ServerRoute[] = [
     renderMode: RenderMode.Prerender,
   },
   {
+    /*
+     * Client, not prerendered: the sign-in page reads uaa's `?auth=1` marker and its `XSRF-TOKEN` cookie out of
+     * the browser, and asks uaa what this realm offers before it draws the form. None of that exists at build
+     * time, and a prerendered snapshot of it would post an empty CSRF token on every attempt.
+     */
     path: 'sign-in',
-    renderMode: RenderMode.Prerender,
+    renderMode: RenderMode.Client,
   },
   {
     path: 'sign-up',
     renderMode: RenderMode.Prerender,
+  },
+  {
+    // Both read a `?token=` out of the browser and call uaa before they can draw anything.
+    path: 'invitation',
+    renderMode: RenderMode.Client,
+  },
+  {
+    path: 'reset-password',
+    renderMode: RenderMode.Client,
   },
   {
     path: 'terms',
@@ -61,6 +75,14 @@ export const serverRoutes: ServerRoute[] = [
   },
   {
     path: 'customers/**',
+    renderMode: RenderMode.Client,
+  },
+  {
+    path: 'shoppers/**',
+    renderMode: RenderMode.Client,
+  },
+  {
+    path: 'identity-providers/**',
     renderMode: RenderMode.Client,
   },
   {

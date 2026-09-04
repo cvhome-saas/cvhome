@@ -1,5 +1,5 @@
 /** Console-native; no seller-core original — uaa's admin API has never had a caller. */
-import {Injectable, inject} from '@angular/core';
+import {InjectionToken, Injectable, inject} from '@angular/core';
 import {Observable, concat, map, of, toArray} from 'rxjs';
 
 import {CrudService, UI_KIT_CONFIG} from '@cvhome-saas/ui-kit';
@@ -46,11 +46,24 @@ import type {UserIdentityDto} from './admin-idp.service';
  */
 export const ADMIN_USER_API_PATH = '/api/v1/admin/users';
 
+/**
+ * Where this client points. uaa's platform administration is the default; cua exposes a narrower
+ * slice of the same contract per store at {@code /spg/cua/api/v1/private/shoppers}, so a merchant
+ * screen overrides this token in its own `providers` and re-provides {@link AdminUserService}.
+ *
+ * Narrower matters: a store's shoppers have no create, no invite, no role assignment and no
+ * password reset, because none of those is a merchant's to do. The methods are still on the client;
+ * the screen simply does not offer them, and the server answers 404 to anything else.
+ */
+export const USER_API_BASE = new InjectionToken<string>('USER_API_BASE', {
+  providedIn: 'root',
+  factory: () => `${inject(UI_KIT_CONFIG).uaaBasePath}${ADMIN_USER_API_PATH}`,
+});
+
 @Injectable({providedIn: 'root'})
 export class AdminUserService {
   private readonly crudService = inject(CrudService);
-  /** `/uaa/…` behind the gateway, `/api/…` on uaa itself. See {@link UiKitConfig.uaaBasePath}. */
-  private readonly base = `${inject(UI_KIT_CONFIG).uaaBasePath}${ADMIN_USER_API_PATH}`;
+  private readonly base = inject(USER_API_BASE);
 
   /**
    * A page of accounts narrowed by metadata equality — the filter tenancy has always used, and the

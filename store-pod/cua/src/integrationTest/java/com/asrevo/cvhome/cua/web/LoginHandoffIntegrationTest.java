@@ -16,9 +16,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.context.TestPropertySource;
 
 import com.asrevo.cvhome.testsupport.annotations.DatabaseIntegrationTest;
 import com.asrevo.cvhome.testsupport.http.ApiClient;
+
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 
 import static com.asrevo.cvhome.testsupport.http.ApiClient.expect;
 import static com.asrevo.cvhome.testsupport.http.ApiClient.scoped;
@@ -35,6 +39,10 @@ import static org.assertj.core.api.Assertions.assertThat;
  * </p>
  */
 @DatabaseIntegrationTest
+// Every case here signs in, several of them more than once, and all of them from 127.0.0.1 — which is one key to
+// the per-address login limiter. The limit is raised so the class measures the hand-off rather than the limiter;
+// RateLimitIntegrationTest is where the limiter itself is pinned down.
+@TestPropertySource(properties = "com.asrevo.cvhome.uaa.rate-limit.login.limit=100")
 class LoginHandoffIntegrationTest {
 
     /** A store in the {@code test-stores} seed with the shopper {@code user} / {@code revo}. */
@@ -82,8 +90,12 @@ class LoginHandoffIntegrationTest {
     /** A second sign-in the storefront starts has a fresh PKCE challenge; that is what tells the flows apart. */
     private static final String SECOND_CHALLENGE = "XAaXCEfz7-YLOOyWmusnRfKPr55J1VF_dM7fnQHdqqw";
 
-    /** Long enough for the registration body's size rule; the seeded {@code revo} is not. */
-    private static final String NEW_PASSWORD = "secret-1";
+    /** Registration goes through the realm's password policy now, the same funnel as every other password. */
+    private static final String NEW_PASSWORD = "Str0ng-Passphrase!";
+
+    private static final String REGISTRATION = "/api/v1/public/registration";
+
+    private static final String ID = "id";
 
     @LocalServerPort
     private int port;
@@ -238,16 +250,73 @@ class LoginHandoffIntegrationTest {
     @Test
     void aShopperOfOneStoreIsNobodyOnAnother() throws IOException, InterruptedException {
         String username = ApiClient.slug("jane");
-        expect(new ApiClient(port).send(HttpMethod.POST, scoped("/api/v1/public/registration", STORE), null,
-                String.format("""
-                        {"username": "%s", "email": "%s@example.com", "password": "%s"}""", username, username,
-                        NEW_PASSWORD)), HttpStatus.CREATED);
+        register(username, STORE);
 
         HttpResponse<String> elsewhere = postLogin(session, OTHER_STORE, username, NEW_PASSWORD);
         HttpResponse<String> home = postLogin(session, STORE, username, NEW_PASSWORD);
 
         assertThat(location(elsewhere)).isEqualTo(url(INVALID));
         assertThat(location(home)).startsWith(url(RESUMED_AUTHORIZE));
+    }
+
+    /**
+     * The same username in two stores is two accounts, and neither can see or end the other's sessions.
+     *
+     * <p>
+     * One cua serves every store on the pod, so one {@code SPRING_SESSION} table holds every store's sessions and
+     * one index — {@code PRINCIPAL_NAME} — answers "which are this account's". That index used to hold the
+     * username, which is unique only within a realm: two shoppers called the same thing in two stores shared it,
+     * so each could list the other's sessions (address, browser, when it started) and end them. The principal name
+     * is the account id now, and this is the case that says so.
+     * </p>
+     */
+    @Test
+    void sameNamedShoppersOfTwoStoresDoNotShareSessions() throws IOException, InterruptedException {
+        String username = ApiClient.slug("mia");
+        register(username, STORE);
+        register(username, OTHER_STORE);
+
+        String here = signIn(username, STORE);
+        String there = signIn(username, OTHER_STORE);
+
+        assertThat(sessions(here, STORE)).as("a shopper sees their own store's session and no other").hasSize(1);
+        assertThat(sessions(there, OTHER_STORE)).hasSize(1);
+        assertThat(sessions(here, STORE).get(0).get(ID)).isNotEqualTo(sessions(there, OTHER_STORE).get(0).get(ID));
+        assertThat(accountSessions(here, OTHER_STORE).statusCode())
+                .as("and asking as the other store is refused, not answered with its sessions").isEqualTo(403);
+    }
+
+    private void register(String username, String store) {
+        expect(new ApiClient(port).send(HttpMethod.POST, scoped(REGISTRATION, store), null,
+                String.format("""
+                        {"username": "%s", "email": "%s-%s@example.com", "password": "%s"}""", username, username,
+                        store, NEW_PASSWORD)), HttpStatus.CREATED);
+    }
+
+    /** A fresh hand-off and a form post, returning the session cookie the shopper is now signed in with. */
+    private String signIn(String username, String store) throws IOException, InterruptedException {
+        HttpResponse<String> handoff = get(authorizeUrl(true, FIRST_CHALLENGE), null);
+        String xsrfCookie = cookie(handoff, XSRF_COOKIE).orElseThrow().split(ATTRIBUTES)[0];
+        String started = both(cookie(handoff, SESSION_COOKIE).orElseThrow().split(ATTRIBUTES)[0], xsrfCookie);
+
+        HttpResponse<String> login = postLogin(started, store, username, NEW_PASSWORD,
+                xsrfCookie.substring(XSRF_COOKIE.length()));
+
+        assertThat(location(login)).as("%s must be able to sign in on %s", username, store)
+                .startsWith(url(RESUMED_AUTHORIZE));
+        return cookieAfter(login, started).split(ATTRIBUTES)[0];
+    }
+
+    private JsonNode sessions(String sessionCookie, String store) throws IOException, InterruptedException {
+        HttpResponse<String> response = accountSessions(sessionCookie, store);
+        assertThat(response.statusCode()).isEqualTo(200);
+        return JsonMapper.builder().build().readTree(response.body());
+    }
+
+    /** The realm comes from the host in production; without Caddy in front, {@code ?store=} is what carries it. */
+    private HttpResponse<String> accountSessions(String sessionCookie, String store)
+            throws IOException, InterruptedException {
+        return get(scoped("/api/v1/account/sessions", store), sessionCookie);
     }
 
     /** A valid token but no session, nothing saved: still sent to the storefront, without the pending marker. */

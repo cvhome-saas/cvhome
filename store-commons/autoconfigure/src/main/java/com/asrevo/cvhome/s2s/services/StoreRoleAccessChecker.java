@@ -1,6 +1,7 @@
 package com.asrevo.cvhome.s2s.services;
 
 import java.util.Objects;
+import java.util.function.Supplier;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
@@ -25,6 +26,72 @@ import static com.asrevo.cvhome.s2s.utils.SecurityUtils.hasSuperAdminRole;
 
 @Slf4j
 public class StoreRoleAccessChecker {
+
+    private static final String NO_RETRIEVER = """
+            Refusing an org admin on store {}: this service has no StoreOrgOwnerRetriever, so which \
+            organization owns the store cannot be established. Give the service the merchant client and the \
+            retriever registers itself.""";
+
+    /**
+     * Which organization owns a store. Absent in a service that has not been given one, and the answer then is
+     * to refuse rather than to assume — see {@link #ownsTheStore}.
+     */
+    /**
+     * Resolved on use, not at construction.
+     *
+     * <p>
+     * This checker is built while the security configuration is, which is before the retriever's own bean
+     * exists — asking for it then answered null for good, and every org admin was refused with a warning about
+     * a lookup that was in fact wired. A supplier asks at the moment the answer is needed.
+     * </p>
+     */
+    private final Supplier<StoreOrgOwnerRetriever> owners;
+
+    private final StoreOwnershipPolicy policy;
+
+    public StoreRoleAccessChecker(Supplier<StoreOrgOwnerRetriever> owners, StoreOwnershipPolicy policy) {
+        this.owners = owners == null ? () -> null : owners;
+        this.policy = policy == null ? StoreOwnershipPolicy.ENFORCED : policy;
+    }
+
+
+    /**
+     * Whether {@code org} is the organization the requested store belongs to.
+     *
+     * <p>
+     * This is the question an org admin's token cannot answer on its own. The token says which organization the
+     * person administers; it says nothing about who owns the store in the query parameter, and every store on a
+     * pod is one query parameter away. Without this, an org admin of one organization read another's store —
+     * the tenancy was never wrong, the authorization was: the realm switched correctly and returned exactly that
+     * realm's rows, to somebody who should not have been asking.
+     * </p>
+     *
+     * <p>
+     * Refuses when the owner cannot be established, including when no retriever is wired. A check that cannot be
+     * made has not passed.
+     * </p>
+     */
+    private boolean ownsTheStore(ManagerOrgId org, StoreMerchantId requestedStoreId) {
+        if (policy == StoreOwnershipPolicy.DELEGATED) {
+            // The service checks for itself, and can answer better than a yes-or-no gate — see the enum.
+            return true;
+        }
+        StoreOrgOwnerRetriever retriever = owners.get();
+        if (retriever == null) {
+            log.warn(NO_RETRIEVER, requestedStoreId);
+            return false;
+        }
+        ManagerOrgId owner = retriever.owner(requestedStoreId);
+        if (owner == null) {
+            log.warn("Refusing an org admin on store {}: its owning organization is unknown.", requestedStoreId);
+            return false;
+        }
+        if (!owner.equals(org)) {
+            log.debug("Store {} belongs to org {}, not to the requesting org {}", requestedStoreId, owner, org);
+            return false;
+        }
+        return true;
+    }
 
     /**
      * Whether this principal came from the wrong identity server for the check being made.
@@ -68,7 +135,6 @@ public class StoreRoleAccessChecker {
         return isStoreModerator(authentication, requestedStoreId, null);
     }
 
-    @SuppressWarnings("java:S1172")
     public boolean isOrgAdmin(Authentication authentication, StoreMerchantId requestedStoreId, Pod pod) {
         if (wrongRealm(authentication, SecurityUtils.REALM_UAA)) {
             return false;
@@ -82,8 +148,7 @@ public class StoreRoleAccessChecker {
                     authentication.getName(), getRoles(authentication), pod.name(), identity.org().id().toString());
             return false;
         }
-        // @TODO find better way to know if requested store created by this org admin
-        return true;
+        return ownsTheStore(identity.org(), requestedStoreId);
     }
 
     public boolean isStoreAdmin(Authentication authentication, StoreMerchantId requestedStoreId, Pod pod) {
@@ -210,8 +275,19 @@ public class StoreRoleAccessChecker {
         return true;
     }
 
+    /**
+     * The store a shopper token belongs to.
+     *
+     * <p>
+     * The {@code realm} claim, which is what the authorization server calls the user pool a token was minted
+     * against. It used to be read from {@code clientId}, which happened to hold the same value because a store had
+     * exactly one client — a coincidence of the old shape, and one that would have quietly stopped being true the
+     * first time a store was given a second client (a mobile app on the same shopper pool). The name now says what
+     * the value means.
+     * </p>
+     */
     private String getStoreId(JwtAuthenticationToken authentication) {
-        return authentication.getTokenAttributes().getOrDefault("clientId", "").toString();
+        return authentication.getTokenAttributes().getOrDefault(SecurityUtils.USER_REALM_CLAIM, "").toString();
     }
 
 }

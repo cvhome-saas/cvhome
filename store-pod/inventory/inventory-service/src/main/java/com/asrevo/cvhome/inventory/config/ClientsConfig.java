@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 
 import com.asrevo.cvhome.checkout.services.order.ExternalOrderService;
 import com.asrevo.cvhome.errors.remote.RemoteErrorCatalog;
+import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
 import com.asrevo.cvhome.s2s.config.internal.RestClientBuilder;
 
 @Configuration
@@ -16,5 +17,16 @@ public class ClientsConfig {
     @Bean
     public ExternalOrderService externalOrderService(RestClientBuilder restClientBuilder) {
         return restClientBuilder.buildClient("checkout", ExternalOrderService.class, RemoteErrorCatalog.none());
+    }
+
+    /**
+     * Not for reading a store — this service never does. It is what tells the authorization layer which
+     * organization owns the store a request names, which is the question an org admin's token cannot answer on
+     * its own; without it every org admin is refused. See {@code MerchantStoreOrgOwnerAutoConfiguration}.
+     */
+    @Bean
+    public ExternalMerchantStoreService externalMerchantStoreService(RestClientBuilder restClientBuilder) {
+        return restClientBuilder.buildClient("merchant", ExternalMerchantStoreService.class,
+                RemoteErrorCatalog.none());
     }
 }

@@ -1,0 +1,16 @@
+plugins {
+    alias(libs.plugins.java.library.conventions)
+}
+
+/*
+ * The SSO server's published event contracts, and nothing else: a consumer — the future delivery service,
+ * tenancy's membership reconciliation — depends on this module alone and gets the records, their outbox keys and
+ * the Event envelope, with no repositories, no security configuration and no database driver behind them.
+ *
+ * In store-commons rather than beside a service because both SSO deployments publish these: uaa for platform
+ * staff, cua for a store's shoppers. A pod cannot depend on store-core.
+ */
+dependencies {
+    api project(':store-commons:commons')
+    api libs.namastack.outbox.api
+}

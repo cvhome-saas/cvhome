@@ -19,6 +19,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DatabaseIntegrationTest
 class CsrfLoginIntegrationTest {
 
+    private static final String LOGOUT = "/logout";
+
     private static final String ROLES = "/api/v1/admin/roles";
 
     @LocalServerPort
@@ -73,11 +75,26 @@ class CsrfLoginIntegrationTest {
         uaa.login(UaaClient.SUPER_ADMIN, UaaClient.PASSWORD);
         assertThat(uaa.session(UaaClient.GET, UaaClient.ME, null).statusCode()).isEqualTo(200);
 
-        HttpResponse<String> logout = uaa.session(UaaClient.GET, "/logout", null);
+        HttpResponse<String> logout = uaa.postForm(LOGOUT, Map.of("_csrf", uaa.csrfToken()));
 
         assertThat(logout.statusCode()).isEqualTo(302);
         assertThat(UaaClient.location(logout)).endsWith("/login?logout");
         assertThat(uaa.session(UaaClient.GET, UaaClient.ME, null).statusCode()).isEqualTo(401);
+    }
+
+    /**
+     * A {@code /logout} that answers a GET is a link, or an {@code <img src>}, on any page anywhere: visiting it
+     * signs the reader out of this site. Nothing is stolen, so it is low severity — but it is free to close, and
+     * the SPA posts a form now rather than navigating.
+     */
+    @Test
+    void aGetCannotSignSomebodyOut() throws IOException, InterruptedException {
+        uaa.login(UaaClient.SUPER_ADMIN, UaaClient.PASSWORD);
+
+        uaa.session(UaaClient.GET, LOGOUT, null);
+
+        assertThat(uaa.session(UaaClient.GET, UaaClient.ME, null).statusCode())
+                .as("the session must survive a GET /logout").isEqualTo(200);
     }
 
 }
