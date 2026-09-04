@@ -72,4 +72,16 @@ class PreviewTokensTest {
         assertThat(tokens.valid(".deadbeef", STORE, SLUG)).isFalse();
     }
 
+    @Test
+    void aSlugContainingADotCanNeverBeValidatedBecauseThePayloadIsDotDelimited() {
+        // The payload is "<store>.<slug>.<expiry>", split on ".", and the reader requires exactly three parts. A slug
+        // with a dot in it therefore produces four and is refused even though the signature verifies. No content type
+        // mints such a slug today -- pages and posts are kebab-case, layouts are "layout:<KIND>" -- so this pins the
+        // limit rather than a defect anybody is hitting. A slug like "terms.v2" would silently never preview.
+        String dotted = "terms.v2";
+
+        String token = tokens.issue(STORE, dotted);
+
+        assertThat(tokens.valid(token, STORE, dotted)).isFalse();
+    }
 }

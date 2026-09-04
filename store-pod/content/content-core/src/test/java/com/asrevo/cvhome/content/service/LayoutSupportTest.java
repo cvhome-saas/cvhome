@@ -26,6 +26,9 @@ class LayoutSupportTest {
     private static final String HOLOGRAM = "hologram";
     private static final String IMG = "img";
     private static final String ITEM_P = "p";
+    private static final String ITEM_1 = "i1";
+    private static final String RICHTEXT = "richtext";
+    private static final String FAQ = "faq";
 
 
     private static LayoutSection section(String id, String kind, Map<String, Object> props, List<LayoutItem> items) {
@@ -39,8 +42,8 @@ class LayoutSupportTest {
     @Test
     void aWellFormedDocumentPasses() throws InvalidContentRequestException {
         LayoutSupport.validate(document(
-                section(SEC_A, HERO, Map.of(), List.of(new LayoutItem("i1", Map.of(MEDIA_ID, 5), null))),
-                section("b", "richtext", Map.of(), null)));
+                section(SEC_A, HERO, Map.of(), List.of(new LayoutItem(ITEM_1, Map.of(MEDIA_ID, 5), null))),
+                section("b", RICHTEXT, Map.of(), null)));
     }
 
     @Test
@@ -85,4 +88,68 @@ class LayoutSupportTest {
                 .satisfies(w -> assertThat(w.field()).isEqualTo(ITEM_P));
     }
 
+    @Test
+    void aNullDocumentIsRefusedRatherThanDereferenced() {
+        assertThatThrownBy(() -> LayoutSupport.validate(null))
+                .isInstanceOf(InvalidContentRequestException.class)
+                .hasMessageContaining("required");
+    }
+
+    @Test
+    void aSectionWithNoIdIsRefused() {
+        assertThatThrownBy(() -> LayoutSupport.validate(document(section(null, HERO, Map.of(), List.of()))))
+                .isInstanceOf(InvalidContentRequestException.class);
+        assertThatThrownBy(() -> LayoutSupport.validate(document(section("  ", HERO, Map.of(), List.of()))))
+                .isInstanceOf(InvalidContentRequestException.class);
+    }
+
+    @Test
+    void moreSectionsThanAPageHoldsAreRefused() {
+        LayoutSection[] tooMany = new LayoutSection[LayoutDocument.MAX_SECTIONS + 1];
+        for (int i = 0; i < tooMany.length; i++) {
+            tooMany[i] = section("s%d".formatted(i), HERO, Map.of(), List.of());
+        }
+
+        assertThatThrownBy(() -> LayoutSupport.validate(document(tooMany)))
+                .isInstanceOf(InvalidContentRequestException.class)
+                .hasMessageContaining(String.valueOf(LayoutDocument.MAX_SECTIONS));
+    }
+
+    @Test
+    void moreItemsThanASectionHoldsAreRefused() {
+        List<LayoutItem> tooMany = new java.util.ArrayList<>();
+        for (int i = 0; i <= LayoutSection.MAX_ITEMS; i++) {
+            tooMany.add(new LayoutItem("i%d".formatted(i), Map.of(), null));
+        }
+
+        assertThatThrownBy(() -> LayoutSupport.validate(document(section(SEC_A, HERO, Map.of(), tooMany))))
+                .isInstanceOf(InvalidContentRequestException.class)
+                .hasMessageContaining(String.valueOf(LayoutSection.MAX_ITEMS));
+    }
+
+    @Test
+    void itemsWithoutUniqueIdsAreRefusedBecauseTheEditorAddressesThemById() {
+        assertThatThrownBy(() -> LayoutSupport.validate(document(section(SEC_A, HERO, Map.of(),
+                List.of(new LayoutItem(ITEM_1, Map.of(), null), new LayoutItem(ITEM_1, Map.of(), null))))))
+                .isInstanceOf(InvalidContentRequestException.class);
+        assertThatThrownBy(() -> LayoutSupport.validate(document(section(SEC_A, HERO, Map.of(),
+                List.of(new LayoutItem(null, Map.of(), null))))))
+                .isInstanceOf(InvalidContentRequestException.class);
+    }
+
+    @Test
+    void aGrouplessFaqAndAnEmptyHeroAreWarningsNotWalls() {
+        // Publishing is allowed; the console shows these so an editor knows the section will render as nothing.
+        assertThat(LayoutSupport.warnings(document(section(SEC_A, FAQ, Map.of(), List.of()))))
+                .singleElement().extracting(it -> it.message().contains("whole FAQ")).isEqualTo(true);
+        assertThat(LayoutSupport.warnings(document(section(SEC_A, HERO, Map.of(), List.of()))))
+                .singleElement().extracting(it -> it.message().contains("neither slides nor text")).isEqualTo(true);
+    }
+
+    @Test
+    void anFaqThatNamesItsGroupAndAKindWithNoRulesWarnAboutNothing() {
+        assertThat(LayoutSupport.warnings(document(section(SEC_A, FAQ, Map.of("group", "shipping"), List.of()))))
+                .isEmpty();
+        assertThat(LayoutSupport.warnings(document(section(SEC_A, RICHTEXT, Map.of(), List.of())))).isEmpty();
+    }
 }
