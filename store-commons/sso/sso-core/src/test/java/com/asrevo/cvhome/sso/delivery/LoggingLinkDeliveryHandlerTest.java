@@ -62,4 +62,25 @@ class LoggingLinkDeliveryHandlerTest {
         return new LinksProperties(Duration.ofDays(7), Duration.ofHours(1), logLinks);
     }
 
+    /**
+     * The outbox guarantees at-least-once, so this handler will be delivered twice sooner or later.
+     *
+     * <p>
+     * It is idempotent in the only way it can be: a redelivery produces a second log line and nothing else. It
+     * issues no new token and invalidates no existing one — the link in the event was minted before it was
+     * published, so a redelivery cannot change which link is valid for the person waiting on it.
+     * </p>
+     */
+    @Test
+    void aredeliveredEventProducesAsecondLogLineAndNothingElse() {
+        LoggingLinkDeliveryHandler handler = new LoggingLinkDeliveryHandler(properties(false));
+
+        handler.onInvitation(EVENT);
+        handler.onInvitation(EVENT);
+
+        assertThat(appender.list).hasSize(2);
+        assertThat(appender.list.getFirst().getFormattedMessage())
+                .isEqualTo(appender.list.getLast().getFormattedMessage());
+    }
+
 }
