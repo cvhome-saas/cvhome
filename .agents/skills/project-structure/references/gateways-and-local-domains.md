@@ -91,7 +91,7 @@ It registers three groups:
 |---|---|
 | Platform | `gateway.com`, `www.gateway.com`, `uaa.gateway.com`, `console-ui.gateway.com` |
 | Pod | `spg-507f1f77.gateway.com`, plus `merchant/catalog/checkout/cua/payment/landing-ui.gateway.com` |
-| Tenant storefronts | `org1-store1`, `org1-store2`, `org2-store1`, `org2-store2` `.spg-507f1f77.gateway.com` |
+| Tenant storefronts | `org1-store1`, `org1-store2`, `org2-store1`, `org2-store2`, `k6-local` `.spg-507f1f77.gateway.com` |
 
 The tenant entries are the shopper path end to end: the browser hits
 `org1-store1.spg-507f1f77.gateway.com` → Caddy's fall-through route → `domain_lookup` asks `merchant-service`
