@@ -23,7 +23,7 @@ import com.asrevo.cvhome.payment.errors.PaymentProviderUnavailableException;
 import com.asrevo.cvhome.payment.model.payment.PaymentInitiateResult;
 import com.asrevo.cvhome.payment.model.payment.PaymentRequest;
 import com.asrevo.cvhome.store.core.entity.payments.PaymentType;
-import com.asrevo.cvhome.testsupport.annotations.ServiceIntegrationTest;
+import com.asrevo.cvhome.testsupport.annotations.StorageIntegrationTest;
 import com.stripe.exception.ApiConnectionException;
 import com.stripe.exception.CardException;
 import com.stripe.exception.StripeException;
@@ -54,9 +54,10 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  * which is why this class does not run in parallel with anything else that talks to Stripe.
  * </p>
  */
-@ServiceIntegrationTest
-// Same context as every other payment integration test: without this the class asks for a second one, which
-// has no stubbed external clients and fails to start — and forks another Postgres container besides.
+// @StorageIntegrationTest and this @Import are what every other payment integration test carries, and both
+// matter: a different annotation or a missing import asks for a second context, which forks another set of
+// containers and — without the storage one — fails outright when the S3 client tries to reach real AWS.
+@StorageIntegrationTest
 @Import(ExternalClientsTestConfiguration.class)
 class StripeProcessorContractIntegrationTest {
 

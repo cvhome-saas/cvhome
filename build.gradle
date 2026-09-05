@@ -34,7 +34,11 @@ ext.domainCoverageMinimum = [
         gateway       : [unit: 0.97, integration: 0.72, merged: 0.97],
         payment       : [unit: 0.98, integration: 0.74, merged: 0.99],
         content       : [unit: 0.95, integration: 0.87, merged: 0.99],
-        tenancy       : [unit: 0.95, integration: 0.79, merged: 0.97],
+        // Tenancy's integration figure is not deterministic: its outbox handlers run on a poller, so whether
+        // those lines execute inside a test's window varies. Two clean runs measured 0.7883/0.9830 and
+        // 0.7993/0.9793. The floors sit at the bottom of the observed range rather than the top — ratcheting a
+        // nondeterministic domain to its best run buys nothing and makes the gate fail at random.
+        tenancy       : [unit: 0.95, integration: 0.78, merged: 0.97],
         catalog       : [unit: 0.95, integration: 0.94, merged: 0.99],
         billing       : [unit: 0.95, integration: 0.75, merged: 0.97],
         // sso = the authorization server shared by store-core/uaa and store-pod/cua. Its own domain since the
