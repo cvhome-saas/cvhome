@@ -19,7 +19,6 @@ import com.asrevo.cvhome.checkout.services.customer.CustomerService;
 import com.asrevo.cvhome.checkout.services.order.OrderService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.customer.errors.CustomerNotFoundException;
 import com.asrevo.cvhome.customer.model.customer.ReadableCustomer;
 
 import io.swagger.v3.oas.annotations.Parameter;
@@ -49,8 +48,7 @@ public class CustomerApi {
     @GetMapping("/private/customer/info")
     @PreAuthorize(SHOPPER)
     @Parameter(name = "store", schema = @Schema(type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
-    public ReadableCustomer info(StoreMerchantId merchantStore, @CurrentShopper ShopperId shopper)
-            throws CustomerNotFoundException {
+    public ReadableCustomer info(StoreMerchantId merchantStore, @CurrentShopper ShopperId shopper) {
         return customers.info(merchantStore, shopper);
     }
 

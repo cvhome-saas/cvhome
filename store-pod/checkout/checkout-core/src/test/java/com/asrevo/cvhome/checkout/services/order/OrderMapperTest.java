@@ -50,9 +50,9 @@ class OrderMapperTest {
         assertThat(readable.getDatePurchased()).isEqualTo(Orders.T0);
         assertThat(readable.isNeedsAttention()).isTrue();
         assertThat(readable.getAttentionReason()).isEqualTo(LOOK);
-        assertThat(readable.getTotals()).extracting("code", "total").containsExactly(
-                org.assertj.core.groups.Tuple.tuple("SUBTOTAL", LIT_20_00),
-                org.assertj.core.groups.Tuple.tuple(TOTAL_2, LIT_20_00));
+        assertThat(readable.getTotals()).extracting("code", "title", "total").containsExactly(
+                org.assertj.core.groups.Tuple.tuple("SUBTOTAL", "Subtotal", LIT_20_00),
+                org.assertj.core.groups.Tuple.tuple(TOTAL_2, "Total", LIT_20_00));
         assertThat(readable.getTotal().getCode()).isEqualTo(TOTAL_2);
         assertThat(readable.getTotal().getValue()).isEqualByComparingTo(LIT_20_00_2);
         assertThat(readable.getBilling().getFirstName()).isEqualTo("Ada");

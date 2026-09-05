@@ -5,7 +5,7 @@
 #
 # Requires a running stack: lcl start -d
 
-### my profile (404 CUSTOMER.NOT_FOUND until the first order)
+### my profile (an empty profile carrying only the cua id until the first order)
 GET {{SPG_URL}}/checkout/api/v1/private/customer/info?store={{STORE_ID}}&lang={{LANG}}
 Authorization: Bearer {{SHOPPER_TOKEN}}
 

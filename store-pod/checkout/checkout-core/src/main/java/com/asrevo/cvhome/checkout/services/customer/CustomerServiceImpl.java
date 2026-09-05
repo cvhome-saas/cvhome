@@ -15,7 +15,6 @@ import com.asrevo.cvhome.checkout.repositories.CustomerRepository;
 import com.asrevo.cvhome.checkout.repositories.OrderSpecifications;
 import com.asrevo.cvhome.checkout.services.reference.CountryService;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.customer.errors.CustomerNotFoundException;
 import com.asrevo.cvhome.customer.errors.UnsupportedCountryCodeException;
 import com.asrevo.cvhome.customer.model.customer.PersistableCustomer;
 import com.asrevo.cvhome.customer.model.customer.ReadableCustomer;
@@ -67,9 +66,12 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     @Transactional(readOnly = true)
-    public ReadableCustomer info(StoreMerchantId store, ShopperId shopper) throws CustomerNotFoundException {
-        return find(store, shopper).map(CustomerMapper::toReadable)
-                .orElseThrow(() -> CustomerNotFoundException.byExternalId(shopper.sub(), store.getId()));
+    public ReadableCustomer info(StoreMerchantId store, ShopperId shopper) {
+        return find(store, shopper).map(CustomerMapper::toReadable).orElseGet(() -> {
+            ReadableCustomer empty = new ReadableCustomer();
+            empty.setCuaExternalId(shopper.sub());
+            return empty;
+        });
     }
 
     @Override

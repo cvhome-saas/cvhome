@@ -8,7 +8,6 @@ import com.asrevo.cvhome.checkout.domain.ShopperId;
 import com.asrevo.cvhome.checkout.entity.Customer;
 import com.asrevo.cvhome.checkout.model.customer.CustomerFilter;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.customer.errors.CustomerNotFoundException;
 import com.asrevo.cvhome.customer.errors.UnsupportedCountryCodeException;
 import com.asrevo.cvhome.customer.model.customer.PersistableCustomer;
 import com.asrevo.cvhome.customer.model.customer.ReadableCustomer;
@@ -26,7 +25,11 @@ public interface CustomerService {
 
     Optional<Customer> find(StoreMerchantId store, ShopperId shopper);
 
-    ReadableCustomer info(StoreMerchantId store, ShopperId shopper) throws CustomerNotFoundException;
+    /**
+     * The shopper's profile. A shopper who has not ordered yet has no row, and answers an empty profile carrying only
+     * their cua id — the account page renders "nothing yet", not an error.
+     */
+    ReadableCustomer info(StoreMerchantId store, ShopperId shopper);
 
     ReadableCustomerList list(StoreMerchantId store, CustomerFilter filter, Pageable pageable);
 }

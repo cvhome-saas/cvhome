@@ -300,8 +300,8 @@ public class Order extends SalesManagerEntity<Long, Order> implements Auditable 
         subtotal = lines.stream().map(OrderLine::getLineTotal).reduce(BigDecimal.ZERO, BigDecimal::add);
         total = subtotal;
         totals.clear();
-        totals.add(new OrderTotal(this, OrderTotal.SUBTOTAL, "summary", subtotal, 0));
-        totals.add(new OrderTotal(this, OrderTotal.TOTAL, "total", total, 1));
+        totals.add(new OrderTotal(this, OrderTotal.SUBTOTAL, "summary", "Subtotal", subtotal, 0));
+        totals.add(new OrderTotal(this, OrderTotal.TOTAL, "total", "Total", total, 1));
     }
 
     // ---------------------------------------------------------------- placement steps

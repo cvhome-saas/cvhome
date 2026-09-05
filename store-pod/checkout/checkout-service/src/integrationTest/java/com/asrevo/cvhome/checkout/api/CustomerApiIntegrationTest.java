@@ -39,11 +39,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 @TestPropertySource(properties = CheckoutApiSupport.POD_PROPERTY)
 class CustomerApiIntegrationTest {
 
+    private static final String NEVER_ORDERED = "never-ordered";
+
+    private static final String CUA_EXTERNAL_ID = "cuaExternalId";
+
     private static final String PAGE_0_COUNT_50 = "page=0&count=50";
 
     private static final String BOB_EXAMPLE_COM = "bob@example.com";
 
-    private static final String CUAEXTERNALID = "cuaExternalId";
+    private static final String CUAEXTERNALID = CUA_EXTERNAL_ID;
 
     private static final String EMAILADDRESS = "emailAddress";
 
@@ -116,10 +120,12 @@ class CustomerApiIntegrationTest {
     }
 
     @Test
-    void aShopperWhoNeverOrderedHasNoProfileAndAnEmptyList() {
-        String fresh = api.shopper(STORE_A, "never-ordered");
+    void aShopperWhoNeverOrderedGetsAnEmptyProfileAndAnEmptyList() {
+        String fresh = api.shopper(STORE_A, NEVER_ORDERED);
 
-        expect(api.get(scoped(path(V1_PRIVATE, CUSTOMER, INFO), STORE_A), fresh), HttpStatus.NOT_FOUND);
+        JsonNode info = json(api.get(scoped(path(V1_PRIVATE, CUSTOMER, INFO), STORE_A), fresh));
+        assertThat(info.get(CUA_EXTERNAL_ID).asString()).isEqualTo(NEVER_ORDERED);
+        assertThat(info.get(ID).isNull()).isTrue();
         JsonNode orders = json(api.get(scoped(path(V1_PRIVATE, CUSTOMER, ORDERS), STORE_A), fresh));
         assertThat(orders.get(CONTENT)).isEmpty();
         assertThat(orders.get("totalElements").asLong()).isZero();

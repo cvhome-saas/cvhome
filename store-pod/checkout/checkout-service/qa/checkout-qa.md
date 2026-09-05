@@ -11,7 +11,7 @@ console's order statistics.
 - **Runs on** — `lcl start -d --stack <name>`; read the live ports from `lcl urls`. Address it through the pod
   gateway (`http://spg-507f1f77.gateway.com/checkout/…`) or the platform gateway (`gateway.com:8000/spg/checkout/…`),
   never `:8123`
-- **Cases** — 46 (22 verified end to end or in part, 11 unit only, 13 not verified — the console and signed-in shopper screens, which need a login the automated QA run could not perform)
+- **Cases** — 48 (29 verified end to end or in part, 10 unit only, 9 not verified — the console screens, which need a seller login the automated QA run could not perform)
 - **Also see** — [payment](../../payment/payment-service/qa/payment-qa.md) (the transactions and the approve /
   reject that drive the signals), [inventory](../../inventory/inventory-service/qa/inventory-qa.md) (the
   reservation that placement takes and expiry releases), [landing-ui](../../landing-ui/qa/landing-ui-qa.md) (the
@@ -125,11 +125,12 @@ checkout keys the row on the lowercased email (`guest:<email>`), so a repeat gue
 - **Steps** — place two orders as `user`, changing the billing city between them; open **Customers** in the console.
 - **Expect** — one row, the newer city, `cua_external_id` = the shopper's `sub` (an account id, not `user`).
 
-### CUS-02 — The shopper's profile and order list are theirs alone · critical · [not verified]
+### CUS-02 — The shopper's profile and order list are theirs alone · critical · [verified in the browser for the own path — the foreign-id 404 is unit only]
 
 - **Steps** — as `user`, open the storefront account page; then call `GET /private/customer/{id}/order` with
   another shopper's order id (`customer-api.http`).
-- **Expect** — the page lists only this shopper's orders; the foreign id answers **404**, never 403.
+- **Expect** — the page lists only this shopper's orders; the foreign id answers **404**, never 403. A shopper who
+  has never ordered gets an **empty profile (200)**, not a 404 — the account page renders it as dashes.
 
 ### CUS-03 — A seller cannot use the shopper endpoints and a shopper cannot use the console's · critical · [not verified]
 
@@ -156,7 +157,7 @@ transaction: reserve stock → initiate payment → (COD or already paid) commit
 outage leaves the step owed, and both a resubmit of the same cart and the recovery job pick it up. COD confirms at
 placement and commits at once — the reservation timer could only ever cancel a valid order.
 
-### PLC-01 — Cash on delivery · critical · [verified via API]
+### PLC-01 — Cash on delivery · critical · [verified]
 
 - **Steps** — cart → checkout → COD.
 - **Expect** — success dialog; `sales_order` is `CONFIRMED / PENDING / COMMITTED / NONE`; ledger reads
@@ -219,9 +220,10 @@ row at all — there is nothing to resume or recover, and the cart stays `ACTIVE
 - **Steps** — store 1 (requires login): checkout signed out → `401 CHECKOUT.ORDER.LOGIN_REQUIRED`. A store with
   `requireLoginForOrderPlacement` off: checkout signed out → 201, customer row `guest:<email>`.
 
-### PLC-09 — The return page reads the real status, whichever URL it landed on · high · [not verified]
+### PLC-09 — The return page reads the real status, whichever URL it landed on · high · [verified for COD — the card return not verified]
 
-- **Steps** — after a card payment, open `/{lang}/checkout/cancel?orderId=<id>` by hand.
+- **Steps** — after a card payment, open `/{lang}/checkout/cancel?orderId=<id>` by hand; after a COD order open
+  `/{lang}/checkout/success?orderId=<id>` by hand.
 - **Expect** — the page still shows the order as paid: it calls `GET /order/{id}/status` and trusts that, not the
   URL. The redirect link is offered only while `PENDING_PAYMENT`.
 
@@ -230,7 +232,7 @@ row at all — there is nothing to resume or recover, and the cart stays `ACTIVE
 - **Steps** — read another shopper's `/order/{id}/status` with your token; read it from store 2.
 - **Expect** — 404 both times.
 
-### PLC-11 — The order snapshot survives catalog edits · high · [not verified]
+### PLC-11 — The order snapshot survives catalog edits · high · [verified via API — the console detail not verified]
 
 - **Steps** — place an order for a variant product; rename the product and its option value in the console; reopen
   the order.
@@ -439,6 +441,9 @@ Defects that actually happened in checkout — most in the service this one repl
 | **A redelivered webhook applied twice** | The second delivery wrote a second ledger row under the same key and 409ed. | SIG-03 — `DUPLICATE`, not an error. |
 | **A cart handed back after a refusal could not order again** | A unique (store, cart) constraint refused the second order. | PLC-04 — the reopened cart places a new order. |
 | **Customers collided across stores** | The same cua `sub` in two stores found one row. | CUS-04 — two stores, one shopper account, two rows. |
+| **The account page 404ed before the first order** | `CUSTOMER.NOT_FOUND [404]` on My Account for a signed-in shopper with no order yet. | CUS-02 — empty profile, 200. |
+| **Totals rendered without labels** | Two bare amounts under the items — `sales_order_total.title` was empty. | PLC-01 — the order page reads `Subtotal` / `Total`. |
+| **First name blank on the account page** | Every storefront theme read `customer.firstNames`; the API has always sent `firstName`. | CUS-02 — the profile tab shows the first name. |
 | **Order ids walked by URL** | Another shopper's status read answered 403 (confirming the id) or worse, the order. | PLC-10, CUS-02 — 404, never 403. |
 
 ---

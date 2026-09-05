@@ -22,7 +22,6 @@ import com.asrevo.cvhome.checkout.repositories.CustomerRepository;
 import com.asrevo.cvhome.checkout.services.reference.CountryService;
 import com.asrevo.cvhome.commons.domain.CountryIsoCode;
 import com.asrevo.cvhome.commons.domain.ZoneCode;
-import com.asrevo.cvhome.customer.errors.CustomerNotFoundException;
 import com.asrevo.cvhome.customer.errors.UnsupportedCountryCodeException;
 import com.asrevo.cvhome.customer.model.customer.PersistableCustomer;
 import com.asrevo.cvhome.customer.model.customer.ReadableCustomer;
@@ -181,7 +180,7 @@ class CustomerServiceImplTest {
     }
 
     @Test
-    void infoAnswersTheReadableShapeOr404() throws Exception {
+    void infoAnswersTheReadableShapeOrAnEmptyProfile() throws Exception {
         when(customers.findByStoreMerchantIdAndCuaExternalId(Orders.STORE, SUB_1))
                 .thenReturn(Optional.of(Orders.customer()));
 
@@ -195,8 +194,10 @@ class CustomerServiceImplTest {
         assertThat(info.getBilling()).isNotNull();
 
         when(customers.findByStoreMerchantIdAndCuaExternalId(Orders.STORE, SUB_2)).thenReturn(Optional.empty());
-        assertThatThrownBy(() -> service.info(Orders.STORE, new ShopperId(SUB_2)))
-                .isInstanceOf(CustomerNotFoundException.class);
+        ReadableCustomer empty = service.info(Orders.STORE, new ShopperId(SUB_2));
+        assertThat(empty.getCuaExternalId()).as("who asked, and nothing else yet").isEqualTo(SUB_2);
+        assertThat(empty.getId()).isNull();
+        assertThat(empty.getEmailAddress()).isNull();
     }
 
     @Test

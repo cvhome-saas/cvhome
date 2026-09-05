@@ -67,10 +67,11 @@ public class OrderTotal extends SalesManagerEntity<Long, OrderTotal> {
     public OrderTotal() {
     }
 
-    public OrderTotal(Order order, String code, String module, BigDecimal value, int sortOrder) {
+    public OrderTotal(Order order, String code, String module, String title, BigDecimal value, int sortOrder) {
         this.order = order;
         this.code = code;
         this.module = module;
+        this.title = title;
         this.value = value;
         this.sortOrder = sortOrder;
     }

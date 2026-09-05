@@ -56,7 +56,7 @@ export function CustomerTabs({storeContext}: { storeContext: StoreContext }) {
             </TabsList>
             <TabsContent value="profile">
                 <dl className="ruled sm:grid-cols-2">
-                    {[[t('FIRST_NAME'), customer?.firstNames], [t('LAST_NAME'), customer?.lastName], [t('EMAIL'), customer?.emailAddress], [t('PHONE'), customer?.billing?.phone], [t('USERNAME'), customer?.username]].map(([k, v]) => (
+                    {[[t('FIRST_NAME'), customer?.firstName], [t('LAST_NAME'), customer?.lastName], [t('EMAIL'), customer?.emailAddress], [t('PHONE'), customer?.billing?.phone], [t('USERNAME'), customer?.username]].map(([k, v]) => (
                         <div key={k as string} className="p-4 lg:p-5"><dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{k}</dt><dd className="mt-1 font-medium">{v || '—'}</dd></div>
                     ))}
                 </dl>
