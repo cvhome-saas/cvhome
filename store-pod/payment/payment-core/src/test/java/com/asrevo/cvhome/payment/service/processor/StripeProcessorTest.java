@@ -165,7 +165,9 @@ class StripeProcessorTest {
         SessionCreateParams.LineItem line = sent.getLineItems().getFirst();
         assertThat(line.getQuantity()).isEqualTo(1L);
         assertThat(line.getPriceData().getCurrency()).isEqualTo("usd");
-        assertThat(line.getPriceData().getUnitAmount()).isEqualTo(1900L);
+        // 19.99 is 1999 cents. This asserted 1900 — the truncation in `amount.longValue() * 100` written down as
+        // if it were the contract, which is why nothing caught that every fractional order lost its minor units.
+        assertThat(line.getPriceData().getUnitAmount()).isEqualTo(1999L);
         assertThat(line.getPriceData().getProductData().getName()).contains(ORDER_REF);
     }
 
