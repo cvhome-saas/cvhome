@@ -84,10 +84,17 @@ tasks.register('coverageReport', JacocoReport) {
     group = 'verification'
     description = 'Unit + integration coverage of every Java module, in one report.'
     javaProjects.each { p ->
-        dependsOn p.tasks.named('test')
-        if (hasIntegration(p)) {
-            dependsOn p.tasks.named('integrationTest')
+        if (!providers.gradleProperty('coverageFromArtifacts').isPresent()) {
+            dependsOn p.tasks.named('test')
+            if (hasIntegration(p)) {
+                dependsOn p.tasks.named('integrationTest')
+            }
         }
+        // Wrapping classesDirs in a fileTree to apply the excludes drops the built-by information that
+        // sourceSets.main.output carries, so the dependency has to be stated. Without it the CI coverage job —
+        // which runs with -x test -x integrationTest — fails Gradle 9's validation for reading compileJava's
+        // output undeclared. Same reason the domain reports below depend on 'classes'.
+        dependsOn p.tasks.named('classes')
         sourceDirectories.from p.sourceSets.main.allJava.srcDirs
         // Same filter as the domain reports below: without it this report counts wiring the gates do not, and the
         // two disagree by several points on the same build.
