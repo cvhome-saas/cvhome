@@ -48,6 +48,13 @@ dependencies {
 
     annotationProcessor libs.lombok
     testImplementation project(':store-commons:test-support')
+    /*
+     * The admin SDK, so uaa's integration tests can drive it against uaa itself. Test-only and deliberately not an
+     * `implementation`: uaa is the server this client talks to, and nothing in uaa's own code may depend on it.
+     * Nothing else verifies the two against each other — tenancy is the SDK's only production consumer and its
+     * tests mock the SDK out.
+     */
+    integrationTestImplementation project(':store-commons:uaa-client-impl')
     integrationTestImplementation libs.spring.boot.starter.actuator.test
     integrationTestImplementation libs.spring.boot.starter.data.jpa.test
     integrationTestImplementation libs.spring.boot.starter.security.oauth2.authorization.server.test

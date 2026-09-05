@@ -104,11 +104,24 @@ tasks.register('coverageReport', JacocoReport) {
     }
 }
 
-// kind -> [exec file names, task each module must have run, sub-directory of the report]
+// Code that can only ever execute on AWS: the KMS crypto provider, the ECS task-metadata fetcher and the ECS
+// service-discovery client. A Testcontainers run has no instance metadata endpoint, no ECS task metadata and no
+// ECS control plane to ask, so no integration test can reach any of it — it is proven by unit tests and by
+// deployment. Excluded from the *integration* column alone, so that number states what the integration suites can
+// actually reach; the same classes still count in unit and in merged, where their unit tests do credit them.
+def awsOnlyExcludes = [
+        '**/crypto/aws/**',
+        '**/fargate/task/**',
+        '**/com/asrevo/cloud/ecs/discovery/**',
+        '**/org/springframework/cloud/client/**',
+]
+
+// kind -> [exec file names, task each module must have run, sub-directory of the report, extra class excludes]
 def kinds = [
-        unit       : [execs: ['test.exec'], task: 'test', dir: 'unit'],
-        integration: [execs: ['integrationTest.exec'], task: 'integrationTest', dir: 'integration'],
-        merged     : [execs: ['test.exec', 'integrationTest.exec'], task: null, dir: ''],
+        unit       : [execs: ['test.exec'], task: 'test', dir: 'unit', excludes: []],
+        integration: [execs: ['integrationTest.exec'], task: 'integrationTest', dir: 'integration',
+                      excludes: awsOnlyExcludes],
+        merged     : [execs: ['test.exec', 'integrationTest.exec'], task: null, dir: '', excludes: []],
 ]
 
 // JaCoCo's agent carries no `includes` filter, so a module's .exec records every class its test JVM loaded — a
@@ -165,7 +178,7 @@ domains.each { String domain, List<Project> modules ->
                 dependsOn m.tasks.named('classes')
                 sourceDirectories.from m.sourceSets.main.allJava.srcDirs
                 classDirectories.from m.sourceSets.main.output.classesDirs.collect { dir ->
-                    fileTree(dir).exclude(coverageExcludes)
+                    fileTree(dir).exclude(coverageExcludes + (spec.excludes ?: []))
                 }
             }
             executionData.from execFiles
@@ -187,7 +200,7 @@ domains.each { String domain, List<Project> modules ->
                 dependsOn m.tasks.named('classes')
                 sourceDirectories.from m.sourceSets.main.allJava.srcDirs
                 classDirectories.from m.sourceSets.main.output.classesDirs.collect { dir ->
-                    fileTree(dir).exclude(coverageExcludes)
+                    fileTree(dir).exclude(coverageExcludes + (spec.excludes ?: []))
                 }
             }
             violationRules {
