@@ -12,7 +12,7 @@ Every other file is `<service>/qa/<module>-qa.md` — see
 - **Scope** — public `cvhome-saas/lcl` engine, `lcl.yml` (project), `docker-compose-lcl.yml`,
   `store-pod/spg/Caddyfile` (`{$LCL_PORT_*}`), local Docker infra, Java services, frontends
 - **Change** — rewrite of the bash supervisor as a TypeScript multi-stack runner with dynamic port sequences
-- **Cases** — 14
+- **Cases** — 15
 - **Also see** — [spg](../store-pod/spg/qa/spg-qa.md) (case 09's `X-Forwarded-Port` observation is asserted
   there as HDR-01), [uaa](../store-core/uaa/qa/uaa-qa.md) (case 09's redirect patching is AUT-08),
   [inventory](../store-pod/inventory/inventory-service/qa/inventory-qa.md) (case 06 is the fix for a
@@ -223,3 +223,25 @@ java.lang.IllegalArgumentException: Failed to evaluate expression 'hasPermission
   `lcl status`; `lcl stop`.
 - **Expect** — version is `0.1.0`; the repo-root schema-v1 configuration validates; the globally installed binary
   starts and stops the service without any engine or wrapper under `extra/`.
+
+## 15 — Telemetry reaches the collector from every service [verified]
+
+- **Setup** — Docker running; nothing on the configured ports (`lcl doctor`).
+- **Steps** — `OTEL_SDK_DISABLED=false lcl start -d --infra all`; open the storefront
+  (`http://org1-store1.spg-507f1f77.gateway.com/`) and the seller console once; then in Grafana
+  (`http://localhost:3000`, anonymous admin) run, per data source:
+  Loki `sum by (service_name) (count_over_time({service_name=~".+"}[30m]))`,
+  Tempo `{ resource.service.name="landing-ui" }` and open one trace,
+  Prometheus `count by (service_name) (group by (__name__, service_name) ({service_name=~".+"}))`.
+  Also `lcl logs --errors --grep 'Failed to export'`.
+- **Expect** — all twelve Java services appear in each of the three queries; landing-ui appears in Tempo and
+  Prometheus (its Node SDK exports no logs); the storefront trace contains spans from landing-ui, spg and the
+  pod services it called (merchant, content, catalog, inventory); Loki lines carry `trace_id` and `span_id`;
+  the grep prints nothing. **Expected to fail if** `otel.exporter.otlp.protocol` is dropped from
+  `SPRING_APPLICATION_JSON` in `lcl.yml`: the starter defaults to http/protobuf against the gRPC port, every Java
+  service logs `Failed to export spans/logs … unexpected end of stream on http://localhost:4317` once a second,
+  and only metrics (Micrometer, port 4318) arrive — Prometheus fills while Loki and Tempo stay empty.
+- **Note** — `lcl restart <svc>` re-uses the supervisor's environment, so a changed `OTEL_*` variable needs
+  `lcl stop` + `lcl start`, not a restart. The `--infra all` set is not part of `lcl start -d`; without it the
+  SDK-enabled services retry the export forever and count it as errors in `lcl status`.
+
