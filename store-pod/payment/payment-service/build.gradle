@@ -31,6 +31,13 @@ bootBuildImage {
 
 dependencies {
     testImplementation project(':store-commons:test-support')
+    /*
+     * Stripe reaches payment-service transitively at runtime through payment-core, but not at compile time. The
+     * processor's integration test stubs the SDK's global response getter, so the test sources need the types.
+     */
+    integrationTestCompileOnly libs.stripe.java
+    // ApiResource.GSON is typed on Gson, so resolving that field needs the type even though the SDK carries it.
+    integrationTestCompileOnly libs.gson
     implementation libs.spring.cloud.starter.loadbalancer
     implementation libs.spring.boot.starter.web
     implementation libs.spring.boot.starter.validation

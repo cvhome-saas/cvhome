@@ -8,11 +8,13 @@
  *
  * A "domain" is the union of one service's modules (-commons/-core/-events/-external-api/-service), derived from the
  * project path: `:store-pod:catalog:*` and `:store-core:billing:*` are domains, single-module services (`:store-pod:cua`,
- * `:store-core:uaa`) are their own domain, and `:store-commons:*` / `:store-pod:commons:*` fold into `shared`.
+ * `:store-core:uaa`) are their own domain, `:store-commons:*` folds into `shared`, and `:store-pod:commons:*`
+ * into `pod-commons`.
  * A module may override with `ext.coverageDomain = 'checkout'`.
  *
- * Every task only reads the .exec files the modules' own test / integrationTest tasks produce, so it never resolves
- * another module's dependencies — a service's BOM-managed versions are only visible inside that service.
+ * Reports read every module's .exec files and let classDirectories decide what is reported (see execFilesFor
+ * below). Reading a file tree resolves no dependencies, so a service's BOM-managed versions stay visible only
+ * inside that service.
  */
 
 plugins {
@@ -82,12 +84,23 @@ tasks.register('coverageReport', JacocoReport) {
     group = 'verification'
     description = 'Unit + integration coverage of every Java module, in one report.'
     javaProjects.each { p ->
-        dependsOn p.tasks.named('test')
-        if (hasIntegration(p)) {
-            dependsOn p.tasks.named('integrationTest')
+        if (!providers.gradleProperty('coverageFromArtifacts').isPresent()) {
+            dependsOn p.tasks.named('test')
+            if (hasIntegration(p)) {
+                dependsOn p.tasks.named('integrationTest')
+            }
         }
-        sourceDirectories.from p.sourceSets.main.allSource.srcDirs
-        classDirectories.from p.sourceSets.main.output
+        // Wrapping classesDirs in a fileTree to apply the excludes drops the built-by information that
+        // sourceSets.main.output carries, so the dependency has to be stated. Without it the CI coverage job —
+        // which runs with -x test -x integrationTest — fails Gradle 9's validation for reading compileJava's
+        // output undeclared. Same reason the domain reports below depend on 'classes'.
+        dependsOn p.tasks.named('classes')
+        sourceDirectories.from p.sourceSets.main.allJava.srcDirs
+        // Same filter as the domain reports below: without it this report counts wiring the gates do not, and the
+        // two disagree by several points on the same build.
+        classDirectories.from p.sourceSets.main.output.classesDirs.collect { dir ->
+            fileTree(dir).exclude(coverageExcludes)
+        }
     }
     executionData.from files(javaProjects.collect { fileTree(it.layout.buildDirectory.dir('jacoco')).include('*.exec') })
     reports {
@@ -98,12 +111,42 @@ tasks.register('coverageReport', JacocoReport) {
     }
 }
 
-// kind -> [exec file names, task each module must have run, sub-directory of the report]
-def kinds = [
-        unit       : [execs: ['test.exec'], task: 'test', dir: 'unit'],
-        integration: [execs: ['integrationTest.exec'], task: 'integrationTest', dir: 'integration'],
-        merged     : [execs: ['test.exec', 'integrationTest.exec'], task: null, dir: ''],
+// Code that can only ever execute on AWS: the KMS crypto provider, the ECS task-metadata fetcher and the ECS
+// service-discovery client. A Testcontainers run has no instance metadata endpoint, no ECS task metadata and no
+// ECS control plane to ask, so no integration test can reach any of it — it is proven by unit tests and by
+// deployment. Excluded from the *integration* column alone, so that number states what the integration suites can
+// actually reach; the same classes still count in unit and in merged, where their unit tests do credit them.
+def awsOnlyExcludes = [
+        '**/crypto/aws/**',
+        '**/fargate/task/**',
+        '**/com/asrevo/cloud/ecs/discovery/**',
+        '**/org/springframework/cloud/client/**',
 ]
+
+// kind -> [exec file names, task each module must have run, sub-directory of the report, extra class excludes]
+def kinds = [
+        unit       : [execs: ['test.exec'], task: 'test', dir: 'unit', excludes: []],
+        integration: [execs: ['integrationTest.exec'], task: 'integrationTest', dir: 'integration',
+                      excludes: awsOnlyExcludes],
+        merged     : [execs: ['test.exec', 'integrationTest.exec'], task: null, dir: '', excludes: []],
+]
+
+// JaCoCo's agent carries no `includes` filter, so a module's .exec records every class its test JVM loaded — a
+// service's integration run holds the s2s filters, the error handlers and the value objects it exercised, all of
+// which belong to other domains. Scoping executionData to a domain's own modules discarded that: `shared` reported
+// 52 % line coverage while `GlobalErrorHandler`, `ProblemDetailFactory` and `s2s/**` were being exercised by every
+// service in the build, and the store-commons libraries own no integrationTest source set at all, so their
+// integration column could only ever read 0. Union the exec files instead and let classDirectories decide what is
+// reported — JaCoCo ignores probe data for classes it was not asked about.
+def execFilesFor = { List<String> execNames ->
+    files(javaProjects.collect { m -> fileTree(m.layout.buildDirectory.dir('jacoco')).include(execNames) })
+}
+
+// Every module that can actually produce an integrationTest.exec, repo-wide. The integration and merged gates are
+// now fed by all of them, so "did integrationTest run?" is a repo-wide question rather than a per-domain one.
+def integrationModules = javaProjects.findAll { m ->
+    hasIntegration(m) && !m.sourceSets.integrationTest.allJava.isEmpty()
+}
 
 def floorOf = { String domain, String kind ->
     def floors = rootProject.findProperty('domainCoverageMinimum') ?: [:]
@@ -118,10 +161,7 @@ domains.each { String domain, List<Project> modules ->
     kinds.each { String kind, Map spec ->
         def suffix = kind == 'merged' ? '' : kind.capitalize()
         def reportDir = spec.dir ? "reports/coverage/${domain}/${spec.dir}" : "reports/coverage/${domain}"
-        def modulesWithData = modules.findAll { m -> kind != 'integration' || hasIntegration(m) }
-        def execFiles = files(modulesWithData.collect { m ->
-            fileTree(m.layout.buildDirectory.dir('jacoco')).include(spec.execs)
-        })
+        def execFiles = execFilesFor(spec.execs)
         // Coverage produced upstream (CI downloads the .exec artifacts) or on a no-Docker laptop is fed in without
         // re-running the tests; the integration gate then checks the files exist instead of the task graph.
         def fromArtifacts = rootProject.hasProperty('coverageFromArtifacts')
@@ -130,7 +170,7 @@ domains.each { String domain, List<Project> modules ->
             group = 'verification'
             description = "${kind.capitalize()} line coverage of the ${domain} domain (${modules.size()} modules)."
             if (!fromArtifacts) {
-                modules.each { m ->
+                javaProjects.each { m ->
                     (spec.task ? [spec.task] : ['test', 'integrationTest']).each { t ->
                         if (t == 'test' || hasIntegration(m)) {
                             dependsOn m.tasks.named(t)
@@ -145,7 +185,7 @@ domains.each { String domain, List<Project> modules ->
                 dependsOn m.tasks.named('classes')
                 sourceDirectories.from m.sourceSets.main.allJava.srcDirs
                 classDirectories.from m.sourceSets.main.output.classesDirs.collect { dir ->
-                    fileTree(dir).exclude(coverageExcludes)
+                    fileTree(dir).exclude(coverageExcludes + (spec.excludes ?: []))
                 }
             }
             executionData.from execFiles
@@ -167,7 +207,7 @@ domains.each { String domain, List<Project> modules ->
                 dependsOn m.tasks.named('classes')
                 sourceDirectories.from m.sourceSets.main.allJava.srcDirs
                 classDirectories.from m.sourceSets.main.output.classesDirs.collect { dir ->
-                    fileTree(dir).exclude(coverageExcludes)
+                    fileTree(dir).exclude(coverageExcludes + (spec.excludes ?: []))
                 }
             }
             violationRules {
@@ -184,16 +224,18 @@ domains.each { String domain, List<Project> modules ->
             if (kind != 'unit') {
                 doFirst {
                     def floor = floorOf(domain, kind)
-                    // Only modules that actually contain integration tests can produce an integrationTest.exec.
-                    def itModules = modulesWithData.findAll { m -> hasIntegration(m) && !m.sourceSets.integrationTest.allJava.isEmpty() }
-                    if (floor > 0 && itModules) {
+                    // Repo-wide, because the exec set is repo-wide: a library domain owns no integrationTest source
+                    // set of its own and is covered entirely by the services that boot it, so asking only about its
+                    // own modules would let it pass on an empty exec set.
+                    if (floor > 0 && integrationModules) {
                         def ran = fromArtifacts
-                                ? itModules.any { m -> m.layout.buildDirectory.file('jacoco/integrationTest.exec').get().asFile.exists() }
-                                : itModules.every { m -> project.gradle.taskGraph.hasTask(m.tasks.named('integrationTest').get()) }
+                                ? integrationModules.any { m -> m.layout.buildDirectory.file('jacoco/integrationTest.exec').get().asFile.exists() }
+                                : integrationModules.every { m -> project.gradle.taskGraph.hasTask(m.tasks.named('integrationTest').get()) }
                         if (!ran) {
-                            throw new GradleException("integrationTest did not run for ${domain}: the ${kind} coverage gate " +
-                                    "(floor ${floor}) needs its integrationTest.exec files. Run without -x integrationTest, " +
-                                    "or pass -PcoverageFromArtifacts with the .exec files in place.")
+                            throw new GradleException("integrationTest did not run: the ${domain} ${kind} coverage gate " +
+                                    "(floor ${floor}) needs the integrationTest.exec files of every module that has " +
+                                    "integration tests. Run without -x integrationTest, or pass -PcoverageFromArtifacts " +
+                                    "with the .exec files in place.")
                         }
                     }
                 }

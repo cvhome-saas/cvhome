@@ -5,7 +5,7 @@ import java.util.Set;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -41,18 +41,23 @@ public class UserAccountApi {
 
     private final ManagedUserAccountService managedUserAccountService;
 
+    /**
+     * The signed-in user's own record. Takes the {@link Authentication} rather than
+     * {@code @AuthenticationPrincipal Principal}: a {@code JwtAuthenticationToken}'s principal is a {@code Jwt},
+     * which is not a {@link Principal}, so the resolver passed {@code null} and every authenticated call to this
+     * endpoint failed on {@code principal.getName()} with a 500.
+     */
     @GetMapping("current")
-
-    public ReadableUser current(@AuthenticationPrincipal Principal principal)
+    public ReadableUser current(Authentication authentication)
             throws ManagedUserNotFoundException, UaaApiUnavailableException {
-        return managedUserAccountService.findOne(principal.getName());
+        return managedUserAccountService.findOne(authentication.getName());
     }
 
     @GetMapping("list")
     @PreAuthorize("hasPermission(#store,'StoreMerchantId','STORE-CORE.USERS.LIST')")
 
-    public ReadableUserList list(@AuthenticationPrincipal Principal principal,
-                                 @OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam StoreMerchantId store,
+    public ReadableUserList list(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
+                                 @RequestParam StoreMerchantId store,
                                  Pageable pageable) throws UaaApiUnavailableException {
         return managedUserAccountService.list(identity, store, pageable);
     }

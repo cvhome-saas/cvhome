@@ -10,6 +10,8 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.csrf.CsrfException;
 
+import com.asrevo.cvhome.sso.security.HandoffUrls;
+
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -36,7 +38,8 @@ public class ConsoleAwareAccessDeniedHandler implements AccessDeniedHandler {
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException exception)
             throws IOException, ServletException {
-        if (console.isHandoff(request) && exception instanceof CsrfException && LOGIN.equals(request.getServletPath())) {
+        if (console.isHandoff(request) && exception instanceof CsrfException
+                && LOGIN.equals(HandoffUrls.pathWithinApplication(request))) {
             handoff.handle(request, response, exception);
             return;
         }

@@ -15,31 +15,45 @@ repositories {
 
 // Per-domain LINE-coverage floors, one per test kind (see com.asrevo.jacoco-aggregate-conventions). Ratchet: run
 // `./gradlew printDomainCoverage`, bump a domain's floors to what it now achieves (rounded down to 0.01); never lower.
-// Target: merged 0.85 everywhere. uaa, cua and checkout stay at 0.0 (reports only) until their legacy code is
-// refactored.
+//
+// The contract, since the coverage push: unit >= 0.95 and merged >= 0.95 for every in-scope domain, and integration
+// ratcheted to what each domain actually achieves rather than held to a number of its own. Unit and integration miss
+// disjoint things by design — unit misses the thin `*Api` controllers, the exception classes and the repositories that
+// only exist once a context is booted; integration misses the external-provider adapters, the error factories only a
+// consumer service invokes, and the scheduled jobs. A hard 0.95 on both would mean covering the same class twice in
+// two styles, so integration gets a behavioural contract (every endpoint tested, every store-scoped one with a
+// tenant-isolation and a 403 case, every outbox handler idempotent) plus this floor, which only moves up.
+//
+// A floor above the general bar is a domain that has earned it; it stays where it is rather than being relaxed to 0.95.
 ext.domainCoverageMinimum = [
-        inventory     : [unit: 0.88, integration: 0.85, merged: 0.95],
-        'pod-registry': [unit: 0.81, integration: 0.61, merged: 0.97],
-        merchant      : [unit: 0.95, integration: 0.88, merged: 0.95],
-        gateway       : [unit: 0.97, integration: 0.71, merged: 0.97],
-        // unit was 0.92 until payment's `CloudFilePathUtils` was deleted with the rest of the per-service image
-        // path builders (media moved to the content service, and the `ImageFilePath` interface went with it). It
-        // was fully covered by its own test, so removing both took 50 covered lines out of a 612-line denominator
-        // and the ratio fell to 0.9199 without a single test being lost. Lowered by that arithmetic alone — the
-        // remaining shortfall is checkstyle's mandatory `default` arm on an exhaustive enum switch, which cannot
-        // be reached. Ratchet it back up the next time payment gains real tests.
-        payment       : [unit: 0.91, integration: 0.61, merged: 0.99],
-        content       : [unit: 0.89, integration: 0.81, merged: 0.97],
-        tenancy       : [unit: 0.82, integration: 0.76, merged: 0.96],
-        catalog       : [unit: 0.72, integration: 0.94, merged: 0.98],
-        billing       : [unit: 0.85, integration: 0.59, merged: 0.91],
-        // shared = the store-commons libraries. No module here applies the integration-test convention, so the
-        // integration floor stays 0.0 and the unit gate is the real one.
-        shared        : [unit: 0.48, integration: 0.0, merged: 0.48],
-        // :store-pod:commons:* — customer/reference/CMS code queued behind the checkout refactor. It has no tests
-        // at all yet, so its reports are skipped and the table shows n/a until the first one lands.
+        // Merged is at 1.00 and capped here at 0.99 on purpose: a floor of exactly 1.00 fails the build on the
+        // first line of new code, before its test can land in the same commit.
+        inventory     : [unit: 0.95, integration: 0.96, merged: 0.99],
+        'pod-registry': [unit: 0.95, integration: 0.77, merged: 0.99],
+        merchant      : [unit: 0.95, integration: 0.91, merged: 0.99],
+        gateway       : [unit: 0.97, integration: 0.72, merged: 0.97],
+        payment       : [unit: 0.98, integration: 0.74, merged: 0.99],
+        content       : [unit: 0.95, integration: 0.87, merged: 0.99],
+        // Tenancy's integration figure is not deterministic: its outbox handlers run on a poller, so whether
+        // those lines execute inside a test's window varies. Two clean runs measured 0.7883/0.9830 and
+        // 0.7993/0.9793. The floors sit at the bottom of the observed range rather than the top — ratcheting a
+        // nondeterministic domain to its best run buys nothing and makes the gate fail at random.
+        tenancy       : [unit: 0.95, integration: 0.78, merged: 0.97],
+        catalog       : [unit: 0.95, integration: 0.94, merged: 0.99],
+        billing       : [unit: 0.95, integration: 0.75, merged: 0.97],
+        // sso = the authorization server shared by store-core/uaa and store-pod/cua. Its own domain since the
+        // extraction: ~12.7k lines in `shared`'s denominator made both numbers meaningless.
+        sso           : [unit: 0.95, integration: 0.83, merged: 0.97],
+        // shared = the store-commons libraries. They own no integrationTest source set of their own; since the
+        // coverage fix they are credited from the services that boot them, so the integration column is real — and
+        // low for the honest reason that a library is exercised by whichever service happens to use it.
+        shared        : [unit: 0.95, integration: 0.69, merged: 0.96],
+        // Thin shells since the SSO extraction: everything they own beyond their two deployment seams lives in sso.
+        // The integration floors are low because most of what a request touches is counted against `sso`, not here.
+        uaa           : [unit: 0.95, integration: 0.96, merged: 0.99],
+        cua           : [unit: 0.95, integration: 0.67, merged: 0.98],
+        // :store-pod:commons:* — customer/reference/CMS code queued behind the checkout refactor; its packages are
+        // literally `com.asrevo.cvhome.checkout`. Both wait on that refactor and are reported but not gated.
         'pod-commons' : [unit: 0.0, integration: 0.0, merged: 0.0],
         checkout      : [unit: 0.0, integration: 0.0, merged: 0.0],
-        uaa           : [unit: 0.0, integration: 0.0, merged: 0.0],
-        cua           : [unit: 0.0, integration: 0.0, merged: 0.0],
 ]

@@ -10,14 +10,19 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import com.asrevo.cvhome.sso.audit.AuditService;
 import com.asrevo.cvhome.sso.domain.Role;
 import com.asrevo.cvhome.sso.domain.UaaConstants;
 import com.asrevo.cvhome.sso.domain.User;
+import com.asrevo.cvhome.sso.domain.UserStatus;
 import com.asrevo.cvhome.sso.dto.CreateUserRequest;
 import com.asrevo.cvhome.sso.dto.ResetUserPasswordRequest;
 import com.asrevo.cvhome.sso.dto.UpdateUserRequest;
+import com.asrevo.cvhome.sso.dto.UserCounts;
+import com.asrevo.cvhome.sso.dto.UserSearch;
 import com.asrevo.cvhome.sso.password.PasswordService;
 import com.asrevo.cvhome.sso.repo.RoleRepository;
 import com.asrevo.cvhome.sso.repo.UserRepository;
@@ -27,6 +32,7 @@ import com.asrevo.cvhome.sso.token.TokenRevocationService;
 import com.asrevo.cvhome.uaa.errors.RoleNotAssignableException;
 import com.asrevo.cvhome.uaa.errors.RoleNotFoundException;
 import com.asrevo.cvhome.uaa.errors.SuperAdminImmutableException;
+import com.asrevo.cvhome.uaa.errors.UserNotFoundException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -36,6 +42,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -72,6 +79,17 @@ class AdminServiceTest {
 
     private static final String USER = "USER";
 
+    private static final String SOMEONE = "someone";
+
+    private static final String SESSION_ID = "s-1";
+
+    private static final String NOBODY = "nobody";
+    private static final String ADA = "Ada";
+    private static final String LOVELACE = "Lovelace";
+    private static final String GRACE = "Grace";
+    private static final String HOPPER = "Hopper";
+    private static final String OLD_EXAMPLE_COM = "old@example.com";
+
     private final UserRepository users = mock(UserRepository.class);
 
     private final RoleRepository roles = mock(RoleRepository.class);
@@ -99,7 +117,7 @@ class AdminServiceTest {
         superAdmin.setEmail("owner@example.com");
         ordinary = new User();
         ordinary.setId(UUID.randomUUID());
-        ordinary.setUsername("someone");
+        ordinary.setUsername(SOMEONE);
         ordinary.getMetadata().putAll(new HashMap<>(Map.of(ORG, ORG_ID, STORE, "store-1")));
         Map<UUID, User> store = new HashMap<>(Map.of(superAdmin.getId(), superAdmin, ordinary.getId(), ordinary));
         when(users.findById(any(UUID.class))).thenAnswer(invocation -> Optional.ofNullable(store.get(invocation.getArgument(0))));
@@ -187,6 +205,324 @@ class AdminServiceTest {
                 new Role(USER)));
 
         assertThat(service.getAssignableRoles()).containsExactlyInAnyOrder(ORG_ADMIN, USER);
+    }
+
+    @Test
+    void everyAdministrativeActionRefusesTheSuperAdminByIdRatherThanByRole() {
+        // The account that grants every privilege cannot be disabled, deleted or re-roled through the admin API,
+        // and the check is on the seeded id so renaming the role or the user does not open it.
+        UUID id = superAdmin.getId();
+
+        assertThatThrownBy(() -> service.disableUser(id)).isInstanceOf(SuperAdminImmutableException.class);
+        assertThatThrownBy(() -> service.enableUser(id)).isInstanceOf(SuperAdminImmutableException.class);
+        assertThatThrownBy(() -> service.delete(id)).isInstanceOf(SuperAdminImmutableException.class);
+        assertThatThrownBy(() -> service.unlock(id)).isInstanceOf(SuperAdminImmutableException.class);
+        assertThatThrownBy(() -> service.verifyEmail(id)).isInstanceOf(SuperAdminImmutableException.class);
+        assertThatThrownBy(() -> service.removeRoles(id, Set.of(STORE_ADMIN)))
+                .isInstanceOf(SuperAdminImmutableException.class);
+    }
+
+    @Test
+    void anUnknownUserIsATypedNotFoundOnEveryPathThatResolvesOne() {
+        UUID missing = UUID.randomUUID();
+
+        assertThatThrownBy(() -> service.getUser(missing)).isInstanceOf(UserNotFoundException.class);
+        assertThatThrownBy(() -> service.listSessions(missing)).isInstanceOf(UserNotFoundException.class);
+        assertThatThrownBy(() -> service.revokeSessions(missing)).isInstanceOf(UserNotFoundException.class);
+        assertThatThrownBy(() -> service.revokeSession(missing, SESSION_ID)).isInstanceOf(UserNotFoundException.class);
+        assertThatThrownBy(() -> service.enableUser(missing)).isInstanceOf(UserNotFoundException.class);
+    }
+
+    @Test
+    void disablingAUserEndsEverySessionAndEveryTokenNotJustTheFlag() throws Exception {
+        service.disableUser(ordinary.getId());
+
+        // A disabled account with a live refresh token is still signed in until that token expires.
+        assertThat(ordinary.isEnabled()).isFalse();
+        verify(sessions).revokeAll(ordinary, null);
+        verify(tokens).revokeAllForUser(ordinary);
+    }
+
+    @Test
+    void enablingAUserIsJustTheFlagAndLeavesSessionsAlone() throws Exception {
+        service.enableUser(ordinary.getId());
+
+        assertThat(ordinary.isEnabled()).isTrue();
+        verify(sessions, never()).revokeAll(any(), any());
+    }
+
+    @Test
+    void resettingAPasswordAlsoEndsEverySessionAndToken() throws Exception {
+        service.resetPassword(ordinary.getId(), new ResetUserPasswordRequest(NEW_PASSWORD));
+
+        // Otherwise whoever knew the old password stays signed in after the reset that was meant to lock them out.
+        verify(sessions).revokeAll(ordinary, null);
+        verify(tokens).revokeAllForUser(ordinary);
+    }
+
+    @Test
+    void deletingAUserRevokesFirstAndRecordsWhatWasThere() throws Exception {
+        service.delete(ordinary.getId());
+
+        verify(sessions).revokeAll(ordinary, null);
+        verify(tokens).revokeAllForUser(ordinary);
+        verify(users).delete(ordinary);
+    }
+
+    @Test
+    void verifyingAnAlreadyVerifiedEmailRecordsNothingNew() throws Exception {
+        ordinary.setEmailVerified(true);
+
+        service.verifyEmail(ordinary.getId());
+
+        verify(audit, never()).record(any());
+    }
+
+    @Test
+    void verifyingAnUnverifiedEmailFlipsItAndRecordsIt() throws Exception {
+        ordinary.setEmailVerified(false);
+
+        assertThat(service.verifyEmail(ordinary.getId()).emailVerified()).isTrue();
+        verify(audit).record(any());
+    }
+
+    @Test
+    void removingNoRolesIsANoOpRatherThanAnEmptyAudit() throws Exception {
+        service.removeRoles(ordinary.getId(), Set.of());
+        service.removeRoles(ordinary.getId(), null);
+
+        verify(audit, never()).record(any());
+    }
+
+    @Test
+    void theSessionCallsAllResolveTheUserFirstSoTheyCannotAddressAnother() throws Exception {
+        service.listSessions(ordinary.getId());
+        service.revokeSession(ordinary.getId(), SESSION_ID);
+        service.revokeSessions(ordinary.getId());
+
+        verify(sessions).list(ordinary, null);
+        verify(sessions).revoke(ordinary, SESSION_ID);
+        verify(sessions).revokeAll(ordinary, null);
+    }
+
+    @Test
+    void aUsernameLookupAnswersWhetherOneIsTaken() {
+        when(users.findByUsername(SOMEONE)).thenReturn(Optional.of(ordinary));
+        when(users.findByUsername(NOBODY)).thenReturn(Optional.empty());
+
+        assertThat(service.usernameExist(SOMEONE)).isTrue();
+        assertThat(service.usernameExist(NOBODY)).isFalse();
+    }
+
+    @Test
+    void theCountsAreOnePerStatusPlusTheTotal() {
+        when(users.count()).thenReturn(10L);
+        when(users.count(any(org.springframework.data.jpa.domain.Specification.class))).thenReturn(2L);
+
+        UserCounts counts = service.counts();
+
+        assertThat(counts.total()).isEqualTo(10L);
+        assertThat(counts.active()).isEqualTo(2L);
+        // One query per status, not one scan filtered four ways.
+        verify(users, times(4)).count(any(org.springframework.data.jpa.domain.Specification.class));
+    }
+
+    @Test
+    void anEmptySearchStillProducesASpecificationRatherThanNull() {
+        when(users.findAll(any(org.springframework.data.jpa.domain.Specification.class), any(Pageable.class)))
+                .thenReturn(Page.empty());
+
+        service.getUsers(null, Pageable.unpaged());
+        service.getUsers(new UserSearch(null, null, null, Map.of()), Pageable.unpaged());
+
+        verify(users, times(2))
+                .findAll(any(org.springframework.data.jpa.domain.Specification.class), any(Pageable.class));
+    }
+
+    @Test
+    void eachSearchFieldAddsItsOwnPredicateAndANullMetadataEntryAddsNone() {
+        when(users.findAll(any(org.springframework.data.jpa.domain.Specification.class), any(Pageable.class)))
+                .thenReturn(Page.empty());
+        Map<String, String> metadata = new HashMap<>();
+        metadata.put(ORG, ORG_ID);
+        metadata.put(TEAM, null);
+
+        service.getUsers(new UserSearch("q", UserStatus.ACTIVE, STORE_ADMIN, metadata), Pageable.unpaged());
+
+        verify(users).findAll(any(org.springframework.data.jpa.domain.Specification.class), any(Pageable.class));
+    }
+
+    @Test
+    void createAccountMakesAnAccountWithNoPasswordSoAnInvitationCanSetIt() throws Exception {
+        var created = service.createAccount(
+                new CreateUserRequest(NEW_USERNAME, NEW_EMAIL, ADA, LOVELACE, NEW_PASSWORD, Set.of(), Map.of()));
+
+        // The password in the body is ignored on purpose: the invitation link is what sets one.
+        assertThat(created.username()).isEqualTo(NEW_USERNAME);
+        verify(passwords, never()).setPassword(any(), anyString());
+    }
+
+    @Test
+    void createAccountAssignsTheRolesItWasGiven() throws Exception {
+        when(roles.findByName(STORE_ADMIN)).thenReturn(Optional.of(role(STORE_ADMIN)));
+
+        var created = service.createAccount(
+                new CreateUserRequest(NEW_USERNAME, NEW_EMAIL, null, null, null, Set.of(STORE_ADMIN), Map.of()));
+
+        assertThat(created.roles()).containsExactly(STORE_ADMIN);
+    }
+
+    @Test
+    void ausernameAlreadyTakenIsRefused() {
+        when(users.existsByUsernameIgnoreCase(NEW_USERNAME)).thenReturn(true);
+
+        assertThatThrownBy(() -> service.createAccount(
+                new CreateUserRequest(NEW_USERNAME, NEW_EMAIL, null, null, null, Set.of(), Map.of())))
+                .isInstanceOf(com.asrevo.cvhome.uaa.errors.UsernameTakenException.class);
+    }
+
+    @Test
+    void anEmailAlreadyTakenIsRefused() {
+        when(users.existsByEmailIgnoreCase(NEW_EMAIL)).thenReturn(true);
+
+        assertThatThrownBy(() -> service.createAccount(
+                new CreateUserRequest(NEW_USERNAME, NEW_EMAIL, null, null, null, Set.of(), Map.of())))
+                .isInstanceOf(com.asrevo.cvhome.uaa.errors.EmailTakenException.class);
+    }
+
+    @Test
+    void anAccountWithNoEmailAtAllIsNotCheckedAgainstTheEmailIndex() throws Exception {
+        service.createAccount(new CreateUserRequest(NEW_USERNAME, null, null, null, null, Set.of(), Map.of()));
+
+        verify(users, never()).existsByEmailIgnoreCase(anyString());
+    }
+
+    @Test
+    void updateLeavesAnAbsentFieldAlone() throws Exception {
+        ordinary.setFirstName(ADA);
+        ordinary.setLastName(LOVELACE);
+        ordinary.setEnabled(true);
+
+        service.updateUser(ordinary.getId(), new UpdateUserRequest(null, null, null, null, null, null));
+
+        assertThat(ordinary.getFirstName()).isEqualTo(ADA);
+        assertThat(ordinary.getLastName()).isEqualTo(LOVELACE);
+        assertThat(ordinary.isEnabled()).isTrue();
+    }
+
+    @Test
+    void updateWritesEveryFieldItWasGiven() throws Exception {
+        when(roles.findByName(USER)).thenReturn(Optional.of(role(USER)));
+        ordinary.getRoles().add(role(STORE_ADMIN));
+
+        service.updateUser(ordinary.getId(),
+                new UpdateUserRequest(GRACE, HOPPER, null, false, Set.of(USER), null));
+
+        assertThat(ordinary.getFirstName()).isEqualTo(GRACE);
+        assertThat(ordinary.getLastName()).isEqualTo(HOPPER);
+        assertThat(ordinary.isEnabled()).isFalse();
+        // The role set is replaced, not merged: an update that only added could never take a role away.
+        assertThat(ordinary.getRoles()).extracting(Role::getName).containsExactly(USER);
+    }
+
+    @Test
+    void anewEmailIsUnverifiedUntilAlinkReachesIt() throws Exception {
+        ordinary.setEmail(OLD_EXAMPLE_COM);
+        ordinary.setEmailVerified(true);
+
+        service.updateUser(ordinary.getId(), new UpdateUserRequest(null, null, NEW_EMAIL, null, null, null));
+
+        assertThat(ordinary.getEmail()).isEqualTo(NEW_EMAIL);
+        assertThat(ordinary.isEmailVerified()).isFalse();
+    }
+
+    @Test
+    void thesameEmailInDifferentCaseIsNotTreatedAsAchange() throws Exception {
+        ordinary.setEmail(NEW_EMAIL);
+        ordinary.setEmailVerified(true);
+
+        service.updateUser(ordinary.getId(),
+                new UpdateUserRequest(null, null, NEW_EMAIL.toUpperCase(java.util.Locale.ROOT), null, null, null));
+
+        // Re-sending the same address must not silently unverify it.
+        assertThat(ordinary.isEmailVerified()).isTrue();
+        verify(users, never()).existsByEmailIgnoreCaseAndIdNot(anyString(), any(UUID.class));
+    }
+
+    @Test
+    void anEmailAlreadyOnAnotherAccountIsRefused() {
+        ordinary.setEmail(OLD_EXAMPLE_COM);
+        when(users.existsByEmailIgnoreCaseAndIdNot(eq(NEW_EMAIL), any(UUID.class))).thenReturn(true);
+
+        assertThatThrownBy(() -> service.updateUser(ordinary.getId(),
+                new UpdateUserRequest(null, null, NEW_EMAIL, null, null, null)))
+                .isInstanceOf(com.asrevo.cvhome.uaa.errors.EmailTakenException.class);
+    }
+
+    @Test
+    void anUnknownRoleInAnUpdateIsRefusedRatherThanSkipped() {
+        when(roles.findByName(MISSPELLED)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.updateUser(ordinary.getId(),
+                new UpdateUserRequest(null, null, null, null, Set.of(MISSPELLED), null)))
+                .isInstanceOf(RoleNotFoundException.class);
+    }
+
+    @Test
+    void thesuperAdminRoleCannotBeGrantedByAnUpdateEither() {
+        assertThatThrownBy(() -> service.updateUser(ordinary.getId(), new UpdateUserRequest(null, null, null, null,
+                Set.of(UaaConstants.SUPER_ADMIN_ROLE), null)))
+                .isInstanceOf(RoleNotAssignableException.class);
+    }
+
+    @Test
+    void removingArolePutsTheRemainderInTheAuditChange() throws Exception {
+        ordinary.getRoles().add(role(STORE_ADMIN));
+        ordinary.getRoles().add(role(USER));
+
+        service.removeRoles(ordinary.getId(), Set.of(STORE_ADMIN));
+
+        assertThat(ordinary.getRoles()).extracting(Role::getName).containsExactly(USER);
+    }
+
+    @Test
+    void removingNoRolesAtAllIsAnoOp() throws Exception {
+        ordinary.getRoles().add(role(STORE_ADMIN));
+
+        service.removeRoles(ordinary.getId(), Set.of());
+        service.removeRoles(ordinary.getId(), null);
+
+        assertThat(ordinary.getRoles()).hasSize(1);
+        verify(audit, never()).record(any());
+    }
+
+    @Test
+    void rolesCannotBeRemovedFromTheSuperAdmin() {
+        assertThatThrownBy(() -> service.removeRoles(superAdmin.getId(), Set.of(STORE_ADMIN)))
+                .isInstanceOf(SuperAdminImmutableException.class);
+    }
+
+    @Test
+    void unlockingIsRefusedForTheSuperAdminAndDelegatedForAnyoneElse() throws Exception {
+        assertThatThrownBy(() -> service.unlock(superAdmin.getId()))
+                .isInstanceOf(SuperAdminImmutableException.class);
+
+        service.unlock(ordinary.getId());
+    }
+
+    @Test
+    void anEmptySearchStillYieldsAusableSpecification() {
+        when(users.findAll(any(org.springframework.data.jpa.domain.Specification.class), any(Pageable.class)))
+                .thenReturn(Page.empty());
+
+        assertThat(service.getUsers(null, Pageable.unpaged())).isEmpty();
+    }
+
+    private static Role role(String name) {
+        Role role = new Role();
+        role.setId(UUID.randomUUID());
+        role.setName(name);
+        return role;
     }
 
 }

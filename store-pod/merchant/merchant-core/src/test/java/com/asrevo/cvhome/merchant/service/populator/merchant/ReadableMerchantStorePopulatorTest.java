@@ -143,7 +143,9 @@ class ReadableMerchantStorePopulatorTest {
         assertThat(target.getStoreDomains()).extracting(ManagerStoreDomain::domain).containsExactly(SUB_DOMAIN);
         assertThat(target.getReadableAudit().getCreated()).isEqualTo(CREATED);
         assertThat(target.getReadableAudit().getUser()).isEqualTo(EDITOR);
-        assertThat(target.getReadableAudit().getModified()).isNotNull();
+        // Pinned to the value rather than isNotNull(): the populator read getDateCreated() into setModified(), so
+        // every store's reported "last modified" was its creation date, and a not-null assertion passed anyway.
+        assertThat(target.getReadableAudit().getModified()).isEqualTo(MODIFIED).isNotEqualTo(CREATED);
     }
 
     @Test

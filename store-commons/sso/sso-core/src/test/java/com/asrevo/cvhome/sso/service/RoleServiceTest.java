@@ -151,4 +151,134 @@ class RoleServiceTest {
         assertThat(UUID.randomUUID()).isNotNull();
     }
 
+    @Test
+    void thelistAndTheSingleRoleAreBothServedAsDtos() throws Exception {
+        Role staff = role(STAFF, false, USERS_READ);
+        when(roles.findAll(any(org.springframework.data.domain.Pageable.class)))
+                .thenReturn(new org.springframework.data.domain.PageImpl<>(java.util.List.of(staff)));
+
+        assertThat(service.findAll(org.springframework.data.domain.Pageable.unpaged()))
+                .extracting(RoleDto::name).containsExactly(STAFF);
+        assertThat(service.findOne(staff.getId()).name()).isEqualTo(STAFF);
+    }
+
+    @Test
+    void anUnknownRoleIdIsNotFound() {
+        UUID missing = UUID.randomUUID();
+        when(roles.findById(missing)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.findOne(missing))
+                .isInstanceOf(com.asrevo.cvhome.uaa.errors.RoleNotFoundException.class);
+    }
+
+    @Test
+    void anewRoleMayInheritFromAnExistingOne() throws Exception {
+        Role parent = role(OWNER, false, USERS_WRITE);
+        when(roles.findByName(STAFF)).thenReturn(Optional.empty());
+        when(roles.save(any(Role.class))).thenAnswer(invocation -> {
+            Role saved = invocation.getArgument(0);
+            saved.prePersist();
+            return saved;
+        });
+
+        RoleDto created = service.create(
+                new CreateRoleRequest(STAFF, OWNS, RoleScope.REALM, parent.getId(), Set.of(USERS_READ)));
+
+        assertThat(created.name()).isEqualTo(STAFF);
+        assertThat(created.inheritsFromId()).isEqualTo(parent.getId());
+    }
+
+    @Test
+    void arolesDescriptionCanBeChangedOnItsOwn() throws Exception {
+        Role staff = role(STAFF, false, USERS_READ);
+
+        RoleDto updated = service.update(staff.getId(),
+                new UpdateRoleRequest(null, OWNS, null, null, null, null));
+
+        assertThat(updated.description()).isEqualTo(OWNS);
+        assertThat(updated.name()).isEqualTo(STAFF);
+    }
+
+    @Test
+    void anupdateThatChangesNoPermissionIsRecordedAsAplainUpdate() throws Exception {
+        Role staff = role(STAFF, false, USERS_READ);
+
+        RoleDto updated = service.update(staff.getId(),
+                new UpdateRoleRequest(null, null, null, null, null, Set.of(USERS_READ)));
+
+        // The same set is not a permission change; recording it as one would fill the audit log with noise.
+        assertThat(updated.permissions()).containsExactly(USERS_READ);
+    }
+
+    @Test
+    void anupdateMayReplaceTheRolesName() throws Exception {
+        Role staff = role(STAFF, false, USERS_READ);
+        when(roles.findByName(OWNER)).thenReturn(Optional.empty());
+
+        assertThat(service.update(staff.getId(), new UpdateRoleRequest(OWNER, null, null, null, null, null)).name())
+                .isEqualTo(OWNER);
+    }
+
+    @Test
+    void anameAlreadyHeldByAnotherRoleIsRefused() {
+        Role staff = role(STAFF, false, USERS_READ);
+        when(roles.findByName(OWNER)).thenReturn(Optional.of(new Role(OWNER)));
+
+        assertThatThrownBy(() -> service.update(staff.getId(),
+                new UpdateRoleRequest(OWNER, null, null, null, null, null)))
+                .isInstanceOf(DuplicateRoleNameException.class);
+    }
+
+    @Test
+    void asystemRoleRefusesAscopeChangeAsWellAsAname() {
+        Role system = role(ORG_ADMIN, true, USERS_READ);
+
+        // Other services key on both, so neither may move under them.
+        assertThatThrownBy(() -> service.update(system.getId(),
+                new UpdateRoleRequest(null, null, RoleScope.ORGANIZATION, null, null, null)))
+                .isInstanceOf(SystemRoleImmutableException.class);
+    }
+
+    @Test
+    void anOrdinaryRolesScopeMayBeChanged() throws Exception {
+        Role staff = role(STAFF, false, USERS_READ);
+        staff.setScope(RoleScope.REALM);
+
+        assertThat(service.update(staff.getId(),
+                new UpdateRoleRequest(null, null, RoleScope.ORGANIZATION, null, null, null)).scope())
+                .isEqualTo(RoleScope.ORGANIZATION);
+    }
+
+    @Test
+    void asameValuedScopeIsNotAchangeSoAsystemRoleToleratesIt() throws Exception {
+        Role system = role(ORG_ADMIN, true, USERS_READ);
+        system.setScope(RoleScope.REALM);
+
+        assertThat(service.update(system.getId(),
+                new UpdateRoleRequest(null, null, RoleScope.REALM, null, null, null)).scope())
+                .isEqualTo(RoleScope.REALM);
+    }
+
+    @Test
+    void aparentCanBeClearedAndTheClearWinsOverAnyIdSentAlongsideIt() throws Exception {
+        Role parent = role(OWNER, false, USERS_WRITE);
+        Role staff = role(STAFF, false, USERS_READ);
+        staff.setInheritsFrom(parent);
+
+        RoleDto updated = service.update(staff.getId(),
+                new UpdateRoleRequest(null, null, null, parent.getId(), Boolean.TRUE, null));
+
+        assertThat(updated.inheritsFromId()).isNull();
+    }
+
+    @Test
+    void aroleWithNoHoldersCanBeDeleted() throws Exception {
+        Role staff = role(STAFF, false, USERS_READ);
+        when(roles.countHolders(staff.getId())).thenReturn(0L);
+
+        service.delete(staff.getId());
+
+        org.mockito.Mockito.verify(roles).delete(staff);
+    }
+
 }

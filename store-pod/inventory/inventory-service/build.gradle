@@ -61,7 +61,10 @@ dependencies {
     testImplementation libs.testcontainers.postgresql
     testRuntimeOnly libs.junit.platform.launcher
     // WebClientsUtils overloads on WebClient.Builder; the compiler needs the type to pick the RestClient one.
+    // compileOnly on both source sets rather than implementation: webflux on the runtime classpath would have
+    // Spring Boot take this servlet app for a reactive one.
     testCompileOnly libs.spring.webflux
+    integrationTestCompileOnly libs.spring.webflux
 }
 
 dependencyManagement {

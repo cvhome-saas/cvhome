@@ -40,6 +40,8 @@ import static org.assertj.core.api.Assertions.assertThat;
         "com.asrevo.cvhome.pod-info.pod.endpoint.endpoint=http://spg-507f1f77.gateway.com"})
 class ExternalMediaApiIntegrationTest {
 
+    private static final String EXTERNAL = "external";
+
     private static final String POD_NAME = "pod-507f1f77";
 
     /** A seeded store. */
@@ -54,13 +56,16 @@ class ExternalMediaApiIntegrationTest {
 
     private static final String MEDIA = path(PRIVATE, MEDIA_SEGMENT);
 
-    private static final String EXTERNAL_MEDIA = path(PRIVATE, "external", MEDIA_SEGMENT);
+    private static final String EXTERNAL_MEDIA = path(PRIVATE, EXTERNAL, MEDIA_SEGMENT);
 
     private static final String USAGE = path(EXTERNAL_MEDIA, USAGE_SEGMENT);
+
+    private static final String BRANDING = path(PRIVATE, EXTERNAL, "branding");
 
     private static final String PRODUCT_TITLE = "Blue sneakers";
 
     private static final String IMAGE_FIELD = "image[0]";
+    private static final String POD_SOMEWHERE_ELSE = "pod-somewhere-else";
 
     private static final String USAGE_BODY = """
             {"ownerKind":"PRODUCT","ownerRef":"42","ownerTitle":"%s",
@@ -155,8 +160,25 @@ class ExternalMediaApiIntegrationTest {
 
     @Test
     void aServiceTokenForAnotherPodIsRefused() {
-        expect(api.get(query(scoped(EXTERNAL_MEDIA, STORE_A), "ids=1"), api.s2s("pod-somewhere-else")),
+        expect(api.get(query(scoped(EXTERNAL_MEDIA, STORE_A), "ids=1"), api.s2s(POD_SOMEWHERE_ELSE)),
                 HttpStatus.FORBIDDEN);
+    }
+
+    /**
+     * The storefront renderer needs the store's logo and colours with no person signed in, so branding reads
+     * under the same "same store pod" fall-through as the media lookups above.
+     */
+    @Test
+    void aPeerServiceReadsTheStoresBranding() {
+        var branding = api.get(scoped(BRANDING, STORE_A), service);
+
+        expect(branding, HttpStatus.OK);
+        org.assertj.core.api.Assertions.assertThat(json(branding).isObject()).isTrue();
+    }
+
+    @Test
+    void brandingIsRefusedToAServiceTokenFromAnotherPod() {
+        expect(api.get(scoped(BRANDING, STORE_A), api.s2s(POD_SOMEWHERE_ELSE)), HttpStatus.FORBIDDEN);
     }
 
 }

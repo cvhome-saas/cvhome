@@ -146,21 +146,29 @@ class UserAccountApiIntegrationTest {
                 Map.of(USER_PARAM, USER_ID), List.of(), "uaa", HttpStatus.NOT_FOUND.value(), null, null));
     }
 
-    /**
-     * {@code current} is behind the filter chain like everything else on this controller.
-     *
-     * <p>
-     * Only the authentication half is asserted, because the endpoint cannot answer the other half as written: it
-     * takes {@code @AuthenticationPrincipal Principal}, and a resource server's principal is a
-     * {@code org.springframework.security.oauth2.jwt.Jwt}, which does not implement {@code Principal}. Spring's
-     * resolver hands the method {@code null} rather than failing, so {@code principal.getName()} throws and every
-     * authenticated call answers 500. That is a defect in the controller, not in this test, and a test asserting the
-     * 500 would only make it permanent — {@code ManagedUserAccountServiceImplTest} covers the lookup itself.
-     * </p>
-     */
     @Test
     void theCurrentUserEndpointIsAuthenticatedOnly() {
         expect(api.get(CURRENT, null), HttpStatus.UNAUTHORIZED);
+    }
+
+    /**
+     * The signed-in caller's own record.
+     *
+     * <p>
+     * This endpoint used to take {@code @AuthenticationPrincipal Principal}, and a resource server's principal is
+     * an {@code org.springframework.security.oauth2.jwt.Jwt}, which does not implement {@code Principal} — so
+     * Spring's resolver handed the method {@code null} and every authenticated call failed on
+     * {@code principal.getName()} with a 500. It takes the {@code Authentication} now; this asserts the half that
+     * could not be asserted before, and the subject it looks the user up by.
+     * </p>
+     */
+    @Test
+    void theCurrentUserEndpointAnswersTheSignedInCallersOwnRecord() throws Exception {
+        uaaHolds(userOf(ORG_A, STORE));
+
+        expect(api.get(CURRENT, api.orgAdmin(ORG_A)), HttpStatus.OK);
+
+        verify(userAccountService).findOne(any(String.class));
     }
 
     @Test

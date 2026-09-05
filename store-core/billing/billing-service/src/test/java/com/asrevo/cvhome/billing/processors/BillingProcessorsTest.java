@@ -41,6 +41,8 @@ import static org.mockito.Mockito.verifyNoInteractions;
  */
 class BillingProcessorsTest {
 
+    private static final String SUSPENDED = "SUSPENDED";
+    private static final String ACTIVE = "ACTIVE";
     private static final String CUSTOMER_SUBSCRIPTION_UPDATED = "customer.subscription.updated";
 
     private static final String EVT_1 = "evt_1";
@@ -90,7 +92,7 @@ class BillingProcessorsTest {
     @Test
     @DisplayName("an illegal transition on a trial command is swallowed too")
     void expireTrialSwallowsIllegalTransition() throws Exception {
-        doThrow(IllegalSubscriptionTransitionException.of(STORE, null, "SUSPENDED"))
+        doThrow(IllegalSubscriptionTransitionException.of(STORE, null, SUSPENDED))
                 .when(subscriptionService).expireTrial(STORE);
 
         assertThatCode(() -> new ExpireTrialCommandImpl(subscriptionService)
@@ -170,7 +172,7 @@ class BillingProcessorsTest {
     @Test
     @DisplayName("an illegal transition ends the record too")
     void anIllegalTransitionCompletes() throws Exception {
-        doThrow(IllegalSubscriptionTransitionException.of(STORE, null, "ACTIVE"))
+        doThrow(IllegalSubscriptionTransitionException.of(STORE, null, ACTIVE))
                 .when(applyService).applySubscriptionChanged(eq(STORE), anyString(), anyString());
 
         assertThatCode(() -> new StripeWebhookReceivedEventImpl(applyService)
@@ -188,6 +190,75 @@ class BillingProcessorsTest {
         assertThatThrownBy(() -> new StripeWebhookReceivedEventImpl(applyService)
                 .process(event(INVOICE_PAYMENT_SUCCEEDED)))
                 .isInstanceOf(UncheckedBaseException.class);
+    }
+
+    // ------------------------------------------------------------------------------------------ redelivery
+
+    /**
+     * The outbox guarantees at-least-once, so every one of these commands will be delivered twice sooner or later.
+     *
+     * <p>
+     * None of them is made idempotent by a dedupe table; they are idempotent because the second application finds
+     * a transition that is no longer legal and the handler <em>swallows</em> that. Rethrowing it instead would burn
+     * the record's retries on work that has already succeeded, and eventually park a completed change in the
+     * outbox's failed pile where an operator would come looking for a real problem.
+     * </p>
+     */
+    @Test
+    @DisplayName("a redelivered trial expiry completes rather than failing the record")
+    void aRedeliveredTrialExpiryIsSwallowedTheSecondTime() throws Exception {
+        ExpireTrialCommandImpl handler = new ExpireTrialCommandImpl(subscriptionService);
+        ExpireTrialCommand command = ExpireTrialCommand.from(STORE);
+
+        handler.process(command);
+        // The first application moved it out of TRIALING, so the second is no longer a legal transition.
+        doThrow(IllegalSubscriptionTransitionException.of(STORE, ACTIVE, "TRIALING"))
+                .when(subscriptionService).expireTrial(STORE);
+
+        assertThatCode(() -> handler.process(command)).doesNotThrowAnyException();
+        verify(subscriptionService, org.mockito.Mockito.times(2)).expireTrial(STORE);
+    }
+
+    @Test
+    @DisplayName("a redelivered suspension completes rather than failing the record")
+    void aRedeliveredSuspensionIsSwallowedTheSecondTime() throws Exception {
+        SuspendUnpaidSubscriptionCommandImpl handler = new SuspendUnpaidSubscriptionCommandImpl(subscriptionService);
+        SuspendUnpaidSubscriptionCommand command = SuspendUnpaidSubscriptionCommand.from(STORE);
+
+        handler.process(command);
+        doThrow(IllegalSubscriptionTransitionException.of(STORE, SUSPENDED, SUSPENDED))
+                .when(subscriptionService).suspendUnpaid(STORE);
+
+        assertThatCode(() -> handler.process(command)).doesNotThrowAnyException();
+    }
+
+    @Test
+    @DisplayName("a redelivered deferred plan change completes rather than failing the record")
+    void aRedeliveredPlanChangeIsSwallowedTheSecondTime() throws Exception {
+        ApplyPendingPlanChangeCommandImpl handler = new ApplyPendingPlanChangeCommandImpl(subscriptionService);
+        ApplyPendingPlanChangeCommand command = ApplyPendingPlanChangeCommand.from(STORE);
+
+        handler.process(command);
+        // The pending change is gone once applied, so a redelivery finds nothing to apply.
+        doThrow(SubscriptionNotFoundException.forStore(STORE)).when(subscriptionService).applyPendingChange(STORE);
+
+        assertThatCode(() -> handler.process(command)).doesNotThrowAnyException();
+    }
+
+    /**
+     * A redelivered Stripe event is dispatched again with the same event id. Deduplication is
+     * {@code WebhookApplyService}'s, keyed on that id — the handler must pass it through rather than deciding for
+     * itself, or a genuine second event with the same shape would be dropped.
+     */
+    @Test
+    @DisplayName("a redelivered Stripe event is dispatched again, carrying the id the apply service dedupes on")
+    void aRedeliveredStripeEventIsDispatchedWithItsId() throws Exception {
+        StripeWebhookReceivedEventImpl handler = new StripeWebhookReceivedEventImpl(applyService);
+
+        handler.process(event(INVOICE_PAYMENT_SUCCEEDED));
+        handler.process(event(INVOICE_PAYMENT_SUCCEEDED));
+
+        verify(applyService, org.mockito.Mockito.times(2)).applyInvoicePaid(eq(STORE), eq(EVT_1), eq(PAYLOAD));
     }
 
 }

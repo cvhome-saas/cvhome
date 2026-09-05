@@ -12,4 +12,8 @@ dependencies {
     annotationProcessor libs.mapstruct.processor
     annotationProcessor libs.lombok
     annotationProcessor libs.lombok.mapstruct.binding
+
+    // commons is compileOnly above, so the tests need their own copy: the user DTOs extend ReadableList and name the
+    // shared value objects, and none of them is constructible without it.
+    testImplementation project(":store-commons:commons")
 }

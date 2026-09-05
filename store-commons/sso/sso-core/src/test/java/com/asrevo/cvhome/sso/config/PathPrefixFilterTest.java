@@ -97,4 +97,29 @@ class PathPrefixFilterTest {
         assertThat(through(request)).isSameAs(request);
     }
 
+    /**
+     * The wrapper reports the prefix as the context path but leaves the servlet path alone, so
+     * {@code getServletPath()} still carries the prefix behind a proxy.
+     *
+     * <p>
+     * Pinned because two access-denied handlers compare {@code getServletPath()} against {@code "/login"} to
+     * decide whether a CSRF failure is a person with a stale form. Behind the prefix that comparison is
+     * {@code "/uaa/login".equals("/login")}, which is false — so the handler that exists to send them back to the
+     * form never fired, and they got a JSON 403 instead. Anything making that decision has to strip the context
+     * path first.
+     * </p>
+     */
+    @Test
+    void theServletPathStillCarriesThePrefixEvenThoughTheContextPathIsSet() throws Exception {
+        String loginBehindPrefix = String.format("%s/login", UAA);
+        MockHttpServletRequest request = request(loginBehindPrefix);
+        request.setServletPath(loginBehindPrefix);
+        request.addHeader(PREFIX, UAA);
+
+        HttpServletRequest wrapped = through(request);
+
+        assertThat(wrapped.getContextPath()).isEqualTo(UAA);
+        assertThat(wrapped.getServletPath()).isEqualTo("/uaa/login");
+    }
+
 }

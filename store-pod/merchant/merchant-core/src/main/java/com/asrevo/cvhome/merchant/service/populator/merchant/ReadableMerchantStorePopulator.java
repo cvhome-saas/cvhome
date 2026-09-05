@@ -110,7 +110,7 @@ public class ReadableMerchantStorePopulator
             audit.setCreated(source.getAuditSection().getDateCreated());
         }
         if (source.getAuditSection().getDateModified() != null) {
-            audit.setModified(source.getAuditSection().getDateCreated());
+            audit.setModified(source.getAuditSection().getDateModified());
         }
         audit.setUser(source.getAuditSection().getModifiedBy());
         target.setReadableAudit(audit);

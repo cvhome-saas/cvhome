@@ -77,6 +77,10 @@ class AdminClientServiceTest {
     private static final String GENERATED_SECRET = "{bcrypt}generated";
 
     private static final String SCOPE = "store_core";
+    private static final String CLIENT_B = "client-b";
+    private static final String OPENID = "openid";
+    private static final String THE_CONSOLE = "the console";
+    private static final String CHOSEN = "chosen";
 
     private final RegisteredClientRepository clients = mock(RegisteredClientRepository.class);
 
@@ -90,8 +94,12 @@ class AdminClientServiceTest {
 
     private final RealmSettings realm = mock(RealmSettings.class);
 
-    private final AdminClientService service = new AdminClientService(clients, encoder, mock(JdbcTemplate.class),
-            mock(AuditService.class), extensions, history, settings,
+    private final JdbcTemplate jdbc = mock(JdbcTemplate.class);
+
+    private final AuditService audit = mock(AuditService.class);
+
+    private final AdminClientService service = new AdminClientService(clients, encoder, jdbc,
+            audit, extensions, history, settings,
             new RedirectUriRules(new ClientsProperties(List.of("localhost"))), mock(TokenRevocationService.class),
             Clock.fixed(NOW, java.time.ZoneOffset.UTC));
 
@@ -117,8 +125,8 @@ class AdminClientServiceTest {
     }
 
     private static ClientDetails withRedirect(String uri) {
-        return new ClientDetails(A, "client-b", B, Set.of(ClientAuthMethod.NONE), Set.of(OAuthGrantType.AUTHORIZATION_CODE),
-                Set.of(uri), Set.of(), Set.of("openid"), null, null, null);
+        return new ClientDetails(A, CLIENT_B, B, Set.of(ClientAuthMethod.NONE), Set.of(OAuthGrantType.AUTHORIZATION_CODE),
+                Set.of(uri), Set.of(), Set.of(OPENID), null, null, null);
     }
 
     @Test
@@ -222,6 +230,150 @@ class AdminClientServiceTest {
         when(clients.findById(A)).thenReturn(publicClient);
 
         assertThatThrownBy(() -> service.rotateSecret(A)).isInstanceOf(ClientNotConfidentialException.class);
+    }
+
+    @Test
+    void findByIdAnswersTheRegistrationWithItsStatusAttached() throws ClientNotFoundException {
+        when(clients.findById(A)).thenReturn(existing(A));
+
+        ClientDetails found = service.findById(A);
+
+        assertThat(found.id()).isEqualTo(A);
+        assertThat(found.status().type()).isEqualTo(ClientType.MACHINE);
+    }
+
+    @Test
+    void findByIdOfAmissingClientIsNotFound() {
+        when(clients.findById(MISSING)).thenReturn(null);
+
+        assertThatThrownBy(() -> service.findById(MISSING)).isInstanceOf(ClientNotFoundException.class);
+    }
+
+    @Test
+    void thegraceWindowShownIsTheLatestLiveOneAndExpiredRowsAreIgnored() throws ClientNotFoundException {
+        when(clients.findById(A)).thenReturn(existing(A));
+        when(history.findByRegisteredClientIdAndRevokedAtIsNull(A)).thenReturn(List.of(
+                ClientSecretHistory.retire(A, KEPT_SECRET, NOW, NOW.minusSeconds(60)),
+                ClientSecretHistory.retire(A, KEPT_SECRET, NOW, NOW.plusSeconds(600)),
+                ClientSecretHistory.retire(A, KEPT_SECRET, NOW, NOW.plusSeconds(60))));
+
+        // An expired row still has no revokedAt, so filtering on live() rather than on the column is what matters.
+        assertThat(service.findById(A).status().previousSecretUntil()).isEqualTo(NOW.plusSeconds(600));
+    }
+
+    @Test
+    void aclientIdAlreadyTakenByAdisabledClientIsStillRefused() {
+        // A disabled client is invisible to findByClientId, so the uniqueness check has to read the table.
+        when(jdbc.queryForObject(anyString(), org.mockito.ArgumentMatchers.eq(Integer.class), anyString()))
+                .thenReturn(1);
+
+        assertThatThrownBy(() -> service.create(details(IGNORED, NEW))).isInstanceOf(ClientIdTakenException.class);
+    }
+
+    @Test
+    void acountThatComesBackNullIsTreatedAsNoSuchClientRatherThanThrowing()
+            throws ClientIdTakenException, InvalidRedirectUriException, ClientTokenTtlExceedsPolicyException {
+        when(jdbc.queryForObject(anyString(), org.mockito.ArgumentMatchers.eq(Integer.class), anyString()))
+                .thenReturn(null);
+
+        assertThat(service.create(details(IGNORED, NEW))).isNotNull();
+    }
+
+    @Test
+    void adescriptionSentWithTheStatusIsTheOnePartOfItTheServerReadsBack()
+            throws ClientIdTakenException, InvalidRedirectUriException, ClientTokenTtlExceedsPolicyException {
+        ClientDetails withDescription = details(IGNORED, NEW).withStatus(new com.asrevo.cvhome.sso.dto.ClientStatus(
+                THE_CONSOLE, true, ClientType.MACHINE, null, null, null, null, null, null));
+
+        service.create(withDescription);
+
+        ArgumentCaptor<com.asrevo.cvhome.sso.domain.ClientExtension> saved =
+                ArgumentCaptor.forClass(com.asrevo.cvhome.sso.domain.ClientExtension.class);
+        verify(extensions).save(saved.capture());
+        assertThat(saved.getValue().getDescription()).isEqualTo(THE_CONSOLE);
+    }
+
+    @Test
+    void revokingThePreviousSecretEndsTheGraceWindowNow() throws Exception {
+        ClientSecretHistory live = ClientSecretHistory.retire(A, KEPT_SECRET, NOW, NOW.plusSeconds(600));
+        when(clients.findById(A)).thenReturn(existing(A));
+        when(history.findByRegisteredClientIdAndRevokedAtIsNull(A)).thenReturn(List.of(live));
+
+        service.revokePreviousSecret(A);
+
+        assertThat(live.getRevokedAt()).isEqualTo(NOW);
+        verify(history).save(live);
+    }
+
+    @Test
+    void revokingApreviousSecretThatIsAlreadyGoneIsRefusedRatherThanAnsweredAsDone() {
+        when(clients.findById(A)).thenReturn(existing(A));
+        when(history.findByRegisteredClientIdAndRevokedAtIsNull(A))
+                .thenReturn(List.of(ClientSecretHistory.retire(A, KEPT_SECRET, NOW, NOW.minusSeconds(1))));
+
+        assertThatThrownBy(() -> service.revokePreviousSecret(A))
+                .isInstanceOf(com.asrevo.cvhome.uaa.errors.ClientNoPreviousSecretException.class);
+    }
+
+    @Test
+    void revokingThePreviousSecretOfAmissingClientIsNotFound() {
+        when(clients.findById(MISSING)).thenReturn(null);
+
+        assertThatThrownBy(() -> service.revokePreviousSecret(MISSING))
+                .isInstanceOf(ClientNotFoundException.class);
+    }
+
+    @Test
+    void resettingAsecretWritesTheOperatorsChoiceWithNoGraceWindow() throws Exception {
+        ClientSecretHistory live = ClientSecretHistory.retire(A, KEPT_SECRET, NOW, NOW.plusSeconds(600));
+        when(clients.findById(A)).thenReturn(existing(A));
+        when(history.findByRegisteredClientIdAndRevokedAtIsNull(A)).thenReturn(List.of(live));
+        when(encoder.encode(CHOSEN)).thenReturn(GENERATED_SECRET);
+
+        service.resetSecret(A, CHOSEN);
+
+        ArgumentCaptor<RegisteredClient> saved = ArgumentCaptor.forClass(RegisteredClient.class);
+        verify(clients).save(saved.capture());
+        assertThat(saved.getValue().getClientSecret()).isEqualTo(GENERATED_SECRET);
+        // No grace window at all: the previous secret stops working the moment this returns.
+        assertThat(live.getRevokedAt()).isEqualTo(NOW);
+    }
+
+    @Test
+    void resettingTheSecretOfApublicClientIsRefused() {
+        when(clients.findById(A)).thenReturn(RegisteredClient.withId(A).clientId(CLIENT_A).clientName(A)
+                .clientAuthenticationMethod(ClientAuthenticationMethod.NONE)
+                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+                .redirectUri(CALLBACK).scope(OPENID).build());
+
+        assertThatThrownBy(() -> service.resetSecret(A, CHOSEN))
+                .isInstanceOf(ClientNotConfidentialException.class);
+    }
+
+    @Test
+    void resettingTheSecretOfAmissingClientIsNotFoundRatherThanAsilentSuccess() {
+        when(clients.findById(MISSING)).thenReturn(null);
+
+        // The previous `if (client != null)` answered 200 without rotating anything.
+        assertThatThrownBy(() -> service.resetSecret(MISSING, CHOSEN))
+                .isInstanceOf(ClientNotFoundException.class);
+    }
+
+    @Test
+    void rotatingEverythingSkipsTheClientsThatHoldNoSecret() throws Exception {
+        when(jdbc.query(anyString(), org.mockito.ArgumentMatchers.<org.springframework.jdbc.core.RowMapper<
+                com.asrevo.cvhome.sso.dto.ClientSummary>>any())).thenReturn(List.of(
+                        new com.asrevo.cvhome.sso.dto.ClientSummary(A, CLIENT_A, A, ClientType.MACHINE, true,
+                                Set.of("client_credentials"), null, null),
+                        new com.asrevo.cvhome.sso.dto.ClientSummary(B, CLIENT_B, B, ClientType.PUBLIC, true,
+                                Set.of("authorization_code"), null, null)));
+        when(clients.findById(A)).thenReturn(existing(A));
+        when(encoder.encode(anyString())).thenReturn(GENERATED_SECRET);
+
+        List<RotatedSecret> rotated = service.rotateAll();
+
+        // A public client has no secret to rotate; asking would throw and abort the whole incident response.
+        assertThat(rotated).extracting(RotatedSecret::id).containsExactly(A);
     }
 
 }

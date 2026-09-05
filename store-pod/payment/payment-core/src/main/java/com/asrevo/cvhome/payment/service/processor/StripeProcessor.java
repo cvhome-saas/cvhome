@@ -1,6 +1,7 @@
 package com.asrevo.cvhome.payment.service.processor;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Map;
 
 import org.springframework.stereotype.Service;
@@ -37,6 +38,12 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Service
 public class StripeProcessor implements PaymentProcessor {
+
+    /**
+     * Stripe takes the amount in the currency's smallest unit. Two digits everywhere the platform sells
+     * today; a zero-decimal currency (JPY) would need this to become per-currency rather than a constant.
+     */
+    private static final int MINOR_UNIT_DIGITS = 2;
 
     private static final String INTERNAL_REFERENCE_METADATA_KEY = "internal_reference";
 
@@ -78,8 +85,23 @@ public class StripeProcessor implements PaymentProcessor {
         }
     }
 
+    /**
+     * The amount in the currency's smallest unit, which is what Stripe charges.
+     *
+     * <p>
+     * {@code longValue()} <em>truncates</em>: written as {@code amount.longValue() * 100}, an order for 12.34 was
+     * sent as 1200 and the shopper was charged 12.00. Every fractional amount lost its minor units silently, and
+     * nothing downstream could notice, because Stripe was told a whole number that was internally consistent.
+     * </p>
+     *
+     * <p>
+     * Scaling the {@link BigDecimal} keeps the minor units; {@code longValueExact} then refuses rather than
+     * truncating if an amount ever arrives with more precision than the currency has, which is a loud failure
+     * instead of another quiet under-charge.
+     * </p>
+     */
     private static long toStripeUnitAmount(BigDecimal amount) {
-        return amount.longValue() * 100;
+        return amount.movePointRight(MINOR_UNIT_DIGITS).setScale(0, RoundingMode.HALF_UP).longValueExact();
     }
 
     /**

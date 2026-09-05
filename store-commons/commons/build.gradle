@@ -10,4 +10,11 @@ dependencies {
     compileOnly libs.spring.data.commons
     compileOnly libs.lombok
     annotationProcessor libs.lombok
+
+    // Everything the value objects compile against is compileOnly, so the tests need their own copies. Jackson is
+    // the one that matters: StoreMerchantId.Reader is a real deserializer with three accepted wire shapes, and
+    // without databind on the test classpath none of them can be asserted.
+    testImplementation libs.jackson.databind
+    testImplementation libs.jackson.annotations
+    testImplementation libs.spring.data.commons
 }

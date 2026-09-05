@@ -38,20 +38,21 @@ public record LanguageCode(String code) implements Serializable, Comparable<Lang
         return this.code.compareTo(o.code);
     }
 
+    /**
+     * An ISO-ish two- or three-letter code, and neither sentinel.
+     *
+     * <p>
+     * The sentinels need no test of their own here: {@code _non} and {@code _all} are four characters, so the length
+     * bound has already rejected them. This used to compare against both explicitly after the bound, which was dead
+     * code — the arms could not be reached, and so could not be covered either.
+     * </p>
+     */
     @JsonIgnore
     public boolean isLanguage() {
         if (Objects.isNull(code)) {
             return false;
-        } else if (code.trim().isEmpty()) {
-            return false;
-        } else if (code.trim().length() < 2) {
-            return false;
-        } else if (code.trim().length() > 3) {
-            return false;
-        } else if (this.equals(nonLanguage())) {
-            return false;
-        } else {
-            return !this.equals(allLanguage());
         }
+        int length = code.trim().length();
+        return length >= 2 && length <= 3;
     }
 }

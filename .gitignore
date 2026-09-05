@@ -55,3 +55,10 @@ http-client.private.env.json
 # lcl stack runner state (.lcl/<stack>/) and its per-stack Next build dirs (.next-<stack>/)
 .lcl/
 **/.next-*/
+
+# JVM crash and heap dumps. A test JVM that runs out of memory drops an .hprof next to the build, and one of
+# these is hundreds of megabytes — well past GitHub's 100 MB limit, so a `git add -A` that swept one up is only
+# discovered when the push is rejected.
+*.hprof
+hs_err_pid*.log
+replay_pid*.log

@@ -82,6 +82,16 @@ class ProductServiceImplTest {
 
     private static final String SLUG = "slug";
 
+    private static final String SKU_A = "SKU-A";
+
+    private static final String SKU_B = "SKU-B";
+
+    private static final String ONE = "ONE";
+
+    private static final String TWO = "TWO";
+
+    private static final String ONLY = "ONLY";
+
     @Mock
     private ProductRepository productRepository;
 
@@ -378,4 +388,128 @@ class ProductServiceImplTest {
         verify(productRepository, never()).delete(any(Product.class));
     }
 
+    @Test
+    void aStorefrontReadHydratesVariantsAndTheirOptionsInDisplayOrder() throws Exception {
+        Product product = new Product();
+        product.setId(1L);
+        product.setStore(STORE);
+        ProductVariant first = new ProductVariant(product, SKU_B);
+        first.setSortOrder(2);
+        ProductVariant second = new ProductVariant(product, SKU_A);
+        second.setSortOrder(1);
+        when(productRepository.findByStoreAndFriendlyUrl(STORE, SLUG, EN)).thenReturn(Optional.of(product));
+        when(productMapper.toReadable(product, EN)).thenReturn(new ReadableProduct());
+        when(variantRepository.findByProductIdHydrated(STORE, 1L)).thenReturn(List.of(first, second));
+
+        ReadableProduct readable = service.getByFriendlyUrl(STORE, SLUG, EN);
+
+        // Sorted by the mapper's DISPLAY_ORDER, not by whatever the repository returned.
+        assertThat(readable.getVariants()).extracting(it -> it.getSku()).containsExactly(SKU_A, SKU_B);
+    }
+
+    @Test
+    void aSkuLookupResolvesItsVariantThenItsProductBothWithinTheStore() throws Exception {
+        Product product = new Product();
+        product.setId(1L);
+        product.setStore(STORE);
+        ProductVariant variant = new ProductVariant(product, SKU);
+        when(variantRepository.findByStoreAndSku(STORE, SKU)).thenReturn(Optional.of(variant));
+        when(productRepository.findByStoreAndId(STORE, 1L)).thenReturn(Optional.of(product));
+        when(productMapper.toMinimal(product, EN))
+                .thenReturn(new com.asrevo.cvhome.catalog.model.product.ReadableMinimalProduct());
+
+        assertThat(service.getBySku(STORE, SKU, EN).getSku()).isEqualTo(SKU);
+    }
+
+    @Test
+    void aVariantWhoseProductIsNotInThisStoreIsNotFound() {
+        Product product = new Product();
+        product.setId(1L);
+        when(variantRepository.findByStoreAndSku(STORE, SKU))
+                .thenReturn(Optional.of(new ProductVariant(product, SKU)));
+        when(productRepository.findByStoreAndId(STORE, 1L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.getBySku(STORE, SKU, EN)).isInstanceOf(ProductNotFoundException.class);
+    }
+
+    @Test
+    void anEmptySkuListIsAnEmptyAnswerRatherThanAQuery() {
+        assertThat(service.getBySkus(STORE, null, EN)).isEmpty();
+        assertThat(service.getBySkus(STORE, List.of(), EN)).isEmpty();
+
+        verify(variantRepository, never()).findByStoreAndSkuIn(any(), any());
+    }
+
+    @Test
+    void abulkSkuLookupKeepsTheCallersOrderDropsDuplicatesAndSkipsWhatItCannotResolve() {
+        Product product = new Product();
+        product.setId(1L);
+        product.setStore(STORE);
+        ProductVariant variant = new ProductVariant(product, SKU);
+        when(variantRepository.findByStoreAndSkuIn(eq(STORE), any())).thenReturn(List.of(variant));
+        when(productRepository.findAllHydrated(any())).thenReturn(List.of(product));
+        when(productMapper.toMinimal(eq(product), eq(EN)))
+                .thenReturn(new com.asrevo.cvhome.catalog.model.product.ReadableMinimalProduct());
+
+        // "missing" resolves to nothing and is skipped rather than yielding a null entry the caller must filter.
+        assertThat(service.getBySkus(STORE, List.of(SKU, SKU, "missing"), EN)).hasSize(1);
+    }
+
+    @Test
+    void renamingTheDefaultVariantIsRefusedWhenTheSkuIsAlreadySoldHere() throws Exception {
+        Product product = new Product();
+        product.setId(1L);
+        product.setStore(STORE);
+        product.getVariants().add(new ProductVariant(product, "OLD"));
+        when(productRepository.findByStoreAndId(STORE, 1L)).thenReturn(Optional.of(product));
+        when(variantRepository.existsByStoreMerchantIdAndSku(STORE, SKU)).thenReturn(true);
+
+        PersistableProductDefinition source = new PersistableProductDefinition();
+        source.setSku(SKU);
+
+        assertThatThrownBy(() -> service.update(STORE, 1L, source))
+                .isInstanceOf(com.asrevo.cvhome.catalog.errors.DuplicateVariantSkuException.class);
+    }
+
+    @Test
+    void aProductWithSeveralVariantsNeverHasItsDefaultRenamedByTheDefinition() throws Exception {
+        Product product = new Product();
+        product.setId(1L);
+        product.setStore(STORE);
+        product.getVariants().add(new ProductVariant(product, ONE));
+        product.getVariants().add(new ProductVariant(product, TWO));
+        when(productRepository.findByStoreAndId(STORE, 1L)).thenReturn(Optional.of(product));
+
+        PersistableProductDefinition source = new PersistableProductDefinition();
+        source.setSku(SKU);
+        service.update(STORE, 1L, source);
+
+        // With a real matrix the definition's sku is not any one variant's; renaming would pick an arbitrary row.
+        assertThat(product.getVariants()).extracting(ProductVariant::getSku).containsExactlyInAnyOrder(ONE, TWO);
+        verify(variantRepository, never()).existsByStoreMerchantIdAndSku(any(), any());
+    }
+
+    @Test
+    void aDefinitionWithNoSkuLeavesTheDefaultVariantAlone() throws Exception {
+        Product product = new Product();
+        product.setId(1L);
+        product.setStore(STORE);
+        product.getVariants().add(new ProductVariant(product, ONLY));
+        when(productRepository.findByStoreAndId(STORE, 1L)).thenReturn(Optional.of(product));
+
+        service.update(STORE, 1L, new PersistableProductDefinition());
+
+        assertThat(product.getVariants()).extracting(ProductVariant::getSku).containsExactly(ONLY);
+    }
+
+    @Test
+    void theDefinitionReadIsScopedToTheStore() throws Exception {
+        Product product = new Product();
+        product.setId(1L);
+        when(productRepository.findByStoreAndId(STORE, 1L)).thenReturn(Optional.of(product));
+
+        service.getDefinition(STORE, 1L, EN);
+
+        verify(productMapper).toDefinition(product, EN);
+    }
 }

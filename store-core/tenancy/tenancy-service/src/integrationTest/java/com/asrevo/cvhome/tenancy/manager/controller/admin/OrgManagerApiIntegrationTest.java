@@ -60,6 +60,7 @@ import static org.mockito.Mockito.when;
 @Import(ExternalClientsTestConfiguration.class)
 class OrgManagerApiIntegrationTest {
 
+    private static final String SUSPENDED = "SUSPENDED";
     private static final String BASE = "/api/v1/org-manager";
 
     private static final String FIND_ALL = path(BASE, "find-all");
@@ -208,7 +209,7 @@ class OrgManagerApiIntegrationTest {
     @Test
     void suspendingThenResumingReturnsTheOrganizationToActive() {
         expect(api.post(forOrg(SUSPEND, ORG_LIFECYCLE), api.superAdmin(), null), HttpStatus.OK);
-        assertThat(json(asOperator(forOrg(FIND_ONE, ORG_LIFECYCLE))).get(STATUS).asString()).isEqualTo("SUSPENDED");
+        assertThat(json(asOperator(forOrg(FIND_ONE, ORG_LIFECYCLE))).get(STATUS).asString()).isEqualTo(SUSPENDED);
 
         JsonNode resumed = json(api.post(forOrg(RESUME, ORG_LIFECYCLE), api.superAdmin(), null));
 
@@ -306,6 +307,31 @@ class OrgManagerApiIntegrationTest {
         JsonNode stores = json(asOperator(forOrg(STORES, ORG_CLOSED)));
 
         assertThat(stores.get(CONTENT)).isEmpty();
+    }
+
+    /**
+     * A suspension with a reason keeps it; one without gets the default. The reason is what an operator reads
+     * later to know why a merchant's stores stopped serving, so an empty one is worse than a generic one.
+     */
+    @Test
+    void asuspensionCarriesTheOperatorsReasonOrAdefaultWhenNoneIsGiven() {
+        expect(api.post(query(forOrg(SUSPEND, ORG_LIFECYCLE), param("reason", "unpaid invoice")),
+                api.superAdmin(), null), HttpStatus.OK);
+        expect(api.post(forOrg(RESUME, ORG_LIFECYCLE), api.superAdmin(), null), HttpStatus.OK);
+
+        JsonNode suspended = json(api.post(forOrg(SUSPEND, ORG_LIFECYCLE), api.superAdmin(), null));
+
+        assertThat(suspended.get(STATUS).asString()).isEqualTo(SUSPENDED);
+    }
+
+    @Test
+    void closingAnOrganizationIsTerminalAndAttributedToTheOperator() {
+        JsonNode closed = json(api.post(forOrg(CLOSE, ORG_LIFECYCLE), api.superAdmin(), null));
+
+        assertThat(closed.get(STATUS).asString()).isEqualTo("CLOSED");
+        // Terminal: nothing brings it back.
+        expect(api.post(forOrg(RESUME, ORG_LIFECYCLE), api.superAdmin(), null),
+                HttpStatus.UNPROCESSABLE_CONTENT);
     }
 
 }

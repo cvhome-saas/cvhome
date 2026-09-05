@@ -3,6 +3,13 @@ plugins {
 }
 
 /*
+ * Its own coverage domain rather than folding into `shared`. sso-core is ~12.7k counted lines of authorization
+ * server; inside `shared` it sits in the same denominator as crypto, the S2S security filters and the error
+ * contract, and one gate over both means neither number says anything. See domainCoverageMinimum in the root build.
+ */
+ext.coverageDomain = 'sso'
+
+/*
  * The SSO server itself: users, roles and permissions, settings, audit, lockout, password policy, rate limiting,
  * sessions, invitations and reset links, OAuth2 clients with secret rotation, signing keys, and identity-provider
  * brokering. Everything except the two deployment seams — how the issuer is pinned, and how a realm is resolved —

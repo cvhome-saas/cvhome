@@ -46,6 +46,12 @@ public class ClientRegistrationFactory {
         if (StringUtils.hasText(secret)) {
             builder.clientSecret(secret);
         }
+        // Apple is the one provider uaa does not send PKCE to, and since Spring Security 7 `requireProofKey`
+        // defaults to true — so the carve-out has to be stated on the registration as well as on the resolver,
+        // or `getBuilder` adds the code_challenge before any resolver customizer is consulted.
+        if (p.getPreset() == IdpPreset.APPLE) {
+            builder.clientSettings(ClientRegistration.ClientSettings.builder().requireProofKey(false).build());
+        }
         return builder.build();
     }
 

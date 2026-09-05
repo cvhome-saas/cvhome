@@ -43,6 +43,8 @@ class IdentityBrokerServiceTest {
     private static final String SUB = "sub-1";
 
     private static final String MAIL = "ada@example.com";
+    private static final String NO_SUCH_ROLE = "NO_SUCH_ROLE";
+    private static final String AUGUSTA = "Augusta";
 
     private final UserRepository users = mock(UserRepository.class);
 
@@ -139,6 +141,106 @@ class IdentityBrokerServiceTest {
         when(users.findById(ada.getId())).thenReturn(Optional.of(ada));
         assertThatThrownBy(() -> broker.completeLink(pending, IdpFixtures.provider(AccountLinking.CONFIRM, false, true)))
                 .extracting(e -> ((BrokerRefusedException) e).code()).isEqualTo(BrokerRefusedException.LOCKED);
+    }
+
+    @Test
+    void aproviderThatSentNoStableSubjectIsRefused() {
+        IdentityProvider provider = IdpFixtures.provider(AccountLinking.LINK, true, true);
+
+        // Without a subject there is nothing durable to key the link on; the next login would make a new account.
+        assertThatThrownBy(() -> broker.resolve(provider, new BrokeredIdentity(null, MAIL, true, ADA, LOVELACE, Map.of())))
+                .isInstanceOf(BrokerRefusedException.class);
+        assertThatThrownBy(() -> broker.resolve(provider, new BrokeredIdentity("  ", MAIL, true, ADA, LOVELACE, Map.of())))
+                .isInstanceOf(BrokerRefusedException.class);
+    }
+
+    @Test
+    void alinkWhoseAccountHasSinceBeenDeletedIsRefusedRatherThanSigningNobodyIn() {
+        IdentityProvider provider = IdpFixtures.provider(AccountLinking.LINK, true, true);
+        UserIdentity known = UserIdentity.link(UUID.randomUUID(), provider.getId(), SUB, MAIL, NOW);
+        when(identities.findByProviderIdAndSubject(provider.getId(), SUB)).thenReturn(Optional.of(known));
+        when(users.findById(known.getUserId())).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> broker.resolve(provider, identity(true)))
+                .isInstanceOf(BrokerRefusedException.class);
+    }
+
+    @Test
+    void anAddressIsMatchedCaseInsensitivelyAndTrimmed() throws Exception {
+        IdentityProvider provider = IdpFixtures.provider(AccountLinking.LINK, false, true);
+        ada.prePersist();
+        when(users.findByEmailIgnoreCase(MAIL)).thenReturn(Optional.of(ada));
+
+        BrokerOutcome outcome = broker.resolve(provider,
+                new BrokeredIdentity(SUB, String.format("  %s  ", MAIL.toUpperCase(java.util.Locale.ROOT)), true,
+                        ADA, LOVELACE, Map.of()));
+
+        assertThat(outcome.needsConfirmation()).isFalse();
+    }
+
+    @Test
+    void aloginWithNoAddressAtAllCannotProvisionAnAccount() {
+        IdentityProvider provider = IdpFixtures.provider(AccountLinking.LINK, true, true);
+
+        assertThatThrownBy(() -> broker.resolve(provider,
+                new BrokeredIdentity(SUB, null, true, ADA, LOVELACE, Map.of())))
+                .isInstanceOf(BrokerRefusedException.class);
+        verify(users, never()).save(any());
+    }
+
+    @Test
+    void completingAlinkAttachesTheIdentityAndGrantsTheProvidersDefaultRoles() throws Exception {
+        IdentityProvider provider = IdpFixtures.provider(AccountLinking.CONFIRM, false, true);
+        ada.prePersist();
+        when(users.findById(ada.getId())).thenReturn(Optional.of(ada));
+
+        User signedIn = broker.completeLink(new PendingLink(provider.getId(), provider.getAlias(),
+                provider.getDisplayName(), SUB, MAIL, ada.getId(), ada.getUsername()), provider);
+
+        assertThat(signedIn).isSameAs(ada);
+        assertThat(ada.getRoles()).extracting(Role::getName).contains(USER_ROLE);
+        verify(identities).save(any(UserIdentity.class));
+    }
+
+    @Test
+    void completingAlinkForAnAccountDeletedInTheMeantimeIsRefused() {
+        IdentityProvider provider = IdpFixtures.provider(AccountLinking.CONFIRM, false, true);
+        UUID gone = UUID.randomUUID();
+        when(users.findById(gone)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> broker.completeLink(new PendingLink(provider.getId(), provider.getAlias(),
+                provider.getDisplayName(), SUB, MAIL, gone, "someone"), provider))
+                .isInstanceOf(BrokerRefusedException.class);
+    }
+
+    @Test
+    void aroleTheProviderNamesButTheRealmDoesNotHaveIsSkippedRatherThanFailingTheLogin() throws Exception {
+        IdentityProvider provider = IdpFixtures.provider(AccountLinking.CONFIRM, false, true);
+        provider.setDefaultRoles(NO_SUCH_ROLE);
+        ada.prePersist();
+        when(users.findById(ada.getId())).thenReturn(Optional.of(ada));
+        when(roles.findByName(NO_SUCH_ROLE)).thenReturn(Optional.empty());
+
+        // Logged and moved past: a misconfigured provider must not lock everyone who uses it out.
+        assertThat(broker.completeLink(new PendingLink(provider.getId(), provider.getAlias(),
+                provider.getDisplayName(), SUB, MAIL, ada.getId(), ada.getUsername()), provider)).isSameAs(ada);
+        assertThat(ada.getRoles()).isEmpty();
+    }
+
+    @Test
+    void anameAlreadyOnTheAccountIsNotOverwrittenByTheProviders() throws Exception {
+        IdentityProvider provider = IdpFixtures.provider(AccountLinking.LINK, false, true);
+        ada.prePersist();
+        ada.setFirstName(AUGUSTA);
+        UserIdentity known = UserIdentity.link(ada.getId(), provider.getId(), SUB, MAIL, NOW);
+        when(identities.findByProviderIdAndSubject(provider.getId(), SUB)).thenReturn(Optional.of(known));
+        when(users.findById(ada.getId())).thenReturn(Optional.of(ada));
+
+        broker.resolve(provider, identity(true));
+
+        // The person edited it here; a provider re-asserting its own value on every login would undo that.
+        assertThat(ada.getFirstName()).isEqualTo(AUGUSTA);
+        assertThat(ada.getLastName()).isEqualTo(LOVELACE);
     }
 
 }
