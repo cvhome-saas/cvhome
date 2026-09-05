@@ -53,7 +53,7 @@ public class ProblemAccessDeniedHandler implements AccessDeniedHandler {
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException exception)
             throws IOException {
-        if (exception instanceof CsrfException && LOGIN.equals(request.getServletPath())) {
+        if (exception instanceof CsrfException && LOGIN.equals(HandoffUrls.pathWithinApplication(request))) {
             response.setStatus(HttpStatus.FOUND.value());
             response.setHeader("Location", String.format("%s%s", request.getContextPath(), EXPIRED));
             return;

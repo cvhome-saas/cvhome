@@ -52,6 +52,26 @@ public final class HandoffUrls {
         return origin.toString();
     }
 
+    /**
+     * The request path with the proxy's prefix removed — what the application's own routes are written against.
+     *
+     * <p>
+     * {@code PathPrefixFilter} reports {@code X-Forwarded-Prefix} as the context path but leaves the servlet path
+     * alone, so behind a proxy {@code getServletPath()} is {@code /uaa/login} while the route is {@code /login}.
+     * Anything deciding "is this the sign-in form" has to strip the prefix first; comparing the raw servlet path
+     * silently answers "no" in exactly the deployments the prefix exists for.
+     * </p>
+     */
+    public static String pathWithinApplication(HttpServletRequest request) {
+        String path = request.getServletPath();
+        String prefix = request.getContextPath();
+        if (Objects.isNull(path) || Objects.isNull(prefix) || prefix.isEmpty() || !path.startsWith(prefix)) {
+            return path;
+        }
+        String within = path.substring(prefix.length());
+        return within.isEmpty() ? "/" : within;
+    }
+
     /** Issues the CSRF cookie when the browser does not already hold one. */
     public static void plantCsrfCookie(CsrfTokenRepository csrfTokens, HttpServletRequest request,
                                        HttpServletResponse response) {
