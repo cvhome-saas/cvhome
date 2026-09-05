@@ -43,7 +43,9 @@ compose:
   files: [docker-compose-lcl.yml]
   # What the services actually need. The monitoring stack (otel-collector, loki, tempo, prometheus, grafana) is
   # in the compose file and starts with `--infra all`; locally `otel.sdk.disabled: true`, so nothing exports to it
-  # unless you turn tracing on. spg is a container but also a routed service, so it carries a port in the map below.
+  # unless you turn it on — `OTEL_SDK_DISABLED=false lcl start -d --infra all` does, for every Java service and
+  # landing-ui alike (lcl passes its environment through). spg is a container but also a routed service, so it
+  # carries a port in the map below.
   default: [postgres, minio, spg]
   environment:
     # Consumed by the ${LCL_PORT_*:-default} placeholders in docker-compose-lcl.yml: the upstream ports the
@@ -68,6 +70,12 @@ defaults:
     # platform resolves hangs off `com.asrevo.cvhome.services.<name>.port` (server.port, the uaa issuer and JWKS
     # URIs, the pod endpoints) or off the SimpleDiscoveryClient instance URIs that back every `lb://` call, so
     # rewriting both from the assigned map is what makes a shifted stack coherent.
+    #
+    # The OTel starter's exporter protocol defaults to http/protobuf, and 4317 is the collector's gRPC port: without
+    # `otel.exporter.otlp.protocol: grpc` every span and log export fails with "unexpected end of stream on
+    # http://localhost:4317" the moment the SDK is enabled, while Micrometer's metrics (4318, HTTP) still arrive —
+    # so Prometheus fills up and Tempo and Loki stay empty. The containers (spg, landing-ui) pin the same protocol
+    # in docker-compose-lcl.yml.
     #
     # `{{#each services}}` iterates the *source* services only — Compose services are a separate list and are not
     # in it. spg is configured under com.asrevo.cvhome.services like any other service but runs as a container, so
@@ -105,7 +113,8 @@ defaults:
         "com.asrevo.cvhome.pod-info.pod.endpoint.type": "EXTERNAL",
         "management.otlp.tracing.endpoint": "http://localhost:${port.otel-collector.4318}/v1/traces",
         "management.otlp.metrics.export.url": "http://localhost:${port.otel-collector.4318}/v1/metrics",
-        "otel.exporter.otlp.endpoint": "http://localhost:${port.otel-collector.4317}"
+        "otel.exporter.otlp.endpoint": "http://localhost:${port.otel-collector.4317}",
+        "otel.exporter.otlp.protocol": "grpc"
       }
     # Whose code is this? One worktree per feature means several stacks are up at once, serving different
     # branches on ports that differ only by the offset — and nothing in a response says which. Spring's relaxed
