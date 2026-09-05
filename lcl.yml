@@ -195,15 +195,19 @@ services:
     description: seller/admin console (Angular); reached through store-core-gateway, not directly
     cwd: store-core/console-ui
     # A fresh worktree has no node_modules, and `npm run start` there fails as a bare "exited with 127"
-    # that says nothing about why. Install once, only when they are missing, so an existing checkout pays
-    # nothing. `npm install`, not `npm ci`: no package-lock.json is committed for this app.
+    # that says nothing about why. Install when they are missing, and again when any package.json (a workspace
+    # member's included) is newer than node_modules/.package-lock.json, the marker npm writes on every install:
+    # a pull that adds a dependency (#318 added a font to the pink theme, ui-kit became a file: dependency of
+    # the console) otherwise leaves the dev server failing on a module it cannot resolve, and "[ -d
+    # node_modules ]" never notices. Build outputs carry package.json files of their own, so they are pruned
+    # from the search. `npm install`, not `npm ci`: no package-lock.json is committed for this app.
     prepare:
       # The shared Angular library first: console-ui links its build output as a file: dependency, and
       # npm reads that directory's package.json at install time, so `dist/ui-kit` must already exist.
       # The build is cheap (~1s) and idempotent, so it runs every time rather than being guarded.
-      - { cwd: store-commons/ui-kit, command: [sh, -c, "[ -d node_modules ] || npm install --no-audit --no-fund"] }
+      - { cwd: store-commons/ui-kit, command: [sh, -c, "m=node_modules/.package-lock.json; [ -f \"$m\" ] && [ -z \"$(find . \\( -name node_modules -o -name .next -o -name .next-default -o -name dist -o -name build -o -name .angular \\) -prune -o -name package.json -newer \"$m\" -print -quit)\" ] || npm install --no-audit --no-fund"] }
       - { cwd: store-commons/ui-kit, command: [npm, run, build] }
-      - { cwd: store-core/console-ui, command: [sh, -c, "[ -d node_modules ] || npm install --no-audit --no-fund"] }
+      - { cwd: store-core/console-ui, command: [sh, -c, "m=node_modules/.package-lock.json; [ -f \"$m\" ] && [ -z \"$(find . \\( -name node_modules -o -name .next -o -name .next-default -o -name dist -o -name build -o -name .angular \\) -prune -o -name package.json -newer \"$m\" -print -quit)\" ] || npm install --no-audit --no-fund"] }
     command: [npm, run, start, --, --port, "${port.console-ui.http}"]
     ports: { http: 8011 }
     depends-on: [store-core-gateway]
@@ -267,7 +271,7 @@ services:
     prepare:
       # Same fresh-worktree gap as the console: without node_modules the build:libs steps below fail
       # first, and the error names the build rather than the missing install.
-      - { cwd: store-pod/landing-ui, command: [sh, -c, "[ -d node_modules ] || npm install --no-audit --no-fund"] }
+      - { cwd: store-pod/landing-ui, command: [sh, -c, "m=node_modules/.package-lock.json; [ -f \"$m\" ] && [ -z \"$(find . \\( -name node_modules -o -name .next -o -name .next-default -o -name dist -o -name build -o -name .angular \\) -prune -o -name package.json -newer \"$m\" -print -quit)\" ] || npm install --no-audit --no-fund"] }
       - { cwd: store-pod/landing-ui, command: [npm, run, build:libs-types] }
       - { cwd: store-pod/landing-ui, command: [npm, run, build:libs-services] }
       - { cwd: store-pod/landing-ui, command: [npm, run, build:libs-hooks] }
