@@ -65,6 +65,10 @@ public class SiteSettingsService {
         return repository.findById(store.getId()).orElseGet(() -> {
             SiteSettings created = new SiteSettings();
             created.setStoreMerchantId(store.getId());
+            // The insert names every column, so the DDL defaults never apply: a null here is a NOT NULL
+            // violation, and the first storefront read of a store nobody has configured answered 409.
+            created.setSeo(JsonCodec.write(Map.of()));
+            created.setSocialLinks(JsonCodec.write(List.of()));
             return repository.save(created);
         });
     }

@@ -137,6 +137,22 @@ class SiteSettingsServiceTest {
         verify(repository).save(created);
     }
 
+    /**
+     * The insert names every column, so the DDL defaults never apply: a null JSON column is a NOT NULL violation
+     * and the first storefront read of an unconfigured store answered 409. Empty documents, never null.
+     */
+    @Test
+    void theRecordIsCreatedWithEmptyJsonDocumentsRatherThanNulls() {
+        when(repository.findById(STORE_ID)).thenReturn(Optional.empty());
+
+        SiteSettings created = service.entity(ContentFixtures.STORE);
+
+        assertThat(created.getSeo()).isEqualTo(JsonCodec.write(Map.of()));
+        assertThat(created.getSocialLinks()).isEqualTo(JsonCodec.write(List.of()));
+        assertThat(service.seo(created)).isEmpty();
+        assertThat(service.socialLinks(created)).isEmpty();
+    }
+
     @Test
     void anUntouchedRecordReadsAsEmptyRatherThanNull() {
         stored(settings());
