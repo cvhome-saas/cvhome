@@ -7,6 +7,12 @@ services:
       POSTGRES_DB: cvhome
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
+    # A named volume, or the data lives in an anonymous one that `compose down` orphans: every `lcl stop` /
+    # `lcl start` then boots an empty database and re-seeds it, and every store, order or account created since
+    # the last start is gone (sixty-odd dangling volumes on one machine told the story). `lcl stop --hard` is the
+    # documented way to discard it; a plain stop keeps it.
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
   minio:
     image: minio/minio:RELEASE.2025-09-07T16-13-09Z-cpuv1
     command: server /data --console-address ":9001"
@@ -16,6 +22,9 @@ services:
     environment:
       MINIO_ROOT_USER: minioadmin
       MINIO_ROOT_PASSWORD: minioadmin
+    # Same reason as postgres: uploaded media and the seeded product photos survive a stop.
+    volumes:
+      - minio-data:/data
   spg:
     image: ashraf1abdelrasool/saas-gateway:sha-4a6d381
     ports:
@@ -109,3 +118,7 @@ services:
       - prometheus
       - loki
       - tempo
+
+volumes:
+  postgres-data:
+  minio-data:
