@@ -13,8 +13,10 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Import;
 
 import com.asrevo.cvhome.commons.domain.CurrencyCode;
+import com.asrevo.cvhome.payment.config.ExternalClientsTestConfiguration;
 import com.asrevo.cvhome.payment.entity.payment.PaymentSecret;
 import com.asrevo.cvhome.payment.errors.PaymentInitiateRejectedException;
 import com.asrevo.cvhome.payment.errors.PaymentProviderUnavailableException;
@@ -53,6 +55,9 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  * </p>
  */
 @ServiceIntegrationTest
+// Same context as every other payment integration test: without this the class asks for a second one, which
+// has no stubbed external clients and fails to start — and forks another Postgres container besides.
+@Import(ExternalClientsTestConfiguration.class)
 class StripeProcessorContractIntegrationTest {
 
     private static final String REFERENCE = "internal-ref-1";
