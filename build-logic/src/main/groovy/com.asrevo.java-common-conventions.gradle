@@ -69,6 +69,18 @@ tasks.named('jacocoTestReport') {
     }
 }
 
+// processResources is a Copy, and a Copy never removes what it copied before: delete a file under src/main/resources
+// and its twin under build/resources/main stays until `clean`. That is harmless for most resources and fatal for
+// the SQL seeds, because the test-stores profile runs every file matching init-sql/stores/*/*.sql — so a seed
+// retired from src/ (the SECTION rows #309 replaced with layout documents) kept executing from build/ and failed
+// the content service on start against the very check constraint the same PR had narrowed. Sync semantics
+// instead: when the task runs at all, it starts from an empty destination. An up-to-date task still skips.
+tasks.withType(ProcessResources).configureEach {
+    doFirst {
+        delete(destinationDir)
+    }
+}
+
 // Coverage is gated per domain by the root com.asrevo.jacoco-aggregate-conventions plugin (domainCoverageMinimum in
 // the root build.gradle); modules carry no gate of their own.
 
