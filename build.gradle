@@ -28,25 +28,25 @@ repositories {
 ext.domainCoverageMinimum = [
         // Merged is at 1.00 and capped here at 0.99 on purpose: a floor of exactly 1.00 fails the build on the
         // first line of new code, before its test can land in the same commit.
-        inventory     : [unit: 0.95, integration: 0.87, merged: 0.99],
-        'pod-registry': [unit: 0.95, integration: 0.64, merged: 0.99],
-        merchant      : [unit: 0.95, integration: 0.88, merged: 0.97],
+        inventory     : [unit: 0.95, integration: 0.96, merged: 0.99],
+        'pod-registry': [unit: 0.95, integration: 0.77, merged: 0.99],
+        merchant      : [unit: 0.95, integration: 0.91, merged: 0.99],
         gateway       : [unit: 0.97, integration: 0.72, merged: 0.97],
-        payment       : [unit: 0.98, integration: 0.62, merged: 0.99],
+        payment       : [unit: 0.98, integration: 0.74, merged: 0.99],
         content       : [unit: 0.95, integration: 0.87, merged: 0.99],
-        tenancy       : [unit: 0.95, integration: 0.78, merged: 0.98],
+        tenancy       : [unit: 0.95, integration: 0.79, merged: 0.97],
         catalog       : [unit: 0.95, integration: 0.94, merged: 0.99],
-        billing       : [unit: 0.95, integration: 0.63, merged: 0.97],
+        billing       : [unit: 0.95, integration: 0.75, merged: 0.97],
         // sso = the authorization server shared by store-core/uaa and store-pod/cua. Its own domain since the
         // extraction: ~12.7k lines in `shared`'s denominator made both numbers meaningless.
-        sso           : [unit: 0.95, integration: 0.81, merged: 0.97],
+        sso           : [unit: 0.95, integration: 0.83, merged: 0.97],
         // shared = the store-commons libraries. They own no integrationTest source set of their own; since the
         // coverage fix they are credited from the services that boot them, so the integration column is real — and
         // low for the honest reason that a library is exercised by whichever service happens to use it.
-        shared        : [unit: 0.95, integration: 0.48, merged: 0.96],
+        shared        : [unit: 0.95, integration: 0.69, merged: 0.96],
         // Thin shells since the SSO extraction: everything they own beyond their two deployment seams lives in sso.
         // The integration floors are low because most of what a request touches is counted against `sso`, not here.
-        uaa           : [unit: 0.95, integration: 0.32, merged: 0.99],
+        uaa           : [unit: 0.95, integration: 0.96, merged: 0.99],
         cua           : [unit: 0.95, integration: 0.67, merged: 0.98],
         // :store-pod:commons:* — customer/reference/CMS code queued behind the checkout refactor; its packages are
         // literally `com.asrevo.cvhome.checkout`. Both wait on that refactor and are reported but not gated.
