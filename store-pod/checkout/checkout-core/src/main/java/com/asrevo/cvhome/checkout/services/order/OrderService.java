@@ -1,39 +1,49 @@
 package com.asrevo.cvhome.checkout.services.order;
 
 import java.util.List;
-import java.util.Optional;
 
-import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
-import com.asrevo.cvhome.checkout.entity.customer.Customer;
-import com.asrevo.cvhome.checkout.entity.order.Order;
-import com.asrevo.cvhome.checkout.entity.order.OrderSummary;
-import com.asrevo.cvhome.checkout.entity.order.OrderTotalSummary;
-import com.asrevo.cvhome.checkout.entity.order.orderstatus.OrderStatusHistory;
-import com.asrevo.cvhome.checkout.entity.shoppingcart.ShoppingCartItem;
-import com.asrevo.cvhome.checkout.model.order.OrderCriteria;
+import com.asrevo.cvhome.checkout.domain.ShopperId;
+import com.asrevo.cvhome.checkout.errors.IllegalOrderTransitionException;
+import com.asrevo.cvhome.checkout.errors.OrderNotFoundException;
+import com.asrevo.cvhome.checkout.model.order.OrderFilter;
+import com.asrevo.cvhome.checkout.model.order.PersistableOrderStatusHistory;
+import com.asrevo.cvhome.checkout.model.order.ReadableOrder;
+import com.asrevo.cvhome.checkout.model.order.ReadableOrderConfirmation;
+import com.asrevo.cvhome.checkout.model.order.ReadableOrderList;
+import com.asrevo.cvhome.checkout.model.order.ReadableOrderStatus;
+import com.asrevo.cvhome.checkout.model.order.ReadableOrderStatusHistory;
+import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.entity.common.InventoryStatus;
-import com.asrevo.cvhome.store.core.entity.common.PaymentStatus;
-import com.asrevo.cvhome.store.core.entity.order.orderstatus.OrderStatus; // Import OrderStatus
-import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
 
-public interface OrderService extends SalesManagerEntityService<Long, Order> {
+/**
+ * Orders after placement: the console's reads and its one write, and the shopper's view of their own orders.
+ */
+public interface OrderService {
 
-    void addOrderStatusHistory(Order order, OrderStatusHistory history);
+    ReadableOrderList list(StoreMerchantId store, LanguageCode language, OrderFilter filter, Pageable pageable);
 
-    OrderTotalSummary calculateOrderTotal(OrderSummary orderSummary, StoreMerchantId store);
+    ReadableOrder get(StoreMerchantId store, LanguageCode language, Long id) throws OrderNotFoundException;
 
-    Order process(Order order, Customer customer, List<ShoppingCartItem> items, OrderTotalSummary summary, StoreMerchantId store);
+    List<ReadableOrderStatusHistory> history(StoreMerchantId store, Long id) throws OrderNotFoundException;
 
-    Order getOrder(Long orderId, StoreMerchantId store);
+    /** The console moving an order along; {@code actor} is the staff principal for the history row. */
+    ReadableOrderStatusHistory transition(StoreMerchantId store, Long id, PersistableOrderStatusHistory change,
+                                          String actor) throws OrderNotFoundException, IllegalOrderTransitionException;
 
-    Page<Order> getOrders(OrderCriteria criteria, StoreMerchantId store);
+    /**
+     * The payment-return page's read. Owned by {@code shopper} when one is signed in; anonymous when the store
+     * allows guest checkout and none is.
+     */
+    ReadableOrderStatus status(StoreMerchantId store, Long id, ShopperId shopper) throws OrderNotFoundException;
 
-    void updateOrderStatus(Long orderId, OrderStatus orderStatus, InventoryStatus inventoryStatus, PaymentStatus paymentStatus);
+    ReadableOrderList listForShopper(StoreMerchantId store, LanguageCode language, ShopperId shopper,
+                                     Pageable pageable);
 
-    void updateOrderStatus(Long orderId, OrderStatus orderStatus, InventoryStatus inventoryStatus, PaymentStatus paymentStatus,
-                           String redirectUri);
+    ReadableOrderConfirmation getForShopper(StoreMerchantId store, LanguageCode language, ShopperId shopper, Long id)
+            throws OrderNotFoundException;
 
-    Optional<Order> findOrderByShoppingCartCodeAndStoreMerchantId(String shoppingCartCode, StoreMerchantId storeMerchantId);
+    List<ReadableOrderStatusHistory> historyForShopper(StoreMerchantId store, ShopperId shopper, Long id)
+            throws OrderNotFoundException;
 }

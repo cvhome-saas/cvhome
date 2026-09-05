@@ -3,26 +3,23 @@ plugins {
 }
 
 dependencies {
-    // The unit tests build entities (SalesManagerEntity extends Spring Data's AbstractAggregateRoot) and read
-    // JPA-annotated fields, so the interfaces production code only compiles against must resolve at test time.
-    testImplementation libs.spring.data.commons
-    testImplementation libs.spring.data.jpa
-    testImplementation libs.jakarta.persistence.api
-    testImplementation libs.hibernate.core
     api project(':store-pod:commons:store-commons')
-    api project(':store-pod:merchant:merchant-external-api')
-    api project(':store-pod:catalog:catalog-external-api')
-    api project(':store-pod:inventory:inventory-external-api')
-    api project(':store-pod:payment:payment-external-api')
     api project(':store-pod:checkout:checkout-commons')
-    api project(':store-pod:commons:customer:customer-core')
-    implementation project(':store-pod:commons:reference:reference-core')
-    implementation libs.commons.beanutils
+    // Neighbours are reached through their -external-api only; never a -core or -service.
+    implementation project(':store-pod:merchant:merchant-external-api')
+    implementation project(':store-pod:catalog:catalog-external-api')
+    implementation project(':store-pod:inventory:inventory-external-api')
+    implementation project(':store-pod:payment:payment-external-api')
     compileOnly libs.spring.data.jpa
-    compileOnly libs.jakarta.validation.api
-    compileOnly libs.jackson.annotations
-    compileOnly libs.apache.commons.lang3
-    compileOnly libs.lombok
+    compileOnly libs.spring.boot.starter.autoconfigure
     compileOnly libs.hibernate.core
+    compileOnly libs.jakarta.validation.api
+    compileOnly libs.lombok
     annotationProcessor libs.lombok
+
+    // The aggregate under test extends AbstractAggregateRoot, which is compileOnly for main.
+    testImplementation libs.spring.data.jpa
+    // Mockito mocks the JPA repositories, whose annotations reference jakarta.persistence at load time.
+    testImplementation libs.jakarta.persistence.api
+    testImplementation libs.spring.boot.starter.autoconfigure
 }

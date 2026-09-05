@@ -10,7 +10,8 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 
-import com.asrevo.cvhome.checkout.services.order.ExternalOrderService;
+import com.asrevo.cvhome.checkout.api.errors.CheckoutApiUnavailableException;
+import com.asrevo.cvhome.checkout.services.order.ExternalOrderSignalService;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.payment.config.ExternalClientsTestConfiguration;
 import com.asrevo.cvhome.store.core.entity.common.PaymentStatus;
@@ -40,6 +41,8 @@ import static com.asrevo.cvhome.payment.api.v1.payment.PaymentApiTestSupport.que
 import static com.asrevo.cvhome.payment.api.v1.payment.PaymentApiTestSupport.scoped;
 import static com.asrevo.cvhome.payment.api.v1.payment.PaymentApiTestSupport.slug;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 
@@ -49,7 +52,7 @@ import static org.mockito.Mockito.verify;
  * <p>
  * Approving a bank transfer is the one place where payment writes back to checkout: the transaction registers a
  * domain event, the outbox picks it up, and the order is told it is paid. That hop runs asynchronously, so it is
- * asserted through the stubbed {@code ExternalOrderService} rather than assumed from the 200.
+ * asserted through the stubbed {@code ExternalOrderSignalService} rather than assumed from the 200.
  * </p>
  */
 @StorageIntegrationTest
@@ -88,7 +91,7 @@ class PrivatePaymentApiIntegrationTest {
     private TestJwtSigner signer;
 
     @Autowired
-    private ExternalOrderService externalOrderService;
+    private ExternalOrderSignalService externalOrderService;
 
     private PaymentApiTestSupport api;
 
@@ -145,7 +148,7 @@ class PrivatePaymentApiIntegrationTest {
     }
 
     @Test
-    void approvingATransferMarksItPaidAndTellsCheckout() {
+    void approvingATransferMarksItPaidAndTellsCheckout() throws CheckoutApiUnavailableException {
         String ref = slug(ORDER);
         String internalRef = stage(ref);
 
@@ -156,7 +159,7 @@ class PrivatePaymentApiIntegrationTest {
         assertThat(row.get(STATUS).asString()).isEqualTo(PAID);
         assertThat(row.get("transactionNo").asString()).isEqualTo(TRANSACTION_NO);
         verify(externalOrderService, timeout(PROPAGATION_TIMEOUT.toMillis()))
-                .updatePaymentStatus(new StoreMerchantId(STORE), ref, PaymentStatus.PAID);
+                .signalPayment(eq(new StoreMerchantId(STORE)), eq(ref), argThat(signal -> signal.status() == PaymentStatus.PAID));
     }
 
     @Test

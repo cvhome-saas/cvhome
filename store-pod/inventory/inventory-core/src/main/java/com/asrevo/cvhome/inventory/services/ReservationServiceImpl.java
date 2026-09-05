@@ -36,12 +36,16 @@ public class ReservationServiceImpl implements ReservationService {
 
     private final Duration expiry;
 
+    private final Duration maxExpiry;
+
     public ReservationServiceImpl(ProductReservationRepository reservationRepository,
                                   InventoryRepository inventoryRepository,
-                                  @Value("${reservation.expiry.minutes:45}") int expiryMinutes) {
+                                  @Value("${reservation.expiry.minutes:45}") int expiryMinutes,
+                                  @Value("${reservation.expiry.max-hours:72}") int maxExpiryHours) {
         this.reservationRepository = reservationRepository;
         this.inventoryRepository = inventoryRepository;
         this.expiry = Duration.ofMinutes(expiryMinutes);
+        this.maxExpiry = Duration.ofHours(maxExpiryHours);
     }
 
     @Override
@@ -54,7 +58,7 @@ public class ReservationServiceImpl implements ReservationService {
         ProductReservation reservation = reservationRepository.findByStoreMerchantIdAndRef(store, ref)
                 .orElseGet(() -> new ProductReservation(store, ref));
         reservation.setStatus(ProductReservationStatus.TEMPORARY_RESERVED);
-        reservation.setExpireAt(Instant.now().plus(expiry));
+        reservation.setExpireAt(expireAt(Instant.now(), request.expireAt()));
 
         // Locked in sku order so two orders holding overlapping sku sets cannot deadlock each other.
         List<ReserveProductEntry> entries = request.entries().stream()
@@ -67,6 +71,18 @@ public class ReservationServiceImpl implements ReservationService {
         }
         ProductReservation saved = reservationRepository.save(reservation);
         return new ProductReservationReserveResult(true, saved.getId(), saved.getExpireAt());
+    }
+
+    /**
+     * The caller's hold, if it asked for one, capped so a misconfigured checkout cannot park stock for a year; the
+     * service default otherwise.
+     */
+    private Instant expireAt(Instant now, Instant requested) {
+        Instant cap = now.plus(maxExpiry);
+        if (requested == null || !requested.isAfter(now)) {
+            return now.plus(expiry);
+        }
+        return requested.isAfter(cap) ? cap : requested;
     }
 
     private Inventory take(StoreMerchantId store, String sku, int quantity) throws InsufficientInventoryException {

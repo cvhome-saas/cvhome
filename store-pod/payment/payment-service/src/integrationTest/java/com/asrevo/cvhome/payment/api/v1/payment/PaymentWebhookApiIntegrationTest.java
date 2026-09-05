@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 
-import com.asrevo.cvhome.checkout.services.order.ExternalOrderService;
+import com.asrevo.cvhome.checkout.services.order.ExternalOrderSignalService;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.payment.config.ExternalClientsTestConfiguration;
 import com.asrevo.cvhome.store.core.entity.common.PaymentStatus;
@@ -41,6 +41,8 @@ import static com.asrevo.cvhome.payment.api.v1.payment.PaymentApiTestSupport.slu
 import static com.asrevo.cvhome.payment.api.v1.payment.PaymentApiTestSupport.stripeSignature;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 
@@ -83,7 +85,7 @@ class PaymentWebhookApiIntegrationTest {
     private TestJwtSigner signer;
 
     @Autowired
-    private ExternalOrderService externalOrderService;
+    private ExternalOrderSignalService externalOrderService;
 
     private PaymentApiTestSupport api;
 
@@ -129,7 +131,7 @@ class PaymentWebhookApiIntegrationTest {
 
         await().atMost(SETTLEMENT_TIMEOUT).untilAsserted(() -> assertThat(statusOf(ref)).isEqualTo(PAID));
         verify(externalOrderService, timeout(SETTLEMENT_TIMEOUT.toMillis()))
-                .updatePaymentStatus(new StoreMerchantId(STORE), ref, PaymentStatus.PAID);
+                .signalPayment(eq(new StoreMerchantId(STORE)), eq(ref), argThat(signal -> signal.status() == PaymentStatus.PAID));
     }
 
     @Test

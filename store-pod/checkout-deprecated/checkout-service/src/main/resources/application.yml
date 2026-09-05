@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: checkout
+  config:
+    import: "classpath:common-config.yml"
+  security:
+    oauth2:
+      client:
+        registration:
+          s2s:
+            provider: uaa
+            client-id: store-pod-507f1f77@service.store-pod.internal
+            client-secret: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
+            authorization-grant-type: client_credentials
+            scope: store_pod
+  sql:
+    init:
+      schema-locations: classpath:init-sql/schema.sql
+      data-locations: classpath:init-sql/data-common.sql
+  jpa:
+    properties:
+      hibernate:
+        default_schema: ${spring.application.name}

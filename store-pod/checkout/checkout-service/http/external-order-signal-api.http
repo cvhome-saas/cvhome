@@ -1,0 +1,83 @@
+# ExternalOrderSignalApi — com.asrevo.cvhome.checkout.api.v1.order.ExternalOrderSignalApi
+#
+# Payment and inventory telling checkout what became of an order. STORE-POD.CHECKOUT.SIGNAL → a service principal
+# of this pod only; a seller session or a shopper token answers 403. To drive it by hand, mint an s2s token from
+# uaa with the pod client and put it in S2S_TOKEN (http-client.private.env.json):
+#
+#   curl -u 'store-pod-507f1f77@service.store-pod.internal:hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7' \
+#        -d grant_type=client_credentials -d scope=store_pod {{UAA_URL}}/oauth2/token
+#
+# Both signals are idempotent: a redelivery answers outcome=DUPLICATE, a signal the order cannot use answers IGNORED
+# (200 either way — payment's outbox must not retry a decision that will not change). Set ORDER_REF from a
+# placement (checkout-api.http stores it).
+#
+# Requires a running stack: lcl start -d
+
+### payment settled — APPLIED: order CONFIRMED, payment PAID, then the stock is committed
+POST {{SPG_URL}}/checkout/api/v1/private/orders/{{ORDER_REF}}/signals/payment?store={{STORE_ID}}&lang={{LANG}}
+Authorization: Bearer {{S2S_TOKEN}}
+Content-Type: application/json
+
+{
+  "status": "PAID",
+  "transactionRef": "manual-tx-1"
+}
+
+### the same signal again — DUPLICATE, nothing changes, one more ledger row
+POST {{SPG_URL}}/checkout/api/v1/private/orders/{{ORDER_REF}}/signals/payment?store={{STORE_ID}}&lang={{LANG}}
+Authorization: Bearer {{S2S_TOKEN}}
+Content-Type: application/json
+
+{
+  "status": "PAID",
+  "transactionRef": "manual-tx-1"
+}
+
+### a failure after the payment — IGNORED (money already taken; the console decides)
+POST {{SPG_URL}}/checkout/api/v1/private/orders/{{ORDER_REF}}/signals/payment?store={{STORE_ID}}&lang={{LANG}}
+Authorization: Bearer {{S2S_TOKEN}}
+Content-Type: application/json
+
+{
+  "status": "FAILED",
+  "transactionRef": "manual-tx-1"
+}
+
+### a rejected manual transfer (on a PENDING_PAYMENT order) — APPLIED: CANCELLED, stock released
+POST {{SPG_URL}}/checkout/api/v1/private/orders/{{ORDER_REF}}/signals/payment?store={{STORE_ID}}&lang={{LANG}}
+Authorization: Bearer {{S2S_TOKEN}}
+Content-Type: application/json
+
+{
+  "status": "REJECTED",
+  "transactionRef": "manual-tx-2"
+}
+
+### inventory released an expired reservation
+POST {{SPG_URL}}/checkout/api/v1/private/orders/{{ORDER_REF}}/signals/reservation-expired?store={{STORE_ID}}&lang={{LANG}}
+Authorization: Bearer {{S2S_TOKEN}}
+Content-Type: application/json
+
+{
+  "reservationRef": "{{ORDER_REF}}"
+}
+
+### a shopper token — 403
+POST {{SPG_URL}}/checkout/api/v1/private/orders/{{ORDER_REF}}/signals/payment?store={{STORE_ID}}&lang={{LANG}}
+Authorization: Bearer {{SHOPPER_TOKEN}}
+Content-Type: application/json
+
+{
+  "status": "PAID",
+  "transactionRef": "manual-tx-3"
+}
+
+### a ref this store never issued — 404 CHECKOUT.ORDER.NOT_FOUND
+POST {{SPG_URL}}/checkout/api/v1/private/orders/00000000-0000-0000-0000-000000000000/signals/payment?store={{STORE_ID}}&lang={{LANG}}
+Authorization: Bearer {{S2S_TOKEN}}
+Content-Type: application/json
+
+{
+  "status": "PAID",
+  "transactionRef": "manual-tx-4"
+}

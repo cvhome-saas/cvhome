@@ -1,0 +1,12 @@
+# CountryApi — com.asrevo.cvhome.checkout.api.v1.reference.CountryApi
+#
+# Public. The ISO country list from the JDK, named in the request language; `zones` is always empty (states and
+# provinces are free text on an address now).
+#
+# Requires a running stack: lcl start -d
+
+### in English
+GET {{SPG_URL}}/checkout/api/v1/country?store={{STORE_ID}}&lang=en
+
+### in French
+GET {{SPG_URL}}/checkout/api/v1/country?store={{STORE_ID}}&lang=fr

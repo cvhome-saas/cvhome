@@ -33,6 +33,12 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
     private static final String CONTENT_MEDIA_USAGE = "STORE-POD.CONTENT.MEDIA-USAGE";
     private static final String CATALOG_ALL = "STORE-POD.CATALOG.*";
     private static final String CHECKOUT_ALL = "STORE-POD.CHECKOUT.*";
+
+    /**
+     * Pod-internal: payment and inventory telling checkout what became of an order. Same shape as INVENTORY_RESERVE —
+     * a service principal of this pod, never a shopper or seller token.
+     */
+    private static final String CHECKOUT_SIGNAL = "STORE-POD.CHECKOUT.SIGNAL";
     private static final String CUA_ALL = "STORE-POD.CUA.*";
     private static final String PAYMENT_ALL = "STORE-POD.PAYMENT.*";
     private static final String INVENTORY_ALL = "STORE-POD.INVENTORY.*";
@@ -80,9 +86,9 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
                                  Object permission) {
         String action = (String) permission;
         return switch (action) {
-            case STORE_CREATE, CATALOG_RESERVE, INVENTORY_RESERVE, MERCHANT_ALL, MERCHANT_READ, CONTENT_ALL,
-                 CONTENT_READ, CONTENT_MEDIA_USAGE, CATALOG_ALL, CHECKOUT_ALL, CUA_ALL, PAYMENT_ALL, INVENTORY_ALL,
-                 CUSTOMER_ALL -> hasStorePodPermission(authentication, targetId, action);
+            case STORE_CREATE, CATALOG_RESERVE, INVENTORY_RESERVE, CHECKOUT_SIGNAL, MERCHANT_ALL, MERCHANT_READ,
+                 CONTENT_ALL, CONTENT_READ, CONTENT_MEDIA_USAGE, CATALOG_ALL, CHECKOUT_ALL, CUA_ALL, PAYMENT_ALL,
+                 INVENTORY_ALL, CUSTOMER_ALL -> hasStorePodPermission(authentication, targetId, action);
             default -> hasStoreCorePermission(authentication, targetId, action);
         };
     }
@@ -91,7 +97,7 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
         return switch (action) {
             case STORE_CREATE -> checker.hasAccessOnStoreCreate(authentication, (String) targetId, this.pod);
 
-            case CATALOG_RESERVE, INVENTORY_RESERVE, CONTENT_MEDIA_USAGE ->
+            case CATALOG_RESERVE, INVENTORY_RESERVE, CHECKOUT_SIGNAL, CONTENT_MEDIA_USAGE ->
                     checker.isSameStorePod(authentication, (StoreMerchantId) targetId, this.pod);
 
             case MERCHANT_READ, CONTENT_READ -> checker.hasReadAccessOnStore(authentication, (StoreMerchantId) targetId,

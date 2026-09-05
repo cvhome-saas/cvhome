@@ -9,7 +9,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.asrevo.cvhome.checkout.services.order.ExternalOrderService;
+import com.asrevo.cvhome.checkout.api.errors.CheckoutApiUnavailableException;
+import com.asrevo.cvhome.checkout.model.signal.ReservationExpiredSignal;
+import com.asrevo.cvhome.checkout.services.order.ExternalOrderSignalService;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.inventory.entity.ProductReservation;
 import com.asrevo.cvhome.inventory.entity.ProductReservationStatus;
@@ -42,34 +44,34 @@ class ReservationExpiryJobTest {
     private ReservationService reservationService;
 
     @Mock
-    private ExternalOrderService externalOrderService;
+    private ExternalOrderSignalService externalOrderService;
 
     @InjectMocks
     private ReservationExpiryJob job;
 
     @Test
-    void nothingExpiredMeansNothingReleased() {
+    void nothingExpiredMeansNothingReleased() throws CheckoutApiUnavailableException {
         when(reservationRepository.findByStatusAndExpireAtBeforeOrderById(
                 eq(ProductReservationStatus.TEMPORARY_RESERVED), any(Instant.class))).thenReturn(List.of());
 
         job.releaseExpired();
 
         verify(reservationService, never()).release(any(), any());
-        verify(externalOrderService, never()).handleReservationExpired(any(), any());
+        verify(externalOrderService, never()).signalReservationExpired(any(), any(), any());
     }
 
     @Test
-    void releasesEveryExpiredReservationEvenWhenCheckoutCannotBeToldAboutOne() {
+    void releasesEveryExpiredReservationEvenWhenCheckoutCannotBeToldAboutOne() throws CheckoutApiUnavailableException {
         when(reservationRepository.findByStatusAndExpireAtBeforeOrderById(
                 eq(ProductReservationStatus.TEMPORARY_RESERVED), any(Instant.class)))
                 .thenReturn(List.of(new ProductReservation(STORE, REF_1), new ProductReservation(STORE, REF_2)));
         doThrow(new IllegalStateException("checkout down"))
-                .when(externalOrderService).handleReservationExpired(STORE, REF_1);
+                .when(externalOrderService).signalReservationExpired(STORE, REF_1, new ReservationExpiredSignal(REF_1));
 
         job.releaseExpired();
 
         verify(reservationService).release(STORE, REF_1);
         verify(reservationService).release(STORE, REF_2);
-        verify(externalOrderService).handleReservationExpired(STORE, REF_2);
+        verify(externalOrderService).signalReservationExpired(STORE, REF_2, new ReservationExpiredSignal(REF_2));
     }
 }

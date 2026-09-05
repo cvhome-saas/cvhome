@@ -52,8 +52,9 @@ ext.domainCoverageMinimum = [
         // The integration floors are low because most of what a request touches is counted against `sso`, not here.
         uaa           : [unit: 0.95, integration: 0.96, merged: 0.99],
         cua           : [unit: 0.95, integration: 0.67, merged: 0.98],
-        // :store-pod:commons:* — customer/reference/CMS code queued behind the checkout refactor; its packages are
-        // literally `com.asrevo.cvhome.checkout`. Both wait on that refactor and are reported but not gated.
+        // :store-pod:commons:* — the pod-shared DTO libraries (store-commons, customer-commons, reference-commons).
+        // Since the checkout rewrite they hold no service code of their own; reported, not gated.
         'pod-commons' : [unit: 0.0, integration: 0.0, merged: 0.0],
-        checkout      : [unit: 0.0, integration: 0.0, merged: 0.0],
+        // Rewritten 2026-09; the floors are what the rewrite's suites measured, rounded down.
+        checkout      : [unit: 0.97, integration: 0.86, merged: 0.99],
 ]

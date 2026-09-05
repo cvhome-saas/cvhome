@@ -5,7 +5,7 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 
-import com.asrevo.cvhome.checkout.services.order.ExternalOrderService;
+import com.asrevo.cvhome.checkout.services.order.ExternalOrderSignalService;
 
 /**
  * Inventory's one outbound client, replaced: checkout is another pod and is never reachable from these tests.
@@ -15,7 +15,7 @@ public class ExternalClientsTestConfiguration {
 
     @Bean
     @Primary
-    ExternalOrderService mockExternalOrderService() {
-        return Mockito.mock(ExternalOrderService.class);
+    ExternalOrderSignalService mockExternalOrderSignalService() {
+        return Mockito.mock(ExternalOrderSignalService.class);
     }
 }

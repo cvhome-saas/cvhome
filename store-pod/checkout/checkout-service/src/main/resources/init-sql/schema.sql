@@ -4,467 +4,216 @@ create table if not exists checkout.sm_sequencer
     seq_name  varchar(255) not null primary key,
     seq_count bigint
 );
-create table if not exists checkout.currency
+
+-- A shopper as this store knows them. Unique per (store, cua account): the same cua account in two stores is two rows.
+create table if not exists checkout.customer_account
 (
-    currency_code      varchar(6) not null primary key,
-    currency_name      varchar(255)
-        constraint uk_ntgaxtcgi6crpijka4yu7927o unique,
-    currency_supported boolean
-);
-create table if not exists checkout.geozone
-(
-    geozone_id   bigint not null primary key,
-    geozone_code varchar(255),
-    geozone_name varchar(255)
-);
-create table if not exists checkout.country
-(
-    country_isocode   varchar(6) not null primary key,
-    country_supported boolean,
-    geozone_id        bigint
-);
-create table if not exists checkout.language
-(
-    date_created  timestamp(6),
-    date_modified timestamp(6),
-    updt_id       varchar(60),
-    code          varchar(6) not null primary key,
-    sort_order    integer
-);
-create table if not exists checkout.country_description
-(
-    description_id bigint       not null primary key,
-    date_created   timestamp(6),
-    date_modified  timestamp(6),
-    updt_id        varchar(60),
-    description    text,
-    name           varchar(120) not null,
-    title          varchar(100),
-    language_code  varchar(6)   not null,
-    country_id     varchar(6)   not null,
-    constraint UKdf8ewjt49cy3enpcwoe9ganps unique (country_id, language_code)
-);
-create table if not exists checkout.geozone_description
-(
-    description_id bigint       not null primary key,
-    date_created   timestamp(6),
-    date_modified  timestamp(6),
-    updt_id        varchar(60),
-    description    text,
-    name           varchar(120) not null,
-    title          varchar(100),
-    language_code  varchar(6)   not null,
-    geozone_id     bigint,
-    constraint UKl86ppufwjqn6fy1sd7vfc7any unique (geozone_id, language_code)
-);
-create index if not exists code_idx2 on checkout.language (code);
-create table if not exists checkout.zone
-(
-    zone_code  varchar(100) not null primary key,
-    country_id varchar(6)   not null
-);
-create table if not exists checkout.zone_description
-(
-    description_id bigint       not null primary key,
-    date_created   timestamp(6),
-    date_modified  timestamp(6),
-    updt_id        varchar(60),
-    description    text,
-    name           varchar(120) not null,
-    title          varchar(100),
-    language_code  varchar(6)   not null,
-    zone_id        varchar(100) not null,
-    constraint UKbb9ur48rkg1nngdmka6tjlmum unique (zone_id, language_code)
-);
-create table if not exists checkout.customer
-(
-    customer_id             bigint      not null primary key,
-    customer_email_address  varchar(96),
-    customer_username       varchar(96),
-    cua_external_id         varchar(96),
+    customer_id             bigint       not null primary key,
     date_created            timestamp(6),
     date_modified           timestamp(6),
     updt_id                 varchar(60),
+    store_merchant_id       varchar(50)  not null,
+    cua_external_id         varchar(96)  not null,
+    email                   varchar(96)  not null,
+    first_name              varchar(64),
+    last_name               varchar(64),
+    billing_first_name      varchar(64),
+    billing_last_name       varchar(64),
+    billing_company         varchar(100),
     billing_street_address  varchar(256),
     billing_city            varchar(100),
-    billing_company         varchar(100),
-    billing_first_name      varchar(64) not null,
-    billing_last_name       varchar(64) not null,
-    billing_postcode        varchar(20),
     billing_state           varchar(100),
+    billing_postcode        varchar(20),
     billing_telephone       varchar(32),
-    billing_country_code    varchar(6)  not null,
+    billing_country_code    varchar(6),
     billing_zone_code       varchar(100),
-    delivery_street_address varchar(256),
-    delivery_city           varchar(100),
-    delivery_company        varchar(100),
     delivery_first_name     varchar(64),
     delivery_last_name      varchar(64),
-    delivery_postcode       varchar(20),
+    delivery_company        varchar(100),
+    delivery_street_address varchar(256),
+    delivery_city           varchar(100),
     delivery_state          varchar(100),
+    delivery_postcode       varchar(20),
     delivery_telephone      varchar(32),
     delivery_country_code   varchar(6),
     delivery_zone_code      varchar(100),
-    store_merchant_id       varchar(50) not null
+    constraint uk_customer_store_sub unique (store_merchant_id, cua_external_id)
 );
-create table if not exists checkout.customer_group
-(
-    customer_id bigint  not null
-        constraint fkbopjkmu9mriivehbk9yd6rbvw references checkout.customer,
-    group_id    integer not null
-);
-create table if not exists checkout.customer_review
-(
-    customer_review_id   bigint not null primary key,
-    date_created         timestamp(6),
-    date_modified        timestamp(6),
-    updt_id              varchar(60),
-    review_date          timestamp(6),
-    reviews_rating       double precision,
-    reviews_read         bigint,
-    status               integer,
-    customers_id         bigint
-        constraint fktnsb170ewuhjtok3p50nuaby2 references checkout.customer,
-    reviewed_customer_id bigint
-        constraint uk_p329f4tc2gt8e9iicefcf1dwu unique
-        constraint fkrt9to366jismmfdap0onydy9c references checkout.customer,
-    constraint ukpe13frashysxlaqa4rcms49j6 unique (
-                                                   customers_id, reviewed_customer_id
-        )
-);
-create table if not exists checkout.customer_review_description
-(
-    description_id     bigint       not null primary key,
-    date_created       timestamp(6),
-    date_modified      timestamp(6),
-    updt_id            varchar(60),
-    description        text,
-    name               varchar(120) not null,
-    title              varchar(100),
-    language_code      varchar(6)   not null,
-    customer_review_id bigint
-        constraint fk3nu9inejlfrkcig7ppv3glhrh references checkout.customer_review,
-    constraint UKmxdv3d04v2swtcv7ss7cx7qc9 unique (customer_review_id, language_code)
-);
-create table if not exists checkout.file_history
-(
-    file_history_id   bigint       not null primary key,
-    accounted_date    timestamp(6),
-    date_added        timestamp(6) not null,
-    date_deleted      timestamp(6),
-    download_count    integer      not null,
-    file_id           bigint,
-    filesize          integer      not null,
-    store_merchant_id varchar(50)  not null,
-    constraint UKippv13bhwgk2igdoub27tps73 unique (store_merchant_id, file_id)
-);
-create table if not exists checkout.optin
-(
-    optin_id          bigint       not null primary key,
-    code              varchar(255) not null,
-    description       varchar(255),
-    end_date          timestamp(6),
-    type              varchar(255) not null
-        constraint optin_type_check check (
-            (type):: text = ANY (
-                (
-                    ARRAY [ 'NEWSLETTER' :: character varying,
-                        'PROMOTIONS' :: character varying]
-                    ):: text[]
-                )
-            ),
-    start_date        timestamp(6),
-    store_merchant_id varchar(50),
-    constraint UKre6g495jxc6apfyo4dyvw7yuy unique (store_merchant_id, code)
-);
-create table if not exists checkout.orders
-(
-    order_id                bigint       not null primary key,
-    billing_street_address  varchar(256),
-    billing_city            varchar(100),
-    billing_company         varchar(100),
-    billing_first_name      varchar(64)  not null,
-    billing_last_name       varchar(64)  not null,
-    latitude                varchar(100),
-    longitude               varchar(100),
-    billing_postcode        varchar(20),
-    billing_state           varchar(100),
-    billing_telephone       varchar(32),
-    channel                 varchar(255)
-        constraint orders_channel_check check (
-            (channel):: text = ANY (
-                (
-                    ARRAY [ 'ONLINE' :: character varying,
-                        'API' :: character varying]
-                    ):: text[]
-                )
-            ),
-    confirmed_address       boolean,
-    currency_value          numeric(38, 2),
-    customer_agreed         boolean,
-    customer_email_address  varchar(50)  not null,
-    customer_id             bigint,
-    date_purchased          date,
-    delivery_street_address varchar(256),
-    delivery_city           varchar(100),
-    delivery_company        varchar(100),
-    delivery_first_name     varchar(64),
-    delivery_last_name      varchar(64),
-    delivery_postcode       varchar(20),
-    delivery_state          varchar(100),
-    delivery_telephone      varchar(32),
-    ip_address              varchar(255),
-    last_modified           timestamp(6),
-    locale                  varchar(255),
-    order_date_finished     timestamp(6),
-    order_type              varchar(255)
-        constraint orders_order_type_check check (
-            (order_type):: text = ANY (
-                (
-                    ARRAY [ 'ORDER' :: character varying,
-                        'BOOKING' :: character varying]
-                    ):: text[]
-                )
-            ),
-    cart_code               varchar(255) not null
-        constraint uk_g6b5qebd5yvy3msjrut230w91 unique,
-    order_status            varchar(255)
-        constraint orders_order_status_check check (
-            (order_status):: text = ANY (
-                (
-                    ARRAY [
-                        'CREATED' :: character varying,
-                        'PENDING_PAYMENT' :: character varying,
-                        'CONFIRMED' :: character varying,
-                        'PROCESSING' :: character varying,
-                        'SHIPPED' :: character varying,
-                        'DELIVERING' :: character varying,
-                        'DELIVERED' :: character varying,
-                        'COMPLETED' :: character varying,
-                        'CANCELLED' :: character varying,
-                        'RETURNED' :: character varying
-                        ]
-                    ):: text[]
-                )
-            ),
-    inventory_status        varchar(255)
-        constraint orders_inventory_status_check check (
-            (inventory_status):: text = ANY (
-                (
-                    ARRAY [
-                        'NOT_REQUESTED' :: character varying,
-                        'RESERVED' :: character varying,
-                        'COMMITTED' :: character varying,
-                        'RELEASED' :: character varying,
-                        'RESERVATION_FAILED' :: character varying
-                        ]
-                    ):: text[]
-                )
-            ),
-    payment_status          varchar(255)
-        constraint orders_payment_status_check check (
-            (payment_status):: text = ANY (
-                (
-                    ARRAY [
-                        'PENDING' :: character varying,
-                        'PAID' :: character varying,
-                        'FAILED' :: character varying,
-                        'AUTHORIZED' :: character varying,
-                        'REFUNDED' :: character varying
-                        ]
-                    ):: text[]
-                )
-            ),
-    payment_type            varchar(255)
-        constraint orders_payment_type_check check (
-            (payment_type):: text = ANY (
-                (
-                    ARRAY [
-                        'COD' :: character varying,
-                        'MANUAL_TRANSFER' :: character varying,
-                        'PAYPAL' :: character varying,
-                        'STRIPE' :: character varying
-                        ]
-                    ):: text[]
-                )
-            ),
+create index if not exists customer_store_email_idx on checkout.customer_account (store_merchant_id, email);
 
-    order_total             numeric(38, 2),
-    billing_country_code    varchar(6)   not null,
-    billing_zone_code       varchar(100),
-    currency_id             varchar(6),
-    delivery_country_CODE   varchar(6),
-    delivery_zone_code      varchar(100),
-    store_merchant_id       varchar(50),
-    redirect_uri            varchar(2048)
-);
-create index if not exists orders_cart_code_idx on checkout.orders (cart_code);
-create table if not exists checkout.order_account
+-- The cart: sku and quantity per line. Prices are never stored; they are read live from inventory.
+create table if not exists checkout.cart
 (
-    order_account_id         bigint  not null primary key,
-    order_account_bill_day   integer not null,
-    order_account_end_date   date,
-    order_account_start_date date    not null,
-    order_id                 bigint  not null
-        constraint fktdb599f1si18ktq25o4w5tsau references checkout.orders
-);
-create table if not exists checkout.order_attribute
-(
-    order_attribute_id bigint       not null primary key,
-    identifier         varchar(255) not null,
-    value              varchar(255) not null,
-    order_id           bigint       not null
-        constraint fkpfbrs3waqlbp0yeohck8sx91c references checkout.orders
-);
-create table if not exists checkout.order_product
-(
-    order_product_id bigint         not null primary key,
-    onetime_charge   numeric(38, 2) not null,
-    product_name     varchar(255)   not null,
-    product_quantity integer,
-    product_sku      varchar(255),
-    order_id         bigint         not null
-        constraint fkl5mnj9n0di7k1v90yxnthkc73 references checkout.orders
-);
--- The sold variant's option/value labels, copied at placement so the order renders "Color: Red / Size: L"
--- however the catalog is edited later. Empty for a default-variant line.
-create table if not exists checkout.order_product_option
-(
-    order_product_option_id bigint       not null primary key,
-    option_code             varchar(100) not null,
-    option_name             varchar(120) not null,
-    value_code              varchar(100) not null,
-    value_name              varchar(120) not null,
-    sort_order              integer,
-    order_product_id        bigint       not null
-        constraint fk_order_product_option_line references checkout.order_product
-);
-create index if not exists order_product_option_line_idx
-    on checkout.order_product_option (order_product_id);
-create table if not exists checkout.order_account_product
-(
-    order_account_product_id       bigint  not null primary key,
-    order_account_product_accnt_dt date,
-    order_account_product_end_dt   date,
-    order_account_product_eot      timestamp(6),
-    order_account_product_l_st_dt  timestamp(6),
-    order_account_product_l_trx_st integer not null,
-    order_account_product_pm_fr_ty integer not null,
-    order_account_product_st_dt    date    not null,
-    order_account_product_status   integer not null,
-    order_account_id               bigint  not null
-        constraint fk238g8uilgxlh5fa6ieub3ods references checkout.order_account,
-    order_product_id               bigint  not null
-        constraint fkl3rvhrb6nq9sdb1nai9cr9klm references checkout.order_product
-);
-create table if not exists checkout.order_product_download
-(
-    order_product_download_id bigint       not null primary key,
-    download_count            integer      not null,
-    download_maxdays          integer      not null,
-    order_product_filename    varchar(255) not null,
-    order_product_id          bigint       not null
-        constraint fkmy1bxlfoja5v2pmo9vq76l7ry references checkout.order_product
-);
-create table if not exists checkout.order_product_price
-(
-    order_product_price_id   bigint         not null primary key,
-    default_price            boolean        not null,
-    product_price            numeric(38, 2) not null,
-    product_price_code       varchar(64)    not null,
-    product_price_name       varchar(255),
-    product_price_special    numeric(38, 2),
-    prd_price_special_end_dt timestamp(6),
-    prd_price_special_st_dt  timestamp(6),
-    order_product_id         bigint         not null
-        constraint fkoh8f95nugkcqxflqo1rist0g1 references checkout.order_product
-);
-create table if not exists checkout.order_status_history
-(
-    order_status_history_id bigint       not null primary key,
-    comments                text,
-    customer_notified       integer,
-    date_added              timestamp(6) not null,
-    status                  varchar(255)
-        constraint order_status_history_status_check check (
-            (status):: text = ANY (
-                (
-                    ARRAY [
-                        'CREATED' :: character varying,
-                        'PENDING_PAYMENT' :: character varying,
-                        'CONFIRMED' :: character varying,
-                        'PROCESSING' :: character varying,
-                        'SHIPPED' :: character varying,
-                        'DELIVERING' :: character varying,
-                        'DELIVERED' :: character varying,
-                        'COMPLETED' :: character varying,
-                        'CANCELLED' :: character varying,
-                        'RETURNED' :: character varying
-                        ]
-                    ):: text[]
-                )
-            ),
-    order_id                bigint       not null
-        constraint fknmcbg3mmbt8wfva97ra40nmp3 references checkout.orders
-);
-create table if not exists checkout.order_total
-(
-    order_account_id bigint         not null primary key,
-    module           varchar(60),
-    code             varchar(255)   not null,
-    order_total_type varchar(255)
-        constraint order_total_order_total_type_check check (
-            (order_total_type):: text = ANY (
-                (
-                    ARRAY [ 'SHIPPING' :: character varying,
-                        'HANDLING' :: character varying, 'TAX' :: character varying,
-                        'PRODUCT' :: character varying, 'SUBTOTAL' :: character varying,
-                        'TOTAL' :: character varying, 'CREDIT' :: character varying,
-                        'REFUND' :: character varying]
-                    ):: text[]
-                )
-            ),
-    order_value_type varchar(255)
-        constraint order_total_order_value_type_check check (
-            (order_value_type):: text = ANY (
-                (
-                    ARRAY [ 'ONE_TIME' :: character varying,
-                        'MONTHLY' :: character varying]
-                    ):: text[]
-                )
-            ),
-    sort_order       integer        not null,
-    text             text,
-    title            varchar(255),
-    value            numeric(15, 4) not null,
-    order_id         bigint         not null
-        constraint fksyu55314fmsbvx76nxyvo2ejj references checkout.orders
-);
-create table if not exists checkout.shopping_cart
-(
-    shp_cart_id       bigint       not null primary key,
+    cart_id           bigint      not null primary key,
+    version           bigint      not null default 0,
     date_created      timestamp(6),
     date_modified     timestamp(6),
     updt_id           varchar(60),
-    customer_id       bigint,
-    ip_address        varchar(255),
+    store_merchant_id varchar(50) not null,
+    cart_code         varchar(36) not null constraint uk_cart_code unique,
+    status            varchar(10) not null constraint cart_status_check check (status in ('ACTIVE', 'CONVERTED')),
     order_id          bigint,
-    promo_added       timestamp(6),
-    promo_code        varchar(255),
-    shp_cart_code     varchar(255) not null
-        constraint uk_g6b5qebd5yvy3msjrus23vw51 unique,
-    store_merchant_id varchar(50)  not null
+    cua_external_id   varchar(96),
+    language_code     varchar(6)
 );
-create index if not exists shp_cart_code_idx on checkout.shopping_cart (shp_cart_code);
-create index if not exists shp_cart_customer_idx on checkout.shopping_cart (customer_id);
-create table if not exists checkout.shopping_cart_item
+create table if not exists checkout.cart_line
 (
-    shp_cart_item_id bigint       not null primary key,
-    date_created     timestamp(6),
-    date_modified    timestamp(6),
-    updt_id          varchar(60),
-    quantity         integer,
-    sku              varchar(255) not null,
-    shp_cart_id      bigint       not null
-        constraint fk10kmhpldycqc7cvn24tesj8yx references checkout.shopping_cart
+    line_id       bigint       not null primary key,
+    date_created  timestamp(6),
+    date_modified timestamp(6),
+    updt_id       varchar(60),
+    cart_id       bigint       not null constraint fk_cart_line_cart references checkout.cart,
+    sku           varchar(255) not null,
+    quantity      integer      not null constraint cart_line_quantity_check check (quantity > 0),
+    constraint uk_cart_line_sku unique (cart_id, sku)
 );
+
+-- The order aggregate. version is the optimistic lock every transition is applied under; pending_action is the remote
+-- step still owed, which the recovery job re-drives; the three status CHECKs list every value of their Java enum.
+create table if not exists checkout.sales_order
+(
+    order_id                  bigint         not null primary key,
+    version                   bigint         not null default 0,
+    date_created              timestamp(6),
+    date_modified             timestamp(6),
+    updt_id                   varchar(60),
+    store_merchant_id         varchar(50)    not null,
+    order_ref                 varchar(36)    not null constraint uk_sales_order_ref unique,
+    cart_code                 varchar(36)    not null,
+    customer_id               bigint         not null constraint fk_sales_order_customer references checkout.customer_account,
+    cua_external_id           varchar(96),
+    customer_email            varchar(96)    not null,
+    language_code             varchar(6)     not null,
+    currency_code             varchar(6)     not null,
+    payment_type              varchar(20)    not null constraint sales_order_payment_type_check
+        check (payment_type in ('COD', 'MANUAL_TRANSFER', 'PAYPAL', 'STRIPE')),
+    order_status              varchar(20)    not null constraint sales_order_order_status_check
+        check (order_status in ('CREATED', 'PENDING_PAYMENT', 'CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERING',
+                                'DELIVERED', 'COMPLETED', 'CANCELLED', 'RETURNED')),
+    payment_status            varchar(30)    not null constraint sales_order_payment_status_check
+        check (payment_status in ('PENDING', 'PROCESSING', 'PAID', 'FAILED', 'EXPIRED', 'CANCELLED',
+                                  'WAITING_VERIFICATION', 'REJECTED', 'AUTHORIZED', 'REFUNDED')),
+    inventory_status          varchar(30)    not null constraint sales_order_inventory_status_check
+        check (inventory_status in ('AVAILABLE', 'NOT_REQUESTED', 'RESERVED', 'COMMITTED', 'RELEASED',
+                                    'RESERVATION_FAILED')),
+    pending_action            varchar(20)    not null constraint sales_order_pending_action_check
+        check (pending_action in ('NONE', 'RESERVE', 'INITIATE_PAYMENT', 'COMMIT', 'RELEASE')),
+    pending_action_attempts   integer        not null default 0,
+    pending_action_updated_at timestamp(6)   not null,
+    needs_attention           boolean        not null default false,
+    attention_reason          varchar(255),
+    reservation_expire_at     timestamp(6),
+    payment_transaction_ref   varchar(70),
+    redirect_url              varchar(2048),
+    success_url               varchar(1024)  not null,
+    cancel_url                varchar(1024)  not null,
+    expires_at                timestamp(6),
+    date_purchased            timestamp(6)   not null,
+    subtotal                  numeric(19, 4) not null,
+    total                     numeric(19, 4) not null,
+    comments                  text,
+    billing_first_name        varchar(64),
+    billing_last_name         varchar(64),
+    billing_company           varchar(100),
+    billing_street_address    varchar(256),
+    billing_city              varchar(100),
+    billing_state             varchar(100),
+    billing_postcode          varchar(20),
+    billing_telephone         varchar(32),
+    billing_country_code      varchar(6),
+    billing_zone_code         varchar(100),
+    delivery_first_name       varchar(64),
+    delivery_last_name        varchar(64),
+    delivery_company          varchar(100),
+    delivery_street_address   varchar(256),
+    delivery_city             varchar(100),
+    delivery_state            varchar(100),
+    delivery_postcode         varchar(20),
+    delivery_telephone        varchar(32),
+    delivery_country_code     varchar(6),
+    delivery_zone_code        varchar(100)
+);
+create index if not exists sales_order_store_cart_idx on checkout.sales_order (store_merchant_id, cart_code);
+create index if not exists sales_order_store_date_idx on checkout.sales_order (store_merchant_id, date_purchased desc);
+create index if not exists sales_order_store_customer_idx on checkout.sales_order (store_merchant_id, customer_id);
+create index if not exists sales_order_store_status_idx on checkout.sales_order (store_merchant_id, order_status);
+create index if not exists sales_order_pending_idx on checkout.sales_order (pending_action_updated_at)
+    where pending_action <> 'NONE';
+create index if not exists sales_order_expiry_idx on checkout.sales_order (expires_at) where expires_at is not null;
+create index if not exists sales_order_attention_idx on checkout.sales_order (store_merchant_id) where needs_attention;
+
+create table if not exists checkout.sales_order_line
+(
+    line_id      bigint         not null primary key,
+    order_id     bigint         not null constraint fk_sales_order_line_order references checkout.sales_order,
+    sku          varchar(255)   not null,
+    product_id   bigint,
+    product_name varchar(255)   not null,
+    unit_price   numeric(19, 4) not null,
+    quantity     integer        not null constraint sales_order_line_quantity_check check (quantity > 0),
+    line_total   numeric(19, 4) not null,
+    image_url    varchar(1024),
+    sort_order   integer        not null
+);
+create index if not exists sales_order_line_order_idx on checkout.sales_order_line (order_id);
+
+create table if not exists checkout.sales_order_line_option
+(
+    option_id   bigint       not null primary key,
+    line_id     bigint       not null constraint fk_sales_order_line_option_line references checkout.sales_order_line,
+    option_name varchar(120) not null,
+    value_name  varchar(120) not null,
+    sort_order  integer
+);
+create index if not exists sales_order_line_option_line_idx on checkout.sales_order_line_option (line_id);
+
+create table if not exists checkout.sales_order_total
+(
+    total_id   bigint         not null primary key,
+    order_id   bigint         not null constraint fk_sales_order_total_order references checkout.sales_order,
+    code       varchar(20)    not null constraint sales_order_total_code_check
+        check (code in ('SUBTOTAL', 'SHIPPING', 'TAX', 'TOTAL')),
+    module     varchar(60)    not null,
+    title      varchar(255),
+    value      numeric(19, 4) not null,
+    sort_order integer        not null
+);
+create index if not exists sales_order_total_order_idx on checkout.sales_order_total (order_id);
+
+-- The user-visible status trail.
+create table if not exists checkout.sales_order_history
+(
+    history_id bigint       not null primary key,
+    order_id   bigint       not null constraint fk_sales_order_history_order references checkout.sales_order,
+    status     varchar(20)  not null constraint sales_order_history_status_check
+        check (status in ('CREATED', 'PENDING_PAYMENT', 'CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERING',
+                          'DELIVERED', 'COMPLETED', 'CANCELLED', 'RETURNED')),
+    comments   text,
+    actor      varchar(100),
+    date_added timestamp(6) not null
+);
+create index if not exists sales_order_history_order_idx on checkout.sales_order_history (order_id, date_added);
+
+-- The ledger: one row per transition and per inbound signal, including the ones that changed nothing.
+-- (order, source, source_ref) is unique where source_ref is set — that is what makes a redelivered signal a DUPLICATE.
+create table if not exists checkout.sales_order_event
+(
+    event_id               bigint       not null primary key,
+    order_id               bigint       not null constraint fk_sales_order_event_order references checkout.sales_order,
+    event_type             varchar(40)  not null,
+    source                 varchar(20)  not null constraint sales_order_event_source_check
+        check (source in ('PLACEMENT', 'PAYMENT', 'INVENTORY', 'CONSOLE', 'JOB', 'SYSTEM')),
+    source_ref             varchar(120),
+    outcome                varchar(10)  not null constraint sales_order_event_outcome_check
+        check (outcome in ('APPLIED', 'DUPLICATE', 'IGNORED')),
+    order_status_after     varchar(20),
+    payment_status_after   varchar(30),
+    inventory_status_after varchar(30),
+    pending_action_after   varchar(20),
+    payload                text,
+    reason                 varchar(255),
+    occurred_at            timestamp(6) not null
+);
+create unique index if not exists sales_order_event_dedup_idx on checkout.sales_order_event (order_id, source, source_ref)
+    where source_ref is not null;
+create index if not exists sales_order_event_order_idx on checkout.sales_order_event (order_id, occurred_at);

@@ -1,0 +1,20 @@
+# CustomerAdminApi — com.asrevo.cvhome.checkout.api.v1.customer.CustomerAdminApi
+#
+# The console's customer list. STORE-POD.CHECKOUT.* → an org or store admin session.
+#
+# Requires a running stack: lcl start -d
+
+### list, with optional filters name / firstName / lastName / email / country
+GET {{SELLER_UI_URL}}/spg/checkout/api/v1/private/customers?page=0&count=20&store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+### by email fragment and country
+GET {{SELLER_UI_URL}}/spg/checkout/api/v1/private/customers?email=example.com&country=EG&page=0&count=20&store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+### another store — its own customers only (tenant isolation)
+GET {{SELLER_UI_URL}}/spg/checkout/api/v1/private/customers?page=0&count=20&store={{STORE_ID_2}}&pod={{POD_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+### no session — 401
+GET {{SELLER_UI_URL}}/spg/checkout/api/v1/private/customers?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}

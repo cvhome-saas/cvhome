@@ -7,11 +7,18 @@ import com.asrevo.cvhome.errors.ErrorPayload;
 import com.asrevo.cvhome.errors.ResourceNotFoundException;
 
 /**
- * No order exists with that id in this store, or — when a customer asked — none belonging to them.
+ * No order exists with that id or ref in this store, or — when a shopper asked — none belonging to them.
+ *
+ * <p>
+ * The shopper case is deliberately the same code and status as a genuinely missing order: a 403 would confirm the
+ * id is real, which is precisely what someone walking order ids is trying to find out.
+ * </p>
  */
 public class OrderNotFoundException extends ResourceNotFoundException {
 
     private static final String ORDER_ID = "orderId";
+
+    private static final String STORE = "store";
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -24,24 +31,23 @@ public class OrderNotFoundException extends ResourceNotFoundException {
         return new ErrorBuilder<>(CheckoutErrors.ORDER_NOT_FOUND, OrderNotFoundException::new)
                 .detail("No order %s in store %s.", orderId, store)
                 .param(ORDER_ID, orderId)
-                .param("store", store)
+                .param(STORE, store)
                 .build();
     }
 
-    /**
-     * The order exists but belongs to someone else.
-     *
-     * <p>
-     * Deliberately the same code and status as a genuinely missing order: a 403 here would confirm the id is real,
-     * which is precisely what someone walking order ids is trying to find out. The {@code customerId} param keeps the
-     * distinction available in the log, where it is safe.
-     * </p>
-     */
-    public static OrderNotFoundException forCustomer(Long orderId, Long customerId) {
+    public static OrderNotFoundException ofRef(String orderRef, Object store) {
         return new ErrorBuilder<>(CheckoutErrors.ORDER_NOT_FOUND, OrderNotFoundException::new)
-                .detail("No order %s for customer %s.", orderId, customerId)
+                .detail("No order with ref %s in store %s.", orderRef, store)
+                .param("orderRef", orderRef)
+                .param(STORE, store)
+                .build();
+    }
+
+    public static OrderNotFoundException forShopper(Long orderId, Object shopper) {
+        return new ErrorBuilder<>(CheckoutErrors.ORDER_NOT_FOUND, OrderNotFoundException::new)
+                .detail("No order %s for shopper %s.", orderId, shopper)
                 .param(ORDER_ID, orderId)
-                .param("customerId", customerId)
+                .param("shopper", shopper)
                 .build();
     }
 

@@ -1,0 +1,46 @@
+# StatisticApi — com.asrevo.cvhome.checkout.api.v2.statistic.StatisticApi
+#
+# The console dashboard's three checkout charts. STORE-POD.CHECKOUT.* → an org or store admin session. Each answers
+# {entries:[{date, name, value}]}: orders per day per status; distinct customers per billing country; units sold
+# per sku.
+#
+# Requires a running stack: lcl start -d
+
+### orders per day, split by status
+POST {{SELLER_UI_URL}}/spg/checkout/api/v2/private/order-statistic?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{
+  "fromDate": "2026-01-01T00:00:00Z",
+  "toDate": "2027-01-01T00:00:00Z"
+}
+
+### distinct customers per billing country
+POST {{SELLER_UI_URL}}/spg/checkout/api/v2/private/customer-statistic?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{
+  "fromDate": "2026-01-01T00:00:00Z",
+  "toDate": "2027-01-01T00:00:00Z"
+}
+
+### units sold per sku
+POST {{SELLER_UI_URL}}/spg/checkout/api/v2/private/product-statistic?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{
+  "fromDate": "2026-01-01T00:00:00Z",
+  "toDate": "2027-01-01T00:00:00Z"
+}
+
+### no session — 401
+POST {{SELLER_UI_URL}}/spg/checkout/api/v2/private/order-statistic?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Content-Type: application/json
+
+{
+  "fromDate": "2026-01-01T00:00:00Z",
+  "toDate": "2027-01-01T00:00:00Z"
+}

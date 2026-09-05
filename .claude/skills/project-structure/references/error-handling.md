@@ -18,7 +18,7 @@ never sees the old shapes, but a `LEGACY.*` code means that endpoint has not bee
 says nothing.
 
 Grepping `LEGACY.` measures the remaining work. As of this writing ~125 legacy throw sites remain, concentrated in
-`catalog-core` (69), `content-core` (13) and `checkout-core` (13). Payment, the
+`catalog-core` (69) and `content-core` (13). Payment, checkout (rewritten 2026-09), the
 `store-commons` roots and the s2s layer are fully migrated — payment is the reference implementation to copy.
 The bridge and its four classes are deleted in the final step; a repo-wide grep for the deleted types is the
 completion gate.

@@ -1,187 +1,144 @@
 package com.asrevo.cvhome.checkout.services.order;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.time.Clock;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.asrevo.cvhome.checkout.entity.customer.Customer;
-import com.asrevo.cvhome.checkout.entity.order.Order;
-import com.asrevo.cvhome.checkout.entity.order.OrderSummary;
-import com.asrevo.cvhome.checkout.entity.order.OrderTotal;
-import com.asrevo.cvhome.checkout.entity.order.OrderTotalSummary;
-import com.asrevo.cvhome.checkout.entity.order.OrderTotalType;
-import com.asrevo.cvhome.checkout.entity.order.orderstatus.OrderStatusHistory;
-import com.asrevo.cvhome.checkout.entity.shoppingcart.ShoppingCartItem;
-import com.asrevo.cvhome.checkout.model.order.OrderCriteria;
-import com.asrevo.cvhome.checkout.repositories.order.OrderRepository;
+import com.asrevo.cvhome.checkout.domain.ShopperId;
+import com.asrevo.cvhome.checkout.entity.Customer;
+import com.asrevo.cvhome.checkout.entity.Order;
+import com.asrevo.cvhome.checkout.errors.IllegalOrderTransitionException;
+import com.asrevo.cvhome.checkout.errors.OrderNotFoundException;
+import com.asrevo.cvhome.checkout.model.order.OrderFilter;
+import com.asrevo.cvhome.checkout.model.order.PersistableOrderStatusHistory;
+import com.asrevo.cvhome.checkout.model.order.ReadableOrder;
+import com.asrevo.cvhome.checkout.model.order.ReadableOrderConfirmation;
+import com.asrevo.cvhome.checkout.model.order.ReadableOrderList;
+import com.asrevo.cvhome.checkout.model.order.ReadableOrderStatus;
+import com.asrevo.cvhome.checkout.model.order.ReadableOrderStatusHistory;
+import com.asrevo.cvhome.checkout.repositories.CustomerRepository;
+import com.asrevo.cvhome.checkout.repositories.OrderRepository;
+import com.asrevo.cvhome.checkout.repositories.OrderSpecifications;
+import com.asrevo.cvhome.checkout.services.customer.CustomerService;
+import com.asrevo.cvhome.checkout.services.store.StoreSettings;
+import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.constants.Constants;
-import com.asrevo.cvhome.store.core.entity.common.InventoryStatus;
-import com.asrevo.cvhome.store.core.entity.common.PaymentStatus;
-import com.asrevo.cvhome.store.core.entity.order.orderstatus.OrderStatus;
-import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
+import com.asrevo.cvhome.errors.BaseException;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
+@RequiredArgsConstructor
 @Slf4j
-public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order> implements OrderService {
+public class OrderServiceImpl implements OrderService {
 
-    private final OrderRepository orderRepository;
+    private static final Sort NEWEST_FIRST = Sort.by(Sort.Direction.DESC, "datePurchased", "id");
 
-    public OrderServiceImpl(OrderRepository orderRepository) {
-        super(orderRepository);
-        this.orderRepository = orderRepository;
+    private final OrderRepository orders;
+
+    private final CustomerRepository customers;
+
+    private final CustomerService customerService;
+
+    private final StoreSettings storeSettings;
+
+    private final OrderStepRunner steps;
+
+    private final OrderTransitionTransaction transitions;
+
+    private final Clock clock;
+
+    @Override
+    @Transactional(readOnly = true)
+    public ReadableOrderList list(StoreMerchantId store, LanguageCode language, OrderFilter filter, Pageable pageable) {
+        Pageable sorted = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
+                pageable.getSortOr(NEWEST_FIRST));
+        Page<Order> page = orders.findAll(OrderSpecifications.orders(store, filter), sorted);
+        return OrderMapper.toList(page, order -> OrderMapper.toReadable(order, customerOf(order), false,
+                storeSettings.locale(language)));
     }
 
     @Override
-    @Transactional
-    public void addOrderStatusHistory(Order order, OrderStatusHistory history) {
-        order.setStatus(history.getStatus());
-        order.getOrderHistory().add(history);
-        history.setOrder(order);
-        update(order);
+    @Transactional(readOnly = true)
+    public ReadableOrder get(StoreMerchantId store, LanguageCode language, Long id) throws OrderNotFoundException {
+        Order order = require(store, id);
+        return OrderMapper.toReadable(order, customerOf(order), true, storeSettings.locale(language));
     }
 
     @Override
-    public OrderTotalSummary calculateOrderTotal(OrderSummary orderSummary, StoreMerchantId store) {
-        return calculateOrder(orderSummary, store);
+    @Transactional(readOnly = true)
+    public List<ReadableOrderStatusHistory> history(StoreMerchantId store, Long id) throws OrderNotFoundException {
+        return OrderMapper.toHistory(require(store, id));
     }
 
     @Override
-    @Transactional
-    public void delete(Order order) {
-
-        super.delete(order);
-    }
-
-    @Override
-    public Order getOrder(Long orderId, StoreMerchantId store) {
-        return orderRepository.findOne(orderId, store);
-    }
-
-    @Override
-    public Page<Order> getOrders(OrderCriteria criteria, StoreMerchantId store) {
-        return orderRepository.listOrders(store, criteria, criteria.getPageable());
-    }
-
-    @Transactional
-    @Override
-    public Order process(Order order, Customer customer, List<ShoppingCartItem> items, OrderTotalSummary summary, StoreMerchantId store) {
-
-        if (order.getOrderHistory() == null || order.getOrderHistory().isEmpty() || order.getStatus() == null) {
-            OrderStatus status = order.getStatus();
-            if (status == null) {
-                status = OrderStatus.CREATED;
-                order.setStatus(status);
-                order.setInventoryStatus(InventoryStatus.NOT_REQUESTED);
-                order.setPaymentStatus(PaymentStatus.PENDING);
-            }
-            Set<OrderStatusHistory> statusHistorySet = new HashSet<>();
-            OrderStatusHistory statusHistory = new OrderStatusHistory();
-            statusHistory.setStatus(status);
-            statusHistory.setDateAdded(Instant.now());
-            statusHistory.setOrder(order);
-            statusHistorySet.add(statusHistory);
-            order.setOrderHistory(statusHistorySet);
+    public ReadableOrderStatusHistory transition(StoreMerchantId store, Long id, PersistableOrderStatusHistory change,
+                                                 String actor)
+            throws OrderNotFoundException, IllegalOrderTransitionException {
+        ReadableOrderStatusHistory entry = transitions.apply(store, id, change, actor);
+        try {
+            steps.runUntilSettled(id, 1); // a cancel may owe a RELEASE
+        } catch (BaseException e) {
+            log.warn("Order {}: pending action after console change left to recovery: {}", id, e.getMessage());
         }
-
-        order.setCustomerId(customer.getId());
-        this.create(order);
-
-        return order;
+        return entry;
     }
 
-    private OrderTotalSummary calculateOrder(OrderSummary summary, StoreMerchantId store) {
+    @Override
+    @Transactional(readOnly = true)
+    public ReadableOrderStatus status(StoreMerchantId store, Long id, ShopperId shopper) throws OrderNotFoundException {
+        Order order = shopper == null ? require(store, id) : requireForShopper(store, shopper, id);
+        return OrderMapper.toStatus(order);
+    }
 
-        OrderTotalSummary totalSummary = new OrderTotalSummary();
-        List<OrderTotal> orderTotals = new ArrayList<>();
-
-        BigDecimal grandTotal = new BigDecimal(0).setScale(2, RoundingMode.HALF_UP);
-        BigDecimal subTotal = new BigDecimal(0).setScale(2, RoundingMode.HALF_UP);
-
-        for (ShoppingCartItem item : summary.getProducts()) {
-
-            BigDecimal st = item.getItemPrice().multiply(new BigDecimal(item.getQuantity()));
-            item.setSubTotal(st);
-            subTotal = subTotal.add(st);
+    @Override
+    @Transactional(readOnly = true)
+    public ReadableOrderList listForShopper(StoreMerchantId store, LanguageCode language, ShopperId shopper,
+                                            Pageable pageable) {
+        Optional<Customer> customer = customerService.find(store, shopper);
+        if (customer.isEmpty()) {
+            return OrderMapper.toList(Page.empty(pageable), order -> null);
         }
-
-        totalSummary.setSubTotal(subTotal);
-        grandTotal = grandTotal.add(subTotal);
-
-        OrderTotal orderTotalSubTotal = new OrderTotal();
-        orderTotalSubTotal.setModule(Constants.OT_SUBTOTAL_MODULE_CODE);
-        orderTotalSubTotal.setOrderTotalType(OrderTotalType.SUBTOTAL);
-        orderTotalSubTotal.setOrderTotalCode("order.total.subtotal");
-        orderTotalSubTotal.setTitle(Constants.OT_SUBTOTAL_MODULE_CODE);
-        orderTotalSubTotal.setSortOrder(5);
-        orderTotalSubTotal.setValue(subTotal);
-
-        orderTotals.add(orderTotalSubTotal);
-
-        OrderTotal orderTotal = new OrderTotal();
-        orderTotal.setModule(Constants.OT_TOTAL_MODULE_CODE);
-        orderTotal.setOrderTotalType(OrderTotalType.TOTAL);
-        orderTotal.setOrderTotalCode("order.total.total");
-        orderTotal.setTitle(Constants.OT_TOTAL_MODULE_CODE);
-        orderTotal.setSortOrder(500);
-        orderTotal.setValue(grandTotal);
-        orderTotals.add(orderTotal);
-
-        totalSummary.setTotal(grandTotal);
-        totalSummary.setTotals(orderTotals);
-        return totalSummary;
+        Page<Order> page = orders.findByStoreMerchantIdAndCustomerIdOrderByDatePurchasedDesc(store,
+                customer.get().getId(), pageable);
+        return OrderMapper.toList(page, order -> OrderMapper.toReadable(order, customer.get(), true,
+                storeSettings.locale(language)));
     }
 
     @Override
-    @Transactional
-    public void updateOrderStatus(Long orderId, OrderStatus orderStatus, InventoryStatus inventoryStatus, PaymentStatus paymentStatus) {
-        updateOrderStatus(orderId, orderStatus, inventoryStatus, paymentStatus, null);
+    @Transactional(readOnly = true)
+    public ReadableOrderConfirmation getForShopper(StoreMerchantId store, LanguageCode language, ShopperId shopper,
+                                                   Long id) throws OrderNotFoundException {
+        return OrderMapper.toConfirmation(requireForShopper(store, shopper, id), storeSettings.locale(language));
     }
 
     @Override
-    @Transactional
-    public void updateOrderStatus(Long orderId, OrderStatus orderStatus, InventoryStatus inventoryStatus, PaymentStatus paymentStatus,
-                                  String redirectUri) {
-        Order order = orderRepository.findById(orderId).orElse(null);
-        if (order != null) {
-            if (orderStatus != null && !orderStatus.equals(order.getStatus())) {
-                order.setStatus(orderStatus);
-                // Add to history
-                OrderStatusHistory statusHistory = new OrderStatusHistory();
-                statusHistory.setStatus(orderStatus);
-                statusHistory.setDateAdded(Instant.now());
-                statusHistory.setOrder(order);
-                order.getOrderHistory().add(statusHistory);
-            }
-            if (inventoryStatus != null) {
-                order.setInventoryStatus(inventoryStatus);
-            }
-            if (paymentStatus != null) {
-                order.setPaymentStatus(paymentStatus);
-            }
-            if (redirectUri != null) {
-                order.setRedirectUri(redirectUri);
-            }
-            orderRepository.save(order);
-            log.info("Order {} status updated: status={}, inventory={}, payment={}", orderId, orderStatus, inventoryStatus, paymentStatus);
-        } else {
-            log.warn("Attempted to update status for non-existent order {}", orderId);
-        }
+    @Transactional(readOnly = true)
+    public List<ReadableOrderStatusHistory> historyForShopper(StoreMerchantId store, ShopperId shopper, Long id)
+            throws OrderNotFoundException {
+        return OrderMapper.toHistory(requireForShopper(store, shopper, id));
     }
 
-    @Override
-    public Optional<Order> findOrderByShoppingCartCodeAndStoreMerchantId(String shoppingCartCode, StoreMerchantId storeMerchantId) {
-        return orderRepository.findOrderByShoppingCartCodeAndStoreMerchantId(shoppingCartCode, storeMerchantId);
+    private Order require(StoreMerchantId store, Long id) throws OrderNotFoundException {
+        return orders.findByStoreMerchantIdAndId(store, id).orElseThrow(() -> OrderNotFoundException.of(id, store.getId()));
+    }
+
+    private Order requireForShopper(StoreMerchantId store, ShopperId shopper, Long id) throws OrderNotFoundException {
+        Customer customer = customerService.find(store, shopper)
+                .orElseThrow(() -> OrderNotFoundException.forShopper(id, shopper.sub()));
+        return orders.findByStoreMerchantIdAndIdAndCustomerId(store, id, customer.getId())
+                .orElseThrow(() -> OrderNotFoundException.forShopper(id, shopper.sub()));
+    }
+
+    private Customer customerOf(Order order) {
+        return customers.findById(order.getCustomerId()).orElse(null);
     }
 }

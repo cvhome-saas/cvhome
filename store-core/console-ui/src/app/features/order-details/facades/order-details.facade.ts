@@ -341,7 +341,7 @@ export class OrderDetailsFacade {
     }
     return [
       {labelKey: 'orderDetails.flag.paymentStatus', value: this.statusLabels.label(order.paymentStatus)},
-      {labelKey: 'orderDetails.flag.reservationStatus', value: this.statusLabels.label(order.reservationStatus)},
+      {labelKey: 'orderDetails.flag.reservationStatus', value: this.statusLabels.label(order.inventoryStatus)},
       {labelKey: 'orderDetails.flag.customerAgreed', value: this.yesNo(order.customerAgreed)},
       {labelKey: 'orderDetails.flag.confirmedAddress', value: this.yesNo(order.confirmedAddress)},
     ];

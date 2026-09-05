@@ -74,25 +74,27 @@ public record PaymentPaidEvent(String internalRef, String requestRef, String sto
 
 Consumers annotate methods with `@OutboxHandler`; the poller dispatches by event type.
 
-`payment-service` — reacts to its own payment events by telling checkout the order's payment status changed:
+`payment-service` — reacts to its own payment events by signalling checkout (`ExternalOrderSignalService`,
+`PaymentSignal{status, transactionRef}` — the transaction ref is checkout's dedup key):
 
 ```java
 @Component
 public class PaymentOutboxHandler {
-    private final ExternalOrderService externalOrderService;
+    private final ExternalOrderSignalService orderSignals;
 
     @OutboxHandler
     public void handlePaymentPaidEvent(PaymentPaidEvent event) {
-        externalOrderService.updatePaymentStatus(
-            new StoreMerchantId(event.storeId()), event.requestRef(), PaymentStatus.PAID);
+        orderSignals.signalPayment(new StoreMerchantId(event.storeId()), event.requestRef(),
+            new PaymentSignal(PaymentStatus.PAID, event.internalRef()));   // CheckoutApiUnavailableException → rethrown unchecked, so the outbox retries
     }
-    // ... handlePaymentFailedEvent, handlePaymentCanceledEvent
+    // ... handlePaymentFailedEvent, handlePaymentCanceledEvent, handlePaymentRejectedEvent
 }
 ```
 
 Note what this buys: the **HTTP call to checkout happens in the handler, after the transaction committed**. If
 checkout is down, the payment is still recorded and the outbox retries — no lost payment, no distributed
-transaction.
+transaction. On checkout's side the signal is idempotent (the transaction ref plus the status is the dedup key), so
+the redelivery a retry implies is a recorded no-op, never a second application.
 
 `tenancy-service` — same shape, with an extra `EventImpl<T>` interface (from `store-commons:commons`) as a
 naming convention:

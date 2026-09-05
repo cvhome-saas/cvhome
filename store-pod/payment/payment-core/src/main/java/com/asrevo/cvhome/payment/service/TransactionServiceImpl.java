@@ -134,8 +134,7 @@ public class TransactionServiceImpl implements TransactionService {
     @Transactional
     public void rejectPayment(StoreMerchantId store, String internalRef) {
         Transaction transaction = getTransaction(store, internalRef);
-        transaction.setStatus(PaymentStatus.REJECTED);
-        transactionRepository.save(transaction);
+        transactionRepository.save(transaction.rejected());
     }
 
     @Transactional(readOnly = true)

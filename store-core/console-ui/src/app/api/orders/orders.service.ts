@@ -9,7 +9,6 @@ import type {
   ReadableCountry,
   ReadableOrder,
   ReadableOrderStatusHistory,
-  ReadableZone,
 } from '@models/checkout';
 
 /** The filters `OrderApi.list` accepts. All optional; omitted means unfiltered. */
@@ -84,9 +83,5 @@ export class OrdersService {
   /** Reference data. Orders carry ISO codes; these are what turn `DE` into `Germany`. */
   countries(): Observable<ReadableCountry[]> {
     return this.crudService.get(`${CHECKOUT_API_BASE}/country`);
-  }
-
-  zones(countryCode: string): Observable<ReadableZone[]> {
-    return this.crudService.get(`${CHECKOUT_API_BASE}/zones`, {code: countryCode});
   }
 }

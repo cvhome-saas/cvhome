@@ -56,7 +56,7 @@ export const PAYMENT_STATUSES: readonly string[] = [
   'REFUNDED',
 ];
 
-/** `store-commons` `InventoryStatus`, which the order reports as `reservationStatus`. */
+/** `store-commons` `InventoryStatus`, which the order reports as `inventoryStatus`. */
 export const INVENTORY_STATUSES: readonly string[] = [
   'AVAILABLE',
   'NOT_REQUESTED',
@@ -185,8 +185,11 @@ export interface ReadableOrder {
   readonly tax?: OrderTotal;
   readonly shipping?: OrderTotal;
   readonly paymentStatus?: string;
-  readonly reservationStatus?: string;
-  readonly redirectUri?: string;
+  readonly inventoryStatus?: string;
+  readonly redirectUrl?: string;
+  /** Set when automation could not finish the order (paid after cancel, commit refused); read `attentionReason`. */
+  readonly needsAttention?: boolean;
+  readonly attentionReason?: string;
 }
 
 export interface ReadableOrderStatusHistory {
@@ -286,9 +289,3 @@ export interface ReadableCountry {
   readonly supported?: boolean;
 }
 
-export interface ReadableZone {
-  readonly id?: number;
-  readonly code?: string;
-  readonly name?: string;
-  readonly countryCode?: string;
-}

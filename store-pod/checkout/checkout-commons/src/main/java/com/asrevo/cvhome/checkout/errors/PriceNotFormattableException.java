@@ -1,16 +1,16 @@
 package com.asrevo.cvhome.checkout.errors;
 
 import java.io.Serial;
-import java.math.BigDecimal;
 
-import com.asrevo.cvhome.errors.ConversionException;
 import com.asrevo.cvhome.errors.ErrorBuilder;
 import com.asrevo.cvhome.errors.ErrorPayload;
+import com.asrevo.cvhome.errors.StoreIOException;
 
 /**
- * An amount could not be rendered in the store's currency.
+ * A money amount could not be rendered in the store's currency — a misconfigured currency code, in practice. Ours to
+ * fix, hence 500.
  */
-public class PriceNotFormattableException extends ConversionException {
+public class PriceNotFormattableException extends StoreIOException {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -19,10 +19,11 @@ public class PriceNotFormattableException extends ConversionException {
         super(payload, cause);
     }
 
-    public static PriceNotFormattableException of(BigDecimal amount, Throwable cause) {
+    public static PriceNotFormattableException of(Object amount, Object currency, Throwable cause) {
         return new ErrorBuilder<>(CheckoutErrors.PRICE_NOT_FORMATTABLE, PriceNotFormattableException::new)
-                .detail("Amount %s could not be formatted for this store.", amount)
+                .detail("Cannot format %s in currency %s.", amount, currency)
                 .param("amount", amount)
+                .param("currency", currency)
                 .cause(cause)
                 .build();
     }
