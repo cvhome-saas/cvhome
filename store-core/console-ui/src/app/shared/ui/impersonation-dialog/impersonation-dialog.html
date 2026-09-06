@@ -1,0 +1,80 @@
+<app-form-dialog
+  [open]="open()"
+  [title]="t('platform.impersonation.title')"
+  [description]="t('platform.impersonation.description')"
+  [closeLabel]="t('shared.actions.close')"
+  (dismissed)="reset()"
+  *transloco="let t"
+>
+  <form class="impersonation-form" (submit)="onSubmit($event)">
+    <div class="row">
+      <span class="label">{{ t('platform.impersonation.target') }}</span>
+      @if (targets().length === 1) {
+        <span class="fixed latin">{{ targets()[0].label }}</span>
+      } @else {
+        <app-select
+          [value]="targetId()"
+          (valueChange)="targetId.set($event)"
+          [options]="targets()"
+          [placeholder]="t('platform.impersonation.pickTarget')"
+          [ariaLabel]="t('platform.impersonation.target')"
+        />
+      }
+    </div>
+
+    <div class="row">
+      <span class="label">{{ t('platform.impersonation.store') }}</span>
+      @if (stores().length === 1) {
+        <span class="fixed">{{ stores()[0].label }}</span>
+      } @else {
+        <app-select
+          [value]="storeId()"
+          (valueChange)="storeId.set($event)"
+          [options]="stores()"
+          [placeholder]="t('platform.impersonation.pickStore')"
+          [ariaLabel]="t('platform.impersonation.store')"
+        />
+      }
+    </div>
+
+    <div class="row">
+      <span class="label">{{ t('platform.impersonation.modeLabel') }}</span>
+      @if (allowWrite()) {
+        <app-select
+          [value]="mode()"
+          (valueChange)="setMode($event)"
+          [options]="[
+            {value: 'read', label: t('platform.impersonation.mode.read')},
+            {value: 'write', label: t('platform.impersonation.mode.write')}
+          ]"
+          [ariaLabel]="t('platform.impersonation.modeLabel')"
+        />
+      } @else {
+        <span class="fixed">{{ t('platform.impersonation.mode.read') }}</span>
+      }
+      <p class="hint">{{ t(mode() === 'write' ? 'platform.impersonation.hint.write' : 'platform.impersonation.hint.read') }}</p>
+    </div>
+
+    <div class="row">
+      <span class="label">{{ t('platform.impersonation.reason') }}</span>
+      <app-textarea
+        [value]="reason()"
+        (valueChange)="reason.set($event)"
+        [rows]="3"
+        [maxLength]="reasonMax"
+        [placeholder]="t('platform.impersonation.reasonPlaceholder')"
+        [ariaLabel]="t('platform.impersonation.reason')"
+      />
+      <p class="hint">{{ t('platform.impersonation.hint.reason') }}</p>
+    </div>
+
+    <div class="actions">
+      <button class="secondary-action" type="button" [disabled]="busy()" (click)="reset()">
+        {{ t('shared.actions.cancel') }}
+      </button>
+      <button class="primary-action" type="submit" [disabled]="!canSubmit()">
+        {{ busy() ? t('platform.impersonation.busy') : t('platform.impersonation.confirm') }}
+      </button>
+    </div>
+  </form>
+</app-form-dialog>

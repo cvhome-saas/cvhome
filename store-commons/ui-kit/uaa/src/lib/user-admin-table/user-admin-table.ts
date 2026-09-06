@@ -12,8 +12,9 @@ export interface UserAdminIntent {
 
 /** The table's columns. Widths are grid tracks, read straight into the row layout. */
 /** What a host may offer on a row. Not every console may offer all of them — see {@link UserAdminTable.allow}. */
-export type UserAdminAction = 'toggleEnabled' | 'unlock' | 'resetPassword' | 'editRoles' | 'delete';
+export type UserAdminAction = 'toggleEnabled' | 'unlock' | 'resetPassword' | 'editRoles' | 'delete' | 'impersonate';
 
+/** The default offer. `impersonate` is not in it: a host opts in when its operator holds the permission. */
 const ALL_ACTIONS: readonly UserAdminAction[] = [
   'unlock',
   'toggleEnabled',
@@ -42,9 +43,10 @@ const COLUMN_KEYS: readonly {key: string; labelKey: string; width: string}[] = [
  * It renders no dialog of its own. Confirming a delete and collecting a password are the host's
  * job, so that a page can decide how loudly to ask.
  *
- * `impersonate` is deliberately present and deliberately disabled: the point of writing the
- * requirement is that the screen it belongs to already exists. See
- * `.agents/requirments/user-impersonation.md`, and lessons.md, "Platform — no impersonation".
+ * `impersonate` is always listed, and enabled only where the host allows it: the seller console
+ * offers it to an operator who holds the permission, uaa's own console and the shoppers screen do
+ * not — a shopper cannot be acted as, and the disabled entry says so rather than vanishing. See
+ * lessons.md, "Platform — impersonation".
  *
  * **The five actions are a menu, not a row of glyphs.** They were five bare `.icon-action` buttons
  * in a 10rem column: an eye, a padlock, a shield, an arrow and a bin, distinguishable only by
@@ -125,11 +127,11 @@ export class UserAdminTable {
   }
 
   /**
-   * The row's menu, rebuilt per row because two entries read from the row itself.
+   * The row's menu, rebuilt per row because three entries read from the row or the host.
    *
-   * `impersonate` is listed and disabled rather than omitted: a capability the product intends to
-   * have is worth showing as not-yet-built, and a menu has room to say so where a bare glyph did
-   * not. It carries no `kind`, so picking it cannot reach {@link act}.
+   * `impersonate` is listed whatever the host allows, and disabled where it is not allowed: a menu
+   * has room to say why an entry is unavailable where a bare glyph did not, and an operator who
+   * cannot act as accounts here should see that the capability exists elsewhere.
    */
   protected actionsFor(row: PlatformUserRow): readonly MenuAction[] {
     const allowed = this.allow();
@@ -163,8 +165,12 @@ export class UserAdminTable {
       {
         key: 'impersonate',
         icon: 'signIn',
-        disabled: true,
-        label: this.transloco.translate('shared.userAdmin.action.impersonateUnavailable'),
+        disabled: !this.allow().includes('impersonate'),
+        label: this.transloco.translate(
+          this.allow().includes('impersonate')
+            ? 'shared.userAdmin.action.impersonate'
+            : 'shared.userAdmin.action.impersonateUnavailable',
+        ),
       },
       {
         key: 'delete',
@@ -189,9 +195,9 @@ export class UserAdminTable {
     }
   }
 
-  /** Only the real intents reach the host; `impersonate` is inert by design. */
+  /** Only what the host allowed reaches it; a disabled `impersonate` entry cannot be picked, and is inert if it were. */
   protected onPick(action: MenuAction, row: PlatformUserRow): void {
-    if (action.key === 'impersonate') {
+    if (!this.allow().includes(action.key as UserAdminAction)) {
       return;
     }
     this.act.emit({kind: action.key as UserAdminIntent['kind'], row});

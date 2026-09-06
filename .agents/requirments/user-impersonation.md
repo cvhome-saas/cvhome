@@ -22,14 +22,15 @@ that produces a system where "who did this" has no answer.
 
 ## 2. What exists today
 
-Nothing.
-
-```
-grep -ril "impersonat\|act_as\|actAs\|on-behalf\|token-exchange" store-core store-commons store-pod
-```
-
-returns **zero files**. There is no partial implementation to finish, no dormant column, no
-half-written filter. Every piece below is new.
+**Built — 2026-09**, by `.agents/plans/user-impersonation.md`. The grant is
+`store-commons/sso/sso-core/.../sso/token/ImpersonationExchangeProvider.java` (registered by uaa's
+shell only), the swap is `store-core/gateway/gateway-service/.../impersonation/ImpersonationService.java`,
+the audit rows are `user.impersonation.{started,ended,denied}` in uaa and the `act`-aware actor in
+tenancy, and the console's banner is `layouts/console-shell/components/impersonation-banner/`. Two
+decisions the sections below did not settle: a **read-only mode** (the token carries
+`STORE_MODERATOR` on the chosen store) beside the verbatim one, and a **store-centric entry** from
+an organization's Stores tab beside the account row action. The rest of this document is the design
+as it was agreed; where it and the code differ, the code and the plan are current.
 
 ## 3. Why this is not a front-end change
 

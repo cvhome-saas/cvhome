@@ -1078,6 +1078,91 @@ every one of them fails silently rather than loudly.
 
 ---
 
+## IMP — Acting as a merchant
+
+_From `.agents/plans/user-impersonation.md`._ The platform operator's way into a merchant's console. The console
+holds no token, so the whole thing is a **gateway session swap** (`../../gateway/gateway-service/qa/gateway-qa.md`
+§IMP) behind a uaa grant (`../../uaa/qa/uaa-qa.md` §IMP); what this section proves is the console's half — the two
+ways in, the banner, and that the page you land on is the merchant's.
+
+Design points a tester needs:
+
+- **Both entry points reload the page.** Starting lands on `/dashboard` with the chosen store selected; ending lands
+  on `/platform/users`. Identity, rail, store list and every page facade change at once, and a reload is deliberate.
+- **The banner cannot be dismissed.** Its only control ends the session. The gateway's fifteen-minute ceiling ends
+  it too, whatever the banner shows — the countdown is minute-granular.
+- **Read-only is the default** and is a real narrowing: the token carries `STORE_MODERATOR` on the chosen store, so
+  every save 403s. Write mode is the merchant verbatim and is offered to `super-admin` only; `support` never sees it.
+- **The dialog's choices come from the axis you did not pick.** From an account row, the stores are that account's
+  (its `store`, or the org's stores for an org admin); from a store row, the accounts are those acting in it.
+
+### IMP-01 — Act as a store admin, read-only, from the account list · critical · [not verified]
+
+- **Setup** — signed in as `super-admin`.
+- **Steps** — `/platform/users` → row menu of `org1-store1-admin` → **Act as this account** → the store is fixed
+  (ORG1-STORE1), leave Read-only, type a reason → Start.
+- **Expect** — a reload to `/dashboard` as the merchant: the merchant rail (no Platform group), ORG1-STORE1 selected,
+  an amber banner *You are acting as org1-store1-admin · Store: … · Read-only · N minutes left*. Orders and the
+  catalogue load. Open a product and save → **403**, shown as the server's refusal. Network panel: `auth/me` carries
+  `impersonation`, and every private call is `?store=65f023632bc46470c104b76f`.
+
+### IMP-02 — Write mode saves as the merchant and audits as the operator · critical · [not verified]
+
+- **Steps** — as IMP-01 with **Read and write**. Rename a category. Then, in another tab as `super-admin`, open
+  `/platform/organizations/<ORG1>/activity` — or `psql`: `select actor, action from tenancy.tenancy_audit order by
+  id desc limit 5` after a store rename in **Store management**.
+- **Expect** — the save succeeds; the tenancy row's actor reads `<merchant id> (via super-admin)`. uaa's audit log
+  (`/uaa/api/v1/admin/audit?type=user.impersonation.started`) has the start row with the reason.
+
+### IMP-03 — The banner ends it, and ending lands on the account list · high · [not verified]
+
+- **Steps** — click **Stop acting as them**.
+- **Expect** — a reload to `/platform/users` as `super-admin`; the Platform group is back; no banner;
+  `uaa.audit_events` has a `user.impersonation.ended` row for the merchant.
+
+### IMP-04 — From a store row, the accounts on offer are the ones acting in it · high · [not verified]
+
+- **Steps** — `/platform/organizations/<ORG1>/stores` → the sign-in icon on ORG1-STORE2 → the dialog opens with the
+  store fixed and an **Account** select.
+- **Expect** — the select lists `org1-store2-admin`, `org1-store2-moderator` and `org1-admin` (an org admin acts in
+  every store of theirs), and not `org1-store1-admin`. Start → `/dashboard` on ORG1-STORE2.
+
+### IMP-05 — A store the account does not act in is refused before anything is swapped · high · [not verified]
+
+- **Steps** — `.http`: `POST /api/v1/impersonation` for `org1-store1-admin` with `storeId` = ORG1-STORE2
+  (`../../gateway/gateway-service/http/impersonation-api.http`, "a store the merchant does not act in").
+- **Expect** — **422** `GATEWAY.IMPERSONATION.STORE_NOT_TARGETS`; `auth/me` still says the operator; a
+  `user.impersonation.ended` row exists in uaa because the token that was minted for the probe was revoked.
+
+### IMP-06 — The gate: an org admin cannot impersonate, and support cannot write · critical · [not verified]
+
+- **Steps** — sign in as `org1-admin`: the row menu on `/users` shows no impersonate entry (the page is not offered
+  the platform rail at all); `.http` `POST /api/v1/impersonation` with that session → **403**
+  `GATEWAY.IMPERSONATION.REFUSED`. Sign in as `support` (password `admin`): `/platform/users` renders, the dialog
+  offers **no** Read-and-write option, and a read-only start succeeds.
+- **Expect** — as stated, plus a `user.impersonation.denied` row per refusal in uaa.
+
+### IMP-07 — Expiry hands the session back silently · high · [not verified]
+
+- **Setup** — lower the ceiling for the test: `update uaa.oauth2_registered_client set token_settings = replace(
+  token_settings, '900.000000000', '60.000000000') where client_id = 'console-impersonation'` and restart uaa
+  (`lcl restart uaa --stack <name>`). Put it back afterwards.
+- **Steps** — start an impersonation, wait past a minute, navigate.
+- **Expect** — the operator's rail, no banner, never a 401 and never the merchant's page again; the audit log has an
+  `ended` row.
+
+### IMP-08 — Logout mid-impersonation ends both sessions · critical · [not verified]
+
+- **Steps** — while acting as the merchant, profile menu → Sign out. Then open `/dashboard`.
+- **Expect** — the sign-in page, not the operator's console: the gateway restored the operator before building
+  uaa's end-session redirect, so uaa's session ended too.
+
+### IMP-09 — i18n and RTL · [not verified]
+
+- **Steps** — switch to Arabic before starting; start; end.
+- **Expect** — the dialog and the banner in Arabic, the banner's icon and End button mirrored, the countdown's plural
+  right at 1 minute, no raw key anywhere.
+
 ## REG — Regression watchlist
 
 Every row was a real defect, and several were invisible from the screen.
@@ -1208,9 +1293,10 @@ stack on 2026-09-03.
 ### SSO-UI-02 — The row menu offers only what a merchant may do · critical · [verified]
 
 - **Steps** — open a row's action menu.
-- **Expect** — unlock (on a locked account only), disable, delete, and the disabled impersonate placeholder.
-  **No password reset and no role editing**: cua exposes neither for a shopper, so a menu entry would answer 404.
-  Verified by reading the rendered menu, not by eye.
+- **Expect** — unlock (on a locked account only), disable, delete, and an impersonate entry that is **disabled** here:
+  a shopper cannot be acted as (the grant is uaa's, for staff accounts), and the entry says the capability is not
+  available rather than vanishing. **No password reset and no role editing**: cua exposes neither for a shopper, so a
+  menu entry would answer 404. Verified by reading the rendered menu, not by eye.
 
 ### SSO-UI-03 — The sessions pane says where an account is signed in · high · [verified]
 

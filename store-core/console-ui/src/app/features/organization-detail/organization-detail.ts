@@ -3,9 +3,10 @@ import {Router, RouterLink} from '@angular/router';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 import {TranslocoDatePipe} from '@jsverse/transloco-locale';
 
-import type {PlatformUserRow} from '@models/platform';
+import type {PlatformStoreRow, PlatformUserRow} from '@models/platform';
 import {Badge, BusyOverlay, ConfirmDialog, CopyField, DataTable, type TableColumn, TableRow, EmptyState, Icon, LoadError, PageHeader, Pagination, Panel, RolesDialog, SectionNav, SetPasswordDialog, TabSwitcher, type TabItem, TextField} from '@cvhome-saas/ui-kit/ui';
-import {UserAdminTable, type UserAdminIntent} from '@cvhome-saas/ui-kit/uaa';
+import {UserAdminTable, type UserAdminAction, type UserAdminIntent} from '@cvhome-saas/ui-kit/uaa';
+import {ImpersonationDialog} from '@shared/ui/impersonation-dialog/impersonation-dialog';
 import {SuspendOrgDialog} from './components/suspend-org-dialog/suspend-org-dialog';
 import {ORG_SECTIONS, OrganizationDetailFacade, PAGE_SIZE, type OrgSection} from './facades/organization-detail.facade';
 
@@ -15,7 +16,11 @@ const STORE_COLUMN_KEYS: readonly {key: string; labelKey: string; width: string}
   {key: 'provisioning', labelKey: 'platform.organization.stores.column.provisioning', width: 'minmax(7rem, 0.9fr)'},
   {key: 'billing', labelKey: 'platform.organization.stores.column.billing', width: 'minmax(6rem, 0.8fr)'},
   {key: 'pod', labelKey: 'platform.organization.stores.column.pod', width: 'minmax(7rem, 1fr)'},
+  {key: 'actions', labelKey: 'platform.organization.stores.column.actions', width: '4rem'},
 ];
+
+/** What the users tab's row menu offers everyone; `impersonate` is added when the operator may. */
+const BASE_USER_ACTIONS: readonly UserAdminAction[] = ['unlock', 'toggleEnabled', 'resetPassword', 'editRoles', 'delete'];
 
 /** Which tab keys the route accepts. Anything else settles on `overview`. */
 const SECTION_KEYS = new Set<string>(ORG_SECTIONS.map((section) => section.key));
@@ -42,6 +47,7 @@ const SECTION_KEYS = new Set<string>(ORG_SECTIONS.map((section) => section.key))
     DataTable,
     EmptyState,
     Icon,
+    ImpersonationDialog,
     LoadError,
     PageHeader,
     Pagination,
@@ -140,6 +146,11 @@ export class OrganizationDetail {
     this.facade.usersPage.set(page);
   }
 
+  /** The users tab's row menu, with `impersonate` enabled only for an operator who holds the permission. */
+  protected readonly allowedUserActions: readonly UserAdminAction[] = this.facade.canImpersonate()
+    ? [...BASE_USER_ACTIONS, 'impersonate']
+    : BASE_USER_ACTIONS;
+
   /** The shared table asks; this page decides how loudly. */
   protected onUserAction(intent: UserAdminIntent): void {
     switch (intent.kind) {
@@ -154,7 +165,18 @@ export class OrganizationDetail {
         return;
       case 'delete':
         this.facade.askDeleteUser(intent.row);
+        return;
+      case 'impersonate':
+        this.facade.askImpersonate(intent.row);
+        return;
+      default:
+        return;
     }
+  }
+
+  /** The Stores tab's way in: open this store's dashboard as one of the accounts acting in it. */
+  protected onOpenStore(store: PlatformStoreRow): void {
+    this.facade.askOpenStore(store);
   }
 
   /** The organization every account on this tab belongs to — so the column has nothing to add. */

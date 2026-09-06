@@ -5,6 +5,7 @@ import {PlatformBillingService} from '@api/billing/platform-billing.service';
 import {OrgService} from '@api/tenancy/org.service';
 import {AdminUserService, type AdminUserAction} from '@cvhome-saas/ui-kit/uaa';
 import {optionalList, optionalOne} from '@cvhome-saas/ui-kit';
+import type {SelectOption} from '@cvhome-saas/ui-kit/ui';
 import {
   toOrgRow,
   toPlatformStoreRow,
@@ -22,6 +23,9 @@ import {
 } from '@models/platform-billing';
 
 /** One organization's stores, as the Stores tab reads them. */
+/** How many stores or accounts the impersonation dialog offers. */
+const CHOICE_LIMIT = 200;
+
 export interface OrgStoresSnapshot {
   readonly rows: readonly PlatformStoreRow[];
   readonly totalElements: number;
@@ -151,6 +155,28 @@ export class OrganizationDetailApi {
   }
 
   /** One account action, dispatched by the api tier so the two screens that offer them agree. */
+  /**
+   * The organization's stores, as the impersonation dialog offers them. Capped, like every choice
+   * list on the platform screens; an organization with more stores than that picks from the Stores tab.
+   */
+  storeChoices(orgId: string): Observable<readonly SelectOption[]> {
+    return this.orgs.stores(orgId, 0, CHOICE_LIMIT).pipe(
+      map((page) => (page.content ?? []).map(toPlatformStoreRow).map((store) => ({value: store.id, label: store.name}))),
+    );
+  }
+
+  /**
+   * The accounts that act in a store: the ones whose `store` metadata is it, and the organization's
+   * admins, who act in every store of theirs. Filtered here because uaa's list matches one metadata
+   * key at a time and cannot say "this store or no store".
+   */
+  candidates(orgId: string, storeId: string): Observable<readonly PlatformUserRow[]> {
+    return this.users.list(0, CHOICE_LIMIT, {org: orgId}).pipe(
+      map((page) => (page.content ?? []).map(toPlatformUserRow)),
+      map((rows) => rows.filter((row) => row.store === storeId || (!row.store && row.roles.includes('ORG_ADMIN')))),
+    );
+  }
+
   applyToUser(userId: string, action: AdminUserAction): Observable<void> {
     return this.users.apply(userId, action);
   }

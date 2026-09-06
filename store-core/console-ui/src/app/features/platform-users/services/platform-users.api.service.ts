@@ -1,13 +1,17 @@
 import {Injectable, inject} from '@angular/core';
-import {Observable, forkJoin, map} from 'rxjs';
+import {Observable, forkJoin, map, of} from 'rxjs';
 
 import {OrgService} from '@api/tenancy/org.service';
 import {AdminUserService, type AdminUserAction} from '@cvhome-saas/ui-kit/uaa';
 import {optionalOne} from '@cvhome-saas/ui-kit';
-import {toOrgRow, toPlatformUserRow, type PlatformUserRow} from '@models/platform';
+import {toOrgRow, toPlatformStoreRow, toPlatformUserRow, type PlatformUserRow} from '@models/platform';
+import type {SelectOption} from '@cvhome-saas/ui-kit/ui';
 
 /** How many organizations the filter offers. See `pods.api.service.ts` for why there is a cap. */
 export const ORG_FILTER_LIMIT = 200;
+
+/** How many of an organization's stores the impersonation dialog offers. */
+export const STORE_CHOICE_LIMIT = 200;
 
 /** One organization, as the filter lists it. */
 export interface OrgChoice {
@@ -74,5 +78,21 @@ export class PlatformUsersApi {
   /** One row action, dispatched by the api tier so the two screens that offer them agree. */
   apply(userId: string, action: AdminUserAction): Observable<void> {
     return this.users.apply(userId, action);
+  }
+
+  /**
+   * The stores an impersonation of this account may enter: the one in its `store` metadata, or every
+   * store of its organization for an org admin. Named from tenancy's rows; an account outside every
+   * organization has nowhere to be acted as, and the dialog says so with an empty list.
+   */
+  storeChoices(row: PlatformUserRow): Observable<readonly SelectOption[]> {
+    if (!row.org) {
+      return of([]);
+    }
+    return this.orgs.stores(row.org, 0, STORE_CHOICE_LIMIT).pipe(
+      map((page) => (page.content ?? []).map(toPlatformStoreRow)),
+      map((stores) => stores.filter((store) => !row.store || store.id === row.store)),
+      map((stores) => stores.map((store) => ({value: store.id, label: store.name}))),
+    );
   }
 }

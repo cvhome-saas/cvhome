@@ -18,6 +18,10 @@ import {INVOICE_STATUS_TONE} from '@models/platform-billing';
 import {Money} from '@shared/i18n/money';
 import {PlatformLabel} from '@shared/i18n/platform-label';
 import {RoleLabel} from '@shared/i18n/role-label';
+import {ConsolePermissions} from '@shared/auth/console-permissions';
+import {ImpersonationLauncher} from '@layouts/console-shell/services/impersonation-launcher';
+import type {StartImpersonation} from '@models/impersonation';
+import type {SelectOption} from '@cvhome-saas/ui-kit/ui';
 import type {NavSection, RoleChange, RoleOption} from '@cvhome-saas/ui-kit/ui';
 import {ToastService} from '@cvhome-saas/ui-kit/ui';
 import {OrganizationDetailApi} from '../services/organization-detail.api.service';
@@ -85,6 +89,8 @@ export class OrganizationDetailFacade {
   private readonly labels = inject(PlatformLabel);
   private readonly money = inject(Money);
   private readonly roleLabels = inject(RoleLabel);
+  private readonly permissions = inject(ConsolePermissions);
+  private readonly launcher = inject(ImpersonationLauncher);
 
   /** The organization being read, set by the page from the route. */
   readonly orgId = signal<string | null>(null);
@@ -414,6 +420,86 @@ export class OrganizationDetailFacade {
       {name: this.row()?.label ?? ''},
       () => this.resettingOwner.set(false),
     );
+  }
+
+  /* ------------------------------------------------------------------ acting as an account ---- */
+
+  /**
+   * What the impersonation dialog was opened from: an account row (the stores are theirs to pick)
+   * or a store row (the accounts are the ones acting in it). Null when closed.
+   */
+  readonly impersonating = signal<{target: PlatformUserRow | null; store: PlatformStoreRow | null} | null>(null);
+
+  readonly canImpersonate = computed(() => this.permissions.canImpersonate());
+  readonly canImpersonateInWriteMode = computed(() => this.permissions.canImpersonateInWriteMode());
+
+  /** The organization's stores, loaded when the dialog opens from an account row. */
+  private readonly impersonationStores = snapshot(
+    () => {
+      const open = this.impersonating();
+      const id = this.orgId();
+      return open && !open.store && id ? {id, store: open.target?.store ?? null} : undefined;
+    },
+    (query) => this.api.storeChoices(query.id),
+  );
+
+  /** The accounts acting in a store, loaded when the dialog opens from a store row. */
+  private readonly impersonationCandidates = snapshot(
+    () => {
+      const open = this.impersonating();
+      const id = this.orgId();
+      return open?.store && id ? {id, store: open.store.id} : undefined;
+    },
+    (query) => this.api.candidates(query.id, query.store),
+  );
+
+  readonly impersonationStoreChoices = computed<readonly SelectOption[]>(() => {
+    const open = this.impersonating();
+    if (!open) {
+      return [];
+    }
+    if (open.store) {
+      return [{value: open.store.id, label: open.store.name}];
+    }
+    const stores = this.impersonationStores.value() ?? [];
+    return open.target?.store ? stores.filter((store) => store.value === open.target?.store) : stores;
+  });
+
+  readonly impersonationTargetChoices = computed<readonly SelectOption[]>(() => {
+    const open = this.impersonating();
+    if (!open) {
+      return [];
+    }
+    if (open.target) {
+      return [{value: open.target.id, label: open.target.name || open.target.username}];
+    }
+    return (this.impersonationCandidates.value() ?? []).map((row) => ({value: row.id, label: row.name || row.username}));
+  });
+
+  askImpersonate(row: PlatformUserRow): void {
+    this.impersonating.set({target: row, store: null});
+  }
+
+  askOpenStore(store: PlatformStoreRow): void {
+    this.impersonating.set({target: null, store});
+  }
+
+  dismissImpersonation(): void {
+    this.impersonating.set(null);
+  }
+
+  /** Starts acting as the account; on success the launcher has already left for the merchant's dashboard. */
+  confirmImpersonate(request: StartImpersonation): void {
+    if (this.busy()) {
+      return;
+    }
+    this.busy.set(true);
+    this.launcher.start(request).subscribe({
+      error: (failure: unknown) => {
+        this.busy.set(false);
+        this.toast.danger(this.apiErrors.messageFor(failure));
+      },
+    });
   }
 
   /* -------------------------------------------------------------- the users tab's writes ---- */

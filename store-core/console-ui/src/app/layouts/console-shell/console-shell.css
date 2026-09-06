@@ -8,8 +8,21 @@
   font-size: 16px;
 }
 
+/*
+ * The reserved row is the sum of the banners shown, because two can stack: the plan notice, and the
+ * impersonation bar above it. A layout that reserved one row for two would leave a 49px gap under
+ * the second.
+ */
 .console.banner-on {
   --banner-h: 49px;
+}
+
+.console.impersonation-on {
+  --banner-h: 49px;
+}
+
+.console.impersonation-on.banner-on {
+  --banner-h: 98px;
 }
 
 .console-body {

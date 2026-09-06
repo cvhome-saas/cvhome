@@ -1652,6 +1652,66 @@ a valid store id.
 
 ---
 
+## IMP — The impersonation grant
+
+_From `.agents/plans/user-impersonation.md`._ RFC 8693 token exchange with the `requested_subject` extension, on
+`/oauth2/token`, held by the seeded `console-impersonation` client alone and registered by uaa's shell only — cua
+never answers it. Requests: `http/impersonation-api.http`. The gateway is the product's caller
+(`../gateway/gateway-service/qa/gateway-qa.md` §IMP); this section drives uaa directly.
+
+Design points:
+
+- **`sub` is the merchant, `act` is the operator.** Every `hasPermission` on every service keeps working; the audit
+  trail can still tell the two apart. `act_mode` says `read` or `write`.
+- **Read mode mints `STORE_MODERATOR`** on `impersonation_store`; write mode mints the target's own roles — never
+  wider, never narrower.
+- **Seven refusals, each a `user.impersonation.denied` row** naming the rule: a dead subject token, a chained one, an
+  operator without `users:impersonate`, a disabled or privileged target, write mode for support, a store the target
+  does not act in, read mode on a target with no store-level read role.
+- **Never a refresh token; fifteen minutes at most; never past the operator's own token.**
+- **The store check for an org admin is the gateway's**, not uaa's: uaa holds no store registry.
+
+### IMP-01 — A super admin exchanges for a merchant, read-only · critical · [verified]
+
+- **Covered by** `ImpersonationExchangeIntegrationTest.aSuperAdminActsAsAmerchantReadOnlyAndTheTrailSaysSo` against
+  the real endpoint, and `.http` "act as org1-store1-admin, read-only".
+- **Expect** — 200 with `issued_token_type`, `act_mode: read`, `acting_as`, **no** `refresh_token`; the JWT's `sub`
+  and `uid` are the merchant's id, `roles` is `[STORE_MODERATOR]`, `store` the chosen one, `act.sub` = `super-admin`;
+  a `user.impersonation.started` row whose detail is the reason.
+
+### IMP-02 — Write mode is the merchant verbatim · high · [verified]
+
+- **Covered by** `writeModeCarriesTheMerchantsOwnRoles`; `.http` "the same, read-write".
+
+### IMP-03 — Chaining is refused · critical · [verified]
+
+- **Covered by** `anImpersonatedTokenCannotBeExchangedAgain`; `.http` "chaining is refused".
+- **Expect** — 400 `invalid_grant`, and a `denied` row with reason `CHAINED`.
+
+### IMP-04 — Support acts read-only and never in write mode · critical · [verified]
+
+- **Covered by** `supportActsReadOnlyAndNeverInWriteMode` — `support` / `admin` is seeded by `test-stores`.
+
+### IMP-05 — An org admin may not impersonate; a platform principal cannot be impersonated · critical · [verified]
+
+- **Covered by** `anOrgAdminMayNotImpersonateAndAplatformPrincipalCannotBeImpersonated`; `.http` "a platform
+  principal cannot be impersonated".
+
+### IMP-06 — Only `console-impersonation` holds the grant · critical · [verified]
+
+- **Covered by** `theGrantIsRefusedToEveryOtherClient`; `.http` "web-app does not hold the grant".
+
+### IMP-07 — Revocation writes the "ended" row · high · [verified]
+
+- **Covered by** IMP-01's second half and `ProtocolAuditListenerTest.revokingAnImpersonatedTokenAlsoRecordsTheImpersonationAsEnded`.
+
+### IMP-08 — The admin console lists the client without breaking · [not verified]
+
+- **Steps** — uaa's own console → Clients.
+- **Expect** — `console-impersonation` listed with grant `urn:ietf:params:oauth:grant-type:token-exchange`; the New
+  Client form's grant options do **not** offer token exchange (`OAuthGrantTypeTest`,
+  `AdminClientController.getOptions`).
+
 ## MIG — Resetting a database
 
 This project is not in production: **there are no migrations.** `schema.sql` is rewritten in place (the

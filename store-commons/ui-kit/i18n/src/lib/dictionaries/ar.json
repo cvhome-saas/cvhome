@@ -287,7 +287,8 @@
         "disable": "تعطيل الحساب",
         "editRoles": "تعديل الأدوار",
         "enable": "تفعيل الحساب",
-        "impersonateUnavailable": "الدخول بحساب آخر غير مبني بعد",
+        "impersonate": "الدخول بصفة هذا الحساب",
+        "impersonateUnavailable": "الدخول بصفة هذا الحساب غير متاح هنا",
         "resetPassword": "تعيين كلمة مرور",
         "menuFor": "إجراءات {{name}}",
         "unlock": "فتح قفل الحساب"

@@ -1,5 +1,6 @@
 import {Observable, of} from 'rxjs';
 
+import type {ImpersonationState} from '@cvhome-saas/ui-kit';
 import type {ConsoleStore, ConsoleUser, NavigationSection, StoreDirectory} from '@models/console';
 import type {ProvisioningState} from '@models/tenancy';
 
@@ -19,6 +20,11 @@ export class FakeConsoleApi {
   platformOperator = false;
   /** Shaped like what uaa actually yields today: a username, no email. */
   user: ConsoleUser = {name: 'org1-admin', initials: 'OR', email: null};
+  /** Who the session is acting as. Itself unless a case says otherwise, which keeps the banner out of the default shell. */
+  impersonation: ImpersonationState | null = null;
+  /** How many times a case ended an impersonation, and where the chrome then asked to reload to. */
+  ended = 0;
+  reloadedTo: string | null = null;
 
   /**
    * A nav of its own, not the real one.
@@ -50,6 +56,19 @@ export class FakeConsoleApi {
 
   loadUser(): Observable<ConsoleUser> {
     return of(this.user);
+  }
+
+  loadImpersonation(): Observable<ImpersonationState | null> {
+    return of(this.impersonation);
+  }
+
+  endImpersonation(): Observable<void> {
+    this.ended += 1;
+    return of(undefined);
+  }
+
+  reloadTo(path: string): void {
+    this.reloadedTo = path;
   }
 
   loadStores(): Observable<StoreDirectory> {

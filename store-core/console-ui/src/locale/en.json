@@ -965,6 +965,16 @@
       "dismiss": "Dismiss plan notice",
       "manage": "Manage plan"
     },
+    "impersonation": {
+      "actingAs": "You are acting as {{name}}",
+      "store": "Store: {{store}}",
+      "mode": {
+        "read": "Read-only",
+        "write": "Read and write"
+      },
+      "remaining": "{{minutes}} {count, plural, =1 {minute} other {minutes}} left",
+      "end": "Stop acting as them"
+    },
     "store": {
       "ariaLabel": "Stores",
       "title": "Store",
@@ -2032,6 +2042,28 @@
     }
   },
   "platform": {
+    "impersonation": {
+      "title": "Act as an account",
+      "description": "You will see the console exactly as this account does, until you stop or fifteen minutes pass. Every action is recorded against you.",
+      "target": "Account",
+      "pickTarget": "Choose an account",
+      "store": "Store",
+      "pickStore": "Choose a store",
+      "modeLabel": "Access",
+      "mode": {
+        "read": "Read-only",
+        "write": "Read and write"
+      },
+      "hint": {
+        "read": "Their store as a moderator sees it: everything readable, nothing editable.",
+        "write": "Their account verbatim. Anything you save is saved as them — and audited as you.",
+        "reason": "Required. This is what the audit trail will say the session was for."
+      },
+      "reason": "Reason",
+      "reasonPlaceholder": "Ticket number, what they reported…",
+      "confirm": "Start",
+      "busy": "Starting…"
+    },
     "orgStatus": {
       "ACTIVE": "Active",
       "SUSPENDED": "Suspended",
@@ -2225,7 +2257,8 @@
           "status": "Status",
           "provisioning": "Provisioning",
           "pod": "Pod",
-          "billing": "Billing"
+          "billing": "Billing",
+          "actions": "Actions"
         },
         "empty": {
           "title": "No stores yet",
@@ -2233,7 +2266,8 @@
         },
         "billingUnknown": "Billing has no subscription recorded for this store, or could not be reached. Either way it does not mean the store has lapsed.",
         "billingUnknownShort": "Unknown",
-        "openBilling": "Open this store in the billing register"
+        "openBilling": "Open this store in the billing register",
+        "openDashboard": "Open this store's dashboard as one of its accounts"
       },
       "users": {
         "title": "Users",
