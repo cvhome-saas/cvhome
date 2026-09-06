@@ -40,8 +40,7 @@ public class ProductRelationshipApi {
 
     @GetMapping("/products/{id}/relationship")
     @Parameter(name = "store", schema = @Schema(type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
-    public ReadableProductGroup related(@PathVariable Long id, StoreMerchantId merchantStore, LanguageCode language)
-            throws ProductGroupNotFoundException {
+    public ReadableProductGroup related(@PathVariable Long id, StoreMerchantId merchantStore, LanguageCode language) {
         return productGroupService.related(merchantStore, id, language);
     }
 

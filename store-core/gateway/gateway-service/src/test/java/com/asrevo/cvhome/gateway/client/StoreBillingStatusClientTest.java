@@ -36,12 +36,12 @@ class StoreBillingStatusClientTest {
     @Test
     void refreshReplacesTheSetWholesale() {
         when(entitlementService.blockedStores()).thenReturn(Mono.just(List.of(new StoreMerchantId(STORE_A))));
-        client.refresh();
+        client.refresh().block();
         assertThat(client.blocked(STORE_A)).isTrue();
         assertThat(client.blocked(STORE_B)).isFalse();
 
         when(entitlementService.blockedStores()).thenReturn(Mono.just(List.of(new StoreMerchantId(STORE_B))));
-        client.refresh();
+        client.refresh().block();
         assertThat(client.blocked(STORE_A)).isFalse();
         assertThat(client.blocked(STORE_B)).isTrue();
     }
@@ -49,10 +49,10 @@ class StoreBillingStatusClientTest {
     @Test
     void failedRefreshKeepsTheLastKnownSet() {
         when(entitlementService.blockedStores()).thenReturn(Mono.just(List.of(new StoreMerchantId(STORE_A))));
-        client.refresh();
+        client.refresh().block();
 
         when(entitlementService.blockedStores()).thenReturn(Mono.error(new IllegalStateException("billing is down")));
-        client.refresh();
+        client.refresh().block();
 
         assertThat(client.blocked(STORE_A)).isTrue();
     }

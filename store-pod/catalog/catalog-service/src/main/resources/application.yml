@@ -40,3 +40,9 @@ namastack:
       schema-initialization:
         enabled: false
       schema-name: ${spring.application.name}
+cvhome:
+  metrics:
+    outbox:
+      # Outbox gauges (cvhome_outbox_records, cvhome_outbox_oldest_pending_seconds) over this service's outbox table.
+      enabled: true
+      table: catalog.outbox_record

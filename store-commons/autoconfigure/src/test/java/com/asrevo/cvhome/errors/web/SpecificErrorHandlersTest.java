@@ -12,10 +12,12 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 
 import com.asrevo.cvhome.errors.CommonErrors;
+import com.asrevo.cvhome.metrics.AuthRejectionMetricsFilter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -106,13 +108,18 @@ class SpecificErrorHandlersTest {
     @Test
     void accessDeniedAndUnauthenticatedAreDistinctCodesAndDistinctStatuses() {
         SecurityErrorHandler handler = new SecurityErrorHandler(factory);
+        MockHttpServletRequest deniedRequest = new MockHttpServletRequest();
 
-        ResponseEntity<ProblemDetail> denied = handler.handleAccessDenied(new AccessDeniedException("nope"));
+        ResponseEntity<ProblemDetail> denied =
+                handler.handleAccessDenied(new AccessDeniedException("nope"), deniedRequest);
         ResponseEntity<ProblemDetail> unauthenticated =
-                handler.handleAuthentication(new BadCredentialsException("bad"));
+                handler.handleAuthentication(new BadCredentialsException("bad"), new MockHttpServletRequest());
 
         assertThat(denied.getStatusCode().value()).isEqualTo(403);
         assertThat(unauthenticated.getStatusCode().value()).isEqualTo(401);
+        // The rejection is named for the cvhome.auth.rejections counter, which runs outside the advice.
+        assertThat(deniedRequest.getAttribute(AuthRejectionMetricsFilter.REASON_ATTRIBUTE))
+                .isEqualTo("AccessDeniedException");
         assertThat(denied.getBody().getProperties())
                 .containsEntry(ProblemDetailFactory.CODE, CommonErrors.ACCESS_DENIED.code());
         assertThat(unauthenticated.getBody().getProperties())
@@ -124,7 +131,7 @@ class SpecificErrorHandlersTest {
         SecurityErrorHandler handler = new SecurityErrorHandler(factory);
 
         // "Bad credentials for user X" in a 401 body is a user-enumeration oracle.
-        assertThat(handler.handleAuthentication(new BadCredentialsException("no such user bob"))
-                .getBody().getDetail()).doesNotContain("bob");
+        assertThat(handler.handleAuthentication(new BadCredentialsException("no such user bob"),
+                new MockHttpServletRequest()).getBody().getDetail()).doesNotContain("bob");
     }
 }

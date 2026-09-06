@@ -77,7 +77,7 @@ class PodRouteResilienceTest {
     void failedRefreshKeepsLastKnownGood() {
         when(podService.listPods()).thenReturn(Mono.error(new IllegalStateException("registry is down")));
 
-        podClient.refreshRoutes();
+        podClient.refreshRoutes().block();
 
         assertThat(routeIds(podClient)).containsExactly(POD_A_ROUTE_ID);
         assertThat(podClient.knownRouteCount()).isOne();
@@ -90,7 +90,7 @@ class PodRouteResilienceTest {
     void emptyResponseIsAppliedButOnlyWhenItIsTheRealAnswer() {
         when(podService.listPods()).thenReturn(Mono.just(List.of()));
 
-        podClient.refreshRoutes();
+        podClient.refreshRoutes().block();
 
         assertThat(routeIds(podClient)).isEmpty();
     }
@@ -100,12 +100,12 @@ class PodRouteResilienceTest {
     void publishesOnlyOnChange() {
         when(podService.listPods()).thenReturn(Mono.just(List.of(POD_A, POD_B)));
 
-        podClient.refreshRoutes();
+        podClient.refreshRoutes().block();
         assertThat(routeIds(podClient)).containsExactly(POD_A_ROUTE_ID, "pod-607f1f77");
         verify(publisher, times(1)).publishEvent(any(RefreshRoutesEvent.class));
 
         // Same answer again: no event, because republishing churned the whole route cache every minute for nothing.
-        podClient.refreshRoutes();
+        podClient.refreshRoutes().block();
         verify(publisher, times(1)).publishEvent(any(RefreshRoutesEvent.class));
     }
 

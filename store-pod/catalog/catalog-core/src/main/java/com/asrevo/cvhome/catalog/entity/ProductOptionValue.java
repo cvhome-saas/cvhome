@@ -21,6 +21,8 @@ import jakarta.persistence.Table;
 import jakarta.persistence.TableGenerator;
 import jakarta.persistence.UniqueConstraint;
 
+import org.hibernate.annotations.BatchSize;
+
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.store.core.constants.SchemaConstant;
 import com.asrevo.cvhome.store.core.entity.common.audit.AuditListener;
@@ -68,7 +70,9 @@ public class ProductOptionValue extends SalesManagerEntity<Long, ProductOptionVa
     @Column(name = "SORT_ORDER")
     private Integer sortOrder;
 
+    // Batched for the same reason as ProductOption.values: a label per value was one query per value.
     @OneToMany(mappedBy = "optionValue", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @BatchSize(size = 100)
     private Set<ProductOptionValueDescription> descriptions = new HashSet<>();
 
     public ProductOptionValue() {

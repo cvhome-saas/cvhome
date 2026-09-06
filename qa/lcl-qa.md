@@ -233,15 +233,81 @@ java.lang.IllegalArgumentException: Failed to evaluate expression 'hasPermission
   Loki `sum by (service_name) (count_over_time({service_name=~".+"}[30m]))`,
   Tempo `{ resource.service.name="landing-ui" }` and open one trace,
   Prometheus `count by (service_name) (group by (__name__, service_name) ({service_name=~".+"}))`.
-  Also `lcl logs --errors --grep 'Failed to export'`.
+  Also `lcl logs --errors --grep 'Failed to export'`, and at the collector
+  `curl -s localhost:8889/metrics > /tmp/m` then
+  `grep -c http_server_requests_milliseconds /tmp/m` (duplicate export path),
+  `grep http_server_requests_seconds_bucket /tmp/m | grep -o 'le="[^"]*"' | sort -u` (latency buckets),
+  `grep -o 'service_version="[^"]*"' /tmp/m | sort -u`,
+  `grep traces_span_metrics_calls_total /tmp/m | grep -cE 'span_name="(http|task) '` (Micrometer-tracing spans),
+  `grep -c '^tomcat_threads_busy' /tmp/m`, `grep traces_span_metrics_calls_total /tmp/m | grep -c 'fetch GET http'`.
+  Then `curl -s 'http://localhost:8122/api/v2/products/does-not-exist?store=65f023632bc46470c104b75f&lang=en'`
+  and take the `traceId` from the body: `grep <traceId> .lcl/<stack>/logs/catalog.log`, Loki
+  `{service_name="catalog"} | trace_id="<traceId>"`, Tempo `curl localhost:3200/api/traces/<traceId>`.
+  Finally `grep -c ObservationThreadLocalAccessor .lcl/<stack>/logs/store-core-gateway.log` after 5 minutes.
 - **Expect** — all twelve Java services appear in each of the three queries; landing-ui appears in Tempo and
   Prometheus (its Node SDK exports no logs); the storefront trace contains spans from landing-ui, spg and the
   pod services it called (merchant, content, catalog, inventory); Loki lines carry `trace_id` and `span_id`;
-  the grep prints nothing. **Expected to fail if** `otel.exporter.otlp.protocol` is dropped from
-  `SPRING_APPLICATION_JSON` in `lcl.yml`: the starter defaults to http/protobuf against the gRPC port, every Java
-  service logs `Failed to export spans/logs … unexpected end of stream on http://localhost:4317` once a second,
-  and only metrics (Micrometer, port 4318) arrive — Prometheus fills while Loki and Tempo stay empty.
+  the export grep prints nothing. At the collector: the milliseconds count is 0; the buckets are the thirteen SLO
+  boundaries (0.05 … 10) plus `+Inf`; `service_version` is the build version, never `${version}`; the
+  Micrometer-tracing span count is 0 (one server span per route, named `GET /api/...`); Tomcat threads are
+  present; no landing-ui span name contains a URL. The 404 body's `traceId` is a 32-hex trace id that appears
+  in the catalog log line (`[<traceId>-<spanId>]`), in Loki and in Tempo. The gateway WARN count is 0.
+  **Expected to fail if** `otel.exporter.otlp.protocol` is dropped from `SPRING_APPLICATION_JSON` in `lcl.yml`:
+  the starter defaults to http/protobuf against the gRPC port, every Java service logs
+  `Failed to export spans/logs … unexpected end of stream on http://localhost:4317` once a second, and only
+  metrics arrive.
 - **Note** — `lcl restart <svc>` re-uses the supervisor's environment, so a changed `OTEL_*` variable needs
   `lcl stop` + `lcl start`, not a restart. The `--infra all` set is not part of `lcl start -d`; without it the
-  SDK-enabled services retry the export forever and count it as errors in `lcl status`.
+  SDK-enabled services retry the export forever and count it as errors in `lcl status`. A whole-stack
+  `lcl restart` also comes back with the default infra only — the monitoring containers are gone until the next
+  `lcl start -d --infra all`.
 
+## 16 — SLO rules evaluate and every dashboard has data [verified; not verified: the two in-UI link clicks (*View trace*, *Slow traces*) — checked through the Loki and Tempo APIs instead]
+
+- **Setup** — case 15 passed; `cd ../load-testing && make smoke` has run once against the stack (fills every
+  route, journey and the k6 series).
+- **Steps** — `curl -s localhost:9090/api/v1/rules | jq '[.data.groups[].rules[] | select(.health!="ok")]'`;
+  `curl -s 'localhost:9090/api/v1/query?query=count(cvhome:http_server_errors:ratio_rate5m)'` and the same for
+  `cvhome:span_server:p95_5m`, `cvhome:sql:p95_5m`, `cvhome:hikari_pool:utilisation`,
+  `cvhome:tomcat_threads:utilisation`, `cvhome:s2s:rate5m`;
+  `curl -s 'localhost:3000/api/search?type=dash-db' | jq length`; open Grafana → the home page is *Platform
+  Overview*; walk the folders `platform`, `data`, `edge`, `observability`, `load-testing` and open every
+  dashboard; on *Service RED* pick `catalog`, on *Load test vs app* pick the smoke run's `testid`; on *Logs &
+  Errors* expand an error line and click *View trace*; on *Service RED* → *Latency* click *Slow traces*.
+  Trigger a 401 (`curl -s -o /dev/null -w '%{http_code}' 'http://localhost:8122/api/v1/private/product/unique?store=65f023632bc46470c104b75f&lang=en&name=x'`)
+  and, two minutes later, `curl -s localhost:8889/metrics | grep cvhome_auth_rejections_total`.
+  From the repo root: `node extra/monitoring/scripts/build-dashboards.mjs --check && node extra/monitoring/scripts/dashboard-docs.mjs --check`
+  and `docker run --rm -v "$PWD/extra/monitoring/prometheus-rules:/r:ro" --entrypoint promtool prom/prometheus:v3.11.2 test rules /r/tests/cvhome.test.yml`.
+- **Expect** — the unhealthy-rules list is empty; each `count(...)` query returns a number (12 services for the
+  HTTP and JVM ones, the service-graph edges for `cvhome:s2s:rate5m`); the search returns 12 dashboards, all
+  marked provisioned and not editable in the UI; every dashboard shows data in its panels (the *Auth rejections
+  by reason*, *Cache*, *Outbox records* and *Gateway sessions* panels once the smoke run and the 401 have
+  happened); *View trace* opens the trace in Tempo with the same id; *Slow traces* opens Tempo search filtered
+  on the service; `cvhome_auth_rejections_total{reason="missing_token",status="401"}` is present; both scripts
+  print "valid" / "up to date" and promtool prints SUCCESS. **Expected to fail if** a dashboard JSON is edited
+  by hand without regenerating `docs/dashboards.md` — the check script fails on the diff, which is the point.
+
+## 17 — The load stack: images, one container each, 1 GB per container [verified; not verified: LOAD_MEM other than 1g, a registry-tagged LOAD_TAG]
+
+The numbers a load test produces against `lcl start` are development numbers (gradle `bootRun`, no memory limit,
+`next dev`). This stack runs the platform as its images with the memory a deployed task gets.
+
+- **Setup** — Docker running, `/etc/hosts` from `configure-domain.sh`, no lcl stack on the default ports
+  (`lcl list` shows none — the script refuses otherwise).
+- **Steps** —
+  1. `extra/scripts/load-stack.sh build` — expect `store-core/{uaa,store-core-gateway,tenancy,billing,pod-registry,console-ui}:latest`
+     and `store-pod/{merchant,content,catalog,checkout,cua,payment,inventory,landing-ui}:latest` in `docker images`
+     (a Docker Hub timeout on the buildpack builder fails one image; rerun the same command).
+  2. `extra/scripts/load-stack.sh up` — expect "every Java service is UP" within ten minutes, then
+     `landing-ui 307`, `console-ui 200`, `spg 307`.
+  3. `extra/scripts/load-stack.sh stats` — every container `/ 1GiB`; a JVM at rest sits at 250–400 MiB.
+  4. `curl -s http://localhost:9090/api/v1/query --data-urlencode 'query=count by (service_version) (process_uptime_seconds)'`
+     — `1.0.16 12`: every JVM exports to the collector, from inside the network.
+  5. `cd ../load-testing && make smoke` — 308 requests, 0 failed, 2 orders (the `spg:domain-lookup` check that
+     fails once is the same on lcl).
+  6. `extra/scripts/load-stack.sh down --hard` — no `cvhome-load-*` containers or volumes remain.
+- **Expect** — the storefront reaches spg by its in-network alias and spg reaches the pods by theirs (no
+  `host-gateway` entries: `docker inspect cvhome-load-spg-1 | grep -c host-gateway` is 0); an lcl stack started
+  afterwards on the same ports works unchanged.
+- **Expected to fail** — `up` while an lcl stack holds the ports (refused by the guard, or port collisions if the
+  guard is bypassed); `up` before `build` (`pull access denied` for `store-pod/catalog`).

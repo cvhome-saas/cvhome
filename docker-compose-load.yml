@@ -1,0 +1,285 @@
+# The load stack: every service as the image `bootBuildImage` produces, one container each, every container
+# capped at LOAD_MEM (1g by default) — the packaging and the memory a deployed task gets, so load numbers come
+# from a JVM that was started the way production starts it, not from `gradle bootRun` with a warm compiler daemon
+# behind it. Layered over docker-compose-lcl.yml, which keeps the infra and the monitoring exactly as lcl runs them:
+#
+#   extra/scripts/load-stack.sh build     ./gradlew bootBuildImage — fourteen images, tagged <version> and latest
+#   extra/scripts/load-stack.sh up        docker compose -p cvhome-load -f docker-compose-lcl.yml -f docker-compose-load.yml up -d
+#   extra/scripts/load-stack.sh down      stop; `down --hard` also drops the volumes
+#
+# Ports, hostnames and store ids are the lcl defaults, so `load-testing` runs against it with TARGET=lcl unchanged
+# and the /etc/hosts entries from extra/scripts/configure-domain.sh keep pointing the browser at it. Stop any lcl
+# stack on the same ports first (`lcl stop`).
+#
+# Inside the network the platform's hostnames are container aliases rather than host-gateway entries: spg proxies
+# to catalog.gateway.com:8122 and reaches the catalog container; every JVM validates tokens against
+# uaa.gateway.com:8001 and reaches uaa; the storefront calls spg-507f1f77.gateway.com:80 and reaches spg. The
+# `lb://` calls go through SimpleDiscoveryClient with the container names, the same override document lcl writes,
+# with container names instead of localhost.
+
+x-limits: &limits
+  deploy:
+    resources:
+      limits:
+        memory: ${LOAD_MEM:-1g}
+
+x-java-env: &java-env
+  SPRING_PROFILES_ACTIVE: lcl,test-stores
+  # Every JVM exports to the collector unless told otherwise; a load stack without telemetry has nothing to read.
+  OTEL_SDK_DISABLED: ${OTEL_SDK_DISABLED:-false}
+  INFO_STACK_NAME: load
+  # The Paketo memory calculator sizes the heap from the container limit; this is the only knob worth exposing.
+  JAVA_TOOL_OPTIONS: ${JAVA_TOOL_OPTIONS:-}
+  SPRING_APPLICATION_JSON: >-
+    {
+      "com.asrevo.cvhome.app.handlers[0].schema": "http",
+      "com.asrevo.cvhome.app.handlers[0].port": "8000",
+      "spring.cloud.discovery.client.simple.instances.uaa[0].uri": "http://uaa:8001",
+      "spring.cloud.discovery.client.simple.instances.store-core-gateway[0].uri": "http://store-core-gateway:8000",
+      "spring.cloud.discovery.client.simple.instances[store-core-gateway.store-core.cvhome.lcl][0].uri": "http://store-core-gateway:8000",
+      "spring.cloud.discovery.client.simple.instances.tenancy[0].uri": "http://tenancy:8020",
+      "spring.cloud.discovery.client.simple.instances.billing[0].uri": "http://billing:8021",
+      "spring.cloud.discovery.client.simple.instances.pod-registry[0].uri": "http://pod-registry:8022",
+      "spring.cloud.discovery.client.simple.instances.console-ui[0].uri": "http://console-ui:8011",
+      "spring.cloud.discovery.client.simple.instances.merchant[0].uri": "http://merchant:8120",
+      "spring.cloud.discovery.client.simple.instances.content[0].uri": "http://content:8121",
+      "spring.cloud.discovery.client.simple.instances.catalog[0].uri": "http://catalog:8122",
+      "spring.cloud.discovery.client.simple.instances.checkout[0].uri": "http://checkout:8123",
+      "spring.cloud.discovery.client.simple.instances.cua[0].uri": "http://cua:8124",
+      "spring.cloud.discovery.client.simple.instances.payment[0].uri": "http://payment:8125",
+      "spring.cloud.discovery.client.simple.instances.inventory[0].uri": "http://inventory:8126",
+      "spring.cloud.discovery.client.simple.instances.landing-ui[0].uri": "http://landing-ui:8110",
+      "spring.datasource.url": "jdbc:postgresql://postgres:5432/cvhome",
+      "spring.datasource.hikari.maximum-pool-size": ${LOAD_POOL_SIZE:-10},
+      "com.asrevo.cvhome.cdn.storage.s3-url": "http://minio:9000",
+      "com.asrevo.cvhome.pods[0].id": "507f1f77bcf86cd799439011",
+      "com.asrevo.cvhome.pods[0].name": "pod-507f1f77",
+      "com.asrevo.cvhome.pods[0].domain": "spg-507f1f77.gateway.com",
+      "com.asrevo.cvhome.pods[0].endpoint.endpoint": "http://spg-507f1f77.gateway.com:80",
+      "com.asrevo.cvhome.pods[0].endpoint.type": "EXTERNAL",
+      "com.asrevo.cvhome.pod-info.pod.id": "507f1f77bcf86cd799439011",
+      "com.asrevo.cvhome.pod-info.pod.name": "pod-507f1f77",
+      "com.asrevo.cvhome.pod-info.pod.domain": "spg-507f1f77.gateway.com",
+      "com.asrevo.cvhome.pod-info.pod.endpoint.endpoint": "http://spg-507f1f77.gateway.com:80",
+      "com.asrevo.cvhome.pod-info.pod.endpoint.type": "EXTERNAL",
+      "management.otlp.tracing.endpoint": "http://otel-collector:4318/v1/traces",
+      "management.otlp.metrics.export.url": "http://otel-collector:4318/v1/metrics",
+      "otel.exporter.otlp.endpoint": "http://otel-collector:4317",
+      "otel.exporter.otlp.protocol": "grpc"
+    }
+
+# A Spring image has no shell for a health probe, so readiness is "postgres is up, then start"; a JVM that loses
+# the race to another still-starting peer retries on its own (Spring Cloud LoadBalancer, the OAuth2 client), and
+# `restart: on-failure` covers a JVM that gave up.
+x-java: &java
+  <<: *limits
+  restart: on-failure:5
+  depends_on:
+    postgres:
+      condition: service_healthy
+
+services:
+  postgres:
+    <<: *limits
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d cvhome" ]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+  minio:
+    <<: *limits
+  otel-collector:
+    <<: *limits
+  loki:
+    <<: *limits
+  tempo:
+    <<: *limits
+  prometheus:
+    <<: *limits
+  grafana:
+    <<: *limits
+
+  spg:
+    <<: *limits
+    # The lcl file points the upstream hostnames at the host; here they are containers on this network.
+    extra_hosts: !reset []
+    environment:
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+    networks:
+      default:
+        aliases:
+          - spg-507f1f77.gateway.com
+          - spg-org3.gateway.com
+          - org1-store1.spg-507f1f77.gateway.com
+          - org1-store2.spg-507f1f77.gateway.com
+          - org2-store1.spg-507f1f77.gateway.com
+          - org2-store2.spg-507f1f77.gateway.com
+          - org3-store1.spg-507f1f77.gateway.com
+    depends_on:
+      - merchant
+      - landing-ui
+
+  uaa:
+    <<: *java
+    image: ${LOAD_REGISTRY:-}store-core/uaa:${LOAD_TAG:-latest}
+    environment:
+      <<: *java-env
+    ports:
+      - "8001:8001"
+    networks:
+      default:
+        aliases:
+          - uaa.gateway.com
+
+  store-core-gateway:
+    <<: *java
+    image: ${LOAD_REGISTRY:-}store-core/store-core-gateway:${LOAD_TAG:-latest}
+    environment:
+      <<: *java-env
+    ports:
+      - "8000:8000"
+    networks:
+      default:
+        aliases:
+          - gateway.com
+          - www.gateway.com
+          - console-ui.gateway.com
+
+  tenancy:
+    <<: *java
+    image: ${LOAD_REGISTRY:-}store-core/tenancy:${LOAD_TAG:-latest}
+    environment:
+      <<: *java-env
+    ports:
+      - "8020:8020"
+
+  billing:
+    <<: *java
+    image: ${LOAD_REGISTRY:-}store-core/billing:${LOAD_TAG:-latest}
+    environment:
+      <<: *java-env
+    ports:
+      - "8021:8021"
+
+  pod-registry:
+    <<: *java
+    image: ${LOAD_REGISTRY:-}store-core/pod-registry:${LOAD_TAG:-latest}
+    environment:
+      <<: *java-env
+    ports:
+      - "8022:8022"
+
+  console-ui:
+    <<: *limits
+    image: ${LOAD_REGISTRY:-}store-core/console-ui:${LOAD_TAG:-latest}
+    environment:
+      PORT: "8011"
+    ports:
+      - "8011:8011"
+
+  merchant:
+    <<: *java
+    image: ${LOAD_REGISTRY:-}store-pod/merchant:${LOAD_TAG:-latest}
+    environment:
+      <<: *java-env
+    ports:
+      - "8120:8120"
+    networks:
+      default:
+        aliases:
+          - merchant.gateway.com
+
+  content:
+    <<: *java
+    image: ${LOAD_REGISTRY:-}store-pod/content:${LOAD_TAG:-latest}
+    environment:
+      <<: *java-env
+    ports:
+      - "8121:8121"
+    networks:
+      default:
+        aliases:
+          - content.gateway.com
+
+  catalog:
+    <<: *java
+    image: ${LOAD_REGISTRY:-}store-pod/catalog:${LOAD_TAG:-latest}
+    environment:
+      <<: *java-env
+    ports:
+      - "8122:8122"
+    networks:
+      default:
+        aliases:
+          - catalog.gateway.com
+
+  checkout:
+    <<: *java
+    image: ${LOAD_REGISTRY:-}store-pod/checkout:${LOAD_TAG:-latest}
+    environment:
+      <<: *java-env
+    ports:
+      - "8123:8123"
+    networks:
+      default:
+        aliases:
+          - checkout.gateway.com
+
+  cua:
+    <<: *java
+    image: ${LOAD_REGISTRY:-}store-pod/cua:${LOAD_TAG:-latest}
+    environment:
+      <<: *java-env
+    ports:
+      - "8124:8124"
+    networks:
+      default:
+        aliases:
+          - cua.gateway.com
+
+  payment:
+    <<: *java
+    image: ${LOAD_REGISTRY:-}store-pod/payment:${LOAD_TAG:-latest}
+    environment:
+      <<: *java-env
+    ports:
+      - "8125:8125"
+    networks:
+      default:
+        aliases:
+          - payment.gateway.com
+
+  inventory:
+    <<: *java
+    image: ${LOAD_REGISTRY:-}store-pod/inventory:${LOAD_TAG:-latest}
+    environment:
+      <<: *java-env
+    ports:
+      - "8126:8126"
+    networks:
+      default:
+        aliases:
+          - inventory.gateway.com
+
+  landing-ui:
+    <<: *limits
+    image: ${LOAD_REGISTRY:-}store-pod/landing-ui:${LOAD_TAG:-latest}
+    environment:
+      PORT: "8110"
+      # Server-side API calls go back out through spg, by its in-network alias.
+      INTERNAL_SPG: http://spg-507f1f77.gateway.com:80
+      OTEL_SDK_DISABLED: ${OTEL_SDK_DISABLED:-false}
+      OTEL_SERVICE_NAME: landing-ui
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
+    ports:
+      - "8110:8110"
+    networks:
+      default:
+        aliases:
+          - landing-ui.gateway.com
+    depends_on:
+      - catalog
+      - content
+      - inventory
+      - merchant

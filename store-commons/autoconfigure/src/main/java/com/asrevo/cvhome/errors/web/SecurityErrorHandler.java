@@ -3,6 +3,8 @@ package com.asrevo.cvhome.errors.web;
 import java.util.List;
 import java.util.Map;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.ProblemDetail;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.asrevo.cvhome.errors.CommonErrors;
 import com.asrevo.cvhome.errors.ErrorCode;
+import com.asrevo.cvhome.metrics.AuthRejectionMetricsFilter;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -40,16 +43,22 @@ public class SecurityErrorHandler {
     }
 
     @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<ProblemDetail> handleAccessDenied(AccessDeniedException exception) {
-        return render(CommonErrors.ACCESS_DENIED, "Access is denied.", exception);
+    public ResponseEntity<ProblemDetail> handleAccessDenied(AccessDeniedException exception,
+                                                            HttpServletRequest request) {
+        return render(CommonErrors.ACCESS_DENIED, "Access is denied.", exception, request);
     }
 
     @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity<ProblemDetail> handleAuthentication(AuthenticationException exception) {
-        return render(CommonErrors.UNAUTHENTICATED, "Authentication is required.", exception);
+    public ResponseEntity<ProblemDetail> handleAuthentication(AuthenticationException exception,
+                                                              HttpServletRequest request) {
+        return render(CommonErrors.UNAUTHENTICATED, "Authentication is required.", exception, request);
     }
 
-    private ResponseEntity<ProblemDetail> render(ErrorCode code, String detail, Exception exception) {
+    private ResponseEntity<ProblemDetail> render(ErrorCode code, String detail, Exception exception,
+                                                 HttpServletRequest request) {
+        // Names the rejection for the cvhome.auth.rejections counter; the filter that increments it runs outside
+        // the security chain and otherwise only sees a status code.
+        request.setAttribute(AuthRejectionMetricsFilter.REASON_ATTRIBUTE, exception.getClass().getSimpleName());
         String traceId = factory.traceId();
         log.warn(LOG_FORMAT, code.code(), traceId, exception.getMessage());
         ProblemDetail problem = factory.create(code, detail, Map.of(), List.of(), traceId);

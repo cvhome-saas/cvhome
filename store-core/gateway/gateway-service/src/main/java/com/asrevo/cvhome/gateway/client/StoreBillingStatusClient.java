@@ -51,9 +51,15 @@ public class StoreBillingStatusClient {
      */
     private volatile Set<String> blockedStores = Set.of();
 
+    /**
+     * Reactive for the same reason as {@link PodClient#refreshRoutes()}: Spring subscribes outside the scheduled-task
+     * observation scope, which is what stops the per-refresh scope-leak warning.
+     */
     @Scheduled(fixedRateString = "${cvhome.gateway.billing-refresh-rate:PT1M}", initialDelay = 5000L)
-    public void refresh() {
-        entitlementService.blockedStores()
+    public Mono<Void> refresh() {
+        // Deferred for the same reason as PodClient.refreshRoutes(): the publisher is obtained once at startup.
+        return Mono.defer(entitlementService::blockedStores)
+                .doOnNext(this::replace)
                 .onErrorResume(e -> {
                     // Fails open, and this is the deliberate opposite of store creation, which fails closed. An
                     // outage in billing must not take every working storefront's console offline; the worst case
@@ -62,7 +68,7 @@ public class StoreBillingStatusClient {
                     log.error("Could not refresh blocked stores from billing; keeping the last known set", e);
                     return Mono.empty();
                 })
-                .subscribe(this::replace);
+                .then();
     }
 
     /**

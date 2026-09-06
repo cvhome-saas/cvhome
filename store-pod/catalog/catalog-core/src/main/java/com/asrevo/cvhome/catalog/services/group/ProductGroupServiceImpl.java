@@ -48,6 +48,14 @@ public class ProductGroupServiceImpl implements ProductGroupService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public ReadableProductGroup storefront(StoreMerchantId store, String code, LanguageCode language) {
+        return productGroupRepository.findByStoreAndCode(store, code)
+                .map(group -> productGroupMapper.toReadable(group, language, false))
+                .orElseGet(() -> emptyStrip(code));
+    }
+
+    @Override
     public boolean exists(StoreMerchantId store, String code) {
         return productGroupRepository.findByStoreAndCode(store, code).isPresent();
     }
@@ -99,11 +107,17 @@ public class ProductGroupServiceImpl implements ProductGroupService {
 
     @Override
     @Transactional(readOnly = true)
-    public ReadableProductGroup related(StoreMerchantId store, Long productId, LanguageCode language)
-            throws ProductGroupNotFoundException {
-        ProductGroup group = productGroupRepository.findByStoreAndParentProductAndCode(store, productId, RELATED_ITEMS)
-                .orElseThrow(() -> ProductGroupNotFoundException.of(RELATED_ITEMS, store));
-        return productGroupMapper.toReadable(group, language, false);
+    public ReadableProductGroup related(StoreMerchantId store, Long productId, LanguageCode language) {
+        return productGroupRepository.findByStoreAndParentProductAndCode(store, productId, RELATED_ITEMS)
+                .map(group -> productGroupMapper.toReadable(group, language, false))
+                .orElseGet(() -> emptyStrip(RELATED_ITEMS));
+    }
+
+    private static ReadableProductGroup emptyStrip(String code) {
+        ReadableProductGroup strip = new ReadableProductGroup();
+        strip.setCode(code);
+        strip.setActive(false);
+        return strip;
     }
 
     @Override

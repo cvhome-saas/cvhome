@@ -73,8 +73,8 @@ class PodRoutingIntegrationTest {
         Mockito.when(podService.listPods()).thenReturn(Mono.just(List.of(local)));
         Mockito.when(entitlementService.blockedStores())
                 .thenReturn(Mono.just(List.of(new StoreMerchantId(Tokens.STORE_2))));
-        podClient.refreshRoutes();
-        billingStatusClient.refresh();
+        podClient.refreshRoutes().block();
+        billingStatusClient.refresh().block();
     }
 
     @Test

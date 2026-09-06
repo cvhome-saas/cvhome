@@ -58,7 +58,7 @@ class PodClientTest {
         PodClient client = client();
         when(podService.listPods()).thenReturn(Mono.just(List.of(pod(ENDPOINT, EndpointType.EXTERNAL))));
 
-        client.refreshRoutes();
+        client.refreshRoutes().block();
         RouteDefinition route = client.getRouteDefinitions().blockFirst();
 
         assertThat(route).isNotNull();

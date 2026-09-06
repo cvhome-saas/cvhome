@@ -61,3 +61,9 @@ com:
         # environments should supply their own, encrypted under AWS KMS rather than the local provider.
         key: ""
         webhook-signing-key: ""
+cvhome:
+  metrics:
+    outbox:
+      # Outbox gauges (cvhome_outbox_records, cvhome_outbox_oldest_pending_seconds) over this service's outbox table.
+      enabled: true
+      table: billing_outbox.outbox_record

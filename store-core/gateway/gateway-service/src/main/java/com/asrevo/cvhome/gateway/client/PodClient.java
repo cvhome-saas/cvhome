@@ -86,13 +86,24 @@ public class PodClient implements RouteDefinitionRepository {
         log.info("Seeded {} pod route(s) from configuration", configured.size());
     }
 
+    /**
+     * Reactive on purpose: Spring subscribes to the returned {@code Mono} itself, outside the scheduled-task
+     * observation scope. Subscribing by hand from inside that scope had Reactor's context propagation restore an
+     * observation the scope no longer owned, and the gateway logged "Observation … is not the same as the one set as
+     * this scope's parent" on every refresh.
+     */
     @Scheduled(fixedRateString = "${cvhome.gateway.route-refresh-rate:PT1M}")
-    public void refreshRoutes() {
-        podService.listPods()
+    public Mono<Void> refreshRoutes() {
+        // Deferred: Spring calls a reactive @Scheduled method once at startup to obtain its publisher, before any
+        // test has stubbed the registry, and a null there fails the whole context. The registry is read on subscribe.
+        return Mono.defer(podService::listPods)
                 .map(this::toRouteDefinitions)
-                .subscribe(this::applyRefresh,
-                        e -> log.error("Pod route refresh failed; keeping {} known route(s)",
-                                lastKnownGood.get().size(), e));
+                .doOnNext(this::applyRefresh)
+                .onErrorResume(e -> {
+                    log.error("Pod route refresh failed; keeping {} known route(s)", lastKnownGood.get().size(), e);
+                    return Mono.empty();
+                })
+                .then();
     }
 
     private void applyRefresh(List<RouteDefinition> fresh) {

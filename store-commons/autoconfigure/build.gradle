@@ -2,6 +2,15 @@ plugins {
     alias(libs.plugins.java.library.conventions)
 }
 
+// common-config.yml tags every metric, span and log line with the build version. Spring has no property named
+// `version`, so the file carries an @version@ token that Gradle fills in from project.version here. ReplaceTokens
+// touches only @...@ tokens; expand() would also try to resolve every ${...} Spring placeholder in the file.
+processResources {
+    filesMatching('common-config.yml') {
+        filter(org.apache.tools.ant.filters.ReplaceTokens, tokens: [version: project.version.toString()])
+    }
+}
+
 dependencies {
     compileOnly project(":store-commons:commons")
     api project(":store-commons:errors")
@@ -19,6 +28,15 @@ dependencies {
     compileOnly libs.spring.cloud.gateway.server.webflux
     compileOnly libs.spring.cloud.commons
     compileOnly libs.spring.boot.starter.actuator
+    // OutboxMetrics counts outbox rows through a JdbcTemplate; only services that enable cvhome.metrics.outbox have one.
+    compileOnly libs.spring.jdbc
+    // TraceContextMdcFilter reads the current span; the API is on every service's runtime classpath via the starter.
+    compileOnly libs.io.opentelemetry.api
+    // With this library on the classpath the OpenTelemetry starter wraps the root logger's appenders with its MDC
+    // appender, so console lines from any thread (scheduled work, outbox handlers) print trace_id/span_id. Request
+    // threads additionally get the ids in the real MDC from TraceContextMdcFilter, which is what the ProblemDetail
+    // traceId reads. Runtime for every service that imports this module.
+    implementation libs.io.opentelemetry.instrumentation.logback.mdc
     compileOnly libs.jackson.databind
     compileOnly libs.jackson.core
     compileOnly libs.swagger.models
@@ -47,4 +65,6 @@ dependencies {
     testImplementation libs.spring.webflux
     testImplementation libs.reactor.test
     testImplementation libs.spring.data.commons
+    testImplementation libs.spring.jdbc
+    testImplementation libs.io.opentelemetry.api
 }

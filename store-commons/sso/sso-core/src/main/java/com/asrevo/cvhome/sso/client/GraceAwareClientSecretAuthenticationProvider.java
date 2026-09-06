@@ -9,6 +9,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
+import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
+import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
 import org.springframework.security.oauth2.server.authorization.authentication.ClientSecretAuthenticationProvider;
 import org.springframework.security.oauth2.server.authorization.authentication.OAuth2ClientAuthenticationToken;
@@ -22,10 +24,11 @@ import com.asrevo.cvhome.sso.repo.ClientSecretHistoryRepository;
  *
  * <p>
  * Spring's {@link ClientSecretAuthenticationProvider} is {@code final} and matches only the one hash on the
- * registration. Rather than copy its expiry and PKCE handling, this provider decides <em>which hash</em> the client
- * should be matched against — the live one, or a retired one that is still inside its window — and then hands a
- * one-client view carrying that hash to a fresh instance of Spring's provider. Everything the stock provider checks,
- * it still checks; the only thing that changes is the row it reads.
+ * registration. Rather than copy its expiry and PKCE handling, this provider lets it match the live registration
+ * first and, only when that is refused as {@code invalid_client}, looks for a retired hash still inside its window and
+ * hands a one-client view carrying that hash to a fresh instance of Spring's provider. Everything the stock provider
+ * checks, it still checks; the only thing that changes is the row it reads. The live secret is hashed once per
+ * request, which is what keeps the token endpoint at one bcrypt.
  * </p>
  *
  * <p>
@@ -64,23 +67,36 @@ public class GraceAwareClientSecretAuthenticationProvider implements Authenticat
         if (!isSecretMethod(token.getClientAuthenticationMethod())) {
             return null;
         }
-        RegisteredClient client = clients.findByClientId(token.getPrincipal().toString());
-        // The live registry unless a retired secret is what was presented; then a one-client view of that hash.
-        RegisteredClientRepository view = client == null ? clients
-                : graceView(client, token.getCredentials()).<RegisteredClientRepository>map(SingleClientRepository::new)
-                        .orElse(clients);
+        // The live registry first, and only that: the stock provider loads the client and matches the hash itself, so
+        // matching it here as well cost every token request a second bcrypt and a second client read — half of the
+        // ~0.5 s the s2s token endpoint took. The grace path is tried only once the live secret has been refused.
+        try {
+            return stock(clients).authenticate(authentication);
+        } catch (OAuth2AuthenticationException refused) {
+            if (!OAuth2ErrorCodes.INVALID_CLIENT.equals(refused.getError().getErrorCode())) {
+                throw refused;
+            }
+            RegisteredClient client = clients.findByClientId(token.getPrincipal().toString());
+            RegisteredClient retired = client == null ? null : graceView(client, token.getCredentials()).orElse(null);
+            if (retired == null) {
+                throw refused;
+            }
+            return stock(new SingleClientRepository(retired)).authenticate(authentication);
+        }
+    }
+
+    private ClientSecretAuthenticationProvider stock(RegisteredClientRepository view) {
         ClientSecretAuthenticationProvider stock = new ClientSecretAuthenticationProvider(view, authorizations);
         stock.setPasswordEncoder(encoder);
-        return stock.authenticate(authentication);
+        return stock;
     }
 
     /**
      * The client carrying a retired hash, when the presented secret is one still inside its grace window; empty when
-     * the live secret (or nothing) was presented, so the stock provider reads the real registry.
+     * nothing retired matches, so the refusal of the live secret stands.
      */
     private Optional<RegisteredClient> graceView(RegisteredClient client, Object credentials) {
-        if (!(credentials instanceof String presented) || client.getClientSecret() == null
-                || encoder.matches(presented, client.getClientSecret())) {
+        if (!(credentials instanceof String presented)) {
             return Optional.empty();
         }
         Instant now = clock.instant();
