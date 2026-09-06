@@ -241,6 +241,11 @@ storefront on `next dev`): smoke, `storefront-browse` 30 VUs, `shopper-guest-che
 | `mixed-production-mix` load | `production-mix-load-20260906T125109Z` | admin 2 % failed (403s), pages ~4.4 s | 3,918 req, 0 failed on every layer, 31 orders, pages under 0.1 s; 409s on category attach remain (expected) |
 | `storefront-breakpoint` to 600 it/s | `breakpoint-breakpoint-20260906T125416Z` | knee not found at 552 app req/s | knee not found at 1,540 app req/s; CPU 71 % is the first limit |
 
+The whole sequence was repeated on a fresh stack (`lcl stop --hard`, empty volumes, fixtures re-provisioned:
+test ids `browse-load-20260906T133147Z`, `guest-checkout-load-20260906T133755Z`,
+`production-mix-load-20260906T134058Z`, `breakpoint-breakpoint-20260906T134403Z`) with the same numbers; the ramp
+dropped 57 iterations at ~1,200 k6 req/s, so the next ramp needs more pre-allocated VUs before it can find the knee.
+
 ## What is still open
 
 1. A ramp past 2,000 req/s, and the write-heavy scripts, to find the knee (issue 8).
