@@ -330,11 +330,13 @@
                           <strong>{{ payment.method }}</strong>
                           <small class="payment-ref">{{ payment.internalRef }}</small>
                         </div>
-                        <app-badge [tone]="payment.tone" shape="square">{{ payment.status }}</app-badge>
-                        <span class="payment-amount">{{ payment.amount }}</span>
-                        <span class="payment-date">
-                          {{ payment.takenOn ? (payment.takenOn | translocoDate: {dateStyle: 'medium'}) : '—' }}
-                        </span>
+                        <div class="payment-figures">
+                          <app-badge [tone]="payment.tone" shape="square">{{ payment.status }}</app-badge>
+                          <span class="payment-amount">{{ payment.amount }}</span>
+                          <span class="payment-date">
+                            {{ payment.takenOn ? (payment.takenOn | translocoDate: {dateStyle: 'medium'}) : '—' }}
+                          </span>
+                        </div>
                       </li>
                     }
                   </ul>
