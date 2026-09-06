@@ -8,11 +8,19 @@ export const DS = {
   tempo: {type: 'tempo', uid: 'tempo'},
 };
 
+/**
+ * Explore URL for one query. The JSON is percent-encoded except for the Grafana variables inside it
+ * (`$service`, `${__data.fields.uri}`, `${__from}`): Grafana interpolates them in the link text before the browser
+ * decodes it, and an encoded `%24%7B` is not a variable to it — the literal text would reach the query.
+ */
 const explore = (ds, query) => {
   const panes = {
     a: {datasource: ds.uid, queries: [query], range: {from: '${__from}', to: '${__to}'}},
   };
-  return '/explore?schemaVersion=1&panes=' + encodeURIComponent(JSON.stringify(panes));
+  const encoded = encodeURIComponent(JSON.stringify(panes))
+    .replace(/%24%7B([A-Za-z0-9_.:]+)%7D/g, '${$1}')
+    .replace(/%24([A-Za-z_][A-Za-z0-9_]*)/g, '$$$1');
+  return '/explore?schemaVersion=1&panes=' + encoded;
 };
 
 /** Data link to Tempo search with a TraceQL query. */
