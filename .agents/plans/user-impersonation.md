@@ -263,6 +263,28 @@ boolean and `AuthService` needs no cache invalidation** — both are re-read on 
 
 ---
 
+## Deviations, as built
+
+- **The pod-side actor was never there to make act-aware.** The requirements doc named a `PodAuditEntity`;
+  what exists is `store-pod/commons/.../audit/AuditListener`, which stamps dates and never `modifiedBy`. Left
+  as is and recorded in `lessons.md` — populating it is its own change across every pod entity.
+- **The store check for an org-admin target is the gateway's**, not uaa's: uaa holds no store registry. After
+  the exchange the gateway calls tenancy's `router/store-pod-by-store-id` *as the impersonated principal*
+  (`getStorePod` refuses another organization's store, and `requireOperable` a suspended one); a refusal revokes
+  the token and answers 422.
+- **No new `ReactiveOAuth2AuthorizedClientManager` on the gateway.** It holds exactly one, and Spring Cloud
+  Gateway's `tokenRelay()` resolves it with `getIfAvailable`; a second bean breaks every relayed route. The
+  swapped client is written into the `ReactiveOAuth2AuthorizedClientService` that manager reads, under a
+  principal named `<target>/<operator>` so the merchant's own client is never overwritten.
+- **The gateway grew its one problem-detail advice** (`GatewayErrorHandler`): the shared one is servlet-only.
+- **`ImpersonationLauncher` lives in `layouts/console-shell/services/`**, not `shared/auth/` — `shared/` may
+  not reach the api tier. The reload goes through `ConsoleApi.reloadTo`, the seam shell specs fake, because
+  `location.assign` inside Karma reloads the test page.
+- **The exchange answers `acting_as`** (the merchant's username) beside `issued_token_type` and `act_mode`,
+  so the gateway needs no second call to name who it is now acting as.
+- **`ConsolePermissions.canImpersonate()`** falls back to the roles: the gateway's `MeView` carries no
+  `permissions` claim (the ID token has none), so `users:impersonate` is inferred from `SUPER_ADMIN` / `SUPPORT`.
+
 ## Files to touch — the short list
 
 | Area | Path |
