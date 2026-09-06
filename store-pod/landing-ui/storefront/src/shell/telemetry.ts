@@ -1,4 +1,5 @@
 import {NodeSDK} from '@opentelemetry/sdk-node';
+import {BatchSpanProcessor, Span as SdkSpan, SpanProcessor} from '@opentelemetry/sdk-trace-node';
 import {OTLPTraceExporter} from '@opentelemetry/exporter-trace-otlp-grpc';
 import {OTLPMetricExporter} from '@opentelemetry/exporter-metrics-otlp-grpc';
 import {getNodeAutoInstrumentations} from '@opentelemetry/auto-instrumentations-node';
@@ -51,13 +52,40 @@ class BrowserSourcePropagator implements TextMapPropagator {
     }
 }
 
+/**
+ * Next.js names its outgoing-fetch spans `fetch GET http://host/path?store=…&lang=…` — the full URL, query string
+ * included. Every distinct store, language and sku list is then a distinct span name, and the collector's span
+ * metrics grow one series per name until the storefront alone is most of Prometheus. The name is rewritten at start
+ * to `fetch GET /path` with ids templated; the full URL stays on the span as `http.url` for trace search.
+ */
+class SpanNameNormalizer implements SpanProcessor {
+    onStart(span: SdkSpan): void {
+        const match = /^fetch (\w+) (https?:\/\/[^/]+)?(\/[^?#]*)/.exec(span.name);
+        if (!match) return;
+        const path = match[3]
+            .replace(/\/[0-9a-f]{24}(?=\/|$)/g, '/{id}')
+            .replace(/\/\d+(?=\/|$)/g, '/{id}');
+        span.updateName(`fetch ${match[1]} ${path}`);
+    }
+
+    onEnd(): void {}
+
+    shutdown(): Promise<void> {
+        return Promise.resolve();
+    }
+
+    forceFlush(): Promise<void> {
+        return Promise.resolve();
+    }
+}
+
 let started = false;
 
 export function startTelemetry() {
     if (started) return;
     started = true;
     const sdk = new NodeSDK({
-        traceExporter: new OTLPTraceExporter({}),
+        spanProcessors: [new SpanNameNormalizer(), new BatchSpanProcessor(new OTLPTraceExporter({}))],
         serviceName: 'landing-ui',
         resource: emptyResource(),
         resourceDetectors: [envDetector, hostDetector, osDetector, serviceInstanceIdDetector].map(withKeyFilter),
