@@ -246,6 +246,53 @@ test ids `browse-load-20260906T133147Z`, `guest-checkout-load-20260906T133755Z`,
 `production-mix-load-20260906T134058Z`, `breakpoint-breakpoint-20260906T134403Z`) with the same numbers; the ramp
 dropped 57 iterations at ~1,200 k6 req/s, so the next ramp needs more pre-allocated VUs before it can find the knee.
 
+## What running the images showed (the load stack, 2026-09-06)
+
+The four runs were repeated against the containerised stack — every service as the image `bootBuildImage`
+produces, one container each, 1 GB per container ([load-testing.md](load-testing.md), "The load stack"). The API
+tier behaved exactly as on the host; the storefront did not, and two of the three findings below are about the
+image rather than the code.
+
+| run | test id | result |
+|---|---|---|
+| smoke | `smoke-smoke-20260906T190111Z` | 308 requests, 0 failed, 2 orders |
+| `storefront-browse` load | `browse-load-20260906T190309Z` | 9,288 requests, 0 failed; **pages 2.35–2.63 s p95** against 73–91 ms on the host; `catalog:product` 7.4 ms |
+| `shopper-guest-checkout` load | `guest-checkout-load-20260906T190928Z` | 90 orders, 0 failed, checkout 48 ms p95 |
+| `mixed-production-mix` load | `production-mix-load-20260906T191234Z` | 3,869 requests, 0 failed on every layer, 31 orders |
+| `storefront-breakpoint` to 600 it/s | `breakpoint-breakpoint-20260906T191542Z` | 288,358 requests, 0 failed, 0 dropped, product p95 6.0 ms, **1,530 app req/s**, catalog pool 20 %, threads 1 %, heap after GC 19 % |
+
+### A. The storefront image had no telemetry at all — fixed
+
+`landing-ui` was absent from the span metrics and from the service graph on the container stack, while every Java
+service reported normally. Two silent gaps in `next build --output standalone`: the compiled instrumentation hook
+is not copied into the output, and the server `require()`s exactly that path and swallows `MODULE_NOT_FOUND`;
+and Next keeps every `@opentelemetry` package except `api` external without bundling it, while file tracing does
+not follow the dynamic `import('./src/shell/telemetry')` in `instrumentation.ts`. A deployed storefront therefore
+produced no page-render spans, no upstream fetch spans and no service-graph entry — and said nothing about it.
+`storefront/scripts/copy-instrumentation.mjs` (wired into `npm run build`) copies the hook with the chunks it
+references and the telemetry dependency closure. Verified in the container: `✅ OpenTelemetry instrumentation
+started`, page-render and `fetch GET /catalog/...` spans arriving, the `landing-ui → spg` edge back.
+
+This is why issue 1 could only ever be measured on the host before: the image never traced.
+
+### B. The two Node images are amd64 only — not fixed, a deployment decision
+
+`store-pod/landing-ui` and `store-core/console-ui` are `linux/amd64` (their base is
+`public.ecr.aws/b2i4h4k9/nodejs20`), while every buildpack-built Java image is `linux/arm64`. On an arm64 host
+they run under emulation, which is the bulk of the storefront's 2.4 s p95 in the container against 91 ms as a
+native host process, while every API route through spg stayed at 5–45 ms in the same run. It matters beyond the
+laptop: on Graviton these two images are the ones that would be emulated or refuse to start. A multi-arch base
+(or building them for the deployment's architecture) is the fix; it was left alone because it changes what is
+published.
+
+### C. A Node 20 runtime error on the locale-redirect path — not fixed
+
+`TypeError: controller[kState].transformAlgorithm is not a function`, 26 times in one browse run, always right
+after `Locale 'en' not supported by store … Redirecting to … /ar`. It does not fail the request (0 failed in
+every run) but it is a real error on a real path, and it does not occur on the host's newer Node. The image runs
+Node 20.20.1; Next 16 accepts it, but this is a known web-streams incompatibility fixed in Node 22. Moving the
+base image forward is the same decision as B.
+
 ## What is still open
 
 1. A ramp past 2,000 req/s, and the write-heavy scripts, to find the knee (issue 8).
