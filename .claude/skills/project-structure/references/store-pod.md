@@ -17,7 +17,6 @@ store-pod/
 ├── content-deprecated/           —            the previous content service, kept as reference only (unregistered)
 ├── catalog/                      BE    :8122  products & categories
 ├── checkout/                     BE    :8123  cart, orders (durable placement, event ledger), customers
-├── checkout-deprecated/          —            the previous checkout service, kept as reference only (unregistered)
 ├── payment/                      BE    :8125  payment gateways & webhooks
 └── commons/                                   pod-shared libraries (grouping folder)
     ├── store-commons/                         pod-scoped shared domain
@@ -204,5 +203,5 @@ hand; `gateways-and-local-domains.md` has both edges' routing tables and the loc
 | Module | Role |
 |---|---|
 | `store-commons` (`:store-pod:commons:store-commons`) | Pod-scoped shared domain — consumed by essentially every pod module. **Not** the root `store-commons/`; see `shared-libraries.md`. |
-| `reference/reference-commons` | Reference DTOs (`ReadableCountry`, addresses, units). The `reference-core` tables moved to `checkout-deprecated/commons/`; countries now come from the JDK. |
+| `reference/reference-commons` | Reference DTOs (`ReadableCountry`, addresses, units). `reference-core` was retired with the checkout rewrite; countries now come from the JDK. |
 | `customer/customer-commons` | Customer DTOs (`ReadableCustomer`, `CustomerAddress`) both frontends read. The `Customer` entity lives in `checkout-core` since the rewrite. |

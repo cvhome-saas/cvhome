@@ -1,5 +1,5 @@
--- One-off: the pre-rewrite checkout schema (store-pod/checkout-deprecated). No data was migrated by decision; every
--- name here is legacy-only and the new schema reuses none of them, so after the first boot this is a no-op.
+-- One-off: the pre-rewrite checkout schema (the service deleted in the 2026-09 rewrite; git history before PR #328 has
+-- it). No data was migrated by decision; every name here is legacy-only and the new schema reuses none of them, so after the first boot this is a no-op.
 -- Delete this file once every environment has booted the new service once.
 drop table if exists
     checkout.order_account_product, checkout.order_account, checkout.order_product_download,

@@ -23,7 +23,7 @@ branch `refactor/checkout-rewrite`, stack `checkout-rw`).
 Decisions taken with the user (2026-09-05): fresh start (no data migration); placement stays synchronous and returns
 `redirectUrl`, made durable step by step with a recovery job; customers absorbed into checkout-core, `customer-core` and
 `reference-core` retired, `/country` from the JDK; callback contract with payment/inventory may change, payment must emit
-an event on manual-transfer rejection. Old service → `store-pod/checkout-deprecated/`.
+an event on manual-transfer rejection. Old service deleted outright (it was first parked as `store-pod/checkout-deprecated/`, then removed in the same PR).
 
 Style templates: `store-pod/catalog` (flat `entity/`, `repositories/`, `services/<domain>/{XService, XServiceImpl, XMapper}`)
 and `store-pod/inventory` (tiny). Aggregate idiom: `store-pod/payment/payment-core/.../entity/payment/Transaction.java`
@@ -355,8 +355,8 @@ Console (`CustomerAdminApi`, `STORE-POD.CHECKOUT.*`): `GET /private/customers` w
 | inventory: `ReservationExpiryJob`, `ClientsConfig`, tests | §5 |
 | `store-core/console-ui/src/app/models/checkout.ts` + usages; `api/orders/orders.service.ts` | `redirectUri`→`redirectUrl`, `reservationStatus`→`inventoryStatus`; delete `zones()`/`ReadableZone`; `npm run build && npm run lint` |
 | `store-pod/landing-ui` | none expected; verify with the stack |
-| `store-pod/checkout-deprecated/` | `git mv store-pod/checkout/*` keeping layout minus `checkout-service/{missed,products,requests,store}.http`, `compose.yml`, `*/HELP.md`, `*/bin`; `README.md` (what it was, why, old class → new class table, "unregistered, do not depend on", removal condition for `drop-legacy.sql`); `docs/` ← `git mv store-pod/{checkout-flow,order-placement-flow,align-checkout-inventory-payment-flow}.md` |
-| `.claude/skills/project-structure/SKILL.md`, `references/store-pod.md`, `references/testing.md`, `references/events-outbox.md`, `references/error-handling.md` | checkout row/section rewritten; `checkout-deprecated` noted; remove the two checkout ArchUnit deviations and the `LEGACY.*` count; `PaymentRejectedEvent` listed |
+| old `store-pod/checkout/*`, `store-pod/{checkout-flow,order-placement-flow,align-checkout-inventory-payment-flow}.md` | deleted (history keeps them); `drop-legacy.sql` removes their tables |
+| `.claude/skills/project-structure/SKILL.md`, `references/store-pod.md`, `references/testing.md`, `references/events-outbox.md`, `references/error-handling.md` | checkout row/section rewritten; remove the two checkout ArchUnit deviations and the `LEGACY.*` count; `PaymentRejectedEvent` listed |
 | `checkout-service/http/*.http` (8 files) | one block per endpoint + 403/404/409/422 negatives; seller via `{{SELLER_UI_URL}}/spg/checkout/...` + gateway session cookie; shopper/public via `{{SPG_URL}}/checkout/...?store={{STORE_ID}}&lang={{LANG}}`; add `SHOPPER_TOKEN`, `S2S_TOKEN` to `http-client.private.env.json.example` |
 | `checkout-service/qa/checkout-qa.md` | rewritten on `store-core/billing/billing-service/qa/billing-qa.md` structure: `00` prerequisites + `psql` idioms on `sales_order`/`sales_order_event`; sections `CART`, `CUS`, `PLC`, `SIG`, `JOB`, `ORD`, `STA`, `SEC`, `REG`, `99` |
 | `lcl.yml`, `Caddyfile`, `common-config.yml`, `lcl-config.yml`, `fargate-config.yml`, `docker-compose-lcl.yml` | unchanged (same name/port/schema) |
