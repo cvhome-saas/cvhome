@@ -554,7 +554,9 @@ Store-level groups (`FEATURED_ITEMS`, …) have no parent product. A product's r
 
 ### GRP-07 — Related items from nothing · critical · [not verified]
 
-- **Steps** — `GET /products/1/relationship` (verified: **404** on the seeds — no `RELATED_ITEM` group exists);
+- **Steps** — `GET /products/1/relationship` (verified: **200** with `active: false` and empty `products` on the
+  seeds — no `RELATED_ITEM` group exists, and the storefront reads "none" as an empty strip, not a 404; the same
+  for `GET /products/groups/{code}` with a code the store has not set up. The console's `/private/…` reads stay 404);
   `POST /private/products/1/relationship/2`; `GET` again; `POST …/relationship/3`; `DELETE …/relationship/2`.
 - **Expect** — the first `POST` creates product 1's `RELATED_ITEM` group and answers 201; the `GET` then shows
   `parentProduct` = product 1 and `products` = [2]; then [2, 3]; then [3]. The storefront's "you may also

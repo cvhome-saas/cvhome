@@ -23,6 +23,13 @@ public interface ProductGroupService {
     ReadableProductGroup get(StoreMerchantId store, String code, LanguageCode language, boolean allLanguages)
             throws ProductGroupNotFoundException;
 
+    /**
+     * The strip as the storefront reads it: the group, or an empty, inactive strip when the store has none by that
+     * code. A store that has not set up {@code FEATURED_ITEMS} has nothing to show there, which is not an error —
+     * answering 404 made every home page render log a failed call and count it against the service graph.
+     */
+    ReadableProductGroup storefront(StoreMerchantId store, String code, LanguageCode language);
+
     boolean exists(StoreMerchantId store, String code);
 
     /**
@@ -38,8 +45,11 @@ public interface ProductGroupService {
 
     void removeProduct(StoreMerchantId store, String code, Long productId) throws ProductGroupNotFoundException;
 
-    ReadableProductGroup related(StoreMerchantId store, Long productId, LanguageCode language)
-            throws ProductGroupNotFoundException;
+    /**
+     * The product's related items, or an empty, inactive strip when it has never had any — see
+     * {@link #storefront(StoreMerchantId, String, LanguageCode)}.
+     */
+    ReadableProductGroup related(StoreMerchantId store, Long productId, LanguageCode language);
 
     /**
      * Relates {@code relatedProductId} to {@code productId}, creating the product's related-items group on first use.

@@ -48,9 +48,8 @@ public class ProductGroupApi {
 
     @GetMapping("/products/groups/{code}")
     @Parameter(name = "store", schema = @Schema(type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
-    public ReadableProductGroup get(@PathVariable String code, StoreMerchantId merchantStore, LanguageCode language)
-            throws ProductGroupNotFoundException {
-        return productGroupService.get(merchantStore, code, language, false);
+    public ReadableProductGroup get(@PathVariable String code, StoreMerchantId merchantStore, LanguageCode language) {
+        return productGroupService.storefront(merchantStore, code, language);
     }
 
     @GetMapping("/private/products/groups/{code}")

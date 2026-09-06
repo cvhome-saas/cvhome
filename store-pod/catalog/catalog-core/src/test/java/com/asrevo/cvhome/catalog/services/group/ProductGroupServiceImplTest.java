@@ -136,6 +136,28 @@ class ProductGroupServiceImplTest {
                 .isInstanceOf(ProductGroupNotFoundException.class);
     }
 
+    @Test
+    void theStorefrontReadsAnUnknownCodeAsAnEmptyStrip() {
+        when(productGroupRepository.findByStoreAndCode(STORE, HOME_PAGE)).thenReturn(Optional.empty());
+
+        ReadableProductGroup strip = service.storefront(STORE, HOME_PAGE, EN);
+
+        assertThat(strip.getCode()).isEqualTo(HOME_PAGE);
+        assertThat(strip.isActive()).isFalse();
+        assertThat(strip.getProducts()).isEmpty();
+        assertThat(strip.getParentProduct()).isNull();
+    }
+
+    @Test
+    void theStorefrontReadsAKnownCodeInOneLanguage() {
+        when(productGroupRepository.findByStoreAndCode(STORE, HOME_PAGE)).thenReturn(Optional.of(group(HOME_PAGE, null)));
+
+        ReadableProductGroup strip = service.storefront(STORE, HOME_PAGE, EN);
+
+        assertThat(strip.isActive()).isTrue();
+        assertThat(strip.getDescriptions()).isEmpty();
+    }
+
     // ------------------------------------------------------------------------------------------------- writing
 
     @Test
@@ -210,12 +232,16 @@ class ProductGroupServiceImplTest {
     }
 
     @Test
-    void relatedItemsOfAProductThatHasNoneAreNotFound() {
+    void relatedItemsOfAProductThatHasNoneAreAnEmptyStrip() {
         when(productGroupRepository.findByStoreAndParentProductAndCode(STORE, 3L, RELATED))
                 .thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.related(STORE, 3L, EN))
-                .isInstanceOf(ProductGroupNotFoundException.class);
+        ReadableProductGroup strip = service.related(STORE, 3L, EN);
+
+        assertThat(strip.getCode()).isEqualTo(RELATED);
+        assertThat(strip.isActive()).isFalse();
+        assertThat(strip.getProducts()).isEmpty();
+        // removing from a strip that does not exist is still a console error, not a silent no-op
         assertThatThrownBy(() -> service.removeRelated(STORE, 3L, 4L))
                 .isInstanceOf(ProductGroupNotFoundException.class);
     }

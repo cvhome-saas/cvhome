@@ -171,8 +171,13 @@ class ProductGroupApiIntegrationTest {
         assertThat(json(api.get(scoped(query(UNIQUE, String.format("code=%s", FEATURED_ITEMS)), STORE_A), admin))
                 .get(EXISTS).asBoolean()).isTrue();
 
-        expect(api.get(scoped(path(PUBLIC_GROUPS, slug("nothing").toUpperCase()), STORE_A), null),
-                HttpStatus.NOT_FOUND);
+        // a code the store has not set up is an empty, inactive strip on the storefront surface, not an error
+        String unknown = slug("nothing").toUpperCase();
+        JsonNode unset = json(api.get(scoped(path(PUBLIC_GROUPS, unknown), STORE_A), null));
+        assertThat(unset.get(ACTIVE).asBoolean()).isFalse();
+        assertThat(unset.get(PRODUCTS)).isEmpty();
+        // the console still learns that it does not exist
+        expect(api.get(scoped(path(PRIVATE_GROUPS, unknown), STORE_A), admin), HttpStatus.NOT_FOUND);
     }
 
     @Test
@@ -212,9 +217,10 @@ class ProductGroupApiIntegrationTest {
         assertThat(json(api.get(scoped(path(V1, PRODUCTS, PRODUCT_ONE, RELATIONSHIP), STORE_A), null))
                 .get(PRODUCTS)).isEmpty();
 
-        // a product that has never had related items has no strip at all
-        expect(api.get(scoped(path(V1, PRODUCTS, PRODUCT_THREE, RELATIONSHIP), STORE_A), null),
-                HttpStatus.NOT_FOUND);
+        // a product that has never had related items answers an empty, inactive strip: nothing to render, no error
+        JsonNode none = json(api.get(scoped(path(V1, PRODUCTS, PRODUCT_THREE, RELATIONSHIP), STORE_A), null));
+        assertThat(none.get(ACTIVE).asBoolean()).isFalse();
+        assertThat(none.get(PRODUCTS)).isEmpty();
         expect(api.send(HttpMethod.DELETE,
                 scoped(path(V1_PRIVATE, PRODUCTS, PRODUCT_THREE, RELATIONSHIP, PRODUCT_TWO), STORE_A), admin, null),
                 HttpStatus.NOT_FOUND);
@@ -235,8 +241,11 @@ class ProductGroupApiIntegrationTest {
         expect(api.get(scoped(path(PRIVATE_GROUPS, code), STORE_B), other), HttpStatus.NOT_FOUND);
         expect(api.send(HttpMethod.DELETE, scoped(path(PRIVATE_GROUPS, code), STORE_B), other, null),
                 HttpStatus.NOT_FOUND);
-        // nor from the storefront surface, which takes the store from the query string alone
-        expect(api.get(scoped(path(PUBLIC_GROUPS, code), STORE_B), null), HttpStatus.NOT_FOUND);
+        // nor from the storefront surface, which takes the store from the query string alone: store B reads an
+        // empty strip under that code, never store A's members
+        JsonNode fromB = json(api.get(scoped(path(PUBLIC_GROUPS, code), STORE_B), null));
+        assertThat(fromB.get(ACTIVE).asBoolean()).isFalse();
+        assertThat(fromB.get(PRODUCTS)).isEmpty();
 
         expect(api.send(HttpMethod.DELETE, scoped(path(PRIVATE_GROUPS, code), STORE_A), admin, null),
                 HttpStatus.NO_CONTENT);
