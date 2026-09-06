@@ -256,7 +256,7 @@ image rather than the code.
 | run | test id | result |
 |---|---|---|
 | smoke | `smoke-smoke-20260906T190111Z` | 308 requests, 0 failed, 2 orders |
-| `storefront-browse` load | `browse-load-20260906T190309Z` | 9,288 requests, 0 failed; **pages 2.35–2.63 s p95** against 73–91 ms on the host; `catalog:product` 7.4 ms |
+| `storefront-browse` load | `browse-load-20260906T190309Z` | 9,288 requests, 0 failed; **pages 2.35–2.63 s p95** against 73–91 ms on the host — the emulated image, see B; `catalog:product` 7.4 ms |
 | `shopper-guest-checkout` load | `guest-checkout-load-20260906T190928Z` | 90 orders, 0 failed, checkout 48 ms p95 |
 | `mixed-production-mix` load | `production-mix-load-20260906T191234Z` | 3,869 requests, 0 failed on every layer, 31 orders |
 | `storefront-breakpoint` to 600 it/s | `breakpoint-breakpoint-20260906T191542Z` | 288,358 requests, 0 failed, 0 dropped, product p95 6.0 ms, **1,530 app req/s**, catalog pool 20 %, threads 1 %, heap after GC 19 % |
@@ -275,23 +275,41 @@ started`, page-render and `fetch GET /catalog/...` spans arriving, the `landing-
 
 This is why issue 1 could only ever be measured on the host before: the image never traced.
 
-### B. The two Node images are amd64 only — not fixed, a deployment decision
+### B. The two Node images are built for amd64 only — measured at 17× on the storefront
 
 `store-pod/landing-ui` and `store-core/console-ui` are `linux/amd64` (their base is
-`public.ecr.aws/b2i4h4k9/nodejs20`), while every buildpack-built Java image is `linux/arm64`. On an arm64 host
-they run under emulation, which is the bulk of the storefront's 2.4 s p95 in the container against 91 ms as a
-native host process, while every API route through spg stayed at 5–45 ms in the same run. It matters beyond the
-laptop: on Graviton these two images are the ones that would be emulated or refuse to start. A multi-arch base
-(or building them for the deployment's architecture) is the fix; it was left alone because it changes what is
-published.
+`public.ecr.aws/b2i4h4k9/nodejs20`), while every buildpack-built Java image is `linux/arm64`. On an arm64 host the
+two Node images run emulated. To separate emulation from the container limit and from everything else, the same
+build was packaged onto a multi-arch Node 20 base, run with the same 1 GB limit on the same network, and given the
+same `storefront-browse` load:
+
+| storefront under `storefront-browse` at `PROFILE=load`, 30 VUs | `page:home` p95 | `page:product` p95 | `page:category` p95 |
+|---|---|---|---|
+| the shipped image, amd64 emulated, 1 GB (`browse-load-20260906T193538Z`) | 2.77 s | 2.60 s | 2.53 s |
+| the same build on an arm64 base, 1 GB (`browse-load-20260906T195057Z`) | 157 ms | 118 ms | 141 ms |
+| host process, `node start.mjs`, no container (`browse-load-20260906T124154Z`) | 91 ms | 73 ms | 79 ms |
+
+Emulation costs about **17×** on this workload; the container itself costs about 1.7× against an unconstrained host
+process, which is what a 1 GB limit and a shared CPU are expected to cost. A tight integer loop is only 2.4×
+slower emulated (`node:20-alpine`, amd64 638 ms against arm64 261 ms), so the penalty is specific to what server
+rendering does: V8 generating and running JIT code, which the emulator must translate as it is produced.
+
+What follows: on an amd64 deployment target the shipped images run natively and none of this applies; on Graviton
+they are the only two images that would be emulated, and their published architecture no longer matches the Java
+images beside them. Publishing both for the deployment's architecture (or multi-arch) is the fix. It was left
+alone because it changes what is published, and the numbers above are what the decision needs.
+
+Local load runs on Apple Silicon are affected today: every storefront number taken against the container stack is
+an emulated number, and the ones in this document say so.
 
 ### C. A Node 20 runtime error on the locale-redirect path — not fixed
 
-`TypeError: controller[kState].transformAlgorithm is not a function`, 26 times in one browse run, always right
-after `Locale 'en' not supported by store … Redirecting to … /ar`. It does not fail the request (0 failed in
-every run) but it is a real error on a real path, and it does not occur on the host's newer Node. The image runs
-Node 20.20.1; Next 16 accepts it, but this is a known web-streams incompatibility fixed in Node 22. Moving the
-base image forward is the same decision as B.
+`TypeError: controller[kState].transformAlgorithm is not a function`, 26 times in one browse run, always
+immediately after `Locale 'en' not supported by store … Redirecting to … /ar`. It does not fail the request (0
+failed in every run) but it is a real error on a real path. It appears on the arm64 rebuild too (7 times in 10
+redirects), so it is the Node version rather than the architecture: the image runs Node 20.20.1, which Next 16
+accepts, and this is a web-streams incompatibility fixed in Node 22. Moving the base image forward is the same
+decision as B, and would settle both.
 
 ## What is still open
 
