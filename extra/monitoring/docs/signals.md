@@ -163,7 +163,7 @@ and TraceQL searches:
 | `span:kind` | every span | `server`, `client`, `internal` |
 | `span.http.route`, `span.http.request.method`, `span.http.response.status_code`, `span.error.type` | HTTP server spans | `/api/v2/products/search`, `GET`, `404` |
 | `span.server.address`, `span.url.path`, `span.url.full` | HTTP client spans | `localhost`, `/api/v1/store` |
-| `span.db.system`, `span.db.operation`, `span.db.sql.table`, `span.db.name`, `span.db.statement` | JDBC client spans | `postgresql`, `SELECT`, `catalog.product` |
+| `span.db.system`, `span.db.operation`, `span.db.sql.table`, `span.db.name`, `span.db.statement` | JDBC client spans | `postgresql`, `SELECT`, `catalog.product`. The instrumentation sets `db.sql.table` only for single-table statements; the collector (`transform/span_names`) fills it from the first table after `FROM` / `INTO` / `UPDATE` in `db.statement` for joins and subqueries and renames the span from `SELECT cvhome` to `SELECT <table>` |
 | `name` | scheduled work (`@Scheduled` methods) | `PartitionCoordinator.rebalance`, `OrderExpiryJob.expire`, `KeyRotationScheduler.tick` |
 
 Only the OpenTelemetry starter produces spans; Spring Boot's Micrometer Tracing is excluded
