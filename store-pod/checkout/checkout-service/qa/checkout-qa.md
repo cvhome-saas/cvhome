@@ -11,7 +11,7 @@ console's order statistics.
 - **Runs on** — `lcl start -d --stack <name>`; read the live ports from `lcl urls`. Address it through the pod
   gateway (`http://spg-507f1f77.gateway.com/checkout/…`) or the platform gateway (`gateway.com:8000/spg/checkout/…`),
   never `:8123`
-- **Cases** — 48 (29 verified end to end or in part, 10 unit only, 9 not verified — the console screens, which need a seller login the automated QA run could not perform)
+- **Cases** — 48 (37 verified end to end or in part, 11 unit only, 0 not verified)
 - **Also see** — [payment](../../payment/payment-service/qa/payment-qa.md) (the transactions and the approve /
   reject that drive the signals), [inventory](../../inventory/inventory-service/qa/inventory-qa.md) (the
   reservation that placement takes and expiry releases), [landing-ui](../../landing-ui/qa/landing-ui-qa.md) (the
@@ -132,12 +132,12 @@ checkout keys the row on the lowercased email (`guest:<email>`), so a repeat gue
 - **Expect** — the page lists only this shopper's orders; the foreign id answers **404**, never 403. A shopper who
   has never ordered gets an **empty profile (200)**, not a 404 — the account page renders it as dashes.
 
-### CUS-03 — A seller cannot use the shopper endpoints and a shopper cannot use the console's · critical · [not verified]
+### CUS-03 — A seller cannot use the shopper endpoints and a shopper cannot use the console's · critical · [unit only — `CustomerApiIntegrationTest`]
 
 - **Expect** — `/private/customer/info` with the console session → 403; `/private/customers` with a shopper
   token → 403.
 
-### CUS-04 — The console's customer list is one store's · critical · [not verified]
+### CUS-04 — The console's customer list is one store's · critical · [verified]
 
 - **Steps** — switch the console to store 2.
 - **Expect** — store 1's customers are absent; the filters (`email`, `country`, `name`) narrow within the store.
@@ -169,7 +169,7 @@ placement and commits at once — the reservation timer could only ever cancel a
 - **Expect** — success dialog, no redirect; `PENDING_PAYMENT / PENDING / RESERVED / NONE`, `expires_at` 48 h out;
   the transaction waits in the console's Payments screen for approval (PAY-01 in payment's QA).
 
-### PLC-03 — Card (Stripe) · critical · [verified up to the Stripe redirect — the paid return not verified]
+### PLC-03 — Card (Stripe) · critical · [verified]
 
 - **Setup** — the store's Stripe configuration enabled, the `stripe-org1-store1-webhook` listener running.
 - **Steps** — checkout with STRIPE; pay with `4242 4242 4242 4242` on the Stripe page.
@@ -253,13 +253,13 @@ own service principal). **A signal is never a 4xx for a state the order cannot u
 `DUPLICATE` (same transaction ref + status seen before) or `IGNORED` (with the reason), because payment's outbox
 would otherwise retry a decision that will not change. A ref this store never issued is the one 404.
 
-### SIG-01 — Payment approved in the console confirms the order · critical · [not verified]
+### SIG-01 — Payment approved in the console confirms the order · critical · [verified]
 
 - **Steps** — PLC-02, then **Payments → Approve** in the console.
 - **Expect** — within a few seconds the order is `CONFIRMED / PAID / COMMITTED`; the ledger has a `PAYMENT_SIGNAL`
   `APPLIED` row keyed `<internal ref>:PAID`, then `COMMITTED`.
 
-### SIG-02 — Payment rejected in the console cancels the order and releases the stock · critical · [verified via the signal API — the console reject button not verified]
+### SIG-02 — Payment rejected in the console cancels the order and releases the stock · critical · [verified]
 
 Before the rewrite a rejection told nobody; the order waited forever. `PaymentRejectedEvent` is new.
 
@@ -353,13 +353,13 @@ both try, the second loses and skips, and the remotes are idempotent by ref anyw
 
 ## ORD — The console's orders
 
-### ORD-01 — List, filters, newest first · critical · [not verified]
+### ORD-01 — List, filters, newest first · critical · [verified]
 
-- **Expect** — `?name`, `?id`, `?status`, `?phone`, `?email`, `?customerId` narrow the list; the list rows carry no
+- **Expect** — `?name`, `?id`, `?status`, `?phone`, `?email`, `?customerId`, `?ref` (exact `orderRef`) narrow the list; the list rows carry no
   lines or customer (`products: null`), the detail does; `inventoryStatus` and `redirectUrl` are the field names
   (the console model was renamed from `reservationStatus` / `redirectUri`).
 
-### ORD-02 — Moving an order forward, and an illegal step · critical · [not verified]
+### ORD-02 — Moving an order forward, and an illegal step · critical · [verified]
 
 - **Steps** — CONFIRMED → PROCESSING → SHIPPED → DELIVERING → DELIVERED; then try DELIVERED again, or COMPLETED
   from PROCESSING.
@@ -367,7 +367,7 @@ both try, the second loses and skips, and the remotes are idempotent by ref anyw
   `409 CHECKOUT.ORDER.ILLEGAL_TRANSITION` with `params.from` / `params.to`, and the order does not move. On a COD
   order `DELIVERED` also sets payment `PAID`.
 
-### ORD-03 — Cancelling from the console · high · [not verified]
+### ORD-03 — Cancelling from the console · high · [verified]
 
 - **Expect** — a `PENDING_PAYMENT` or `CONFIRMED` order goes `CANCELLED`; a still-reserved one owes `RELEASE`, which
   runs inline and puts the stock back; a paid one keeps `PAID` and is flagged for a refund; a `SHIPPED` one is
@@ -378,21 +378,22 @@ both try, the second loses and skips, and the remotes are idempotent by ref anyw
 - **Expect** — no session → 401; a shopper token → 403; a store **moderator** → 403 (checkout grants
   `STORE-POD.CHECKOUT.*` to admins only).
 
-### ORD-05 — Another store's seller sees nothing · critical · [not verified]
+### ORD-05 — Another store's seller sees nothing · critical · [verified]
 
 - **Expect** — list empty for a store 1 id, detail / history / transition → 404, and store 1's admin asking for
   store 2 → 403.
 
-### ORD-06 — Flagged orders are visible · high · [not verified]
+### ORD-06 — Flagged orders are visible · high · [verified]
 
-- **Expect** — `needsAttention` / `attentionReason` on the detail; `select … where needs_attention` finds them.
-  There is no console filter yet (99).
+- **Expect** — `needsAttention` / `attentionReason` on the detail; the console's order page shows a
+  "Needs attention: <reason>" notice above the tracker; `select … where needs_attention` finds them. There is no
+  console list filter yet (99).
 
 ---
 
 ## STA — Statistics
 
-### STA-01 — Three charts, one store · high · [not verified]
+### STA-01 — Three charts, one store · high · [verified]
 
 - **Expect** — `order-statistic` = orders per day per status; `customer-statistic` = **distinct customers** per
   billing country (it used to count orders); `product-statistic` = **units** per sku (it used to count orders). A
@@ -444,6 +445,8 @@ Defects that actually happened in checkout — most in the service this one repl
 | **The account page 404ed before the first order** | `CUSTOMER.NOT_FOUND [404]` on My Account for a signed-in shopper with no order yet. | CUS-02 — empty profile, 200. |
 | **Totals rendered without labels** | Two bare amounts under the items — `sales_order_total.title` was empty. | PLC-01 — the order page reads `Subtotal` / `Total`. |
 | **First name blank on the account page** | Every storefront theme read `customer.firstNames`; the API has always sent `firstName`. | CUS-02 — the profile tab shows the first name. |
+| **The console lost the payment ↔ order link** | The order page's Payments card was empty and the ledger's order column was a bare UUID, because the console matched `requestRef` to the numeric order id while the rewrite hands payment the `orderRef`. | ORD-01 detail (Payments card lists the transaction); Payments → order link opens the summary; `GET /private/orders?ref=`. |
+| **The reject dialog promised nothing would happen** | Its copy said the order does not change status; SIG-02 cancels and releases. | SIG-02 — read the dialog. |
 | **Order ids walked by URL** | Another shopper's status read answered 403 (confirming the id) or worse, the order. | PLC-10, CUS-02 — 404, never 403. |
 
 ---

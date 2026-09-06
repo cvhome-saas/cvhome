@@ -10,6 +10,7 @@ import jakarta.persistence.criteria.Predicate;
 
 import org.springframework.data.jpa.domain.Specification;
 
+import com.asrevo.cvhome.checkout.domain.OrderRef;
 import com.asrevo.cvhome.checkout.entity.Customer;
 import com.asrevo.cvhome.checkout.entity.Order;
 import com.asrevo.cvhome.checkout.model.customer.CustomerFilter;
@@ -38,6 +39,9 @@ public final class OrderSpecifications {
             predicates.add(cb.equal(root.get(STORE), store));
             if (filter.id() != null) {
                 predicates.add(cb.equal(root.get("id"), filter.id()));
+            }
+            if (hasText(filter.ref())) {
+                predicates.add(cb.equal(root.get("orderRef"), OrderRef.of(filter.ref().trim())));
             }
             if (filter.status() != null) {
                 predicates.add(cb.equal(root.get("orderStatus"), filter.status()));

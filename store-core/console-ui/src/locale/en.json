@@ -1044,6 +1044,7 @@
     "fulfilment": "Fulfilment progress",
     "stageAhead": "Not yet",
     "offPath": "This order is {status}. It is no longer moving through fulfilment.",
+    "needsAttention": "Needs attention: {reason}",
     "stage": {
       "placed": "Placed",
       "paid": "Paid",
@@ -1751,7 +1752,7 @@
     },
     "reject": {
       "title": "Reject this payment?",
-      "message": "Payment {{reference}} will be marked rejected. The order does not change status and the customer is not notified — you will need to follow up separately.",
+      "message": "Payment {{reference}} will be marked rejected. Checkout cancels the order and releases its stock within seconds; the customer is not notified — you will need to follow up separately.",
       "confirm": "Reject payment"
     },
     "toast": {

@@ -9,11 +9,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -27,7 +27,6 @@ import com.asrevo.cvhome.checkout.model.order.ReadableOrderStatusHistory;
 import com.asrevo.cvhome.checkout.services.order.OrderService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.entity.order.orderstatus.OrderStatus;
 
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -53,14 +52,9 @@ public class OrderApi {
     @GetMapping("/private/orders")
     @PreAuthorize(MANAGE)
     @Parameter(name = "store", schema = @Schema(type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
-    public ReadableOrderList list(@RequestParam(required = false) String name, @RequestParam(required = false) Long id,
-                                  @RequestParam(required = false) OrderStatus status,
-                                  @RequestParam(required = false) String phone,
-                                  @RequestParam(required = false) String email,
-                                  @RequestParam(required = false) Long customerId,
-                                  StoreMerchantId merchantStore, LanguageCode language, Pageable pageable) {
-        return orderService.list(merchantStore, language, new OrderFilter(name, id, status, phone, email, customerId),
-                pageable);
+    public ReadableOrderList list(@ModelAttribute OrderFilter filter, StoreMerchantId merchantStore, LanguageCode language,
+                                  Pageable pageable) {
+        return orderService.list(merchantStore, language, filter, pageable);
     }
 
     @GetMapping("/private/orders/{id}")

@@ -151,6 +151,10 @@
   color: var(--destructive);
 }
 
+.off-path.attention {
+  color: var(--foreground);
+}
+
 /*
  * The tracker is a panel like every other block on this page, so it takes the shared card chrome
  * rather than restating it: same surface, same header rhythm, same divider. It had its own, and a

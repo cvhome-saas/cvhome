@@ -20,7 +20,7 @@ const ORDER: ReadableOrder = {
   customerAgreed: true,
   confirmedAddress: false,
   paymentStatus: 'PAID',
-  reservationStatus: 'RESERVED',
+  inventoryStatus: 'RESERVED',
   customer: {id: 7, firstName: 'Maya', lastName: 'Chen', emailAddress: 'maya@northline.example'},
   products: [
     {id: 1, productName: 'Wireless Headphones', sku: 'ACME-HDPH-01', orderedQuantity: 2, price: '$62.00', subTotal: '$124.00'},
@@ -232,6 +232,18 @@ describe('OrderDetails', () => {
     // A half-filled progress bar for a cancelled order would claim it is still moving.
     expect(element.querySelector('.stages')).toBeNull();
     expect(element.querySelector('.off-path')?.textContent).toContain('no longer moving');
+  }));
+
+  it('repeats the attention reason where the operator is looking, and only when the order is flagged', fakeAsync(() => {
+    api.detail = {
+      ...DETAIL,
+      order: {...ORDER, orderStatus: 'CANCELLED', needsAttention: true, attentionReason: 'cancelled after payment — refund required'},
+    };
+    const flagged = load();
+    expect(flagged.querySelector('.attention')?.textContent).toContain('refund required');
+
+    api.detail = DETAIL;
+    expect(load().querySelector('.attention')).toBeNull();
   }));
 
   it('opens the invoice as a document and closes it again', fakeAsync(() => {

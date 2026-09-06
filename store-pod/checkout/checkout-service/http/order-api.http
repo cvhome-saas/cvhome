@@ -7,14 +7,18 @@
 #
 # Requires a running stack: lcl start -d
 
-### list, newest first, with the console's filters (name, id, status, phone, email, customerId — all optional)
+### list, newest first, with the console's filters (name, id, status, phone, email, customerId, ref — all optional)
 GET {{SELLER_UI_URL}}/spg/checkout/api/v1/private/orders?page=0&count=20&store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
 
-> {% if (response.body.content.length > 0) client.global.set("ORDER_ID", response.body.content[0].id); %}
+> {% if (response.body.content.length > 0) { client.global.set("ORDER_ID", response.body.content[0].id); client.global.set("ORDER_REF", response.body.content[0].orderRef); } %}
 
 ### filter by status
 GET {{SELLER_UI_URL}}/spg/checkout/api/v1/private/orders?status=CONFIRMED&page=0&count=20&store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+### filter by the order ref — the value payment holds as requestRef; how the payments screen finds the order
+GET {{SELLER_UI_URL}}/spg/checkout/api/v1/private/orders?ref={{ORDER_REF}}&store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
 
 ### detail — lines, customer, addresses, totals, needsAttention/attentionReason

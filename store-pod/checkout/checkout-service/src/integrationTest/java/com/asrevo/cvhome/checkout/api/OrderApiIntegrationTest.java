@@ -130,6 +130,10 @@ class OrderApiIntegrationTest {
         assertThat(byEmail.get(CONTENT)).hasSize(1);
         JsonNode byName = json(api.get(with(scoped(path(V1_PRIVATE, ORDERS), STORE_A), String.format("name=lovel&id=%s", id)), admin));
         assertThat(byName.get(CONTENT)).hasSize(1);
+        String ref = first.get("orderRef").asString();
+        JsonNode byRef = json(api.get(with(scoped(path(V1_PRIVATE, ORDERS), STORE_A), String.format("ref=%s", ref)), admin));
+        assertThat(byRef.get(CONTENT)).as("the payments screen finds an order by the ref payment holds").hasSize(1);
+        assertThat(byRef.get(CONTENT).get(0).get(ID).asLong()).isEqualTo(first.get(ID).asLong());
     }
 
     @Test

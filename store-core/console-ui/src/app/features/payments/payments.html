@@ -100,7 +100,7 @@
                   </div>
 
                   <div class="cell-order" role="cell" [attr.data-label]="t('payments.column.order')">
-                    @if (row.orderId !== null) {
+                    @if (row.orderId !== null || row.orderRef !== null) {
                       <!--
                         Opens a summary of the order rather than navigating: the operator is here to
                         judge a payment, and leaving the ledger to answer "what did this pay for"
@@ -109,19 +109,18 @@
                         The icon is the point of it. A bare `#10482` reads as a label, and the old
                         version gave no sign it did anything at all until you hovered it.
 
-                        There is a link at all only because `requestRef` holds the order id — a
-                        checkout convention, not a contract. A reference that does not read as an id
-                        is shown as itself rather than opening something that would 404. See
-                        lessons.md, "Payments — the link from a transaction to its order is a
-                        convention".
+                        `requestRef` is the order's opaque ref (checkout hands payment its
+                        `orderRef`), or the numeric id for transactions the retired checkout wrote.
+                        Either opens the summary; a reference that is neither is shown as itself
+                        rather than opening something that would 404.
                       -->
                       <button
                         class="order-ref"
                         type="button"
-                        [attr.aria-label]="t('payments.viewOrderFor', {order: row.orderId})"
+                        [attr.aria-label]="t('payments.viewOrderFor', {order: row.orderId ?? row.orderRef})"
                         (click)="facade.openOrderSummary(row)"
                       >
-                        <span>#{{ row.orderId }}</span>
+                        <span dir="ltr">{{ row.orderId !== null ? '#' + row.orderId : row.orderRef!.slice(0, 8) }}</span>
                         <app-icon name="externalLink" class="order-ref-icon" />
                       </button>
                     } @else {

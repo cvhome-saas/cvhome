@@ -1,5 +1,5 @@
 import {Injectable, inject} from '@angular/core';
-import {Observable, catchError, forkJoin, map, of} from 'rxjs';
+import {Observable, catchError, forkJoin, map, of, switchMap} from 'rxjs';
 
 import {OrdersService} from '@api/orders/orders.service';
 import {SiteSettingsService} from '@api/content/site-settings.service';
@@ -67,45 +67,52 @@ export class OrderDetailsApi {
   private readonly siteSettings = inject(SiteSettingsService);
 
   load(orderId: number, storeId: string): Observable<OrderDetail> {
-    return forkJoin({
-      order: this.orders.get(orderId),
-      history: this.orders.history(orderId),
-      countries: this.orders.countries(),
-      // Optional, unlike the other three: the letterhead is the only thing that reads it, and an
-      // order is still an order when the merchant service cannot be reached.
-      seller: this.stores.getStoreDetail(storeId).pipe(catchError(() => of(null))),
-      // Optional, like the letterhead itself: a content outage costs the invoice its logo, not the order.
-      sellerLogo: this.siteSettings.get().pipe(
-        map((settings) => settings.branding?.logo?.url ?? null),
-        catchError(() => of(null)),
-      ),
-      /*
-       * The order's payments, found by the one link there is: checkout writes the order id into the
-       * payment request's `ref`, which lands in `Transaction.requestRef`. It is a convention held in
-       * one line of a different service, not a typed relation — see lessons.md, "Payments — the link
-       * from a transaction to its order is a convention". Optional, like the letterhead: a payments
-       * outage costs this panel and nothing else.
-       */
-      payments: this.payments
-        .transactions({requestRef: String(orderId), page: 0, count: PAYMENTS_PER_ORDER})
-        .pipe(
-          map((page) => page.content),
-          catchError(() => of([] as readonly PaymentTransaction[])),
-        ),
-    }).pipe(
-      map(({order, history, countries, seller, sellerLogo, payments}) => ({
-        order,
-        seller,
-        sellerLogo,
-        // Newest first: a re-tried payment is the one being asked about.
-        payments: [...payments].sort(byTransactionDate),
+    return this.orders.get(orderId).pipe(
+      switchMap((order) =>
+        forkJoin({
+          history: this.orders.history(orderId),
+          countries: this.orders.countries(),
+          // Optional, unlike the other three: the letterhead is the only thing that reads it, and an
+          // order is still an order when the merchant service cannot be reached.
+          seller: this.stores.getStoreDetail(storeId).pipe(catchError(() => of(null))),
+          // Optional, like the letterhead itself: a content outage costs the invoice its logo, not the order.
+          sellerLogo: this.siteSettings.get().pipe(
+            map((settings) => settings.branding?.logo?.url ?? null),
+            catchError(() => of(null)),
+          ),
+          /*
+           * The order's payments, found by the one link there is: checkout hands payment the order's
+           * opaque `orderRef` as the request ref, which lands in `Transaction.requestRef`. That is why
+           * the order is read first — the ref is on it. Optional, like the letterhead: a payments outage
+           * costs this panel and nothing else, and an order with no ref (none exists after the rewrite)
+           * simply has no payments to show.
+           */
+          payments: order.orderRef
+            ? this.payments
+                .transactions({requestRef: order.orderRef, page: 0, count: PAYMENTS_PER_ORDER})
+                .pipe(
+                  map((page) => page.content),
+                  catchError(() => of([] as readonly PaymentTransaction[])),
+                )
+            : of([] as readonly PaymentTransaction[]),
+        }).pipe(
+          map(({history, countries, seller, sellerLogo, payments}) => ({
+            order,
+            seller,
+            sellerLogo,
+            // Newest first: a re-tried payment is the one being asked about.
+            payments: [...payments].sort(byTransactionDate),
 
-        // Oldest first is how a timeline reads; the server's order is not guaranteed.
-        history: [...history].sort(byDate),
-        countries: new Map(
-          countries.filter((country) => country.code).map((country) => [country.code!, country.name ?? country.code!]),
+            // Oldest first is how a timeline reads; the server's order is not guaranteed.
+            history: [...history].sort(byDate),
+            countries: new Map(
+              countries
+                .filter((country) => country.code)
+                .map((country) => [country.code!, country.name ?? country.code!]),
+            ),
+          })),
         ),
-      })),
+      ),
     );
   }
 

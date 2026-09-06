@@ -167,6 +167,8 @@ export interface OrderTotal {
 /** Mirrors checkout-commons `ReadableOrder`. `orderStatus` serializes as the enum name. */
 export interface ReadableOrder {
   readonly id?: number;
+  /** The opaque ref checkout minted for this order — what payment holds as `requestRef`. */
+  readonly orderRef?: string;
   readonly totals?: readonly OrderTotal[];
   readonly shippingModule?: string;
   readonly previousOrderStatus?: readonly string[];

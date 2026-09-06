@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 import org.mockito.ArgumentCaptor;
 
+import com.asrevo.cvhome.checkout.domain.OrderRef;
 import com.asrevo.cvhome.checkout.entity.Customer;
 import com.asrevo.cvhome.checkout.entity.Order;
 import com.asrevo.cvhome.checkout.entity.Orders;
@@ -18,6 +19,7 @@ import com.asrevo.cvhome.store.core.entity.order.orderstatus.OrderStatus;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -33,6 +35,8 @@ class OrderSpecificationsTest {
     private static final String A_B = "a@b";
 
     private static final String ADA = "ada";
+
+    private static final String BLANK = " ";
 
     @SuppressWarnings("unchecked")
     private static <T> Root<T> root() {
@@ -66,7 +70,7 @@ class OrderSpecificationsTest {
         CriteriaBuilder cb = builder();
         Root<Order> root = root();
 
-        OrderSpecifications.orders(Orders.STORE, new OrderFilter(ADA, 5L, OrderStatus.CONFIRMED, "+44", A_B, 7L))
+        OrderSpecifications.orders(Orders.STORE, new OrderFilter(ADA, 5L, OrderStatus.CONFIRMED, "+44", A_B, 7L, null))
                 .toPredicate(root, mock(CriteriaQuery.class), cb);
 
         assertThat(predicateCount(cb)).isEqualTo(7);
@@ -75,10 +79,21 @@ class OrderSpecificationsTest {
     }
 
     @Test
+    void theRefFilterIsAnExactMatchOnTheOrderRef() {
+        CriteriaBuilder cb = builder();
+
+        OrderSpecifications.orders(Orders.STORE, new OrderFilter(null, null, null, null, null, null, " abc "))
+                .toPredicate(root(), mock(CriteriaQuery.class), cb);
+
+        assertThat(predicateCount(cb)).isEqualTo(2);
+        verify(cb).equal(any(), eq(OrderRef.of("abc")));
+    }
+
+    @Test
     void blankTextFiltersAreIgnored() {
         CriteriaBuilder cb = builder();
 
-        OrderSpecifications.orders(Orders.STORE, new OrderFilter("  ", null, null, "", " ", null))
+        OrderSpecifications.orders(Orders.STORE, new OrderFilter("  ", null, null, "", BLANK, null, BLANK))
                 .toPredicate(root(), mock(CriteriaQuery.class), cb);
 
         assertThat(predicateCount(cb)).isEqualTo(1);

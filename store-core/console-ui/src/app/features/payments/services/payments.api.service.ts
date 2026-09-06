@@ -14,7 +14,7 @@ import {
   type TransactionQuery,
 } from '@models/payment';
 import type {ReadableOrder} from '@models/checkout';
-import type {PaymentTab, TransactionRow, TransactionsSnapshot} from '@models/transactions';
+import type {OrderKey, PaymentTab, TransactionRow, TransactionsSnapshot} from '@models/transactions';
 import type {DateRangeValue} from '@cvhome-saas/ui-kit/ui';
 
 /** The KPI row's four figures. `null` is "could not be read", which is not the same as zero. */
@@ -89,8 +89,8 @@ export class PaymentsApi {
    *
    * The detail endpoint, not the list: only it populates `products` and `customer`.
    */
-  loadOrder(orderId: number): Observable<ReadableOrder> {
-    return this.orders.get(orderId);
+  loadOrder(key: OrderKey): Observable<ReadableOrder> {
+    return key.id !== null ? this.orders.get(key.id) : this.orders.byRef(key.ref ?? '');
   }
 
   approve(internalRef: string, approval: PaymentApproval): Observable<void> {
@@ -165,6 +165,7 @@ function toRow(transaction: PaymentTransaction): TransactionRow {
     internalRef: transaction.internalRef,
     transactionNo: transaction.transactionNo,
     orderId: asOrderId(transaction.requestRef),
+    orderRef: asOrderRef(transaction.requestRef),
     reference: transaction.requestRef,
     paymentType: transaction.paymentType,
     status: transaction.status,
@@ -183,6 +184,13 @@ function toRow(transaction: PaymentTransaction): TransactionRow {
  */
 function asOrderId(requestRef: string): number | null {
   return /^\d+$/.test(requestRef) && Number(requestRef) > 0 ? Number(requestRef) : null;
+}
+
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/** `requestRef` read as checkout's opaque order ref, or null when it is not UUID-shaped. */
+function asOrderRef(requestRef: string): string | null {
+  return UUID.test(requestRef) ? requestRef : null;
 }
 
 function startOfDay(date: Date): Date {

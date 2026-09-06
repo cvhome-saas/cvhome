@@ -66,6 +66,17 @@
             dated from the history entry that put it there — nothing is estimated, so a stage still
             ahead simply carries no date.
           -->
+          @if (facade.attention(); as reason) {
+            <!--
+              Automation stopped here and a person has to finish: a refund, a re-reservation, a manual
+              commit. The ledger row that set the flag names the reason; this repeats it where the
+              operator is looking.
+            -->
+            <div class="off-path attention" role="alert">
+              <app-icon name="alertCircle" />
+              <span>{{ t('orderDetails.needsAttention', {reason}) }}</span>
+            </div>
+          }
           @if (facade.isCancelled()) {
             <div class="off-path" role="status">
               <app-icon name="alertCircle" />

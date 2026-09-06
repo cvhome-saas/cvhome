@@ -354,6 +354,18 @@ export class OrderDetailsFacade {
   });
 
   /**
+   * Why automation could not finish this order, or null when it did.
+   *
+   * Checkout sets `needsAttention` when a person has to act — paid after a cancel (refund), stock
+   * released before the commit, a recovery that gave up — and says why in `attentionReason`. The
+   * reason is the server's own sentence, shown as-is: it is diagnostic, not copy.
+   */
+  readonly attention = computed<string | null>(() => {
+    const order = this.order();
+    return order?.needsAttention ? (order.attentionReason?.trim() || '—') : null;
+  });
+
+  /**
    * The fulfilment tracker.
    *
    * Both the position and the timestamps are real: the position comes from the order's status, and

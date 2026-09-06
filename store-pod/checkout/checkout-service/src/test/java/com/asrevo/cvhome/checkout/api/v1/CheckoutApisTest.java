@@ -183,8 +183,9 @@ class CheckoutApisTest {
         checkoutApi.status(5L, STORE, SHOPPER);
         verify(orderService).status(STORE, 5L, SHOPPER);
 
-        orderApi.list(ADA, 5L, OrderStatus.CONFIRMED, LIT_1, A_B, 7L, STORE, EN, page);
-        verify(orderService).list(STORE, EN, new OrderFilter(ADA, 5L, OrderStatus.CONFIRMED, LIT_1, A_B, 7L), page);
+        OrderFilter filter = new OrderFilter(ADA, 5L, OrderStatus.CONFIRMED, LIT_1, A_B, 7L, null);
+        orderApi.list(filter, STORE, EN, page);
+        verify(orderService).list(STORE, EN, filter, page);
         orderApi.get(5L, STORE, EN);
         verify(orderService).get(STORE, EN, 5L);
         orderApi.history(5L, STORE);
