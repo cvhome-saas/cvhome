@@ -91,9 +91,13 @@ com:
         clients:
           admin-sdk:
             secret: ${UAA_ADMIN_SDK_SECRET}
-          store-pod-507f1f77@service.store-pod.internal:
+          # Bracketed, because these keys carry '@' and '.'. Unbracketed, Spring's binder splits a map
+          # key at every dot, so neither client ever reached OAuth2ClientProperties: the seed writer
+          # updated admin-sdk and web-app and silently left both service clients on the SQL seed's
+          # secret, and the first deployment with generated secrets locked every service out.
+          "[store-pod-507f1f77@service.store-pod.internal]":
             secret: ${UAA_STORE_POD_SECRET}
-          store-core@service.store-core.internal:
+          "[store-core@service.store-core.internal]":
             secret: ${UAA_STORE_CORE_SECRET}
           web-app:
             secret: ${UAA_WEB_APP_SECRET}
