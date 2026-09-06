@@ -1,3 +1,8 @@
+# The one collector every service, spg and landing-ui export to (OTLP on 4317 gRPC / 4318 HTTP). Traces go to Tempo,
+# logs to Loki, metrics to the Prometheus exporter on :8889 which Prometheus scrapes. Two connectors derive metrics
+# from the traces: spanmetrics (rate / errors / latency per span, incl. every JDBC statement) and servicegraph (who
+# calls whom, how often, how slowly, how often it fails). Every dashboard under extra/monitoring/grafana reads the
+# names this file produces; extra/monitoring/docs/signals.md is the catalogue.
 receivers:
   otlp:
     protocols:
@@ -8,7 +13,42 @@ receivers:
 
 connectors:
   servicegraph:
+    # traces_service_graph_request_total / _failed_total / _server_seconds / _client_seconds by (client, server).
+    # connection_type="" is a service-to-service call, "database" the JDBC edge (server = db.name), "virtual_node"
+    # a peer that sent no spans (a browser, k6, or an unknown host).
+    latency_histogram_buckets: [ 10ms, 50ms, 100ms, 250ms, 500ms, 800ms, 1s, 2s, 5s, 10s ]
+    dimensions: [ http.response.status_code ]
+    store:
+      ttl: 5s
+      max_items: 5000
+    metrics_flush_interval: 15s
+    database_name_attributes: [ db.name ]
   spanmetrics:
+    # traces_span_metrics_calls_total and traces_span_metrics_duration_seconds_{bucket,count,sum} per
+    # (service_name, span_name, span_kind, status_code) plus the dimensions below. Buckets match the SLOs in
+    # load-testing/k6/config/thresholds.js so p95 is exact at the boundaries that matter.
+    histogram:
+      unit: s
+      explicit:
+        buckets: [ 5ms, 10ms, 25ms, 50ms, 100ms, 250ms, 400ms, 500ms, 600ms, 800ms, 1s, 2s, 2500ms, 3s, 5s, 10s ]
+    dimensions:
+      - name: http.request.method
+      - name: http.route
+      - name: http.response.status_code
+      - name: error.type
+      - name: db.system
+      - name: db.operation
+      - name: db.sql.table
+      - name: server.address
+    exemplars:
+      enabled: true
+    dimensions_cache_size: 2000
+    aggregation_temporality: AGGREGATION_TEMPORALITY_CUMULATIVE
+    metrics_flush_interval: 15s
+    metrics_expiration: 10m
+    # One series set per service, not per JVM instance: service.instance.id is a fresh UUID on every boot and would
+    # leave a dead series set behind each restart.
+    resource_metrics_key_attributes: [ service.name ]
 
 processors:
   batch/traces:
@@ -26,25 +66,41 @@ processors:
     send_batch_max_size: 60
     timeout: 1s
 
+  # Resource attributes become labels on every metric, log stream and span. Host facts are one laptop locally and add
+  # nothing but cardinality; the deployed collector (aws-otel-collector) keeps them.
+  resource/trim:
+    attributes:
+      - key: host.arch
+        action: delete
+      - key: host.name
+        action: delete
+      - key: os.type
+        action: delete
+
+  # Safety net behind the app-side fix in landing-ui's telemetry.ts: an outgoing-call span named after a full URL
+  # ("fetch GET http://host/path?store=…") would be one span-metrics series per distinct URL. Query strings and ids
+  # are cut from CLIENT span names here, whatever the emitting SDK did. $$1 is OTTL's escape for the capture group.
+  transform/span_names:
+    error_mode: ignore
+    trace_statements:
+      - context: span
+        statements:
+          - replace_pattern(name, "\\?.*$$", "") where kind == SPAN_KIND_CLIENT
+          - replace_pattern(name, "^(fetch \\w+) https?://[^/]+", "$$1") where kind == SPAN_KIND_CLIENT
+          - replace_pattern(name, "/[0-9a-fA-F]{24}(/|$$)", "/{id}$$1") where kind == SPAN_KIND_CLIENT
+          - replace_pattern(name, "/[0-9]+(/|$$)", "/{id}$$1") where kind == SPAN_KIND_CLIENT
+
+  # Meter families nobody reads. Kept on purpose (not listed): http.*, jvm.*, system.*, process.*, jdbc.*,
+  # hikaricp.*, tomcat.* (request-thread saturation), executor.* (async/scheduler pools), cache.*, cvhome.*.
   filter/drop_metrics:
     error_mode: ignore
     metrics:
       metric:
-        #        - IsMatch(name, "^http.*")
-        #        - IsMatch(name, "^application.*")
-        #        - IsMatch(name, "^jvm.*")
-        #        - IsMatch(name, "^system.*")
-        #        - IsMatch(name, "^process.*")
-        #        - IsMatch(name, "^jdbc.*")
-        #        - IsMatch(name, "^hikaricp.*")
-
         - IsMatch(name, "^spring.*")
         - IsMatch(name, "^processedLogs.*")
         - IsMatch(name, "^disk.*")
-        - IsMatch(name, "^tomcat.*")
         - IsMatch(name, "^nodejs.*")
         - IsMatch(name, "^logback.*")
-        - IsMatch(name, "^executor.*")
         - IsMatch(name, "^tasks.*")
         - IsMatch(name, "^v8js.*")
 
@@ -68,6 +124,9 @@ exporters:
 
   prometheus:
     endpoint: 0.0.0.0:8889
+    # OpenMetrics so the exemplars (trace ids on histogram buckets) reach Prometheus and Grafana can jump from a
+    # latency point to the trace behind it.
+    enable_open_metrics: true
     resource_to_telemetry_conversion:
       enabled: true
 extensions:
@@ -79,15 +138,15 @@ service:
   pipelines:
     traces:
       receivers: [ otlp ]
-      processors: [ memory_limiter, batch/traces ]
+      processors: [ memory_limiter, resource/trim, transform/span_names, batch/traces ]
       exporters: [ otlp/tempo, servicegraph, spanmetrics ]
 
     metrics:
       receivers: [ otlp, servicegraph, spanmetrics ]
-      processors: [ memory_limiter, filter/drop_metrics, batch/metrics ]
+      processors: [ memory_limiter, resource/trim, filter/drop_metrics, batch/metrics ]
       exporters: [ prometheus ]
 
     logs:
       receivers: [ otlp ]
-      processors: [ memory_limiter, batch/logs ]
+      processors: [ memory_limiter, resource/trim, batch/logs ]
       exporters: [ otlphttp/loki ]

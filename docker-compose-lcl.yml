@@ -101,8 +101,10 @@ services:
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"
       - "--web.enable-remote-write-receiver"
+      - "--enable-feature=exemplar-storage"
     volumes:
       - ./extra/monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./extra/monitoring/prometheus-rules:/etc/prometheus/rules:ro
     ports:
       - "9090:9090"
   grafana:
@@ -110,8 +112,12 @@ services:
     environment:
       GF_AUTH_ANONYMOUS_ENABLED: "true"
       GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
+      GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /var/lib/grafana/dashboards/platform/platform-overview.json
+      GF_FEATURE_TOGGLES_ENABLE: traceqlEditor
     volumes:
       - ./extra/monitoring/grafana-datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml
+      - ./extra/monitoring/grafana-dashboards.yml:/etc/grafana/provisioning/dashboards/cvhome.yml
+      - ./extra/monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
     ports:
       - "3000:3000"
     depends_on:
