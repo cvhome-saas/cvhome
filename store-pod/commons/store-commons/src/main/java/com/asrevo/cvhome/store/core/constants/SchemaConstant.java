@@ -6,8 +6,14 @@ import java.util.Map;
 
 public final class SchemaConstant {
 
-
-    public static final int DESCRIPTION_ID_ALLOCATION_SIZE = 0;
+    /**
+     * Ids per round-trip for every {@code @TableGenerator} in the pods. At 0 (Hibernate's "no optimizer") each insert
+     * paid a SELECT and an UPDATE on the sequencer row, on a second pooled connection, inside the request: an order
+     * with its lines, totals and event cost seven extra statements and serialised every checkout on one row. Fifty
+     * ids per fetch (Hibernate's pooled optimizer) makes that one round-trip per fifty inserts. Ids keep increasing;
+     * a restart skips what its JVM had left, so an id is unique, not consecutive.
+     */
+    public static final int DESCRIPTION_ID_ALLOCATION_SIZE = 50;
 
     public static final int DESCRIPTION_ID_START_VALUE = 1;
 

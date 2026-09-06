@@ -161,6 +161,16 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: false
+    properties:
+      hibernate:
+        id:
+          optimizer:
+            pooled:
+              # The table generators hand out DESCRIPTION_ID_ALLOCATION_SIZE ids per round-trip. "pooled-lo" reads the
+              # sequencer row as the first id of the next block, which is what the rows already hold from the
+              # one-id-per-fetch days and what the seeds write; Hibernate's default "pooled" reads it as the last id of
+              # a block and hands out negatives when the row is below the block size. Keep this with the constant.
+              preferred: pooled-lo
   cloud:
     function:
       definition: events
