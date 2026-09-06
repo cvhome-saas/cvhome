@@ -5,7 +5,7 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 
-import com.asrevo.cvhome.checkout.services.order.ExternalOrderService;
+import com.asrevo.cvhome.checkout.services.order.ExternalOrderSignalService;
 
 /**
  * Other pods' {@code -external-api} clients, stubbed.
@@ -22,8 +22,8 @@ public class ExternalClientsTestConfiguration {
 
     @Bean
     @Primary
-    ExternalOrderService stubExternalOrderService() {
-        return Mockito.mock(ExternalOrderService.class);
+    ExternalOrderSignalService stubExternalOrderSignalService() {
+        return Mockito.mock(ExternalOrderSignalService.class);
     }
 
 }

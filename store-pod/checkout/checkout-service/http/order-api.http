@@ -1,0 +1,58 @@
+# OrderApi — com.asrevo.cvhome.checkout.api.v1.order.OrderApi
+#
+# The console's orders. STORE-POD.CHECKOUT.* → an org or store admin; a moderator or a shopper gets 403.
+# Seller calls go through the platform gateway with the console session cookie (ORG_ADMIN_SESSION_ID in
+# http-client.private.env.json — copy the STORE-CORE-GATEWAY-JSESSIONID after signing in on {{SELLER_UI_URL}}).
+# Page size parameter is `count`, not `size`.
+#
+# Requires a running stack: lcl start -d
+
+### list, newest first, with the console's filters (name, id, status, phone, email, customerId, ref — all optional)
+GET {{SELLER_UI_URL}}/spg/checkout/api/v1/private/orders?page=0&count=20&store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+> {% if (response.body.content.length > 0) { client.global.set("ORDER_ID", response.body.content[0].id); client.global.set("ORDER_REF", response.body.content[0].orderRef); } %}
+
+### filter by status
+GET {{SELLER_UI_URL}}/spg/checkout/api/v1/private/orders?status=CONFIRMED&page=0&count=20&store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+### filter by the order ref — the value payment holds as requestRef; how the payments screen finds the order
+GET {{SELLER_UI_URL}}/spg/checkout/api/v1/private/orders?ref={{ORDER_REF}}&store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+### detail — lines, customer, addresses, totals, needsAttention/attentionReason
+GET {{SELLER_UI_URL}}/spg/checkout/api/v1/private/orders/{{ORDER_ID}}?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+### the status trail
+GET {{SELLER_UI_URL}}/spg/checkout/api/v1/private/orders/{{ORDER_ID}}/history?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+### move the order forward — 201 with the new history entry. Legal path: CONFIRMED → PROCESSING → SHIPPED →
+### DELIVERING → DELIVERED → COMPLETED (or RETURNED); CANCELLED from CREATED/PENDING_PAYMENT/CONFIRMED/PROCESSING.
+POST {{SELLER_UI_URL}}/spg/checkout/api/v1/private/orders/{{ORDER_ID}}/history?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{
+  "orderStatus": "PROCESSING",
+  "comments": "packing"
+}
+
+### an illegal step — 409 CHECKOUT.ORDER.ILLEGAL_TRANSITION with params.from / params.to
+POST {{SELLER_UI_URL}}/spg/checkout/api/v1/private/orders/{{ORDER_ID}}/history?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{
+  "orderStatus": "COMPLETED",
+  "comments": "too fast"
+}
+
+### another store's id — 404, never the row (tenant isolation)
+GET {{SELLER_UI_URL}}/spg/checkout/api/v1/private/orders/{{ORDER_ID}}?store={{STORE_ID_2}}&pod={{POD_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+### no session — 401
+GET {{SELLER_UI_URL}}/spg/checkout/api/v1/private/orders?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}

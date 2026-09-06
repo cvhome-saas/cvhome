@@ -1,0 +1,31 @@
+# CustomerApi — com.asrevo.cvhome.checkout.api.v1.customer.CustomerApi
+#
+# The signed-in shopper's own view. STORE-POD.CUSTOMER.* → a shopper token of this store's realm (see
+# checkout-api.http for how to obtain SHOPPER_TOKEN); a seller session answers 403.
+#
+# Requires a running stack: lcl start -d
+
+### my profile (an empty profile carrying only the cua id until the first order)
+GET {{SPG_URL}}/checkout/api/v1/private/customer/info?store={{STORE_ID}}&lang={{LANG}}
+Authorization: Bearer {{SHOPPER_TOKEN}}
+
+### my orders, newest first
+GET {{SPG_URL}}/checkout/api/v1/private/customer/orders?page=0&count=10&store={{STORE_ID}}&lang={{LANG}}
+Authorization: Bearer {{SHOPPER_TOKEN}}
+
+> {% if (response.body.content.length > 0) client.global.set("ORDER_ID", response.body.content[0].id); %}
+
+### one of my orders
+GET {{SPG_URL}}/checkout/api/v1/private/customer/{{ORDER_ID}}/order?store={{STORE_ID}}&lang={{LANG}}
+Authorization: Bearer {{SHOPPER_TOKEN}}
+
+### its status trail
+GET {{SPG_URL}}/checkout/api/v1/private/customer/{{ORDER_ID}}/order/history?store={{STORE_ID}}&lang={{LANG}}
+Authorization: Bearer {{SHOPPER_TOKEN}}
+
+### an order that is not mine — 404 (never 403)
+GET {{SPG_URL}}/checkout/api/v1/private/customer/1/order?store={{STORE_ID}}&lang={{LANG}}
+Authorization: Bearer {{SHOPPER_TOKEN}}
+
+### no token — 401
+GET {{SPG_URL}}/checkout/api/v1/private/customer/info?store={{STORE_ID}}&lang={{LANG}}

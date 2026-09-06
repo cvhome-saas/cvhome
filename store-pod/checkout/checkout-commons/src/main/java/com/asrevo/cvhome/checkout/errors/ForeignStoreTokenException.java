@@ -7,12 +7,8 @@ import com.asrevo.cvhome.errors.ErrorBuilder;
 import com.asrevo.cvhome.errors.ErrorPayload;
 
 /**
- * The token authenticates a shopper of a different store than the one addressed.
- *
- * <p>
- * A 403 rather than the 401 the legacy message claimed. The caller is authenticated; what they lack is a claim on this
- * store, and telling a storefront to re-authenticate would send the shopper round a loop that cannot terminate.
- * </p>
+ * The shopper token was minted by another store's realm. Refused rather than silently ordering under the wrong
+ * tenant.
  */
 public class ForeignStoreTokenException extends AccessDeniedStoreException {
 
@@ -23,10 +19,11 @@ public class ForeignStoreTokenException extends AccessDeniedStoreException {
         super(payload, cause);
     }
 
-    public static ForeignStoreTokenException of(Object store) {
+    public static ForeignStoreTokenException of(Object requestedStore, Object tokenStore) {
         return new ErrorBuilder<>(CheckoutErrors.ORDER_CLIENT_MISMATCH, ForeignStoreTokenException::new)
-                .detail("The token does not authenticate a shopper of store %s.", store)
-                .param("store", store)
+                .detail("Token of store %s presented to store %s.", tokenStore, requestedStore)
+                .param("store", requestedStore)
+                .param("tokenStore", tokenStore)
                 .build();
     }
 

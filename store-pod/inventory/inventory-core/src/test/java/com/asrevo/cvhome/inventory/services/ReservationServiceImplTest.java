@@ -51,6 +51,8 @@ class ReservationServiceImplTest {
 
     private static final int EXPIRY_MINUTES = 30;
 
+    private static final int MAX_EXPIRY_HOURS = 72;
+
     @Mock
     private ProductReservationRepository reservationRepository;
 
@@ -61,7 +63,7 @@ class ReservationServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        service = new ReservationServiceImpl(reservationRepository, inventoryRepository, EXPIRY_MINUTES);
+        service = new ReservationServiceImpl(reservationRepository, inventoryRepository, EXPIRY_MINUTES, MAX_EXPIRY_HOURS);
     }
 
     private static Inventory stocked(String sku, int quantity) {

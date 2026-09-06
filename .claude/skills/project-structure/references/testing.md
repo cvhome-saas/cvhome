@@ -136,8 +136,8 @@ services talk here and must not be flagged.
 
 Where a service genuinely deviates, **declare the deviation in its own test** rather than deleting the rule — pass the
 legacy package to `controllersLiveIn(DOMAIN, "…controller..")`, so the debt is visible and no *new* deviation can
-appear. Two live ones: tenancy/checkout/payment keep controllers outside `..api..`, and checkout's v2 statistic APIs
-inject repositories directly (its `API_GOES_THROUGH_SERVICES` rule is commented out with what must change first).
+appear. One live one: tenancy/payment keep controllers outside `..api..`. Checkout cleared both of its deviations in
+the 2026-09 rewrite and binds all five rules.
 
 ## Coverage — reported and gated per domain
 
@@ -165,7 +165,7 @@ Docker-free subset.
 
 Ratchet: after a test PR run `./gradlew printDomainCoverage`, bump the domain's three floors to what it achieves
 (rounded down to 0.01); never lower a floor to make a build pass — fix the tests. Target is `merged: 0.85` for every
-domain. `uaa`, `cua` and `checkout` stay at `0.0` until their legacy code is refactored.
+domain. `uaa` and `cua` stay at `0.0` until their legacy code is refactored.
 
 Excluded from every number: `*Application`, classes in a `config` package named `*Config`, `*Configuration`,
 `*Configurer`, `*Properties`, `JobScheduling`, `*AutoConfiguration`, MapStruct `*MapperImpl`/`*MappersImpl`, and

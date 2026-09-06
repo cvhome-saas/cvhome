@@ -53,13 +53,24 @@ describe('OrdersService', () => {
     post.flush(null);
   });
 
-  it('reads the store’s countries and a country’s zones', () => {
+  it('reads the store’s countries', () => {
     service.countries().subscribe();
     http.expectOne(`${BASE}/country?store=${TEST_STORE}`).flush([]);
+  });
 
-    service.zones('DE').subscribe();
-    const zones = http.expectOne((candidate) => candidate.url === `${BASE}/zones`);
-    expect(zones.request.params.get('code')).toBe('DE');
-    zones.flush([]);
+  it('finds the one order behind a ref, and fails when the store has none', () => {
+    let found: number | undefined;
+    service.byRef('9f1c7e2a-0000-4000-8000-000000000001').subscribe((order) => (found = order.id));
+    const list = http.expectOne((candidate) => candidate.url === `${BASE}/private/orders`);
+    expect(list.request.params.get('ref')).toBe('9f1c7e2a-0000-4000-8000-000000000001');
+    expect(list.request.params.get('count')).toBe('1');
+    list.flush({content: [{id: 4187}], totalElements: 1});
+    http.expectOne(`${BASE}/private/orders/4187?store=${TEST_STORE}`).flush({id: 4187, products: [{id: 1}]});
+    expect(found).toBe(4187);
+
+    let failed = false;
+    service.byRef('missing').subscribe({error: () => (failed = true)});
+    http.expectOne((candidate) => candidate.url === `${BASE}/private/orders`).flush({content: [], totalElements: 0});
+    expect(failed).toBe(true);
   });
 });

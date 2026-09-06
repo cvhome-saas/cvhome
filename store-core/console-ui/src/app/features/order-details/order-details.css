@@ -151,6 +151,10 @@
   color: var(--destructive);
 }
 
+.off-path.attention {
+  color: var(--foreground);
+}
+
 /*
  * The tracker is a panel like every other block on this page, so it takes the shared card chrome
  * rather than restating it: same surface, same header rhythm, same divider. It had its own, and a
@@ -1136,22 +1140,31 @@
 /* ---- Payments panel ---------------------------------------------------------------- */
 
 /*
- * The payments taken against this order. Four columns rather than a table: there is rarely more
- * than one row, and a `data-table` for a single line reads as an empty grid.
+ * The payments taken against this order. Two columns rather than a table: there is rarely more
+ * than one row, and a `data-table` for a single line reads as an empty grid. The method and the
+ * gateway's reference sit on the left; the status, amount and date stack on the right, end-aligned.
+ *
+ * The list takes the card's own padding from `.panel-pad` — it must not zero its inline padding,
+ * which is what once pushed the first column flush against the card edge.
  */
 .payment-list {
   display: grid;
   gap: var(--spacing-field);
   margin: 0;
-  padding-inline-start: 0;
   list-style: none;
 }
 
 .payment-row {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  gap: 0.35rem 0.75rem;
-  align-items: center;
+  gap: var(--spacing-field);
+  align-items: start;
+}
+
+.payment-figures {
+  display: grid;
+  justify-items: end;
+  gap: var(--spacing-tight);
 }
 
 .payment-copy {

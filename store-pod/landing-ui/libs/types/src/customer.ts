@@ -2,7 +2,7 @@ export interface Customer {
     id: number
     cuaExternalId: string
     emailAddress: string
-    firstNames: string
+    firstName: string
     lastName: string
     username: string
     billing: Address

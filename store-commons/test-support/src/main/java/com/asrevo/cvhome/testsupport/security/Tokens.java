@@ -67,6 +67,10 @@ public final class Tokens {
 
     private static final String CLAIM_EXPIRES = "exp";
 
+    private static final String CLAIM_REALM = "realm";
+
+    private static final String ROLE_CUSTOMER = "ROLE_CUSTOMER";
+
     private static final long ONE_HOUR = 3600;
 
     private final TestJwtSigner signer;
@@ -118,6 +122,18 @@ public final class Tokens {
         Map<String, Object> claims = base(String.format("org-admin@%s", org), "Test Org Admin",
                 List.of(ROLE_ORG_ADMIN), SCOPE_STORE_POD);
         claims.put(CLAIM_ORG, org);
+        return signer.sign(claims);
+    }
+
+    /**
+     * A shopper of {@code store}, as cua mints one: {@code sub} is the account id (not a username), {@code realm} is
+     * the store the token was minted against — which is what {@code STORE-POD.CUSTOMER.*} compares to the request's
+     * {@code store}. The test decoder attaches no {@code REALM_} authority, so the foreign-realm check stays quiet.
+     */
+    public String shopper(String store, String sub) {
+        Map<String, Object> claims = base(sub, "Test Shopper", List.of(ROLE_CUSTOMER), "openid");
+        claims.put(CLAIM_REALM, store);
+        claims.put("clientId", store);
         return signer.sign(claims);
     }
 

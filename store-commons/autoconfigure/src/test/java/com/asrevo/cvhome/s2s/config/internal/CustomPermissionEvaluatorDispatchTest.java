@@ -71,7 +71,7 @@ class CustomPermissionEvaluatorDispatchTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"STORE-POD.CATALOG.RESERVE", "STORE-POD.INVENTORY.RESERVE",
-        "STORE-POD.CONTENT.MEDIA-USAGE"})
+        "STORE-POD.CHECKOUT.SIGNAL", "STORE-POD.CONTENT.MEDIA-USAGE"})
     void theServiceToServiceTokensAskOnlyThatTheCallerIsOnTheSamePod(String token) {
         when(checker.isSameStorePod(any(), any(), any())).thenReturn(true);
 

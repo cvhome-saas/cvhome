@@ -7,13 +7,7 @@ import com.asrevo.cvhome.errors.ErrorBuilder;
 import com.asrevo.cvhome.errors.ErrorPayload;
 
 /**
- * The store requires a logged-in shopper to place or track an order, and the request carried none.
- *
- * <p>
- * Replaces a {@code ServiceRuntimeException} whose message read "HTTP 401 Unauthorized — Login required" while the
- * response it produced was a 400: the status the storefront needs in order to send the shopper to the login page was
- * in the text, where nothing could act on it.
- * </p>
+ * The store requires a signed-in shopper for order placement and the request carried no shopper token.
  */
 public class OrderLoginRequiredException extends AuthenticationRequiredException {
 
@@ -26,7 +20,7 @@ public class OrderLoginRequiredException extends AuthenticationRequiredException
 
     public static OrderLoginRequiredException of(Object store) {
         return new ErrorBuilder<>(CheckoutErrors.ORDER_LOGIN_REQUIRED, OrderLoginRequiredException::new)
-                .detail("Store %s requires an authenticated shopper for this operation.", store)
+                .detail("Store %s requires a signed-in shopper to place an order.", store)
                 .param("store", store)
                 .build();
     }

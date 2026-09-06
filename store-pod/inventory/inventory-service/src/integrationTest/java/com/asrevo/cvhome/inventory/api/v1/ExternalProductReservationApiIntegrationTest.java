@@ -13,7 +13,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 
-import com.asrevo.cvhome.checkout.services.order.ExternalOrderService;
+import com.asrevo.cvhome.checkout.api.errors.CheckoutApiUnavailableException;
+import com.asrevo.cvhome.checkout.model.signal.ReservationExpiredSignal;
+import com.asrevo.cvhome.checkout.services.order.ExternalOrderSignalService;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.inventory.config.ExternalClientsTestConfiguration;
 import com.asrevo.cvhome.inventory.entity.ProductReservation;
@@ -92,7 +94,7 @@ class ExternalProductReservationApiIntegrationTest {
     private ReservationExpiryJob expiryJob;
 
     @Autowired
-    private ExternalOrderService externalOrderService;
+    private ExternalOrderSignalService externalOrderService;
 
     private ApiClient api;
 
@@ -230,7 +232,7 @@ class ExternalProductReservationApiIntegrationTest {
     }
 
     @Test
-    void expiryJobGivesBackStockOfOverdueReservationsAndTellsCheckout() {
+    void expiryJobGivesBackStockOfOverdueReservationsAndTellsCheckout() throws CheckoutApiUnavailableException {
         String ref = ApiClient.slug(ORDER);
         int before = quantity(STORE_A, SKU);
         ok(call(RESERVE, STORE_A, s2s, ref, entries(SKU, 4)));
@@ -242,7 +244,8 @@ class ExternalProductReservationApiIntegrationTest {
         expiryJob.releaseExpired();
 
         assertThat(quantity(STORE_A, SKU)).isEqualTo(before);
-        verify(externalOrderService).handleReservationExpired(new StoreMerchantId(STORE_A), ref);
+        verify(externalOrderService).signalReservationExpired(new StoreMerchantId(STORE_A), ref,
+                new ReservationExpiredSignal(ref));
         assertThat(ok(call(COMMIT, STORE_A, s2s, ref, null)).get(STATUS).asBoolean())
                 .as("an expired and released reservation cannot be committed").isFalse();
     }

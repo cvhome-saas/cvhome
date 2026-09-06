@@ -1,0 +1,113 @@
+# CheckoutApi — com.asrevo.cvhome.checkout.api.v1.order.CheckoutApi
+#
+# Placing an order and reading its status back. Store 1 (org1-store1) requires a signed-in shopper, so these carry
+# a shopper bearer: sign in on {{LANDING_UI_URL}} as user / revo, copy the access token from sessionStorage
+# (`auth-tokens`) into SHOPPER_TOKEN in http-client.private.env.json. A guest checkout (no Authorization header)
+# is refused with 401 CHECKOUT.ORDER.LOGIN_REQUIRED on such a store.
+#
+# The Origin header is what the payment provider sends the shopper back to (…/{lang}/checkout/success|cancel).
+#
+# Requires a running stack: lcl start -d
+
+### a fresh cart for the order (COD needs a sku whose stock is > 0)
+POST {{SPG_URL}}/checkout/api/v1/cart?store={{STORE_ID}}&lang={{LANG}}
+Content-Type: application/json
+
+{
+  "product": "SKU-AD-CL-TPT03",
+  "quantity": 2
+}
+
+> {% client.global.set("CART_CODE", response.body.code); %}
+
+### place a COD order — 201 CONFIRMED, stock committed in the same request, no redirectUrl
+POST {{SPG_URL}}/checkout/api/v1/cart/{{CART_CODE}}/checkout?store={{STORE_ID}}&lang={{LANG}}
+Authorization: Bearer {{SHOPPER_TOKEN}}
+Origin: {{LANDING_UI_URL}}
+Content-Type: application/json
+
+{
+  "paymentType": "COD",
+  "customer": {
+    "emailAddress": "user@example.com",
+    "billing": {
+      "firstName": "Demo",
+      "lastName": "Shopper",
+      "address": "1 Demo Street",
+      "city": "Cairo",
+      "postalCode": "11511",
+      "phone": "+20 100 000 0000",
+      "country": "EG"
+    }
+  }
+}
+
+> {% client.global.set("ORDER_ID", response.body.id); client.global.set("ORDER_REF", response.body.orderRef); %}
+
+### the payment-return page's read — {orderId, orderStatus, paymentStatus, redirectUrl}
+GET {{SPG_URL}}/checkout/api/v1/order/{{ORDER_ID}}/status?store={{STORE_ID}}&lang={{LANG}}
+Authorization: Bearer {{SHOPPER_TOKEN}}
+
+### the same cart again — 409 CHECKOUT.CART.ALREADY_CONVERTED once its order is closed;
+### 201 with the SAME order while the order is still open (a resubmit after a 502 resumes it)
+POST {{SPG_URL}}/checkout/api/v1/cart/{{CART_CODE}}/checkout?store={{STORE_ID}}&lang={{LANG}}
+Authorization: Bearer {{SHOPPER_TOKEN}}
+Origin: {{LANDING_UI_URL}}
+Content-Type: application/json
+
+{
+  "paymentType": "COD",
+  "customer": {
+    "emailAddress": "user@example.com",
+    "billing": {"firstName": "Demo", "lastName": "Shopper", "address": "1 Demo Street", "city": "Cairo", "country": "EG"}
+  }
+}
+
+### a STRIPE order — 201 PENDING_PAYMENT with a redirectUrl to follow (needs the store's Stripe key configured)
+POST {{SPG_URL}}/checkout/api/v1/cart?store={{STORE_ID}}&lang={{LANG}}
+Content-Type: application/json
+
+{
+  "product": "SKU-AD-CL-TPT03",
+  "quantity": 1
+}
+
+> {% client.global.set("CART_CODE_STRIPE", response.body.code); %}
+
+###
+POST {{SPG_URL}}/checkout/api/v1/cart/{{CART_CODE_STRIPE}}/checkout?store={{STORE_ID}}&lang={{LANG}}
+Authorization: Bearer {{SHOPPER_TOKEN}}
+Origin: {{LANDING_UI_URL}}
+Content-Type: application/json
+
+{
+  "paymentType": "STRIPE",
+  "customer": {
+    "emailAddress": "user@example.com",
+    "billing": {"firstName": "Demo", "lastName": "Shopper", "address": "1 Demo Street", "city": "Cairo", "country": "EG"}
+  }
+}
+
+### a guest on a store that requires login — 401 CHECKOUT.ORDER.LOGIN_REQUIRED
+POST {{SPG_URL}}/checkout/api/v1/cart/{{CART_CODE_STRIPE}}/checkout?store={{STORE_ID}}&lang={{LANG}}
+Origin: {{LANDING_UI_URL}}
+Content-Type: application/json
+
+{
+  "paymentType": "COD",
+  "customer": {"emailAddress": "guest@example.com", "billing": {"firstName": "G", "lastName": "U", "country": "EG"}}
+}
+
+### an unknown cart — 404 CHECKOUT.CART.NOT_FOUND
+POST {{SPG_URL}}/checkout/api/v1/cart/no-such-cart/checkout?store={{STORE_ID}}&lang={{LANG}}
+Authorization: Bearer {{SHOPPER_TOKEN}}
+Content-Type: application/json
+
+{
+  "paymentType": "COD",
+  "customer": {"emailAddress": "user@example.com", "billing": {"firstName": "D", "lastName": "S", "country": "EG"}}
+}
+
+### someone else's order status — 404 (never 403: the id must not be confirmed real)
+GET {{SPG_URL}}/checkout/api/v1/order/1/status?store={{STORE_ID}}&lang={{LANG}}
+Authorization: Bearer {{SHOPPER_TOKEN}}

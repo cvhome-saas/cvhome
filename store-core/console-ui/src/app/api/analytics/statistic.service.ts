@@ -8,7 +8,7 @@ import type {StatisticList, StatisticRange} from '@models/statistics';
  * The merchant statistics, all served by checkout through the pod gateway.
  *
  * Each returns the same `(date, name, value)` triple and each means something different by it. The
- * comments below are the queries, read from `OrderRepository` and `OrderProductRepository` — without
+ * comments below are the queries, read from checkout's `OrderRepository` — without
  * them the shape says nothing, and the console has already shipped one chart mislabelled because of
  * that (see `customerStatistic`).
  *
@@ -55,21 +55,20 @@ export class StatisticService {
   }
 
   /**
-   * **Orders grouped by billing country** — `select (null, billing.country, count(id)) … group by
-   * billing.country`. Despite the name it counts orders, not customers: a store with one loyal German
-   * buyer reads the same as one with forty. See lessons.md, "Dashboard — customer-statistic counts
-   * orders, not customers".
+   * **Distinct customers grouped by billing country** — `select (null, billing.country,
+   * count(distinct customerId)) … group by billing.country` (`OrderRepository.customersPerCountry`).
+   * Since the checkout rewrite this counts customers, not orders; the older mislabelling is in
+   * lessons.md, "Dashboard — customer-statistic counts orders, not customers".
    */
   customerStatistic(range: StatisticRange): Observable<StatisticList> {
     return this.crudService.post(`${CHECKOUT_STATISTIC_BASE}/customer-statistic`, range);
   }
 
   /**
-   * Order lines per SKU — `select (null, op.sku, count(o.id)) from OrderProduct … group by op.sku`.
-   *
-   * The SKU, not the product's name, and a count of *orders containing it* rather than units sold: a
-   * ten-unit order counts once. See lessons.md, "Dashboard — product-statistic has no name and no
-   * quantity".
+   * **Units sold per SKU** — `select (null, l.sku, sum(l.quantity)) from OrderLine … group by l.sku`
+   * (`OrderRepository.unitsPerSku`). Since the checkout rewrite a ten-unit order counts ten; the name
+   * is still the SKU, not the product's name. See lessons.md, "Dashboard — product-statistic has no
+   * name and no quantity".
    */
   productStatistic(range: StatisticRange): Observable<StatisticList> {
     return this.crudService.post(`${CHECKOUT_STATISTIC_BASE}/product-statistic`, range);

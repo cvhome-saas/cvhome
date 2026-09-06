@@ -4,83 +4,40 @@ import com.asrevo.cvhome.errors.ErrorCategory;
 import com.asrevo.cvhome.errors.ErrorCode;
 
 /**
- * Error codes owned by the checkout context — carts, orders and the order-placement flow.
+ * Error codes owned by the checkout context. Every code is a decision a client can act on; failures of the services
+ * checkout calls arrive as the typed exceptions of their own {@code -external-api} and are not re-coded here.
  */
 public enum CheckoutErrors implements ErrorCode {
 
-    /**
-     * No cart exists for that code or id in this store.
-     */
+    /** No cart with that code in this store — or the cart's order is closed, so the code is spent. */
     CART_NOT_FOUND("CHECKOUT.CART.NOT_FOUND", ErrorCategory.NOT_FOUND),
 
-    /**
-     * The product cannot be bought — unpublished, or with no inventory configured at all. A rule about the product,
-     * not about the request, hence 422.
-     */
+    /** A checkout was asked for a cart with no lines. */
+    CART_EMPTY("CHECKOUT.CART.EMPTY", ErrorCategory.UNPROCESSABLE),
+
+    /** The cart already became an order that is still open; the cart cannot be edited, only its order resumed. */
+    CART_ALREADY_CONVERTED("CHECKOUT.CART.ALREADY_CONVERTED", ErrorCategory.CONFLICT),
+
+    /** The sku is unknown to the catalog or unstocked in inventory, so it cannot be put in a cart or an order. */
     PRODUCT_NOT_PURCHASABLE("CHECKOUT.CART.PRODUCT_NOT_PURCHASABLE", ErrorCategory.UNPROCESSABLE),
 
-    /**
-     * The quantity asked for is outside the merchant's per-order floor or ceiling for that sku.
-     *
-     * <p>
-     * Its own code rather than {@link #PRODUCT_NOT_PURCHASABLE}: that one means the item is not sellable at all,
-     * so a storefront rightly tells the shopper to give up on it. This one refuses only <em>this amount</em> —
-     * the same shopper buying fewer succeeds — and the message it renders needs the numbers to say so.
-     * </p>
-     */
+    /** The quantity is below the sku's minimum or above its maximum per order. */
     CART_QUANTITY_OUT_OF_RANGE("CHECKOUT.CART.QUANTITY_OUT_OF_RANGE", ErrorCategory.UNPROCESSABLE),
 
-    /**
-     * No order exists with that id in this store — or, when a customer asked, none belonging to them.
-     *
-     * <p>
-     * A customer reaching for another customer's order gets this rather than a 403 deliberately: answering
-     * "forbidden" would confirm the order exists, which is exactly what a caller probing for order ids wants to
-     * learn.
-     * </p>
-     */
+    /** No order with that id or ref in this store — or, for a shopper, none of theirs. */
     ORDER_NOT_FOUND("CHECKOUT.ORDER.NOT_FOUND", ErrorCategory.NOT_FOUND),
 
-    /**
-     * The store requires a logged-in shopper to place or track an order, and the request carried no usable
-     * authentication.
-     */
+    /** The store requires a signed-in shopper to place an order and the request carried none. */
     ORDER_LOGIN_REQUIRED("CHECKOUT.ORDER.LOGIN_REQUIRED", ErrorCategory.UNAUTHENTICATED),
 
-    /**
-     * The token authenticates a shopper of a different store than the one addressed.
-     *
-     * <p>
-     * 403, not the 401 the legacy {@code ServiceRuntimeException} message claimed: the caller <em>is</em>
-     * authenticated, and sending them back to log in again would not change the answer.
-     * </p>
-     */
+    /** The shopper token was minted for another store. */
     ORDER_CLIENT_MISMATCH("CHECKOUT.ORDER.CLIENT_MISMATCH", ErrorCategory.FORBIDDEN),
 
-    /**
-     * The customer on the order could neither be found nor created, so there is nobody to place it for.
-     */
-    ORDER_CUSTOMER_UNRESOLVED("CHECKOUT.ORDER.CUSTOMER_UNRESOLVED", ErrorCategory.UNPROCESSABLE),
+    /** The requested status change is not legal from the order's current state. */
+    ORDER_ILLEGAL_TRANSITION("CHECKOUT.ORDER.ILLEGAL_TRANSITION", ErrorCategory.CONFLICT),
 
-    /**
-     * A cart line references a product whose price the catalog did not return, so no order line can be priced.
-     */
-    ORDER_PRODUCT_PRICE_MISSING("CHECKOUT.ORDER_PRODUCT.PRICE_MISSING", ErrorCategory.CONVERSION),
-
-    /**
-     * A cart line could not be turned into an order line.
-     */
-    ORDER_PRODUCT_NOT_CONVERTIBLE("CHECKOUT.ORDER_PRODUCT.NOT_CONVERTIBLE", ErrorCategory.CONVERSION),
-
-    /**
-     * An order could not be assembled from the submitted payload.
-     */
-    ORDER_NOT_CONVERTIBLE("CHECKOUT.ORDER.NOT_CONVERTIBLE", ErrorCategory.CONVERSION),
-
-    /**
-     * An amount could not be rendered in the store's currency.
-     */
-    PRICE_NOT_FORMATTABLE("CHECKOUT.PRICE.NOT_FORMATTABLE", ErrorCategory.CONVERSION);
+    /** A money amount could not be rendered in the store's currency. */
+    PRICE_NOT_FORMATTABLE("CHECKOUT.PRICE.NOT_FORMATTABLE", ErrorCategory.INTERNAL);
 
     private final String code;
 

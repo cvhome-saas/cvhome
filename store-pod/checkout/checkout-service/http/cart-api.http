@@ -1,0 +1,66 @@
+# CartApi — com.asrevo.cvhome.checkout.api.v1.cart.CartApi
+#
+# Public: the cart code the browser holds is the whole credential; `store` is the tenant boundary. Address it the
+# way the storefront does, through the pod gateway (spg), never the service port. Prices come live from inventory
+# on every read, so a line's `finalPrice` can change between two GETs.
+#
+# Shared vars: repo-root http-client.env.json. Run "create a cart" first — its handler stores the code in
+# {{CART_CODE}} for the requests below.
+#
+# Requires a running stack: lcl start -d
+
+### create a cart with one line — 201, the cart in the storefront's shape
+POST {{SPG_URL}}/checkout/api/v1/cart?store={{STORE_ID}}&lang={{LANG}}
+Content-Type: application/json
+
+{
+  "product": "SKU-NK-RUN-001",
+  "quantity": 1
+}
+
+> {% client.global.set("CART_CODE", response.body.code); %}
+
+### read it back
+GET {{SPG_URL}}/checkout/api/v1/cart/{{CART_CODE}}?store={{STORE_ID}}&lang={{LANG}}
+
+### set a line to an absolute quantity (adds the sku if new)
+PUT {{SPG_URL}}/checkout/api/v1/cart/{{CART_CODE}}?store={{STORE_ID}}&lang={{LANG}}
+Content-Type: application/json
+
+{
+  "product": "SKU-ZR-CL-DRS02",
+  "quantity": 2
+}
+
+### quantity 0 removes the line
+PUT {{SPG_URL}}/checkout/api/v1/cart/{{CART_CODE}}?store={{STORE_ID}}&lang={{LANG}}
+Content-Type: application/json
+
+{
+  "product": "SKU-ZR-CL-DRS02",
+  "quantity": 0
+}
+
+### remove a line — 204 (add &body=true to get the remaining cart back instead)
+DELETE {{SPG_URL}}/checkout/api/v1/cart/{{CART_CODE}}/product/SKU-NK-RUN-001?store={{STORE_ID}}&lang={{LANG}}&body=true
+
+### an unknown sku — 422 CHECKOUT.CART.PRODUCT_NOT_PURCHASABLE
+POST {{SPG_URL}}/checkout/api/v1/cart?store={{STORE_ID}}&lang={{LANG}}
+Content-Type: application/json
+
+{
+  "product": "SKU-DOES-NOT-EXIST",
+  "quantity": 1
+}
+
+### above the sku's per-order maximum (SKU-NK-RUN-001 allows 1) — 422 CHECKOUT.CART.QUANTITY_OUT_OF_RANGE
+POST {{SPG_URL}}/checkout/api/v1/cart?store={{STORE_ID}}&lang={{LANG}}
+Content-Type: application/json
+
+{
+  "product": "SKU-NK-RUN-001",
+  "quantity": 5
+}
+
+### the same code from another store — 404 CHECKOUT.CART.NOT_FOUND (tenant isolation)
+GET {{SPG_URL}}/checkout/api/v1/cart/{{CART_CODE}}?store={{STORE_ID_2}}&lang={{LANG}}

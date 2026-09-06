@@ -1,5 +1,5 @@
 import {Injectable, inject} from '@angular/core';
-import {Observable} from 'rxjs';
+import {Observable, map, switchMap} from 'rxjs';
 
 import {CrudService} from '@cvhome-saas/ui-kit';
 import type {PageRequest, PageT} from '@cvhome-saas/ui-kit';
@@ -9,7 +9,6 @@ import type {
   ReadableCountry,
   ReadableOrder,
   ReadableOrderStatusHistory,
-  ReadableZone,
 } from '@models/checkout';
 
 /** The filters `OrderApi.list` accepts. All optional; omitted means unfiltered. */
@@ -27,6 +26,8 @@ export interface OrderQuery extends PageRequest {
    * `OrderRepository` all along and bound to no request parameter until the customers module.
    */
   readonly customerId?: number;
+  /** The exact `orderRef` — the value a payment transaction carries as `requestRef`. */
+  readonly ref?: string;
 }
 
 const CHECKOUT_API_BASE = '/spg/checkout/api/v1';
@@ -62,6 +63,24 @@ export class OrdersService {
     return this.crudService.get(`${CHECKOUT_API_BASE}/private/orders`, {...query});
   }
 
+  /**
+   * The one order behind an `orderRef`, or an error when the store has none — what a payments row
+   * needs, since payment holds the ref and not the id. Two reads: the list filtered by `ref` finds
+   * the id, and only the detail endpoint carries `products` and `customer`.
+   */
+  byRef(ref: string): Observable<ReadableOrder> {
+    return this.list({ref, page: 0, count: 1}).pipe(
+      map((page) => {
+        const id = page.content[0]?.id;
+        if (id === undefined) {
+          throw new Error(`No order with ref ${ref}`);
+        }
+        return id;
+      }),
+      switchMap((id) => this.get(id)),
+    );
+  }
+
   get(orderId: number | string): Observable<ReadableOrder> {
     return this.crudService.get(`${CHECKOUT_API_BASE}/private/orders/${orderId}`);
   }
@@ -84,9 +103,5 @@ export class OrdersService {
   /** Reference data. Orders carry ISO codes; these are what turn `DE` into `Germany`. */
   countries(): Observable<ReadableCountry[]> {
     return this.crudService.get(`${CHECKOUT_API_BASE}/country`);
-  }
-
-  zones(countryCode: string): Observable<ReadableZone[]> {
-    return this.crudService.get(`${CHECKOUT_API_BASE}/zones`, {code: countryCode});
   }
 }

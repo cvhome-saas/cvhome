@@ -15,9 +15,27 @@ spring:
             scope: store_pod
   sql:
     init:
-      schema-locations: classpath:init-sql/schema.sql
+      # drop-legacy.sql first: the pre-rewrite tables, dropped once; a no-op on every later boot.
+      schema-locations: classpath:init-sql/drop-legacy.sql, classpath:init-sql/schema.sql
       data-locations: classpath:init-sql/data-common.sql
   jpa:
     properties:
       hibernate:
         default_schema: ${spring.application.name}
+
+checkout:
+  placement:
+    expiry:
+      stripe: 30m
+      paypal: 30m
+      manual-transfer: 48h
+      processing-grace: 24h
+      cod-payment-expiry: 30d
+  recovery:
+    interval: 30s
+    stale-after: 60s
+    batch-size: 50
+    max-attempts: 10
+  expiry:
+    interval: 60s
+    batch-size: 50

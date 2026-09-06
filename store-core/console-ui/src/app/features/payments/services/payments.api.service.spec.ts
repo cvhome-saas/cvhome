@@ -76,6 +76,11 @@ class FakeOrdersService {
     this.loaded.push(orderId);
     return of({id: Number(orderId)});
   }
+
+  byRef(ref: string): Observable<ReadableOrder> {
+    this.loaded.push(ref);
+    return of({id: 4187, orderRef: ref});
+  }
 }
 
 function query(overrides: Partial<PaymentsQuery> = {}): PaymentsQuery {
@@ -288,7 +293,7 @@ describe('PaymentsApi', () => {
 
   /* The detail endpoint, not the list: only it populates `products` and `customer`. */
   it('reads the order behind a transaction for the summary', () => {
-    api.loadOrder(10482).subscribe();
+    api.loadOrder({id: 10482, ref: null}).subscribe();
     expect(orders.loaded).toEqual([10482]);
   });
 });

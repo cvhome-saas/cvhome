@@ -6,7 +6,7 @@ import {NOTIFICATION_PORT} from '@cvhome-saas/ui-kit';
 import {ConsoleApi} from '@layouts/console-shell/services/console.api.service';
 import type {ReadableOrder} from '@models/checkout';
 import type {PaymentStatus} from '@models/payment';
-import type {TransactionRow, TransactionsSnapshot} from '@models/transactions';
+import type {OrderKey, TransactionRow, TransactionsSnapshot} from '@models/transactions';
 import {CONSOLE_STORES_FAKE, FakeConsoleApi} from '@testing/console-api.fake';
 import {translocoTesting} from '@testing/transloco-testing';
 import {Payments} from './payments';
@@ -24,6 +24,7 @@ function row(
     internalRef: `ref-${id}`,
     transactionNo: status === 'PAID' ? `ACME-${id}` : null,
     orderId: /^\d+$/.test(requestRef) ? Number(requestRef) : null,
+    orderRef: /^[0-9a-f-]{36}$/.test(requestRef) ? requestRef : null,
     reference: requestRef,
     paymentType,
     status,
@@ -48,7 +49,7 @@ class FakePaymentsApi {
   readonly requests: PaymentsQuery[] = [];
   readonly approvals: {ref: string; transactionNo: string}[] = [];
   readonly rejections: string[] = [];
-  readonly orderLoads: number[] = [];
+  readonly orderLoads: OrderKey[] = [];
   /** When set, list requests hang until `resolve()` — used to observe the loading state. */
   pending: Subject<TransactionsSnapshot> | null = null;
   failure = false;
@@ -64,10 +65,11 @@ class FakePaymentsApi {
     return this.pending ?? of(this.snapshot(query));
   }
 
-  loadOrder(orderId: number): Observable<ReadableOrder> {
-    this.orderLoads.push(orderId);
+  loadOrder(key: OrderKey): Observable<ReadableOrder> {
+    this.orderLoads.push(key);
     return of({
-      id: orderId,
+      id: key.id ?? 4187,
+      orderRef: key.ref ?? undefined,
       orderStatus: 'PROCESSING' as const,
       currency: 'SAR',
       datePurchased: '2026-08-18T09:00:00Z',
@@ -273,7 +275,7 @@ describe('Payments', () => {
     settle();
 
     expect(router.navigate).not.toHaveBeenCalled();
-    expect(api.orderLoads).toEqual([10481]);
+    expect(api.orderLoads).toEqual([{id: 10481, ref: null}]);
 
     const dialog = element.querySelector<HTMLDialogElement>('dialog.summary')!;
     expect(dialog.open).toBe(true);
@@ -467,7 +469,7 @@ describe('Payments', () => {
 
     const dialog = element.querySelector<HTMLDialogElement>('dialog.confirm')!;
     expect(dialog.open).toBe(true);
-    expect(dialog.textContent).toContain('The order does not change status');
+    expect(dialog.textContent).toContain('cancels the order and releases its stock');
     expect(api.rejections).toEqual([]);
 
     dialog.querySelector<HTMLButtonElement>('button[type="submit"]')!.click();

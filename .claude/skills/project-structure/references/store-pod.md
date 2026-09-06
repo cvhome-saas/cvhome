@@ -16,7 +16,7 @@ store-pod/
 │                                              media, store appearance, home sections)
 ├── content-deprecated/           —            the previous content service, kept as reference only (unregistered)
 ├── catalog/                      BE    :8122  products & categories
-├── checkout/                     BE    :8123  cart, orders, customers
+├── checkout/                     BE    :8123  cart, orders (durable placement, event ledger), customers
 ├── payment/                      BE    :8125  payment gateways & webhooks
 └── commons/                                   pod-shared libraries (grouping folder)
     ├── store-commons/                         pod-scoped shared domain
@@ -130,9 +130,23 @@ APIs under `api/v1/`: `ProductApi`, `CategoryApi`, `ProductInventoryApi`, `Produ
 
 ### `checkout` — cart, orders, customers
 
-APIs under `api/order/v1/` and `v2/`: `ShoppingCartApi`, `OrderApi`, `CustomerOrderApi`, `ExternalOrderApi`,
-`OrderStatusHistoryApi`, `CustomerApi`, `ReferencesApi`, and `v2/statistic/` (`OrderStatisticApi`,
-`ProductStatisticApi`, `CustomerStatisticApi`). Note the mixed API versioning — statistics are `v2`.
+Rewritten 2026-09 in the `catalog`/`inventory` shape: flat `entity/`, `repositories/`, `services/<domain>/{XService,
+XServiceImpl, XMapper}`, no facades or populators. The `Order` entity is the aggregate: every transition is a method
+(`reserved`, `paymentPending`, `applyPaymentSignal`, `fulfil`, `cancel`, …) that checks the current state, moves the
+three statuses and the `pendingAction` together under `@Version`, and appends a `sales_order_event` row. Placement
+(`OrderPlacementService` + `OrderStepRunner`) commits the order row first, then runs each remote step — reserve,
+initiate payment, commit — outside a transaction and applies the answer in its own; a crash leaves a `PendingAction`
+that `OrderRecoveryJob` finishes, and `OrderExpiryJob` cancels unpaid orders past their window after asking payment
+once. Customers (`customer_account`) and the JDK-backed country list live here; the former `commons/customer-core`
+and `commons/reference-core` modules are gone.
+
+APIs under `api/v1/` and `api/v2/`: `cart/CartApi` (public), `order/CheckoutApi` (`POST /cart/{code}/checkout`,
+`GET /order/{id}/status`), `order/OrderApi` (console list/detail/history + the one write, `POST …/history`, which
+is a guarded transition — 409 when illegal), `order/ExternalOrderSignalApi` (`POST /private/orders/{ref}/signals/
+payment|reservation-expired`, `STORE-POD.CHECKOUT.SIGNAL`), `customer/CustomerApi` (shopper, `STORE-POD.CUSTOMER.*`),
+`customer/CustomerAdminApi`, `reference/CountryApi`, `v2/statistic/StatisticApi`. Payment and inventory call the
+signal API through `checkout-external-api`'s `ExternalOrderSignalService`; both signals are idempotent and answer
+`APPLIED` / `DUPLICATE` / `IGNORED`, never a 4xx for a state the order cannot use.
 
 ### `payment` — gateways & webhooks
 
@@ -141,8 +155,9 @@ APIs under `api/order/v1/` and `v2/`: `ShoppingCartApi`, `OrderApi`, `CustomerOr
 `ExternalPaymentGatewayApi`. Stripe is the integrated provider.
 
 This is the one pod using the **transactional outbox**: the `Transaction` aggregate registers
-`PaymentPaidEvent` / `PaymentFailedEvent` / `PaymentCanceledEvent`, and `PaymentOutboxHandler` /
-`WebhookOutboxHandler` push the resulting status to checkout asynchronously. See `events-outbox.md`.
+`PaymentPaidEvent` / `PaymentFailedEvent` / `PaymentCanceledEvent` / `PaymentRejectedEvent`, and
+`PaymentOutboxHandler` / `WebhookOutboxHandler` push the resulting status to checkout's signal API asynchronously.
+See `events-outbox.md`.
 
 ## Pods that break the pattern
 
@@ -188,5 +203,5 @@ hand; `gateways-and-local-domains.md` has both edges' routing tables and the loc
 | Module | Role |
 |---|---|
 | `store-commons` (`:store-pod:commons:store-commons`) | Pod-scoped shared domain — consumed by essentially every pod module. **Not** the root `store-commons/`; see `shared-libraries.md`. |
-| `reference/{reference-commons, reference-core}` | Reference data: countries, zones, currencies, languages. |
-| `customer/{customer-commons, customer-core}` | Customer domain shared between checkout and cua. |
+| `reference/reference-commons` | Reference DTOs (`ReadableCountry`, addresses, units). `reference-core` was retired with the checkout rewrite; countries now come from the JDK. |
+| `customer/customer-commons` | Customer DTOs (`ReadableCustomer`, `CustomerAddress`) both frontends read. The `Customer` entity lives in `checkout-core` since the rewrite. |

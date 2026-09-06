@@ -139,10 +139,13 @@ export class Payments {
    * surprise, and the route change is the operator choosing to leave.
    */
   protected openFullOrder(): void {
+    // A row keyed by ref only knows its numeric id once the summary has loaded; the order page is
+    // addressed by id, so without one there is nowhere to go yet.
     const pending = this.facade.summaryFor();
-    if (pending) {
+    const id = pending?.key.id ?? this.facade.summary()?.id ?? null;
+    if (pending && id !== null) {
       this.facade.closeOrderSummary();
-      void this.router.navigate(['/orders', pending.id]);
+      void this.router.navigate(['/orders', id]);
     }
   }
 

@@ -3,7 +3,8 @@ package com.asrevo.cvhome.payment.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.asrevo.cvhome.checkout.services.order.ExternalOrderService;
+import com.asrevo.cvhome.checkout.api.errors.CheckoutApiErrors;
+import com.asrevo.cvhome.checkout.services.order.ExternalOrderSignalService;
 import com.asrevo.cvhome.errors.remote.RemoteErrorCatalog;
 import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
 import com.asrevo.cvhome.s2s.config.internal.RestClientBuilder;
@@ -22,9 +23,9 @@ public class ClientsConfig {
     }
 
     @Bean
-    public ExternalOrderService externalOrderService(RestClientBuilder restClientBuilder) {
-        return restClientBuilder.buildClient(CHECKOUT_SERVICE_NAME,
-                ExternalOrderService.class, RemoteErrorCatalog.none());
+    public ExternalOrderSignalService externalOrderSignalService(RestClientBuilder restClientBuilder) {
+        return restClientBuilder.buildClient(CHECKOUT_SERVICE_NAME, ExternalOrderSignalService.class,
+                CheckoutApiErrors.CATALOG);
     }
 
 }

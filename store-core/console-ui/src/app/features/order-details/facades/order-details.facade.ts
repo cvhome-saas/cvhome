@@ -341,7 +341,7 @@ export class OrderDetailsFacade {
     }
     return [
       {labelKey: 'orderDetails.flag.paymentStatus', value: this.statusLabels.label(order.paymentStatus)},
-      {labelKey: 'orderDetails.flag.reservationStatus', value: this.statusLabels.label(order.reservationStatus)},
+      {labelKey: 'orderDetails.flag.reservationStatus', value: this.statusLabels.label(order.inventoryStatus)},
       {labelKey: 'orderDetails.flag.customerAgreed', value: this.yesNo(order.customerAgreed)},
       {labelKey: 'orderDetails.flag.confirmedAddress', value: this.yesNo(order.confirmedAddress)},
     ];
@@ -351,6 +351,18 @@ export class OrderDetailsFacade {
   readonly isCancelled = computed(() => {
     const status = this.order()?.orderStatus;
     return status === 'CANCELLED' || status === 'RETURNED';
+  });
+
+  /**
+   * Why automation could not finish this order, or null when it did.
+   *
+   * Checkout sets `needsAttention` when a person has to act — paid after a cancel (refund), stock
+   * released before the commit, a recovery that gave up — and says why in `attentionReason`. The
+   * reason is the server's own sentence, shown as-is: it is diagnostic, not copy.
+   */
+  readonly attention = computed<string | null>(() => {
+    const order = this.order();
+    return order?.needsAttention ? (order.attentionReason?.trim() || '—') : null;
   });
 
   /**

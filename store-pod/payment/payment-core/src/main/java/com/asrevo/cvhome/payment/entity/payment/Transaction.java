@@ -25,6 +25,7 @@ import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.payment.model.payment.event.payment.PaymentCanceledEvent;
 import com.asrevo.cvhome.payment.model.payment.event.payment.PaymentFailedEvent;
 import com.asrevo.cvhome.payment.model.payment.event.payment.PaymentPaidEvent;
+import com.asrevo.cvhome.payment.model.payment.event.payment.PaymentRejectedEvent;
 import com.asrevo.cvhome.store.core.constants.SchemaConstant;
 import com.asrevo.cvhome.store.core.converter.CurrencyCodeConverter;
 import com.asrevo.cvhome.store.core.entity.common.PaymentStatus;
@@ -131,6 +132,12 @@ public class Transaction extends SalesManagerEntity<Long, Transaction> implement
     public Transaction failed() {
         this.status = PaymentStatus.FAILED;
         this.registerEvent(PaymentFailedEvent.from(this.internalRef, this.requestRef, this.storeMerchantId.getId()));
+        return this;
+    }
+
+    public Transaction rejected() {
+        this.status = PaymentStatus.REJECTED;
+        this.registerEvent(PaymentRejectedEvent.from(this.internalRef, this.requestRef, this.storeMerchantId.getId()));
         return this;
     }
 

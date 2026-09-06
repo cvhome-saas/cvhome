@@ -10,6 +10,7 @@ import type {PaymentStatus} from '@models/payment';
 import {PAYMENT_TYPE_LABEL_KEY, isPaymentType} from '@models/store-settings';
 import {parseAmount, type ReadableOrder} from '@models/checkout';
 import {
+  type OrderKey,
   PAYMENT_TABS,
   TRANSACTION_TONE,
   type OrderSummary,
@@ -309,11 +310,11 @@ export class PaymentsFacade {
   /* ------------------------------------------------------------- the order summary ---- */
 
   /** The order whose summary is open, or null. Drives both the fetch and the dialog. */
-  readonly summaryFor = signal<{id: number; reference: string} | null>(null);
+  readonly summaryFor = signal<{key: OrderKey; reference: string} | null>(null);
 
   private readonly orderSummary = snapshot(
-    () => this.summaryFor()?.id,
-    (orderId) => this.api.loadOrder(orderId),
+    () => this.summaryFor()?.key,
+    (key) => this.api.loadOrder(key),
   );
 
   readonly summaryLoading = this.orderSummary.isLoading;
@@ -337,7 +338,9 @@ export class PaymentsFacade {
 
   openOrderSummary(row: TransactionRow): void {
     if (row.orderId !== null) {
-      this.summaryFor.set({id: row.orderId, reference: `#${row.orderId}`});
+      this.summaryFor.set({key: {id: row.orderId, ref: null}, reference: `#${row.orderId}`});
+    } else if (row.orderRef !== null) {
+      this.summaryFor.set({key: {id: null, ref: row.orderRef}, reference: shortRef(row.orderRef)});
     }
   }
 
@@ -485,4 +488,9 @@ function flagFor(count: number | null | undefined, whenSome: string, whenNone: s
     return 'payments.kpi.unavailable';
   }
   return count > 0 ? whenSome : whenNone;
+}
+
+/** The first block of a UUID — enough to recognise the ref in the ledger, short enough for a title. */
+function shortRef(ref: string): string {
+  return ref.slice(0, 8);
 }

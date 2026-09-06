@@ -1,246 +1,483 @@
 # QA — checkout (`store-pod/checkout/checkout-service`)
 
-Checkout is where a shopper's intent becomes an order: the cart, the customer, the order and its status
-history, and the statistics the console reports on. It owns no product copy and no stock — it **composes**
-[catalog](../../../catalog/catalog-service/qa/catalog-qa.md) and
-[inventory](../../../inventory/inventory-service/qa/inventory-qa.md) for every cart line, and holds stock through
-inventory's reservations while the shopper pays.
+Checkout owns the shopper's **cart**, turns it into an **order**, and keeps that order tracked to a final state:
+every status change is a method on one aggregate, every inbound signal from payment or inventory lands in an
+append-only ledger, and two jobs finish what a request could not. It also owns the store's **customers** and the
+console's order statistics.
 
-- **Scope** — `ShoppingCartApi`, `OrderApi` / `CustomerOrderApi` / `ExternalOrderApi`, `OrderStatusHistoryApi`,
-  `CustomerApi`, `ReferencesApi` and the v2 statistics APIs; the composition of catalog + inventory; the
-  reserve → commit → release cycle
-- **Runs on** — `lcl start -d --stack <name>`; read the live port from `lcl urls`. Address it through an edge,
+- **Scope** — `CartApi` (public), `CheckoutApi` (placement + the payment-return status read), `OrderApi` /
+  `CustomerAdminApi` / `StatisticApi` (console), `CustomerApi` (shopper), `ExternalOrderSignalApi` (payment and
+  inventory calling in), `CountryApi`, the recovery and expiry jobs
+- **Runs on** — `lcl start -d --stack <name>`; read the live ports from `lcl urls`. Address it through the pod
+  gateway (`http://spg-507f1f77.gateway.com/checkout/…`) or the platform gateway (`gateway.com:8000/spg/checkout/…`),
   never `:8123`
-- **Cases** — 19 (2 verified, 0 unit only, 17 not verified)
-- **Also see** — catalog and inventory (the two services it composes),
-  [payment](../../../payment/payment-service/qa/payment-qa.md) (which takes the money),
-  [landing-ui](../../../landing-ui/qa/landing-ui-qa.md) (the shopper's screens),
-  [content](../../../content/content-service/qa/content-qa.md) (the TERMS policy the agreement reads)
+- **Cases** — 48 (37 verified end to end or in part, 11 unit only, 0 not verified)
+- **Also see** — [payment](../../payment/payment-service/qa/payment-qa.md) (the transactions and the approve /
+  reject that drive the signals), [inventory](../../inventory/inventory-service/qa/inventory-qa.md) (the
+  reservation that placement takes and expiry releases), [landing-ui](../../landing-ui/qa/landing-ui-qa.md) (the
+  storefront screens), [console-ui](../../../store-core/console-ui/qa/console-ui-qa.md) (the orders and customers
+  screens)
+- **Runnable requests** — `../http/*.http`, one file per `*Api` class; the shopper and s2s bearers they need are
+  described in `checkout-api.http` and `external-order-signal-api.http`
 
 Each case is tagged:
 
 - **[verified]** — run against a running stack and passed.
-- **[unit only]** — covered by the named test; nobody drove it through the stack.
+- **[unit only]** — the branch is covered by the named unit or integration test, but nobody drove it through the stack.
 - **[not verified]** — never run end to end by anyone.
+
+Sections [REG](#reg--regression-watchlist) and [99](#99--known-gaps) are the highest-value reading.
 
 ---
 
 ## 00 — Before you start
 
-**Shared prerequisites** — starting the stack, the demo logins, the seeded org/store/pod ids, gateway-vs-pod
-addressing and the `psql` idiom are in
-[`references/qa-testing.md`](../../../../.claude/skills/project-structure/references/qa-testing.md) §§1–5. Only
-what is specific to checkout is below.
+**Shared prerequisites** — starting the stack, the demo logins, the seeded ids and the `psql` idiom are in
+[`references/qa-testing.md`](../../../../.claude/skills/project-structure/references/qa-testing.md) §§1–5.
+Everything below is specific to checkout.
 
-Shop as `user` / `revo` at `http://org1-store1.spg-507f1f77.gateway.com` — the storefront account is scoped per
-store and **only authenticates through the store host**.
+**Nothing is seeded.** `init-sql/data-test-stores.sql` primes the id generators only; every cart, customer and
+order in these cases is made by the case itself. That is deliberate — a placement that works from an empty schema
+is the thing being proved.
 
-> **A stale cart survives a container restart and then fails every add-to-cart** with
-> `CHECKOUT.CART.NOT_FOUND`. Clear the `cart` keys in `localStorage` — this is the single most common
-> false alarm on this service.
+**The first boot drops the old schema.** `init-sql/drop-legacy.sql` removes the pre-rewrite `orders`,
+`shopping_cart`, `customer`, `country` … tables once; on a database that ran the old service you will see them go.
+It is a no-op afterwards.
+
+**Store 1 requires a signed-in shopper**; sign in on the storefront as `user` / `revo`. For the `.http` files copy the
+access token from the storefront's `sessionStorage` (`auth-tokens`) into `SHOPPER_TOKEN`.
 
 ### Looking at the truth underneath
 
 ```bash
+# the order and what it still owes
 docker exec cvhome-postgres-1 psql -U postgres -d cvhome -c \
-  "select id, store_merchant_id, customer_id, status, total, created_date
-     from checkout.orders order by created_date desc limit 10;"
-... "select * from checkout.order_product where order_id=<id>;"
-... "select ref, status, expire_at from inventory.product_reservation order by id desc limit 10;"
+  "select order_id, order_ref, order_status, payment_status, inventory_status, pending_action,
+          pending_action_attempts, needs_attention, attention_reason, expires_at
+     from checkout.sales_order order by order_id desc limit 10;"
+
+# the ledger — every transition and every signal, including the ones that changed nothing
+... "select event_type, source, source_ref, outcome, order_status_after, payment_status_after,
+            inventory_status_after, pending_action_after, reason, occurred_at
+       from checkout.sales_order_event where order_id = <id> order by occurred_at, event_id;"
+
+# the trail the console and the shopper see
+... "select status, comments, actor, date_added from checkout.sales_order_history where order_id = <id> order by date_added;"
+
+# the cart's fate
+... "select cart_code, status, order_id from checkout.cart order by cart_id desc limit 5;"
 ```
 
-Logs: `.lcl/<stack>/logs/checkout.log`. An `Unhandled failure [traceId=…]` line is a defect regardless of what
-the screen showed.
+Logs: `.lcl/<stack>/logs/checkout.log`. The two jobs log at INFO when they act (`Order N was paid after all`,
+`recovery attempt failed, will retry`) and at ERROR when recovery gives up.
+
+Timings that matter for QA, all in `application.yml` under `checkout.*` and overridable per stack through
+`SPRING_APPLICATION_JSON`: card orders expire after **30 min**, manual transfers after **48 h**, COD never; the
+recovery job runs every **30 s** over actions untouched for **60 s**; the expiry job every **60 s**.
 
 ---
 
-## CHK — Composing catalog and inventory
+## CART — The cart
 
-_From `qa/catalog-and-inventory.md` §CHK._
+Public and keyed by the code the browser holds (`localStorage` `seller-ui-cart-data`). Prices are never stored:
+every read re-prices from inventory, and a line the catalog or inventory no longer knows is dropped on read.
 
-`ProductDetailsComposer` (checkout-core) calls catalog's `detailed-product` and inventory's bulk read for one
-sku and hands the cart and order code a `(product, inventory)` pair.
+### CART-01 — Add, change, remove, read · critical · [verified via API — browser drawer not verified]
 
-### CHK-01 — Add to cart shows catalog copy and inventory price · critical · [verified]
+- **Steps** — on the storefront add a product, open the cart drawer, raise the quantity, add a second product,
+  remove the first.
+- **Expect** — the drawer follows every step; `subtotal`/`total` and the `displaySubTotal` strings agree with the
+  product prices; `checkout.cart_line` holds sku + quantity only.
 
-- **Steps** — `POST /checkout/api/v1/cart?store=…&lang=en` with `{"product": "SKU-NK-RUN-001", "quantity": 1}`.
-- **Expect** — the cart line with the product's name and image from catalog and `displayTotal` `SAR750.00`
-  from inventory (or 608 while the special is on — the cart charges `finalPrice`).
+### CART-02 — A quantity outside the sku's bounds is refused with the bounds · high · [verified]
 
-### CHK-02 — A sku with no inventory cannot be added · critical · [not verified]
+- **Steps** — `SKU-NK-RUN-001` is capped at 1 per order; ask for 2 (`cart-api.http`, "above the maximum").
+- **Expect** — `422 CHECKOUT.CART.QUANTITY_OUT_OF_RANGE` with `params.minimum` / `params.maximum`; the storefront
+  renders the message from the params, not a generic failure.
 
-- **Steps** — add PRD-01's sku (catalog only, no inventory row).
-- **Expect** — refused with checkout's `ProductNotPurchasableException` code; the same for `available: false`
-  or `quantity: 0` in inventory. The composer treats a missing sku as *not stocked* — never a 500.
+### CART-03 — An unknown or unpurchasable sku · high · [verified]
 
-### CHK-03 — A cart line whose product lost its price is dropped · high · [not verified]
+- **Expect** — `422 CHECKOUT.CART.PRODUCT_NOT_PURCHASABLE`, `params.sku` naming it.
 
-- **Steps** — add a product, then delete its inventory rows by SQL, then read the cart.
-- **Expect** — the cart is rebuilt without that line (checkout marks the item obsolete). Before the rewrite
-  this was a NullPointerException.
+### CART-04 — Another store cannot read the cart · critical · [verified]
 
-### CHK-04 — Catalog down · critical · [not verified]
+- **Steps** — `GET /cart/{code}?store=<store 2>`.
+- **Expect** — `404 CHECKOUT.CART.NOT_FOUND`. Never the cart.
 
-- **Steps** — stop catalog, add to cart.
-- **Expect** — a typed remote failure from checkout, not a 500 with a stack trace; the storefront's cart
-  page reports it. Inventory down: the same, with `INVENTORY.*` codes.
+### CART-05 — A converted cart is read-only while its order is open, and gone once it closes · high · [verified]
 
-### CHK-05 — Placing an order reserves, then commits · critical · [not verified]
+`CartServiceImplTest.aConvertedCartWithAnOpenOrderIsReadOnly`, `…WhoseOrderClosedIsSpent`;
+`CheckoutApiIntegrationTest.aClosedOrdersCartIsSpent`.
 
-- **Steps** — a full storefront checkout (`qa/billing-per-store-subscriptions.md` has the payment set-up).
-- **Expect** — `inventory.product_reservation` gains a `TEMPORARY_RESERVED` row under the order ref on
-  placement and it becomes `COMPLETED` on payment; the sku's quantity drops by the ordered amount and stays
-  down. A failed payment: `ROLLBACK` and the quantity back.
-
-### CHK-06 — The order records the price it sold at · high · [not verified]
-
-- **Steps** — after CHK-05 with a special price active, read `checkout.order_product_price`.
-- **Expect** — one row per line: `product_price_code base`, `default_price true`, `product_price` = the final
-  price, and the special amount/dates copied when the sale was discounted. Changing the price afterwards does
-  not change the order.
+- **Expect** — `GET` answers the cart with `order: <id>` while the order is open; `PUT`/`DELETE` answer
+  `409 CHECKOUT.CART.ALREADY_CONVERTED`; once the order is CANCELLED or COMPLETED every verb answers 404 and the
+  storefront starts a new cart on the next add.
 
 ---
 
----
+## CUS — Customers
 
-## AGR — The checkout agreement
+One row per (store, cua account), created on the first order and refreshed from every later checkout body. A guest
+checkout keys the row on the lowercased email (`guest:<email>`), so a repeat guest is one customer.
 
-### AGR-01 — The checkout agreement comes from the live TERMS policy · [verified]
+### CUS-01 — The first order creates the customer, the second refreshes it · high · [verified for a guest — signed-in refresh not verified]
 
-- **Steps** — edit the TERMS policy's text, publish a new version, open checkout.
-- **Expect** — the new text. No `agreement` box is consulted.
+- **Steps** — place two orders as `user`, changing the billing city between them; open **Customers** in the console.
+- **Expect** — one row, the newer city, `cua_external_id` = the shopper's `sub` (an account id, not `user`).
 
-- _Was SF-02 in `qa/content-owns-appearance-and-media.md`. The storefront's half is
-  [landing-ui-qa.md](../../../landing-ui/qa/landing-ui-qa.md) LUI-04, and the policy itself is
-  [content-qa.md](../../../content/content-service/qa/content-qa.md) POL-01. All three broke together once: the
-  demo stores seeded a legacy `agreement` box but no TERMS policy, and the agreement now reads only
-  `GET /storefront/policies/TERMS`._
+### CUS-02 — The shopper's profile and order list are theirs alone · critical · [verified in the browser for the own path — the foreign-id 404 is unit only]
 
----
+- **Steps** — as `user`, open the storefront account page; then call `GET /private/customer/{id}/order` with
+  another shopper's order id (`customer-api.http`).
+- **Expect** — the page lists only this shopper's orders; the foreign id answers **404**, never 403. A shopper who
+  has never ordered gets an **empty profile (200)**, not a 404 — the account page renders it as dashes.
 
-## ORD — Orders
+### CUS-03 — A seller cannot use the shopper endpoints and a shopper cannot use the console's · critical · [unit only — `CustomerApiIntegrationTest`]
 
-### ORD-01 — Placing an order reserves stock, then commits it · critical · [not verified]
+- **Expect** — `/private/customer/info` with the console session → 403; `/private/customers` with a shopper
+  token → 403.
 
-- **Setup** — a store with stock, a signed-in shopper, a configured payment provider.
-- **Steps** — place an order through the storefront and watch `inventory.product_reservation`.
-- **Expect** — a reservation appears before payment and is **committed** after it succeeds; stock drops once,
-  not twice. This is CHK-05 from the other side, and the case both services own together.
+### CUS-04 — The console's customer list is one store's · critical · [verified]
 
-### ORD-02 — A failed payment releases the reservation · critical · [not verified]
+- **Steps** — switch the console to store 2.
+- **Expect** — store 1's customers are absent; the filters (`email`, `country`, `name`) narrow within the store.
 
-- **Steps** — place an order with a card the provider declines.
-- **Expect** — the order is not marked paid, the reservation is **released**, and the stock returns. A
-  reservation left held after a refusal silently removes sellable stock — see inventory RES-05.
+### CUS-05 — An unknown country code is refused before anything is written · [unit only]
 
-### ORD-03 — An abandoned order's reservation expires and checkout is told · critical · [not verified]
+`CustomerServiceImplTest.anUnknownCountryIsRefusedBeforeAnythingIsWritten`.
 
-- **Steps** — start an order, stop before paying, wait past the reservation window.
-- **Expect** — inventory's sweep expires the hold and calls `handleReservationExpired`; the order moves to a
-  terminal state rather than sitting payable forever. Inventory's half is RES-06.
-
-### ORD-04 — The order records the price it sold at · high · [not verified]
-
-- **Steps** — place an order, then change the product's price in inventory, then re-read the order.
-- **Expect** — the order still shows the price at the time of sale. An order that re-reads today's price is a
-  bookkeeping defect, not a display bug. (CHK-06 asserts the same from the composition side.)
-
-### ORD-05 — Order status history records every transition with its actor · [not verified]
-
-- **Steps** — move an order through a few states and read `OrderStatusHistoryApi`.
-- **Expect** — one row per transition, each with who or what caused it.
-
-### ORD-06 — The customer's own order list shows only their orders · critical · [not verified]
-
-- **Steps** — as a signed-in shopper, `CustomerOrderApi` list; then as a second shopper in the same store.
-- **Expect** — each sees only their own. A shopper seeing another shopper's order is a customer-data breach,
-  not a scoping bug.
+- **Expect** — `400 CUSTOMER.COUNTRY.UNSUPPORTED`, no customer row, no order.
 
 ---
 
-## SEC — Permissions and tenant isolation
+## PLC — Placement
 
-Every private endpoint carries
-`@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CHECKOUT.*')")` — the customer
-endpoints use `STORE-POD.CUSTOMER.*`.
+The order row is committed **before** the first remote call. Then, one step at a time and each in its own
+transaction: reserve stock → initiate payment → (COD or already paid) commit stock. A refusal closes the order; an
+outage leaves the step owed, and both a resubmit of the same cart and the recovery job pick it up. COD confirms at
+placement and commits at once — the reservation timer could only ever cancel a valid order.
 
-### SEC-01 — Every private endpoint refuses without a session · critical · [not verified]
+### PLC-01 — Cash on delivery · critical · [verified]
 
-- **Steps** — call a sample of `/private/**` order, customer and statistics paths with no token.
-- **Expect** — **401** on each.
+- **Steps** — cart → checkout → COD.
+- **Expect** — success dialog; `sales_order` is `CONFIRMED / PENDING / COMMITTED / NONE`; ledger reads
+  `PLACED, RESERVED, PAYMENT_INITIATED, COMMITTED`; the cart is `CONVERTED`; inventory's stock dropped; a
+  `payment.transaction` exists for the order ref.
 
-### SEC-02 — A moderator can read orders and cannot change them · critical · [not verified]
+### PLC-02 — Manual bank transfer · critical · [verified via API]
 
-- **Steps** — as `org1-store1-moderator`, list orders, then attempt a status change and a customer edit.
-- **Expect** — reads pass, writes are **403**.
+- **Expect** — success dialog, no redirect; `PENDING_PAYMENT / PENDING / RESERVED / NONE`, `expires_at` 48 h out;
+  the transaction waits in the console's Payments screen for approval (PAY-01 in payment's QA).
 
-### SEC-03 — Another store's orders are not reachable · critical · [not verified]
+### PLC-03 — Card (Stripe) · critical · [verified]
 
-- **Steps** — repeat the order list with `?store=` set to org1-store2 and to org2-store1 while holding an
-  org1-store1 session.
-- **Expect** — refused, or an empty page — never another store's rows. Check the order **ids** too: nothing may
-  cross stores through an id in a path or body.
+- **Setup** — the store's Stripe configuration enabled, the `stripe-org1-store1-webhook` listener running.
+- **Steps** — checkout with STRIPE; pay with `4242 4242 4242 4242` on the Stripe page.
+- **Expect** — the storefront navigates to `redirectUrl`; the order sits at `PENDING_PAYMENT` with `expires_at`
+  30 min out until the webhook lands; then `CONFIRMED / PAID / COMMITTED` and a `PAYMENT_SIGNAL` row whose
+  `source_ref` is `<transaction internal ref>:PAID`; the return page shows the paid state.
 
-### SEC-04 — Nothing sensitive in the logs · high · [not verified]
+### PLC-04 — A refused reservation cancels the order and hands the cart back · critical · [unit only]
 
-- **Steps** — run a full cart → order → payment cycle and read the log.
-- **Expect** — no card data, no customer address dumped at INFO, no provider secret.
+- **Setup** — a sku with 1 in stock; two shoppers with it in their carts.
+- **Steps** — both check out.
+- **Expect** — the second gets `422 INVENTORY.RESERVATION.INSUFFICIENT_INVENTORY`; their order row is
+  `CANCELLED / CANCELLED / RESERVATION_FAILED`; their cart is `ACTIVE` again and can be edited and re-ordered.
+
+### PLC-05 — Inventory down: the request fails before any row, and nothing is left behind · critical · [verified]
+
+Placement prices the lines from inventory before it writes the order, so an inventory outage is a 502 with no order
+row at all — there is nothing to resume or recover, and the cart stays `ACTIVE`. The durable path is PLC-06.
+
+- **Steps** — `lcl stop inventory --stack <name>`; check out.
+- **Expect** — `502 COMMON.REMOTE_UNAVAILABLE`; no `sales_order` row for the cart; the cart still `ACTIVE`; after
+  `lcl start inventory` the same cart checks out normally.
+- **Seen** — 502 in ~1 s; cart untouched; the retry placed a fresh order.
+
+### PLC-06 — Payment down: the order row and the reservation survive; a resubmit resumes, recovery finishes · critical · [verified]
+
+- **Steps** — two carts; `lcl stop payment --stack <name>`; check both out; wait 100 s; `lcl start payment`;
+  resubmit the first cart; wait ~95 s for the second.
+- **Expect** — both checkouts answer `502 COMMON.REMOTE_UNAVAILABLE` (`remoteService: payment`); both orders sit at
+  `CREATED / PENDING / RESERVED / INITIATE_PAYMENT` with the stock held; while payment is down the recovery job counts
+  an attempt (`pending_action_attempts = 1`, a `RECOVERY_RETRIED` row) and changes nothing else; the resubmit answers
+  **201 with the same order id** (one row per cart); the untouched order is finished by the job — `PENDING_PAYMENT /
+  RESERVED / NONE` for a transfer, `CONFIRMED / COMMITTED` for COD — and its ledger reads `PLACED, RESERVED,
+  RECOVERY_RETRIED ×n, PAYMENT_INITIATED`; a `payment.transaction` exists for each.
+- **Seen** — exactly that: orders 1006/1007, stock 149 → 147 and held throughout, two `RECOVERY_RETRIED` rows before
+  `PAYMENT_INITIATED`.
+
+### PLC-07 — A refused payment cancels and releases in the same request · critical · [unit only]
+
+`OrderStepRunnerTest.aRefusedPaymentCancelsReleasesTheStockAndIsRethrownAfterwards`;
+`CheckoutApiIntegrationTest.aRefusedPaymentCancelsTheOrderAndReleasesTheStock`.
+
+- **Expect** — `422 PAYMENT.INITIATE.REJECTED`; `CANCELLED / FAILED / RELEASED / NONE`; inventory's stock back.
+  A declined test card at Stripe is a webhook, not an initiate refusal — see SIG-02 for that path.
+
+### PLC-08 — A guest may order where the store allows it, and is refused where it does not · high · [verified]
+
+- **Steps** — store 1 (requires login): checkout signed out → `401 CHECKOUT.ORDER.LOGIN_REQUIRED`. A store with
+  `requireLoginForOrderPlacement` off: checkout signed out → 201, customer row `guest:<email>`.
+
+### PLC-09 — The return page reads the real status, whichever URL it landed on · high · [verified for COD — the card return not verified]
+
+- **Steps** — after a card payment, open `/{lang}/checkout/cancel?orderId=<id>` by hand; after a COD order open
+  `/{lang}/checkout/success?orderId=<id>` by hand.
+- **Expect** — the page still shows the order as paid: it calls `GET /order/{id}/status` and trusts that, not the
+  URL. The redirect link is offered only while `PENDING_PAYMENT`.
+
+### PLC-10 — The status read is owned by the shopper · critical · [verified for the store-2 read — owner scoping not verified]
+
+- **Steps** — read another shopper's `/order/{id}/status` with your token; read it from store 2.
+- **Expect** — 404 both times.
+
+### PLC-11 — The order snapshot survives catalog edits · high · [verified via API — the console detail not verified]
+
+- **Steps** — place an order for a variant product; rename the product and its option value in the console; reopen
+  the order.
+- **Expect** — `sales_order_line.product_name` and `sales_order_line_option` still say what was bought; both the
+  console detail and the storefront order page render the old labels.
+
+### PLC-12 — Money is rendered in the store currency · [verified]
+
+- **Expect** — `price`, `subTotal`, `total.total`, `grandTotal` carry the store's currency symbol and the request
+  locale's formatting; the numbers behind them are on `sales_order_line.unit_price` / `line_total`.
+
+---
+
+## SIG — Signals from payment and inventory
+
+`POST /private/orders/{ref}/signals/payment` and `…/reservation-expired`, `STORE-POD.CHECKOUT.SIGNAL` (the pod's
+own service principal). **A signal is never a 4xx for a state the order cannot use**: it answers `APPLIED`,
+`DUPLICATE` (same transaction ref + status seen before) or `IGNORED` (with the reason), because payment's outbox
+would otherwise retry a decision that will not change. A ref this store never issued is the one 404.
+
+### SIG-01 — Payment approved in the console confirms the order · critical · [verified]
+
+- **Steps** — PLC-02, then **Payments → Approve** in the console.
+- **Expect** — within a few seconds the order is `CONFIRMED / PAID / COMMITTED`; the ledger has a `PAYMENT_SIGNAL`
+  `APPLIED` row keyed `<internal ref>:PAID`, then `COMMITTED`.
+
+### SIG-02 — Payment rejected in the console cancels the order and releases the stock · critical · [verified]
+
+Before the rewrite a rejection told nobody; the order waited forever. `PaymentRejectedEvent` is new.
+
+- **Steps** — PLC-02, then **Payments → Reject**.
+- **Expect** — `CANCELLED / REJECTED / RELEASED`; inventory's quantity back; the shopper's order page shows it
+  cancelled.
+
+### SIG-03 — The same signal twice is a recorded no-op · critical · [verified]
+
+- **Steps** — `external-order-signal-api.http`, "the same signal again".
+- **Expect** — `outcome: DUPLICATE`, statuses unchanged, one more ledger row (`outcome = DUPLICATE`, the key in
+  `payload`).
+
+### SIG-04 — A late failure after a payment is ignored, not applied · critical · [verified]
+
+- **Expect** — `outcome: IGNORED`, `reason: already paid`; the order stays `CONFIRMED / PAID`.
+
+### SIG-05 — Paid after cancellation is recorded and flagged for a refund · critical · [unit only]
+
+`OrderTransitionTest.paidAfterCancellationIsRecordedAndFlaggedForARefund`.
+
+- **Expect** — payment `PAID`, order stays `CANCELLED`, `needs_attention = true`, reason names the refund; a
+  `PAYMENT_AFTER_CLOSE` ledger row. The console detail shows `needsAttention` / `attentionReason`.
+
+### SIG-06 — Only the pod's service principal may signal · critical · [verified]
+
+- **Expect** — a shopper token → 403; the console session → 403; no token → 401; the order untouched.
+
+### SIG-07 — An expired reservation cancels an unpaid order · high · [verified via the signal API]
+
+- **Steps** — place a card order and do not pay; wait for inventory's expiry (`reservation.expiry.minutes`, or
+  post the signal by hand).
+- **Expect** — `CANCELLED / EXPIRED / RELEASED`; a second delivery is `DUPLICATE`.
+
+### SIG-08 — An expiry arriving after payment but before the commit flags the order · high · [unit only]
+
+`OrderTransitionTest.expiringAPaidOrderBeforeItsCommitFlagsIt`.
+
+- **Expect** — inventory `RELEASED`, `needs_attention` with "re-reserve manually"; the order stays `CONFIRMED / PAID`.
+
+### SIG-09 — PROCESSING / WAITING_VERIFICATION keep the order waiting · [unit only]
+
+`OrderTransitionTest.aPaymentInFlightIsRecordedAndTheOrderKeepsWaiting`, `…waitingForVerificationDropsTheExpiryEntirely`.
+
+- **Expect** — `PROCESSING` extends `expires_at` by 24 h; `WAITING_VERIFICATION` clears it, so a merchant looking
+  at a transfer proof is never expired under.
+
+### SIG-10 — A ref this store never issued is 404, and the outbox says so · high · [verified]
+
+- **Expect** — `404 CHECKOUT.ORDER.NOT_FOUND`; on payment's side the outbox record ends `FAILED` with the problem
+  detail in `failure_reason` — the documented place to find a lost signal.
+
+---
+
+## JOB — Recovery and expiry
+
+Both run on every replica with no lock. The claim is the order's `@Version`: two replicas picking the same order
+both try, the second loses and skips, and the remotes are idempotent by ref anyway.
+
+### JOB-01 — Recovery finishes an order stuck on an outage · critical · [verified]
+
+- **Steps** — PLC-05 without the resubmit.
+- **Expect** — after `stale-after` (60 s) the ledger gains `RECOVERY_RETRIED` rows, one per attempt, then the
+  missing step; `pending_action_attempts` counts them.
+
+### JOB-02 — Recovery gives up and flags instead of retrying forever · high · [unit only]
+
+`OrderRecoveryJobTest.afterMaxAttemptsTheOrderIsFlaggedAndNoStepRuns`.
+
+- **Expect** — after `max-attempts` (10) `needs_attention` is set with the attempt count, `pending_action` is kept
+  so a person can see what was owed, and the job stops touching the order.
+
+### JOB-03 — Expiry cancels an unpaid card order · critical · [unit only]
+
+- **Steps** — card order, do not pay; wait past 30 min (or lower `checkout.placement.expiry.stripe` for the stack).
+- **Expect** — `CANCELLED / EXPIRED / RELEASED`, `EXPIRED` then `RELEASED` in the ledger, stock back.
+
+### JOB-04 — A late payment rescues the order instead of expiring it · critical · [unit only]
+
+`OrderJobsIntegrationTest.expiryClosesAnUnpaidCardOrderButSparesOneThatPaymentSaysWasPaid`.
+
+- **Expect** — before cancelling a card order the job asks payment once; `PAID` → the order is confirmed and
+  committed with the gateway ref as the signal key; payment unreachable → nothing is decided this pass.
+
+### JOB-05 — COD and verified transfers never expire · high · [verified for COD]
+
+- **Expect** — a COD order has `expires_at` null from placement; a transfer answered `WAITING_VERIFICATION` has it
+  cleared. Neither is ever selected by the job.
+
+---
+
+## ORD — The console's orders
+
+### ORD-01 — List, filters, newest first · critical · [verified]
+
+- **Expect** — `?name`, `?id`, `?status`, `?phone`, `?email`, `?customerId`, `?ref` (exact `orderRef`) narrow the list; the list rows carry no
+  lines or customer (`products: null`), the detail does; `inventoryStatus` and `redirectUrl` are the field names
+  (the console model was renamed from `reservationStatus` / `redirectUri`).
+
+### ORD-02 — Moving an order forward, and an illegal step · critical · [verified]
+
+- **Steps** — CONFIRMED → PROCESSING → SHIPPED → DELIVERING → DELIVERED; then try DELIVERED again, or COMPLETED
+  from PROCESSING.
+- **Expect** — each legal step answers 201 with the history entry and the actor; an illegal one answers
+  `409 CHECKOUT.ORDER.ILLEGAL_TRANSITION` with `params.from` / `params.to`, and the order does not move. On a COD
+  order `DELIVERED` also sets payment `PAID`.
+
+### ORD-03 — Cancelling from the console · high · [verified]
+
+- **Expect** — a `PENDING_PAYMENT` or `CONFIRMED` order goes `CANCELLED`; a still-reserved one owes `RELEASE`, which
+  runs inline and puts the stock back; a paid one keeps `PAID` and is flagged for a refund; a `SHIPPED` one is
+  refused with 409.
+
+### ORD-04 — Every private endpoint refuses without the seller token · critical · [verified for the no-token case]
+
+- **Expect** — no session → 401; a shopper token → 403; a store **moderator** → 403 (checkout grants
+  `STORE-POD.CHECKOUT.*` to admins only).
+
+### ORD-05 — Another store's seller sees nothing · critical · [verified]
+
+- **Expect** — list empty for a store 1 id, detail / history / transition → 404, and store 1's admin asking for
+  store 2 → 403.
+
+### ORD-06 — Flagged orders are visible · high · [verified]
+
+- **Expect** — `needsAttention` / `attentionReason` on the detail; the console's order page shows a
+  "Needs attention: <reason>" notice above the tracker; `select … where needs_attention` finds them. There is no
+  console list filter yet (99).
 
 ---
 
 ## STA — Statistics
 
-The v2 statistics APIs (`OrderStatisticApi`, `CustomerStatisticApi`, `ProductStatisticApi`) back the console's
-dashboard.
+### STA-01 — Three charts, one store · high · [verified]
 
-### STA-01 — Each statistic answers, scoped to the store · high · [not verified]
+- **Expect** — `order-statistic` = orders per day per status; `customer-statistic` = **distinct customers** per
+  billing country (it used to count orders); `product-statistic` = **units** per sku (it used to count orders). A
+  second store's charts do not include the first's.
 
-- **Steps** — call all three for org1-store1 with some seeded orders, then for a store with none.
-- **Expect** — real numbers for the first, zeroes rather than a 500 for the second, and no row from another
-  store in either.
+### STA-02 — Statistics need the seller token · high · [verified for the no-token case]
 
-### STA-02 — A statistics query is store-scoped in SQL, not just in the response · critical · [not verified]
-
-- **Why it matters** — an aggregate that forgets its `where store_merchant_id = ?` returns a number that looks
-  plausible and is the whole platform's. Check the query, not only the answer: totals for org1-store1 plus
-  org1-store2 must not equal what either reports alone.
+- **Expect** — shopper → 403, none → 401, another store's admin → 403.
 
 ---
 
-## VAR — variant lines through checkout
+## REF — Countries
 
-Added by the variant rework (PR #306). The model is
-[catalog](../../../catalog/catalog-service/qa/catalog-qa.md#var--the-uniform-variant-model).
+### REF-01 — The list is public, ISO-complete and localised · [verified]
 
-### PERF-03 — Cart and listing service-to-service calls · [tests]
+- **Expect** — ~250 entries, `Germany` in `lang=en`, `Allemagne` in `lang=fr`, `zones` always empty (states are
+  free text now); both address forms still load it.
 
-- `ProductDetailsComposer` is batch-only: one catalog call and one inventory call per cart or order, whatever
-  the line count. Covered by `ProductDetailsComposerImplTest`; not re-measured on the running stack here.
+---
+
+## SEC — Secrets and logs
+
+### SEC-01 — Nothing sensitive in the logs · high · [verified]
+
+- **Expect** — `grep -i "authorization\|bearer" .lcl/<stack>/logs/checkout.log` finds nothing; shopper emails
+  appear only in the request path, never in an error message.
+
+### SEC-02 — Every CHECK constraint accepts every enum value · critical · [unit only]
+
+`CheckoutContextIntegrationTest.everyEnumValueIsAcceptedByItsCheckConstraint`. This is the test the old
+service needed: its DDL rejected `EXPIRED` and `CANCELLED`, so expiry and cancel failed at flush.
+
+---
+
+## REG — Regression watchlist
+
+Defects that actually happened in checkout — most in the service this one replaced. Each row is a re-test.
+
+| What broke | How it looked | How to catch it again |
+|---|---|---|
+| **Expiry and cancel failed at flush** | Orders never expired; cancel 500ed with a CHECK violation. | SEC-02; JOB-03; SIG-02. |
+| **An order lost between two remote calls** | Reserved stock, no payment, order stuck `CREATED` forever. | PLC-05, PLC-06, JOB-01 — stop a service mid-placement and watch the order finish anyway. |
+| **A refused payment left the stock held** | Cancelled order, inventory still decremented. | PLC-07: `inventory_status = RELEASED` and the quantity back. |
+| **A rejected transfer told nobody** | Payment `REJECTED`, order `PENDING_PAYMENT` forever. | SIG-02. |
+| **Any JWT could mark an order paid** | The callback had no permission gate. | SIG-06. |
+| **A redelivered webhook applied twice** | The second delivery wrote a second ledger row under the same key and 409ed. | SIG-03 — `DUPLICATE`, not an error. |
+| **A cart handed back after a refusal could not order again** | A unique (store, cart) constraint refused the second order. | PLC-04 — the reopened cart places a new order. |
+| **Customers collided across stores** | The same cua `sub` in two stores found one row. | CUS-04 — two stores, one shopper account, two rows. |
+| **The account page 404ed before the first order** | `CUSTOMER.NOT_FOUND [404]` on My Account for a signed-in shopper with no order yet. | CUS-02 — empty profile, 200. |
+| **Totals rendered without labels** | Two bare amounts under the items — `sales_order_total.title` was empty. | PLC-01 — the order page reads `Subtotal` / `Total`. |
+| **First name blank on the account page** | Every storefront theme read `customer.firstNames`; the API has always sent `firstName`. | CUS-02 — the profile tab shows the first name. |
+| **The console lost the payment ↔ order link** | The order page's Payments card was empty and the ledger's order column was a bare UUID, because the console matched `requestRef` to the numeric order id while the rewrite hands payment the `orderRef`. | ORD-01 detail (Payments card lists the transaction); Payments → order link opens the summary; `GET /private/orders?ref=`. |
+| **The reject dialog promised nothing would happen** | Its copy said the order does not change status; SIG-02 cancels and releases. | SIG-02 — read the dialog. |
+| **Order ids walked by URL** | Another shopper's status read answered 403 (confirming the id) or worse, the order. | PLC-10, CUS-02 — 404, never 403. |
 
 ---
 
 ## 99 — Known gaps
 
-**Checkout has no `http/` directory.** Ten API classes and not one runnable block. That is the cheapest way to
-move most of this file off `[not verified]`, and it is a review-policy violation for the next PR that touches
-an endpoint here.
+Behaviour that is expected today.
 
-**`quantityOrderMaximum` is not enforced.** Inventory records a per-sku minimum and maximum and checkout does
-not read either — see inventory 99.
+**No refund automation.** Payment has no refund API, so "paid after cancellation" and "cancelled after payment" end
+as `needs_attention` orders with a reason, and someone refunds by hand at the provider. The ledger shows exactly
+what happened; nothing is lost, nothing is automatic.
 
-**Inventory has no billing write gate**, so a lapsed store's stock still moves through a checkout even though
-the seller cannot edit the catalog. Deliberate: a suspended store keeps selling.
+**No console filter for flagged orders.** `needsAttention` is on the detail and in the database; a list filter is a
+console change waiting on a product decision about the screen.
 
-**A cart line whose product lost its price is dropped** rather than shown as unavailable (CHK-03). Silently
-losing a line is friendlier than a 500 and worse than saying so.
+**The status read is anonymous for stores that allow guest checkout.** A store that requires login gets the
+owner-scoped 404; a store that does not lets anyone who knows a numeric order id read `{orderStatus,
+paymentStatus}` — the storefront never passes the opaque `orderRef`, and changing that is a landing-ui change.
 
-**`isOrgAdmin` ignores the store it is handed** — see
-[tenancy-qa.md](../../../../store-core/tenancy/tenancy-service/qa/tenancy-qa.md) 99. Checkout is one of the pod
-services that gap affects, so SEC-03 may pass at the query layer and fail at the permission layer.
+**No shipping, no tax.** Totals are `SUBTOTAL` and `TOTAL`, always equal; the codes `SHIPPING` and `TAX` are
+reserved in the CHECK constraint for when they exist.
+
+**Stripe's declined test card is a webhook, not an initiate refusal.** PLC-07's 422 path is reached from the API
+only through a provider that refuses at initiate; with Stripe Checkout a declined card arrives as a `FAILED`
+signal after the redirect (SIG path). Both end the same way.
+
+**Guests collapse on email.** A guest who mistypes their email is a new customer row. Chosen over one row per
+order so the console's customer list stays meaningful for stores that allow guest checkout.
 
 ---
 
-Raise anything unexpected against the checkout PR. Include the store id, the order id or cart ref, the time,
-and the matching `Unhandled failure [traceId=…]` block from `.lcl/<stack>/logs/checkout.log`.
-
----
+Raise anything unexpected against the checkout rewrite PR with the order id, the `sales_order_event` rows for it
+and the matching lines from `.lcl/<stack>/logs/checkout.log` — the ledger is written to answer "what happened to
+this order" without a debugger.

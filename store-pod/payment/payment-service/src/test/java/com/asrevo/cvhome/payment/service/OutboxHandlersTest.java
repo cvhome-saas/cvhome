@@ -7,11 +7,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.asrevo.cvhome.checkout.services.order.ExternalOrderService;
+import com.asrevo.cvhome.checkout.api.errors.CheckoutApiUnavailableException;
+import com.asrevo.cvhome.checkout.model.signal.PaymentSignal;
+import com.asrevo.cvhome.checkout.services.order.ExternalOrderSignalService;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.payment.model.payment.event.payment.PaymentCanceledEvent;
 import com.asrevo.cvhome.payment.model.payment.event.payment.PaymentFailedEvent;
 import com.asrevo.cvhome.payment.model.payment.event.payment.PaymentPaidEvent;
+import com.asrevo.cvhome.payment.model.payment.event.payment.PaymentRejectedEvent;
 import com.asrevo.cvhome.payment.model.payment.event.webhook.WebhookEvent;
 import com.asrevo.cvhome.store.core.entity.common.PaymentStatus;
 import com.asrevo.cvhome.store.core.entity.payments.PaymentType;
@@ -40,22 +43,24 @@ class OutboxHandlersTest {
     private static final Map<String, String> HEADERS = Map.of("stripe-signature", "t=1,v1=abc");
 
     @Mock
-    private ExternalOrderService orders;
+    private ExternalOrderSignalService orders;
 
     @Mock
     private PaymentGatewayService gateway;
 
     @Test
-    void paidFailedAndCanceledBecomeOrderPaymentStatuses() {
+    void paidFailedCanceledAndRejectedBecomeOrderPaymentSignals() throws CheckoutApiUnavailableException {
         PaymentOutboxHandler handler = new PaymentOutboxHandler(orders);
 
         handler.handlePaymentPaidEvent(PaymentPaidEvent.from(INTERNAL_REF, REQUEST_REF, STORE_ID));
         handler.handlePaymentFailedEvent(PaymentFailedEvent.from(INTERNAL_REF, REQUEST_REF, STORE_ID));
         handler.handlePaymentCanceledEvent(PaymentCanceledEvent.from(INTERNAL_REF, REQUEST_REF, STORE_ID));
+        handler.handlePaymentRejectedEvent(PaymentRejectedEvent.from(INTERNAL_REF, REQUEST_REF, STORE_ID));
 
-        verify(orders).updatePaymentStatus(STORE, REQUEST_REF, PaymentStatus.PAID);
-        verify(orders).updatePaymentStatus(STORE, REQUEST_REF, PaymentStatus.FAILED);
-        verify(orders).updatePaymentStatus(STORE, REQUEST_REF, PaymentStatus.CANCELLED);
+        verify(orders).signalPayment(STORE, REQUEST_REF, signal(PaymentStatus.PAID));
+        verify(orders).signalPayment(STORE, REQUEST_REF, signal(PaymentStatus.FAILED));
+        verify(orders).signalPayment(STORE, REQUEST_REF, signal(PaymentStatus.CANCELLED));
+        verify(orders).signalPayment(STORE, REQUEST_REF, signal(PaymentStatus.REJECTED));
         verifyNoMoreInteractions(orders);
     }
 
@@ -78,19 +83,19 @@ class OutboxHandlersTest {
      * </p>
      */
     @Test
-    void aredeliveredPaymentEventAssignsTheSameStatusRatherThanApplyingAdelta() {
+    void aredeliveredPaymentEventAssignsTheSameStatusRatherThanApplyingAdelta() throws CheckoutApiUnavailableException {
         PaymentOutboxHandler handler = new PaymentOutboxHandler(orders);
         PaymentPaidEvent paid = PaymentPaidEvent.from(INTERNAL_REF, REQUEST_REF, STORE_ID);
 
         handler.handlePaymentPaidEvent(paid);
         handler.handlePaymentPaidEvent(paid);
 
-        verify(orders, times(2)).updatePaymentStatus(STORE, REQUEST_REF, PaymentStatus.PAID);
+        verify(orders, times(2)).signalPayment(STORE, REQUEST_REF, signal(PaymentStatus.PAID));
         verifyNoMoreInteractions(orders);
     }
 
     @Test
-    void aredeliveredFailureOrCancellationIsEquallyRepeatable() {
+    void aredeliveredFailureOrCancellationIsEquallyRepeatable() throws CheckoutApiUnavailableException {
         PaymentOutboxHandler handler = new PaymentOutboxHandler(orders);
 
         handler.handlePaymentFailedEvent(PaymentFailedEvent.from(INTERNAL_REF, REQUEST_REF, STORE_ID));
@@ -98,8 +103,8 @@ class OutboxHandlersTest {
         handler.handlePaymentCanceledEvent(PaymentCanceledEvent.from(INTERNAL_REF, REQUEST_REF, STORE_ID));
         handler.handlePaymentCanceledEvent(PaymentCanceledEvent.from(INTERNAL_REF, REQUEST_REF, STORE_ID));
 
-        verify(orders, times(2)).updatePaymentStatus(STORE, REQUEST_REF, PaymentStatus.FAILED);
-        verify(orders, times(2)).updatePaymentStatus(STORE, REQUEST_REF, PaymentStatus.CANCELLED);
+        verify(orders, times(2)).signalPayment(STORE, REQUEST_REF, signal(PaymentStatus.FAILED));
+        verify(orders, times(2)).signalPayment(STORE, REQUEST_REF, signal(PaymentStatus.CANCELLED));
         verifyNoMoreInteractions(orders);
     }
 
@@ -120,4 +125,8 @@ class OutboxHandlersTest {
         verifyNoMoreInteractions(gateway);
     }
 
+    /** Our transaction ref rides along as checkout's dedup key. */
+    private static PaymentSignal signal(PaymentStatus status) {
+        return new PaymentSignal(status, INTERNAL_REF);
+    }
 }

@@ -25,5 +25,7 @@ spring:
 reservation:
   expiry:
     minutes: 45
+    # The longest hold a caller may ask for (checkout asks for 48h on a manual bank transfer).
+    max-hours: 72
   cleanup:
     interval: 60000

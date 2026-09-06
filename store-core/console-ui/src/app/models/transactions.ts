@@ -61,6 +61,16 @@ export type PaymentTab = 'queue' | 'all' | PaymentStatus;
 
 export const PAYMENT_TABS: readonly PaymentTab[] = ['queue', 'all', ...PAYMENT_STATUS_VALUES];
 
+/**
+ * How a payments row addresses its order: by numeric id for the transactions the retired checkout
+ * wrote (`requestRef` = order id), by opaque ref for everything the rewritten checkout placed.
+ * Exactly one of the two is set.
+ */
+export interface OrderKey {
+  readonly id: number | null;
+  readonly ref: string | null;
+}
+
 /** One row of the ledger. Every field is read off the transaction the list already returned. */
 export interface TransactionRow {
   /** `ReadableTransaction.id`, the track-by. Never the key for approve or reject. */
@@ -76,7 +86,14 @@ export interface TransactionRow {
    * not a positive integer is treated as an opaque reference and not offered as a link.
    */
   readonly orderId: number | null;
-  /** `requestRef` verbatim, for the rows where it is not an order id. */
+  /**
+   * The order ref this transaction paid for, or null when `requestRef` does not read as one.
+   *
+   * Checkout hands payment its opaque `orderRef` (a UUID), so this is the link for every order the
+   * rewritten checkout placed; `orderId` survives for the transactions the retired service wrote.
+   */
+  readonly orderRef: string | null;
+  /** `requestRef` verbatim, for the rows where it is neither an order id nor an order ref. */
   readonly reference: string;
   /** The server's `PaymentType` name, unlabelled — the page translates it through the known-set guard. */
   readonly paymentType: string;

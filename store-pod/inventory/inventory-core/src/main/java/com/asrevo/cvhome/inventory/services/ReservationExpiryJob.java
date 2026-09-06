@@ -7,7 +7,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.asrevo.cvhome.checkout.services.order.ExternalOrderService;
+import com.asrevo.cvhome.checkout.api.errors.CheckoutApiUnavailableException;
+import com.asrevo.cvhome.checkout.model.signal.ReservationExpiredSignal;
+import com.asrevo.cvhome.checkout.services.order.ExternalOrderSignalService;
 import com.asrevo.cvhome.inventory.entity.ProductReservation;
 import com.asrevo.cvhome.inventory.entity.ProductReservationStatus;
 import com.asrevo.cvhome.inventory.repositories.ProductReservationRepository;
@@ -27,7 +29,7 @@ public class ReservationExpiryJob {
 
     private final ReservationService reservationService;
 
-    private final ExternalOrderService externalOrderService;
+    private final ExternalOrderSignalService orderSignals;
 
     @Scheduled(fixedRateString = "${reservation.cleanup.interval:60000}")
     @Transactional
@@ -38,8 +40,9 @@ public class ReservationExpiryJob {
             reservationService.release(reservation.getStoreMerchantId(), reservation.getRef());
             log.info("Released expired reservation {}", reservation.getRef());
             try {
-                externalOrderService.handleReservationExpired(reservation.getStoreMerchantId(), reservation.getRef());
-            } catch (RuntimeException e) {
+                orderSignals.signalReservationExpired(reservation.getStoreMerchantId(), reservation.getRef(),
+                        new ReservationExpiredSignal(reservation.getRef()));
+            } catch (RuntimeException | CheckoutApiUnavailableException e) {
                 // The stock is back either way; checkout's own expiry handling catches up on the next pass.
                 log.error("Could not notify checkout of expired reservation {}", reservation.getRef(), e);
             }
