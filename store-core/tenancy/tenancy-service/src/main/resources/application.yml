@@ -39,3 +39,9 @@ namastack:
       schema-initialization:
         enabled: false
       schema-name: tenancy_outbox
+cvhome:
+  metrics:
+    outbox:
+      # Outbox gauges (cvhome_outbox_records, cvhome_outbox_oldest_pending_seconds) over this service's outbox table.
+      enabled: true
+      table: tenancy_outbox.outbox_record
