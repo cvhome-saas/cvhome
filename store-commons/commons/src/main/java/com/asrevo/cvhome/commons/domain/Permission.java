@@ -25,6 +25,7 @@ public enum Permission {
     USERS_INVITE("users:invite", PermissionGroup.IDENTITY, "Invite people and issue reset links"),
     USERS_SESSIONS("users:sessions", PermissionGroup.IDENTITY, "See and end other people's sessions"),
     USERS_UNLOCK("users:unlock", PermissionGroup.IDENTITY, "Unlock a locked account"),
+    USERS_IMPERSONATE("users:impersonate", PermissionGroup.IDENTITY, "Act as a merchant account inside the console"),
     ROLES_READ("roles:read", PermissionGroup.IDENTITY, "See roles and what they grant"),
     ROLES_WRITE("roles:write", PermissionGroup.IDENTITY, "Create and change roles"),
     CLIENTS_READ("clients:read", PermissionGroup.CLIENTS, "See registered applications"),

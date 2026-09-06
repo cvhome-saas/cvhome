@@ -15,6 +15,10 @@ public record UserOrgStoreIdentity(ManagerOrgId org, StoreMerchantId store, Set<
         return this.hasRole(Roles.ROLE_SUPER_ADMIN);
     }
 
+    public boolean isSupport() {
+        return this.hasRole(Roles.ROLE_SUPPORT);
+    }
+
     public boolean isOrgAdmin() {
         return this.hasRole(Roles.ROLE_ORG_ADMIN);
     }

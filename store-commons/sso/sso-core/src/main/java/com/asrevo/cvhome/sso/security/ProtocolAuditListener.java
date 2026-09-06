@@ -9,6 +9,8 @@ import org.springframework.security.authentication.event.AbstractAuthenticationF
 import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
+import org.springframework.security.oauth2.server.authorization.OAuth2Authorization;
+import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
 import org.springframework.security.oauth2.server.authorization.authentication.OAuth2AccessTokenAuthenticationToken;
 import org.springframework.security.oauth2.server.authorization.authentication.OAuth2ClientAuthenticationToken;
 import org.springframework.security.oauth2.server.authorization.authentication.OAuth2TokenRevocationAuthenticationToken;
@@ -24,6 +26,8 @@ import com.asrevo.cvhome.sso.audit.AuditService;
 import com.asrevo.cvhome.sso.audit.AuditTargetType;
 import com.asrevo.cvhome.sso.domain.ClientExtension;
 import com.asrevo.cvhome.sso.repo.ClientExtensionRepository;
+import com.asrevo.cvhome.sso.token.ImpersonationContext;
+import com.asrevo.cvhome.sso.token.ImpersonationExchangeProvider;
 
 import lombok.RequiredArgsConstructor;
 
@@ -41,6 +45,12 @@ import lombok.RequiredArgsConstructor;
  * Issuing a token also stamps the client's {@code last_token_issued_at}, which is what the clients list shows and
  * what makes an unused registration visible.
  * </p>
+ *
+ * <p>
+ * Revoking an impersonated token is how an impersonation ends — the gateway revokes on the operator's way out and
+ * on expiry alike — so that revocation is also written as {@link AuditEventType#USER_IMPERSONATION_ENDED}, attributed
+ * to the operator and naming the merchant, from the {@link ImpersonationContext} the authorization row still holds.
+ * </p>
  */
 @Component
 @RequiredArgsConstructor
@@ -53,6 +63,8 @@ public class ProtocolAuditListener {
     private final PrincipalNames principals;
 
     private final ClientExtensionRepository extensions;
+
+    private final OAuth2AuthorizationService authorizations;
 
     private final Clock clock;
 
@@ -93,6 +105,16 @@ public class ProtocolAuditListener {
                 .client(clientId)
                 .target(AuditTargetType.TOKEN, null, null)
                 .detail("revocation endpoint"));
+        // The row is invalidated, not deleted, so the context is still there to read.
+        OAuth2Authorization authorization = authorizations.findByToken(revocation.getToken(), null);
+        ImpersonationContext.from(authorization).ifPresent(impersonation -> audit.recordDetached(
+                AuditRecord.of(AuditEventType.USER_IMPERSONATION_ENDED)
+                        .actor(new AuditActor(AuditActorType.USER, impersonation.operatorId().toString(),
+                                impersonation.operatorUsername()))
+                        .user(impersonation.targetId(), impersonation.targetUsername())
+                        .client(clientId)
+                        .reason(impersonation.mode().wire())
+                        .detail(impersonation.reason())));
     }
 
     /**
@@ -114,6 +136,9 @@ public class ProtocolAuditListener {
     }
 
     private static String grantOf(OAuth2AccessTokenAuthenticationToken token) {
+        if (token.getAdditionalParameters().containsKey(ImpersonationExchangeProvider.ISSUED_TOKEN_TYPE)) {
+            return "grant=token-exchange";
+        }
         return token.getRefreshToken() == null ? "grant=client_credentials" : "grant=authorization_code";
     }
 

@@ -32,7 +32,10 @@ values ('318F2FD5-E235-4C2E-AB7E-6C949BA4CDD4', 'org1-admin', 'org1-admin@mail.c
        ('97022CD5-CC0A-467A-A99A-460B8E2745C3', 'org2-store2-moderator', 'org2-store2-moderator@mail.com', 'Store2',
         'Moderator',
         '{bcrypt}$2a$10$pse9zsAXkH/zOjZpfiP7X.weD6CNtVY/NR5A4mYUwbYqcYThHchRa', TRUE,
-        '{"org": "352023632b046970c104b76f", "store": "65f023632bc26470c104b75f"}')
+        '{"org": "352023632b046970c104b76f", "store": "65f023632bc26470c104b75f"}'),
+       -- Platform support: no org, no store — the impersonation cases' read-only operator.
+       ('5A1C2D3E-4F50-4617-8293-A4B5C6D7E8F9', 'support', 'support@mail.com', 'Platform', 'Support',
+        '{bcrypt}$2a$10$pse9zsAXkH/zOjZpfiP7X.weD6CNtVY/NR5A4mYUwbYqcYThHchRa', TRUE, '{}')
 on conflict (id) do nothing;
 
 -- Map user roles
@@ -46,5 +49,6 @@ values ('318F2FD5-E235-4C2E-AB7E-6C949BA4CDD4', '4CA169A8-E8AC-4874-ACAE-795BF7B
        ('6C303A6A-459C-44FB-B4B2-EAB53FB2B325', '58C35650-746C-48F8-84E7-78E588045194'),
        ('F900B31E-376E-4757-8EAB-501ABA2CFDD3', '23BAB562-5FF0-4690-A0C2-89E2CEA6FCE8'),
        ('F1FA1FA2-51F3-41CD-A816-356F6816ABD4', '58C35650-746C-48F8-84E7-78E588045194'),
-       ('97022CD5-CC0A-467A-A99A-460B8E2745C3', '23BAB562-5FF0-4690-A0C2-89E2CEA6FCE8')
+       ('97022CD5-CC0A-467A-A99A-460B8E2745C3', '23BAB562-5FF0-4690-A0C2-89E2CEA6FCE8'),
+       ('5A1C2D3E-4F50-4617-8293-A4B5C6D7E8F9', '9E2B7C10-5A4D-4F3E-8B6C-1D2E3F4A5B6C')
 on conflict (user_id, role_id) do nothing;

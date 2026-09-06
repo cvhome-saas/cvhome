@@ -10,10 +10,14 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -39,6 +43,12 @@ public final class UaaClient {
     /** The console's authorization-code client. */
     public static final String WEB_APP = "web-app";
 
+    /** The gateway's impersonation client — the only holder of the token-exchange grant. */
+    public static final String IMPERSONATION = "console-impersonation";
+
+    /** Where web-app's code comes back; one of the seeded redirect URIs. */
+    public static final String WEB_APP_REDIRECT = "http://gateway.com:8000/login/oauth2/code/uaa";
+
     public static final String LCL_SECRET = "hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7";
 
     public static final String SUPER_ADMIN = "super-admin";
@@ -46,6 +56,8 @@ public final class UaaClient {
     public static final String ORG1_ADMIN = "org1-admin";
 
     public static final String ORG1_STORE1_ADMIN = "org1-store1-admin";
+
+    public static final String SUPPORT = "support";
 
     /** Every seeded account's password. */
     public static final String PASSWORD = "admin";
@@ -69,6 +81,20 @@ public final class UaaClient {
     public static final String ME = "/api/v1/auth/me";
 
     private static final String AUTHORIZATION = "Authorization";
+
+    private static final String TOKEN_ENDPOINT = "/oauth2/token";
+
+    private static final String GRANT_TYPE = "grant_type";
+
+    private static final String SCOPE = "scope";
+
+    private static final String CODE = "code";
+
+    private static final String REDIRECT_URI = "redirect_uri";
+
+    private static final String ACCESS_TOKEN = "access_token";
+
+    private static final String TOKEN_ANSWERED = "token endpoint answered %d: %s";
 
     private static final String CONTENT_TYPE = "Content-Type";
 
@@ -98,13 +124,12 @@ public final class UaaClient {
     // --- tokens ---------------------------------------------------------------------------------------------------
 
     public String clientCredentialsToken(String clientId, String secret, String scope) throws IOException, InterruptedException {
-        HttpResponse<String> response = clientPost(clientId, secret, "/oauth2/token",
-                Map.of("grant_type", "client_credentials", "scope", scope));
+        HttpResponse<String> response = clientPost(clientId, secret, TOKEN_ENDPOINT,
+                Map.of(GRANT_TYPE, "client_credentials", SCOPE, scope));
         if (response.statusCode() != 200) {
-            throw new IllegalStateException(
-                    String.format("token endpoint answered %d: %s", response.statusCode(), response.body()));
+            throw new IllegalStateException(String.format(TOKEN_ANSWERED, response.statusCode(), response.body()));
         }
-        return JSON.readTree(response.body()).get("access_token").asText();
+        return JSON.readTree(response.body()).get(ACCESS_TOKEN).asText();
     }
 
     /** A form POST authenticated as an OAuth2 client with HTTP Basic — the token, introspection and revocation calls. */
@@ -126,6 +151,33 @@ public final class UaaClient {
 
     public String storeCoreToken() throws IOException, InterruptedException {
         return clientCredentialsToken(STORE_CORE, LCL_SECRET, "store_core");
+    }
+
+    /**
+     * A person's access token, the way the gateway obtains one: sign in, run the authorization-code flow with PKCE
+     * against {@code web-app}, redeem the code. Leaves this client signed in as that person.
+     */
+    public String userAccessToken(String username) throws IOException, InterruptedException, NoSuchAlgorithmException {
+        String verifier = "0123456789abcdef0123456789abcdef0123456789abcdef";
+        String challenge = Base64.getUrlEncoder().withoutPadding().encodeToString(
+                MessageDigest.getInstance("SHA-256").digest(verifier.getBytes(StandardCharsets.US_ASCII)));
+        login(username, PASSWORD);
+        String authorize = UriComponentsBuilder.fromPath("/oauth2/authorize")
+                .queryParam("response_type", CODE).queryParam("client_id", WEB_APP)
+                .queryParam(REDIRECT_URI, WEB_APP_REDIRECT).queryParam(SCOPE, "openid").queryParam("state", "s")
+                .queryParam("code_challenge", challenge).queryParam("code_challenge_method", "S256")
+                .build().toUriString();
+        HttpResponse<String> granted = session(GET, authorize, null);
+        if (granted.statusCode() != 302) {
+            throw new IllegalStateException(String.format("authorize answered %d: %s", granted.statusCode(), granted.body()));
+        }
+        String code = UriComponentsBuilder.fromUriString(location(granted)).build().getQueryParams().getFirst(CODE);
+        HttpResponse<String> tokens = clientPost(WEB_APP, LCL_SECRET, TOKEN_ENDPOINT, Map.of(GRANT_TYPE, "authorization_code",
+                CODE, Objects.requireNonNull(code), REDIRECT_URI, WEB_APP_REDIRECT, "code_verifier", verifier));
+        if (tokens.statusCode() != 200) {
+            throw new IllegalStateException(String.format(TOKEN_ANSWERED, tokens.statusCode(), tokens.body()));
+        }
+        return JSON.readTree(tokens.body()).get(ACCESS_TOKEN).asText();
     }
 
     // --- sessions -------------------------------------------------------------------------------------------------

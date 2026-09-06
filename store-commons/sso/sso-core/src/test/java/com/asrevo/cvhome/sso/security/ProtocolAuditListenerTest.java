@@ -5,8 +5,10 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -21,6 +23,8 @@ import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.OAuth2RefreshToken;
+import org.springframework.security.oauth2.server.authorization.OAuth2Authorization;
+import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
 import org.springframework.security.oauth2.server.authorization.authentication.OAuth2AccessTokenAuthenticationToken;
 import org.springframework.security.oauth2.server.authorization.authentication.OAuth2ClientAuthenticationToken;
 import org.springframework.security.oauth2.server.authorization.authentication.OAuth2TokenRevocationAuthenticationToken;
@@ -36,9 +40,14 @@ import com.asrevo.cvhome.sso.audit.AuditService;
 import com.asrevo.cvhome.sso.audit.AuditTargetType;
 import com.asrevo.cvhome.sso.domain.ClientExtension;
 import com.asrevo.cvhome.sso.repo.ClientExtensionRepository;
+import com.asrevo.cvhome.sso.token.ImpersonationContext;
+import com.asrevo.cvhome.sso.token.ImpersonationExchangeConverter;
+import com.asrevo.cvhome.sso.token.ImpersonationExchangeProvider;
+import com.asrevo.cvhome.sso.token.ImpersonationMode;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -70,13 +79,18 @@ class ProtocolAuditListenerTest {
     private static final String DESCRIPTION = "the console";
     private static final String INVALID_CLIENT = "INVALID_CLIENT";
     private static final String WRONG_SECRET = "no";
+    private static final String OPERATOR = "super-admin";
+    private static final String MERCHANT = "org1-store1-admin";
+    private static final String STORE = "store-1";
+    private static final String REASON = "ticket 42";
 
     private final AuditService audit = mock(AuditService.class);
     private final PrincipalNames principals = mock(PrincipalNames.class);
     private final ClientExtensionRepository extensions = mock(ClientExtensionRepository.class);
+    private final OAuth2AuthorizationService authorizations = mock(OAuth2AuthorizationService.class);
     private final Clock clock = Clock.fixed(Instant.parse(NOW), ZoneOffset.UTC);
     private final ProtocolAuditListener listener =
-            new ProtocolAuditListener(audit, principals, extensions, clock);
+            new ProtocolAuditListener(audit, principals, extensions, authorizations, clock);
 
     @Test
     void aclientCredentialsTokenIsRecordedAgainstTheClientWithItsGrantScopesAndTtl() {
@@ -150,6 +164,50 @@ class ProtocolAuditListenerTest {
         assertThat(AuditRecords.typeOf(record)).isEqualTo(AuditEventType.TOKEN_REVOKED);
         assertThat(AuditRecords.clientIdOf(record)).isEqualTo(CLIENT_ID);
         assertThat(AuditRecords.detailOf(record)).isEqualTo("revocation endpoint");
+    }
+
+    /** The response carries {@code issued_token_type}, which only the exchange sets; that is how the row knows. */
+    @Test
+    void anExchangedTokenIsRecordedAsAtokenExchangeGrant() {
+        when(extensions.findById(REGISTRATION_ID)).thenReturn(Optional.empty());
+        when(principals.display(ACCOUNT_ID)).thenReturn(PERSON);
+        Authentication merchant = new TestingAuthenticationToken(ACCOUNT_ID, null, List.of());
+        OAuth2AccessTokenAuthenticationToken exchanged = new OAuth2AccessTokenAuthenticationToken(client(), merchant,
+                accessToken(Set.of(SCOPE_READ)), null, Map.of(ImpersonationExchangeProvider.ISSUED_TOKEN_TYPE,
+                        ImpersonationExchangeConverter.ACCESS_TOKEN_TYPE));
+
+        listener.onTokenIssued(new AuthenticationSuccessEvent(exchanged));
+
+        assertThat(AuditRecords.detailOf(recorded())).startsWith("grant=token-exchange");
+    }
+
+    /**
+     * Revoking an impersonated token is how an impersonation ends, so the revocation row gets a sibling: the
+     * operator ending their act on the merchant, with the reason they gave when they started.
+     */
+    @Test
+    void revokingAnImpersonatedTokenAlsoRecordsTheImpersonationAsEnded() {
+        UUID operatorId = UUID.randomUUID();
+        UUID merchantId = UUID.randomUUID();
+        OAuth2Authorization.Builder builder = OAuth2Authorization.withRegisteredClient(client())
+                .principalName(merchantId.toString()).authorizationGrantType(AuthorizationGrantType.TOKEN_EXCHANGE);
+        new ImpersonationContext(operatorId, OPERATOR, merchantId, MERCHANT, STORE, ImpersonationMode.READ, REASON,
+                Instant.parse(NOW), List.of(), List.of()).writeTo(builder);
+        when(authorizations.findByToken(TOKEN_VALUE, null)).thenReturn(builder.build());
+
+        listener.onTokenRevoked(new AuthenticationSuccessEvent(revocation(clientPrincipal())));
+
+        ArgumentCaptor<AuditRecord> captor = ArgumentCaptor.forClass(AuditRecord.class);
+        verify(audit, times(2)).recordDetached(captor.capture());
+        AuditRecord ended = captor.getAllValues().get(1);
+        assertThat(AuditRecords.typeOf(captor.getAllValues().get(0))).isEqualTo(AuditEventType.TOKEN_REVOKED);
+        assertThat(AuditRecords.typeOf(ended)).isEqualTo(AuditEventType.USER_IMPERSONATION_ENDED);
+        assertThat(AuditRecords.actorOf(ended).type()).isEqualTo(AuditActorType.USER);
+        assertThat(AuditRecords.actorOf(ended).name()).isEqualTo(OPERATOR);
+        assertThat(AuditRecords.targetIdOf(ended)).isEqualTo(merchantId.toString());
+        assertThat(AuditRecords.targetNameOf(ended)).isEqualTo(MERCHANT);
+        assertThat(AuditRecords.reasonCodeOf(ended)).isEqualTo(ImpersonationMode.READ.wire());
+        assertThat(AuditRecords.detailOf(ended)).isEqualTo(REASON);
     }
 
     @Test

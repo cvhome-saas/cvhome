@@ -1,0 +1,98 @@
+# The impersonation grant — com.asrevo.cvhome.sso.token.ImpersonationExchangeProvider, on /oauth2/token
+#
+# RFC 8693 token exchange with the `requested_subject` extension: `subject_token` is the OPERATOR's own access
+# token and `requested_subject` names the account to act as. The issued token's `sub` is the merchant, `act` names
+# the operator, `act_mode` says read or write. Read mode mints STORE_MODERATOR on `impersonation_store`; write
+# mode mints the target's own roles. Never a refresh token; fifteen minutes at most.
+#
+# Only `console-impersonation` holds the grant, and that client's secret is the gateway's. In the product the
+# gateway makes this call for you (POST /api/v1/impersonation — gateway-service/http/impersonation-api.http);
+# this file drives uaa directly for API QA. Addressed through the gateway's /uaa forward, not uaa's port.
+#
+# SUBJECT_TOKEN: an operator's access token. The gateway holds it server-side; for QA obtain one the way
+# LoginFlowIntegrationTest does (authorization_code + PKCE against web-app), or read it from
+# uaa.oauth2_authorization.access_token_value for the operator's principal_name (their account id).
+#
+# Requires a running stack: lcl start -d
+
+### act as org1-store1-admin, read-only — 200, access_token only
+# @name exchangeRead
+POST {{SELLER_UI_URL}}/uaa/oauth2/token
+Authorization: Basic console-impersonation {{IMPERSONATION_SECRET}}
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=urn:ietf:params:oauth:grant-type:token-exchange&subject_token={{SUBJECT_TOKEN}}&subject_token_type=urn:ietf:params:oauth:token-type:access_token&requested_token_type=urn:ietf:params:oauth:token-type:access_token&requested_subject=60ab49a5-7f06-4b5a-be81-9b30bb6559ae&impersonation_store={{STORE_ID}}&impersonation_mode=read&reason=ticket%2042
+
+> {%
+    client.test("exchanged", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        client.assert(response.body.issued_token_type === "urn:ietf:params:oauth:token-type:access_token", "issued_token_type");
+        client.assert(response.body.act_mode === "read", "act_mode");
+        client.assert(response.body.refresh_token === undefined, "no refresh token");
+    });
+    client.global.set("IMPERSONATED_TOKEN", response.body.access_token);
+%}
+
+### the same, read-write — 200; roles are the merchant's own
+POST {{SELLER_UI_URL}}/uaa/oauth2/token
+Authorization: Basic console-impersonation {{IMPERSONATION_SECRET}}
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=urn:ietf:params:oauth:grant-type:token-exchange&subject_token={{SUBJECT_TOKEN}}&subject_token_type=urn:ietf:params:oauth:token-type:access_token&requested_subject=60ab49a5-7f06-4b5a-be81-9b30bb6559ae&impersonation_store={{STORE_ID}}&impersonation_mode=write&reason=ticket%2042
+
+### the exchanged token is the merchant, and says who is behind it — 200 MeResponse
+GET {{SELLER_UI_URL}}/uaa/api/v1/auth/me
+Authorization: Bearer {{IMPERSONATED_TOKEN}}
+
+### chaining is refused — 400 invalid_grant, and a user.impersonation.denied row
+POST {{SELLER_UI_URL}}/uaa/oauth2/token
+Authorization: Basic console-impersonation {{IMPERSONATION_SECRET}}
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=urn:ietf:params:oauth:grant-type:token-exchange&subject_token={{IMPERSONATED_TOKEN}}&subject_token_type=urn:ietf:params:oauth:token-type:access_token&requested_subject=60ab49a5-7f06-4b5a-be81-9b30bb6559ae&impersonation_store={{STORE_ID}}&impersonation_mode=read&reason=chain
+
+> {%
+    client.test("refused", function () {
+        client.assert(response.status === 400, "status " + response.status);
+        client.assert(response.body.error === "invalid_grant", response.body.error);
+    });
+%}
+
+### a platform principal cannot be impersonated — 400 access_denied
+POST {{SELLER_UI_URL}}/uaa/oauth2/token
+Authorization: Basic console-impersonation {{IMPERSONATION_SECRET}}
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=urn:ietf:params:oauth:grant-type:token-exchange&subject_token={{SUBJECT_TOKEN}}&subject_token_type=urn:ietf:params:oauth:token-type:access_token&requested_subject=65d8419c-8765-4b8b-a15f-910dce959931&impersonation_store={{STORE_ID}}&impersonation_mode=read&reason=escalate
+
+### a store the target does not act in — 400 invalid_request
+POST {{SELLER_UI_URL}}/uaa/oauth2/token
+Authorization: Basic console-impersonation {{IMPERSONATION_SECRET}}
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=urn:ietf:params:oauth:grant-type:token-exchange&subject_token={{SUBJECT_TOKEN}}&subject_token_type=urn:ietf:params:oauth:token-type:access_token&requested_subject=60ab49a5-7f06-4b5a-be81-9b30bb6559ae&impersonation_store={{STORE_ID_2}}&impersonation_mode=read&reason=wrong%20store
+
+### no reason — 400 invalid_request; an impersonation nobody can review is refused before any account is read
+POST {{SELLER_UI_URL}}/uaa/oauth2/token
+Authorization: Basic console-impersonation {{IMPERSONATION_SECRET}}
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=urn:ietf:params:oauth:grant-type:token-exchange&subject_token={{SUBJECT_TOKEN}}&subject_token_type=urn:ietf:params:oauth:token-type:access_token&requested_subject=60ab49a5-7f06-4b5a-be81-9b30bb6559ae&impersonation_store={{STORE_ID}}&impersonation_mode=read
+
+### web-app does not hold the grant — 400 unauthorized_client
+POST {{SELLER_UI_URL}}/uaa/oauth2/token
+Authorization: Basic web-app {{WEB_APP_SECRET}}
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=urn:ietf:params:oauth:grant-type:token-exchange&subject_token={{SUBJECT_TOKEN}}&subject_token_type=urn:ietf:params:oauth:token-type:access_token&requested_subject=60ab49a5-7f06-4b5a-be81-9b30bb6559ae&impersonation_store={{STORE_ID}}&impersonation_mode=read&reason=wrong%20client
+
+### end it: revoke — 200, and a user.impersonation.ended row beside token.revoked
+POST {{SELLER_UI_URL}}/uaa/oauth2/revoke
+Authorization: Basic console-impersonation {{IMPERSONATION_SECRET}}
+Content-Type: application/x-www-form-urlencoded
+
+token={{IMPERSONATED_TOKEN}}
+
+### the trail — 200; filter the audit log to the impersonation events
+GET {{SELLER_UI_URL}}/uaa/api/v1/admin/audit?type=user.impersonation.started&page=0&count=20
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
