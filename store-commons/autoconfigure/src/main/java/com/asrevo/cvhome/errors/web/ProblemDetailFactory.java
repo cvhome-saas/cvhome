@@ -90,9 +90,16 @@ public class ProblemDetailFactory {
     public static final String PROVIDER_STATUS = "providerStatus";
 
     /**
-     * MDC key the tracing infrastructure publishes under, reused so both agree on one id.
+     * MDC key {@code TraceContextMdcFilter} writes the current trace id under — the OpenTelemetry name, the same id
+     * Loki indexes as {@code trace_id} and Tempo stores, so the response, the log line and the trace all agree.
      */
-    private static final String MDC_TRACE_ID = TRACE_ID;
+    static final String MDC_OTEL_TRACE_ID = "trace_id";
+
+    /**
+     * MDC key Micrometer Tracing used before the OTel starter became the only tracer; still honoured so a service
+     * that runs with Micrometer Tracing on (tests, a future switch back) keeps its correlation.
+     */
+    static final String MDC_MICROMETER_TRACE_ID = TRACE_ID;
 
     private final ErrorHandlingProperties properties;
 
@@ -202,7 +209,10 @@ public class ProblemDetailFactory {
      * server-side cause. Reuses the active tracing id when one is in the MDC, otherwise mints a short unique one.
      */
     public String traceId() {
-        String fromMdc = MDC.get(MDC_TRACE_ID);
+        String fromMdc = MDC.get(MDC_OTEL_TRACE_ID);
+        if (fromMdc == null || fromMdc.isBlank()) {
+            fromMdc = MDC.get(MDC_MICROMETER_TRACE_ID);
+        }
         if (fromMdc != null && !fromMdc.isBlank()) {
             return fromMdc;
         }

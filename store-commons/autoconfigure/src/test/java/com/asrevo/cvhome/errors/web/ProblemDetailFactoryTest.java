@@ -202,18 +202,41 @@ class ProblemDetailFactoryTest {
     }
 
     @Test
-    void theTraceIdComesFromTheMdcSoAReportedIdLeadsToTheStackTrace() {
-        MDC.put(ProblemDetailFactory.TRACE_ID, FROM_MDC);
+    void theTraceIdComesFromTheOtelMdcKeySoAReportedIdLeadsToTheTraceAndTheLogLine() {
+        MDC.put(ProblemDetailFactory.MDC_OTEL_TRACE_ID, FROM_MDC);
         try {
             assertThat(factory.traceId()).isEqualTo(FROM_MDC);
         } finally {
-            MDC.remove(ProblemDetailFactory.TRACE_ID);
+            MDC.remove(ProblemDetailFactory.MDC_OTEL_TRACE_ID);
+        }
+    }
+
+    @Test
+    void theMicrometerMdcKeyIsStillHonouredWhenTheOtelOneIsAbsent() {
+        MDC.put(ProblemDetailFactory.MDC_MICROMETER_TRACE_ID, FROM_MDC);
+        try {
+            assertThat(factory.traceId()).isEqualTo(FROM_MDC);
+        } finally {
+            MDC.remove(ProblemDetailFactory.MDC_MICROMETER_TRACE_ID);
+        }
+    }
+
+    @Test
+    void theOtelMdcKeyWinsOverTheMicrometerOne() {
+        MDC.put(ProblemDetailFactory.MDC_OTEL_TRACE_ID, FROM_MDC);
+        MDC.put(ProblemDetailFactory.MDC_MICROMETER_TRACE_ID, "other");
+        try {
+            assertThat(factory.traceId()).isEqualTo(FROM_MDC);
+        } finally {
+            MDC.remove(ProblemDetailFactory.MDC_OTEL_TRACE_ID);
+            MDC.remove(ProblemDetailFactory.MDC_MICROMETER_TRACE_ID);
         }
     }
 
     @Test
     void withoutAnMdcTraceAShortOneIsMinted() {
-        MDC.remove(ProblemDetailFactory.TRACE_ID);
+        MDC.remove(ProblemDetailFactory.MDC_OTEL_TRACE_ID);
+        MDC.remove(ProblemDetailFactory.MDC_MICROMETER_TRACE_ID);
         assertThat(factory.traceId()).hasSize(8).isNotEqualTo(factory.traceId());
     }
 

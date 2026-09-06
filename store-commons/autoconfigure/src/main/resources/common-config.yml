@@ -121,6 +121,27 @@ com:
       crypto:
         type: LOCAL
 spring:
+  autoconfigure:
+    # Spans come from the OpenTelemetry starter alone (semconv attributes: http.route, http.response.status_code,
+    # db.*). Boot's Micrometer Tracing produced a second server span per request ("http get /api/...") and a second
+    # span per scheduled task on top of those, doubling Tempo and every span metric; management.tracing.enabled only
+    # gates Boot's exporters, not the tracer, so the tracing auto-configurations are excluded outright. Metrics are
+    # untouched (DefaultMeterObservationHandler stays), and log correlation reads the OTel MDC keys — see
+    # logging.pattern.correlation and ProblemDetailFactory.
+    exclude:
+      - org.springframework.boot.micrometer.tracing.autoconfigure.MicrometerTracingAutoConfiguration
+      - org.springframework.boot.micrometer.tracing.opentelemetry.autoconfigure.OpenTelemetryTracingAutoConfiguration
+      - org.springframework.boot.micrometer.tracing.opentelemetry.autoconfigure.otlp.OtlpTracingAutoConfiguration
+  cache:
+    # The one named cache the pods use (catalog, checkout, payment: the merchant store read). Declared here so the
+    # cache exists at start-up: Boot binds cache meters to the caches a CacheManager knows when the context starts,
+    # and a cache created lazily on its first @Cacheable hit is never bound. Services without @EnableCaching have
+    # no CacheManager and ignore this.
+    cache-names: STORE
+    caffeine:
+      # Hit/miss/eviction counters for every Spring cache (cache_gets_total, cache_size, cache_evictions_total);
+      # Boot's CacheMetricsAutoConfiguration binds them once the cache records statistics.
+      spec: recordStats
   docker:
     compose:
       file: ${spring.application.name}/compose.yml
@@ -131,6 +152,8 @@ spring:
     driver-class-name: org.postgresql.Driver
     hikari:
       schema: ${spring.application.name}
+      # Named after the service so hikaricp_* series carry pool="<service>" instead of "HikariPool-1" everywhere.
+      pool-name: ${spring.application.name}
   session:
     jdbc:
       initialize-schema: always
@@ -201,22 +224,47 @@ spring:
 server:
   forward-headers-strategy: NATIVE
   port: ${com.asrevo.cvhome.services.${spring.application.name}.port}
+  tomcat:
+    mbeanregistry:
+      # Tomcat's thread-pool and connection metrics (tomcat.threads.busy, tomcat.connections.current) exist only when
+      # the MBean registry is on. Request-thread saturation is a primary signal under load.
+      enabled: true
 
 springdoc:
   show-actuator: true
   api-docs:
     path: /api-docs
 management:
+  otlp:
+    metrics:
+      export:
+        # One export path for Micrometer meters. The OTel starter's Micrometer bridge (otel.instrumentation.micrometer)
+        # already forwards every meter through the OTel SDK, on the same resource as the traces and logs and gated by
+        # the same otel.sdk.disabled switch. Micrometer's own OTLP registry pushed a second copy of every series to
+        # the collector (milliseconds instead of seconds, no service.instance.id), which doubled Prometheus and made
+        # every dashboard query pick one of two names. Off, so the bridge is the only path.
+        enabled: false
   metrics:
     tags:
       application: ${spring.application.name}
-      service.version: ${version}
+      # @version@ is replaced by Gradle's processResources from project.version; a plain ${version} placeholder
+      # resolved to nothing and every series carried the literal text.
+      service.version: "@version@"
     enable:
+      # JVM metrics come from the OTel starter's runtime telemetry (jvm.memory.used, jvm.gc.duration, ...), on the
+      # semantic-convention names the dashboards use. Micrometer's JvmMetrics would be the same data under a second
+      # set of names.
       jvm: false
+    distribution:
+      slo:
+        # Explicit latency buckets, aligned with the SLOs in load-testing/k6/config/thresholds.js, so p95/p99 can be
+        # computed from the histogram. Without these the timers export a single +Inf bucket and no percentile exists.
+        http.server.requests: 50ms,100ms,250ms,400ms,500ms,600ms,800ms,1s,2s,2500ms,3s,5s,10s
+        http.client.requests: 50ms,100ms,250ms,500ms,1s,2s,5s
   observations:
     key-values:
       application: ${spring.application.name}
-      service.version: ${version}
+      service.version: "@version@"
     enable:
       spring.security.filterchains: false
       spring.security.authorizations: false
@@ -241,24 +289,25 @@ management:
 info:
   app:
     name: ${spring.application.name}
+    version: "@version@"
 otel:
   sdk:
     disabled: true
   resource:
     attributes:
       service.name: ${spring.application.name}
-      service.version: ${version}
+      service.version: "@version@"
     disabled:
       keys: process.command,process.command_args,process.command_line,process.executable.name,process.executable.path,process.owner,process.parent_pid,process.pid,process.runtime.description,process.runtime.name,process.runtime.version,telemetry.distro.name,telemetry.distro.version,telemetry.sdk.language,telemetry.sdk.name,telemetry.sdk.version,os.version,os.description,os.type
   instrumentation:
-    runtime-metrics:
-      enabled: false
-    jvm-metrics:
-      enabled: false
+    # The Micrometer bridge is the single metrics path (see management.otlp.metrics.export above). JVM runtime metrics
+    # are on by the starter's default and arrive as jvm.* semconv series; there is no separate switch here on purpose —
+    # the former runtime-metrics/jvm-metrics keys were not read by the starter and did nothing.
     micrometer:
       enabled: true
 logging:
-  level:
-    com.asrevo: DEBUG
-    org.springframework.web: DEBUG
-    org.springframework.security: DEBUG
+  pattern:
+    # trace_id/span_id come from the OTel starter's logback MDC appender (any thread) and TraceContextMdcFilter
+    # (request threads, the real MDC). The same id is the ProblemDetail traceId and the one Loki indexes, so a
+    # reported id finds the log line and the trace.
+    correlation: "[%X{trace_id:-}-%X{span_id:-}] "
