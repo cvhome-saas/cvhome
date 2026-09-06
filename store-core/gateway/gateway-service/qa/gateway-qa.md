@@ -327,7 +327,8 @@ Design points:
   `getIfAvailable`; a second manager bean breaks every relayed route. The impersonation service uses that one.
 - **Errors are problem details** from the gateway's one advice, which exists for these endpoints.
 
-### IMP-01 — Start swaps the relayed token and `auth/me` · critical · [not verified]
+### IMP-01 — Start swaps the relayed token and `auth/me` · critical · [verified]
+- **Seen** — 2026-09-07, stack `impersonation`: `auth/me` → `preferredUsername: org1-store1-admin`, authorities `[ROLE_STORE_MODERATOR]`, `impersonation.mode: read`; `store-manager/list` → the one store.
 
 - **Steps** — `.http` "act as org1-store1-admin … read-only", then "the session is the merchant now", then "the relay
   carries the merchant's token".
@@ -335,28 +336,33 @@ Design points:
   `authorities` containing `ROLE_STORE_MODERATOR` and not `ROLE_SUPER_ADMIN`; `store-manager/list` answers the one
   store, not the platform's page.
 
-### IMP-02 — Read-only refuses a write at the pod · critical · [not verified]
+### IMP-02 — Read-only refuses a write at the pod · critical · [verified]
+- **Seen** — `POST /spg/catalog/api/v1/private/category` → **403** `COMMON.ACCESS_DENIED`.
 
 - **Steps** — `.http` "read-only: a write as the merchant is refused".
 - **Expect** — **403**. The token is a moderator's; `hasManageAccessOnStore` refuses it on every pod service.
 
-### IMP-03 — Tenant isolation holds under the exchanged token · critical · [not verified]
+### IMP-03 — Tenant isolation holds under the exchanged token · critical · [verified]
+- **Seen** — `router/store-pod-by-store-id` for ORG2-STORE1 → **403**; for the merchant's own store → 200.
 
 - **Steps** — `.http` "tenant isolation: another org's store as the merchant".
 - **Expect** — 403 or 404 — never an empty 200. The token carries org1's claims and nothing wider.
 
-### IMP-04 — A second start is a conflict; end is idempotent · [not verified]
+### IMP-04 — A second start is a conflict; end is idempotent · [verified]
+- **Seen** — **409** `GATEWAY.IMPERSONATION.ALREADY_ACTIVE` with `params.actingAs`; `DELETE` → 204 and `auth/me` is `super-admin` again.
 
 - **Steps** — `.http` "a second start while acting", then "end it" twice.
 - **Expect** — **409** `GATEWAY.IMPERSONATION.ALREADY_ACTIVE`; 204, 204.
 
-### IMP-05 — The store probe refuses and revokes · high · [not verified]
+### IMP-05 — The store probe refuses and revokes · high · [verified]
+- **Seen** — A store-admin target with the wrong store is refused by **uaa** first (403 `GATEWAY.IMPERSONATION.REFUSED`, `params.error: invalid_request`, a `denied` row `STORE_NOT_TARGETS`); an **org-admin** target with another org's store reaches tenancy and answers **422** `GATEWAY.IMPERSONATION.STORE_NOT_TARGETS` with `tenancyStatus: 404`, and uaa has the `started`/`ended` pair for the revoked probe token.
 
 - **Steps** — `.http` "a store the merchant does not act in".
 - **Expect** — **422** `GATEWAY.IMPERSONATION.STORE_NOT_TARGETS` with `tenancyStatus` in `params`; `auth/me` is still
   the operator; uaa has an `ended` row for the revoked probe token.
 
-### IMP-06 — The gate · critical · [not verified]
+### IMP-06 — The gate · critical · [verified]
+- **Seen** — 403 `{error: access_denied}` for `org1-admin`; 400 `{field: reason}`; 401 `GATEWAY.SESSION.REQUIRED`. `support`: write → 403, read → 200, end → 204.
 
 - **Steps** — `.http` "the permission gate: an org admin's session", "no reason", "no session".
 - **Expect** — 403 `GATEWAY.IMPERSONATION.REFUSED` (`params.error` = `access_denied`), 400

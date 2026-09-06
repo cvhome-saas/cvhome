@@ -639,19 +639,22 @@ every audit actor goes through `SecurityUtils.actorOf`, which reads the token's 
 `<merchant> (via <operator>)`. `ROLE_SUPPORT` is admitted to `org-manager` `list` / `find-one` / `stores` and to
 nothing else here. The entry point is the console (`../../console-ui/qa/console-ui-qa.md` §IMP).
 
-### IMP-01 — A rename made while acting as a merchant names the operator · critical · [unit only]
+### IMP-01 — A write made while acting as a merchant names the operator · critical · [verified]
+- **Seen** — 2026-09-07: acting as `org1-admin` in write mode, `POST org-member/invitations` left `INVITATION | CREATE | 318f2fd5-… (via super-admin)` in `tenancy.tenancy_audit`. A store-lifecycle write (suspend) is super-admin only and answers 403 under an impersonated org admin exactly as for the real one — impersonation never widens.
 
 - **Covered by** `SecurityUtilsTest.theAuditActorNamesTheOperatorBehindAnImpersonatedToken`. End to end:
   `console-ui-qa.md` IMP-02 — `select actor from tenancy.tenancy_audit order by id desc limit 1` reads
   `60ab49a5-… (via super-admin)`.
 
-### IMP-02 — Support may list organizations and a store list, and change nothing · high · [not verified]
+### IMP-02 — Support may list organizations and a store list, and change nothing · high · [verified]
+- **Seen** — `org-manager/list` 200, `org-manager/rename` 403, uaa `admin/users` 200 as `support`.
 
 - **Steps** — sign in as `support`; `POST /tenancy/api/v1/org-manager/list` and `GET …/org-manager/stores?id=<ORG1>`;
   then `POST …/org-manager/rename?id=<ORG1>&name=x`.
 - **Expect** — 200, 200, **403**.
 
-### IMP-03 — The store probe is the router endpoint · high · [not verified]
+### IMP-03 — The store probe is the router endpoint · high · [verified]
+- **Seen** — Under a read-mode token for `org1-store1-admin`, ORG2-STORE1 → 403 at the permission gate; under a write-mode `org1-admin` token the gateway's probe got tenancy's 404 and answered 422.
 
 - **Steps** — with an exchanged token for `org1-store1-admin` (uaa-qa IMP-01), `GET /tenancy/api/v1/router/store-pod-by-store-id?store=<ORG1-STORE2>`.
 - **Expect** — 404 (`getStorePod`'s org check), which is what the gateway turns into 422 before swapping anything.
