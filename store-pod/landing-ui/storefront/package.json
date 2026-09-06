@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "next dev -p 8110 --turbopack",
-    "build": "next build && node scripts/prune-font-subsets.mjs",
+    "build": "next build && node scripts/prune-font-subsets.mjs && node scripts/copy-instrumentation.mjs",
     "start": "node start.mjs",
     "lint": "cd .. && npm run lint",
     "typecheck": "tsc --noEmit",
