@@ -21,6 +21,8 @@ import com.asrevo.cvhome.sso.repo.ClientSecretHistoryRepository;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -44,13 +46,16 @@ class GraceAwareClientSecretAuthenticationProviderTest {
 
     private static final String OLD_RAW = "old";
 
+    private static final String LIVE_RAW = "live";
+
     private final RegisteredClientRepository clients = mock(RegisteredClientRepository.class);
 
     private final ClientSecretHistoryRepository history = mock(ClientSecretHistoryRepository.class);
 
+    private final PlainEncoder encoder = new PlainEncoder();
+
     private final GraceAwareClientSecretAuthenticationProvider provider = new GraceAwareClientSecretAuthenticationProvider(
-            clients, mock(OAuth2AuthorizationService.class), new PlainEncoder(), history,
-            Clock.fixed(NOW, ZoneOffset.UTC));
+            clients, mock(OAuth2AuthorizationService.class), encoder, history, Clock.fixed(NOW, ZoneOffset.UTC));
 
     private final RegisteredClient client = RegisteredClient.withId(ID).clientId(CLIENT_ID).clientSecret(LIVE)
             .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
@@ -64,10 +69,22 @@ class GraceAwareClientSecretAuthenticationProviderTest {
     void theLiveSecretAuthenticates() {
         when(clients.findByClientId(CLIENT_ID)).thenReturn(client);
 
-        Authentication result = provider.authenticate(presenting("live"));
+        Authentication result = provider.authenticate(presenting(LIVE_RAW));
 
         assertThat(result.isAuthenticated()).isTrue();
         assertThat(((OAuth2ClientAuthenticationToken) result).getRegisteredClient().getClientSecret()).isEqualTo(LIVE);
+    }
+
+    @Test
+    void theLiveSecretIsMatchedOnceAndTheHistoryIsNotRead() {
+        when(clients.findByClientId(CLIENT_ID)).thenReturn(client);
+        encoder.matches = 0;
+
+        provider.authenticate(presenting(LIVE_RAW));
+
+        // one bcrypt per token request: the stock provider's own match, nothing before it
+        assertThat(encoder.matches).isEqualTo(1);
+        verify(history, never()).findByRegisteredClientIdAndRevokedAtIsNull(ID);
     }
 
     @Test
@@ -110,6 +127,8 @@ class GraceAwareClientSecretAuthenticationProviderTest {
     /** {@code {noop}} prefixed comparison, so the hashes above read as the secrets they hold. */
     private static final class PlainEncoder implements org.springframework.security.crypto.password.PasswordEncoder {
 
+        private int matches;
+
         @Override
         public String encode(CharSequence rawPassword) {
             return ENCODED_PREFIX + rawPassword;
@@ -117,6 +136,7 @@ class GraceAwareClientSecretAuthenticationProviderTest {
 
         @Override
         public boolean matches(CharSequence rawPassword, String encodedPassword) {
+            matches++;
             return encodedPassword != null && (ENCODED_PREFIX + rawPassword).equals(encodedPassword);
         }
 
