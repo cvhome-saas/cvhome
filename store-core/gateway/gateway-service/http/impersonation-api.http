@@ -1,0 +1,102 @@
+# ImpersonationController — com.asrevo.cvhome.gateway.controller
+#
+# Acting as a merchant from the console. The gateway holds the session, so these live on the gateway: POST
+# exchanges the operator's token at uaa (uaa/http/impersonation-api.http is the grant itself), asks tenancy as the
+# merchant whether the store is theirs, and swaps the session's authorized client and security context; DELETE
+# swaps them back and revokes. GET /api/v1/auth/me carries `impersonation` for the whole duration.
+#
+# Session-bound: SUPER_ADMIN_SESSION_ID is a super-admin's gateway session (support may impersonate read-only only).
+#
+# Requires a running stack: lcl start -d
+
+### act as org1-store1-admin in ORG1-STORE1, read-only — 200 ImpersonationView
+# @name start
+POST {{SELLER_UI_URL}}/api/v1/impersonation
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{
+  "userId": "60ab49a5-7f06-4b5a-be81-9b30bb6559ae",
+  "storeId": "{{STORE_ID}}",
+  "mode": "read",
+  "reason": "ticket 42 — orders page empty"
+}
+
+> {%
+    client.test("acting", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        client.assert(response.body.actingAs === "org1-store1-admin", "actingAs " + response.body.actingAs);
+        client.assert(response.body.mode === "read", "mode");
+    });
+%}
+
+### the session is the merchant now — 200 MeView with `impersonation`, authorities are STORE_MODERATOR's
+GET {{SELLER_UI_URL}}/api/v1/auth/me
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+
+> {%
+    client.test("banner data", function () {
+        client.assert(response.body.impersonation !== null, "impersonation");
+        client.assert(response.body.authorities.some(a => a.authority === "ROLE_STORE_MODERATOR"), "moderator");
+    });
+%}
+
+### what the session is acting as — 200, or 204 when it is itself
+GET {{SELLER_UI_URL}}/api/v1/impersonation
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+
+### the relay carries the merchant's token: the merchant's store list, not the platform's — 200 Page<ManagerStoreDto> of one
+POST {{SELLER_UI_URL}}/tenancy/api/v1/store-manager/list
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{}
+
+### read-only: a write as the merchant is refused — 403
+POST {{SELLER_UI_URL}}/spg/catalog/api/v1/private/category?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{"code": "impersonation-write-probe", "descriptions": [{"language": "en", "name": "probe"}]}
+
+### tenant isolation: another org's store as the merchant — 403/404, never an empty 200
+GET {{SELLER_UI_URL}}/tenancy/api/v1/router/store-pod-by-store-id?store=65f020632bc46470c104b76f
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+
+### a second start while acting — 409 GATEWAY.IMPERSONATION.ALREADY_ACTIVE
+POST {{SELLER_UI_URL}}/api/v1/impersonation
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{"userId": "60ab49a5-7f06-4b5a-be81-9b30bb6559ae", "storeId": "{{STORE_ID}}", "mode": "read", "reason": "again"}
+
+### end it — 204; the operator is themselves again and uaa has a user.impersonation.ended row
+DELETE {{SELLER_UI_URL}}/api/v1/impersonation
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+
+### a store the merchant does not act in — 422 GATEWAY.IMPERSONATION.STORE_NOT_TARGETS
+POST {{SELLER_UI_URL}}/api/v1/impersonation
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{"userId": "60ab49a5-7f06-4b5a-be81-9b30bb6559ae", "storeId": "{{STORE_ID_2}}", "mode": "read", "reason": "wrong store"}
+
+### no reason — 400 GATEWAY.IMPERSONATION.INVALID
+POST {{SELLER_UI_URL}}/api/v1/impersonation
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{"userId": "60ab49a5-7f06-4b5a-be81-9b30bb6559ae", "storeId": "{{STORE_ID}}", "mode": "read"}
+
+### the permission gate: an org admin's session — 403 GATEWAY.IMPERSONATION.REFUSED (uaa: access_denied)
+POST {{SELLER_UI_URL}}/api/v1/impersonation
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{"userId": "60ab49a5-7f06-4b5a-be81-9b30bb6559ae", "storeId": "{{STORE_ID}}", "mode": "read", "reason": "not allowed"}
+
+### no session — 401 GATEWAY.SESSION.REQUIRED
+POST {{SELLER_UI_URL}}/api/v1/impersonation
+Content-Type: application/json
+
+{"userId": "60ab49a5-7f06-4b5a-be81-9b30bb6559ae", "storeId": "{{STORE_ID}}", "mode": "read", "reason": "anon"}

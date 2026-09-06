@@ -90,6 +90,9 @@ public final class ImpersonationExchangeProvider implements AuthenticationProvid
 
     public static final String ACT_MODE = "act_mode";
 
+    /** The target's username, in the response, so the caller can name who it is now acting as. */
+    public static final String ACTING_AS = "acting_as";
+
     static final int MAX_MINUTES = 15;
 
     static final Duration MAX_TTL = Duration.ofMinutes(MAX_MINUTES);
@@ -287,6 +290,7 @@ public final class ImpersonationExchangeProvider implements AuthenticationProvid
         Map<String, Object> additional = new HashMap<>();
         additional.put(ISSUED_TOKEN_TYPE, ImpersonationExchangeConverter.ACCESS_TOKEN_TYPE);
         additional.put(ACT_MODE, context.mode().wire());
+        additional.put(ACTING_AS, target.getUsername());
         return new OAuth2AccessTokenAuthenticationToken(client, clientPrincipal, accessToken, null, additional);
     }
 

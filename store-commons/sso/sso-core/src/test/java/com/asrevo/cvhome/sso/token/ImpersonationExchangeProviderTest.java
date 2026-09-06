@@ -238,7 +238,8 @@ class ImpersonationExchangeProviderTest {
         assertThat(token.getRefreshToken()).isNull();
         assertThat(token.getAdditionalParameters())
                 .containsEntry(ImpersonationExchangeProvider.ISSUED_TOKEN_TYPE, ImpersonationExchangeConverter.ACCESS_TOKEN_TYPE)
-                .containsEntry(ImpersonationExchangeProvider.ACT_MODE, READ);
+                .containsEntry(ImpersonationExchangeProvider.ACT_MODE, READ)
+                .containsEntry(ImpersonationExchangeProvider.ACTING_AS, target.getUsername());
 
         OAuth2Authorization authorization = saved();
         assertThat(authorization.getPrincipalName()).isEqualTo(target.getId().toString());

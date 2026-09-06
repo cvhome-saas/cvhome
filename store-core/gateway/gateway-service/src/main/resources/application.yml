@@ -13,6 +13,13 @@ spring:
             client-secret: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
             authorization-grant-type: client_credentials
             scope: store_core
+          # The impersonation client: token exchange only, and the one holder of the grant. Its secret is
+          # UAA_IMPERSONATION_SECRET; the default is the local seed, like web-app's in common-config.yml.
+          console-impersonation:
+            provider: uaa
+            client-id: console-impersonation
+            client-secret: ${UAA_IMPERSONATION_SECRET:hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7}
+            authorization-grant-type: urn:ietf:params:oauth:grant-type:token-exchange
 com:
   asrevo:
     cvhome:
