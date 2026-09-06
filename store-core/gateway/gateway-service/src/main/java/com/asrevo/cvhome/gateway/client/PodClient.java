@@ -94,7 +94,9 @@ public class PodClient implements RouteDefinitionRepository {
      */
     @Scheduled(fixedRateString = "${cvhome.gateway.route-refresh-rate:PT1M}")
     public Mono<Void> refreshRoutes() {
-        return podService.listPods()
+        // Deferred: Spring calls a reactive @Scheduled method once at startup to obtain its publisher, before any
+        // test has stubbed the registry, and a null there fails the whole context. The registry is read on subscribe.
+        return Mono.defer(podService::listPods)
                 .map(this::toRouteDefinitions)
                 .doOnNext(this::applyRefresh)
                 .onErrorResume(e -> {

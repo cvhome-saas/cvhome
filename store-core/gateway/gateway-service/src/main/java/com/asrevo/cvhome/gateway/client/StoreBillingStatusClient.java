@@ -57,7 +57,8 @@ public class StoreBillingStatusClient {
      */
     @Scheduled(fixedRateString = "${cvhome.gateway.billing-refresh-rate:PT1M}", initialDelay = 5000L)
     public Mono<Void> refresh() {
-        return entitlementService.blockedStores()
+        // Deferred for the same reason as PodClient.refreshRoutes(): the publisher is obtained once at startup.
+        return Mono.defer(entitlementService::blockedStores)
                 .doOnNext(this::replace)
                 .onErrorResume(e -> {
                     // Fails open, and this is the deliberate opposite of store creation, which fails closed. An
