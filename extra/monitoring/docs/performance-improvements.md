@@ -25,7 +25,7 @@ storefront on `next dev`): smoke, `storefront-browse` 30 VUs, `shopper-guest-che
 | 9 | 409s on category attach under concurrent catalogue edits | expected behaviour | catalog | no change |
 | 10 | Login and redirect paths are the slowest routes on uaa and the gateway | low | uaa, gateway | partly: the `UNKNOWN` route on uaa is the token endpoint, see 6 |
 
-## 1. Storefront pages: 4.5–5 s at p95
+## 1. Storefront pages: 4.5–5 s at p95 — a dev-server measurement; 0.07–0.09 s built
 
 - **Seen.** `page:home` 4.99 s, `page:product` 4.72 s, `page:category` 4.66 s at p95 in the browse run (threshold
   3 s); the same ~4.4 s in the production mix. Server-side renders in landing-ui: `GET /[locale]` 4.73 s,
@@ -34,17 +34,26 @@ storefront on `next dev`): smoke, `storefront-browse` 30 VUs, `shopper-guest-che
 - **What the APIs did meanwhile.** catalog product 14 ms, search 27 ms, products-by-category 16 ms, inventory
   availability 4 ms, content layout under 50 ms — all at p95, all under their thresholds by 20× or more. spg's own
   p95 (2.6 s) is landing-ui's time seen from the gateway.
+- **Cause.** The stack runs the storefront with `next dev` (Turbopack, no build), which compiles on demand and does
+  no caching; the time is inside the render, not in the upstream fetches.
+- **Measured on a built storefront** (`npm run build` at `store-pod/landing-ui`, then `node start.mjs` with
+  `PORT=8110 OTEL_SDK_DISABLED=false` in place of the lcl-managed dev server; `storefront-browse` at
+  `PROFILE=load`, 30 VUs, 3 min hold, test id `browse-load-20260906T124154Z`, after the fixes below):
+
+  | page (k6, p95) | dev server | built |
+  |---|---|---|
+  | `page:home` | 4.99 s | 91 ms |
+  | `page:product` | 4.72 s | 73 ms |
+  | `page:category` | 4.66 s | 79 ms |
+  | landing-ui render p95 (`GET /[locale]`, `/product`, `/category`, `/search`) | 4.5–4.7 s | 91–98 ms |
+
+  14,055 requests, 0 failed, 86 app req/s; catalog, content, inventory and merchant all at 48 ms p95. The
+  platform has no storefront latency problem; the dev server has. Every storefront number in
+  `load-testing/docs/baseline.md` taken before this run is a dev-server number.
 - **Where.** Edge → *Page render p95* and *Upstream fetch p95 by call*; Load test vs app → *k6 p95 by endpoint*
-  against *App p95 by service*; a trace from Traces → *Slow requests* shows the render span with short fetch
-  children underneath.
-- **Known.** The stack runs the storefront with `next dev` (Turbopack, no build), which compiles on demand and does
-  no caching. The k6 suite documents the same ("SSR and browser numbers are dev-server bound"). The time is inside
-  the render, not in the upstream fetches (0.2 s p95 on the `landing-ui → spg` edge).
-- **Still to measure.** The same runs against a built storefront (`next build` + `next start`, or the container
-  image). Only then do these numbers say anything about the platform. If a built storefront is still above 3 s,
-  the render span's children (`resolve page components`, `render route`, `generateMetadata`) in Tempo say which
-  part; the upstream fan-out per page (site, layout, faq, category-hierarchy, products, groups, availability —
-  seven to nine calls, each in both languages in the traces seen) is the next suspect.
+  against *App p95 by service*.
+- **Left.** lcl still starts `next dev`, which is right for development. A stack meant for load numbers should run
+  the built storefront; the swap above is the recipe until lcl grows a flag for it.
 
 ## 2. catalog: ~21 SQL statements per request (N+1 on the product page) — fixed
 
@@ -72,8 +81,8 @@ storefront on `next dev`): smoke, `storefront-browse` 30 VUs, `shopper-guest-che
   `ProductOptionValue`), the same device the product's own collections already used.
 - **Verified.** The same product page after the change: 8 statements — product, categories, category labels,
   variant count, variants (one hydrated query), option assignments, option values, value labels — whatever the
-  number of values. Database & SQL → *Statements per request* is the KPI to watch; expect catalog well under
-  10 under the browse mix.
+  number of values. Under the browse mix re-run (`browse-load-20260906T124154Z`) catalog averaged **5.7**
+  statements per request (was 21.3); Database & SQL → *Statements per request* is the KPI to watch.
 - **Left.** The category read still costs two statements (categories, then their labels), the variant count one;
   they are one query each, not per row, and were left alone.
 
@@ -119,7 +128,8 @@ storefront on `next dev`): smoke, `storefront-browse` 30 VUs, `shopper-guest-che
 - **Verified.** On the live database (154 orders, last id 1154, sequencer row 1154): two smoke orders got 1155
   and 1156, the rows advanced by fifty, and the two orders together cost eight sequencer fetches — one per table
   touched, for the next fifty inserts of each. Product-group creation in the catalog integration tests passes
-  against the seeded ids.
+  against the seeded ids. Under `guest-checkout` and the mix re-run (`production-mix-load-20260906T125109Z`)
+  checkout averaged **5.7** statements per request (was 11.2), 121 orders, 0 failed, checkout p95 86 ms.
 
 ## 5. Admin traffic fails 2 % with 403s in the production mix — fixed in `load-testing`
 
@@ -137,8 +147,9 @@ storefront on `next dev`): smoke, `storefront-browse` 30 VUs, `shopper-guest-che
   `mixed/production-mix.js` and `smoke.js` ask for an `ORG_ADMIN` session for that journey (falling back to the
   pool when none logged in, as on a target without that account).
 - **Verified.** `admin/store-reads` at the smoke profile after the change: 12 admin requests, 0 failed, and no
-  403 on tenancy, billing or merchant in the ten minutes around it (Auth → *401 / 403 by service*). The admin
-  threshold now measures the platform.
+  403 on tenancy, billing or merchant in the ten minutes around it (Auth → *401 / 403 by service*). The mix
+  re-run: 699 admin requests, **0 failed**, no 403 on any service (was 2 %). The admin threshold now measures the
+  platform.
 
 ## 6. `catalog → merchant` is the slowest service-to-service edge — fixed at the token endpoint
 
@@ -176,20 +187,25 @@ storefront on `next dev`): smoke, `storefront-browse` 30 VUs, `shopper-guest-che
   still 404 (`ProductGroupService.storefront(...)`, `related(...)`). Unit and integration tests updated; QA case
   GRP-07 in `store-pod/catalog/catalog-service/qa/catalog-qa.md` corrected.
 - **Verified.** Both reads answer 200 with the empty strip on the live stack for a store without the groups; the
-  storefront renders as before. Expect the edge's failed ratio to sit at 0 under the browse mix; anything left is
-  a real failure worth a look.
+  storefront renders as before. Under the browse mix re-run the `landing-ui → spg` failed ratio was **0** (was
+  4–6 %); anything that shows there now is a real failure worth a look.
 
-## 8. The knee was not found
+## 8. The knee was not found — twice
 
-- **Seen.** The breakpoint ramp reached its ceiling (150 iterations/s = 300 k6 req/s = 552 req/s on the
-  application) with every threshold intact: product p95 9 ms, availability 4 ms, pool 20 %, threads under 1 %,
-  system CPU 29 %, 0 failed, 0 dropped iterations.
-- **Known.** The API tier has more than five times the headroom of that ramp on this machine. The capacity number
-  the SLOs should be set against is still unknown, and so is the resource that gives out first.
-- **Still to measure.** `make storefront-breakpoint PROFILE=breakpoint MAX_RPS=600 RAMP=6m` with pre-allocated VUs
-  raised accordingly (watch *Dropped iterations*: above 0 the generator, not the app, is the limit), then the same
-  for `shopper/cart` and `shopper/inventory-contention`. Read the knee on Bottlenecks → *Traffic vs p95* and the
-  saturation strip on Load test vs app.
+- **Seen (first ramp).** 150 iterations/s = 552 app req/s with every threshold intact: product p95 9 ms, pool 20 %,
+  threads under 1 %, system CPU 29 %, 0 failed, 0 dropped iterations.
+- **Seen (re-run, `MAX_RPS=600 RAMP=6m`, test id `breakpoint-breakpoint-20260906T125416Z`, after the fixes).**
+  Peak 1,200 k6 req/s = **1,540 app req/s**, 288,358 requests, 0 failed, 0 dropped, product p95 9.4 ms and
+  availability 4.1 ms at peak (k6), catalog server p95 inside the 50 ms bucket throughout. Saturation at peak:
+  catalog pool 40 %, request threads 1 %, **system CPU 71 %**. CPU is the first resource to approach its limit
+  on this one-machine stack; nothing else moved.
+- **Known.** The API tier's knee is above 1,500 req/s here, and it will be CPU-bound when it arrives. SLOs can be
+  set against that; a single-machine number says nothing about Fargate task sizing, where each service has its
+  own CPU.
+- **Still to measure.** A ramp to 2,000+ req/s with more pre-allocated VUs (the generator held 50; watch *Dropped
+  iterations* — above 0 the generator is the limit), and the same for `shopper/cart` and
+  `shopper/inventory-contention`, which write. Read the knee on Bottlenecks → *Traffic vs p95* and the saturation
+  strip on Load test vs app.
 
 ## 9. 409s on category attach under concurrent edits
 
@@ -216,10 +232,17 @@ storefront on `next dev`): smoke, `storefront-browse` 30 VUs, `shopper-guest-che
 - No 5xx in any run. No database connection waited (pending 0), no timeouts. No GC pressure (pause share 0,
   heap-after-GC flat). No request-thread saturation (busy under 1 %). Outbox backlog 0, no FAILED records.
 
+## Re-run after the fixes (2026-09-06, built storefront)
+
+| run | test id | before | after |
+|---|---|---|---|
+| `storefront-browse` load | `browse-load-20260906T124154Z` | pages 4.7–5.0 s p95, catalog 21.3 SQL/request, edge failed 4.2 % | pages 73–91 ms, catalog 5.7 SQL/request, edge failed 0, 14,055 req, 0 failed |
+| `shopper-guest-checkout` load | `guest-checkout-load-20260906T124807Z` | checkout 11.2 SQL/request | 5.7 SQL/request, 90 orders, checkout p95 86 ms, 0 failed |
+| `mixed-production-mix` load | `production-mix-load-20260906T125109Z` | admin 2 % failed (403s), pages ~4.4 s | 3,918 req, 0 failed on every layer, 31 orders, pages under 0.1 s; 409s on category attach remain (expected) |
+| `storefront-breakpoint` to 600 it/s | `breakpoint-breakpoint-20260906T125416Z` | knee not found at 552 app req/s | knee not found at 1,540 app req/s; CPU 71 % is the first limit |
+
 ## What is still open
 
-1. Re-run browse and the mix against a **built** storefront; without that, issue 1 is a measurement of the dev server.
-2. Run the breakpoint ramp to at least 600 req/s (issue 8) so the SLOs have a capacity number behind them.
-3. Re-run `mixed-production-mix` at `PROFILE=load` to record the new baseline: statements per request on catalog
-   and checkout, the `catalog → merchant` edge p95, the `landing-ui → spg` failed ratio, and the admin threshold —
-   all expected to move with the fixes above.
+1. A ramp past 2,000 req/s, and the write-heavy scripts, to find the knee (issue 8).
+2. `platform/gateway-login` at load for the sign-in path (issue 10).
+3. Trace the s2s token client so the exchange stops showing as a gap on the edge (issue 6, observability only).
