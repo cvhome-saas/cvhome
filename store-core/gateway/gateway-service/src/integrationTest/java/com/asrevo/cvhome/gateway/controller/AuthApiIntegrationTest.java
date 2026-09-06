@@ -72,6 +72,20 @@ class AuthApiIntegrationTest {
                 });
     }
 
+    /**
+     * The in-memory session count is a load-test capacity signal (Auth dashboard); starting a login opens a session,
+     * and the gauge reads the store the gateway actually holds them in.
+     */
+    @Test
+    void openSessionsAreCountedByTheSessionGauge() {
+        client.get().uri("/oauth2/authorization/uaa").exchange().expectStatus().isFound();
+
+        client.get().uri("/actuator/metrics/cvhome.gateway.sessions").exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.measurements[0].value").value(v -> assertThat(((Number) v).doubleValue()).isGreaterThanOrEqualTo(1.0));
+    }
+
     @Test
     void currentUserIsUnauthorizedWithoutALogin() {
         client.get().uri("/api/v1/auth/current").exchange().expectStatus().isUnauthorized();
