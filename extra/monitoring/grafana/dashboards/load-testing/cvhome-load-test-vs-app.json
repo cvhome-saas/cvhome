@@ -279,7 +279,7 @@
     {
       "type": "stat",
       "title": "Failed share",
-      "description": "Share of requests k6 counted as failed (unexpected status). SLO: under 1 %.",
+      "description": "Share of requests k6 counted as failed (unexpected status), from the request counters over the whole run. SLO: under 1 %.",
       "datasource": {
         "type": "prometheus",
         "uid": "prometheus"
@@ -297,7 +297,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "max(max_over_time(k6_http_req_failed_rate{testid=\"$testid\"}[$__range]))",
+          "expr": "(sum(max_over_time(k6_http_reqs_total{testid=\"$testid\",expected_response=\"false\"}[$__range])) or vector(0)) / sum(max_over_time(k6_http_reqs_total{testid=\"$testid\"}[$__range]))",
           "legendFormat": "",
           "instant": false
         }
@@ -466,7 +466,7 @@
     {
       "type": "stat",
       "title": "Journey errors",
-      "description": "Share of user journeys that failed at any step.",
+      "description": "Share of user journeys that failed at any step (average of k6's per-flush rate over the run).",
       "datasource": {
         "type": "prometheus",
         "uid": "prometheus"
@@ -484,7 +484,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "max(max_over_time(k6_journey_errors_rate{testid=\"$testid\"}[$__range]))",
+          "expr": "avg(avg_over_time(k6_journey_errors_rate{testid=\"$testid\"}[$__range]))",
           "legendFormat": "",
           "instant": false
         }
