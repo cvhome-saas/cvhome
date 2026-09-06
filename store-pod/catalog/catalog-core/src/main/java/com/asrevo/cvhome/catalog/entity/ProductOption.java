@@ -20,6 +20,8 @@ import jakarta.persistence.Table;
 import jakarta.persistence.TableGenerator;
 import jakarta.persistence.UniqueConstraint;
 
+import org.hibernate.annotations.BatchSize;
+
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.constants.SchemaConstant;
@@ -70,10 +72,17 @@ public class ProductOption extends SalesManagerEntity<Long, ProductOption> imple
     @Column(name = "SORT_ORDER")
     private Integer sortOrder;
 
+    /**
+     * Batched: the product page walks every assigned option's values and their labels. Without this each option
+     * paid one query for its values and each value one for its descriptions — the bulk of the ~20 statements a
+     * product read used to cost. Batched, a page's options load in one query per collection.
+     */
     @OneToMany(mappedBy = "option", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @BatchSize(size = 100)
     private Set<ProductOptionValue> values = new HashSet<>();
 
     @OneToMany(mappedBy = "option", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @BatchSize(size = 100)
     private Set<ProductOptionDescription> descriptions = new HashSet<>();
 
     public Optional<ProductOptionDescription> description(LanguageCode language) {
