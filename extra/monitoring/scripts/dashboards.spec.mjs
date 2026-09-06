@@ -22,7 +22,7 @@ const errorLogs = (svc = '${__field.labels.service_name}') =>
   lokiLink('Error logs', `{service_name="${svc}"} | detected_level=~"error|warn"`);
 
 const statusStat = (code, label, what) => stat(`${label}`, what,
-  `sum(increase(http_server_requests_seconds_count{${SVC},uri=~"$uri",status${code.includes('.') ? '=~' : '='}"${code}"}[$__range]))`,
+  `sum(increase(http_server_requests_seconds_count{${SVC},uri=~"$uri",status${code.includes('.') ? '=~' : '='}"${code}"}[$__range])) or vector(0)`,
   {w: 3, h: 4, unit: 'short', graph: false, thresholds: code.startsWith('5') ? [1, 10] : [50, 200],
     links: [tempoLink(`${label} traces`, `{resource.service.name=~"$service" && span:kind=server && span.http.response.status_code ${code.includes('.') ? '>= 500' : '= ' + code}}`),
       lokiLink(`${label} log lines`, `{service_name=~"$service"} |~ "${code.includes('.') ? '5[0-9][0-9]' : code} "`)]});

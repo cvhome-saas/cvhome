@@ -294,7 +294,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "sum(increase(http_server_requests_seconds_count{service_name=~\"$service\",uri=~\"$uri\",status=\"400\"}[$__range]))",
+          "expr": "sum(increase(http_server_requests_seconds_count{service_name=~\"$service\",uri=~\"$uri\",status=\"400\"}[$__range])) or vector(0)",
           "legendFormat": "",
           "instant": false
         }
@@ -370,7 +370,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "sum(increase(http_server_requests_seconds_count{service_name=~\"$service\",uri=~\"$uri\",status=\"401\"}[$__range]))",
+          "expr": "sum(increase(http_server_requests_seconds_count{service_name=~\"$service\",uri=~\"$uri\",status=\"401\"}[$__range])) or vector(0)",
           "legendFormat": "",
           "instant": false
         }
@@ -446,7 +446,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "sum(increase(http_server_requests_seconds_count{service_name=~\"$service\",uri=~\"$uri\",status=\"403\"}[$__range]))",
+          "expr": "sum(increase(http_server_requests_seconds_count{service_name=~\"$service\",uri=~\"$uri\",status=\"403\"}[$__range])) or vector(0)",
           "legendFormat": "",
           "instant": false
         }
@@ -522,7 +522,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "sum(increase(http_server_requests_seconds_count{service_name=~\"$service\",uri=~\"$uri\",status=\"404\"}[$__range]))",
+          "expr": "sum(increase(http_server_requests_seconds_count{service_name=~\"$service\",uri=~\"$uri\",status=\"404\"}[$__range])) or vector(0)",
           "legendFormat": "",
           "instant": false
         }
@@ -598,7 +598,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "sum(increase(http_server_requests_seconds_count{service_name=~\"$service\",uri=~\"$uri\",status=\"409\"}[$__range]))",
+          "expr": "sum(increase(http_server_requests_seconds_count{service_name=~\"$service\",uri=~\"$uri\",status=\"409\"}[$__range])) or vector(0)",
           "legendFormat": "",
           "instant": false
         }
@@ -674,7 +674,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "sum(increase(http_server_requests_seconds_count{service_name=~\"$service\",uri=~\"$uri\",status=\"422\"}[$__range]))",
+          "expr": "sum(increase(http_server_requests_seconds_count{service_name=~\"$service\",uri=~\"$uri\",status=\"422\"}[$__range])) or vector(0)",
           "legendFormat": "",
           "instant": false
         }
@@ -750,7 +750,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "sum(increase(http_server_requests_seconds_count{service_name=~\"$service\",uri=~\"$uri\",status=\"429\"}[$__range]))",
+          "expr": "sum(increase(http_server_requests_seconds_count{service_name=~\"$service\",uri=~\"$uri\",status=\"429\"}[$__range])) or vector(0)",
           "legendFormat": "",
           "instant": false
         }
@@ -826,7 +826,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "sum(increase(http_server_requests_seconds_count{service_name=~\"$service\",uri=~\"$uri\",status=~\"5..\"}[$__range]))",
+          "expr": "sum(increase(http_server_requests_seconds_count{service_name=~\"$service\",uri=~\"$uri\",status=~\"5..\"}[$__range])) or vector(0)",
           "legendFormat": "",
           "instant": false
         }
