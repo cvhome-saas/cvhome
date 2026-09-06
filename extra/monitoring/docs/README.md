@@ -16,6 +16,7 @@ opened Grafana can read it, and so that the whole setup can be rebuilt on anothe
 | see what the system emits, where it comes from, and the switch that turns it on | [signals.md](signals.md) |
 | read a load-test run against the application | [load-testing.md](load-testing.md) |
 | move all of this to CloudWatch, Datadog or another OpenTelemetry backend | [porting.md](porting.md) |
+| see what the first load tests found and what still has to be measured | [performance-improvements.md](performance-improvements.md) |
 
 ## Running it locally
 
