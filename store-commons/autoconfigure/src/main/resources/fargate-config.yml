@@ -48,3 +48,8 @@ spring:
           "cua": 8124
           "payment": 8125
           "inventory": 8126
+logging:
+  level:
+    com.asrevo: INFO
+    org.springframework.web: WARN
+    org.springframework.security: WARN

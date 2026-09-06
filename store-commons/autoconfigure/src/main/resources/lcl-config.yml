@@ -105,3 +105,10 @@ spring:
                 metadata:
                   service-name: landing-ui
                   instance: landing-ui-1
+logging:
+  level:
+    # Local only. The same three packages at DEBUG under fargate flooded CloudWatch with request-plumbing lines; the
+    # deployed profile keeps INFO/WARN in fargate-config.yml.
+    com.asrevo: DEBUG
+    org.springframework.web: DEBUG
+    org.springframework.security: DEBUG
