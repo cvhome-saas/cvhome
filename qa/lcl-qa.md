@@ -262,7 +262,7 @@ java.lang.IllegalArgumentException: Failed to evaluate expression 'hasPermission
   `lcl restart` also comes back with the default infra only — the monitoring containers are gone until the next
   `lcl start -d --infra all`.
 
-## 16 — SLO rules evaluate and every dashboard has data [verified]
+## 16 — SLO rules evaluate and every dashboard has data [verified; not verified: the two in-UI link clicks (*View trace*, *Slow traces*) — checked through the Loki and Tempo APIs instead]
 
 - **Setup** — case 15 passed; `cd ../load-testing && make smoke` has run once against the stack (fills every
   route, journey and the k6 series).
