@@ -89,6 +89,14 @@ processors:
           - replace_pattern(name, "^(fetch \\w+) https?://[^/]+", "$$1") where kind == SPAN_KIND_CLIENT
           - replace_pattern(name, "/[0-9a-fA-F]{24}(/|$$)", "/{id}$$1") where kind == SPAN_KIND_CLIENT
           - replace_pattern(name, "/[0-9]+(/|$$)", "/{id}$$1") where kind == SPAN_KIND_CLIENT
+          # A JDBC span is named "<operation> <table>" only when the instrumentation could name a single table. Every
+          # join and subquery Hibernate emits falls back to "<operation> <database>" ("SELECT cvhome") and loses
+          # db.sql.table, which hid a third of catalog's statements behind one row. The first table after FROM /
+          # INTO / UPDATE names it here instead, so the SQL panels and the per-table rules see every statement.
+          - merge_maps(attributes, ExtractPatterns(attributes["db.statement"], "(?i)\\b(?:from|into|update)\\s+(?P<db_sql_table>[A-Za-z_][A-Za-z0-9_]*(?:\\.[A-Za-z_][A-Za-z0-9_]*)?)"), "insert") where attributes["db.system"] != nil and attributes["db.sql.table"] == nil and attributes["db.statement"] != nil
+          - set(attributes["db.sql.table"], attributes["db_sql_table"]) where attributes["db_sql_table"] != nil
+          - delete_key(attributes, "db_sql_table") where attributes["db_sql_table"] != nil
+          - set(name, Concat([attributes["db.operation"], attributes["db.sql.table"]], " ")) where attributes["db.operation"] != nil and attributes["db.sql.table"] != nil and attributes["db.name"] != nil and name == Concat([attributes["db.operation"], attributes["db.name"]], " ")
 
   # Meter families nobody reads. Kept on purpose (not listed): http.*, jvm.*, system.*, process.*, jdbc.*,
   # hikaricp.*, tomcat.* (request-thread saturation), executor.* (async/scheduler pools), cache.*, cvhome.*.
