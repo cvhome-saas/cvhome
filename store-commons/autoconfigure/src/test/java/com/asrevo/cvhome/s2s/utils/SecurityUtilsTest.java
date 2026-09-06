@@ -47,6 +47,8 @@ class SecurityUtilsTest {
 
     private static final String SUBJECT = "a-principal";
 
+    private static final String OPERATOR = "super-admin";
+
     private static Authentication principal(Map<String, Object> claims, Roles... roles) {
         Jwt jwt = Jwt.withTokenValue(TOKEN_VALUE)
                 .header(ALG, NONE)
@@ -58,6 +60,19 @@ class SecurityUtilsTest {
                 .build();
         return new JwtAuthenticationToken(jwt,
                 List.of(roles).stream().map(role -> new SimpleGrantedAuthority(role.name())).toList());
+    }
+
+    /** An impersonated token's audit actor names both people; a plain one names the principal, and nobody is "unknown". */
+    @Test
+    void theAuditActorNamesTheOperatorBehindAnImpersonatedToken() {
+        Authentication impersonated = principal(Map.of("act", Map.of("sub", OPERATOR)), Roles.ROLE_STORE_MODERATOR);
+        Authentication plain = principal(Map.of(), Roles.ROLE_STORE_ADMIN);
+
+        assertThat(SecurityUtils.actorOf(impersonated)).isEqualTo(String.format("%s (via %s)", SUBJECT, OPERATOR));
+        assertThat(SecurityUtils.actingOperator(impersonated)).contains(OPERATOR);
+        assertThat(SecurityUtils.actorOf(plain)).isEqualTo(SUBJECT);
+        assertThat(SecurityUtils.actingOperator(plain)).isEmpty();
+        assertThat(SecurityUtils.actorOf(null)).isEqualTo("unknown");
     }
 
     @Test

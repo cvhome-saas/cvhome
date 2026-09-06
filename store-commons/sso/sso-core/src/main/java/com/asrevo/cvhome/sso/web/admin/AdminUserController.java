@@ -76,6 +76,12 @@ public class AdminUserController {
 
     private static final String ADMIN = "hasAuthority('SCOPE_super_admin') or hasRole('SUPER_ADMIN')";
 
+    /**
+     * The two reads platform support needs to pick a merchant to act as. Support may read accounts and nothing
+     * else here: its way of doing anything to one is the impersonation grant, read-only.
+     */
+    private static final String READER = "hasAuthority('SCOPE_super_admin') or hasAnyRole('SUPER_ADMIN','SUPPORT')";
+
     private static final String METADATA_PREFIX = "metadata[";
 
     private final AdminService adminService;
@@ -100,7 +106,7 @@ public class AdminUserController {
      * The list, filtered. {@code q} searches username, email and names; {@code status} and {@code role} narrow;
      * {@code metadata[key]=value} is the equality filter tenancy has always used. All optional, all ANDed.
      */
-    @PreAuthorize(ADMIN)
+    @PreAuthorize(READER)
     @GetMapping
     public Page<UserDto> users(@RequestParam(required = false) String q, @RequestParam(required = false) UserStatus status,
                                @RequestParam(required = false) String role, @RequestParam Map<String, String> allParams,
@@ -114,7 +120,7 @@ public class AdminUserController {
         return adminService.counts();
     }
 
-    @PreAuthorize(ADMIN)
+    @PreAuthorize(READER)
     @GetMapping("/{id}")
     public UserDto user(@PathVariable UUID id) throws UserNotFoundException {
         return adminService.getUser(id);

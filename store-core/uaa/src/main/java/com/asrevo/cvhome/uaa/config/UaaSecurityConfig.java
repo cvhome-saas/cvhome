@@ -59,6 +59,9 @@ public class UaaSecurityConfig {
 
     private static final String SUPER_ADMIN = "ROLE_SUPER_ADMIN";
 
+    /** Admitted to the admin chain for the user reads it needs to find a merchant; every method guard still refuses its writes. */
+    private static final String SUPPORT = "ROLE_SUPPORT";
+
     @Bean
     SecurityFilterChain appSecurity(HttpSecurity http, SsoSecurityDefaults defaults, ProblemAccessDeniedHandler denied,
                                     LoginSuccessHandler loginSuccess, LoginFailureHandler loginFailure,
@@ -88,7 +91,7 @@ public class UaaSecurityConfig {
                         .requestMatchers("/oauth2/authorization/**", "/login/oauth2/**", "/api/v1/auth/link-confirm")
                         .permitAll()
                         .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/api-docs/**").permitAll()
-                        .requestMatchers("/api/v1/admin/**").hasAnyAuthority("SCOPE_super_admin", SUPER_ADMIN)
+                        .requestMatchers("/api/v1/admin/**").hasAnyAuthority("SCOPE_super_admin", SUPER_ADMIN, SUPPORT)
                         .anyRequest().authenticated())
                 .formLogin(login -> login.loginPage(LOGIN_PAGE).successHandler(loginSuccess).failureHandler(loginFailure))
                 .oauth2Login(login -> login.loginPage(LOGIN_PAGE)

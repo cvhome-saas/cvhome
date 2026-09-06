@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
+import com.asrevo.cvhome.s2s.utils.SecurityUtils;
 import com.asrevo.cvhome.tenancy.commons.dto.ListOrgQuery;
 import com.asrevo.cvhome.tenancy.commons.dto.ManagerOrgDto;
 import com.asrevo.cvhome.tenancy.commons.dto.ManagerStoreDto;
@@ -75,13 +76,18 @@ public class OrgManagerApi {
      * exactly the rows on screen.
      * </p>
      */
-    @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN')")
+    /*
+     * The three reads below admit ROLE_SUPPORT as well. Support holds users:impersonate and nothing else, and to act
+     * as a merchant it has to find one first: the organizations, one organization, and its stores. Every write on
+     * this controller stays super-admin only.
+     */
+    @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN','ROLE_SUPPORT')")
     @PostMapping("list")
     public Page<ManagerOrgDto> listOrgs(@RequestBody ListOrgQuery query, Pageable pageable) {
         return internalOrgService.findAll(query, pageable);
     }
 
-    @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN')")
+    @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN','ROLE_SUPPORT')")
     @GetMapping("find-one")
 
     public ManagerOrgDto findOne(@RequestParam ManagerOrgId id) throws OrgNotFoundException {
@@ -171,11 +177,12 @@ public class OrgManagerApi {
         return orgLifecycleService.close(id, actorOf(authentication));
     }
 
+    /** The audit actor — the operator behind an impersonated token too, so the trail never blames the merchant. */
     private static String actorOf(Authentication authentication) {
-        return authentication == null ? "unknown" : authentication.getName();
+        return SecurityUtils.actorOf(authentication);
     }
 
-    @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN')")
+    @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN','ROLE_SUPPORT')")
     @GetMapping("stores")
     public Page<ManagerStoreDto> findAllStores(@RequestParam ManagerOrgId id, Pageable pageable) {
         return internalStoreService.findAll(id, pageable);

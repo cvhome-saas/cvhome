@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.asrevo.cvhome.commons.annotation.OrgStorePrincipalInfo;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.commons.domain.UserOrgStoreIdentity;
+import com.asrevo.cvhome.s2s.utils.SecurityUtils;
 import com.asrevo.cvhome.tenancy.commons.dto.ManagerStoreDto;
 import com.asrevo.cvhome.tenancy.errors.IllegalLifecycleTransitionException;
 import com.asrevo.cvhome.tenancy.errors.StoreNotFoundException;
@@ -78,8 +79,9 @@ public class StoreLifecycleApi {
         return lifecycleService.delete(identity, store, actorOf(authentication));
     }
 
+    /** The audit actor — the operator behind an impersonated token too, so the trail never blames the merchant. */
     private static String actorOf(Authentication authentication) {
-        return authentication == null ? "unknown" : authentication.getName();
+        return SecurityUtils.actorOf(authentication);
     }
 
 }
