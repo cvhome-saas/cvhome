@@ -63,3 +63,37 @@ k6 names its requests `service:endpoint`; the application sees route templates. 
 | `spg:domain-lookup` | merchant | `/api/v1/router/public/lookup-by-domain` |
 
 (Exact templates: Service RED → *Requests / s by route* while the run is going.)
+
+## The load stack: images, one container each, 1 GB per container
+
+Numbers from `lcl start` are development numbers: every service is `gradle bootRun` on the host, with a warm build
+daemon behind it, no memory limit, and the storefront on `next dev`. For numbers that mean something about a
+deployment, run the platform the way it is deployed — as the images `bootBuildImage` produces, one container per
+service, each capped at the memory a task gets:
+
+```bash
+lcl stop --stack <name>                     # the load stack takes the same ports
+extra/scripts/load-stack.sh build           # ./gradlew bootBuildImage: twelve JVM images + console-ui + landing-ui
+extra/scripts/load-stack.sh up              # compose up, then waits until every /actuator/health says UP
+cd ../load-testing && make smoke            # TARGET=lcl unchanged: same ports, hostnames and seeded stores
+extra/scripts/load-stack.sh stats           # memory and CPU per container
+extra/scripts/load-stack.sh down [--hard]   # --hard drops the volumes: a fresh database next time
+```
+
+What it is: `docker-compose-load.yml` layered over `docker-compose-lcl.yml`. The infra and the monitoring are the
+same containers lcl runs; the fourteen application containers are added, each with `deploy.resources.limits.memory`
+= `LOAD_MEM` (1g). The JVM images size their heap from that limit (the buildpack memory calculator), so a service
+that leaks or over-allocates is killed the way it would be on Fargate, and JVM & Runtime → *Heap after GC* reads
+against a real ceiling. Inside the network the platform's hostnames (`gateway.com`, `uaa.gateway.com`,
+`catalog.gateway.com`, `spg-507f1f77.gateway.com`, the demo store hosts) are container aliases, so spg, the JVMs
+and the storefront reach each other by the names the config already uses; on the host the same names still point
+at 127.0.0.1 through `/etc/hosts`, and every port is the lcl default, so `load-testing` needs no new target.
+
+Knobs: `LOAD_MEM` (default `1g`), `LOAD_POOL_SIZE` (Hikari maximum per service, default 10 — the deployed default,
+not lcl's 5), `LOAD_TAG` / `LOAD_REGISTRY` (which images), `JAVA_TOOL_OPTIONS`, `OTEL_SDK_DISABLED` (default
+`false`: everything exports to the collector).
+
+What still differs from a deployment: one machine shares its CPU between all containers and the database, so the
+first thing to saturate is the host's CPU, not a task's; `PostgreSQL` runs in a 1 GB container with default
+settings; there is no load balancer, no TLS termination, and the storefront's static assets are served by the
+container rather than a CDN. Record `docker stats` alongside the run so a memory-bound service is visible.

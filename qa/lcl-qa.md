@@ -286,3 +286,28 @@ java.lang.IllegalArgumentException: Failed to evaluate expression 'hasPermission
   on the service; `cvhome_auth_rejections_total{reason="missing_token",status="401"}` is present; both scripts
   print "valid" / "up to date" and promtool prints SUCCESS. **Expected to fail if** a dashboard JSON is edited
   by hand without regenerating `docs/dashboards.md` — the check script fails on the diff, which is the point.
+
+## 17 — The load stack: images, one container each, 1 GB per container [verified; not verified: LOAD_MEM other than 1g, a registry-tagged LOAD_TAG]
+
+The numbers a load test produces against `lcl start` are development numbers (gradle `bootRun`, no memory limit,
+`next dev`). This stack runs the platform as its images with the memory a deployed task gets.
+
+- **Setup** — Docker running, `/etc/hosts` from `configure-domain.sh`, no lcl stack on the default ports
+  (`lcl list` shows none — the script refuses otherwise).
+- **Steps** —
+  1. `extra/scripts/load-stack.sh build` — expect `store-core/{uaa,store-core-gateway,tenancy,billing,pod-registry,console-ui}:latest`
+     and `store-pod/{merchant,content,catalog,checkout,cua,payment,inventory,landing-ui}:latest` in `docker images`
+     (a Docker Hub timeout on the buildpack builder fails one image; rerun the same command).
+  2. `extra/scripts/load-stack.sh up` — expect "every Java service is UP" within ten minutes, then
+     `landing-ui 307`, `console-ui 200`, `spg 307`.
+  3. `extra/scripts/load-stack.sh stats` — every container `/ 1GiB`; a JVM at rest sits at 250–400 MiB.
+  4. `curl -s http://localhost:9090/api/v1/query --data-urlencode 'query=count by (service_version) (process_uptime_seconds)'`
+     — `1.0.16 12`: every JVM exports to the collector, from inside the network.
+  5. `cd ../load-testing && make smoke` — 308 requests, 0 failed, 2 orders (the `spg:domain-lookup` check that
+     fails once is the same on lcl).
+  6. `extra/scripts/load-stack.sh down --hard` — no `cvhome-load-*` containers or volumes remain.
+- **Expect** — the storefront reaches spg by its in-network alias and spg reaches the pods by theirs (no
+  `host-gateway` entries: `docker inspect cvhome-load-spg-1 | grep -c host-gateway` is 0); an lcl stack started
+  afterwards on the same ports works unchanged.
+- **Expected to fail** — `up` while an lcl stack holds the ports (refused by the guard, or port collisions if the
+  guard is bypassed); `up` before `build` (`pull access denied` for `store-pod/catalog`).
