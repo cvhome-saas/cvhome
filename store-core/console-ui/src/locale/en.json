@@ -972,7 +972,7 @@
         "read": "Read-only",
         "write": "Read and write"
       },
-      "remaining": "{{minutes}} {count, plural, =1 {minute} other {minutes}} left",
+      "remaining": "{count, plural, =0 {less than a minute} =1 {1 minute} other {# minutes}} left",
       "end": "Stop acting as them"
     },
     "store": {
@@ -2061,8 +2061,11 @@
       },
       "reason": "Reason",
       "reasonPlaceholder": "Ticket number, what they reported…",
-      "confirm": "Start",
-      "busy": "Starting…"
+      "confirm": "Start acting as {{name}}",
+      "busy": "Starting…",
+      "confirmUnnamed": "Start",
+      "noStores": "This account acts in no store, so there is nowhere to open.",
+      "noTargets": "No account acts in this store."
     },
     "orgStatus": {
       "ACTIVE": "Active",

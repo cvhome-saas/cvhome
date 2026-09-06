@@ -7,10 +7,12 @@
   *transloco="let t"
 >
   <form class="impersonation-form" (submit)="onSubmit($event)">
-    <div class="row">
-      <span class="label">{{ t('platform.impersonation.target') }}</span>
+    <div class="imp-row">
+      <span class="imp-label">{{ t('platform.impersonation.target') }}</span>
       @if (targets().length === 1) {
-        <span class="fixed latin">{{ targets()[0].label }}</span>
+        <span class="imp-value latin">{{ targets()[0].label }}</span>
+      } @else if (targets().length === 0) {
+        <p class="imp-empty">{{ t('platform.impersonation.noTargets') }}</p>
       } @else {
         <app-select
           [value]="targetId()"
@@ -22,10 +24,12 @@
       }
     </div>
 
-    <div class="row">
-      <span class="label">{{ t('platform.impersonation.store') }}</span>
+    <div class="imp-row">
+      <span class="imp-label">{{ t('platform.impersonation.store') }}</span>
       @if (stores().length === 1) {
-        <span class="fixed">{{ stores()[0].label }}</span>
+        <span class="imp-value">{{ stores()[0].label }}</span>
+      } @else if (stores().length === 0) {
+        <p class="imp-empty">{{ t('platform.impersonation.noStores') }}</p>
       } @else {
         <app-select
           [value]="storeId()"
@@ -37,26 +41,23 @@
       }
     </div>
 
-    <div class="row">
-      <span class="label">{{ t('platform.impersonation.modeLabel') }}</span>
+    <div class="imp-row">
+      <span class="imp-label">{{ t('platform.impersonation.modeLabel') }}</span>
       @if (allowWrite()) {
         <app-select
           [value]="mode()"
           (valueChange)="setMode($event)"
-          [options]="[
-            {value: 'read', label: t('platform.impersonation.mode.read')},
-            {value: 'write', label: t('platform.impersonation.mode.write')}
-          ]"
+          [options]="modeOptions()"
           [ariaLabel]="t('platform.impersonation.modeLabel')"
         />
       } @else {
-        <span class="fixed">{{ t('platform.impersonation.mode.read') }}</span>
+        <span class="imp-value">{{ t('platform.impersonation.mode.read') }}</span>
       }
-      <p class="hint">{{ t(mode() === 'write' ? 'platform.impersonation.hint.write' : 'platform.impersonation.hint.read') }}</p>
+      <p class="imp-hint">{{ t(mode() === 'write' ? 'platform.impersonation.hint.write' : 'platform.impersonation.hint.read') }}</p>
     </div>
 
-    <div class="row">
-      <span class="label">{{ t('platform.impersonation.reason') }}</span>
+    <div class="imp-row">
+      <span class="imp-label">{{ t('platform.impersonation.reason') }}</span>
       <app-textarea
         [value]="reason()"
         (valueChange)="reason.set($event)"
@@ -65,15 +66,21 @@
         [placeholder]="t('platform.impersonation.reasonPlaceholder')"
         [ariaLabel]="t('platform.impersonation.reason')"
       />
-      <p class="hint">{{ t('platform.impersonation.hint.reason') }}</p>
+      <p class="imp-hint">{{ t('platform.impersonation.hint.reason') }}</p>
     </div>
 
-    <div class="actions">
+    <div class="imp-actions">
       <button class="secondary-action" type="button" [disabled]="busy()" (click)="reset()">
         {{ t('shared.actions.cancel') }}
       </button>
       <button class="primary-action" type="submit" [disabled]="!canSubmit()">
-        {{ busy() ? t('platform.impersonation.busy') : t('platform.impersonation.confirm') }}
+        @if (busy()) {
+          {{ t('platform.impersonation.busy') }}
+        } @else if (targetLabel()) {
+          {{ t('platform.impersonation.confirm', {name: targetLabel()}) }}
+        } @else {
+          {{ t('platform.impersonation.confirmUnnamed') }}
+        }
       </button>
     </div>
   </form>

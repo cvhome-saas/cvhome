@@ -8,34 +8,45 @@
   gap: var(--spacing-section);
 }
 
-.row {
+/* A label and its control: the scale's own step for exactly that pair. */
+.imp-row {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-tight);
+  gap: var(--spacing-field);
 }
 
-.label {
+.imp-label {
+  display: block;
   color: var(--foreground-strong);
   font-size: var(--text-sm);
   font-weight: 600;
 }
 
-.fixed {
-  padding: var(--spacing-tight) var(--spacing-field);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  background: var(--muted);
-  color: var(--foreground);
+/*
+ * A choice with one option is shown as that option, already made — a value, not a disabled input.
+ * Strong foreground and no box: an input-shaped thing that cannot be clicked reads as broken.
+ */
+.imp-value {
+  display: block;
+  color: var(--foreground-strong);
+  font-size: var(--text-sm);
+  font-weight: 500;
+}
+
+/* Nothing to choose from: said in words, where an empty select would say nothing. */
+.imp-empty {
+  margin: 0;
+  color: var(--muted-foreground);
   font-size: var(--text-sm);
 }
 
-.hint {
+.imp-hint {
   margin: 0;
   color: var(--muted-foreground);
   font-size: var(--text-xs);
 }
 
-.actions {
+.imp-actions {
   display: flex;
   justify-content: flex-end;
   gap: var(--spacing-tight);

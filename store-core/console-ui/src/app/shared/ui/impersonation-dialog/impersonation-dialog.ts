@@ -1,5 +1,5 @@
-import {Component, computed, input, linkedSignal, output, signal} from '@angular/core';
-import {TranslocoDirective} from '@jsverse/transloco';
+import {Component, computed, inject, input, linkedSignal, output, signal} from '@angular/core';
+import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 
 import type {StartImpersonation} from '@models/impersonation';
 import {FormDialog, Select, type SelectOption, TextareaField} from '@cvhome-saas/ui-kit/ui';
@@ -26,6 +26,8 @@ const REASON_MAX = 200;
   styleUrl: './impersonation-dialog.css',
 })
 export class ImpersonationDialog {
+  private readonly transloco = inject(TranslocoService);
+
   readonly open = input(false);
   readonly busy = input(false);
   /** The accounts that may be acted as. One means it is fixed. */
@@ -45,13 +47,25 @@ export class ImpersonationDialog {
 
   protected readonly reasonMax = REASON_MAX;
 
+  /** The chosen account's label, for a submit that names what it does. */
+  protected readonly targetLabel = computed(
+    () => this.targets().find((target) => target.value === this.targetId())?.label ?? '',
+  );
+
   protected readonly canSubmit = computed(
     () => !this.busy() && !!this.targetId() && !!this.storeId() && this.reason().trim().length > 0,
   );
 
-  protected readonly modeOptions = computed<readonly SelectOption[]>(() =>
-    this.allowWrite() ? [{value: 'read', label: ''}, {value: 'write', label: ''}] : [{value: 'read', label: ''}],
-  );
+  /**
+   * Computed rather than written as an array literal in the template: a literal is a new array on every
+   * change-detection pass, and the select closes its popover when its options change identity.
+   */
+  protected readonly modeOptions = computed<readonly SelectOption[]>(() => {
+    this.transloco.activeLang();
+    const read = {value: 'read', label: this.transloco.translate('platform.impersonation.mode.read')};
+    const write = {value: 'write', label: this.transloco.translate('platform.impersonation.mode.write')};
+    return this.allowWrite() ? [read, write] : [read];
+  });
 
   protected onSubmit(event: Event): void {
     event.preventDefault();

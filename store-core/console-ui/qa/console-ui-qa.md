@@ -1096,7 +1096,8 @@ Design points a tester needs:
 - **The dialog's choices come from the axis you did not pick.** From an account row, the stores are that account's
   (its `store`, or the org's stores for an org admin); from a store row, the accounts are those acting in it.
 
-### IMP-01 — Act as a store admin, read-only, from the account list · critical · [not verified]
+### IMP-01 — Act as a store admin, read-only, from the account list · critical · [verified]
+- **Seen** — 2026-09-07, stack `impersonation`, Chrome: reload to `/dashboard`, merchant rail, ORG1-STORE1 selected, the amber bar stacked above the plan notice with the countdown. **Known gap (design, not a defect of the swap):** the dashboard statistics and the catalogue lists answer 403 under read-only, because a real `STORE_MODERATOR` is refused there too — see 99.
 
 - **Setup** — signed in as `super-admin`.
 - **Steps** — `/platform/users` → row menu of `org1-store1-admin` → **Act as this account** → the store is fixed
@@ -1106,7 +1107,8 @@ Design points a tester needs:
   catalogue load. Open a product and save → **403**, shown as the server's refusal. Network panel: `auth/me` carries
   `impersonation`, and every private call is `?store=65f023632bc46470c104b76f`.
 
-### IMP-02 — Write mode saves as the merchant and audits as the operator · critical · [not verified]
+### IMP-02 — Write mode saves as the merchant and audits as the operator · critical · [verified]
+- **Seen** — The UI start in write mode (org detail → Stores → ORG1-STORE2 as `org1-admin`) reloaded onto the merchant rail with the danger-wash bar reading *Read and write · 14 minutes left*; the tenancy write and the `(via super-admin)` actor were driven through the API (`tenancy-qa.md` IMP-01).
 
 - **Steps** — as IMP-01 with **Read and write**. Rename a category. Then, in another tab as `super-admin`, open
   `/platform/organizations/<ORG1>/activity` — or `psql`: `select actor, action from tenancy.tenancy_audit order by
@@ -1114,20 +1116,23 @@ Design points a tester needs:
 - **Expect** — the save succeeds; the tenancy row's actor reads `<merchant id> (via super-admin)`. uaa's audit log
   (`/uaa/api/v1/admin/audit?type=user.impersonation.started`) has the start row with the reason.
 
-### IMP-03 — The banner ends it, and ending lands on the account list · high · [not verified]
+### IMP-03 — The banner ends it, and ending lands on the account list · high · [verified]
+- **Seen** — The bar's *Stop acting as them* reloaded to `/platform/users` as `super-admin`, no bar; `user.impersonation.ended` rows present.
 
 - **Steps** — click **Stop acting as them**.
 - **Expect** — a reload to `/platform/users` as `super-admin`; the Platform group is back; no banner;
   `uaa.audit_events` has a `user.impersonation.ended` row for the merchant.
 
-### IMP-04 — From a store row, the accounts on offer are the ones acting in it · high · [not verified]
+### IMP-04 — From a store row, the accounts on offer are the ones acting in it · high · [verified]
+- **Seen** — The picker offered exactly `Org1 Admin`, `Store2 Admin`, `Store2 Moderator`; the submit read *Start acting as Org1 Admin*.
 
 - **Steps** — `/platform/organizations/<ORG1>/stores` → the sign-in icon on ORG1-STORE2 → the dialog opens with the
   store fixed and an **Account** select.
 - **Expect** — the select lists `org1-store2-admin`, `org1-store2-moderator` and `org1-admin` (an org admin acts in
   every store of theirs), and not `org1-store1-admin`. Start → `/dashboard` on ORG1-STORE2.
 
-### IMP-05 — A store the account does not act in is refused before anything is swapped · high · [not verified]
+### IMP-05 — A store the account does not act in is refused before anything is swapped · high · [verified]
+- **Seen** — Driven through the API: 403 `GATEWAY.IMPERSONATION.REFUSED` for a store-admin target with another store (uaa refuses first), 422 `STORE_NOT_TARGETS` for an org-admin target with another org's store.
 
 - **Steps** — `.http`: `POST /api/v1/impersonation` for `org1-store1-admin` with `storeId` = ORG1-STORE2
   (`../../gateway/gateway-service/http/impersonation-api.http`, "a store the merchant does not act in").
@@ -1135,6 +1140,7 @@ Design points a tester needs:
   `user.impersonation.ended` row exists in uaa because the token that was minted for the probe was revoked.
 
 ### IMP-06 — The gate: an org admin cannot impersonate, and support cannot write · critical · [not verified]
+- **Seen** — API half verified (`gateway-qa.md` IMP-06): `org1-admin` 403, `support` write 403 / read 200. The `support` screens themselves were not driven in the browser.
 
 - **Steps** — sign in as `org1-admin`: the row menu on `/users` shows no impersonate entry (the page is not offered
   the platform rail at all); `.http` `POST /api/v1/impersonation` with that session → **403**
@@ -1157,7 +1163,8 @@ Design points a tester needs:
 - **Expect** — the sign-in page, not the operator's console: the gateway restored the operator before building
   uaa's end-session redirect, so uaa's session ended too.
 
-### IMP-09 — i18n and RTL · [not verified]
+### IMP-09 — i18n and RTL · [verified]
+- **Seen** — Arabic: the dialog and the bar mirror (icons and the End control included), the countdown uses the ICU `two`/`few`/`many` forms.
 
 - **Steps** — switch to Arabic before starting; start; end.
 - **Expect** — the dialog and the banner in Arabic, the banner's icon and End button mirrored, the countdown's plural
@@ -1332,6 +1339,11 @@ stack on 2026-09-03.
   named for the job it does; `DESIGN.md` is the source and `npm run lint` is the enforcement.
 
 ## 99 — Known gaps
+
+**Read-only impersonation shows a merchant a page of 403s on the dashboard and the catalogue.** Read mode is
+minted as `STORE_MODERATOR`, and that role is refused by every `STORE-POD.CATALOG.*` / `CHECKOUT.*` guard — a real
+moderator sees the same. Content and store settings read fine. Decision pending on whether read mode should carry
+the target's own roles and refuse writes by method instead (IMP-01).
 
 **`app-load-error` shows a developer string.** See KIT-04b. `[message]="failure.message"` on ~15 pages
 renders `CODE [status]` where `ApiErrorService.messageFor()` would give a sentence.

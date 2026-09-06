@@ -27,7 +27,7 @@ const TICK_MS = 30_000;
   template: `
     @if (shell.impersonation(); as acting) {
       <aside class="impersonation-banner" [class.write]="acting.mode === 'write'" role="status" *transloco="let t">
-        <app-icon name="signIn" />
+        <app-icon name="signIn" [flip]="true" />
         <p>
           <strong>{{ t('shell.impersonation.actingAs', {name: acting.actingAs}) }}</strong>
           <span class="detail">
@@ -36,7 +36,7 @@ const TICK_MS = 30_000;
             · {{ remainingLabel() }}
           </span>
         </p>
-        <button class="end" type="button" (click)="shell.endImpersonation()">
+        <button class="secondary-action end" type="button" (click)="shell.endImpersonation()">
           {{ t('shell.impersonation.end') }} <app-icon name="signOut" [flip]="true" />
         </button>
       </aside>
@@ -74,6 +74,6 @@ export class ImpersonationBanner {
       return '';
     }
     const minutes = Math.max(0, Math.ceil((Date.parse(acting.expiresAt) - this.now()) / 60_000));
-    return this.transloco.translate('shell.impersonation.remaining', {minutes, count: minutes});
+    return this.transloco.translate('shell.impersonation.remaining', {count: minutes});
   });
 }
