@@ -70,8 +70,21 @@ class UaaApiErrorsTest {
     }
 
     /**
-     * uaa has no code of its own for a duplicate user: it lets the unique constraint decide and the shared advice
-     * renders the database's refusal. To a caller that still means "that user already exists".
+     * uaa names a duplicate by the field it clashed on. Both are one caller-side conflict — unmapped, the taken
+     * address reached signup as "uaa did not complete the request", the one thing it had done.
+     */
+    @Test
+    void uaaNamingATakenUsernameOrAddressBecomesAConflict() {
+        RemoteServiceException byName = resolve(UaaErrors.USERNAME_TAKEN.code(), CONFLICT);
+        assertThat(byName).isInstanceOf(UaaConflictException.class);
+        assertThat(byName.remoteCode()).isEqualTo(UaaErrors.USERNAME_TAKEN.code());
+        assertThat(byName.remoteStatus()).isEqualTo(CONFLICT);
+        assertThat(resolve(UaaErrors.EMAIL_TAKEN.code(), CONFLICT)).isInstanceOf(UaaConflictException.class);
+    }
+
+    /**
+     * The older shape of the same refusal — uaa letting the unique constraint decide and the shared advice rendering
+     * the database's answer — still maps, so a uaa that races its own check answers the same way.
      */
     @Test
     void theDatabasesRefusalOfADuplicateBecomesAConflict() {

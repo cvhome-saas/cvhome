@@ -38,8 +38,12 @@ public final class UaaApiErrors {
             .map(UaaErrors.USER_NOT_FOUND, UaaUserNotFoundException::from)
             .map(UaaErrors.CLIENT_NOT_FOUND, UaaClientNotFoundException::from)
             .map(UaaErrors.SUPER_ADMIN_IMMUTABLE, UaaOperationForbiddenException::from)
-            // Not a uaa-specific code: uaa lets the unique constraint decide, and the shared advice renders the
-            // database's refusal as COMMON.DATA_INTEGRITY_VIOLATION. To a caller it still means "that user exists".
+            // A duplicate user, by name or by address. uaa checks up front and names which; to a caller both mean
+            // "that user exists", and the caller's own message says which field to change.
+            .map(UaaErrors.USERNAME_TAKEN, UaaConflictException::from)
+            .map(UaaErrors.EMAIL_TAKEN, UaaConflictException::from)
+            // The older shape of the same refusal: uaa letting the unique constraint decide, which the shared advice
+            // renders as COMMON.DATA_INTEGRITY_VIOLATION. Kept so a uaa that races its own check still maps.
             .map(CommonErrors.DATA_INTEGRITY_VIOLATION, UaaConflictException::from)
             // No answer at all, so no server-side counterpart exists — a client type by necessity.
             .unreachable(UaaApiUnavailableException::from)
