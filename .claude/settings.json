@@ -11,6 +11,17 @@
             "statusMessage": "Checking worktree"
           }
         ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/push-guard.mjs\"",
+            "timeout": 15,
+            "statusMessage": "Checking the push receipt"
+          }
+        ]
       }
     ]
   }

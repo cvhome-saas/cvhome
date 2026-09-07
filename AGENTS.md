@@ -168,6 +168,16 @@ What binds every change:
   would otherwise never reach an agent's context. Changing the allow-list? Run
   `node .claude/hooks/worktree-guard.test.mjs` — 20 cases, and it cuts a real worktree rather than
   trusting a path that merely looks like one.
+- **Nothing is pushed until the whole pipeline has passed locally.** `extra/scripts/verify-before-push.sh`
+  runs exactly what CI runs — checkstyle, `build -x test -x check`, `test verifyTestNaming`, `integrationTest`,
+  the coverage floors (`domainCoverageVerification`), and both frontends' lint and unit tests — and on a green
+  run writes a receipt (`<git-dir>/cvhome-verified`, a digest of HEAD plus every uncommitted change). The git
+  `pre-push` hook in `.githooks/` (installed by the script, `core.hooksPath`) and the Claude `PreToolUse` hook
+  `.claude/hooks/push-guard.mjs` refuse a push whose tree does not match the receipt: no run, a run of an
+  older tree, an edit since. The pipeline used to go red on coverage after pushes that had run "the tests"
+  and nothing else; a receipt tied to the tree is what stopped that. Never `--no-verify`. `SKIP_VERIFY=1` is
+  the person's escape hatch for a deliberate exception, typed on purpose, never the agent's. Changing the
+  guard? `node .claude/hooks/push-guard.test.mjs` — ten cases against a throwaway repository.
 - **`/go` ships the working tree** (branch if needed → commit → push → PR into `main`, template filled,
   changelog label) and **`/reset` returns to a clean `main`** without losing work. Both live in
   `.AGENTS/commands/`; prefer them over doing the sequence by hand. Run `/go` from the worktree being shipped.
@@ -254,6 +264,8 @@ the change does not touch, and treat a section you keep as mandatory. The `proje
       exactly how it got shipped once; the checker existed and was wired into `check`, and the task list here
       said `npm run build`.
 - [ ] User-visible change exercised against a running stack, not just unit-tested
+- [ ] `extra/scripts/verify-before-push.sh` green for the exact tree being pushed — it is all of the above in
+      one run, and the push hooks will not let the tree through without it
 
 ## Plans
 
