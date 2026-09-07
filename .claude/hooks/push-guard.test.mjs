@@ -38,10 +38,10 @@ function writeReceipt(value = digest()) {
   writeFileSync(join(git('rev-parse', '--absolute-git-dir').trim(), 'cvhome-verified'), `${value}\n`);
 }
 
-function guard(command, env = {}) {
+function guard(command, env = {}, cwd = repo) {
   try {
     execFileSync('node', [GUARD], {
-      cwd: repo,
+      cwd,
       input: JSON.stringify({tool_name: 'Bash', tool_input: {command}}),
       env: {...process.env, SKIP_VERIFY: '', ...env},
       stdio: ['pipe', 'ignore', 'ignore'],
@@ -53,8 +53,8 @@ function guard(command, env = {}) {
 }
 
 let failed = 0;
-function check(expected, name, command, env) {
-  const actual = guard(command, env);
+function check(expected, name, command, env, cwd) {
+  const actual = guard(command, env, cwd);
   const ok = actual === expected;
   if (!ok) {
     failed += 1;
@@ -66,10 +66,34 @@ try {
   check(ALLOW, 'a command that is not a push', 'git status && ./gradlew test');
   check(ALLOW, 'a mention of push that is not git', 'echo push it');
   check(DENY, 'a push with no receipt', 'git push -u origin HEAD');
+  check(DENY, 'a push after && with no receipt', 'git add -A && git commit -m x && git push');
+  check(ALLOW, 'a push that is only mentioned in a heredoc or a string', "cat > f <<'EOF'\ncheck('git push')\nEOF\nnode f");
+  check(ALLOW, 'deleting a remote branch has no tree to verify (--delete)', 'git push origin --delete old-branch');
+  check(ALLOW, 'deleting a remote branch has no tree to verify (-d)', 'git push -d origin old-branch');
+  check(ALLOW, 'deleting a remote branch has no tree to verify (:ref)', 'git push origin :old-branch');
+  check(DENY, 'a refspec that also updates is still gated', 'git push origin :old-branch HEAD');
+  check(DENY, 'a deletion beside an update in one command is still gated', 'git push -d origin old && git push');
   writeReceipt();
   check(ALLOW, 'a push of the verified tree', 'git push origin HEAD');
   check(ALLOW, 'a push through git -C of the verified tree', `git -C ${repo} push`);
+  check(ALLOW, 'a push after cd <dir> && of the verified tree', `cd ${repo} && git push`, {}, tmpdir());
+  check(ALLOW, 'a push after cd <dir>; of the verified tree', `cd ${repo}; git push`, {}, tmpdir());
   check(DENY, '--no-verify even with a receipt', 'git push --no-verify');
+  // main is the integration branch and only ever receives a PR merge — never a push, receipt or not.
+  check(DENY, 'a push naming main as the target is refused whatever the receipt', 'git push origin main');
+  check(DENY, 'a push of HEAD onto main is refused whatever the receipt', 'git push origin HEAD:main');
+  check(DENY, 'a push of HEAD onto refs/heads/main is refused whatever the receipt', 'git push origin HEAD:refs/heads/main');
+  git('branch', '-M', 'topic');
+  git('remote', 'add', 'origin', repo);
+  git('fetch', '-q', 'origin');
+  git('branch', '--set-upstream-to=origin/topic');
+  git('update-ref', 'refs/remotes/origin/main', 'HEAD');
+  git('branch', '--set-upstream-to=origin/main');
+  writeReceipt();
+  check(DENY, 'a bare push from a branch tracking origin/main is refused — that is what a worktree cut without --no-track does', 'git push');
+  git('branch', '--set-upstream-to=origin/topic');
+  writeReceipt();
+  check(ALLOW, 'a bare push from a branch tracking its own remote branch passes', 'git push');
   writeFileSync(join(repo, 'a.txt'), 'two\n');
   check(DENY, 'an edit after the green run stales the receipt', 'git push');
   check(ALLOW, 'SKIP_VERIFY=1 is the person\'s escape hatch', 'git push', {SKIP_VERIFY: '1'});

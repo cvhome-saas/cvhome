@@ -32,7 +32,19 @@ try {
 }
 
 const command = input?.tool_input?.command;
-if (typeof command !== 'string' || !/\bgit\b[^|;&]*\bpush\b/.test(command)) {
+if (typeof command !== 'string') {
+  process.exit(0);
+}
+
+/*
+ * Only a real invocation counts: `git` at the start of a shell segment (the line, or after `;`, `&&`,
+ * `||`, `|`, `(`), optionally `-C <dir>` or another global flag, then `push`. Matching the bare words
+ * anywhere flagged heredocs and quoted strings that merely *mention* a push — this hook's own test
+ * file being written through a heredoc, for one.
+ */
+const INVOCATION = /(?:^|[;|(]|&&|\|\|)\s*(?:env\s+\S+=\S+\s+)*git\s+(?:(?:-C\s+\S+|--\S+|-\w)\s+)*push\b([^|;&)]*)/gm;
+const invocations = [...command.matchAll(INVOCATION)];
+if (invocations.length === 0) {
   process.exit(0);
 }
 
@@ -40,7 +52,20 @@ if (process.env['SKIP_VERIFY'] === '1') {
   process.exit(0);
 }
 
-if (/--no-verify\b/.test(command)) {
+/*
+ * A push that only deletes remote refs has no tree to verify: `git push --delete origin x`,
+ * `git push -d origin x`, or the refspec form `git push origin :x`. The git hook sees the same thing
+ * as all-zero local SHAs on stdin. A command mixing a deletion with an update is still gated.
+ */
+const deleteOnly = (args) => {
+  const tokens = args.trim().split(/\s+/).filter(Boolean);
+  if (tokens.some((t) => t === '--delete' || t === '-d')) {
+    return true;
+  }
+  const refspecs = tokens.filter((t) => !t.startsWith('-')).slice(1);
+  return refspecs.length > 0 && refspecs.every((r) => r.startsWith(':'));
+};
+if (invocations.some((m) => /--no-verify\b/.test(m[1]))) {
   process.stderr.write(
     `Blocked: git push --no-verify.\n\n` +
       `The pre-push hook is the local pipeline run; skipping it is how a red pipeline happens.\n` +
@@ -53,11 +78,46 @@ if (/--no-verify\b/.test(command)) {
  * The worktree the push comes from. A `git -C <dir>` or a leading `cd <dir> &&` names it; otherwise
  * it is the session's working directory.
  */
-const dirMatch = /\bgit\s+-C\s+(\S+)/.exec(command) ?? /^\s*cd\s+(\S+)\s*&&/.exec(command);
+const dirMatch = /\bgit\s+-C\s+(\S+)/.exec(command) ?? /^\s*cd\s+(\S+)\s*(?:&&|;)/.exec(command);
 const cwd = dirMatch ? dirMatch[1].replace(/^["']|["']$/g, '') : process.cwd();
 
 function git(args) {
   return execFileSync('git', args, {cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore']});
+}
+
+/*
+ * main only ever receives a PR merge, receipt or no receipt. An explicit target — `origin main`,
+ * `HEAD:main`, `HEAD:refs/heads/main` — is refused outright. A bare `git push` is refused when the
+ * branch's upstream is origin/main, which is exactly what `git worktree add -b x origin/main` sets up
+ * when `--no-track` is forgotten: the new topic branch tracks main, and a bare push lands there.
+ */
+const MAIN_TARGET = /(?:^|\s|:)(?:refs\/heads\/)?main$/;
+const targetsMain = (args) => {
+  const tokens = args.trim().split(/\s+/).filter((t) => t && !t.startsWith('-'));
+  const refspecs = tokens.slice(1);
+  if (refspecs.length > 0) {
+    return refspecs.some((r) => MAIN_TARGET.test(r.includes(':') ? r.slice(r.indexOf(':') + 1) : r));
+  }
+  try {
+    return /^(?:origin|[^/]+)\/main$/.test(git(['rev-parse', '--abbrev-ref', '@{upstream}']).trim());
+  } catch {
+    return false;
+  }
+};
+if (invocations.some((m) => targetsMain(m[1]))) {
+  process.stderr.write(
+    `Blocked: this push targets main.\n\n` +
+      `main is the integration branch and only ever receives a PR merge (AGENTS.md, Working conventions).\n` +
+      `If the branch tracks origin/main, the worktree was cut without --no-track — point it at its own\n` +
+      `remote branch instead:\n\n` +
+      `  git push -u origin HEAD\n`,
+  );
+  process.exit(2);
+}
+
+// Judged after the main check on purpose: deleting main is not a harmless deletion.
+if (invocations.every((m) => deleteOnly(m[1]))) {
+  process.exit(0);
 }
 
 let gitDir;

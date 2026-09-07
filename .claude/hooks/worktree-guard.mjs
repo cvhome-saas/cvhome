@@ -117,13 +117,13 @@ process.stderr.write(
     `up-to-date main, before the first file is written. The primary checkout stays clean.\n\n` +
     `Cut one and make this edit inside it:\n\n` +
     `  git fetch origin\n` +
-    `  git worktree add .claude/worktrees/<type>-<short-name> -b <type>/<short-name> origin/main\n\n` +
+    `  git worktree add --no-track .claude/worktrees/<type>-<short-name> -b <type>/<short-name> origin/main\n\n` +
     `Then re-apply this edit to\n` +
     `  .claude/worktrees/<type>-<short-name>/${rel}\n` +
     `and run the build, the lcl stack and the QA from in there too.\n\n` +
     `If edits are already stranded on main, move them rather than redoing them:\n` +
     `  git stash push -u -- <paths>\n` +
-    `  git worktree add .claude/worktrees/<type>-<short-name> -b <type>/<short-name> origin/main\n` +
+    `  git worktree add --no-track .claude/worktrees/<type>-<short-name> -b <type>/<short-name> origin/main\n` +
     `  git -C .claude/worktrees/<type>-<short-name> stash pop\n`,
 );
 process.exit(2);
