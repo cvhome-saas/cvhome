@@ -47,7 +47,6 @@ import com.asrevo.cvhome.sso.audit.AuditService;
 import com.asrevo.cvhome.sso.domain.Role;
 import com.asrevo.cvhome.sso.domain.UaaConstants;
 import com.asrevo.cvhome.sso.domain.User;
-import com.asrevo.cvhome.sso.repo.RoleRepository;
 import com.asrevo.cvhome.sso.repo.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -70,16 +69,14 @@ import lombok.extern.slf4j.Slf4j;
  * <li>the target is enabled, and is not a platform principal ({@code SUPER_ADMIN}, {@code SUPPORT});</li>
  * <li>{@code write} is for {@code SUPER_ADMIN} operators only — support acts read-only;</li>
  * <li>the store is one the target acts in: equal to their {@code store} metadata when they have one, otherwise —
- * an org admin — the caller's to have checked against tenancy, which uaa cannot see;</li>
- * <li>{@code read} needs a target with a store-level read role, or minting {@code STORE_MODERATOR} would
- * <em>widen</em> a retail account.</li>
+ * an org admin — the caller's to have checked against tenancy, which uaa cannot see.</li>
  * </ol>
  *
  * <p>
  * The token lives at most {@value #MAX_MINUTES} minutes and never past the operator's own token; there is no refresh
- * token, so an impersonation cannot renew itself. The read/write choice is expressed as roles — see
- * {@link ImpersonationMode} — and written onto the authorization as an {@link ImpersonationContext}, which is what
- * {@code JwtCustomizerConfig} reads to shape the claims.
+ * token, so an impersonation cannot renew itself. Both modes carry the target's own roles; the read/write choice
+ * travels as {@code act_mode} — see {@link ImpersonationMode} — written onto the authorization as an
+ * {@link ImpersonationContext}, which is what {@code JwtCustomizerConfig} reads to shape the claims.
  * </p>
  */
 @RequiredArgsConstructor
@@ -99,16 +96,11 @@ public final class ImpersonationExchangeProvider implements AuthenticationProvid
 
     static final String SUPPORT_ROLE = "SUPPORT";
 
-    static final String STORE_MODERATOR = "STORE_MODERATOR";
-
     static final String UID = "uid";
 
     static final String ACT = "act";
 
     static final String STORE_METADATA = "store";
-
-    /** The roles whose holder reads a store, so a read-mode token for them narrows rather than widens. */
-    static final Set<String> READ_CAPABLE = Set.of("ORG_ADMIN", "STORE_ADMIN", STORE_MODERATOR);
 
     static final Set<String> PLATFORM_ROLES = Set.of(UaaConstants.SUPER_ADMIN_ROLE, SUPPORT_ROLE);
 
@@ -117,8 +109,6 @@ public final class ImpersonationExchangeProvider implements AuthenticationProvid
     private final OAuth2AuthorizationService authorizations;
 
     private final UserRepository users;
-
-    private final RoleRepository roles;
 
     private final OAuth2TokenGenerator<? extends OAuth2Token> tokenGenerator;
 
@@ -149,9 +139,7 @@ public final class ImpersonationExchangeProvider implements AuthenticationProvid
 
         Instant notAfter = notAfter(subjectClaims);
         ImpersonationContext context = new ImpersonationContext(operator.getId(), operator.getUsername(), target.getId(),
-                target.getUsername(), request.getStore(), mode, request.getReason(), notAfter,
-                mode == ImpersonationMode.READ ? List.of(STORE_MODERATOR) : List.of(),
-                mode == ImpersonationMode.READ ? moderatorPermissions() : List.of());
+                target.getUsername(), request.getStore(), mode, request.getReason(), notAfter);
         Set<String> scopes = scopesFor(client, request.getScopes());
         OAuth2AccessTokenAuthenticationToken issued = issue(client, clientPrincipal, request, target, context, scopes);
         audit.recordDetached(AuditRecord.of(AuditEventType.USER_IMPERSONATION_STARTED)
@@ -210,9 +198,6 @@ public final class ImpersonationExchangeProvider implements AuthenticationProvid
         if (!actsIn(target, request.getStore())) {
             throw deny(operator, target, request, Refusal.STORE_NOT_TARGETS);
         }
-        if (mode == ImpersonationMode.READ && !hasAnyRole(target, READ_CAPABLE)) {
-            throw deny(operator, target, request, Refusal.TARGET_NOT_READABLE);
-        }
     }
 
     /**
@@ -233,11 +218,6 @@ public final class ImpersonationExchangeProvider implements AuthenticationProvid
         return subjectExpiry != null && subjectExpiry.isBefore(ceiling) ? subjectExpiry : ceiling;
     }
 
-    private List<String> moderatorPermissions() {
-        return roles.findByName(STORE_MODERATOR).map(Role::effectivePermissions).orElse(Set.of()).stream()
-                .map(Permission::key).sorted().toList();
-    }
-
     private static Set<String> scopesFor(RegisteredClient client, Set<String> requested) {
         Set<String> allowed = client.getScopes();
         if (requested.isEmpty()) {
@@ -252,7 +232,7 @@ public final class ImpersonationExchangeProvider implements AuthenticationProvid
     private OAuth2AccessTokenAuthenticationToken issue(RegisteredClient client, OAuth2ClientAuthenticationToken clientPrincipal,
                                                        ImpersonationExchangeAuthenticationToken request, User target,
                                                        ImpersonationContext context, Set<String> scopes) {
-        Authentication principal = principalFor(target, context);
+        Authentication principal = principalFor(target);
         OAuth2Authorization.Builder builder = OAuth2Authorization.withRegisteredClient(client)
                 .principalName(target.getId().toString())
                 .authorizationGrantType(AuthorizationGrantType.TOKEN_EXCHANGE)
@@ -296,12 +276,10 @@ public final class ImpersonationExchangeProvider implements AuthenticationProvid
 
     /**
      * The target as a principal, the shape {@code JpaUserDetailsService} would give it: the name is the account id,
-     * which is what {@code JwtCustomizerConfig} resolves the claims by. The authorities are the roles the token will
-     * carry, so a read-mode principal already looks like a moderator.
+     * which is what {@code JwtCustomizerConfig} resolves the claims by, and the authorities are the target's roles.
      */
-    private static Authentication principalFor(User target, ImpersonationContext context) {
-        List<String> names = context.overridesRoles() ? context.roles()
-                : target.getRoles().stream().map(Role::getName).sorted().toList();
+    private static Authentication principalFor(User target) {
+        List<String> names = target.getRoles().stream().map(Role::getName).sorted().toList();
         Set<GrantedAuthority> authorities = names.stream()
                 .map(name -> new SimpleGrantedAuthority(ROLE_PREFIX.concat(name)))
                 .collect(Collectors.toCollection(LinkedHashSet::new));
@@ -359,8 +337,7 @@ public final class ImpersonationExchangeProvider implements AuthenticationProvid
         TARGET_DISABLED(OAuth2ErrorCodes.ACCESS_DENIED, "The target account is disabled."),
         TARGET_PRIVILEGED(OAuth2ErrorCodes.ACCESS_DENIED, "A platform principal cannot be impersonated."),
         WRITE_NOT_ALLOWED(OAuth2ErrorCodes.ACCESS_DENIED, "This operator may act read-only."),
-        STORE_NOT_TARGETS(OAuth2ErrorCodes.INVALID_REQUEST, "The target does not act in impersonation_store."),
-        TARGET_NOT_READABLE(OAuth2ErrorCodes.ACCESS_DENIED, "The target holds no store-level read role.");
+        STORE_NOT_TARGETS(OAuth2ErrorCodes.INVALID_REQUEST, "The target does not act in impersonation_store.");
 
         private final String errorCode;
 

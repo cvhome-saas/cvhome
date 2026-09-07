@@ -55,9 +55,8 @@ import com.asrevo.cvhome.sso.token.ImpersonationContext;
  * <p>
  * <strong>An impersonated token says so.</strong> When the authorization behind the token is an impersonation
  * ({@link ImpersonationContext}), {@code act} names the operator (RFC 8693 §4.1: identity only) and {@code act_mode}
- * says read or write; a read-mode token has its {@code roles}, {@code permissions} and {@code store} replaced by the
- * ones the exchange decided on, and no impersonated token outlives the operator's own. This is the one branch that
- * runs after {@code roles} — deliberately, and it is the only thing that may.
+ * says read or write — the roles stay the target's own in both modes; read-only is the resource servers' method
+ * filter — and no impersonated token outlives the operator's own.
  * </p>
  *
  * <p>
@@ -169,8 +168,7 @@ public class JwtCustomizerConfig {
                     }
                 });
             }
-            // Last on purpose: nothing written after this line can shadow it, except addImpersonationClaims, which
-            // is the one deliberate exception and replaces it with a narrower set. A plain List, not a Set: the
+            // Last on purpose: nothing written after this line can shadow it. A plain List, not a Set: the
             // authorization store serialises claim values with type information, and only the JDK's common
             // collections are on its allow-list — a TreeSet here broke the gateway's UserInfo call.
             List<String> permissions = user.getRoles().stream().flatMap(r -> r.effectivePermissions().stream())
@@ -187,14 +185,9 @@ public class JwtCustomizerConfig {
     }
 
     /**
-     * The impersonation claims, and the read-mode override.
-     *
-     * <p>
-     * Runs after {@link #addUserClaims} on purpose: the user claims describe the target as they are, and this narrows
-     * them to what the exchange decided. {@code exp} is pulled back to the exchange's ceiling — the operator's own
-     * token's expiry or fifteen minutes — because the generator set it from the client's lifetime, which knows
-     * nothing about either.
-     * </p>
+     * The impersonation claims. {@code exp} is pulled back to the exchange's ceiling — the operator's own token's
+     * expiry or fifteen minutes — because the generator set it from the client's lifetime, which knows nothing about
+     * either. The roles are left exactly as {@link #addUserClaims} wrote them: the target's own.
      */
     private static void addImpersonationClaims(JwtEncodingContext context) {
         ImpersonationContext.from(context.getAuthorization()).ifPresent(impersonation -> {
@@ -208,11 +201,6 @@ public class JwtCustomizerConfig {
                     claims.put(JwtClaimNames.EXP, impersonation.notAfter());
                 }
             });
-            if (impersonation.overridesRoles()) {
-                context.getClaims().claim(STORE, impersonation.store())
-                        .claim(PERMISSIONS, new ArrayList<>(impersonation.permissions()))
-                        .claim(ROLES, new ArrayList<>(impersonation.roles()));
-            }
         });
     }
 

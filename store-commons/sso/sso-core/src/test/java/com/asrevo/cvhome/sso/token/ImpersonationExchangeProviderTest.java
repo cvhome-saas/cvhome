@@ -5,7 +5,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -40,7 +39,6 @@ import com.asrevo.cvhome.sso.audit.AuditRecords;
 import com.asrevo.cvhome.sso.audit.AuditService;
 import com.asrevo.cvhome.sso.domain.Role;
 import com.asrevo.cvhome.sso.domain.User;
-import com.asrevo.cvhome.sso.repo.RoleRepository;
 import com.asrevo.cvhome.sso.repo.UserRepository;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -79,8 +77,6 @@ class ImpersonationExchangeProviderTest {
 
     private static final String ORG_ADMIN = "ORG_ADMIN";
 
-    private static final String STORE_RETAIL = "STORE_RETAIL";
-
     private static final String READ = "read";
 
     private static final String WRITE = "write";
@@ -88,8 +84,6 @@ class ImpersonationExchangeProviderTest {
     private static final String JWT_VALUE = "exchanged-jwt";
 
     private static final String SECRET = "secret";
-
-    private static final String STORE_MODERATOR = "STORE_MODERATOR";
 
     private static final String ORG = "org";
 
@@ -105,8 +99,6 @@ class ImpersonationExchangeProviderTest {
 
     private final UserRepository users = mock(UserRepository.class);
 
-    private final RoleRepository roles = mock(RoleRepository.class);
-
     @SuppressWarnings("unchecked")
     private final OAuth2TokenGenerator<OAuth2Token> generator = mock(OAuth2TokenGenerator.class);
 
@@ -115,7 +107,7 @@ class ImpersonationExchangeProviderTest {
     private final Clock clock = Clock.fixed(NOW, ZoneOffset.UTC);
 
     private final ImpersonationExchangeProvider provider =
-            new ImpersonationExchangeProvider(authorizations, users, roles, generator, audit, clock);
+            new ImpersonationExchangeProvider(authorizations, users, generator, audit, clock);
 
     private final RegisteredClient client = RegisteredClient.withId("id").clientId("console-impersonation")
             .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
@@ -123,12 +115,6 @@ class ImpersonationExchangeProviderTest {
 
     private final OAuth2ClientAuthenticationToken clientPrincipal =
             new OAuth2ClientAuthenticationToken(client, ClientAuthenticationMethod.CLIENT_SECRET_BASIC, SECRET);
-
-    {
-        Role moderator = new Role(STORE_MODERATOR);
-        moderator.getPermissions().add(Permission.USERS_READ.key());
-        when(roles.findByName(STORE_MODERATOR)).thenReturn(Optional.of(moderator));
-    }
 
     // --- fixtures -------------------------------------------------------------------------------------------------
 
@@ -224,7 +210,7 @@ class ImpersonationExchangeProviderTest {
     // --- the happy paths ------------------------------------------------------------------------------------------
 
     @Test
-    void aSuperAdminActingReadOnlyGetsAmoderatorTokenForTheStore() {
+    void aSuperAdminActingReadOnlyGetsTheTargetsOwnTokenMarkedRead() {
         User operator = superAdmin();
         User target = storeAdmin();
         subjectToken(operator);
@@ -250,8 +236,9 @@ class ImpersonationExchangeProviderTest {
         assertThat(context.targetUsername()).isEqualTo(target.getUsername());
         assertThat(context.mode()).isEqualTo(ImpersonationMode.READ);
         assertThat(context.store()).isEqualTo(STORE);
-        assertThat(context.roles()).containsExactly(STORE_MODERATOR);
-        assertThat(context.permissions()).containsExactly(Permission.USERS_READ.key());
+        // The principal the token is minted for carries the target's own roles in both modes.
+        assertThat(authorization.<Authentication>getAttribute(java.security.Principal.class.getName()).getAuthorities())
+                .extracting("authority").containsExactly("ROLE_STORE_ADMIN");
         // Ten minutes left on the operator's token beats the fifteen-minute ceiling.
         assertThat(context.notAfter()).isEqualTo(NOW.plus(Duration.ofMinutes(10)));
 
@@ -265,7 +252,7 @@ class ImpersonationExchangeProviderTest {
     }
 
     @Test
-    void writeModeKeepsTheTargetsOwnRolesAndCapsAtFifteenMinutes() {
+    void writeModeCapsAtFifteenMinutes() {
         User operator = superAdmin();
         User target = storeAdmin();
         subjectToken(operator, Map.of(), Duration.ofHours(1));
@@ -275,7 +262,6 @@ class ImpersonationExchangeProviderTest {
 
         ImpersonationContext context = ImpersonationContext.from(saved()).orElseThrow();
         assertThat(context.mode()).isEqualTo(ImpersonationMode.WRITE);
-        assertThat(context.overridesRoles()).isFalse();
         assertThat(context.notAfter()).isEqualTo(NOW.plus(Duration.ofMinutes(ImpersonationExchangeProvider.MAX_MINUTES)));
     }
 
@@ -389,16 +375,6 @@ class ImpersonationExchangeProviderTest {
         assertDenied(request(target, OTHER_STORE, READ), "STORE_NOT_TARGETS", OAuth2ErrorCodes.INVALID_REQUEST);
     }
 
-    /** Minting {@code STORE_MODERATOR} for a retail account would widen it; read mode refuses rather than widens. */
-    @Test
-    void readModeOnAtargetWithNoReadRoleIsRefused() {
-        User operator = superAdmin();
-        User target = user("org1-store1-pos", Map.of(ORG, ORG_ID, STORE_KEY, STORE), role(STORE_RETAIL));
-        subjectToken(operator);
-
-        assertDenied(request(target, STORE, READ), "TARGET_NOT_READABLE", OAuth2ErrorCodes.ACCESS_DENIED);
-    }
-
     @Test
     void anUnknownModeIsAnInvalidRequestBeforeAnyRuleRuns() {
         User operator = superAdmin();
@@ -432,7 +408,6 @@ class ImpersonationExchangeProviderTest {
     void supportsOnlyItsOwnToken() {
         assertThat(provider.supports(ImpersonationExchangeAuthenticationToken.class)).isTrue();
         assertThat(provider.supports(OAuth2ClientAuthenticationToken.class)).isFalse();
-        assertThat(List.of(ImpersonationExchangeProvider.READ_CAPABLE)).isNotEmpty();
     }
 
 }

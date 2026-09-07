@@ -118,8 +118,8 @@ class ImpersonationExchangeIntegrationTest {
         assertThat(claims.get(UID).asText()).isEqualTo(ORG1_STORE1_ADMIN_ID);
         assertThat(claims.get("org").asText()).isEqualTo("21f023932bc66470c104b76f");
         assertThat(claims.get("store").asText()).isEqualTo(ORG1_STORE1);
-        // ...read mode narrows the roles to the platform's read-only store role...
-        assertThat(claims.get(ROLES).toString()).contains("STORE_MODERATOR").doesNotContain(STORE_ADMIN);
+        // ...read mode keeps the merchant's own roles — read-only is the resource servers' method filter...
+        assertThat(claims.get(ROLES).toString()).contains(STORE_ADMIN);
         // ...and act names the operator.
         assertThat(claims.get(ACT).get(SUB).asText()).isEqualTo(UaaClient.SUPER_ADMIN);
         assertThat(claims.get(ACT).get(UID).asText()).isEqualTo(SUPER_ADMIN_ID);

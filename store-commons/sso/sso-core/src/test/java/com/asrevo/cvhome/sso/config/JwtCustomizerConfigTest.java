@@ -3,7 +3,6 @@ package com.asrevo.cvhome.sso.config;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -92,8 +91,6 @@ class JwtCustomizerConfigTest {
 
     private static final String RS256 = "RS256";
 
-    private static final String USERS_READ = "users:read";
-
     private static final String ORG_ADMIN = "ORG_ADMIN";
 
     private static final String OPERATOR = "super-admin";
@@ -160,10 +157,8 @@ class JwtCustomizerConfigTest {
                 .authorizationGrantType(AuthorizationGrantType.TOKEN_EXCHANGE).build();
         OAuth2Authorization.Builder authorization = OAuth2Authorization.withRegisteredClient(client)
                 .principalName(target.getId().toString()).authorizationGrantType(AuthorizationGrantType.TOKEN_EXCHANGE);
-        boolean read = mode == ImpersonationMode.READ;
         new ImpersonationContext(UUID.randomUUID(), operator, target.getId(), target.getUsername(), STORE_ID, mode,
-                "ticket", notAfter, read ? List.of(STORE_MODERATOR) : List.of(),
-                read ? List.of(USERS_READ) : List.of()).writeTo(authorization);
+                "ticket", notAfter).writeTo(authorization);
         return JwtEncodingContext.with(JwsHeader.with(() -> RS256),
                         JwtClaimsSet.builder().subject(target.getId().toString()).expiresAt(exp))
                 .registeredClient(client)
@@ -217,12 +212,12 @@ class JwtCustomizerConfigTest {
     }
 
     /**
-     * The one branch allowed to follow {@code roles}: a read-mode impersonation narrows the target's claims to a
-     * moderator's on the chosen store, names the operator in {@code act}, and never outlives the operator's token.
+     * Read mode is the target verbatim too — the read-only enforcement is the resource servers' method filter, keyed
+     * on {@code act_mode}. What the customizer adds is the operator's name and the ceiling on {@code exp}.
      */
     @Test
-    void aReadModeImpersonationNarrowsTheTargetToAmoderatorAndNamesTheOperator() {
-        User target = user(Map.of(ORG, ORG_ID, STORE, "some-other-store"), STORE_ADMIN, ORG_ADMIN);
+    void aReadModeImpersonationKeepsTheTargetsClaimsAndNamesTheOperator() {
+        User target = user(Map.of(ORG, ORG_ID, STORE, STORE_ID), STORE_ADMIN, ORG_ADMIN);
         when(users.findById(target.getId())).thenReturn(Optional.of(target));
         Instant notAfter = Instant.parse("2026-04-01T09:40:00Z");
         Instant later = notAfter.plus(Duration.ofMinutes(5));
@@ -234,9 +229,7 @@ class JwtCustomizerConfigTest {
                 .containsEntry(JwtCustomizerConfig.ACT_MODE, "read")
                 .containsEntry(JwtClaimNames.EXP, notAfter);
         assertThat(claims.get(JwtCustomizerConfig.ROLES)).asInstanceOf(InstanceOfAssertFactories.COLLECTION)
-                .containsExactly(STORE_MODERATOR);
-        assertThat(claims.get(JwtCustomizerConfig.PERMISSIONS)).asInstanceOf(InstanceOfAssertFactories.COLLECTION)
-                .containsExactly(USERS_READ);
+                .containsExactlyInAnyOrder(STORE_ADMIN, ORG_ADMIN);
         assertThat(claims.get(JwtCustomizerConfig.ACT)).asInstanceOf(InstanceOfAssertFactories.MAP)
                 .containsEntry(JwtClaimNames.SUB, OPERATOR).containsKey(JwtCustomizerConfig.UID);
     }

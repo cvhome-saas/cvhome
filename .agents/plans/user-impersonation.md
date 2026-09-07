@@ -43,26 +43,17 @@ token carries the merchant's `org` / `store` / `roles` exactly as `JwtCustomizer
 
 ## The RO/RW model
 
-Read-only lives in the **roles claim**, not in an HTTP-method filter — `POST store-manager/list` and
-`POST org-manager/list` are reads, and `STORE-POD.CATALOG.*` guards GETs too, so neither method nor
-token separates reading from writing. `ROLE_STORE_MODERATOR` already *is* the read-only store role:
-`hasReadAccessOnStore` accepts it, `hasManageAccessOnStore` / `hasMaintainAccessOnUsers` refuse it, and
-it sits in `StoreManagerApi.STORE_VIEWER_ROLES` so the store list still answers (scoped by
-`InternalStoreService.findAll` to that one store — exactly right).
+Both modes mint the **target's own roles**, so the operator sees exactly what the merchant sees. Read-only is the
+`act_mode=read` claim plus `ReadOnlyActorFilter` (`store-commons:autoconfigure`), a servlet filter behind the
+security chain on every service that refuses each unsafe method for such a token — except the paths
+`common-config.yml` names as reads that travel as `POST` (`*-statistic`, `list`, `query`, `search`).
 
-| Mode | `roles` minted | `org` / `store` | `permissions` |
-|---|---|---|---|
-| `write` | the target's own, verbatim — never wider | the target's metadata | the target's |
-| `read` | `["STORE_MODERATOR"]` | target's `org`; the **chosen store** | `STORE_MODERATOR`'s effective set |
+Why not the permission layer or a role: `STORE-POD.CATALOG.*` guards the list and the save alike, so no token can
+tell a read from a write; and `STORE_MODERATOR` — the first cut of read mode — is refused by every catalog,
+checkout and statistics guard, so the operator got a dashboard of 403s. Verified on the stack: a genuine
+moderator is refused the same way.
 
-Both modes carry `act` and `act_mode`. `act_mode` feeds the audit trail and banner copy; **the roles
-claim is the enforcement.** Read mode is refused for a target holding none of
-`ORG_ADMIN` / `STORE_ADMIN` / `STORE_MODERATOR` — otherwise "read" would *widen* a `STORE_RETAIL` account.
-
-Read mode is store-scoped, so an impersonation always resolves to a **concrete store** — which is what
-makes the store-centric entry point natural.
-
----
+A missing allow-list entry surfaces as a 403 on a read screen, never as a write that got through.
 
 ## Phase 1 — uaa: the token-exchange grant  (PR 1)
 

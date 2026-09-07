@@ -10,7 +10,6 @@ import org.springframework.security.oauth2.server.authorization.token.OAuth2Toke
 
 import com.asrevo.cvhome.sso.audit.AuditService;
 import com.asrevo.cvhome.sso.config.AuthorizationServerHttpCustomizer;
-import com.asrevo.cvhome.sso.repo.RoleRepository;
 import com.asrevo.cvhome.sso.repo.UserRepository;
 import com.asrevo.cvhome.sso.token.ImpersonationExchangeConverter;
 import com.asrevo.cvhome.sso.token.ImpersonationExchangeProvider;
@@ -38,15 +37,14 @@ public class ImpersonationGrantCustomizer {
 
     @Bean
     AuthorizationServerHttpCustomizer impersonationGrant(OAuth2AuthorizationService authorizations, UserRepository users,
-                                                         RoleRepository roles, AuditService audit, Clock clock) {
+                                                         AuditService audit, Clock clock) {
         return http -> http.getConfigurer(OAuth2AuthorizationServerConfigurer.class).tokenEndpoint(token -> token
                 .accessTokenRequestConverter(new ImpersonationExchangeConverter())
                 .authenticationProviders(providers -> {
                     @SuppressWarnings("unchecked")
                     OAuth2TokenGenerator<? extends org.springframework.security.oauth2.core.OAuth2Token> generator =
                             http.getSharedObject(OAuth2TokenGenerator.class);
-                    providers.add(0, new ImpersonationExchangeProvider(authorizations, users, roles, generator, audit,
-                            clock));
+                    providers.add(0, new ImpersonationExchangeProvider(authorizations, users, generator, audit, clock));
                 }));
     }
 

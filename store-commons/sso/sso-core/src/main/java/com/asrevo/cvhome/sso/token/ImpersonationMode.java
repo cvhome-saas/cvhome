@@ -7,10 +7,10 @@ import java.util.Optional;
  * What an impersonated session may do, chosen per session by the operator.
  *
  * <p>
- * The mode is expressed in the token's {@code roles} claim, not enforced by a filter: {@link #READ} mints
- * {@code STORE_MODERATOR} — the platform's existing read-only store role — and {@link #WRITE} mints the target's own
- * roles verbatim. Every {@code hasPermission} check on every service then does the right thing without knowing the
- * word "impersonation". The wire value also travels as {@code act_mode}, for the audit trail and the console's banner.
+ * Both modes mint the target's own roles, so the operator sees exactly what the merchant sees. The wire value travels
+ * as the {@code act_mode} claim, and {@link #READ} is enforced by every resource server's {@code ReadOnlyActorFilter},
+ * which refuses each unsafe method for such a token. The permission tokens could not have done it: they cannot tell
+ * a list from a save, and a role that could only read would have shown the operator a page of refusals.
  * </p>
  */
 public enum ImpersonationMode {

@@ -2845,8 +2845,9 @@ shipped as the uaa grant, the gateway swap, the audit rows and the console's ban
   identity, rail, store list and every page facade change at once, and a reload is the honest way to
   say so. Ending it (`DELETE`, the banner's only control) reloads to `/platform/users`.
 - **The banner is not dismissible**, and the gateway's fifteen-minute ceiling ends the session
-  whatever the banner shows. Read-only is `STORE_MODERATOR` on the chosen store; write is the
-  merchant verbatim. `ROLE_SUPPORT` is real now, may impersonate read-only, and is admitted to the
+  whatever the banner shows. Both modes are the merchant verbatim; read-only is the `act_mode=read`
+  claim plus every service's `ReadOnlyActorFilter`, which refuses unsafe methods for it (the first
+  cut minted `STORE_MODERATOR` and showed the operator a dashboard of 403s). `ROLE_SUPPORT` is real now, may impersonate read-only, and is admitted to the
   platform rail's reads.
 - **What is not built:** the pod-side audit sections (`AuditSection.modifiedBy`) are never populated,
   so a catalogue edit made while acting as a merchant carries no actor at all — the gap predates this

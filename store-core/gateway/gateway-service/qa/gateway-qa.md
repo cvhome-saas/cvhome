@@ -333,14 +333,16 @@ Design points:
 - **Steps** — `.http` "act as org1-store1-admin … read-only", then "the session is the merchant now", then "the relay
   carries the merchant's token".
 - **Expect** — 200 `{actingAs: "org1-store1-admin", mode: "read", expiresAt}`; `auth/me` answers `impersonation` and
-  `authorities` containing `ROLE_STORE_MODERATOR` and not `ROLE_SUPER_ADMIN`; `store-manager/list` answers the one
-  store, not the platform's page.
+  `authorities` containing `ROLE_STORE_ADMIN` (the merchant's own) and not `ROLE_SUPER_ADMIN`; `store-manager/list`
+  answers the one store, not the platform's page.
 
 ### IMP-02 — Read-only refuses a write at the pod · critical · [verified]
 - **Seen** — `POST /spg/catalog/api/v1/private/category` → **403** `COMMON.ACCESS_DENIED`.
 
 - **Steps** — `.http` "read-only: a write as the merchant is refused".
-- **Expect** — **403**. The token is a moderator's; `hasManageAccessOnStore` refuses it on every pod service.
+- **Expect** — **403** `COMMON.READ_ONLY_SESSION` from the pod's `ReadOnlyActorFilter`: the token is the merchant's
+  own, and the method is what is refused. `GET` on the same path answers 200, and so does the dashboard's
+  `POST …/order-statistic`, which the allow-list names as a read.
 
 ### IMP-03 — Tenant isolation holds under the exchanged token · critical · [verified]
 - **Seen** — `router/store-pod-by-store-id` for ORG2-STORE1 → **403**; for the merchant's own store → 200.

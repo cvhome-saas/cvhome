@@ -1,7 +1,6 @@
 package com.asrevo.cvhome.sso.token;
 
 import java.time.Instant;
-import java.util.List;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
@@ -34,23 +33,12 @@ class ImpersonationContextTest {
         UUID operator = UUID.randomUUID();
         UUID merchant = UUID.randomUUID();
         ImpersonationContext context = new ImpersonationContext(operator, OPERATOR, merchant, MERCHANT, STORE,
-                ImpersonationMode.READ, REASON, NOT_AFTER, List.of("STORE_MODERATOR"), List.of("users:read"));
+                ImpersonationMode.READ, REASON, NOT_AFTER);
         OAuth2Authorization.Builder builder = OAuth2Authorization.withRegisteredClient(client())
                 .principalName(merchant.toString()).authorizationGrantType(AuthorizationGrantType.TOKEN_EXCHANGE);
         context.writeTo(builder);
 
         assertThat(ImpersonationContext.from(builder.build())).contains(context);
-        assertThat(context.overridesRoles()).isTrue();
-    }
-
-    @Test
-    void writeModeCarriesNoRoleOverride() {
-        ImpersonationContext context = new ImpersonationContext(UUID.randomUUID(), OPERATOR, UUID.randomUUID(), MERCHANT,
-                STORE, ImpersonationMode.WRITE, REASON, NOT_AFTER, null, null);
-
-        assertThat(context.overridesRoles()).isFalse();
-        assertThat(context.roles()).isEmpty();
-        assertThat(context.permissions()).isEmpty();
     }
 
     @Test

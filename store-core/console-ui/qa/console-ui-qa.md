@@ -1091,8 +1091,9 @@ Design points a tester needs:
   on `/platform/users`. Identity, rail, store list and every page facade change at once, and a reload is deliberate.
 - **The banner cannot be dismissed.** Its only control ends the session. The gateway's fifteen-minute ceiling ends
   it too, whatever the banner shows — the countdown is minute-granular.
-- **Read-only is the default** and is a real narrowing: the token carries `STORE_MODERATOR` on the chosen store, so
-  every save 403s. Write mode is the merchant verbatim and is offered to `super-admin` only; `support` never sees it.
+- **Read-only is the default**: the token is the merchant verbatim plus `act_mode=read`, and every service's
+  `ReadOnlyActorFilter` refuses each unsafe method for it — so the operator sees everything the merchant sees and can
+  change nothing. Write mode drops the filter and is offered to `super-admin` only; `support` never sees it.
 - **The dialog's choices come from the axis you did not pick.** From an account row, the stores are that account's
   (its `store`, or the org's stores for an org admin); from a store row, the accounts are those acting in it.
 
@@ -1103,8 +1104,9 @@ Design points a tester needs:
 - **Steps** — `/platform/users` → row menu of `org1-store1-admin` → **Act as this account** → the store is fixed
   (ORG1-STORE1), leave Read-only, type a reason → Start.
 - **Expect** — a reload to `/dashboard` as the merchant: the merchant rail (no Platform group), ORG1-STORE1 selected,
-  an amber banner *You are acting as org1-store1-admin · Store: … · Read-only · N minutes left*. Orders and the
-  catalogue load. Open a product and save → **403**, shown as the server's refusal. Network panel: `auth/me` carries
+  an amber banner *You are acting as org1-store1-admin · Store: … · Read-only · N minutes left*. The dashboard, the
+  orders and the catalogue load exactly as the merchant sees them. Open a product and save → **403**
+  `COMMON.READ_ONLY_SESSION`, shown as the server's refusal. Network panel: `auth/me` carries
   `impersonation`, and every private call is `?store=65f023632bc46470c104b76f`.
 
 ### IMP-02 — Write mode saves as the merchant and audits as the operator · critical · [verified]
@@ -1340,10 +1342,6 @@ stack on 2026-09-03.
 
 ## 99 — Known gaps
 
-**Read-only impersonation shows a merchant a page of 403s on the dashboard and the catalogue.** Read mode is
-minted as `STORE_MODERATOR`, and that role is refused by every `STORE-POD.CATALOG.*` / `CHECKOUT.*` guard — a real
-moderator sees the same. Content and store settings read fine. Decision pending on whether read mode should carry
-the target's own roles and refuse writes by method instead (IMP-01).
 
 **`app-load-error` shows a developer string.** See KIT-04b. `[message]="failure.message"` on ~15 pages
 renders `CODE [status]` where `ApiErrorService.messageFor()` would give a sentence.

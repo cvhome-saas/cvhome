@@ -2055,7 +2055,7 @@
         "write": "Read and write"
       },
       "hint": {
-        "read": "Their store as a moderator sees it: everything readable, nothing editable.",
+        "read": "Everything they can see, exactly as they see it. Nothing can be changed.",
         "write": "Their account verbatim. Anything you save is saved as them — and audited as you.",
         "reason": "Required. This is what the audit trail will say the session was for."
       },

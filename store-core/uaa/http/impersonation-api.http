@@ -2,8 +2,9 @@
 #
 # RFC 8693 token exchange with the `requested_subject` extension: `subject_token` is the OPERATOR's own access
 # token and `requested_subject` names the account to act as. The issued token's `sub` is the merchant, `act` names
-# the operator, `act_mode` says read or write. Read mode mints STORE_MODERATOR on `impersonation_store`; write
-# mode mints the target's own roles. Never a refresh token; fifteen minutes at most.
+# the operator, `act_mode` says read or write. Both modes mint the target's own roles; read-only is enforced by
+# every resource server's ReadOnlyActorFilter (unsafe methods → 403 COMMON.READ_ONLY_SESSION). Never a refresh
+# token; fifteen minutes at most.
 #
 # Only `console-impersonation` holds the grant, and that client's secret is the gateway's. In the product the
 # gateway makes this call for you (POST /api/v1/impersonation — gateway-service/http/impersonation-api.http);
@@ -33,7 +34,7 @@ grant_type=urn:ietf:params:oauth:grant-type:token-exchange&subject_token={{SUBJE
     client.global.set("IMPERSONATED_TOKEN", response.body.access_token);
 %}
 
-### the same, read-write — 200; roles are the merchant's own
+### the same, read-write — 200; the only difference is act_mode
 POST {{SELLER_UI_URL}}/uaa/oauth2/token
 Authorization: Basic console-impersonation {{IMPERSONATION_SECRET}}
 Content-Type: application/x-www-form-urlencoded

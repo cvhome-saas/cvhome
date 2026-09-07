@@ -192,7 +192,7 @@ class ProtocolAuditListenerTest {
         OAuth2Authorization.Builder builder = OAuth2Authorization.withRegisteredClient(client())
                 .principalName(merchantId.toString()).authorizationGrantType(AuthorizationGrantType.TOKEN_EXCHANGE);
         new ImpersonationContext(operatorId, OPERATOR, merchantId, MERCHANT, STORE, ImpersonationMode.READ, REASON,
-                Instant.parse(NOW), List.of(), List.of()).writeTo(builder);
+                Instant.parse(NOW)).writeTo(builder);
         when(authorizations.findByToken(TOKEN_VALUE, null)).thenReturn(builder.build());
 
         listener.onTokenRevoked(new AuthenticationSuccessEvent(revocation(clientPrincipal())));
