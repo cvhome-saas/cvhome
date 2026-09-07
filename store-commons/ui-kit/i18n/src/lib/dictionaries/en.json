@@ -324,6 +324,7 @@
     },
     "code": {
       "clientSessionMissing": "Sign in to continue.",
+      "COMMON_READ_ONLY_SESSION": "This is a read-only session. Nothing can be changed while you are acting as this account.",
       "CONTENT_NOT_FOUND": "That content no longer exists. It may have been deleted.",
       "CONTENT_SLUG_DUPLICATE": "Another item already uses this URL. Pick a different slug.",
       "CONTENT_CODE_DUPLICATE": "Another item already uses this code.",

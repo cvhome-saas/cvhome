@@ -1,6 +1,5 @@
 package com.asrevo.cvhome.s2s.config.internal;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -19,10 +18,16 @@ import tools.jackson.databind.ObjectMapper;
  * order places it behind Spring Security's own filter, where the principal has been resolved and the refusal can
  * be written in the shared problem-detail shape.
  * </p>
+ *
+ * <p>
+ * Deliberately <em>not</em> {@code @ConditionalOnBean(ProblemDetailFactory.class)}: the factory is defined by the
+ * error-handling configuration imported beside this one, and a bean condition is evaluated before that import has
+ * registered anything — so the filter was silently never registered, and a read-only session could save. The
+ * factory is required outright; a servlet service without it fails to start, which is the honest outcome.
+ * </p>
  */
 @Configuration
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
-@ConditionalOnBean(ProblemDetailFactory.class)
 @EnableConfigurationProperties(ReadOnlyActorProperties.class)
 public class ReadOnlyActorConfiguration {
 

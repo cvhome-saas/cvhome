@@ -326,9 +326,12 @@ Design points:
 - **The gateway has exactly one `ReactiveOAuth2AuthorizedClientManager`.** `tokenRelay()` resolves it with
   `getIfAvailable`; a second manager bean breaks every relayed route. The impersonation service uses that one.
 - **Errors are problem details** from the gateway's one advice, which exists for these endpoints.
+- **The whole swap is also pinned without a stack:** `ImpersonationFlowIntegrationTest` drives start → `auth/me` →
+  conflict → end, a uaa refusal, a store probe refusal and the ceiling over the real filter chain, against one
+  throwaway HTTP server standing in for uaa's token/revoke endpoints and tenancy's router.
 
 ### IMP-01 — Start swaps the relayed token and `auth/me` · critical · [verified]
-- **Seen** — 2026-09-07, stack `impersonation`: `auth/me` → `preferredUsername: org1-store1-admin`, authorities `[ROLE_STORE_MODERATOR]`, `impersonation.mode: read`; `store-manager/list` → the one store.
+- **Seen** — 2026-09-07, stack `impersonation`: `auth/me` → `preferredUsername: org1-store1-admin`, authorities `[ROLE_STORE_ADMIN]` (the merchant's own), `impersonation.mode: read`; `store-manager/list` → the one store.
 
 - **Steps** — `.http` "act as org1-store1-admin … read-only", then "the session is the merchant now", then "the relay
   carries the merchant's token".
@@ -337,7 +340,12 @@ Design points:
   answers the one store, not the platform's page.
 
 ### IMP-02 — Read-only refuses a write at the pod · critical · [verified]
-- **Seen** — `POST /spg/catalog/api/v1/private/category` → **403** `COMMON.ACCESS_DENIED`.
+- **Seen** — 2026-09-07, after the read-only model change: `GET …/category-hierarchy` 200, `GET …/orders` 200,
+  `POST …/order-statistic` 200 (allow-listed), `POST /spg/catalog/api/v1/private/category` → **403**
+  `COMMON.READ_ONLY_SESSION` with `params.path`, `DELETE …/category/1` → 403. **Regression caught on the first run:**
+  the filter's `@ConditionalOnBean(ProblemDetailFactory)` was evaluated before the imported error configuration
+  defined the bean, so no service registered it and the `POST` answered 201 — `ReadOnlyActorConfigurationTest`
+  now pins the registration.
 
 - **Steps** — `.http` "read-only: a write as the merchant is refused".
 - **Expect** — **403** `COMMON.READ_ONLY_SESSION` from the pod's `ReadOnlyActorFilter`: the token is the merchant's

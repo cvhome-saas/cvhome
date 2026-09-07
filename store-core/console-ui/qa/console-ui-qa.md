@@ -1098,15 +1098,17 @@ Design points a tester needs:
   (its `store`, or the org's stores for an org admin); from a store row, the accounts are those acting in it.
 
 ### IMP-01 — Act as a store admin, read-only, from the account list · critical · [verified]
-- **Seen** — 2026-09-07, stack `impersonation`, Chrome: reload to `/dashboard`, merchant rail, ORG1-STORE1 selected, the amber bar stacked above the plan notice with the countdown. **Known gap (design, not a defect of the swap):** the dashboard statistics and the catalogue lists answer 403 under read-only, because a real `STORE_MODERATOR` is refused there too — see 99.
+- **Seen** — 2026-09-07, stack `impersonation`, Chrome: reload to `/dashboard`, merchant rail, ORG1-STORE1 selected, the amber bar stacked above the plan notice with the countdown. The first cut (read mode as `STORE_MODERATOR`) showed a dashboard of 403s; with the target's own roles plus the method filter the dashboard and the catalogue render as the merchant sees them, and a save answers 403 `COMMON.READ_ONLY_SESSION`.
 
 - **Setup** — signed in as `super-admin`.
 - **Steps** — `/platform/users` → row menu of `org1-store1-admin` → **Act as this account** → the store is fixed
   (ORG1-STORE1), leave Read-only, type a reason → Start.
 - **Expect** — a reload to `/dashboard` as the merchant: the merchant rail (no Platform group), ORG1-STORE1 selected,
   an amber banner *You are acting as org1-store1-admin · Store: … · Read-only · N minutes left*. The dashboard, the
-  orders and the catalogue load exactly as the merchant sees them. Open a product and save → **403**
-  `COMMON.READ_ONLY_SESSION`, shown as the server's refusal. Network panel: `auth/me` carries
+  orders and the catalogue load exactly as the merchant sees them. Open a product and save — or toggle a category's
+  visibility — → **403** `COMMON.READ_ONLY_SESSION`, and the toast reads *This is a read-only session. Nothing can
+  be changed while you are acting as this account.* (the code's own message, ahead of the generic "no permission"
+  one). Network panel: `auth/me` carries
   `impersonation`, and every private call is `?store=65f023632bc46470c104b76f`.
 
 ### IMP-02 — Write mode saves as the merchant and audits as the operator · critical · [verified]
