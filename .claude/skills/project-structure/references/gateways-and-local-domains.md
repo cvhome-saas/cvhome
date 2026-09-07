@@ -54,7 +54,7 @@ So a seller editing a product traverses **two** gateways:
 ## Local setup
 
 Locally the Java services run on the host and only infrastructure runs in Docker
-(`docker-compose-lcl.yml`: postgres, `spg`, otel-collector, loki, tempo, prometheus, grafana).
+(`docker-compose-lcl.yml`: postgres, minio, `spg`).
 
 `spg` is the piece that must resolve service hostnames, so the compose file maps each one back to the host:
 

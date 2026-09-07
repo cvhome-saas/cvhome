@@ -1,3 +1,6 @@
+> **Moved (2026-09-08):** everything this plan built under `extra/monitoring/` and the load stack now live in the
+> `load-testing` repo (`stack/monitoring/`, `stack/docker-compose.yml`, `docs/monitoring/`). Paths below are historical.
+
 # cvhome observability: SLI/SLO plan, provisioned Grafana dashboards, and the issues found on the way
 
 Implementation plan for PR `feat/observability`; the delivered files are listed in `extra/monitoring/docs/README.md`.

@@ -102,7 +102,7 @@ Image tags come from `createImageTags` in build-logic, identical in `docker-conv
 
 So a local `./gradlew bootBuildImage` produces `<image>:0.0.0-SNAPSHOT` + `latest` and can never claim a
 release number; `-Pversion=2.0.0` reproduces exactly what CI does. `project.version` also reaches the running
-services as `service_version` (`@version@` in `common-config.yml`, see `extra/monitoring/docs/signals.md`).
+services as `service_version` (`@version@` in `common-config.yml`; how it is read: `load-testing/docs/monitoring/signals.md`).
 
 ## Toolchain, checkstyle and the test tasks
 
@@ -155,7 +155,7 @@ is in `configuration.md`.
 ./gradlew :store-pod:catalog:catalog-service:bootRun    # run one service
 ./gradlew :store-core:console-ui:bootRun                 # npm run dev, via ui-conventions
 ./gradlew :store-core:uaa:build                         # also builds + embeds uaa-fe
-docker compose -f docker-compose-lcl.yml up             # postgres, spg, otel-collector, loki, tempo, prometheus, grafana
+docker compose -f docker-compose-lcl.yml up             # postgres, minio, spg — dev infra only
 sudo ./extra/scripts/configure-domain.sh                # one-off: /etc/hosts entries for *.gateway.com
 ```
 
@@ -163,6 +163,7 @@ Run `configure-domain.sh` **before** the first local run — services address ea
 (`merchant.gateway.com`, `spg-507f1f77.gateway.com`, `org1-store1.spg-507f1f77.gateway.com`), not `localhost`,
 and nothing resolves without those entries. See `gateways-and-local-domains.md`.
 
-Local infra in `docker-compose-lcl.yml`: `postgres:15-alpine`, `saas-gateway` (spg image),
-`otel/opentelemetry-collector-contrib`, `grafana/loki`, `grafana/tempo`, `prom/prometheus`, `grafana/grafana` —
-i.e. the full OpenTelemetry logs/traces/metrics stack, matching the OTel starters wired into every service.
+Local infra in `docker-compose-lcl.yml`: `postgres:15-alpine`, `minio`, `saas-gateway` (spg image). No telemetry
+backend runs locally (`otel.sdk.disabled: true`); the OTel starters wired into every service export to the
+collector of the **load-testing** repo's compose stack (`make stack-up` there), which also carries Loki, Tempo,
+Prometheus with the recording rules, and Grafana with the dashboards. This repo ships no monitoring configuration.
