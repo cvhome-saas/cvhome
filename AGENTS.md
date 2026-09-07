@@ -135,14 +135,15 @@ What binds every change:
   it is more useful than implying otherwise. Say what is *expected to fail* too, so a tester does not spend a
   morning re-finding a known gap. **The structure to copy is
   `store-core/billing/billing-service/qa/billing-qa.md`, and the rules are `references/qa-testing.md` §7 in the
-  `project-structure` skill.** This is for people; the machine-checkable path is `.http` blocks and tests, which
+  `project-structure` skill**; the org-wide skeleton every repo shares is `qa/README.md`. This is for people; the machine-checkable path is `.http` blocks and tests, which
   it does not replace.
 
 ## Working conventions
 
 - **Never commit to `main` directly.** `main` is the integration branch (origin no longer has `develop`);
   every change lands via PR into `main`. If you find yourself on `main` with edits, move them to a
-  worktree/branch first, then commit.
+  worktree/branch first, then commit. A release is a `vX.Y.Z` tag cut by `cvhome-saas/orchestrator`'s
+  `Release` workflow, never a tag pushed by hand from here.
 - **Every plan or feature starts as a fresh worktree cut from up-to-date `main` — before the first file is
   written.** Planning a feature, implementing a plan, trying an idea, adding new files: all of it happens in
   its own worktree, never in the primary checkout:
@@ -162,6 +163,13 @@ What binds every change:
   the PR merges: `lcl stop --stack <short-name>`, then `git worktree remove` the directory and delete the
   branch. Tiny same-file follow-ups to an open PR may stay in that PR's existing worktree; anything new gets
   a new one.
+- **A plan is phases; a phase is one PR.** Anything bigger than one PR is written first as
+  `.agents/plans/<kebab-name>.md` (skeleton: `.agents/plans/README.md`; `uaa-sso-platform.md` and
+  `headless-cua-login.md` there show the shape): context, why the design is what it is, then
+  `## Phase N — <area> (PR N)` sections each small enough to review in one sitting, then deviations as built
+  and verification. One plan, one worktree, one branch; each phase is committed and shipped as its own PR
+  before the next begins (stacked if it must). A phase that touches another repo names it and hands it to
+  the orchestrator (`cross-repo-change`).
 - **The worktree rule is enforced, not trusted.** `.claude/hooks/worktree-guard.mjs` runs as a
   `PreToolUse` hook on every `Write`/`Edit`/`MultiEdit` and denies any path inside the primary
   checkout, telling the agent to cut a worktree and how to move edits already stranded on `main`.
@@ -207,6 +215,13 @@ What binds every change:
   column.
 - A new service needs entries in **all three** of `common-config.yml`, `lcl-config.yml`,
   `fargate-config.yml` to be resolvable via `lb://`.
+- **A new screen starts in the design portal, not in an editor.** Before a new console-ui feature component
+  or landing-ui `page.tsx` is written, its design canvas is produced with the orchestrator's `design` skill,
+  reviewed, and recorded in `.agents/designs/<slug>.md` (skeleton: `.agents/designs/README.md`) with the
+  canvas URL and `approved: true`. `.claude/hooks/design-guard.mjs` refuses a new page file without that
+  record; editing an existing page is never gated. `SKIP_DESIGN_GATE=1` lifts it for the person running the
+  session, never the agent. The record names the states the screen must show (empty, loading, error,
+  populated), and the screen's QA case tests exactly those.
 
 ## Error handling
 

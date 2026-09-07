@@ -62,3 +62,4 @@ http-client.private.env.json
 *.hprof
 hs_err_pid*.log
 replay_pid*.log
+.claude/worktrees/

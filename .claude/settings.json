@@ -9,6 +9,12 @@
             "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/worktree-guard.mjs\"",
             "timeout": 5,
             "statusMessage": "Checking worktree"
+          },
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/design-guard.mjs\"",
+            "timeout": 5,
+            "statusMessage": "Checking design record"
           }
         ]
       },
