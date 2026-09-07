@@ -32,7 +32,19 @@ try {
 }
 
 const command = input?.tool_input?.command;
-if (typeof command !== 'string' || !/\bgit\b[^|;&]*\bpush\b/.test(command)) {
+if (typeof command !== 'string') {
+  process.exit(0);
+}
+
+/*
+ * Only a real invocation counts: `git` at the start of a shell segment (the line, or after `;`, `&&`,
+ * `||`, `|`, `(`), optionally `-C <dir>` or another global flag, then `push`. Matching the bare words
+ * anywhere flagged heredocs and quoted strings that merely *mention* a push — this hook's own test
+ * file being written through a heredoc, for one.
+ */
+const INVOCATION = /(?:^|[;|(]|&&|\|\|)\s*(?:env\s+\S+=\S+\s+)*git\s+(?:(?:-C\s+\S+|--\S+|-\w)\s+)*push\b([^|;&)]*)/gm;
+const invocations = [...command.matchAll(INVOCATION)];
+if (invocations.length === 0) {
   process.exit(0);
 }
 
@@ -40,7 +52,24 @@ if (process.env['SKIP_VERIFY'] === '1') {
   process.exit(0);
 }
 
-if (/--no-verify\b/.test(command)) {
+/*
+ * A push that only deletes remote refs has no tree to verify: `git push --delete origin x`,
+ * `git push -d origin x`, or the refspec form `git push origin :x`. The git hook sees the same thing
+ * as all-zero local SHAs on stdin. A command mixing a deletion with an update is still gated.
+ */
+const deleteOnly = (args) => {
+  const tokens = args.trim().split(/\s+/).filter(Boolean);
+  if (tokens.some((t) => t === '--delete' || t === '-d')) {
+    return true;
+  }
+  const refspecs = tokens.filter((t) => !t.startsWith('-')).slice(1);
+  return refspecs.length > 0 && refspecs.every((r) => r.startsWith(':'));
+};
+if (invocations.every((m) => deleteOnly(m[1]))) {
+  process.exit(0);
+}
+
+if (invocations.some((m) => /--no-verify\b/.test(m[1]))) {
   process.stderr.write(
     `Blocked: git push --no-verify.\n\n` +
       `The pre-push hook is the local pipeline run; skipping it is how a red pipeline happens.\n` +

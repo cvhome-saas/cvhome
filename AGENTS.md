@@ -177,7 +177,7 @@ What binds every change:
   older tree, an edit since. The pipeline used to go red on coverage after pushes that had run "the tests"
   and nothing else; a receipt tied to the tree is what stopped that. Never `--no-verify`. `SKIP_VERIFY=1` is
   the person's escape hatch for a deliberate exception, typed on purpose, never the agent's. Changing the
-  guard? `node .claude/hooks/push-guard.test.mjs` — ten cases against a throwaway repository.
+  guard? `node .claude/hooks/push-guard.test.mjs` — seventeen cases against a throwaway repository.
 - **`/go` ships the working tree** (branch if needed → commit → push → PR into `main`, template filled,
   changelog label) and **`/reset` returns to a clean `main`** without losing work. Both live in
   `.AGENTS/commands/`; prefer them over doing the sequence by hand. Run `/go` from the worktree being shipped.

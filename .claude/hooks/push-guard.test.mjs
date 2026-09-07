@@ -66,6 +66,13 @@ try {
   check(ALLOW, 'a command that is not a push', 'git status && ./gradlew test');
   check(ALLOW, 'a mention of push that is not git', 'echo push it');
   check(DENY, 'a push with no receipt', 'git push -u origin HEAD');
+  check(DENY, 'a push after && with no receipt', 'git add -A && git commit -m x && git push');
+  check(ALLOW, 'a push that is only mentioned in a heredoc or a string', "cat > f <<'EOF'\ncheck('git push')\nEOF\nnode f");
+  check(ALLOW, 'deleting a remote branch has no tree to verify (--delete)', 'git push origin --delete old-branch');
+  check(ALLOW, 'deleting a remote branch has no tree to verify (-d)', 'git push -d origin old-branch');
+  check(ALLOW, 'deleting a remote branch has no tree to verify (:ref)', 'git push origin :old-branch');
+  check(DENY, 'a refspec that also updates is still gated', 'git push origin :old-branch HEAD');
+  check(DENY, 'a deletion beside an update in one command is still gated', 'git push -d origin old && git push');
   writeReceipt();
   check(ALLOW, 'a push of the verified tree', 'git push origin HEAD');
   check(ALLOW, 'a push through git -C of the verified tree', `git -C ${repo} push`);

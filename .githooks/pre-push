@@ -17,6 +17,19 @@ if [ "${SKIP_VERIFY:-}" = "1" ]; then
   exit 0
 fi
 
+# A push that only deletes remote refs carries no tree to verify. git hands each ref on stdin as
+# "<local ref> <local sha> <remote ref> <remote sha>", and a deletion's local sha is all zeros.
+zero="0000000000000000000000000000000000000000"
+updates=0
+while read -r _local_ref local_sha _remote_ref _remote_sha; do
+  if [ -n "${local_sha:-}" ] && [ "$local_sha" != "$zero" ]; then
+    updates=$((updates + 1))
+  fi
+done
+if [ "$updates" -eq 0 ]; then
+  exit 0
+fi
+
 git_dir="$(git rev-parse --absolute-git-dir)"
 receipt="$git_dir/cvhome-verified"
 current="$({ git rev-parse HEAD; git status --porcelain=v1 --untracked-files=all; git diff HEAD; } | shasum -a 256 | cut -d' ' -f1)"
