@@ -1,6 +1,6 @@
 ---
 description: Commit the current changes, push, and open a PR into main
-allowed-tools: Bash(git status:*), Bash(git diff:*), Bash(git log:*), Bash(git branch:*), Bash(git fetch:*), Bash(git switch:*), Bash(git checkout:*), Bash(git add:*), Bash(git commit:*), Bash(git push:*), Bash(gh pr create:*), Bash(gh pr view:*), Read, Glob, Grep
+allowed-tools: Bash(extra/scripts/verify-before-push.sh:*), Bash(git status:*), Bash(git diff:*), Bash(git log:*), Bash(git branch:*), Bash(git fetch:*), Bash(git switch:*), Bash(git checkout:*), Bash(git add:*), Bash(git commit:*), Bash(git push:*), Bash(gh pr create:*), Bash(gh pr view:*), Read, Glob, Grep
 ---
 
 Ship the current working tree: commit → push → PR into `main`. Run from the worktree that holds the change —
@@ -28,7 +28,7 @@ each plan/feature lives in its own worktree cut from `origin/main` (see AGENTS.m
    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
    ```
 
-5. **Push.** `git push -u origin HEAD`.
+5. **Verify, then push.** Run `extra/scripts/verify-before-push.sh` from the worktree — the whole pipeline locally: checkstyle, build, unit and integration tests, the coverage floors, both frontends' lint and tests. It writes the receipt the push hooks read; without a green run for exactly this tree, `git push` is refused (by `.githooks/pre-push` and by `.claude/hooks/push-guard.mjs`). Fix what is red and run it again; never `--no-verify`, never `SKIP_VERIFY=1` on the user's behalf. Then `git push -u origin HEAD`.
 
 6. **PR.** `gh pr create --base main` with the body following `.github/PULL_REQUEST_TEMPLATE.md`: *Why* → *What* → *The parts that are not obvious* → *Deviations* → *Verification*, then the checklist with the untouched sections **deleted**. Fill Verification with what was actually run — if the gates (`./gradlew checkstyleMain checkstyleTest`, `./gradlew build -x test -x check`, module `:test`, `npm run build`) were not run in this session, say so plainly rather than ticking boxes. Add a changelog label: `--label type/enhancement` (or `type/bug`, `type/documentation`, `type/test`, `type/chore`, `type/dependency-upgrade`) — an unlabelled PR lands in "Other Changes".
 
