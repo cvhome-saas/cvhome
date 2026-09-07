@@ -64,7 +64,11 @@ export class PlatformUsersFacade {
     () => this.impersonating() ?? undefined,
     (row) => this.api.storeChoices(row),
   );
-  readonly impersonationStoreChoices = computed(() => this.impersonationStores.value() ?? []);
+  /** Empty while loading, never the previous account's list: `snapshot` keeps that on purpose, for tables. */
+  readonly impersonationStoreChoices = computed(() =>
+    this.impersonationStores.isLoading() ? [] : (this.impersonationStores.value() ?? []),
+  );
+  readonly impersonationLoading = computed(() => this.impersonationStores.isLoading());
   readonly impersonationTargetChoices = computed(() => {
     const row = this.impersonating();
     return row ? [{value: row.id, label: row.name || row.username}] : [];

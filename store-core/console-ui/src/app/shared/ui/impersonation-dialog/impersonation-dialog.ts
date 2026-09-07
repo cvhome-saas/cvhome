@@ -30,6 +30,12 @@ export class ImpersonationDialog {
 
   readonly open = input(false);
   readonly busy = input(false);
+  /**
+   * Whether the host is still fetching the choices. Said explicitly, because the host's resource keeps the
+   * previous target's list while the next one loads — rendered, that showed the wrong store as "fixed", and a
+   * quick Start would have sent it.
+   */
+  readonly loading = input(false);
   /** The accounts that may be acted as. One means it is fixed. */
   readonly targets = input.required<readonly SelectOption[]>();
   /** The stores the impersonation may enter. One means it is fixed. */
@@ -53,7 +59,7 @@ export class ImpersonationDialog {
   );
 
   protected readonly canSubmit = computed(
-    () => !this.busy() && !!this.targetId() && !!this.storeId() && this.reason().trim().length > 0,
+    () => !this.busy() && !this.loading() && !!this.targetId() && !!this.storeId() && this.reason().trim().length > 0,
   );
 
   /**

@@ -9,7 +9,9 @@
   <form class="impersonation-form" (submit)="onSubmit($event)">
     <div class="imp-row">
       <span class="imp-label">{{ t('platform.impersonation.target') }}</span>
-      @if (targets().length === 1) {
+      @if (loading()) {
+        <p class="imp-hint">{{ t('platform.impersonation.loading') }}</p>
+      } @else if (targets().length === 1) {
         <span class="imp-value latin">{{ targets()[0].label }}</span>
       } @else if (targets().length === 0) {
         <p class="imp-empty">{{ t('platform.impersonation.noTargets') }}</p>
@@ -26,7 +28,9 @@
 
     <div class="imp-row">
       <span class="imp-label">{{ t('platform.impersonation.store') }}</span>
-      @if (stores().length === 1) {
+      @if (loading()) {
+        <p class="imp-hint">{{ t('platform.impersonation.loading') }}</p>
+      } @else if (stores().length === 1) {
         <span class="imp-value">{{ stores()[0].label }}</span>
       } @else if (stores().length === 0) {
         <p class="imp-empty">{{ t('platform.impersonation.noStores') }}</p>

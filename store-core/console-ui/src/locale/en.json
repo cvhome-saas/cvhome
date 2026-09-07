@@ -2063,6 +2063,7 @@
       "reasonPlaceholder": "Ticket number, what they reported…",
       "confirm": "Start acting as {{name}}",
       "busy": "Starting…",
+      "loading": "Loading…",
       "confirmUnnamed": "Start",
       "noStores": "This account acts in no store, so there is nowhere to open.",
       "noTargets": "No account acts in this store."

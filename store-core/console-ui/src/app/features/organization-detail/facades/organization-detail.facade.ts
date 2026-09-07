@@ -461,9 +461,15 @@ export class OrganizationDetailFacade {
     if (open.store) {
       return [{value: open.store.id, label: open.store.name}];
     }
-    const stores = this.impersonationStores.value() ?? [];
+    // Empty while loading, never the previous account's list — `snapshot` keeps that on purpose, for tables.
+    const stores = this.impersonationStores.isLoading() ? [] : (this.impersonationStores.value() ?? []);
     return open.target?.store ? stores.filter((store) => store.value === open.target?.store) : stores;
   });
+
+  /** Whether either choice list is still on its way; the dialog says so and holds Start. */
+  readonly impersonationLoading = computed(
+    () => this.impersonationStores.isLoading() || this.impersonationCandidates.isLoading(),
+  );
 
   readonly impersonationTargetChoices = computed<readonly SelectOption[]>(() => {
     const open = this.impersonating();
@@ -473,7 +479,8 @@ export class OrganizationDetailFacade {
     if (open.target) {
       return [{value: open.target.id, label: open.target.name || open.target.username}];
     }
-    return (this.impersonationCandidates.value() ?? []).map((row) => ({value: row.id, label: row.name || row.username}));
+    const candidates = this.impersonationCandidates.isLoading() ? [] : (this.impersonationCandidates.value() ?? []);
+    return candidates.map((row) => ({value: row.id, label: row.name || row.username}));
   });
 
   askImpersonate(row: PlatformUserRow): void {

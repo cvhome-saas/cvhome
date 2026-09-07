@@ -108,6 +108,7 @@
   <app-impersonation-dialog
     [open]="!!facade.impersonating()"
     [busy]="facade.busy()"
+    [loading]="facade.impersonationLoading()"
     [targets]="facade.impersonationTargetChoices()"
     [stores]="facade.impersonationStoreChoices()"
     [allowWrite]="facade.canImpersonateInWriteMode()"

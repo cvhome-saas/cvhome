@@ -1111,6 +1111,16 @@ Design points a tester needs:
   one). Network panel: `auth/me` carries
   `impersonation`, and every private call is `?store=65f023632bc46470c104b76f`.
 
+### IMP-01b — The dialog never shows the previous account's stores · high · [verified]
+- **Seen** — 2026-09-07: opening the dialog for `org1-admin` right after `org1-store1-admin` showed *Store: ORG1-STORE1*
+  as a fixed value — the previous account's list, kept by `snapshot` while the org admin's loaded — and a quick Start
+  would have sent it. Now the store row reads *Loading…* with Start held until the list arrives, then a select with
+  both ORG1 stores.
+
+- **Steps** — `/platform/users` → **Act as this account** on `org1-store1-admin` → Cancel → same on `org1-admin`.
+- **Expect** — a moment of *Loading…* under Store (Start disabled), then a **select** offering ORG1-STORE1 and
+  ORG1-STORE2; never a fixed ORG1-STORE1. Same from the org detail Users and Stores tabs.
+
 ### IMP-02 — Write mode saves as the merchant and audits as the operator · critical · [verified]
 - **Seen** — The UI start in write mode (org detail → Stores → ORG1-STORE2 as `org1-admin`) reloaded onto the merchant rail with the danger-wash bar reading *Read and write · 14 minutes left*; the tenancy write and the `(via super-admin)` actor were driven through the API (`tenancy-qa.md` IMP-01).
 
