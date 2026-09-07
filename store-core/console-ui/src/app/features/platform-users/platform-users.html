@@ -102,16 +102,13 @@
   }
 
   <!--
-    Acting as this account. The stores are the ones it acts in; the mode is the operator's to pick
-    where uaa lets them; the reason is what the audit row will say this was for.
+    Acting as this account — as it is, with its own stores and roles; the reason is what the audit row
+    will say this was for.
   -->
   <app-impersonation-dialog
     [open]="!!facade.impersonating()"
     [busy]="facade.busy()"
-    [loading]="facade.impersonationLoading()"
-    [targets]="facade.impersonationTargetChoices()"
-    [stores]="facade.impersonationStoreChoices()"
-    [allowWrite]="facade.canImpersonateInWriteMode()"
+    [target]="facade.impersonationTarget()"
     (submitted)="facade.confirmImpersonate($event)"
     (dismissed)="facade.dismissDialogs()"
   />

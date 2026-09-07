@@ -13,6 +13,9 @@
 }
 
 .menu {
+  /* Viewport-anchored, so no ancestor's overflow clips it; `top`/`left`/`transform` are set inline. */
+  position: fixed;
+  inset-inline-end: auto;
   min-width: 11rem;
   width: max-content;
   max-width: 16rem;

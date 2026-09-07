@@ -2,15 +2,6 @@ com:
   asrevo:
     cvhome:
       s2s:
-        # The reads that travel as POST. A read-only impersonation (a token carrying act_mode=read) is refused every
-        # unsafe method except these — ReadOnlyActorFilter, matched against the service-local path. A missing entry
-        # is a 403 on a read screen, never a write that got through.
-        read-only:
-          allowed-writes:
-            - /**/*-statistic
-            - /**/list
-            - /**/query
-            - /**/search
       app:
         domain: gateway.com
         sub:

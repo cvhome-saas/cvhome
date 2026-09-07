@@ -66,14 +66,11 @@ interface AuthenticationResponse {
  * What the gateway says this session is acting as.
  *
  * `actingAs` is the merchant's username; `expiresAt` is when the gateway hands the session back to
- * the operator whatever else happens. `mode` is `read` — the merchant's store as a moderator — or
- * `write`, the merchant verbatim.
+ * the operator whatever else happens. The session is the merchant verbatim — their org, stores and roles.
  */
 export interface ImpersonationState {
   readonly actingAs: string;
   readonly targetId: string;
-  readonly storeId: string;
-  readonly mode: 'read' | 'write';
   readonly reason: string;
   readonly expiresAt: string;
 }

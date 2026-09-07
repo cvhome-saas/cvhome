@@ -9,55 +9,7 @@
   <form class="impersonation-form" (submit)="onSubmit($event)">
     <div class="imp-row">
       <span class="imp-label">{{ t('platform.impersonation.target') }}</span>
-      @if (loading()) {
-        <p class="imp-hint">{{ t('platform.impersonation.loading') }}</p>
-      } @else if (targets().length === 1) {
-        <span class="imp-value latin">{{ targets()[0].label }}</span>
-      } @else if (targets().length === 0) {
-        <p class="imp-empty">{{ t('platform.impersonation.noTargets') }}</p>
-      } @else {
-        <app-select
-          [value]="targetId()"
-          (valueChange)="targetId.set($event)"
-          [options]="targets()"
-          [placeholder]="t('platform.impersonation.pickTarget')"
-          [ariaLabel]="t('platform.impersonation.target')"
-        />
-      }
-    </div>
-
-    <div class="imp-row">
-      <span class="imp-label">{{ t('platform.impersonation.store') }}</span>
-      @if (loading()) {
-        <p class="imp-hint">{{ t('platform.impersonation.loading') }}</p>
-      } @else if (stores().length === 1) {
-        <span class="imp-value">{{ stores()[0].label }}</span>
-      } @else if (stores().length === 0) {
-        <p class="imp-empty">{{ t('platform.impersonation.noStores') }}</p>
-      } @else {
-        <app-select
-          [value]="storeId()"
-          (valueChange)="storeId.set($event)"
-          [options]="stores()"
-          [placeholder]="t('platform.impersonation.pickStore')"
-          [ariaLabel]="t('platform.impersonation.store')"
-        />
-      }
-    </div>
-
-    <div class="imp-row">
-      <span class="imp-label">{{ t('platform.impersonation.modeLabel') }}</span>
-      @if (allowWrite()) {
-        <app-select
-          [value]="mode()"
-          (valueChange)="setMode($event)"
-          [options]="modeOptions()"
-          [ariaLabel]="t('platform.impersonation.modeLabel')"
-        />
-      } @else {
-        <span class="imp-value">{{ t('platform.impersonation.mode.read') }}</span>
-      }
-      <p class="imp-hint">{{ t(mode() === 'write' ? 'platform.impersonation.hint.write' : 'platform.impersonation.hint.read') }}</p>
+      <span class="imp-value latin">{{ target()?.label }}</span>
     </div>
 
     <div class="imp-row">
@@ -80,8 +32,8 @@
       <button class="primary-action" type="submit" [disabled]="!canSubmit()">
         @if (busy()) {
           {{ t('platform.impersonation.busy') }}
-        } @else if (targetLabel()) {
-          {{ t('platform.impersonation.confirm', {name: targetLabel()}) }}
+        } @else if (target(); as account) {
+          {{ t('platform.impersonation.confirm', {name: account.label}) }}
         } @else {
           {{ t('platform.impersonation.confirmUnnamed') }}
         }

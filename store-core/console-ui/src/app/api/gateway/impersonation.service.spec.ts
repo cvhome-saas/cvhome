@@ -20,7 +20,7 @@ describe('ImpersonationService', () => {
   const scoped = (path: string) => `${path}?store=${TEST_STORE}`;
 
   it('starts with the four fields the gateway validates, and ends with a delete', () => {
-    const request = {userId: 'u', storeId: 's', mode: 'read' as const, reason: 'ticket 42'};
+    const request = {userId: 'u', reason: 'ticket 42'};
 
     service.start(request).subscribe();
     const started = http.expectOne(scoped('/api/v1/impersonation'));

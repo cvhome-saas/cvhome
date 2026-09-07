@@ -35,7 +35,6 @@ import com.asrevo.cvhome.sso.security.PrincipalNames;
 import com.asrevo.cvhome.sso.settings.RealmSettings;
 import com.asrevo.cvhome.sso.settings.SettingsService;
 import com.asrevo.cvhome.sso.token.ImpersonationContext;
-import com.asrevo.cvhome.sso.token.ImpersonationMode;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -151,14 +150,13 @@ class JwtCustomizerConfigTest {
     }
 
     /** An access token whose authorization is an impersonation of {@code target} by {@code operator}. */
-    private static JwtEncodingContext impersonated(User target, String operator, ImpersonationMode mode,
-                                                   Instant notAfter, Instant exp) {
+    private static JwtEncodingContext impersonated(User target, String operator, Instant notAfter, Instant exp) {
         RegisteredClient client = RegisteredClient.withId("imp").clientId("console-impersonation")
                 .authorizationGrantType(AuthorizationGrantType.TOKEN_EXCHANGE).build();
         OAuth2Authorization.Builder authorization = OAuth2Authorization.withRegisteredClient(client)
                 .principalName(target.getId().toString()).authorizationGrantType(AuthorizationGrantType.TOKEN_EXCHANGE);
-        new ImpersonationContext(UUID.randomUUID(), operator, target.getId(), target.getUsername(), STORE_ID, mode,
-                "ticket", notAfter).writeTo(authorization);
+        new ImpersonationContext(UUID.randomUUID(), operator, target.getId(), target.getUsername(), "ticket", notAfter)
+                .writeTo(authorization);
         return JwtEncodingContext.with(JwsHeader.with(() -> RS256),
                         JwtClaimsSet.builder().subject(target.getId().toString()).expiresAt(exp))
                 .registeredClient(client)
@@ -212,21 +210,21 @@ class JwtCustomizerConfigTest {
     }
 
     /**
-     * Read mode is the target verbatim too — the read-only enforcement is the resource servers' method filter, keyed
-     * on {@code act_mode}. What the customizer adds is the operator's name and the ceiling on {@code exp}.
+     * An impersonated token is the target verbatim — org, store, roles — never wider, never narrower. What the
+     * customizer adds is the operator's name and the ceiling on {@code exp}.
      */
     @Test
-    void aReadModeImpersonationKeepsTheTargetsClaimsAndNamesTheOperator() {
+    void anImpersonationKeepsTheTargetsClaimsAndNamesTheOperator() {
         User target = user(Map.of(ORG, ORG_ID, STORE, STORE_ID), STORE_ADMIN, ORG_ADMIN);
         when(users.findById(target.getId())).thenReturn(Optional.of(target));
         Instant notAfter = Instant.parse("2026-04-01T09:40:00Z");
         Instant later = notAfter.plus(Duration.ofMinutes(5));
 
-        Map<String, Object> claims = claims(impersonated(target, OPERATOR, ImpersonationMode.READ, notAfter, later));
+        Map<String, Object> claims = claims(impersonated(target, OPERATOR, notAfter, later));
 
         assertThat(claims).containsEntry(ORG, ORG_ID).containsEntry(STORE, STORE_ID)
                 .containsEntry(JwtCustomizerConfig.UID, target.getId().toString())
-                .containsEntry(JwtCustomizerConfig.ACT_MODE, "read")
+                .doesNotContainKey("act_mode")
                 .containsEntry(JwtClaimNames.EXP, notAfter);
         assertThat(claims.get(JwtCustomizerConfig.ROLES)).asInstanceOf(InstanceOfAssertFactories.COLLECTION)
                 .containsExactlyInAnyOrder(STORE_ADMIN, ORG_ADMIN);
@@ -234,19 +232,17 @@ class JwtCustomizerConfigTest {
                 .containsEntry(JwtClaimNames.SUB, OPERATOR).containsKey(JwtCustomizerConfig.UID);
     }
 
-    /** Write mode is the target verbatim — never wider, never narrower — plus the operator's name. */
+    /** The generator's own, earlier expiry stands: the ceiling only ever pulls {@code exp} back. */
     @Test
-    void aWriteModeImpersonationKeepsTheTargetsOwnClaims() {
+    void anEarlierExpiryOfItsOwnStands() {
         User target = user(Map.of(ORG, ORG_ID, STORE, STORE_ID), STORE_ADMIN);
         when(users.findById(target.getId())).thenReturn(Optional.of(target));
         Instant notAfter = Instant.parse("2026-04-01T09:45:00Z");
         Instant sooner = notAfter.minus(Duration.ofMinutes(5));
 
-        Map<String, Object> claims = claims(impersonated(target, OPERATOR, ImpersonationMode.WRITE, notAfter, sooner));
+        Map<String, Object> claims = claims(impersonated(target, OPERATOR, notAfter, sooner));
 
-        assertThat(claims).containsEntry(JwtCustomizerConfig.ACT_MODE, "write")
-                // The generator's own, earlier expiry stands; the ceiling only ever pulls exp back.
-                .containsEntry(JwtClaimNames.EXP, sooner);
+        assertThat(claims).containsEntry(JwtClaimNames.EXP, sooner);
         assertThat(claims.get(JwtCustomizerConfig.ROLES)).asInstanceOf(InstanceOfAssertFactories.COLLECTION)
                 .containsExactly(STORE_ADMIN);
         assertThat(claims.get(JwtCustomizerConfig.ACT)).asInstanceOf(InstanceOfAssertFactories.MAP)

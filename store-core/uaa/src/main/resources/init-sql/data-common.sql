@@ -12,7 +12,7 @@ values ('c1e3a8e6-3a3e-4b1a-8e3e-3a3e4b1a8e3e', 'SUPER_ADMIN', 'The platform own
        ('58C35650-746C-48F8-84E7-78E588045194', 'STORE_ADMIN', 'Runs one store: catalog, orders, content and staff.', 'ORGANIZATION', true),
        ('23BAB562-5FF0-4690-A0C2-89E2CEA6FCE8', 'STORE_MODERATOR', 'Reads a store and edits its content; no orders, no staff.', 'ORGANIZATION', true),
        ('7A1D2C3B-4E5F-4A6B-8C7D-9E0F1A2B3C4D', 'STORE_RETAIL', 'Point-of-sale staff for one store.', 'ORGANIZATION', true),
-       ('9E2B7C10-5A4D-4F3E-8B6C-1D2E3F4A5B6C', 'SUPPORT', 'Platform support: finds a merchant and acts as them, read-only.', 'REALM', true)
+       ('9E2B7C10-5A4D-4F3E-8B6C-1D2E3F4A5B6C', 'SUPPORT', 'Platform support: finds a merchant and acts as them.', 'REALM', true)
 on conflict (id) do nothing;
 
 -- SUPER_ADMIN holds every permission in the catalogue (the enum in store-commons:commons is the source of truth).
@@ -35,7 +35,7 @@ values ('4CA169A8-E8AC-4874-ACAE-795BF7B27832', 'users:read'),
 on conflict (role_id, permission) do nothing;
 
 -- SUPPORT: enough to find a merchant account and act as it. Deliberately none of the write permissions, and none of
--- the roles a merchant screen authorises on — the way in is the impersonation grant, read-only.
+-- the roles a merchant screen authorises on — the way in is the impersonation grant.
 insert into uaa.role_permissions (role_id, permission)
 values ('9E2B7C10-5A4D-4F3E-8B6C-1D2E3F4A5B6C', 'users:read'),
        ('9E2B7C10-5A4D-4F3E-8B6C-1D2E3F4A5B6C', 'users:impersonate'),

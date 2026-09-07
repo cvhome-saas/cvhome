@@ -57,21 +57,11 @@ export class PlatformUsersFacade {
 
   /** Whether the row menu offers acting as an account: the operator's permission, mirrored. */
   readonly canImpersonate = computed(() => this.permissions.canImpersonate());
-  readonly canImpersonateInWriteMode = computed(() => this.permissions.canImpersonateInWriteMode());
 
-  /** The stores the chosen account may be acted as in — loaded when the dialog opens, not before. */
-  private readonly impersonationStores = snapshot(
-    () => this.impersonating() ?? undefined,
-    (row) => this.api.storeChoices(row),
-  );
-  /** Empty while loading, never the previous account's list: `snapshot` keeps that on purpose, for tables. */
-  readonly impersonationStoreChoices = computed(() =>
-    this.impersonationStores.isLoading() ? [] : (this.impersonationStores.value() ?? []),
-  );
-  readonly impersonationLoading = computed(() => this.impersonationStores.isLoading());
-  readonly impersonationTargetChoices = computed(() => {
+  /** The account the dialog names, as the option the confirm button reads. */
+  readonly impersonationTarget = computed<SelectOption | null>(() => {
     const row = this.impersonating();
-    return row ? [{value: row.id, label: row.name || row.username}] : [];
+    return row ? {value: row.id, label: row.name || row.username} : null;
   });
 
   private readonly users = snapshot(
@@ -194,7 +184,7 @@ export class PlatformUsersFacade {
     this.launcher.start(request).subscribe({
       error: (failure: unknown) => {
         this.busy.set(false);
-        // uaa's refusal, or tenancy's word that the store is not this account's — shown, not predicted.
+        // uaa's refusal — shown, not predicted.
         this.toast.danger(this.apiErrors.messageFor(failure));
       },
     });

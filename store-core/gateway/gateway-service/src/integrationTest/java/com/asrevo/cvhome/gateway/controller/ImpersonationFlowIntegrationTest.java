@@ -55,10 +55,10 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
  * hands the session back and revokes the exchanged token.
  *
  * <p>
- * uaa and tenancy are stood in for by one throwaway HTTP server: the token endpoint issues a signed JWT for
- * whatever subject is asked, refusing one and back-dating another, and the router probe accepts every store but
- * one. The login itself is mocked at the security layer — a real one needs uaa's browser flow — and the operator's
- * authorized client is planted where a login would have put it, keyed by principal name, so the manager the service
+ * uaa is stood in for by a throwaway HTTP server: the token endpoint issues a signed JWT for whatever subject is
+ * asked, refusing one and back-dating another. The login itself is mocked at the security layer — a real one needs
+ * uaa's browser flow — and the operator's authorized client is planted where a login would have put it, keyed by
+ * principal name, so the manager the service
  * refreshes through finds it.
  * </p>
  */
@@ -85,15 +85,11 @@ class ImpersonationFlowIntegrationTest {
 
     private static final String STORE = "65f023632bc46470c104b76f";
 
-    private static final String FOREIGN_STORE = "65f023632bc46470c104b77f";
-
     /** The subject the stubbed token endpoint refuses. */
     private static final String REFUSED = "refused-target";
 
     /** The subject the stubbed token endpoint issues an already-expired token for. */
     private static final String EXPIRED = "expired-target";
-
-    private static final String READ = "read";
 
     private static final String REASON = "ticket 42";
 
@@ -142,7 +138,6 @@ class ImpersonationFlowIntegrationTest {
     static void pointUaaAndTenancyAtTheStub(DynamicPropertyRegistry registry) {
         String base = String.format("http://localhost:%d", STUB.getAddress().getPort());
         registry.add("spring.security.oauth2.client.provider.uaa.token-uri", () -> String.format("%s%s", base, TOKEN_PATH));
-        registry.add("spring.cloud.discovery.client.simple.instances.tenancy[0].uri", () -> base);
     }
 
     @BeforeEach
@@ -157,12 +152,10 @@ class ImpersonationFlowIntegrationTest {
 
     @Test
     void startingActsAsTheMerchantInThatSessionAndEndingHandsItBack() {
-        EntityExchangeResult<byte[]> started = start(MERCHANT_ID, STORE).expectStatus().isOk()
+        EntityExchangeResult<byte[]> started = start(MERCHANT_ID).expectStatus().isOk()
                 .expectBody()
                 .jsonPath("$.actingAs").isEqualTo(MERCHANT)
                 .jsonPath("$.targetId").isEqualTo(MERCHANT_ID)
-                .jsonPath("$.storeId").isEqualTo(STORE)
-                .jsonPath("$.mode").isEqualTo(READ)
                 .jsonPath("$.reason").isEqualTo(REASON)
                 .returnResult();
         String session = sessionOf(started);
@@ -177,7 +170,7 @@ class ImpersonationFlowIntegrationTest {
                 .jsonPath("$.authorities[*].authority").value(authorities -> assertThat(authorities.toString())
                         .contains("ROLE_STORE_ADMIN").doesNotContain(SUPER_ADMIN))
                 .jsonPath("$.impersonation.actingAs").isEqualTo(MERCHANT)
-                .jsonPath("$.impersonation.mode").isEqualTo(READ);
+                .jsonPath("$.impersonation.reason").isEqualTo(REASON);
         // ...and the client tokenRelay() reads for it carries the exchanged token, while the operator's stands.
         OAuth2AuthorizedClient relayed = clients.<OAuth2AuthorizedClient>loadAuthorizedClient(UAA, composite).block();
         assertThat(relayed.getAccessToken().getTokenValue()).startsWith("eyJ");
@@ -186,7 +179,7 @@ class ImpersonationFlowIntegrationTest {
 
         // A second start on a session already acting is a conflict, never a chain.
         client.mutateWith(mockAuthentication(operator())).post().uri(IMPERSONATION).cookie(COOKIE, session)
-                .contentType(MediaType.APPLICATION_JSON).bodyValue(body(MERCHANT_ID, STORE)).exchange()
+                .contentType(MediaType.APPLICATION_JSON).bodyValue(body(MERCHANT_ID)).exchange()
                 .expectStatus().isEqualTo(409)
                 .expectBody().jsonPath(CODE).isEqualTo("GATEWAY.IMPERSONATION.ALREADY_ACTIVE");
 
@@ -204,30 +197,18 @@ class ImpersonationFlowIntegrationTest {
 
     @Test
     void aRefusalFromUaaIsForbiddenAndLeavesTheSessionAsItWas() {
-        start(REFUSED, STORE).expectStatus().isForbidden()
+        start(REFUSED).expectStatus().isForbidden()
                 .expectBody().jsonPath(CODE).isEqualTo("GATEWAY.IMPERSONATION.REFUSED");
 
         assertThat(clients.loadAuthorizedClient(UAA, String.format(COMPOSITE, REFUSED, OPERATOR_ID)).blockOptional()).isEmpty();
         assertThat(clients.<OAuth2AuthorizedClient>loadAuthorizedClient(UAA, OPERATOR_ID).block()).isNotNull();
     }
 
-    @Test
-    void aStoreTheTargetCannotActInIsRefusedAndTheTokenRevoked() {
-        int revoked = REVOCATIONS.get();
-
-        start(MERCHANT_ID, FOREIGN_STORE).expectStatus().isEqualTo(422)
-                .expectBody().jsonPath(CODE).isEqualTo("GATEWAY.IMPERSONATION.STORE_NOT_TARGETS");
-
-        assertThat(REVOCATIONS).hasValue(revoked + 1);
-        assertThat(clients.loadAuthorizedClient(UAA, String.format(COMPOSITE, MERCHANT_ID, OPERATOR_ID)).blockOptional())
-                .isEmpty();
-    }
-
     /** Past the ceiling the next request is the operator's, before anything looks at it. */
     @Test
     void pastTheCeilingTheNextRequestIsTheOperatorAgain() {
         int revoked = REVOCATIONS.get();
-        String session = sessionOf(start(EXPIRED, STORE).expectStatus().isOk().expectBody().returnResult());
+        String session = sessionOf(start(EXPIRED).expectStatus().isOk().expectBody().returnResult());
 
         client.get().uri(IMPERSONATION).cookie(COOKIE, session).exchange().expectStatus().isNoContent();
 
@@ -237,13 +218,13 @@ class ImpersonationFlowIntegrationTest {
         assertThat(clients.loadAuthorizedClient(UAA, String.format(COMPOSITE, EXPIRED, OPERATOR_ID)).blockOptional()).isEmpty();
     }
 
-    private WebTestClient.ResponseSpec start(String userId, String storeId) {
+    private WebTestClient.ResponseSpec start(String userId) {
         return client.mutateWith(mockAuthentication(operator())).post().uri(IMPERSONATION)
-                .contentType(MediaType.APPLICATION_JSON).bodyValue(body(userId, storeId)).exchange();
+                .contentType(MediaType.APPLICATION_JSON).bodyValue(body(userId)).exchange();
     }
 
-    private static Map<String, String> body(String userId, String storeId) {
-        return Map.of("userId", userId, "storeId", storeId, "mode", READ, "reason", REASON);
+    private static Map<String, String> body(String userId) {
+        return Map.of("userId", userId, "reason", REASON);
     }
 
     private static OAuth2AuthenticationToken operator() {
@@ -275,8 +256,6 @@ class ImpersonationFlowIntegrationTest {
                 REVOCATIONS.incrementAndGet();
                 answer(exchange, 200, JSON);
             });
-            server.createContext("/api/v1/router/store-pod-by-store-id", exchange -> answer(exchange,
-                    exchange.getRequestURI().getQuery().contains(String.format("store=%s", FOREIGN_STORE)) ? 403 : 200, JSON));
             server.start();
             return server;
         } catch (IOException e) {
@@ -304,15 +283,14 @@ class ImpersonationFlowIntegrationTest {
         // The back-dated token is still a well-formed one: issued before it expires, both in the past.
         Instant issuedAt = EXPIRED.equals(subject) ? Instant.now().minusSeconds(60) : Instant.now();
         Instant expiresAt = EXPIRED.equals(subject) ? Instant.now().minusSeconds(5) : Instant.now().plusSeconds(600);
-        String mode = form.get("impersonation_mode");
         Map<String, Object> claims = new HashMap<>(Map.of(SUB, subject, UID, subject,
-                "roles", List.of("STORE_ADMIN"), "store", form.get("impersonation_store"), PREFERRED_USERNAME, MERCHANT,
-                "act", Map.of(SUB, OPERATOR, UID, OPERATOR_ID), "act_mode", mode));
+                "roles", List.of("STORE_ADMIN"), "store", STORE, PREFERRED_USERNAME, MERCHANT,
+                "act", Map.of(SUB, OPERATOR, UID, OPERATOR_ID)));
         claims.put("iat", issuedAt.getEpochSecond());
         claims.put("exp", expiresAt.getEpochSecond());
         String jwt = SIGNER.sign(claims);
         answer(exchange, 200, String.format("{\"access_token\":\"%s\",\"token_type\":\"Bearer\",\"expires_in\":600,"
-                + "\"act_mode\":\"%s\",\"acting_as\":\"%s\"}", jwt, mode, MERCHANT));
+                + "\"acting_as\":\"%s\"}", jwt, MERCHANT));
     }
 
     private static String decode(String value) {

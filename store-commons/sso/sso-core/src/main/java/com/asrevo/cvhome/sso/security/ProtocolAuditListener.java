@@ -113,7 +113,6 @@ public class ProtocolAuditListener {
                                 impersonation.operatorUsername()))
                         .user(impersonation.targetId(), impersonation.targetUsername())
                         .client(clientId)
-                        .reason(impersonation.mode().wire())
                         .detail(impersonation.reason())));
     }
 

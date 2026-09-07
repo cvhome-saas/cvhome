@@ -26,9 +26,10 @@ import org.springframework.util.StringUtils;
  * <p>
  * The grant is RFC 8693's token exchange with the extension Keycloak also uses: {@code subject_token} is the
  * <em>operator's</em> token and {@code requested_subject} names the account to act as, because the operator holds no
- * token for that account and the standard alone cannot say "give me one". Two cvhome parameters complete it —
- * {@code impersonation_store} and {@code impersonation_mode} — plus {@code reason}, which is required because an
- * impersonation nobody can review is the one that has to be switched off again.
+ * token for that account and the standard alone cannot say "give me one". One cvhome parameter completes it —
+ * {@code reason}, required because an impersonation nobody can review is the one that has to be switched off again.
+ * The token carries the target's own org and store, whatever they are: an org admin with no store yet is still an
+ * account worth seeing the console as.
  * </p>
  *
  * <p>
@@ -40,10 +41,6 @@ import org.springframework.util.StringUtils;
 public final class ImpersonationExchangeConverter implements AuthenticationConverter {
 
     public static final String REQUESTED_SUBJECT = "requested_subject";
-
-    public static final String STORE = "impersonation_store";
-
-    public static final String MODE = "impersonation_mode";
 
     public static final String REASON = "reason";
 
@@ -57,7 +54,7 @@ public final class ImpersonationExchangeConverter implements AuthenticationConve
 
     /** Every parameter this grant defines; the rest of the form travels as additional parameters. */
     private static final Set<String> OWN = Set.of(OAuth2ParameterNames.GRANT_TYPE, SUBJECT_TOKEN, SUBJECT_TOKEN_TYPE,
-            REQUESTED_TOKEN_TYPE, REQUESTED_SUBJECT, STORE, MODE, REASON, OAuth2ParameterNames.SCOPE);
+            REQUESTED_TOKEN_TYPE, REQUESTED_SUBJECT, REASON, OAuth2ParameterNames.SCOPE);
 
     private static final String RFC = "https://datatracker.ietf.org/doc/html/rfc8693#section-2.1";
 
@@ -75,8 +72,6 @@ public final class ImpersonationExchangeConverter implements AuthenticationConve
         tokenTypeIsAccessToken(single(form, SUBJECT_TOKEN_TYPE), SUBJECT_TOKEN_TYPE);
         tokenTypeIsAccessToken(optional(form, REQUESTED_TOKEN_TYPE), REQUESTED_TOKEN_TYPE);
         String requestedSubject = single(form, REQUESTED_SUBJECT);
-        String store = single(form, STORE);
-        String mode = single(form, MODE);
         String reason = single(form, REASON);
         Set<String> scopes = scopes(optional(form, OAuth2ParameterNames.SCOPE));
         Map<String, Object> additional = new HashMap<>();
@@ -85,8 +80,8 @@ public final class ImpersonationExchangeConverter implements AuthenticationConve
                 additional.put(key, values.length == 1 ? values[0] : List.of(values));
             }
         });
-        return new ImpersonationExchangeAuthenticationToken(client, subjectToken, requestedSubject, store, mode, reason,
-                scopes, additional);
+        return new ImpersonationExchangeAuthenticationToken(client, subjectToken, requestedSubject, reason, scopes,
+                additional);
     }
 
     private static String single(Map<String, String[]> form, String name) {

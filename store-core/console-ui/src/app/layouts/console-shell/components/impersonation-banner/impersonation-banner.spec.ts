@@ -19,8 +19,6 @@ describe('ImpersonationBanner', () => {
     api.impersonation = {
       actingAs: 'org1-store1-admin',
       targetId: 't',
-      storeId: CONSOLE_STORES_FAKE[0].id,
-      mode: 'read',
       reason: 'ticket 42',
       expiresAt: new Date(Date.now() + 10 * 60_000).toISOString(),
     };
@@ -44,13 +42,12 @@ describe('ImpersonationBanner', () => {
     return {fixture, element: fixture.nativeElement as HTMLElement};
   }
 
-  it('names the merchant, the store and the mode, and ends it through the api', fakeAsync(() => {
+  it('names the merchant and the time left, and ends it through the api', fakeAsync(() => {
     const {fixture, element} = banner();
 
     const text = element.textContent ?? '';
     expect(text).toContain('org1-store1-admin');
-    expect(text).toContain(CONSOLE_STORES_FAKE[0].name);
-    expect(text).toContain('Read-only');
+    expect(text).toContain('minutes');
     expect(element.querySelector('.dismiss')).toBeNull();
 
     (element.querySelector('.end') as HTMLButtonElement).click();

@@ -79,8 +79,7 @@ class MeViewTest {
                 Map.of(SUB, MERCHANT_ID, PREFERRED_USERNAME, MERCHANT, EMAIL, MERCHANT_EMAIL, PRINCIPAL_KEY, COMPOSITE),
                 PRINCIPAL_KEY);
         OAuth2AuthenticationToken login = new OAuth2AuthenticationToken(merchant, merchant.getAuthorities(), UAA);
-        ImpersonationView acting = new ImpersonationView(MERCHANT, MERCHANT_ID, "store", "read", "ticket",
-                Instant.EPOCH.plusSeconds(900));
+        ImpersonationView acting = new ImpersonationView(MERCHANT, MERCHANT_ID, "ticket", Instant.EPOCH.plusSeconds(900));
 
         MeView view = MeView.of(login, acting);
 

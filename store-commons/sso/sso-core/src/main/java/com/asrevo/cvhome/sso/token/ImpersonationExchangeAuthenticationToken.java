@@ -20,8 +20,6 @@ import lombok.Getter;
  *
  * @param subjectToken     the operator's own access token
  * @param requestedSubject the account id to act as
- * @param store            the store to act in
- * @param mode             {@code read} or {@code write}, unparsed
  * @param reason           why — free text, required, and carried into the audit row
  * @param scopes           the scopes asked for; the provider narrows them to the client's
  */
@@ -35,22 +33,16 @@ public class ImpersonationExchangeAuthenticationToken extends OAuth2Authorizatio
 
     private final String requestedSubject;
 
-    private final String store;
-
-    private final String mode;
-
     private final String reason;
 
     private final Set<String> scopes;
 
     public ImpersonationExchangeAuthenticationToken(Authentication clientPrincipal, String subjectToken,
-                                                    String requestedSubject, String store, String mode, String reason,
+                                                    String requestedSubject, String reason,
                                                     Set<String> scopes, Map<String, Object> additionalParameters) {
         super(AuthorizationGrantType.TOKEN_EXCHANGE, clientPrincipal, additionalParameters);
         this.subjectToken = subjectToken;
         this.requestedSubject = requestedSubject;
-        this.store = store;
-        this.mode = mode;
         this.reason = reason;
         this.scopes = Set.copyOf(scopes);
     }

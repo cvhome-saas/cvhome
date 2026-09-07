@@ -39,8 +39,6 @@ class GatewayErrorHandlerTest {
     void theOtherConditionsMapToTheirCategories() {
         assertThat(handler.onBaseException(ImpersonationAlreadyActiveException.actingAs("m")).getStatusCode())
                 .isEqualTo(HttpStatus.CONFLICT);
-        assertThat(handler.onBaseException(ImpersonationStoreNotTargetsException.of("s", 404)).getStatusCode())
-                .isEqualTo(HttpStatus.UNPROCESSABLE_CONTENT);
         assertThat(handler.onBaseException(ImpersonationInvalidException.missing("reason")).getStatusCode())
                 .isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(handler.onBaseException(ImpersonationUnavailableException.of(new RuntimeException("x"), "uaa")).getStatusCode())

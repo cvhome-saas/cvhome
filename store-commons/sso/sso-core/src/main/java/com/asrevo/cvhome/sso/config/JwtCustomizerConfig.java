@@ -54,9 +54,8 @@ import com.asrevo.cvhome.sso.token.ImpersonationContext;
  *
  * <p>
  * <strong>An impersonated token says so.</strong> When the authorization behind the token is an impersonation
- * ({@link ImpersonationContext}), {@code act} names the operator (RFC 8693 §4.1: identity only) and {@code act_mode}
- * says read or write — the roles stay the target's own in both modes; read-only is the resource servers' method
- * filter — and no impersonated token outlives the operator's own.
+ * ({@link ImpersonationContext}), {@code act} names the operator (RFC 8693 §4.1: identity only); the roles, org and
+ * store stay the target's own, and no impersonated token outlives the operator's own.
  * </p>
  *
  * <p>
@@ -90,9 +89,6 @@ public class JwtCustomizerConfig {
 
     /** The operator behind an impersonated token — RFC 8693 §4.1. */
     static final String ACT = "act";
-
-    /** Whether an impersonated token acts read-only or as the target. */
-    static final String ACT_MODE = "act_mode";
 
     private final PrincipalNames principals;
 
@@ -194,7 +190,7 @@ public class JwtCustomizerConfig {
             Map<String, Object> act = new LinkedHashMap<>();
             act.put(JwtClaimNames.SUB, impersonation.operatorUsername());
             act.put(UID, impersonation.operatorId().toString());
-            context.getClaims().claim(ACT, act).claim(ACT_MODE, impersonation.mode().wire());
+            context.getClaims().claim(ACT, act);
             context.getClaims().claims(claims -> {
                 Object exp = claims.get(JwtClaimNames.EXP);
                 if (!(exp instanceof Instant expiresAt) || expiresAt.isAfter(impersonation.notAfter())) {

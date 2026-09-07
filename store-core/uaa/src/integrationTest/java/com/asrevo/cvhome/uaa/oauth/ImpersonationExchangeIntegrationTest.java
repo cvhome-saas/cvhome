@@ -48,10 +48,6 @@ class ImpersonationExchangeIntegrationTest {
 
     private static final String AUDIT = "select count(*) from uaa.audit_events where event_type = ? and target_id = ?";
 
-    private static final String READ = "read";
-
-    private static final String WRITE = "write";
-
     private static final String STARTED = "user.impersonation.started";
 
     private static final String ENDED = "user.impersonation.ended";
@@ -59,8 +55,6 @@ class ImpersonationExchangeIntegrationTest {
     private static final String DENIED = "user.impersonation.denied";
 
     private static final String ACT = "act";
-
-    private static final String ACT_MODE = "act_mode";
 
     private static final String SUB = "sub";
 
@@ -78,15 +72,13 @@ class ImpersonationExchangeIntegrationTest {
     @Autowired
     private JdbcTemplate jdbc;
 
-    private static Map<String, String> exchange(String subjectToken, String target, String store, String mode) {
+    private static Map<String, String> exchange(String subjectToken, String target) {
         Map<String, String> form = new HashMap<>();
         form.put("grant_type", GRANT);
         form.put("subject_token", subjectToken);
         form.put("subject_token_type", ACCESS_TOKEN_TYPE);
         form.put("requested_token_type", ACCESS_TOKEN_TYPE);
         form.put("requested_subject", target);
-        form.put("impersonation_store", store);
-        form.put("impersonation_mode", mode);
         form.put("reason", REASON);
         return form;
     }
@@ -97,19 +89,18 @@ class ImpersonationExchangeIntegrationTest {
     }
 
     @Test
-    void aSuperAdminActsAsAmerchantReadOnlyAndTheTrailSaysSo() throws Exception {
+    void aSuperAdminActsAsAmerchantAndTheTrailSaysSo() throws Exception {
         UaaClient uaa = new UaaClient(port);
         String operator = uaa.userAccessToken(UaaClient.SUPER_ADMIN);
         long started = audited(STARTED, ORG1_STORE1_ADMIN_ID);
         long ended = audited(ENDED, ORG1_STORE1_ADMIN_ID);
 
         HttpResponse<String> response = uaa.clientPost(UaaClient.IMPERSONATION, UaaClient.LCL_SECRET, TOKEN,
-                exchange(operator, ORG1_STORE1_ADMIN_ID, ORG1_STORE1, READ));
+                exchange(operator, ORG1_STORE1_ADMIN_ID));
 
         assertThat(response.statusCode()).as(response.body()).isEqualTo(200);
         JsonNode body = UaaClient.body(response);
         assertThat(body.get("issued_token_type").asText()).isEqualTo(ACCESS_TOKEN_TYPE);
-        assertThat(body.get(ACT_MODE).asText()).isEqualTo(READ);
         assertThat(body.has("refresh_token")).as("never a refresh token").isFalse();
         assertThat(body.get("expires_in").asInt()).isLessThanOrEqualTo(900);
         JsonNode claims = UaaClient.claims(body.get(ACCESS_TOKEN).asText());
@@ -118,12 +109,11 @@ class ImpersonationExchangeIntegrationTest {
         assertThat(claims.get(UID).asText()).isEqualTo(ORG1_STORE1_ADMIN_ID);
         assertThat(claims.get("org").asText()).isEqualTo("21f023932bc66470c104b76f");
         assertThat(claims.get("store").asText()).isEqualTo(ORG1_STORE1);
-        // ...read mode keeps the merchant's own roles — read-only is the resource servers' method filter...
+        // ...with the merchant's own roles, org and store...
         assertThat(claims.get(ROLES).toString()).contains(STORE_ADMIN);
         // ...and act names the operator.
         assertThat(claims.get(ACT).get(SUB).asText()).isEqualTo(UaaClient.SUPER_ADMIN);
         assertThat(claims.get(ACT).get(UID).asText()).isEqualTo(SUPER_ADMIN_ID);
-        assertThat(claims.get(ACT_MODE).asText()).isEqualTo(READ);
         assertThat(audited(STARTED, ORG1_STORE1_ADMIN_ID)).isEqualTo(started + 1);
 
         // Ending it is a revocation, which the audit trail also records as the impersonation ending.
@@ -134,50 +124,33 @@ class ImpersonationExchangeIntegrationTest {
     }
 
     @Test
-    void writeModeCarriesTheMerchantsOwnRoles() throws Exception {
-        UaaClient uaa = new UaaClient(port);
-        String operator = uaa.userAccessToken(UaaClient.SUPER_ADMIN);
-
-        HttpResponse<String> response = uaa.clientPost(UaaClient.IMPERSONATION, UaaClient.LCL_SECRET, TOKEN,
-                exchange(operator, ORG1_STORE1_ADMIN_ID, ORG1_STORE1, WRITE));
-
-        assertThat(response.statusCode()).as(response.body()).isEqualTo(200);
-        JsonNode claims = UaaClient.claims(UaaClient.body(response).get(ACCESS_TOKEN).asText());
-        assertThat(claims.get(ROLES).toString()).contains(STORE_ADMIN);
-        assertThat(claims.get(ACT).get(SUB).asText()).isEqualTo(UaaClient.SUPER_ADMIN);
-    }
-
-    @Test
     void anImpersonatedTokenCannotBeExchangedAgain() throws Exception {
         UaaClient uaa = new UaaClient(port);
         String operator = uaa.userAccessToken(UaaClient.SUPER_ADMIN);
         HttpResponse<String> first = uaa.clientPost(UaaClient.IMPERSONATION, UaaClient.LCL_SECRET, TOKEN,
-                exchange(operator, ORG1_STORE1_ADMIN_ID, ORG1_STORE1, READ));
+                exchange(operator, ORG1_STORE1_ADMIN_ID));
         String impersonated = UaaClient.body(first).get(ACCESS_TOKEN).asText();
         long denied = audited(DENIED, ORG1_STORE1_ADMIN_ID);
 
         HttpResponse<String> chained = uaa.clientPost(UaaClient.IMPERSONATION, UaaClient.LCL_SECRET, TOKEN,
-                exchange(impersonated, ORG1_STORE1_ADMIN_ID, ORG1_STORE1, READ));
+                exchange(impersonated, ORG1_STORE1_ADMIN_ID));
 
         assertThat(chained.statusCode()).isEqualTo(400);
         assertThat(UaaClient.body(chained).get(ERROR).asText()).isEqualTo("invalid_grant");
         assertThat(audited(DENIED, ORG1_STORE1_ADMIN_ID)).isEqualTo(denied + 1);
     }
 
+    /** Support holds {@code users:impersonate} and acts as the merchant the same way a super admin does. */
     @Test
-    void supportActsReadOnlyAndNeverInWriteMode() throws Exception {
+    void supportActsAsAmerchantToo() throws Exception {
         UaaClient uaa = new UaaClient(port);
         String operator = uaa.userAccessToken(UaaClient.SUPPORT);
 
-        HttpResponse<String> write = uaa.clientPost(UaaClient.IMPERSONATION, UaaClient.LCL_SECRET, TOKEN,
-                exchange(operator, ORG1_STORE1_ADMIN_ID, ORG1_STORE1, WRITE));
-        HttpResponse<String> read = uaa.clientPost(UaaClient.IMPERSONATION, UaaClient.LCL_SECRET, TOKEN,
-                exchange(operator, ORG1_STORE1_ADMIN_ID, ORG1_STORE1, READ));
+        HttpResponse<String> response = uaa.clientPost(UaaClient.IMPERSONATION, UaaClient.LCL_SECRET, TOKEN,
+                exchange(operator, ORG1_STORE1_ADMIN_ID));
 
-        assertThat(write.statusCode()).isEqualTo(400);
-        assertThat(UaaClient.body(write).get(ERROR).asText()).isEqualTo(ACCESS_DENIED);
-        assertThat(read.statusCode()).as(read.body()).isEqualTo(200);
-        assertThat(UaaClient.claims(UaaClient.body(read).get(ACCESS_TOKEN).asText()).get(ACT).get(SUB).asText())
+        assertThat(response.statusCode()).as(response.body()).isEqualTo(200);
+        assertThat(UaaClient.claims(UaaClient.body(response).get(ACCESS_TOKEN).asText()).get(ACT).get(SUB).asText())
                 .isEqualTo(UaaClient.SUPPORT);
     }
 
@@ -186,14 +159,14 @@ class ImpersonationExchangeIntegrationTest {
         UaaClient uaa = new UaaClient(port);
         String orgAdmin = uaa.userAccessToken(UaaClient.ORG1_ADMIN);
         HttpResponse<String> byOrgAdmin = uaa.clientPost(UaaClient.IMPERSONATION, UaaClient.LCL_SECRET, TOKEN,
-                exchange(orgAdmin, ORG1_STORE1_ADMIN_ID, ORG1_STORE1, READ));
+                exchange(orgAdmin, ORG1_STORE1_ADMIN_ID));
         assertThat(byOrgAdmin.statusCode()).isEqualTo(400);
         assertThat(UaaClient.body(byOrgAdmin).get(ERROR).asText()).isEqualTo(ACCESS_DENIED);
 
         uaa.clearCookies();
         String operator = uaa.userAccessToken(UaaClient.SUPER_ADMIN);
         HttpResponse<String> ofSuperAdmin = uaa.clientPost(UaaClient.IMPERSONATION, UaaClient.LCL_SECRET, TOKEN,
-                exchange(operator, SUPER_ADMIN_ID, ORG1_STORE1, READ));
+                exchange(operator, SUPER_ADMIN_ID));
         assertThat(ofSuperAdmin.statusCode()).isEqualTo(400);
         assertThat(UaaClient.body(ofSuperAdmin).get(ERROR).asText()).isEqualTo(ACCESS_DENIED);
     }
@@ -205,7 +178,7 @@ class ImpersonationExchangeIntegrationTest {
         String operator = uaa.userAccessToken(UaaClient.SUPER_ADMIN);
 
         HttpResponse<String> response = uaa.clientPost(UaaClient.WEB_APP, UaaClient.LCL_SECRET, TOKEN,
-                exchange(operator, ORG1_STORE1_ADMIN_ID, ORG1_STORE1, READ));
+                exchange(operator, ORG1_STORE1_ADMIN_ID));
 
         assertThat(response.statusCode()).isIn(400, 401);
         assertThat(UaaClient.body(response).get(ERROR).asText()).isIn("unauthorized_client", "invalid_client");

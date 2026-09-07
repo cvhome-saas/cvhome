@@ -1,20 +1,12 @@
 package com.asrevo.cvhome.gateway.impersonation;
 
 import java.time.ZoneOffset;
-import java.util.List;
-import java.util.Map;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.cloud.client.loadbalancer.reactive.LoadBalancedExchangeFilterFunction;
-import org.springframework.mock.env.MockEnvironment;
-
-import com.asrevo.cvhome.s2s.config.internal.ServiceUrlBuilder;
-import com.asrevo.cvhome.s2s.model.ServiceDomainProperties;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 
-/** The beans are built as declared: a UTC clock, the shared URL resolution, and two plain clients. */
+/** The beans are built as declared: a UTC clock and a plain client for uaa. */
 class ImpersonationConfigTest {
 
     private final ImpersonationConfig config = new ImpersonationConfig();
@@ -25,17 +17,8 @@ class ImpersonationConfigTest {
     }
 
     @Test
-    void theUrlBuilderIsTheSharedResolutionOverTheSameProperties() {
-        ServiceDomainProperties services = new ServiceDomainProperties(Map.of(), List.of());
-        MockEnvironment environment = new MockEnvironment();
-
-        assertThat(config.impersonationUrls(services, environment)).isEqualTo(new ServiceUrlBuilder(services, environment));
-    }
-
-    @Test
-    void bothClientsAreBuilt() {
+    void theUaaClientIsBuilt() {
         assertThat(config.impersonationUaaClient()).isNotNull();
-        assertThat(config.impersonationTenancyClient(mock(LoadBalancedExchangeFilterFunction.class))).isNotNull();
     }
 
 }

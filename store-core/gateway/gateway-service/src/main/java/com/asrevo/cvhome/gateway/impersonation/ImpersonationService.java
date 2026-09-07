@@ -36,10 +36,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.asrevo.cvhome.gateway.errors.ImpersonationAlreadyActiveException;
 import com.asrevo.cvhome.gateway.errors.ImpersonationRefusedException;
-import com.asrevo.cvhome.gateway.errors.ImpersonationStoreNotTargetsException;
 import com.asrevo.cvhome.gateway.errors.ImpersonationUnavailableException;
 import com.asrevo.cvhome.gateway.errors.SessionRequiredException;
-import com.asrevo.cvhome.s2s.config.internal.ServiceUrlBuilder;
 import com.asrevo.cvhome.s2s.jwt.UaaJwtGrantedAuthoritiesConverter;
 import com.nimbusds.jwt.SignedJWT;
 
@@ -65,10 +63,9 @@ import reactor.core.publisher.Mono;
  * </p>
  *
  * <p>
- * Three calls, in order, none of them committed until the last: uaa's exchange (which applies every rule that
- * needs both principals), a probe of tenancy <em>as the impersonated principal</em> (the store check uaa cannot
- * make for an org admin, and the same call the console makes to enter a store, so a suspended store refuses here
- * too), and only then the swap. A probe that fails revokes the token it was made with.
+ * Two steps, nothing committed until the second: uaa's exchange, which applies every rule that needs both
+ * principals, and then the swap. The session is the target's own — org, stores, roles — and the console reloads
+ * into whatever that is; there is no store to pick and nothing for the gateway to check beyond uaa's answer.
  * </p>
  */
 @Service
@@ -90,14 +87,10 @@ public class ImpersonationService {
 
     static final String ACCESS_TOKEN_TYPE = "urn:ietf:params:oauth:token-type:access_token";
 
-    static final String ROUTER = "/api/v1/router/store-pod-by-store-id";
-
     private static final String SECURITY_CONTEXT =
             WebSessionServerSecurityContextRepository.DEFAULT_SPRING_SECURITY_CONTEXT_ATTR_NAME;
 
     private static final String ACCESS_TOKEN = "access_token";
-
-    private static final String TENANCY = "tenancy";
 
     private static final String TOKEN = "token";
 
@@ -112,24 +105,16 @@ public class ImpersonationService {
 
     private final WebClient uaa;
 
-    private final WebClient tenancy;
-
-    private final ServiceUrlBuilder urls;
-
     private final Clock clock;
 
     public ImpersonationService(ReactiveOAuth2AuthorizedClientManager clientManager,
                                 ReactiveOAuth2AuthorizedClientService clients,
                                 ReactiveClientRegistrationRepository registrations,
-                                @Qualifier("impersonationUaaClient") WebClient uaa,
-                                @Qualifier("impersonationTenancyClient") WebClient tenancy,
-                                @Qualifier("impersonationUrls") ServiceUrlBuilder urls, Clock clock) {
+                                @Qualifier("impersonationUaaClient") WebClient uaa, Clock clock) {
         this.clientManager = clientManager;
         this.clients = clients;
         this.registrations = registrations;
         this.uaa = uaa;
-        this.tenancy = tenancy;
-        this.urls = urls;
         this.clock = clock;
     }
 
@@ -152,7 +137,6 @@ public class ImpersonationService {
             return clientManager.authorize(fresh)
                     .switchIfEmpty(Mono.error(SessionRequiredException::of))
                     .flatMap(operatorClient -> exchange(operatorClient.getAccessToken().getTokenValue(), request)
-                            .flatMap(issued -> probeStore(issued, request.storeId()).thenReturn(issued))
                             .map(issued -> swap(exchange, session, operator, operatorClient, issued, request)));
         }).flatMap(swap -> clients.saveAuthorizedClient(swap.client(), swap.session().impersonated())
                 .thenReturn(swap.session().view()));
@@ -200,8 +184,6 @@ public class ImpersonationService {
             form.add("subject_token_type", ACCESS_TOKEN_TYPE);
             form.add("requested_token_type", ACCESS_TOKEN_TYPE);
             form.add("requested_subject", request.userId());
-            form.add("impersonation_store", request.storeId());
-            form.add("impersonation_mode", request.mode());
             form.add("reason", request.reason());
             return uaa.post().uri(client.getProviderDetails().getTokenUri())
                     .headers(headers -> headers.setBasicAuth(client.getClientId(), client.getClientSecret()))
@@ -218,8 +200,7 @@ public class ImpersonationService {
         try {
             String token = String.valueOf(body.get(ACCESS_TOKEN));
             Map<String, Object> claims = SignedJWT.parse(token).getPayload().toJSONObject();
-            return Mono.just(new Issued(token, claims, String.valueOf(body.get("act_mode")),
-                    String.valueOf(body.get("acting_as"))));
+            return Mono.just(new Issued(token, claims, String.valueOf(body.get("acting_as"))));
         } catch (ParseException malformed) {
             return Mono.error(ImpersonationUnavailableException.of(malformed, UAA_REGISTRATION));
         }
@@ -230,25 +211,6 @@ public class ImpersonationService {
         Object description = body.get("error_description");
         return Mono.error(ImpersonationRefusedException.of(error == null ? null : error.toString(),
                 description == null ? null : description.toString()));
-    }
-
-    /**
-     * Tenancy, asked as the impersonated principal, whether this store is one it acts in. The same endpoint the
-     * console calls to enter a store, so what refuses there refuses here — another organization's store, a
-     * suspended one — and a refusal takes the token it was made with down with it.
-     */
-    private Mono<Void> probeStore(Issued issued, String storeId) {
-        String url = UriComponentsBuilder.fromUriString(urls.getServiceUrl(TENANCY)).path(ROUTER)
-                .queryParam("store", storeId).build().toUriString();
-        return tenancy.get().uri(url)
-                .headers(headers -> headers.setBearerAuth(issued.token()))
-                .exchangeToMono(response -> response.statusCode().is2xxSuccessful()
-                        ? response.releaseBody()
-                        : response.releaseBody().then(revoke(issued.token()))
-                                .then(Mono.error(ImpersonationStoreNotTargetsException.of(storeId,
-                                        response.statusCode().value()))))
-                .onErrorMap(e -> !(e instanceof com.asrevo.cvhome.errors.BaseException),
-                        e -> ImpersonationUnavailableException.of(e, TENANCY));
     }
 
     private Swap swap(ServerWebExchange exchange, WebSession session, OAuth2AuthenticationToken operator,
@@ -267,13 +229,12 @@ public class ImpersonationService {
         if (original == null) {
             original = new SecurityContextImpl(operator);
         }
-        ImpersonationView view = new ImpersonationView(issued.actingAs(), issued.subject(), request.storeId(),
-                issued.mode(), request.reason(), issued.expiresAt());
+        ImpersonationView view = new ImpersonationView(issued.actingAs(), issued.subject(), request.reason(),
+                issued.expiresAt());
         ImpersonationSession stash = new ImpersonationSession(original, operatorClient, impersonated, issued.token(), view);
         session.getAttributes().put(ImpersonationSession.ATTRIBUTE, stash);
         session.getAttributes().put(SECURITY_CONTEXT, new SecurityContextImpl(impersonated));
-        log.info("{} is acting as {} on store {} ({}) until {}", operator.getName(), issued.actingAs(),
-                request.storeId(), issued.mode(), issued.expiresAt());
+        log.info("{} is acting as {} until {}", operator.getName(), issued.actingAs(), issued.expiresAt());
         return new Swap(stash, client);
     }
 
@@ -319,7 +280,7 @@ public class ImpersonationService {
     }
 
     /** What uaa answered with, decoded. The token came straight from uaa over the client channel; no re-verification. */
-    record Issued(String token, Map<String, Object> claims, String mode, String actingAs) {
+    record Issued(String token, Map<String, Object> claims, String actingAs) {
 
         String subject() {
             return String.valueOf(claims.get("sub"));

@@ -66,17 +66,14 @@ import lombok.extern.slf4j.Slf4j;
  * <li>the subject token is a live access token this server issued, and it carries a {@code uid};</li>
  * <li>it does not already carry {@code act} — an impersonation cannot be chained;</li>
  * <li>the operator holds {@code users:impersonate};</li>
- * <li>the target is enabled, and is not a platform principal ({@code SUPER_ADMIN}, {@code SUPPORT});</li>
- * <li>{@code write} is for {@code SUPER_ADMIN} operators only — support acts read-only;</li>
- * <li>the store is one the target acts in: equal to their {@code store} metadata when they have one, otherwise —
- * an org admin — the caller's to have checked against tenancy, which uaa cannot see.</li>
+ * <li>the target is enabled, and is not a platform principal ({@code SUPER_ADMIN}, {@code SUPPORT}).</li>
  * </ol>
  *
  * <p>
  * The token lives at most {@value #MAX_MINUTES} minutes and never past the operator's own token; there is no refresh
- * token, so an impersonation cannot renew itself. Both modes carry the target's own roles; the read/write choice
- * travels as {@code act_mode} — see {@link ImpersonationMode} — written onto the authorization as an
- * {@link ImpersonationContext}, which is what {@code JwtCustomizerConfig} reads to shape the claims.
+ * token, so an impersonation cannot renew itself. The token carries the target's own roles, org and store — the
+ * operator is the target for the session, no more and no less — and the who-acts-as-whom is written onto the
+ * authorization as an {@link ImpersonationContext}, which is what {@code JwtCustomizerConfig} reads for {@code act}.
  * </p>
  */
 @RequiredArgsConstructor
@@ -84,8 +81,6 @@ import lombok.extern.slf4j.Slf4j;
 public final class ImpersonationExchangeProvider implements AuthenticationProvider {
 
     public static final String ISSUED_TOKEN_TYPE = "issued_token_type";
-
-    public static final String ACT_MODE = "act_mode";
 
     /** The target's username, in the response, so the caller can name who it is now acting as. */
     public static final String ACTING_AS = "acting_as";
@@ -99,8 +94,6 @@ public final class ImpersonationExchangeProvider implements AuthenticationProvid
     static final String UID = "uid";
 
     static final String ACT = "act";
-
-    static final String STORE_METADATA = "store";
 
     static final Set<String> PLATFORM_ROLES = Set.of(UaaConstants.SUPER_ADMIN_ROLE, SUPPORT_ROLE);
 
@@ -132,21 +125,18 @@ public final class ImpersonationExchangeProvider implements AuthenticationProvid
         OAuth2Authorization subject = subjectOf(request.getSubjectToken());
         Map<String, Object> subjectClaims = subject.getAccessToken().getClaims();
         User operator = operatorOf(subjectClaims);
-        ImpersonationMode mode = ImpersonationMode.fromWire(request.getMode())
-                .orElseThrow(() -> invalidRequest(ImpersonationExchangeConverter.MODE));
         User target = targetOf(operator, request);
-        refuseUnlessAllowed(operator, target, request, mode, subjectClaims);
+        refuseUnlessAllowed(operator, target, request, subjectClaims);
 
         Instant notAfter = notAfter(subjectClaims);
         ImpersonationContext context = new ImpersonationContext(operator.getId(), operator.getUsername(), target.getId(),
-                target.getUsername(), request.getStore(), mode, request.getReason(), notAfter);
+                target.getUsername(), request.getReason(), notAfter);
         Set<String> scopes = scopesFor(client, request.getScopes());
         OAuth2AccessTokenAuthenticationToken issued = issue(client, clientPrincipal, request, target, context, scopes);
         audit.recordDetached(AuditRecord.of(AuditEventType.USER_IMPERSONATION_STARTED)
                 .actor(actor(operator)).user(target.getId(), target.getUsername()).client(client.getClientId())
-                .reason(mode.wire()).detail(request.getReason()));
-        log.info("{} is acting as {} on store {} ({}) until {}", operator.getUsername(), target.getUsername(),
-                request.getStore(), mode.wire(), notAfter);
+                .detail(request.getReason()));
+        log.info("{} is acting as {} until {}", operator.getUsername(), target.getUsername(), notAfter);
         return issued;
     }
 
@@ -179,7 +169,7 @@ public final class ImpersonationExchangeProvider implements AuthenticationProvid
     }
 
     private void refuseUnlessAllowed(User operator, User target, ImpersonationExchangeAuthenticationToken request,
-                                     ImpersonationMode mode, Map<String, Object> subjectClaims) {
+                                     Map<String, Object> subjectClaims) {
         if (subjectClaims.containsKey(ACT)) {
             throw deny(operator, target, request, Refusal.CHAINED);
         }
@@ -192,23 +182,6 @@ public final class ImpersonationExchangeProvider implements AuthenticationProvid
         if (hasAnyRole(target, PLATFORM_ROLES)) {
             throw deny(operator, target, request, Refusal.TARGET_PRIVILEGED);
         }
-        if (mode == ImpersonationMode.WRITE && !hasAnyRole(operator, Set.of(UaaConstants.SUPER_ADMIN_ROLE))) {
-            throw deny(operator, target, request, Refusal.WRITE_NOT_ALLOWED);
-        }
-        if (!actsIn(target, request.getStore())) {
-            throw deny(operator, target, request, Refusal.STORE_NOT_TARGETS);
-        }
-    }
-
-    /**
-     * A target with a {@code store} in their metadata acts in that store and no other. One without — an org admin —
-     * acts in any store of their organization, which uaa holds no registry of: that check is the gateway's, made
-     * against tenancy before it asks for this exchange, and the resource servers repeat it for a write-mode token
-     * through {@code ownsTheStore}.
-     */
-    private static boolean actsIn(User target, String store) {
-        Object own = target.getMetadata().get(STORE_METADATA);
-        return own == null || own.toString().equals(store);
     }
 
     private Instant notAfter(Map<String, Object> subjectClaims) {
@@ -269,7 +242,6 @@ public final class ImpersonationExchangeProvider implements AuthenticationProvid
         authorizations.save(builder.build());
         Map<String, Object> additional = new HashMap<>();
         additional.put(ISSUED_TOKEN_TYPE, ImpersonationExchangeConverter.ACCESS_TOKEN_TYPE);
-        additional.put(ACT_MODE, context.mode().wire());
         additional.put(ACTING_AS, target.getUsername());
         return new OAuth2AccessTokenAuthenticationToken(client, clientPrincipal, accessToken, null, additional);
     }
@@ -318,14 +290,8 @@ public final class ImpersonationExchangeProvider implements AuthenticationProvid
             record.user(null, request.getRequestedSubject());
         }
         audit.recordDetached(record);
-        log.warn("Refused {} acting as {} on store {}: {}", operator.getUsername(), request.getRequestedSubject(),
-                request.getStore(), refusal);
+        log.warn("Refused {} acting as {}: {}", operator.getUsername(), request.getRequestedSubject(), refusal);
         return new OAuth2AuthenticationException(new OAuth2Error(refusal.errorCode, refusal.description, null));
-    }
-
-    private static OAuth2AuthenticationException invalidRequest(String parameter) {
-        return new OAuth2AuthenticationException(new OAuth2Error(OAuth2ErrorCodes.INVALID_REQUEST,
-                String.format("OAuth 2.0 parameter '%s' is missing, repeated or malformed.", parameter), null));
     }
 
     /** Why an exchange was refused — the audit row's reason code, and the error the caller sees. */
@@ -335,9 +301,7 @@ public final class ImpersonationExchangeProvider implements AuthenticationProvid
         OPERATOR_NOT_ALLOWED(OAuth2ErrorCodes.ACCESS_DENIED, "The operator may not impersonate."),
         TARGET_UNKNOWN(OAuth2ErrorCodes.INVALID_REQUEST, "requested_subject is not an account."),
         TARGET_DISABLED(OAuth2ErrorCodes.ACCESS_DENIED, "The target account is disabled."),
-        TARGET_PRIVILEGED(OAuth2ErrorCodes.ACCESS_DENIED, "A platform principal cannot be impersonated."),
-        WRITE_NOT_ALLOWED(OAuth2ErrorCodes.ACCESS_DENIED, "This operator may act read-only."),
-        STORE_NOT_TARGETS(OAuth2ErrorCodes.INVALID_REQUEST, "The target does not act in impersonation_store.");
+        TARGET_PRIVILEGED(OAuth2ErrorCodes.ACCESS_DENIED, "A platform principal cannot be impersonated.");
 
         private final String errorCode;
 

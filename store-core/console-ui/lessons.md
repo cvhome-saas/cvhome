@@ -2837,18 +2837,20 @@ Built. The requirement that used to be recorded here — `.agents/requirments/us
 shipped as the uaa grant, the gateway swap, the audit rows and the console's banner.
 
 - **Screen:** `/platform/users` and an organization's Users tab offer **Act as this account** on the
-  row menu; an organization's Stores tab offers **Open this store's dashboard** on the row. Both
-  open `shared/ui/impersonation-dialog/`: account, store, read-only or read-write, and a reason.
+  row menu. It opens `shared/ui/impersonation-dialog/`, which asks one thing: the reason. The
+  account is the row; the session becomes that account — its own stores and roles, whatever they
+  are. Two earlier cuts asked for more and were removed: a **store choice** (nothing to offer an
+  organization with no store yet) and a **read/write mode** (double the surface for a distinction
+  the audit trail already makes). The store-side entry on the Stores tab went with the store choice.
 - **What it does:** `POST /api/v1/impersonation` on the gateway exchanges the operator's token at uaa
-  for one whose `sub` is the merchant and whose `act` names the operator, probes tenancy as the
-  merchant for the store, and swaps the session. The console then **reloads** to `/dashboard`:
+  for one whose `sub` is the merchant and whose `act` names the operator, and swaps the session.
+  The console then **reloads** to `/dashboard`:
   identity, rail, store list and every page facade change at once, and a reload is the honest way to
   say so. Ending it (`DELETE`, the banner's only control) reloads to `/platform/users`.
 - **The banner is not dismissible**, and the gateway's fifteen-minute ceiling ends the session
-  whatever the banner shows. Both modes are the merchant verbatim; read-only is the `act_mode=read`
-  claim plus every service's `ReadOnlyActorFilter`, which refuses unsafe methods for it (the first
-  cut minted `STORE_MODERATOR` and showed the operator a dashboard of 403s). `ROLE_SUPPORT` is real now, may impersonate read-only, and is admitted to the
-  platform rail's reads.
+  whatever the banner shows. The token is the merchant verbatim — never wider, never narrower (the
+  first cut minted `STORE_MODERATOR` and showed the operator a dashboard of 403s). `ROLE_SUPPORT` is
+  real now, may impersonate, and is admitted to the platform rail's reads.
 - **What is not built:** the pod-side audit sections (`AuditSection.modifiedBy`) are never populated,
   so a catalogue edit made while acting as a merchant carries no actor at all — the gap predates this
   feature. Tenancy's `tenancy_audit.actor` reads `merchant (via operator)`; uaa's audit log has the

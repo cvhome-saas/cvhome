@@ -3,7 +3,7 @@ import {Router, RouterLink} from '@angular/router';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 import {TranslocoDatePipe} from '@jsverse/transloco-locale';
 
-import type {PlatformStoreRow, PlatformUserRow} from '@models/platform';
+import type {PlatformUserRow} from '@models/platform';
 import {Badge, BusyOverlay, ConfirmDialog, CopyField, DataTable, type TableColumn, TableRow, EmptyState, Icon, LoadError, PageHeader, Pagination, Panel, RolesDialog, SectionNav, SetPasswordDialog, TabSwitcher, type TabItem, TextField} from '@cvhome-saas/ui-kit/ui';
 import {UserAdminTable, type UserAdminAction, type UserAdminIntent} from '@cvhome-saas/ui-kit/uaa';
 import {ImpersonationDialog} from '@shared/ui/impersonation-dialog/impersonation-dialog';
@@ -16,7 +16,6 @@ const STORE_COLUMN_KEYS: readonly {key: string; labelKey: string; width: string}
   {key: 'provisioning', labelKey: 'platform.organization.stores.column.provisioning', width: 'minmax(7rem, 0.9fr)'},
   {key: 'billing', labelKey: 'platform.organization.stores.column.billing', width: 'minmax(6rem, 0.8fr)'},
   {key: 'pod', labelKey: 'platform.organization.stores.column.pod', width: 'minmax(7rem, 1fr)'},
-  {key: 'actions', labelKey: 'platform.organization.stores.column.actions', width: '4rem'},
 ];
 
 /** What the users tab's row menu offers everyone; `impersonate` is added when the operator may. */
@@ -175,10 +174,6 @@ export class OrganizationDetail {
   }
 
   /** The Stores tab's way in: open this store's dashboard as one of the accounts acting in it. */
-  protected onOpenStore(store: PlatformStoreRow): void {
-    this.facade.askOpenStore(store);
-  }
-
   /** The organization every account on this tab belongs to — so the column has nothing to add. */
   protected readonly showScope = false;
 

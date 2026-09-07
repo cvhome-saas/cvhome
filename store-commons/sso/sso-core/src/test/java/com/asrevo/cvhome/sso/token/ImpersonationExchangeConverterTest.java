@@ -33,11 +33,7 @@ class ImpersonationExchangeConverterTest {
 
     private static final String TARGET = "60ab49a5-7f06-4b5a-be81-9b30bb6559ae";
 
-    private static final String STORE = "65f023632bc46470c104b76f";
-
     private static final String REASON = "ticket 42";
-
-    private static final String READ = "read";
 
     private static final String OPENID = "openid";
 
@@ -65,8 +61,6 @@ class ImpersonationExchangeConverterTest {
         request.setParameter(ImpersonationExchangeConverter.SUBJECT_TOKEN, SUBJECT_TOKEN);
         request.setParameter(ImpersonationExchangeConverter.SUBJECT_TOKEN_TYPE, ImpersonationExchangeConverter.ACCESS_TOKEN_TYPE);
         request.setParameter(ImpersonationExchangeConverter.REQUESTED_SUBJECT, TARGET);
-        request.setParameter(ImpersonationExchangeConverter.STORE, STORE);
-        request.setParameter(ImpersonationExchangeConverter.MODE, READ);
         request.setParameter(ImpersonationExchangeConverter.REASON, REASON);
         overrides.forEach(request::setParameter);
         return request;
@@ -83,8 +77,6 @@ class ImpersonationExchangeConverterTest {
         ImpersonationExchangeAuthenticationToken token = (ImpersonationExchangeAuthenticationToken) converted;
         assertThat(token.getSubjectToken()).isEqualTo(SUBJECT_TOKEN);
         assertThat(token.getRequestedSubject()).isEqualTo(TARGET);
-        assertThat(token.getStore()).isEqualTo(STORE);
-        assertThat(token.getMode()).isEqualTo(READ);
         assertThat(token.getReason()).isEqualTo(REASON);
         assertThat(token.getScopes()).containsExactly(OPENID);
         assertThat(token.getGrantType()).isEqualTo(AuthorizationGrantType.TOKEN_EXCHANGE);
@@ -121,13 +113,6 @@ class ImpersonationExchangeConverterTest {
     }
 
     @Test
-    void aBlankStoreIsAnInvalidRequest() {
-        authenticatedClient();
-
-        assertInvalidRequest(exchange(Map.of(ImpersonationExchangeConverter.STORE, "  ")), ImpersonationExchangeConverter.STORE);
-    }
-
-    @Test
     void aSubjectTokenThatIsNotAnAccessTokenIsAnInvalidRequest() {
         authenticatedClient();
 
@@ -139,9 +124,9 @@ class ImpersonationExchangeConverterTest {
     void aRepeatedParameterIsAnInvalidRequest() {
         authenticatedClient();
         MockHttpServletRequest request = exchange(Map.of());
-        request.setParameter(ImpersonationExchangeConverter.MODE, READ, "write");
+        request.setParameter(ImpersonationExchangeConverter.REASON, "ticket 1", "ticket 2");
 
-        assertInvalidRequest(request, ImpersonationExchangeConverter.MODE);
+        assertInvalidRequest(request, ImpersonationExchangeConverter.REASON);
     }
 
     private void assertInvalidRequest(MockHttpServletRequest request, String parameter) {

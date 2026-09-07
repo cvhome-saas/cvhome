@@ -17,8 +17,6 @@ class ImpersonationContextTest {
 
     private static final String MERCHANT = "org1-store1-admin";
 
-    private static final String STORE = "store-1";
-
     private static final String REASON = "ticket 42";
 
     private static final Instant NOT_AFTER = Instant.parse("2026-04-01T09:45:00Z");
@@ -32,8 +30,7 @@ class ImpersonationContextTest {
     void roundTripsThroughTheAuthorizationAttributes() {
         UUID operator = UUID.randomUUID();
         UUID merchant = UUID.randomUUID();
-        ImpersonationContext context = new ImpersonationContext(operator, OPERATOR, merchant, MERCHANT, STORE,
-                ImpersonationMode.READ, REASON, NOT_AFTER);
+        ImpersonationContext context = new ImpersonationContext(operator, OPERATOR, merchant, MERCHANT, REASON, NOT_AFTER);
         OAuth2Authorization.Builder builder = OAuth2Authorization.withRegisteredClient(client())
                 .principalName(merchant.toString()).authorizationGrantType(AuthorizationGrantType.TOKEN_EXCHANGE);
         context.writeTo(builder);
@@ -48,15 +45,6 @@ class ImpersonationContextTest {
 
         assertThat(ImpersonationContext.from(plain)).isEmpty();
         assertThat(ImpersonationContext.from(null)).isEmpty();
-    }
-
-    @Test
-    void theModeReadsItsWireFormBothWays() {
-        assertThat(ImpersonationMode.fromWire("read")).contains(ImpersonationMode.READ);
-        assertThat(ImpersonationMode.fromWire(" WRITE ")).contains(ImpersonationMode.WRITE);
-        assertThat(ImpersonationMode.fromWire("rw")).isEmpty();
-        assertThat(ImpersonationMode.fromWire(null)).isEmpty();
-        assertThat(ImpersonationMode.WRITE.wire()).isEqualTo("write");
     }
 
 }

@@ -51,11 +51,6 @@ public enum CommonErrors implements ErrorCode {
      */
     ACCESS_DENIED("COMMON.ACCESS_DENIED", ErrorCategory.FORBIDDEN),
 
-    /**
-     * The caller is an operator acting as a merchant in read-only mode, and the request would change something.
-     * The token carries {@code act_mode=read}; every unsafe method is refused for it, whatever the target's roles.
-     */
-    READ_ONLY_SESSION("COMMON.READ_ONLY_SESSION", ErrorCategory.FORBIDDEN),
 
     /**
      * Request targeted a store the caller has no access to.

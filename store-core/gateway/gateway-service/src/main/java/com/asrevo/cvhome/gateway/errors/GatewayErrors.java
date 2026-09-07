@@ -25,9 +25,6 @@ public enum GatewayErrors implements ErrorCode {
     /** This session is already acting as somebody; end that first. */
     IMPERSONATION_ALREADY_ACTIVE("GATEWAY.IMPERSONATION.ALREADY_ACTIVE", ErrorCategory.CONFLICT),
 
-    /** The named store is not one the target acts in, or is not operable. */
-    IMPERSONATION_STORE_NOT_TARGETS("GATEWAY.IMPERSONATION.STORE_NOT_TARGETS", ErrorCategory.UNPROCESSABLE),
-
     /** uaa did not answer the exchange, so nothing was decided. */
     IMPERSONATION_UNAVAILABLE("GATEWAY.IMPERSONATION.UNAVAILABLE", ErrorCategory.REMOTE_SERVICE);
 

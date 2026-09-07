@@ -27,10 +27,11 @@ that produces a system where "who did this" has no answer.
 shell only), the swap is `store-core/gateway/gateway-service/.../impersonation/ImpersonationService.java`,
 the audit rows are `user.impersonation.{started,ended,denied}` in uaa and the `act`-aware actor in
 tenancy, and the console's banner is `layouts/console-shell/components/impersonation-banner/`. Two
-decisions the sections below did not settle: a **read-only mode** (the token carries
-`STORE_MODERATOR` on the chosen store) beside the verbatim one, and a **store-centric entry** from
-an organization's Stores tab beside the account row action. The rest of this document is the design
-as it was agreed; where it and the code differ, the code and the plan are current.
+additions the sections below did not settle were built and then removed on 2026-09-07: a
+**read-only mode** and a **store choice** (with a store-side entry from an organization's Stores
+tab). The shipped shape is the one described here — the operator is the merchant verbatim, chosen
+from an account row, for a stated reason. The rest of this document is the design as it was agreed;
+where it and the code differ, the code and the plan are current.
 
 ## 3. Why this is not a front-end change
 

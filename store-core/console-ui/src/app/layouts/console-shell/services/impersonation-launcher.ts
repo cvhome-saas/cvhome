@@ -11,9 +11,9 @@ import type {StartImpersonation} from '@models/impersonation';
  *
  * **A full reload, on purpose.** Identity, rail, store list and every page facade keyed on the
  * selected store change at once when the gateway swaps the session, and the app has no global
- * invalidation for that; a reload is honest where a cascade of signals would be a guess. The store
- * the operator chose is written as the selection first, so the dashboard opens on it rather than on
- * whichever of the merchant's stores sorts first.
+ * invalidation for that; a reload is honest where a cascade of signals would be a guess. The remembered
+ * store selection is dropped first, so the dashboard opens on the merchant's own first store rather than
+ * on whatever the operator last looked at.
  *
  * Shared by the two screens that offer the action, so they agree on where an impersonation lands.
  * In `layouts/` rather than `shared/` because it reaches the api tier, which `shared/` may not.
@@ -29,7 +29,6 @@ export class ImpersonationLauncher {
     return this.impersonation.start(request).pipe(
       map(() => {
         this.selection.invalidate();
-        this.selection.selectStore(request.storeId);
         this.document.defaultView?.location.assign('/dashboard');
       }),
     );

@@ -39,7 +39,7 @@ public class ImpersonationController {
 
     private final ImpersonationService impersonation;
 
-    /** Starts acting as {@code userId} in {@code storeId}; the answer is what the banner shows. */
+    /** Starts acting as {@code userId}; the answer is what the banner shows. */
     @PostMapping
     public Mono<ImpersonationView> start(ServerWebExchange exchange, @RequestBody StartImpersonation request) {
         return operator().flatMap(operator -> {

@@ -13,7 +13,6 @@ import com.asrevo.cvhome.s2s.config.internal.JwtAuthenticationConverterConfigura
 import com.asrevo.cvhome.s2s.config.internal.MultiIssuerJwtDecoderConfiguration;
 import com.asrevo.cvhome.s2s.config.internal.MultiIssuerReactiveJwtDecoderConfiguration;
 import com.asrevo.cvhome.s2s.config.internal.ReactiveGatewayConfig;
-import com.asrevo.cvhome.s2s.config.internal.ReadOnlyActorConfiguration;
 import com.asrevo.cvhome.s2s.config.internal.ServletPermissionConfig;
 import com.asrevo.cvhome.s2s.config.internal.SwaggerConfig;
 import com.asrevo.cvhome.s2s.config.internal.WebClientServicesConfig;
@@ -37,7 +36,7 @@ import com.asrevo.cvhome.tracing.TracingAutoConfiguration;
         ReactiveGatewayConfig.class, IssuerRegistryConfiguration.class, MultiIssuerJwtDecoderConfiguration.class,
         JwtAuthenticationConverterConfiguration.class,
         MultiIssuerReactiveJwtDecoderConfiguration.class, CustomPermissionEvaluator.class,
-        ServletPermissionConfig.class, ReadOnlyActorConfiguration.class, ErrorHandlingAutoConfiguration.class,
+        ServletPermissionConfig.class, ErrorHandlingAutoConfiguration.class,
         MetricsAutoConfiguration.class,
         TracingAutoConfiguration.class})
 @EnableConfigurationProperties({PodInfoProperties.class, ServiceDomainProperties.class, AppProperties.class,

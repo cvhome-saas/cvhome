@@ -39,10 +39,6 @@ class ImpersonationControllerTest {
 
     private static final String TARGET = "t";
 
-    private static final String STORE = "s";
-
-    private static final String READ = "read";
-
     private static final String TICKET = "ticket";
 
     private final ImpersonationService impersonation = mock(ImpersonationService.class);
@@ -55,7 +51,7 @@ class ImpersonationControllerTest {
     private final OAuth2AuthenticationToken login = new OAuth2AuthenticationToken(
             new DefaultOAuth2User(null, Map.of(SUB, "op"), SUB), List.of(), "uaa");
 
-    private final StartImpersonation request = new StartImpersonation(TARGET, STORE, READ, TICKET);
+    private final StartImpersonation request = new StartImpersonation(TARGET, TICKET);
 
     @Test
     void startWithoutAsessionIs401BeforeTheServiceIsAsked() {
@@ -66,7 +62,7 @@ class ImpersonationControllerTest {
 
     @Test
     void startHandsAvalidatedRequestToTheService() {
-        ImpersonationView view = new ImpersonationView("m", TARGET, STORE, READ, TICKET, Instant.now());
+        ImpersonationView view = new ImpersonationView("m", TARGET, TICKET, Instant.now());
         when(impersonation.start(eq(exchange), eq(login), any())).thenReturn(Mono.just(view));
 
         StepVerifier.create(controller.start(exchange, request).contextWrite(ReactiveSecurityContextHolder.withAuthentication(login)))
@@ -75,7 +71,7 @@ class ImpersonationControllerTest {
 
     @Test
     void startRefusesAnIncompleteRequestAsValidation() {
-        StepVerifier.create(controller.start(exchange, new StartImpersonation(TARGET, STORE, READ, " "))
+        StepVerifier.create(controller.start(exchange, new StartImpersonation(TARGET, " "))
                         .contextWrite(ReactiveSecurityContextHolder.withAuthentication(login)))
                 .expectError(ImpersonationInvalidException.class).verify();
     }

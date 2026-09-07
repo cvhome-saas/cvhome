@@ -11,7 +11,7 @@ import org.springframework.security.oauth2.server.authorization.OAuth2Authorizat
  *
  * <p>
  * Written by {@link ImpersonationExchangeProvider} when the grant is issued and read back twice: by
- * {@code JwtCustomizerConfig}, which turns it into the {@code act} and {@code act_mode} claims, and by
+ * {@code JwtCustomizerConfig}, which turns it into the {@code act} claim, and by
  * {@code ProtocolAuditListener}, which turns the token's revocation into the "ended" audit row. The row outlives
  * the token, so the second reading works after expiry too.
  * </p>
@@ -25,7 +25,7 @@ import org.springframework.security.oauth2.server.authorization.OAuth2Authorizat
  *                 whichever is sooner
  */
 public record ImpersonationContext(UUID operatorId, String operatorUsername, UUID targetId, String targetUsername,
-                                   String store, ImpersonationMode mode, String reason, Instant notAfter) {
+                                   String reason, Instant notAfter) {
 
     static final String PREFIX = "cvhome.impersonation.";
 
@@ -37,10 +37,6 @@ public record ImpersonationContext(UUID operatorId, String operatorUsername, UUI
 
     static final String TARGET_USERNAME = PREFIX.concat("target_username");
 
-    static final String STORE = PREFIX.concat("store");
-
-    static final String MODE = PREFIX.concat("mode");
-
     static final String REASON = PREFIX.concat("reason");
 
     static final String NOT_AFTER = PREFIX.concat("not_after");
@@ -50,8 +46,6 @@ public record ImpersonationContext(UUID operatorId, String operatorUsername, UUI
                 .attribute(OPERATOR_USERNAME, operatorUsername)
                 .attribute(TARGET_ID, targetId.toString())
                 .attribute(TARGET_USERNAME, targetUsername)
-                .attribute(STORE, store)
-                .attribute(MODE, mode.wire())
                 .attribute(REASON, reason)
                 .attribute(NOT_AFTER, notAfter.toString());
     }
@@ -61,13 +55,11 @@ public record ImpersonationContext(UUID operatorId, String operatorUsername, UUI
         if (authorization == null || authorization.getAttribute(OPERATOR_ID) == null) {
             return Optional.empty();
         }
-        return ImpersonationMode.fromWire(authorization.getAttribute(MODE)).map(mode -> new ImpersonationContext(
+        return Optional.of(new ImpersonationContext(
                 UUID.fromString(authorization.getAttribute(OPERATOR_ID)),
                 authorization.getAttribute(OPERATOR_USERNAME),
                 UUID.fromString(authorization.getAttribute(TARGET_ID)),
                 authorization.getAttribute(TARGET_USERNAME),
-                authorization.getAttribute(STORE),
-                mode,
                 authorization.getAttribute(REASON),
                 Instant.parse(authorization.getAttribute(NOT_AFTER))));
     }

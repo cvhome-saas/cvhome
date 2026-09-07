@@ -15,18 +15,27 @@ document, linked from `store-core/console-ui/lessons.md:2834`. This plan impleme
 decisions taken with the user:
 
 1. **Two entry points** — by user (the existing row action) *and* by store ("open this store's
-   dashboard" from the platform store/org screens).
+   dashboard" from the platform store/org screens). *Reverted — see "Simplified" below.*
 2. **`ROLE_SUPPORT` becomes real.** It exists only in the frontend (`ui-kit/.../auth/roles.ts`) and in
    the design mockups (`store-core/uaa/sso/SSO Roles.dc.html:249` — a `support` role holding
    `users:impersonate`); the backend `Roles` enum lacks it.
-3. **Read-only vs read-write is a per-session choice** — see *The RO/RW model*.
+3. **Read-only vs read-write is a per-session choice.** *Reverted — see "Simplified" below.*
 
-Outcome: an operator picks a merchant account and a store, states a reason, picks a mode, and lands on
-that merchant's dashboard with the merchant's rail, data and permissions — under a non-dismissible
-banner, with a 15-minute ceiling, every action audited against the real operator.
+Outcome: an operator picks a merchant account, states a reason, and lands on that merchant's console
+with the merchant's rail, data and permissions — under a non-dismissible banner, with a 15-minute
+ceiling, every action audited against the real operator.
 
-**Assumption to confirm at review:** `ROLE_SUPPORT` impersonates **read-only only**; `ROLE_SUPER_ADMIN`
-picks either mode. One predicate in the provider to relax.
+## Simplified (2026-09-07)
+
+Both the **store choice** and the **read/write mode** were built, QA'd, and then removed on the user's
+call: the store choice had nothing to offer an organization with no store yet (a fresh sign-up), and
+the mode doubled the surface — a second claim, a servlet filter on every service with an allow-list,
+a refusal, a dialog control, a banner variant — for a distinction the audit trail already makes. What
+ships is the shape §2 of the requirement described: the request is `{userId, reason}`, the token is
+the merchant verbatim (`sub`, `org`, `store`, `roles` all theirs, `act` the operator), the gateway
+makes no tenancy probe, and `ROLE_SUPPORT` impersonates the same way `ROLE_SUPER_ADMIN` does. Where
+the phases below mention `impersonation_store`, `impersonation_mode`, `act_mode`, `ReadOnlyActorFilter`
+or the Stores-tab entry, they describe the removed cut; the QA files and the code are current.
 
 ---
 
@@ -41,19 +50,13 @@ on every backend route. "Act as" is therefore **a server-side swap inside the ga
 token carries the merchant's `org` / `store` / `roles` exactly as `JwtCustomizerConfig` emits them today.
 **No new permission token, no new checker method.**
 
-## The RO/RW model
+## The RO/RW model — removed
 
-Both modes mint the **target's own roles**, so the operator sees exactly what the merchant sees. Read-only is the
-`act_mode=read` claim plus `ReadOnlyActorFilter` (`store-commons:autoconfigure`), a servlet filter behind the
-security chain on every service that refuses each unsafe method for such a token — except the paths
-`common-config.yml` names as reads that travel as `POST` (`*-statistic`, `list`, `query`, `search`).
-
-Why not the permission layer or a role: `STORE-POD.CATALOG.*` guards the list and the save alike, so no token can
-tell a read from a write; and `STORE_MODERATOR` — the first cut of read mode — is refused by every catalog,
-checkout and statistics guard, so the operator got a dashboard of 403s. Verified on the stack: a genuine
-moderator is refused the same way.
-
-A missing allow-list entry surfaces as a 403 on a read screen, never as a write that got through.
+Kept for the record. Read mode was first minted as `STORE_MODERATOR` (a dashboard of 403s: that role is refused by
+every catalog, checkout and statistics guard), then as the target's own roles plus `act_mode=read` and a
+`ReadOnlyActorFilter` on every service refusing unsafe methods against an allow-list of POST-shaped reads. It
+worked, and it was still a second mode to explain, to test and to keep in step with every new read that travels
+as `POST`. Removed with the store choice — see "Simplified".
 
 ## Phase 1 — uaa: the token-exchange grant  (PR 1)
 

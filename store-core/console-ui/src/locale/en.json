@@ -967,11 +967,6 @@
     },
     "impersonation": {
       "actingAs": "You are acting as {{name}}",
-      "store": "Store: {{store}}",
-      "mode": {
-        "read": "Read-only",
-        "write": "Read and write"
-      },
       "remaining": "{count, plural, =0 {less than a minute} =1 {1 minute} other {# minutes}} left",
       "end": "Stop acting as them"
     },
@@ -2046,27 +2041,14 @@
       "title": "Act as an account",
       "description": "You will see the console exactly as this account does, until you stop or fifteen minutes pass. Every action is recorded against you.",
       "target": "Account",
-      "pickTarget": "Choose an account",
-      "store": "Store",
-      "pickStore": "Choose a store",
-      "modeLabel": "Access",
-      "mode": {
-        "read": "Read-only",
-        "write": "Read and write"
-      },
       "hint": {
-        "read": "Everything they can see, exactly as they see it. Nothing can be changed.",
-        "write": "Their account verbatim. Anything you save is saved as them — and audited as you.",
         "reason": "Required. This is what the audit trail will say the session was for."
       },
       "reason": "Reason",
       "reasonPlaceholder": "Ticket number, what they reported…",
       "confirm": "Start acting as {{name}}",
       "busy": "Starting…",
-      "loading": "Loading…",
-      "confirmUnnamed": "Start",
-      "noStores": "This account acts in no store, so there is nowhere to open.",
-      "noTargets": "No account acts in this store."
+      "confirmUnnamed": "Start"
     },
     "orgStatus": {
       "ACTIVE": "Active",
@@ -2261,8 +2243,7 @@
           "status": "Status",
           "provisioning": "Provisioning",
           "pod": "Pod",
-          "billing": "Billing",
-          "actions": "Actions"
+          "billing": "Billing"
         },
         "empty": {
           "title": "No stores yet",
@@ -2270,8 +2251,7 @@
         },
         "billingUnknown": "Billing has no subscription recorded for this store, or could not be reached. Either way it does not mean the store has lapsed.",
         "billingUnknownShort": "Unknown",
-        "openBilling": "Open this store in the billing register",
-        "openDashboard": "Open this store's dashboard as one of its accounts"
+        "openBilling": "Open this store in the billing register"
       },
       "users": {
         "title": "Users",

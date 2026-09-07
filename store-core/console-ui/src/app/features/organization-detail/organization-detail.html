@@ -263,24 +263,6 @@
                               {{ row.podId || '—' }}
                             </span>
 
-                            <div class="cell-actions" role="cell" [attr.data-label]="t('platform.organization.stores.column.actions')">
-                              @if (facade.canImpersonate()) {
-                                <!--
-                                  The store-centric way in: the dialog opens with this store fixed and
-                                  offers the accounts that act in it. It is the same gateway call the
-                                  account row makes — a picker over the other axis, not a second API.
-                                -->
-                                <button
-                                  class="icon-action"
-                                  type="button"
-                                  [attr.aria-label]="t('platform.organization.stores.openDashboard')"
-                                  [title]="t('platform.organization.stores.openDashboard')"
-                                  (click)="onOpenStore(row)"
-                                >
-                                  <app-icon name="signIn" />
-                                </button>
-                              }
-                            </div>
                           </app-table-row>
                         }
                       </app-data-table>
@@ -552,10 +534,7 @@
   <app-impersonation-dialog
     [open]="!!facade.impersonating()"
     [busy]="facade.busy()"
-    [loading]="facade.impersonationLoading()"
-    [targets]="facade.impersonationTargetChoices()"
-    [stores]="facade.impersonationStoreChoices()"
-    [allowWrite]="facade.canImpersonateInWriteMode()"
+    [target]="facade.impersonationTarget()"
     (submitted)="facade.confirmImpersonate($event)"
     (dismissed)="facade.dismissImpersonation()"
   />

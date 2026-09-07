@@ -1662,51 +1662,47 @@ never answers it. Requests: `http/impersonation-api.http`. The gateway is the pr
 Design points:
 
 - **`sub` is the merchant, `act` is the operator.** Every `hasPermission` on every service keeps working; the audit
-  trail can still tell the two apart. `act_mode` says `read` or `write`.
-- **Both modes mint the target's own roles** — never wider, never narrower. Read-only is `act_mode=read` plus the
-  resource servers' `ReadOnlyActorFilter`; the first cut minted `STORE_MODERATOR` and gave the operator a dashboard
-  of 403s, because that role is refused by every catalog and checkout guard.
-- **Six refusals, each a `user.impersonation.denied` row** naming the rule: a dead subject token, a chained one, an
-  operator without `users:impersonate`, a disabled or privileged target, write mode for support, a store the target
-  does not act in.
+  trail can still tell the two apart.
+- **The token is the merchant verbatim** — their roles, org and store, never wider, never narrower. There is no
+  store to name and no mode to pick: the operator *is* that account for the session. (Earlier cuts minted a
+  moderator, then added a read-only mode and a store choice; both were dropped — the first gave a dashboard of
+  403s, the second had nothing to offer an org admin whose organization has no store yet.)
+- **Four refusals, each a `user.impersonation.denied` row** naming the rule: a dead subject token, a chained one,
+  an operator without `users:impersonate`, a disabled or privileged target.
 - **Never a refresh token; fifteen minutes at most; never past the operator's own token.**
-- **The store check for an org admin is the gateway's**, not uaa's: uaa holds no store registry.
 
-### IMP-01 — A super admin exchanges for a merchant, read-only · critical · [verified]
+### IMP-01 — A super admin exchanges for a merchant · critical · [verified]
 
-- **Covered by** `ImpersonationExchangeIntegrationTest.aSuperAdminActsAsAmerchantReadOnlyAndTheTrailSaysSo` against
-  the real endpoint, and `.http` "act as org1-store1-admin, read-only".
-- **Expect** — 200 with `issued_token_type`, `act_mode: read`, `acting_as`, **no** `refresh_token`; the JWT's `sub`
-  and `uid` are the merchant's id, `roles` the merchant's own, `act.sub` = `super-admin`; a
+- **Covered by** `ImpersonationExchangeIntegrationTest.aSuperAdminActsAsAmerchantAndTheTrailSaysSo` against the
+  real endpoint, and `.http` "act as org1-store1-admin".
+- **Expect** — 200 with `issued_token_type`, `acting_as`, **no** `refresh_token`; the JWT's `sub` and `uid` are the
+  merchant's id, `roles`/`org`/`store` the merchant's own, `act.sub` = `super-admin`, no `act_mode`; a
   `user.impersonation.started` row whose detail is the reason.
 
-### IMP-02 — Write mode is the merchant verbatim · high · [verified]
-
-- **Covered by** `writeModeCarriesTheMerchantsOwnRoles`; `.http` "the same, read-write".
-
-### IMP-03 — Chaining is refused · critical · [verified]
+### IMP-02 — Chaining is refused · critical · [verified]
 
 - **Covered by** `anImpersonatedTokenCannotBeExchangedAgain`; `.http` "chaining is refused".
 - **Expect** — 400 `invalid_grant`, and a `denied` row with reason `CHAINED`.
 
-### IMP-04 — Support acts read-only and never in write mode · critical · [verified]
+### IMP-03 — Support acts as a merchant the same way · critical · [verified]
 
-- **Covered by** `supportActsReadOnlyAndNeverInWriteMode` — `support` / `admin` is seeded by `test-stores`.
+- **Covered by** `supportActsAsAmerchantToo` — `support` / `admin` is seeded by `test-stores`. Support holds
+  `users:impersonate`; what it may do *as* the merchant is the merchant's own permission set.
 
-### IMP-05 — An org admin may not impersonate; a platform principal cannot be impersonated · critical · [verified]
+### IMP-04 — An org admin may not impersonate; a platform principal cannot be impersonated · critical · [verified]
 
 - **Covered by** `anOrgAdminMayNotImpersonateAndAplatformPrincipalCannotBeImpersonated`; `.http` "a platform
   principal cannot be impersonated".
 
-### IMP-06 — Only `console-impersonation` holds the grant · critical · [verified]
+### IMP-05 — Only `console-impersonation` holds the grant · critical · [verified]
 
 - **Covered by** `theGrantIsRefusedToEveryOtherClient`; `.http` "web-app does not hold the grant".
 
-### IMP-07 — Revocation writes the "ended" row · high · [verified]
+### IMP-06 — Revocation writes the "ended" row · high · [verified]
 
 - **Covered by** IMP-01's second half and `ProtocolAuditListenerTest.revokingAnImpersonatedTokenAlsoRecordsTheImpersonationAsEnded`.
 
-### IMP-08 — The admin console lists the client without breaking · [not verified]
+### IMP-07 — The admin console lists the client without breaking · [not verified]
 
 - **Steps** — uaa's own console → Clients.
 - **Expect** — `console-impersonation` listed with grant `urn:ietf:params:oauth:grant-type:token-exchange`; the New

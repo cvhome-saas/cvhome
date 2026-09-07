@@ -63,10 +63,6 @@ class ImpersonationExchangeProviderTest {
 
     private static final String SUBJECT_TOKEN = "operator-token";
 
-    private static final String STORE = "65f023632bc46470c104b76f";
-
-    private static final String OTHER_STORE = "65f023632bc46470c104b75f";
-
     private static final String REASON = "ticket 42";
 
     private static final String SUPER_ADMIN = "SUPER_ADMIN";
@@ -77,10 +73,6 @@ class ImpersonationExchangeProviderTest {
 
     private static final String ORG_ADMIN = "ORG_ADMIN";
 
-    private static final String READ = "read";
-
-    private static final String WRITE = "write";
-
     private static final String JWT_VALUE = "exchanged-jwt";
 
     private static final String SECRET = "secret";
@@ -90,6 +82,8 @@ class ImpersonationExchangeProviderTest {
     private static final String ORG_ID = "org-1";
 
     private static final String STORE_KEY = "store";
+
+    private static final String STORE = "65f023632bc46470c104b76f";
 
     private static final String ORG1_ADMIN = "org1-admin";
 
@@ -168,9 +162,9 @@ class ImpersonationExchangeProviderTest {
         subjectToken(operator, Map.of(), Duration.ofMinutes(10));
     }
 
-    private ImpersonationExchangeAuthenticationToken request(User target, String store, String mode) {
+    private ImpersonationExchangeAuthenticationToken request(User target) {
         return new ImpersonationExchangeAuthenticationToken(clientPrincipal, SUBJECT_TOKEN, target.getId().toString(),
-                store, mode, REASON, Set.of(), Map.of());
+                REASON, Set.of(), Map.of());
     }
 
     private void generatorIssues() {
@@ -210,13 +204,13 @@ class ImpersonationExchangeProviderTest {
     // --- the happy paths ------------------------------------------------------------------------------------------
 
     @Test
-    void aSuperAdminActingReadOnlyGetsTheTargetsOwnTokenMarkedRead() {
+    void aSuperAdminGetsTheTargetsOwnTokenNamingThemselvesAsActor() {
         User operator = superAdmin();
         User target = storeAdmin();
         subjectToken(operator);
         generatorIssues();
 
-        Authentication issued = provider.authenticate(request(target, STORE, READ));
+        Authentication issued = provider.authenticate(request(target));
 
         OAuth2AccessTokenAuthenticationToken token = (OAuth2AccessTokenAuthenticationToken) issued;
         assertThat(token.getAccessToken().getTokenValue()).isEqualTo(JWT_VALUE);
@@ -224,7 +218,6 @@ class ImpersonationExchangeProviderTest {
         assertThat(token.getRefreshToken()).isNull();
         assertThat(token.getAdditionalParameters())
                 .containsEntry(ImpersonationExchangeProvider.ISSUED_TOKEN_TYPE, ImpersonationExchangeConverter.ACCESS_TOKEN_TYPE)
-                .containsEntry(ImpersonationExchangeProvider.ACT_MODE, READ)
                 .containsEntry(ImpersonationExchangeProvider.ACTING_AS, target.getUsername());
 
         OAuth2Authorization authorization = saved();
@@ -234,9 +227,7 @@ class ImpersonationExchangeProviderTest {
         ImpersonationContext context = ImpersonationContext.from(authorization).orElseThrow();
         assertThat(context.operatorId()).isEqualTo(operator.getId());
         assertThat(context.targetUsername()).isEqualTo(target.getUsername());
-        assertThat(context.mode()).isEqualTo(ImpersonationMode.READ);
-        assertThat(context.store()).isEqualTo(STORE);
-        // The principal the token is minted for carries the target's own roles in both modes.
+        // The principal the token is minted for carries the target's own roles.
         assertThat(authorization.<Authentication>getAttribute(java.security.Principal.class.getName()).getAuthorities())
                 .extracting("authority").containsExactly("ROLE_STORE_ADMIN");
         // Ten minutes left on the operator's token beats the fifteen-minute ceiling.
@@ -247,35 +238,33 @@ class ImpersonationExchangeProviderTest {
         assertThat(AuditRecords.actorOf(record).type()).isEqualTo(AuditActorType.USER);
         assertThat(AuditRecords.actorOf(record).name()).isEqualTo(operator.getUsername());
         assertThat(AuditRecords.targetIdOf(record)).isEqualTo(target.getId().toString());
-        assertThat(AuditRecords.reasonCodeOf(record)).isEqualTo(READ);
         assertThat(AuditRecords.detailOf(record)).isEqualTo(REASON);
     }
 
     @Test
-    void writeModeCapsAtFifteenMinutes() {
+    void aLongLivedOperatorTokenCapsAtFifteenMinutes() {
         User operator = superAdmin();
         User target = storeAdmin();
         subjectToken(operator, Map.of(), Duration.ofHours(1));
         generatorIssues();
 
-        provider.authenticate(request(target, STORE, WRITE));
+        provider.authenticate(request(target));
 
         ImpersonationContext context = ImpersonationContext.from(saved()).orElseThrow();
-        assertThat(context.mode()).isEqualTo(ImpersonationMode.WRITE);
         assertThat(context.notAfter()).isEqualTo(NOW.plus(Duration.ofMinutes(ImpersonationExchangeProvider.MAX_MINUTES)));
     }
 
-    /** An org admin has no {@code store} metadata; which stores they own is tenancy's to know, not uaa's. */
+    /** An org admin has no {@code store} metadata and may have no store at all; the account is still one to act as. */
     @Test
-    void anOrgAdminTargetActsInAnyStoreTheCallerNamed() {
+    void anOrgAdminTargetWithNoStoreIsStillActedAs() {
         User operator = superAdmin();
         User target = user(ORG1_ADMIN, Map.of(ORG, ORG_ID), role(ORG_ADMIN, Permission.USERS_WRITE));
         subjectToken(operator);
         generatorIssues();
 
-        provider.authenticate(request(target, OTHER_STORE, READ));
+        provider.authenticate(request(target));
 
-        assertThat(ImpersonationContext.from(saved()).orElseThrow().store()).isEqualTo(OTHER_STORE);
+        assertThat(ImpersonationContext.from(saved()).orElseThrow().targetUsername()).isEqualTo(ORG1_ADMIN);
     }
 
     // --- the refusals ---------------------------------------------------------------------------------------------
@@ -285,7 +274,7 @@ class ImpersonationExchangeProviderTest {
         User target = storeAdmin();
         when(authorizations.findByToken(SUBJECT_TOKEN, OAuth2TokenType.ACCESS_TOKEN)).thenReturn(null);
 
-        assertThatThrownBy(() -> provider.authenticate(request(target, STORE, READ)))
+        assertThatThrownBy(() -> provider.authenticate(request(target)))
                 .isInstanceOf(OAuth2AuthenticationException.class)
                 .extracting(e -> ((OAuth2AuthenticationException) e).getError().getErrorCode())
                 .isEqualTo(OAuth2ErrorCodes.INVALID_GRANT);
@@ -304,7 +293,7 @@ class ImpersonationExchangeProviderTest {
                                 Map.of(JwtClaimNames.SUB, ADMIN_SDK)))
                         .build());
 
-        assertThatThrownBy(() -> provider.authenticate(request(target, STORE, READ)))
+        assertThatThrownBy(() -> provider.authenticate(request(target)))
                 .isInstanceOf(OAuth2AuthenticationException.class)
                 .extracting(e -> ((OAuth2AuthenticationException) e).getError().getErrorCode())
                 .isEqualTo(OAuth2ErrorCodes.INVALID_GRANT);
@@ -316,7 +305,7 @@ class ImpersonationExchangeProviderTest {
         User target = storeAdmin();
         subjectToken(operator, Map.of("act", Map.of("sub", "someone")), Duration.ofMinutes(10));
 
-        assertDenied(request(target, STORE, READ), "CHAINED", OAuth2ErrorCodes.INVALID_GRANT);
+        assertDenied(request(target), "CHAINED", OAuth2ErrorCodes.INVALID_GRANT);
     }
 
     @Test
@@ -325,7 +314,7 @@ class ImpersonationExchangeProviderTest {
         User target = storeAdmin();
         subjectToken(operator);
 
-        assertDenied(request(target, STORE, READ), "OPERATOR_NOT_ALLOWED", OAuth2ErrorCodes.ACCESS_DENIED);
+        assertDenied(request(target), "OPERATOR_NOT_ALLOWED", OAuth2ErrorCodes.ACCESS_DENIED);
     }
 
     @Test
@@ -333,7 +322,7 @@ class ImpersonationExchangeProviderTest {
         User operator = superAdmin();
         subjectToken(operator);
         ImpersonationExchangeAuthenticationToken request = new ImpersonationExchangeAuthenticationToken(clientPrincipal,
-                SUBJECT_TOKEN, "not-an-id", STORE, READ, REASON, Set.of(), Map.of());
+                SUBJECT_TOKEN, "not-an-id", REASON, Set.of(), Map.of());
 
         assertDenied(request, "TARGET_UNKNOWN", OAuth2ErrorCodes.INVALID_REQUEST);
     }
@@ -345,7 +334,7 @@ class ImpersonationExchangeProviderTest {
         target.setEnabled(false);
         subjectToken(operator);
 
-        assertDenied(request(target, STORE, READ), "TARGET_DISABLED", OAuth2ErrorCodes.ACCESS_DENIED);
+        assertDenied(request(target), "TARGET_DISABLED", OAuth2ErrorCodes.ACCESS_DENIED);
     }
 
     @Test
@@ -354,38 +343,7 @@ class ImpersonationExchangeProviderTest {
         User target = support();
         subjectToken(operator);
 
-        assertDenied(request(target, STORE, READ), "TARGET_PRIVILEGED", OAuth2ErrorCodes.ACCESS_DENIED);
-    }
-
-    @Test
-    void supportMayNotActInWriteMode() {
-        User operator = support();
-        User target = storeAdmin();
-        subjectToken(operator);
-
-        assertDenied(request(target, STORE, WRITE), "WRITE_NOT_ALLOWED", OAuth2ErrorCodes.ACCESS_DENIED);
-    }
-
-    @Test
-    void aStoreTheTargetDoesNotActInIsRefused() {
-        User operator = superAdmin();
-        User target = storeAdmin();
-        subjectToken(operator);
-
-        assertDenied(request(target, OTHER_STORE, READ), "STORE_NOT_TARGETS", OAuth2ErrorCodes.INVALID_REQUEST);
-    }
-
-    @Test
-    void anUnknownModeIsAnInvalidRequestBeforeAnyRuleRuns() {
-        User operator = superAdmin();
-        User target = storeAdmin();
-        subjectToken(operator);
-
-        assertThatThrownBy(() -> provider.authenticate(request(target, STORE, "rw")))
-                .isInstanceOf(OAuth2AuthenticationException.class)
-                .extracting(e -> ((OAuth2AuthenticationException) e).getError().getErrorCode())
-                .isEqualTo(OAuth2ErrorCodes.INVALID_REQUEST);
-        verify(audit, never()).recordDetached(any());
+        assertDenied(request(target), "TARGET_PRIVILEGED", OAuth2ErrorCodes.ACCESS_DENIED);
     }
 
     @Test
@@ -395,7 +353,7 @@ class ImpersonationExchangeProviderTest {
         OAuth2ClientAuthenticationToken principal =
                 new OAuth2ClientAuthenticationToken(other, ClientAuthenticationMethod.CLIENT_SECRET_BASIC, SECRET);
         ImpersonationExchangeAuthenticationToken request = new ImpersonationExchangeAuthenticationToken(principal,
-                SUBJECT_TOKEN, UUID.randomUUID().toString(), STORE, READ, REASON, Set.of(), Map.of());
+                SUBJECT_TOKEN, UUID.randomUUID().toString(), REASON, Set.of(), Map.of());
 
         assertThatThrownBy(() -> provider.authenticate(request))
                 .isInstanceOf(OAuth2AuthenticationException.class)

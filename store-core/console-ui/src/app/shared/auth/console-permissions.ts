@@ -74,11 +74,6 @@ export class ConsolePermissions {
     return roles.isSuperAdmin || roles.isSupport;
   }
 
-  /** Whether this operator may pick write mode — uaa refuses it to support, so the dialog does not offer it. */
-  canImpersonateInWriteMode(): boolean {
-    return this.auth.getRoles().isSuperAdmin;
-  }
-
   /**
    * Mirrors `STORE-POD.CONTENT.*` → `hasManageAccessOnStore`: org admin or store admin. A store
    * moderator has `STORE-POD.CONTENT.READ` and sees the lists read-only.

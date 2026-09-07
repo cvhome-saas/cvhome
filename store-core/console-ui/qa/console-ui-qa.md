@@ -1082,87 +1082,70 @@ every one of them fails silently rather than loudly.
 
 _From `.agents/plans/user-impersonation.md`._ The platform operator's way into a merchant's console. The console
 holds no token, so the whole thing is a **gateway session swap** (`../../gateway/gateway-service/qa/gateway-qa.md`
-§IMP) behind a uaa grant (`../../uaa/qa/uaa-qa.md` §IMP); what this section proves is the console's half — the two
-ways in, the banner, and that the page you land on is the merchant's.
+§IMP) behind a uaa grant (`../../uaa/qa/uaa-qa.md` §IMP); what this section proves is the console's half — the row
+action, the dialog, the banner, and that the page you land on is the merchant's.
 
 Design points a tester needs:
 
-- **Both entry points reload the page.** Starting lands on `/dashboard` with the chosen store selected; ending lands
-  on `/platform/users`. Identity, rail, store list and every page facade change at once, and a reload is deliberate.
+- **The dialog asks one thing: why.** The account is the row it opened from; the session becomes that account —
+  its own stores and roles, whatever they are, an org admin with no store included. There is no store to choose and
+  no read/write mode: the operator *is* the merchant until they stop. (Both existed in earlier cuts and were
+  removed: the store choice had nothing to offer an organization without a store, and the mode doubled the
+  surface for a distinction the audit trail already makes.)
+- **Starting and ending reload the page.** Starting lands on `/dashboard` as the merchant, on their own first
+  store; ending lands on `/platform/users`. Identity, rail, store list and every page facade change at once, and a
+  reload is deliberate.
 - **The banner cannot be dismissed.** Its only control ends the session. The gateway's fifteen-minute ceiling ends
   it too, whatever the banner shows — the countdown is minute-granular.
-- **Read-only is the default**: the token is the merchant verbatim plus `act_mode=read`, and every service's
-  `ReadOnlyActorFilter` refuses each unsafe method for it — so the operator sees everything the merchant sees and can
-  change nothing. Write mode drops the filter and is offered to `super-admin` only; `support` never sees it.
-- **The dialog's choices come from the axis you did not pick.** From an account row, the stores are that account's
-  (its `store`, or the org's stores for an org admin); from a store row, the accounts are those acting in it.
+- **Every write made while acting is audited as the operator** — `tenancy-qa.md` IMP-01.
 
-### IMP-01 — Act as a store admin, read-only, from the account list · critical · [verified]
-- **Seen** — 2026-09-07, stack `impersonation`, Chrome: reload to `/dashboard`, merchant rail, ORG1-STORE1 selected, the amber bar stacked above the plan notice with the countdown. The first cut (read mode as `STORE_MODERATOR`) showed a dashboard of 403s; with the target's own roles plus the method filter the dashboard and the catalogue render as the merchant sees them, and a save answers 403 `COMMON.READ_ONLY_SESSION`.
+### IMP-01 — Act as a store admin from the account list · critical · [verified]
+- **Seen** — 2026-09-07, stack `impersonation`, Chrome: reload to `/dashboard`, merchant rail, ORG1-STORE1 selected,
+  the amber bar stacked above the plan notice with the countdown; the dashboard and the catalogue render as the
+  merchant sees them. (Seen with the earlier dialog that also asked for a store and a mode; the landing is the same.)
 
 - **Setup** — signed in as `super-admin`.
-- **Steps** — `/platform/users` → row menu of `org1-store1-admin` → **Act as this account** → the store is fixed
-  (ORG1-STORE1), leave Read-only, type a reason → Start.
-- **Expect** — a reload to `/dashboard` as the merchant: the merchant rail (no Platform group), ORG1-STORE1 selected,
-  an amber banner *You are acting as org1-store1-admin · Store: … · Read-only · N minutes left*. The dashboard, the
-  orders and the catalogue load exactly as the merchant sees them. Open a product and save — or toggle a category's
-  visibility — → **403** `COMMON.READ_ONLY_SESSION`, and the toast reads *This is a read-only session. Nothing can
-  be changed while you are acting as this account.* (the code's own message, ahead of the generic "no permission"
-  one). Network panel: `auth/me` carries
-  `impersonation`, and every private call is `?store=65f023632bc46470c104b76f`.
+- **Steps** — `/platform/users` → row menu of `org1-store1-admin` → **Act as this account** → the dialog names the
+  account, type a reason → **Start acting as Store1 Admin**.
+- **Expect** — a reload to `/dashboard` as the merchant: the merchant rail (no Platform group), ORG1-STORE1
+  selected, an amber banner *You are acting as org1-store1-admin · N minutes left*. The dashboard, the orders and
+  the catalogue load exactly as the merchant sees them; a save succeeds and is audited as the operator. Network
+  panel: `auth/me` carries `impersonation`, and every private call is `?store=65f023632bc46470c104b76f`.
 
-### IMP-01b — The dialog never shows the previous account's stores · high · [verified]
-- **Seen** — 2026-09-07: opening the dialog for `org1-admin` right after `org1-store1-admin` showed *Store: ORG1-STORE1*
-  as a fixed value — the previous account's list, kept by `snapshot` while the org admin's loaded — and a quick Start
-  would have sent it. Now the store row reads *Loading…* with Start held until the list arrives, then a select with
-  both ORG1 stores.
+### IMP-02 — Act as an org admin with no store · high · [not verified]
 
-- **Steps** — `/platform/users` → **Act as this account** on `org1-store1-admin` → Cancel → same on `org1-admin`.
-- **Expect** — a moment of *Loading…* under Store (Start disabled), then a **select** offering ORG1-STORE1 and
-  ORG1-STORE2; never a fixed ORG1-STORE1. Same from the org detail Users and Stores tabs.
-
-### IMP-02 — Write mode saves as the merchant and audits as the operator · critical · [verified]
-- **Seen** — The UI start in write mode (org detail → Stores → ORG1-STORE2 as `org1-admin`) reloaded onto the merchant rail with the danger-wash bar reading *Read and write · 14 minutes left*; the tenancy write and the `(via super-admin)` actor were driven through the API (`tenancy-qa.md` IMP-01).
-
-- **Steps** — as IMP-01 with **Read and write**. Rename a category. Then, in another tab as `super-admin`, open
-  `/platform/organizations/<ORG1>/activity` — or `psql`: `select actor, action from tenancy.tenancy_audit order by
-  id desc limit 5` after a store rename in **Store management**.
-- **Expect** — the save succeeds; the tenancy row's actor reads `<merchant id> (via super-admin)`. uaa's audit log
-  (`/uaa/api/v1/admin/audit?type=user.impersonation.started`) has the start row with the reason.
+- **Setup** — a fresh sign-up (`/sign-up`) creates an organization with no store yet; or `org1-admin` for the
+  two-store case.
+- **Steps** — `/platform/users` → **Act as this account** on that org admin → reason → Start.
+- **Expect** — the dialog offers nothing but the reason (no empty store row, no refusal); the reload lands on the
+  merchant's console with the org's own state — the create-store first-run for a storeless org, the store rail for
+  `org1-admin`.
 
 ### IMP-03 — The banner ends it, and ending lands on the account list · high · [verified]
-- **Seen** — The bar's *Stop acting as them* reloaded to `/platform/users` as `super-admin`, no bar; `user.impersonation.ended` rows present.
+- **Seen** — The bar's *Stop acting as them* reloaded to `/platform/users` as `super-admin`, no bar;
+  `user.impersonation.ended` rows present.
 
 - **Steps** — click **Stop acting as them**.
 - **Expect** — a reload to `/platform/users` as `super-admin`; the Platform group is back; no banner;
   `uaa.audit_events` has a `user.impersonation.ended` row for the merchant.
 
-### IMP-04 — From a store row, the accounts on offer are the ones acting in it · high · [verified]
-- **Seen** — The picker offered exactly `Org1 Admin`, `Store2 Admin`, `Store2 Moderator`; the submit read *Start acting as Org1 Admin*.
+### IMP-04 — The same action on the organization's Users tab · high · [verified]
+- **Seen** — `/platform/organizations/<ORG1>/users` → row menu → the same dialog, the same landing.
 
-- **Steps** — `/platform/organizations/<ORG1>/stores` → the sign-in icon on ORG1-STORE2 → the dialog opens with the
-  store fixed and an **Account** select.
-- **Expect** — the select lists `org1-store2-admin`, `org1-store2-moderator` and `org1-admin` (an org admin acts in
-  every store of theirs), and not `org1-store1-admin`. Start → `/dashboard` on ORG1-STORE2.
+- **Steps** — org detail → Users → row menu of `org1-store2-admin` → **Act as this account**.
+- **Expect** — the dialog names the account; Start → `/dashboard` as that account, ORG1-STORE2 selected.
 
-### IMP-05 — A store the account does not act in is refused before anything is swapped · high · [verified]
-- **Seen** — Driven through the API: 403 `GATEWAY.IMPERSONATION.REFUSED` for a store-admin target with another store (uaa refuses first), 422 `STORE_NOT_TARGETS` for an org-admin target with another org's store.
-
-- **Steps** — `.http`: `POST /api/v1/impersonation` for `org1-store1-admin` with `storeId` = ORG1-STORE2
-  (`../../gateway/gateway-service/http/impersonation-api.http`, "a store the merchant does not act in").
-- **Expect** — **422** `GATEWAY.IMPERSONATION.STORE_NOT_TARGETS`; `auth/me` still says the operator; a
-  `user.impersonation.ended` row exists in uaa because the token that was minted for the probe was revoked.
-
-### IMP-06 — The gate: an org admin cannot impersonate, and support cannot write · critical · [not verified]
-- **Seen** — API half verified (`gateway-qa.md` IMP-06): `org1-admin` 403, `support` write 403 / read 200. The `support` screens themselves were not driven in the browser.
+### IMP-05 — The gate: an org admin cannot impersonate · critical · [not verified]
+- **Seen** — API half verified (`gateway-qa.md` IMP-04): `org1-admin` 403. The `support` screens were not driven in
+  the browser.
 
 - **Steps** — sign in as `org1-admin`: the row menu on `/users` shows no impersonate entry (the page is not offered
   the platform rail at all); `.http` `POST /api/v1/impersonation` with that session → **403**
-  `GATEWAY.IMPERSONATION.REFUSED`. Sign in as `support` (password `admin`): `/platform/users` renders, the dialog
-  offers **no** Read-and-write option, and a read-only start succeeds.
+  `GATEWAY.IMPERSONATION.REFUSED`. Sign in as `support` (password `admin`): `/platform/users` renders and a start
+  succeeds.
 - **Expect** — as stated, plus a `user.impersonation.denied` row per refusal in uaa.
 
-### IMP-07 — Expiry hands the session back silently · high · [not verified]
+### IMP-06 — Expiry hands the session back silently · high · [not verified]
 
 - **Setup** — lower the ceiling for the test: `update uaa.oauth2_registered_client set token_settings = replace(
   token_settings, '900.000000000', '60.000000000') where client_id = 'console-impersonation'` and restart uaa
@@ -1171,14 +1154,15 @@ Design points a tester needs:
 - **Expect** — the operator's rail, no banner, never a 401 and never the merchant's page again; the audit log has an
   `ended` row.
 
-### IMP-08 — Logout mid-impersonation ends both sessions · critical · [not verified]
+### IMP-07 — Logout mid-impersonation ends both sessions · critical · [not verified]
 
 - **Steps** — while acting as the merchant, profile menu → Sign out. Then open `/dashboard`.
 - **Expect** — the sign-in page, not the operator's console: the gateway restored the operator before building
   uaa's end-session redirect, so uaa's session ended too.
 
-### IMP-09 — i18n and RTL · [verified]
-- **Seen** — Arabic: the dialog and the bar mirror (icons and the End control included), the countdown uses the ICU `two`/`few`/`many` forms.
+### IMP-08 — i18n and RTL · [verified]
+- **Seen** — Arabic: the dialog and the bar mirror (icons and the End control included), the countdown uses the ICU
+  `two`/`few`/`many` forms.
 
 - **Steps** — switch to Arabic before starting; start; end.
 - **Expect** — the dialog and the banner in Arabic, the banner's icon and End button mirrored, the countdown's plural

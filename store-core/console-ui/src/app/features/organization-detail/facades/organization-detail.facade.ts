@@ -424,71 +424,19 @@ export class OrganizationDetailFacade {
 
   /* ------------------------------------------------------------------ acting as an account ---- */
 
-  /**
-   * What the impersonation dialog was opened from: an account row (the stores are theirs to pick)
-   * or a store row (the accounts are the ones acting in it). Null when closed.
-   */
-  readonly impersonating = signal<{target: PlatformUserRow | null; store: PlatformStoreRow | null} | null>(null);
+  /** The account the impersonation dialog was opened from; null when closed. */
+  readonly impersonating = signal<PlatformUserRow | null>(null);
 
   readonly canImpersonate = computed(() => this.permissions.canImpersonate());
-  readonly canImpersonateInWriteMode = computed(() => this.permissions.canImpersonateInWriteMode());
 
-  /** The organization's stores, loaded when the dialog opens from an account row. */
-  private readonly impersonationStores = snapshot(
-    () => {
-      const open = this.impersonating();
-      const id = this.orgId();
-      return open && !open.store && id ? {id, store: open.target?.store ?? null} : undefined;
-    },
-    (query) => this.api.storeChoices(query.id),
-  );
-
-  /** The accounts acting in a store, loaded when the dialog opens from a store row. */
-  private readonly impersonationCandidates = snapshot(
-    () => {
-      const open = this.impersonating();
-      const id = this.orgId();
-      return open?.store && id ? {id, store: open.store.id} : undefined;
-    },
-    (query) => this.api.candidates(query.id, query.store),
-  );
-
-  readonly impersonationStoreChoices = computed<readonly SelectOption[]>(() => {
-    const open = this.impersonating();
-    if (!open) {
-      return [];
-    }
-    if (open.store) {
-      return [{value: open.store.id, label: open.store.name}];
-    }
-    // Empty while loading, never the previous account's list — `snapshot` keeps that on purpose, for tables.
-    const stores = this.impersonationStores.isLoading() ? [] : (this.impersonationStores.value() ?? []);
-    return open.target?.store ? stores.filter((store) => store.value === open.target?.store) : stores;
-  });
-
-  /** Whether either choice list is still on its way; the dialog says so and holds Start. */
-  readonly impersonationLoading = computed(
-    () => this.impersonationStores.isLoading() || this.impersonationCandidates.isLoading(),
-  );
-
-  readonly impersonationTargetChoices = computed<readonly SelectOption[]>(() => {
-    const open = this.impersonating();
-    if (!open) {
-      return [];
-    }
-    if (open.target) {
-      return [{value: open.target.id, label: open.target.name || open.target.username}];
-    }
-    const candidates = this.impersonationCandidates.isLoading() ? [] : (this.impersonationCandidates.value() ?? []);
-    return candidates.map((row) => ({value: row.id, label: row.name || row.username}));
+  /** The account the dialog names, as the option the confirm button reads. */
+  readonly impersonationTarget = computed<SelectOption | null>(() => {
+    const row = this.impersonating();
+    return row ? {value: row.id, label: row.name || row.username} : null;
   });
 
   askImpersonate(row: PlatformUserRow): void {
-    this.impersonating.set({target: row, store: null});
-  }
-
-  askOpenStore(store: PlatformStoreRow): void {
-    this.impersonating.set({target: null, store});
+    this.impersonating.set(row);
   }
 
   dismissImpersonation(): void {

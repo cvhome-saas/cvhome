@@ -33,7 +33,7 @@ values ('318F2FD5-E235-4C2E-AB7E-6C949BA4CDD4', 'org1-admin', 'org1-admin@mail.c
         'Moderator',
         '{bcrypt}$2a$10$pse9zsAXkH/zOjZpfiP7X.weD6CNtVY/NR5A4mYUwbYqcYThHchRa', TRUE,
         '{"org": "352023632b046970c104b76f", "store": "65f023632bc26470c104b75f"}'),
-       -- Platform support: no org, no store — the impersonation cases' read-only operator.
+       -- Platform support: no org, no store — the impersonation cases' second operator.
        ('5A1C2D3E-4F50-4617-8293-A4B5C6D7E8F9', 'support', 'support@mail.com', 'Platform', 'Support',
         '{bcrypt}$2a$10$pse9zsAXkH/zOjZpfiP7X.weD6CNtVY/NR5A4mYUwbYqcYThHchRa', TRUE, '{}')
 on conflict (id) do nothing;

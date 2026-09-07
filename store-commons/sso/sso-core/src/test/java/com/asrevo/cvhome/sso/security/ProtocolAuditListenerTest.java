@@ -43,7 +43,6 @@ import com.asrevo.cvhome.sso.repo.ClientExtensionRepository;
 import com.asrevo.cvhome.sso.token.ImpersonationContext;
 import com.asrevo.cvhome.sso.token.ImpersonationExchangeConverter;
 import com.asrevo.cvhome.sso.token.ImpersonationExchangeProvider;
-import com.asrevo.cvhome.sso.token.ImpersonationMode;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -81,7 +80,6 @@ class ProtocolAuditListenerTest {
     private static final String WRONG_SECRET = "no";
     private static final String OPERATOR = "super-admin";
     private static final String MERCHANT = "org1-store1-admin";
-    private static final String STORE = "store-1";
     private static final String REASON = "ticket 42";
 
     private final AuditService audit = mock(AuditService.class);
@@ -191,8 +189,7 @@ class ProtocolAuditListenerTest {
         UUID merchantId = UUID.randomUUID();
         OAuth2Authorization.Builder builder = OAuth2Authorization.withRegisteredClient(client())
                 .principalName(merchantId.toString()).authorizationGrantType(AuthorizationGrantType.TOKEN_EXCHANGE);
-        new ImpersonationContext(operatorId, OPERATOR, merchantId, MERCHANT, STORE, ImpersonationMode.READ, REASON,
-                Instant.parse(NOW)).writeTo(builder);
+        new ImpersonationContext(operatorId, OPERATOR, merchantId, MERCHANT, REASON, Instant.parse(NOW)).writeTo(builder);
         when(authorizations.findByToken(TOKEN_VALUE, null)).thenReturn(builder.build());
 
         listener.onTokenRevoked(new AuthenticationSuccessEvent(revocation(clientPrincipal())));
@@ -206,7 +203,6 @@ class ProtocolAuditListenerTest {
         assertThat(AuditRecords.actorOf(ended).name()).isEqualTo(OPERATOR);
         assertThat(AuditRecords.targetIdOf(ended)).isEqualTo(merchantId.toString());
         assertThat(AuditRecords.targetNameOf(ended)).isEqualTo(MERCHANT);
-        assertThat(AuditRecords.reasonCodeOf(ended)).isEqualTo(ImpersonationMode.READ.wire());
         assertThat(AuditRecords.detailOf(ended)).isEqualTo(REASON);
     }
 

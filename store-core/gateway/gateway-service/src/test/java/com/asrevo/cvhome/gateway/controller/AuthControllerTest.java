@@ -82,7 +82,7 @@ class AuthControllerTest {
 
     @Test
     void meCarriesTheImpersonationSoAreloadKeepsTheBanner() {
-        ImpersonationView acting = new ImpersonationView("org1-store1-admin", "t", "s", "read", "ticket", Instant.now());
+        ImpersonationView acting = new ImpersonationView("org1-store1-admin", "t", "ticket", Instant.now());
         when(impersonation.current(any())).thenReturn(Mono.just(acting));
 
         StepVerifier.create(controller.me(exchange()).contextWrite(ReactiveSecurityContextHolder.withAuthentication(login())))
