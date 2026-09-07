@@ -10,7 +10,7 @@ stack on 2026-09-06.
 | label | value | note |
 |---|---|---|
 | `service_name` | `catalog`, `checkout`, … the 12 Java services, `landing-ui`, `spg` | the join key across metrics, logs and traces |
-| `service_version` | the build version (`1.0.16`) | from `gradle.properties` via `@version@` in `common-config.yml` |
+| `service_version` | the build version (`2.0.0` for a release, `0.0.0-SNAPSHOT` locally) | `project.version` — `-Pversion` from the git tag in CI, `gradle.properties` otherwise — via `@version@` in `common-config.yml` |
 | `service_instance_id` | UUID per process start | metrics and logs only; span metrics are keyed by service only |
 | `application` | same as `service_name` | Micrometer's own tag; prefer `service_name` |
 

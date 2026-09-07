@@ -8,7 +8,8 @@ unlabelled PR lands in ":question: Other Changes":
   warn/api-change · warn/behavior-change · warn/deprecation · warn/regression · warn/blocker
   ignore-changelog
 
-Branch cut from an up-to-date `origin/develop`, merged into `develop`. Never push to `develop`/`main`.
+Branch cut from an up-to-date `origin/main` in its own worktree, merged into `main` by PR. Never push to `main`.
+Releases are git tags cut by the orchestrator repo — this PR never bumps a version.
 -->
 
 ## Why
