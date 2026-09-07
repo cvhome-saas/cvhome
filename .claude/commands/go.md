@@ -18,7 +18,7 @@ each plan/feature lives in its own worktree cut from `origin/main` (see AGENTS.m
 
 1. **Nothing to do?** If the working tree is clean *and* the branch has no unpushed commits, say so and stop.
 
-2. **Branch.** If HEAD is `main`, this working tree skipped the worktree rule — cut a fresh branch now (`git fetch && git switch -c <type>/<short-name>`, where `<type>` is one of `feat`/`fix`/`docs`/`chore`/`refactor`/`test` and `<short-name>` is a kebab-case summary), commit there, and remind that the next piece of work starts as `git worktree add .claude/worktrees/<type>-<short-name> -b <type>/<short-name> origin/main`. Never commit onto `main`. If already on a topic branch, keep it.
+2. **Branch.** If HEAD is `main`, this working tree skipped the worktree rule — cut a fresh branch now (`git fetch && git switch -c <type>/<short-name>`, where `<type>` is one of `feat`/`fix`/`docs`/`chore`/`refactor`/`test` and `<short-name>` is a kebab-case summary), commit there, and remind that the next piece of work starts as `git worktree add --no-track .claude/worktrees/<type>-<short-name> -b <type>/<short-name> origin/main` (`--no-track`, or the branch tracks main and a bare push lands there). Never commit onto `main`. If already on a topic branch, keep it.
 
 3. **Review before staging.** Read the actual diff (`git diff`, `git diff --cached`) so the commit message describes what changed, not what the file names suggest. Flag anything that shouldn't be committed — secrets, `.env`, build output, debug leftovers, `TODO` comments (checkstyle fails the build on those). Ask before committing anything suspicious.
 
