@@ -27,6 +27,8 @@ class AuthApiIntegrationTest {
 
     private static final String DEEP_LINK = "/accept-invitation?token=abc";
 
+    private static final String IMPERSONATION = "/api/v1/impersonation";
+
     @LocalServerPort
     private int port;
 
@@ -89,6 +91,23 @@ class AuthApiIntegrationTest {
     @Test
     void currentUserIsUnauthorizedWithoutALogin() {
         client.get().uri("/api/v1/auth/current").exchange().expectStatus().isUnauthorized();
+    }
+
+    /**
+     * The impersonation endpoints are session-bound like the rest of {@code /api/v1}, and refuse an anonymous caller
+     * with the platform's problem detail — the gateway's one advice, wired for WebFlux.
+     */
+    @Test
+    void impersonationWithoutALoginIsAproblemDetail401() {
+        client.post().uri(IMPERSONATION).contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+                .bodyValue("{\"userId\":\"u\",\"storeId\":\"s\",\"mode\":\"read\",\"reason\":\"r\"}")
+                .exchange()
+                .expectStatus().isUnauthorized()
+                .expectBody()
+                .jsonPath("$.code").isEqualTo("GATEWAY.SESSION.REQUIRED")
+                .jsonPath("$.traceId").exists();
+        client.delete().uri(IMPERSONATION).exchange().expectStatus().isUnauthorized();
+        client.get().uri(IMPERSONATION).exchange().expectStatus().isUnauthorized();
     }
 
     @Test

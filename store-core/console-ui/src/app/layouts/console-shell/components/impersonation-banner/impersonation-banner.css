@@ -1,0 +1,70 @@
+:host {
+  display: block;
+}
+
+/*
+ * The one banner that must not read as ambient. Amber is the platform's "attention" wash, and
+ * write mode — the merchant verbatim — steps up to the danger wash, because that is the session in
+ * which a slip does real harm.
+ */
+.impersonation-banner {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-group);
+  block-size: 49px;
+  padding: 0 2rem;
+  background: var(--chart-4-wash);
+  border-bottom: 1px solid var(--chart-4-foreground);
+}
+
+.impersonation-banner > app-icon {
+  color: var(--chart-4-foreground);
+}
+
+.impersonation-banner.write {
+  background: var(--chart-5-wash);
+  border-bottom-color: var(--chart-5-foreground);
+}
+
+.impersonation-banner.write > app-icon {
+  color: var(--chart-5-foreground);
+}
+
+.impersonation-banner p {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  display: flex;
+  gap: var(--spacing-tight);
+  align-items: baseline;
+  flex-wrap: wrap;
+  color: var(--foreground);
+  font-size: var(--text-sm);
+}
+
+.detail {
+  color: var(--muted-foreground);
+  font-size: var(--text-xs);
+}
+
+/* The system's secondary action, sized to the bar; hover and focus come from the vocabulary. */
+.end {
+  flex-shrink: 0;
+  font-size: var(--text-xs);
+  --icon-size: 0.7rem;
+}
+
+@media (max-width: 56.25rem) {
+  .impersonation-banner {
+    block-size: auto;
+    padding: 0.7rem 1rem;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: var(--spacing-field);
+  }
+
+  .end {
+    flex: 1 0 100%;
+    justify-content: center;
+  }
+}

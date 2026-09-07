@@ -12,6 +12,25 @@ import {
 import {Icon} from '../icon/icon';
 import type {IconName} from '../icon/icon-paths';
 
+/** A menu row's height and the list's padding, in px — what the flip decision is estimated from. */
+const ITEM_HEIGHT = 34;
+const LIST_PADDING = 12;
+/** The gap between trigger and list, matching `.popover`'s `.5rem`. */
+const GAP = 8;
+
+/**
+ * The list's fixed position, as insets only — one vertical and one horizontal edge, the others null.
+ * Deliberately no `transform`: `.popover`'s entrance keyframe animates `transform`, and a placement
+ * that relied on it was overridden for the animation's duration, so the list visibly jumped in from
+ * the wrong side.
+ */
+interface Placement {
+  readonly top: number | null;
+  readonly bottom: number | null;
+  readonly left: number | null;
+  readonly right: number | null;
+}
+
 /** One entry of an action menu. `danger` draws it in the destructive hue; `disabled` keeps it listed but inert. */
 export interface MenuAction {
   readonly key: string;
@@ -28,6 +47,12 @@ export interface MenuAction {
  * Native elements, no library: a toggle button with `aria-expanded`, a `role="menu"` popover with
  * `role="menuitem"` buttons, arrow-key movement, Escape to close, closing on outside click. The
  * popover uses the global `.popover` surface, so it matches the toolbar's menus.
+ *
+ * **The list is placed `fixed`, from the trigger's rectangle, not absolutely under it.** A row menu
+ * lives inside a data table whose `.table-scroll` clips overflow, so the last row's menu opened
+ * into the clipped zone and was invisible; a viewport-anchored list escapes every ancestor's
+ * overflow, flips above the trigger when there is no room below, and is closed by any scroll —
+ * cheaper and more honest than following the trigger around.
  */
 @Component({
   selector: 'app-action-menu',
@@ -54,7 +79,16 @@ export interface MenuAction {
         }
       </button>
       @if (open()) {
-        <div class="popover menu" role="menu" tabindex="-1" (keydown)="onMenuKey($event)">
+        <div
+          class="popover menu"
+          role="menu"
+          tabindex="-1"
+          [style.top.px]="placement().top"
+          [style.bottom.px]="placement().bottom"
+          [style.left.px]="placement().left"
+          [style.right.px]="placement().right"
+          (keydown)="onMenuKey($event)"
+        >
           @for (action of actions(); track action.key; let i = $index) {
             <button
               class="menu-item"
@@ -91,6 +125,9 @@ export class ActionMenu {
   readonly picked = output<MenuAction>();
 
   protected readonly open = signal(false);
+  /** Where the fixed list goes, computed from the trigger the moment it opens. */
+  protected readonly placement = signal<Placement>({top: 0, bottom: null, left: null, right: 0});
+  private readonly closeOnScroll = (): void => this.close();
   protected readonly enabledCount = computed(
     () => this.actions().filter((a) => !a.disabled).length,
   );
@@ -100,12 +137,42 @@ export class ActionMenu {
       this.close();
       return;
     }
+    this.place();
     this.open.set(true);
     queueMicrotask(() => this.focusItem(0));
   }
 
   close(): void {
+    if (this.open()) {
+      document.removeEventListener('scroll', this.closeOnScroll, true);
+      window.removeEventListener('resize', this.closeOnScroll);
+    }
     this.open.set(false);
+  }
+
+  /**
+   * The list's end edge sits on the trigger's end edge (the menu opens inward, whichever the writing
+   * direction), below the trigger when it fits and above it when it would run off the viewport — all
+   * as viewport insets, so the list needs no measuring and no transform. The height is estimated from
+   * the entries rather than measured, because the list does not exist yet.
+   */
+  private place(): void {
+    const trigger = this.trigger();
+    if (!trigger) {
+      return;
+    }
+    const rect = trigger.getBoundingClientRect();
+    const estimated = this.actions().length * ITEM_HEIGHT + LIST_PADDING;
+    const rtl = getComputedStyle(trigger).direction === 'rtl';
+    const below = rect.bottom + GAP + estimated <= window.innerHeight - GAP;
+    this.placement.set({
+      top: below ? rect.bottom + GAP : null,
+      bottom: below ? null : window.innerHeight - rect.top + GAP,
+      left: rtl ? rect.left : null,
+      right: rtl ? null : window.innerWidth - rect.right,
+    });
+    document.addEventListener('scroll', this.closeOnScroll, true);
+    window.addEventListener('resize', this.closeOnScroll);
   }
 
   protected pick(action: MenuAction): void {
@@ -117,6 +184,7 @@ export class ActionMenu {
     if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
       event.preventDefault();
       if (!this.open()) {
+        this.place();
         this.open.set(true);
       }
       queueMicrotask(() =>

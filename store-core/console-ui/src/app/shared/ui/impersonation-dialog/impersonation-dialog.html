@@ -1,0 +1,43 @@
+<app-form-dialog
+  [open]="open()"
+  [title]="t('platform.impersonation.title')"
+  [description]="t('platform.impersonation.description')"
+  [closeLabel]="t('shared.actions.close')"
+  (dismissed)="reset()"
+  *transloco="let t"
+>
+  <form class="impersonation-form" (submit)="onSubmit($event)">
+    <div class="imp-row">
+      <span class="imp-label">{{ t('platform.impersonation.target') }}</span>
+      <span class="imp-value latin">{{ target()?.label }}</span>
+    </div>
+
+    <div class="imp-row">
+      <span class="imp-label">{{ t('platform.impersonation.reason') }}</span>
+      <app-textarea
+        [value]="reason()"
+        (valueChange)="reason.set($event)"
+        [rows]="3"
+        [maxLength]="reasonMax"
+        [placeholder]="t('platform.impersonation.reasonPlaceholder')"
+        [ariaLabel]="t('platform.impersonation.reason')"
+      />
+      <p class="imp-hint">{{ t('platform.impersonation.hint.reason') }}</p>
+    </div>
+
+    <div class="imp-actions">
+      <button class="secondary-action" type="button" [disabled]="busy()" (click)="reset()">
+        {{ t('shared.actions.cancel') }}
+      </button>
+      <button class="primary-action" type="submit" [disabled]="!canSubmit()">
+        @if (busy()) {
+          {{ t('platform.impersonation.busy') }}
+        } @else if (target(); as account) {
+          {{ t('platform.impersonation.confirm', {name: account.label}) }}
+        } @else {
+          {{ t('platform.impersonation.confirmUnnamed') }}
+        }
+      </button>
+    </div>
+  </form>
+</app-form-dialog>

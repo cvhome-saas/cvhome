@@ -4,8 +4,12 @@ import {TranslocoDirective} from '@jsverse/transloco';
 
 import type {PlatformUserRow} from '@models/platform';
 import {BusyOverlay, ConfirmDialog, EmptyState, LoadError, NoticeBar, PageHeader, Pagination, Panel, RolesDialog, Select, SetPasswordDialog} from '@cvhome-saas/ui-kit/ui';
-import {UserAdminTable, type UserAdminIntent} from '@cvhome-saas/ui-kit/uaa';
+import {UserAdminTable, type UserAdminAction, type UserAdminIntent} from '@cvhome-saas/ui-kit/uaa';
+import {ImpersonationDialog} from '@shared/ui/impersonation-dialog/impersonation-dialog';
 import {PAGE_SIZE, PlatformUsersFacade} from './facades/platform-users.facade';
+
+/** What the row menu offers everyone here; `impersonate` is added when the operator may. */
+const BASE_ACTIONS: readonly UserAdminAction[] = ['unlock', 'toggleEnabled', 'resetPassword', 'editRoles', 'delete'];
 
 /**
  * Every account on the platform.
@@ -23,6 +27,7 @@ import {PAGE_SIZE, PlatformUsersFacade} from './facades/platform-users.facade';
     BusyOverlay,
     ConfirmDialog,
     EmptyState,
+    ImpersonationDialog,
     LoadError,
     NoticeBar,
     PageHeader,
@@ -56,6 +61,11 @@ export class PlatformUsers {
   /* Bound once as fields: a method reference created in a binding is a new function every tick. */
   protected readonly roleList = (roles: readonly string[]) => this.facade.roleList(roles);
   protected readonly orgLabel = (orgId: string | null) => this.facade.orgLabel(orgId);
+
+  /** The row menu, with `impersonate` enabled only for an operator who holds the permission. */
+  protected readonly allowedActions: readonly UserAdminAction[] = this.facade.canImpersonate()
+    ? [...BASE_ACTIONS, 'impersonate']
+    : BASE_ACTIONS;
 
   constructor() {
     /*
@@ -95,6 +105,12 @@ export class PlatformUsers {
         return;
       case 'delete':
         this.facade.askDelete(intent.row);
+        return;
+      case 'impersonate':
+        this.facade.askImpersonate(intent.row);
+        return;
+      default:
+        return;
     }
   }
 

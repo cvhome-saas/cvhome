@@ -1,0 +1,81 @@
+### Acting as a merchant — the gateway's session swap.
+# POST exchanges the signed-in operator's token at uaa for one that IS the merchant (sub = merchant, act = operator)
+# and swaps the session's authorized client and security context; DELETE hands the session back and revokes the
+# exchanged token. The session then is the merchant's own — their org, their stores, their roles — so the console
+# reloads into whatever that account sees. Sign in as super-admin first (SESSION_ID in http-client.private.env.json).
+
+### act as org1-store1-admin — 200 ImpersonationView
+POST {{SELLER_UI_URL}}/api/v1/impersonation
+Content-Type: application/json
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SESSION_ID}}
+
+{
+  "userId": "60ab49a5-7f06-4b5a-be81-9b30bb6559ae",
+  "reason": "ticket 42: their orders page is empty"
+}
+
+> {%
+    client.test("acting as the merchant", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        client.assert(response.body.actingAs === "org1-store1-admin", "actingAs " + response.body.actingAs);
+        client.assert(response.body.expiresAt, "expiresAt");
+    });
+%}
+
+### the session is the merchant now — auth/me names them, with the operator behind them
+GET {{SELLER_UI_URL}}/api/v1/auth/me
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SESSION_ID}}
+
+> {%
+    client.test("me is the merchant", function () {
+        client.assert(response.body.principal.preferredUsername === "org1-store1-admin", "preferredUsername");
+        client.assert(response.body.authorities.some(a => a.authority === "ROLE_STORE_ADMIN"), "store admin");
+        client.assert(response.body.impersonation && response.body.impersonation.actingAs === "org1-store1-admin", "impersonation");
+    });
+%}
+
+### the relay carries the merchant's token: the merchant's store list, not the platform's — 200 Page<ManagerStoreDto> of one
+POST {{SELLER_UI_URL}}/tenancy/api/v1/store-manager/list
+Content-Type: application/json
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SESSION_ID}}
+
+{"page": 0, "count": 20}
+
+### tenant isolation: another org's store as the merchant — 403/404, never an empty 200
+GET {{SELLER_UI_URL}}/tenancy/api/v1/router/store-pod-by-store-id?store=65f020632bc46470c104b76f
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SESSION_ID}}
+
+### a second start on a session already acting — 409 GATEWAY.IMPERSONATION.ALREADY_ACTIVE
+POST {{SELLER_UI_URL}}/api/v1/impersonation
+Content-Type: application/json
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SESSION_ID}}
+
+{"userId": "60ab49a5-7f06-4b5a-be81-9b30bb6559ae", "reason": "again"}
+
+### what the session is acting as — 200 ImpersonationView, or 204 when it is itself
+GET {{SELLER_UI_URL}}/api/v1/impersonation
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SESSION_ID}}
+
+### end it — 204, and auth/me is the operator again
+DELETE {{SELLER_UI_URL}}/api/v1/impersonation
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SESSION_ID}}
+
+### a missing reason — 400 GATEWAY.IMPERSONATION.INVALID
+POST {{SELLER_UI_URL}}/api/v1/impersonation
+Content-Type: application/json
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SESSION_ID}}
+
+{"userId": "60ab49a5-7f06-4b5a-be81-9b30bb6559ae"}
+
+### a target uaa refuses (super-admin acting as super-admin) — 403 GATEWAY.IMPERSONATION.REFUSED
+POST {{SELLER_UI_URL}}/api/v1/impersonation
+Content-Type: application/json
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SESSION_ID}}
+
+{"userId": "65d8419c-8765-4b8b-a15f-910dce959931", "reason": "not allowed"}
+
+### no session — 401 GATEWAY.SESSION.REQUIRED
+POST {{SELLER_UI_URL}}/api/v1/impersonation
+Content-Type: application/json
+
+{"userId": "60ab49a5-7f06-4b5a-be81-9b30bb6559ae", "reason": "anon"}

@@ -5,7 +5,10 @@ import {TranslocoLocaleService} from '@jsverse/transloco-locale';
 import type {AdminUserAction} from '@cvhome-saas/ui-kit/uaa';
 import {ApiErrorService, snapshot} from '@cvhome-saas/ui-kit';
 import type {PlatformUserRow} from '@models/platform';
+import {ImpersonationLauncher} from '@layouts/console-shell/services/impersonation-launcher';
+import {ConsolePermissions} from '@shared/auth/console-permissions';
 import {RoleLabel} from '@shared/i18n/role-label';
+import type {StartImpersonation} from '@models/impersonation';
 import type {RoleChange, RoleOption, SelectOption} from '@cvhome-saas/ui-kit/ui';
 import {ToastService} from '@cvhome-saas/ui-kit/ui';
 import {PlatformUsersApi} from '../services/platform-users.api.service';
@@ -32,6 +35,8 @@ export class PlatformUsersFacade {
   private readonly transloco = inject(TranslocoService);
   private readonly localeFormat = inject(TranslocoLocaleService);
   private readonly roleLabels = inject(RoleLabel);
+  private readonly permissions = inject(ConsolePermissions);
+  private readonly launcher = inject(ImpersonationLauncher);
 
   readonly busy = signal(false);
 
@@ -48,6 +53,16 @@ export class PlatformUsersFacade {
   readonly resetting = signal<PlatformUserRow | null>(null);
   readonly editingRoles = signal<PlatformUserRow | null>(null);
   readonly deleting = signal<PlatformUserRow | null>(null);
+  readonly impersonating = signal<PlatformUserRow | null>(null);
+
+  /** Whether the row menu offers acting as an account: the operator's permission, mirrored. */
+  readonly canImpersonate = computed(() => this.permissions.canImpersonate());
+
+  /** The account the dialog names, as the option the confirm button reads. */
+  readonly impersonationTarget = computed<SelectOption | null>(() => {
+    const row = this.impersonating();
+    return row ? {value: row.id, label: row.name || row.username} : null;
+  });
 
   private readonly users = snapshot(
     () => ({page: this.pageIndex(), count: PAGE_SIZE, org: this.orgFilter()}),
@@ -149,10 +164,30 @@ export class PlatformUsersFacade {
     this.deleting.set(row);
   }
 
+  askImpersonate(row: PlatformUserRow): void {
+    this.impersonating.set(row);
+  }
+
   dismissDialogs(): void {
     this.resetting.set(null);
     this.editingRoles.set(null);
     this.deleting.set(null);
+    this.impersonating.set(null);
+  }
+
+  /** Starts acting as the account; on success the launcher has already left for the merchant's dashboard. */
+  confirmImpersonate(request: StartImpersonation): void {
+    if (this.busy()) {
+      return;
+    }
+    this.busy.set(true);
+    this.launcher.start(request).subscribe({
+      error: (failure: unknown) => {
+        this.busy.set(false);
+        // uaa's refusal — shown, not predicted.
+        this.toast.danger(this.apiErrors.messageFor(failure));
+      },
+    });
   }
 
   /** Enable or disable. Re-reads rather than flipping the row, so the table shows uaa's answer. */

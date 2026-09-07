@@ -645,6 +645,37 @@ rather than landing in `select * from outbox_record where status='FAILED'`.
 
 ---
 
+## IMP — The act-aware audit actor, and support's reads
+
+_From `.agents/plans/user-impersonation.md`._ During an impersonation `authentication.getName()` is the merchant, so
+every audit actor goes through `SecurityUtils.actorOf`, which reads the token's `act` claim and writes
+`<merchant> (via <operator>)`. `ROLE_SUPPORT` is admitted to `org-manager` `list` / `find-one` / `stores` and to
+nothing else here. The entry point is the console (`../../console-ui/qa/console-ui-qa.md` §IMP).
+
+### IMP-01 — A write made while acting as a merchant names the operator · critical · [verified]
+- **Seen** — 2026-09-07: acting as `org1-admin`, `POST org-member/invitations` left `INVITATION | CREATE |
+  318f2fd5-… (via super-admin)` in `tenancy.tenancy_audit`. A store-lifecycle write (suspend) is super-admin only
+  and answers 403 under an impersonated org admin exactly as for the real one — impersonation never widens.
+
+- **Covered by** `SecurityUtilsTest.theAuditActorNamesTheOperatorBehindAnImpersonatedToken`. End to end:
+  `console-ui-qa.md` IMP-01 — `select actor from tenancy.tenancy_audit order by id desc limit 1` reads
+  `60ab49a5-… (via super-admin)`.
+
+### IMP-02 — Support may list organizations and a store list, and change nothing · high · [verified]
+- **Seen** — `org-manager/list` 200, `org-manager/rename` 403, uaa `admin/users` 200 as `support`.
+
+- **Steps** — sign in as `support`; `POST /tenancy/api/v1/org-manager/list` and `GET …/org-manager/stores?id=<ORG1>`;
+  then `POST …/org-manager/rename?id=<ORG1>&name=x`.
+- **Expect** — 200, 200, **403**.
+
+### IMP-03 — Isolation under an exchanged token is the merchant's own · high · [verified]
+- **Seen** — Under an exchanged token for `org1-store1-admin`, ORG2-STORE1 → 403 at the permission gate; ORG1-STORE2
+  → 404 (`getStorePod`'s org check) — exactly what the real account gets.
+
+- **Steps** — with an exchanged token for `org1-store1-admin` (uaa-qa IMP-01),
+  `GET /tenancy/api/v1/router/store-pod-by-store-id?store=<ORG2-STORE1>` and `…?store=<ORG1-STORE2>`.
+- **Expect** — 403 and 404: the token carries the merchant's claims and nothing wider.
+
 ## MIG — Migration
 
 Two migrations, in this order, and **the order is not optional**.

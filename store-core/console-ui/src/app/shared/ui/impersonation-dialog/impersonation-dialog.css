@@ -1,0 +1,47 @@
+:host {
+  display: contents;
+}
+
+.impersonation-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-section);
+}
+
+/* A label and its control: the scale's own step for exactly that pair. */
+.imp-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-field);
+}
+
+.imp-label {
+  display: block;
+  color: var(--foreground-strong);
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+/*
+ * A choice with one option is shown as that option, already made — a value, not a disabled input.
+ * Strong foreground and no box: an input-shaped thing that cannot be clicked reads as broken.
+ */
+.imp-value {
+  display: block;
+  color: var(--foreground-strong);
+  font-size: var(--text-sm);
+  font-weight: 500;
+}
+
+
+.imp-hint {
+  margin: 0;
+  color: var(--muted-foreground);
+  font-size: var(--text-xs);
+}
+
+.imp-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-tight);
+}

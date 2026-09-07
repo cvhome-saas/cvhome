@@ -262,6 +262,7 @@
                             >
                               {{ row.podId || '—' }}
                             </span>
+
                           </app-table-row>
                         }
                       </app-data-table>
@@ -311,6 +312,7 @@
                         [busy]="facade.busy()"
                         [roleList]="roleList"
                         [showScope]="showScope"
+                        [allow]="allowedUserActions"
                         (act)="onUserAction($event)"
                       />
 
@@ -523,6 +525,18 @@
     [cancelLabel]="t('shared.actions.cancel')"
     (confirmed)="facade.confirmPrompt()"
     (dismissed)="facade.dismissPrompt()"
+  />
+
+  <!--
+    Acting as an account of this organization — from a row on the Users tab (the stores are theirs)
+    or from a row on the Stores tab (the accounts are the ones acting in it).
+  -->
+  <app-impersonation-dialog
+    [open]="!!facade.impersonating()"
+    [busy]="facade.busy()"
+    [target]="facade.impersonationTarget()"
+    (submitted)="facade.confirmImpersonate($event)"
+    (dismissed)="facade.dismissImpersonation()"
   />
 
   <app-set-password-dialog

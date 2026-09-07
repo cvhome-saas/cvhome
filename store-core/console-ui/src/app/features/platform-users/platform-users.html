@@ -35,6 +35,7 @@
               [busy]="facade.busy()"
               [roleList]="roleList"
               [orgLabel]="orgLabel"
+              [allow]="allowedActions"
               (act)="onAction($event)"
             />
 
@@ -99,6 +100,18 @@
       (dismissed)="facade.dismissDialogs()"
     />
   }
+
+  <!--
+    Acting as this account — as it is, with its own stores and roles; the reason is what the audit row
+    will say this was for.
+  -->
+  <app-impersonation-dialog
+    [open]="!!facade.impersonating()"
+    [busy]="facade.busy()"
+    [target]="facade.impersonationTarget()"
+    (submitted)="facade.confirmImpersonate($event)"
+    (dismissed)="facade.dismissDialogs()"
+  />
 
   <!--
     A typed confirmation, because there is no undo and no soft delete: `AdminService.delete` removes

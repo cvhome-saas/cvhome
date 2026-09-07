@@ -1,8 +1,10 @@
+import {DOCUMENT} from '@angular/common';
 import {Injectable, inject} from '@angular/core';
 import {Observable, map, of} from 'rxjs';
 
+import {ImpersonationService} from '@api/gateway/impersonation.service';
 import {ManagerStoreService} from '@api/tenancy/manager-store.service';
-import {AuthService} from '@cvhome-saas/ui-kit';
+import {AuthService, type ImpersonationState} from '@cvhome-saas/ui-kit';
 import {ConsolePermissions} from '@shared/auth/console-permissions';
 import {SelectedStoreService} from '@api/tenancy/selected-store.service';
 import {CONSOLE_NAVIGATION} from '../console-navigation';
@@ -22,6 +24,8 @@ export class ConsoleApi {
   private readonly stores = inject(ManagerStoreService);
   private readonly auth = inject(AuthService);
   private readonly permissions = inject(ConsolePermissions);
+  private readonly impersonation = inject(ImpersonationService);
+  private readonly document = inject(DOCUMENT);
 
   readonly navigation = CONSOLE_NAVIGATION;
 
@@ -67,6 +71,32 @@ export class ConsoleApi {
         };
       }),
     );
+  }
+
+  /**
+   * Who this session is acting as, or null when it is itself.
+   *
+   * Read off the same cached principal as `loadUser`: the gateway's `auth/me` carries the
+   * impersonation so a reload keeps the banner without a second call.
+   */
+  loadImpersonation(): Observable<ImpersonationState | null> {
+    return this.auth.getAuthUser().pipe(map((account) => account.impersonation ?? null));
+  }
+
+  /** Ends the impersonation at the gateway. The caller reloads: identity, rail and store all change at once. */
+  endImpersonation(): Observable<void> {
+    return this.impersonation.end();
+  }
+
+  /**
+   * A full reload to `path`, with the stored store selection cleared first.
+   *
+   * Here rather than in the facade so a spec that renders the chrome can observe the navigation instead
+   * of suffering it: `location.assign` inside Karma reloads the test page.
+   */
+  reloadTo(path: string): void {
+    this.selection.invalidate();
+    this.document.defaultView?.location.assign(path);
   }
 
   /**

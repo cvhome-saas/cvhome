@@ -22,6 +22,8 @@ import {
 } from '@models/platform-billing';
 
 /** One organization's stores, as the Stores tab reads them. */
+/** How many stores or accounts the impersonation dialog offers. */
+
 export interface OrgStoresSnapshot {
   readonly rows: readonly PlatformStoreRow[];
   readonly totalElements: number;
@@ -151,6 +153,7 @@ export class OrganizationDetailApi {
   }
 
   /** One account action, dispatched by the api tier so the two screens that offer them agree. */
+
   applyToUser(userId: string, action: AdminUserAction): Observable<void> {
     return this.users.apply(userId, action);
   }

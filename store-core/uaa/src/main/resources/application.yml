@@ -99,6 +99,9 @@ com:
             secret: ${UAA_STORE_POD_SECRET}
           "[store-core@service.store-core.internal]":
             secret: ${UAA_STORE_CORE_SECRET}
+          # The gateway's impersonation client. Only the gateway holds this secret.
+          console-impersonation:
+            secret: ${UAA_IMPERSONATION_SECRET}
           web-app:
             secret: ${UAA_WEB_APP_SECRET}
             redirect-uri-paths:

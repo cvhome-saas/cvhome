@@ -1,6 +1,7 @@
 com:
   asrevo:
     cvhome:
+      s2s:
       app:
         domain: gateway.com
         sub:

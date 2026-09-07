@@ -1,6 +1,8 @@
 package com.asrevo.cvhome.sso.config;
 
 import java.time.Clock;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -12,7 +14,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.oidc.endpoint.OidcParameterNames;
 import org.springframework.security.oauth2.jwt.JwsHeader;
+import org.springframework.security.oauth2.jwt.JwtClaimNames;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
+import org.springframework.security.oauth2.server.authorization.OAuth2Authorization;
 import org.springframework.security.oauth2.server.authorization.OAuth2TokenType;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
@@ -30,6 +34,7 @@ import com.asrevo.cvhome.sso.repo.UserRepository;
 import com.asrevo.cvhome.sso.security.PrincipalNames;
 import com.asrevo.cvhome.sso.settings.RealmSettings;
 import com.asrevo.cvhome.sso.settings.SettingsService;
+import com.asrevo.cvhome.sso.token.ImpersonationContext;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -83,6 +88,12 @@ class JwtCustomizerConfigTest {
 
     private static final String X = "x";
 
+    private static final String RS256 = "RS256";
+
+    private static final String ORG_ADMIN = "ORG_ADMIN";
+
+    private static final String OPERATOR = "super-admin";
+
     private final UserRepository users = mock(UserRepository.class);
 
     private final PrincipalNames principals = new PrincipalNames(users);
@@ -130,11 +141,29 @@ class JwtCustomizerConfigTest {
                 .redirectUri("http://localhost/cb")
                 .clientSettings(ClientSettings.builder().settings(s -> s.putAll(clientSettings)).build())
                 .build();
-        return JwtEncodingContext.with(JwsHeader.with(() -> "RS256"), JwtClaimsSet.builder().subject(USERNAME))
+        return JwtEncodingContext.with(JwsHeader.with(() -> RS256), JwtClaimsSet.builder().subject(USERNAME))
                 .registeredClient(client)
                 .principal(UsernamePasswordAuthenticationToken.authenticated(principalName, null, Set.of()))
                 .tokenType(type)
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+                .build();
+    }
+
+    /** An access token whose authorization is an impersonation of {@code target} by {@code operator}. */
+    private static JwtEncodingContext impersonated(User target, String operator, Instant notAfter, Instant exp) {
+        RegisteredClient client = RegisteredClient.withId("imp").clientId("console-impersonation")
+                .authorizationGrantType(AuthorizationGrantType.TOKEN_EXCHANGE).build();
+        OAuth2Authorization.Builder authorization = OAuth2Authorization.withRegisteredClient(client)
+                .principalName(target.getId().toString()).authorizationGrantType(AuthorizationGrantType.TOKEN_EXCHANGE);
+        new ImpersonationContext(UUID.randomUUID(), operator, target.getId(), target.getUsername(), "ticket", notAfter)
+                .writeTo(authorization);
+        return JwtEncodingContext.with(JwsHeader.with(() -> RS256),
+                        JwtClaimsSet.builder().subject(target.getId().toString()).expiresAt(exp))
+                .registeredClient(client)
+                .principal(UsernamePasswordAuthenticationToken.authenticated(target.getId().toString(), null, Set.of()))
+                .authorization(authorization.build())
+                .tokenType(OAuth2TokenType.ACCESS_TOKEN)
+                .authorizationGrantType(AuthorizationGrantType.TOKEN_EXCHANGE)
                 .build();
     }
 
@@ -180,6 +209,46 @@ class JwtCustomizerConfigTest {
                 .doesNotContainKey("clientId");
     }
 
+    /**
+     * An impersonated token is the target verbatim — org, store, roles — never wider, never narrower. What the
+     * customizer adds is the operator's name and the ceiling on {@code exp}.
+     */
+    @Test
+    void anImpersonationKeepsTheTargetsClaimsAndNamesTheOperator() {
+        User target = user(Map.of(ORG, ORG_ID, STORE, STORE_ID), STORE_ADMIN, ORG_ADMIN);
+        when(users.findById(target.getId())).thenReturn(Optional.of(target));
+        Instant notAfter = Instant.parse("2026-04-01T09:40:00Z");
+        Instant later = notAfter.plus(Duration.ofMinutes(5));
+
+        Map<String, Object> claims = claims(impersonated(target, OPERATOR, notAfter, later));
+
+        assertThat(claims).containsEntry(ORG, ORG_ID).containsEntry(STORE, STORE_ID)
+                .containsEntry(JwtCustomizerConfig.UID, target.getId().toString())
+                .doesNotContainKey("act_mode")
+                .containsEntry(JwtClaimNames.EXP, notAfter);
+        assertThat(claims.get(JwtCustomizerConfig.ROLES)).asInstanceOf(InstanceOfAssertFactories.COLLECTION)
+                .containsExactlyInAnyOrder(STORE_ADMIN, ORG_ADMIN);
+        assertThat(claims.get(JwtCustomizerConfig.ACT)).asInstanceOf(InstanceOfAssertFactories.MAP)
+                .containsEntry(JwtClaimNames.SUB, OPERATOR).containsKey(JwtCustomizerConfig.UID);
+    }
+
+    /** The generator's own, earlier expiry stands: the ceiling only ever pulls {@code exp} back. */
+    @Test
+    void anEarlierExpiryOfItsOwnStands() {
+        User target = user(Map.of(ORG, ORG_ID, STORE, STORE_ID), STORE_ADMIN);
+        when(users.findById(target.getId())).thenReturn(Optional.of(target));
+        Instant notAfter = Instant.parse("2026-04-01T09:45:00Z");
+        Instant sooner = notAfter.minus(Duration.ofMinutes(5));
+
+        Map<String, Object> claims = claims(impersonated(target, OPERATOR, notAfter, sooner));
+
+        assertThat(claims).containsEntry(JwtClaimNames.EXP, sooner);
+        assertThat(claims.get(JwtCustomizerConfig.ROLES)).asInstanceOf(InstanceOfAssertFactories.COLLECTION)
+                .containsExactly(STORE_ADMIN);
+        assertThat(claims.get(JwtCustomizerConfig.ACT)).asInstanceOf(InstanceOfAssertFactories.MAP)
+                .containsEntry(JwtClaimNames.SUB, OPERATOR);
+    }
+
     @Test
     void metadataCannotOverrideTheRolesClaim() {
         User user = user(Map.of(JwtCustomizerConfig.ROLES, Set.of("SUPER_ADMIN"), SCOPE, "super_admin", AUD, X),
@@ -206,7 +275,7 @@ class JwtCustomizerConfigTest {
 
     @Test
     void idTokenCarriesProfileClaimsAndNoTenancyMetadata() {
-        User user = user(Map.of(ORG, ORG_ID), "ORG_ADMIN");
+        User user = user(Map.of(ORG, ORG_ID), ORG_ADMIN);
         when(users.findById(user.getId())).thenReturn(Optional.of(user));
 
         Map<String, Object> claims = claims(context(new OAuth2TokenType(OidcParameterNames.ID_TOKEN), Map.of(),

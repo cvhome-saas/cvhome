@@ -63,7 +63,7 @@ describe('UserAdminTable.allow', () => {
     expect(offered).not.toContain('editRoles');
   });
 
-  /** Listed and disabled rather than omitted: a capability the product intends to have. */
+  /** Listed whatever the host allows, and enabled only where it is: the entry explains itself either way. */
   it('keeps impersonate visible whatever the host allows', () => {
     expect(keys(['delete'])).toContain('impersonate');
   });

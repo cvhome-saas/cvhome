@@ -78,7 +78,16 @@
           "options": {
             "port": 8011,
             "host": "0.0.0.0",
-            "allowedHosts": true
+            "allowedHosts": true,
+            "prebundle": {
+              "exclude": [
+                "@cvhome-saas/ui-kit",
+                "@cvhome-saas/ui-kit/ui",
+                "@cvhome-saas/ui-kit/uaa",
+                "@cvhome-saas/ui-kit/forms",
+                "@cvhome-saas/ui-kit/i18n"
+              ]
+            }
           },
           "configurations": {
             "production": {

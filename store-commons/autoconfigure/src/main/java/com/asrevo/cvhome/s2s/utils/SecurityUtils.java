@@ -2,6 +2,7 @@ package com.asrevo.cvhome.s2s.utils;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -43,9 +44,47 @@ public final class SecurityUtils {
      * sentinel that can never collide with a real one — and deliberately kept here rather than on
      * {@link StoreMerchantId}, which is a tenant identifier and has no business knowing about authorization.
      */
+    /** RFC 8693 §4.1: the party acting on behalf of the subject, on an impersonated token. */
+    public static final String ACT_CLAIM = "act";
+
     private static final StoreMerchantId WILD_CARD_STORE_ACCESS = new StoreMerchantId("*");
 
+    private static final String SUB = "sub";
+
+    private static final String UNKNOWN_ACTOR = "unknown";
+
     private SecurityUtils() {
+    }
+
+    /**
+     * Who to write in an audit row for this request.
+     *
+     * <p>
+     * The principal's name — and, when the token is an impersonation, the operator behind it, as
+     * {@code merchant (via operator)}. Services read {@code authentication.getName()}, which during an impersonation
+     * is the merchant; a trail that said the merchant did something they did not do would be worse than no trail,
+     * so this is what every tenancy audit actor goes through.
+     * </p>
+     */
+    public static String actorOf(Authentication authentication) {
+        if (authentication == null) {
+            return UNKNOWN_ACTOR;
+        }
+        return actingOperator(authentication)
+                .map(operator -> String.format("%s (via %s)", authentication.getName(), operator))
+                .orElseGet(authentication::getName);
+    }
+
+    /** The operator behind an impersonated token, or empty for a principal that is itself. */
+    public static Optional<String> actingOperator(Authentication authentication) {
+        if (authentication == null || !(authentication.getPrincipal() instanceof Jwt jwt)) {
+            return Optional.empty();
+        }
+        Map<String, Object> act = jwt.getClaimAsMap(ACT_CLAIM);
+        if (act == null || act.get(SUB) == null) {
+            return Optional.empty();
+        }
+        return Optional.of(act.get(SUB).toString());
     }
 
     public static boolean hasSuperAdminRole(Authentication authentication) {

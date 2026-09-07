@@ -12,6 +12,9 @@ import type {ConsoleNotification, ConsoleStore} from '@models/console';
 import {ConsoleApi} from '../services/console.api.service';
 import {routeData} from '@cvhome-saas/ui-kit';
 
+/** Where ending an impersonation lands: the list the operator started from. */
+const PLATFORM_USERS = '/platform/users';
+
 /** Which of the shell's popovers is open. Only one at a time. */
 export type ConsoleMenu = 'notifications' | 'language' | 'theme' | 'profile' | 'store';
 
@@ -68,6 +71,16 @@ export class ConsoleShellFacade {
    */
   private readonly identity = rxResource({stream: () => this.api.loadUser()});
   readonly user = this.identity.value;
+
+  /**
+   * Who this session is acting as, or null.
+   *
+   * Read once, like the roles: starting and ending an impersonation both reload the page, because
+   * identity, rail, store list and every page resource change at once and a reload is the honest
+   * way to say so. The banner is the only reader.
+   */
+  private readonly acting = rxResource({stream: () => this.api.loadImpersonation()});
+  readonly impersonation = computed(() => this.acting.value() ?? null);
 
   /**
    * TODO(lessons.md): the organization's name — no endpoint. See lessons.md, "Shell — an org admin
@@ -242,6 +255,22 @@ export class ConsoleShellFacade {
   /** Re-reads the directory. Called once a store has been created, so the rail and the guards agree. */
   refreshStores(): void {
     this.directory.reload();
+  }
+
+  /**
+   * Stops acting as the merchant, then reloads as the operator on the platform's account list.
+   *
+   * A full reload rather than a signal: the identity, the rail, the store selection and every page
+   * facade keyed on `currentStoreId` all change at once, and the app has no global invalidation for
+   * that. The stored store selection is cleared first, because the merchant's store is not the
+   * operator's to have selected.
+   */
+  endImpersonation(): void {
+    this.api.endImpersonation().subscribe({
+      next: () => this.api.reloadTo(PLATFORM_USERS),
+      // The gateway's ceiling may already have ended it; either way the operator is themselves again.
+      error: () => this.api.reloadTo(PLATFORM_USERS),
+    });
   }
 
   private deepestRouteData(): Record<string, unknown> {

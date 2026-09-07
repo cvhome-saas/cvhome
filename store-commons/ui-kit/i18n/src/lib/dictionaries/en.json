@@ -287,7 +287,8 @@
         "disable": "Disable account",
         "editRoles": "Edit roles",
         "enable": "Enable account",
-        "impersonateUnavailable": "Signing in as another account is not built yet",
+        "impersonate": "Act as this account",
+        "impersonateUnavailable": "Acting as this account is not available here",
         "resetPassword": "Set password",
         "menuFor": "Actions for {{name}}",
         "unlock": "Unlock account"

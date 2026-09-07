@@ -1652,6 +1652,63 @@ a valid store id.
 
 ---
 
+## IMP — The impersonation grant
+
+_From `.agents/plans/user-impersonation.md`._ RFC 8693 token exchange with the `requested_subject` extension, on
+`/oauth2/token`, held by the seeded `console-impersonation` client alone and registered by uaa's shell only — cua
+never answers it. Requests: `http/impersonation-api.http`. The gateway is the product's caller
+(`../gateway/gateway-service/qa/gateway-qa.md` §IMP); this section drives uaa directly.
+
+Design points:
+
+- **`sub` is the merchant, `act` is the operator.** Every `hasPermission` on every service keeps working; the audit
+  trail can still tell the two apart.
+- **The token is the merchant verbatim** — their roles, org and store, never wider, never narrower. There is no
+  store to name and no mode to pick: the operator *is* that account for the session. (Earlier cuts minted a
+  moderator, then added a read-only mode and a store choice; both were dropped — the first gave a dashboard of
+  403s, the second had nothing to offer an org admin whose organization has no store yet.)
+- **Four refusals, each a `user.impersonation.denied` row** naming the rule: a dead subject token, a chained one,
+  an operator without `users:impersonate`, a disabled or privileged target.
+- **Never a refresh token; fifteen minutes at most; never past the operator's own token.**
+
+### IMP-01 — A super admin exchanges for a merchant · critical · [verified]
+
+- **Covered by** `ImpersonationExchangeIntegrationTest.aSuperAdminActsAsAmerchantAndTheTrailSaysSo` against the
+  real endpoint, and `.http` "act as org1-store1-admin".
+- **Expect** — 200 with `issued_token_type`, `acting_as`, **no** `refresh_token`; the JWT's `sub` and `uid` are the
+  merchant's id, `roles`/`org`/`store` the merchant's own, `act.sub` = `super-admin`, no `act_mode`; a
+  `user.impersonation.started` row whose detail is the reason.
+
+### IMP-02 — Chaining is refused · critical · [verified]
+
+- **Covered by** `anImpersonatedTokenCannotBeExchangedAgain`; `.http` "chaining is refused".
+- **Expect** — 400 `invalid_grant`, and a `denied` row with reason `CHAINED`.
+
+### IMP-03 — Support acts as a merchant the same way · critical · [verified]
+
+- **Covered by** `supportActsAsAmerchantToo` — `support` / `admin` is seeded by `test-stores`. Support holds
+  `users:impersonate`; what it may do *as* the merchant is the merchant's own permission set.
+
+### IMP-04 — An org admin may not impersonate; a platform principal cannot be impersonated · critical · [verified]
+
+- **Covered by** `anOrgAdminMayNotImpersonateAndAplatformPrincipalCannotBeImpersonated`; `.http` "a platform
+  principal cannot be impersonated".
+
+### IMP-05 — Only `console-impersonation` holds the grant · critical · [verified]
+
+- **Covered by** `theGrantIsRefusedToEveryOtherClient`; `.http` "web-app does not hold the grant".
+
+### IMP-06 — Revocation writes the "ended" row · high · [verified]
+
+- **Covered by** IMP-01's second half and `ProtocolAuditListenerTest.revokingAnImpersonatedTokenAlsoRecordsTheImpersonationAsEnded`.
+
+### IMP-07 — The admin console lists the client without breaking · [not verified]
+
+- **Steps** — uaa's own console → Clients.
+- **Expect** — `console-impersonation` listed with grant `urn:ietf:params:oauth:grant-type:token-exchange`; the New
+  Client form's grant options do **not** offer token exchange (`OAuthGrantTypeTest`,
+  `AdminClientController.getOptions`).
+
 ## MIG — Resetting a database
 
 This project is not in production: **there are no migrations.** `schema.sql` is rewritten in place (the

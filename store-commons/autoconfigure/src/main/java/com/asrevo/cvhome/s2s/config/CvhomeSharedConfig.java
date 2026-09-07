@@ -36,7 +36,8 @@ import com.asrevo.cvhome.tracing.TracingAutoConfiguration;
         ReactiveGatewayConfig.class, IssuerRegistryConfiguration.class, MultiIssuerJwtDecoderConfiguration.class,
         JwtAuthenticationConverterConfiguration.class,
         MultiIssuerReactiveJwtDecoderConfiguration.class, CustomPermissionEvaluator.class,
-        ServletPermissionConfig.class, ErrorHandlingAutoConfiguration.class, MetricsAutoConfiguration.class,
+        ServletPermissionConfig.class, ErrorHandlingAutoConfiguration.class,
+        MetricsAutoConfiguration.class,
         TracingAutoConfiguration.class})
 @EnableConfigurationProperties({PodInfoProperties.class, ServiceDomainProperties.class, AppProperties.class,
         PodProperties.class, CdnProperties.class, StripeProperties.class, StoreProductImageProperties.class,

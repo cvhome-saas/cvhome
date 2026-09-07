@@ -74,7 +74,9 @@
     ".next-sso-unify/types/**/*.ts",
     ".next-sso-unify/dev/types/**/*.ts",
     ".next-sso/types/**/*.ts",
-    ".next-sso/dev/types/**/*.ts"
+    ".next-sso/dev/types/**/*.ts",
+    ".next-impersonation/types/**/*.ts",
+    ".next-impersonation/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"

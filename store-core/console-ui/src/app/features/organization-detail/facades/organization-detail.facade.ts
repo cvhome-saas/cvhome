@@ -18,6 +18,10 @@ import {INVOICE_STATUS_TONE} from '@models/platform-billing';
 import {Money} from '@shared/i18n/money';
 import {PlatformLabel} from '@shared/i18n/platform-label';
 import {RoleLabel} from '@shared/i18n/role-label';
+import {ConsolePermissions} from '@shared/auth/console-permissions';
+import {ImpersonationLauncher} from '@layouts/console-shell/services/impersonation-launcher';
+import type {StartImpersonation} from '@models/impersonation';
+import type {SelectOption} from '@cvhome-saas/ui-kit/ui';
 import type {NavSection, RoleChange, RoleOption} from '@cvhome-saas/ui-kit/ui';
 import {ToastService} from '@cvhome-saas/ui-kit/ui';
 import {OrganizationDetailApi} from '../services/organization-detail.api.service';
@@ -85,6 +89,8 @@ export class OrganizationDetailFacade {
   private readonly labels = inject(PlatformLabel);
   private readonly money = inject(Money);
   private readonly roleLabels = inject(RoleLabel);
+  private readonly permissions = inject(ConsolePermissions);
+  private readonly launcher = inject(ImpersonationLauncher);
 
   /** The organization being read, set by the page from the route. */
   readonly orgId = signal<string | null>(null);
@@ -414,6 +420,41 @@ export class OrganizationDetailFacade {
       {name: this.row()?.label ?? ''},
       () => this.resettingOwner.set(false),
     );
+  }
+
+  /* ------------------------------------------------------------------ acting as an account ---- */
+
+  /** The account the impersonation dialog was opened from; null when closed. */
+  readonly impersonating = signal<PlatformUserRow | null>(null);
+
+  readonly canImpersonate = computed(() => this.permissions.canImpersonate());
+
+  /** The account the dialog names, as the option the confirm button reads. */
+  readonly impersonationTarget = computed<SelectOption | null>(() => {
+    const row = this.impersonating();
+    return row ? {value: row.id, label: row.name || row.username} : null;
+  });
+
+  askImpersonate(row: PlatformUserRow): void {
+    this.impersonating.set(row);
+  }
+
+  dismissImpersonation(): void {
+    this.impersonating.set(null);
+  }
+
+  /** Starts acting as the account; on success the launcher has already left for the merchant's dashboard. */
+  confirmImpersonate(request: StartImpersonation): void {
+    if (this.busy()) {
+      return;
+    }
+    this.busy.set(true);
+    this.launcher.start(request).subscribe({
+      error: (failure: unknown) => {
+        this.busy.set(false);
+        this.toast.danger(this.apiErrors.messageFor(failure));
+      },
+    });
   }
 
   /* -------------------------------------------------------------- the users tab's writes ---- */

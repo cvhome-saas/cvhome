@@ -5,6 +5,7 @@ import {TranslocoDirective} from '@jsverse/transloco';
 import {Icon} from '@cvhome-saas/ui-kit/ui';
 import {ConsoleSidebar} from './components/console-sidebar/console-sidebar';
 import {ConsoleToolbar} from './components/console-toolbar/console-toolbar';
+import {ImpersonationBanner} from './components/impersonation-banner/impersonation-banner';
 import {PlanBanner} from './components/plan-banner/plan-banner';
 import {SubscriptionFacade} from '@layouts/console-shell/billing/subscription.facade';
 import {ConsoleShellFacade} from './facades/console-shell.facade';
@@ -19,9 +20,17 @@ import {ConsoleShellFacade} from './facades/console-shell.facade';
  */
 @Component({
   selector: 'app-console-shell',
-  imports: [ConsoleSidebar, ConsoleToolbar, Icon, PlanBanner, RouterOutlet, TranslocoDirective],
+  imports: [ConsoleSidebar, ConsoleToolbar, Icon, ImpersonationBanner, PlanBanner, RouterOutlet, TranslocoDirective],
   template: `
-    <div class="console" [class.banner-on]="bannerShown()" *transloco="let t">
+    <div
+      class="console"
+      [class.banner-on]="bannerShown()"
+      [class.impersonation-on]="shell.impersonation() !== null"
+      *transloco="let t"
+    >
+      @if (shell.impersonation()) {
+        <app-impersonation-banner />
+      }
       @if (bannerShown()) {
         <app-plan-banner />
       }

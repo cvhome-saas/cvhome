@@ -23,6 +23,15 @@ dialog {
   overflow: hidden;
 }
 
+/*
+ * `display: grid` above also overrides the user agent's `display: none` for a dialog that is not
+ * open — so a closed shell was painted inline at the foot of the page, empty, until something
+ * opened it. The UA rule is put back for the closed state.
+ */
+dialog:not([open]) {
+  display: none;
+}
+
 dialog.wide {
   inline-size: min(46rem, calc(100vw - 2rem));
 }

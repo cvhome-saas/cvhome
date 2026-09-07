@@ -965,6 +965,11 @@
       "dismiss": "Dismiss plan notice",
       "manage": "Manage plan"
     },
+    "impersonation": {
+      "actingAs": "You are acting as {{name}}",
+      "remaining": "{count, plural, =0 {less than a minute} =1 {1 minute} other {# minutes}} left",
+      "end": "Stop acting as them"
+    },
     "store": {
       "ariaLabel": "Stores",
       "title": "Store",
@@ -2032,6 +2037,19 @@
     }
   },
   "platform": {
+    "impersonation": {
+      "title": "Act as an account",
+      "description": "You will see the console exactly as this account does, until you stop or fifteen minutes pass. Every action is recorded against you.",
+      "target": "Account",
+      "hint": {
+        "reason": "Required. This is what the audit trail will say the session was for."
+      },
+      "reason": "Reason",
+      "reasonPlaceholder": "Ticket number, what they reported…",
+      "confirm": "Start acting as {{name}}",
+      "busy": "Starting…",
+      "confirmUnnamed": "Start"
+    },
     "orgStatus": {
       "ACTIVE": "Active",
       "SUSPENDED": "Suspended",

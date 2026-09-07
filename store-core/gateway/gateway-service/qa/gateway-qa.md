@@ -308,6 +308,79 @@ _Was C4._
 
 ---
 
+## IMP — Acting as a merchant: the session swap
+
+_From `.agents/plans/user-impersonation.md`._ The gateway holds the console's session and the token it relays, so
+"act as a merchant" is a swap it makes: `POST /api/v1/impersonation` exchanges the operator's token at uaa
+(`../../uaa/qa/uaa-qa.md` §IMP) and replaces both the authorized client `tokenRelay()` reads and the security
+context `auth/me` reads. The originals are stashed in the session; `DELETE`, expiry and logout all restore them and
+revoke the exchanged token. Requests: `http/impersonation-api.http`. The console's half:
+`../../console-ui/qa/console-ui-qa.md` §IMP.
+
+Design points:
+
+- **The request is `{userId, reason}` and nothing else.** The session becomes the merchant's own — org, stores,
+  roles — so there is no store to name and no tenancy probe to make; uaa's refusals are the whole gate.
+- **The impersonated principal is named after target and operator together** (`<target id>/<operator id>`), because
+  authorized clients are keyed by principal name and the merchant may be signed in themselves.
+- **Expiry is a filter ahead of the security chain, on every request.** Past the token's `exp` there is no refresh
+  token; without the filter the relay would forward a dead token and every call would 401.
+- **The gateway has exactly one `ReactiveOAuth2AuthorizedClientManager`.** `tokenRelay()` resolves it with
+  `getIfAvailable`; a second manager bean breaks every relayed route. The impersonation service uses that one.
+- **Errors are problem details** from the gateway's one advice, which exists for these endpoints.
+- **The whole swap is also pinned without a stack:** `ImpersonationFlowIntegrationTest` drives start → `auth/me` →
+  conflict → end, a uaa refusal and the ceiling over the real filter chain, against a throwaway HTTP server
+  standing in for uaa's token/revoke endpoints.
+
+### IMP-01 — Start swaps the relayed token and `auth/me` · critical · [verified]
+- **Seen** — 2026-09-07, stack `impersonation`: `auth/me` → `preferredUsername: org1-store1-admin`, authorities
+  `[ROLE_STORE_ADMIN]` (the merchant's own), `impersonation.actingAs`; `store-manager/list` → the merchant's stores.
+  (Seen under the earlier store-and-mode request shape; the swap itself is unchanged and the integration test
+  covers the new shape.)
+
+- **Steps** — `.http` "act as org1-store1-admin", then "the session is the merchant now", then "the relay carries
+  the merchant's token".
+- **Expect** — 200 `{actingAs: "org1-store1-admin", targetId, reason, expiresAt}`; `auth/me` answers `impersonation`
+  and `authorities` containing `ROLE_STORE_ADMIN` (the merchant's own) and not `ROLE_SUPER_ADMIN`;
+  `store-manager/list` answers the merchant's stores, not the platform's page.
+
+### IMP-02 — Tenant isolation holds under the exchanged token · critical · [verified]
+- **Seen** — `router/store-pod-by-store-id` for ORG2-STORE1 → **403**; for the merchant's own store → 200.
+
+- **Steps** — `.http` "tenant isolation: another org's store as the merchant".
+- **Expect** — 403 or 404 — never an empty 200. The token carries org1's claims and nothing wider.
+
+### IMP-03 — A second start is a conflict; end is idempotent · [verified]
+- **Seen** — **409** `GATEWAY.IMPERSONATION.ALREADY_ACTIVE` with `params.actingAs`; `DELETE` → 204 and `auth/me` is
+  `super-admin` again.
+
+- **Steps** — `.http` "a second start on a session already acting", then "end it" twice.
+- **Expect** — **409** `GATEWAY.IMPERSONATION.ALREADY_ACTIVE`; 204, 204.
+
+### IMP-04 — The gate · critical · [verified]
+- **Seen** — 403 `{error: access_denied}` for `org1-admin`; 400 `{field: reason}`; 401 `GATEWAY.SESSION.REQUIRED`.
+
+- **Steps** — `.http` "a target uaa refuses", "a missing reason", "no session"; and the same `POST` from an
+  `org1-admin` session.
+- **Expect** — 403 `GATEWAY.IMPERSONATION.REFUSED` (`params.error` = `access_denied`), 400
+  `GATEWAY.IMPERSONATION.INVALID` naming `reason`, 401 `GATEWAY.SESSION.REQUIRED`. Every body carries `traceId`.
+
+### IMP-05 — Expiry restores the operator, never the merchant · high · [verified]
+
+- **Covered by** `ImpersonationServiceTest.expiryRestoresTheOperatorOnlyOnceTheCeilingHasPassed`,
+  `ImpersonationExpiryFilterTest`, and `ImpersonationFlowIntegrationTest.pastTheCeilingTheNextRequestIsTheOperatorAgain`
+  over the real filter chain. Drive it in the browser with a shortened ceiling — `console-ui-qa.md` IMP-06.
+
+### IMP-06 — Logout mid-impersonation signs the operator out of uaa too · critical · [unit only]
+
+- **Covered by** `LogoutControllerTest.logoutWhileImpersonatingEndsTheImpersonationAndSignsTheOperatorOut`: the
+  end-session redirect carries the **operator's** `id_token_hint`. End to end: `console-ui-qa.md` IMP-07.
+
+### IMP-07 — A gateway restart ends every impersonation · [not verified]
+
+- **Steps** — start one; `lcl restart store-core-gateway --stack <name>`; reload.
+- **Expect** — the sign-in page (SES-01), and nothing of the impersonation survives. Intended: sessions are in memory.
+
 ## REG — Regression watchlist
 
 | What broke | How it looked | How to catch it again |

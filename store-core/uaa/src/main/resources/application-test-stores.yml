@@ -5,6 +5,7 @@ UAA_ADMIN_SDK_SECRET: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
 UAA_STORE_POD_SECRET: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
 UAA_STORE_CORE_SECRET: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
 UAA_WEB_APP_SECRET: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
+UAA_IMPERSONATION_SECRET: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
 
 com:
   asrevo:
@@ -60,6 +61,8 @@ com:
           - id: F1FA1FA2-51F3-41CD-A816-356F6816ABD4
             password: admin
           - id: 97022CD5-CC0A-467A-A99A-460B8E2745C3
+            password: admin
+          - id: 5A1C2D3E-4F50-4617-8293-A4B5C6D7E8F9
             password: admin
 spring:
   sql:

@@ -2831,27 +2831,30 @@ to a human caller anywhere on this platform.
   currency in the grouping key for the same reason as above. Until it exists, no screen claims a GMV
   figure.
 
-## Platform — no impersonation
+## Platform — impersonation
 
-Large enough to be its own service change, so it graduates out of this file:
-[`../../.agents/requirments/user-impersonation.md`](../../.agents/requirments/user-impersonation.md).
+Built. The requirement that used to be recorded here — `.agents/requirments/user-impersonation.md` —
+shipped as the uaa grant, the gateway swap, the audit rows and the console's banner.
 
-- **Screen:** `/platform/users`, the row action; and an organization's Users tab, which renders the
-  same table.
-- **What the UI needs:** a support or platform admin acting as a merchant, to reproduce what that
-  merchant is reporting.
-- **What is missing:** everything. `grep -ril "impersonat|act_as|actAs|on-behalf|token-exchange"`
-  across `store-core`, `store-commons` and `store-pod` returns **zero files** — there is no partial
-  implementation to finish.
-- **Why it is not a screen.** The console never holds a token: the gateway is an `oauth2Login`
-  client with a session cookie and a `tokenRelay()` filter on every backend route. "Act as this user"
-  therefore means *swapping the authorized client held in the gateway's session*, not minting
-  something the browser can carry — an authorization-server and gateway change with an audit
-  obligation attached. The requirements document covers RFC 8693 token exchange, the `act` claim, the
-  gateway's session problem, the audit rows, the console's banner and the hard exclusions.
-- **Placeholder:** the row action is **rendered and disabled**, with a title saying it is not built
-  (`shared/ui/user-admin-table/`). Not hidden: the point of writing the requirement is that the
-  screen it belongs to already exists.
+- **Screen:** `/platform/users` and an organization's Users tab offer **Act as this account** on the
+  row menu. It opens `shared/ui/impersonation-dialog/`, which asks one thing: the reason. The
+  account is the row; the session becomes that account — its own stores and roles, whatever they
+  are. Two earlier cuts asked for more and were removed: a **store choice** (nothing to offer an
+  organization with no store yet) and a **read/write mode** (double the surface for a distinction
+  the audit trail already makes). The store-side entry on the Stores tab went with the store choice.
+- **What it does:** `POST /api/v1/impersonation` on the gateway exchanges the operator's token at uaa
+  for one whose `sub` is the merchant and whose `act` names the operator, and swaps the session.
+  The console then **reloads** to `/dashboard`:
+  identity, rail, store list and every page facade change at once, and a reload is the honest way to
+  say so. Ending it (`DELETE`, the banner's only control) reloads to `/platform/users`.
+- **The banner is not dismissible**, and the gateway's fifteen-minute ceiling ends the session
+  whatever the banner shows. The token is the merchant verbatim — never wider, never narrower (the
+  first cut minted `STORE_MODERATOR` and showed the operator a dashboard of 403s). `ROLE_SUPPORT` is
+  real now, may impersonate, and is admitted to the platform rail's reads.
+- **What is not built:** the pod-side audit sections (`AuditSection.modifiedBy`) are never populated,
+  so a catalogue edit made while acting as a merchant carries no actor at all — the gap predates this
+  feature. Tenancy's `tenancy_audit.actor` reads `merchant (via operator)`; uaa's audit log has the
+  start, end and every refusal.
 
 ## Organizations — the owner nobody recorded
 

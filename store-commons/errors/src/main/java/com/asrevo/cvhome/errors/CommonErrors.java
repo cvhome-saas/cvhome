@@ -51,6 +51,7 @@ public enum CommonErrors implements ErrorCode {
      */
     ACCESS_DENIED("COMMON.ACCESS_DENIED", ErrorCategory.FORBIDDEN),
 
+
     /**
      * Request targeted a store the caller has no access to.
      */

@@ -150,7 +150,10 @@ public class AdminClientController {
     public Map<String, Object> getOptions() {
         Map<String, Object> options = new HashMap<>(adminClientService.scopeCatalogue());
         options.put("clientAuthenticationMethods", Stream.of(ClientAuthMethod.values()).map(ClientAuthMethod::value).toList());
-        options.put("authorizationGrantTypes", Stream.of(OAuthGrantType.values()).map(OAuthGrantType::value).toList());
+        // Token exchange is the impersonation grant, held by one seeded client; it is not something to hand out from a
+        // form. It still reads back on that client's details, it just is not offered.
+        options.put("authorizationGrantTypes", Stream.of(OAuthGrantType.values())
+                .filter(grant -> grant != OAuthGrantType.TOKEN_EXCHANGE).map(OAuthGrantType::value).toList());
         options.put("idTokenSignatureAlgorithm", Stream.of(SignatureAlgorithm.values()).map(SignatureAlgorithm::getName).toList());
         options.put("tokenEndpointAuthenticationSigningAlgorithm",
                 Stream.of(SignatureAlgorithm.values()).map(SignatureAlgorithm::getName).toList());

@@ -34,13 +34,17 @@ export class PlatformPlans {
    *
    * Built from the facade's rows rather than a constant, because the entitlement half is as long as
    * `ENTITLEMENT_ORDER` and its labels follow the reader's language.
+   *
+   * The minimums are deliberately tight: twelve tracks at the previous 6–11rem summed past the panel
+   * at 1728px and put a horizontal scrollbar under a three-row table. A price is at most `$300.00`, an
+   * allowance at most `Not included` at the small size, and the headers already wrap — 5rem holds each.
    */
   protected readonly columns = computed<readonly TableColumn[]>(() => {
     this.transloco.activeLang();
     return [
-      {key: 'plan', label: this.transloco.translate('platform.plans.column.plan'), width: 'minmax(11rem, 1.6fr)'},
-      {key: 'monthly', label: this.transloco.translate('platform.plans.column.monthly'), width: 'minmax(6rem, 0.8fr)'},
-      {key: 'yearly', label: this.transloco.translate('platform.plans.column.yearly'), width: 'minmax(6rem, 0.8fr)'},
+      {key: 'plan', label: this.transloco.translate('platform.plans.column.plan'), width: 'minmax(10rem, 1.6fr)'},
+      {key: 'monthly', label: this.transloco.translate('platform.plans.column.monthly'), width: 'minmax(5rem, 0.8fr)'},
+      {key: 'yearly', label: this.transloco.translate('platform.plans.column.yearly'), width: 'minmax(5rem, 0.8fr)'},
       /*
        * The two commercial columns, between the prices and the allowances: what the platform charges,
        * then how that is actually selling, then what it buys. They stay in place when the statistics
@@ -49,16 +53,16 @@ export class PlatformPlans {
       {
         key: 'subscribers',
         label: this.transloco.translate('platform.plans.column.subscribers'),
-        width: 'minmax(5rem, 0.6fr)',
+        width: 'minmax(4.5rem, 0.6fr)',
       },
       {
         key: 'recurring',
         label: this.transloco.translate('platform.plans.column.recurring'),
-        width: 'minmax(7rem, 0.9fr)',
+        width: 'minmax(6rem, 0.9fr)',
       },
       ...this.facade
         .entitlementRows()
-        .map((row) => ({key: row.key, label: row.label, width: 'minmax(6rem, 0.9fr)'})),
+        .map((row) => ({key: row.key, label: row.label, width: 'minmax(5rem, 0.9fr)'})),
     ];
   });
 }

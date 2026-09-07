@@ -44,19 +44,34 @@ export class ConsolePermissions {
 
   /**
    * Mirrors the guard every platform endpoint carries — `hasAnyRole('ROLE_SUPER_ADMIN')` on
-   * `OrgManagerApi` and the two statistic controllers, `STORE-CORE.POD.MANAGE` on the pod registry's
-   * writes, and `SCOPE_super_admin or ROLE_SUPER_ADMIN` on uaa's admin API.
+   * `OrgManagerApi`'s writes and the two statistic controllers, `STORE-CORE.POD.MANAGE` on the pod
+   * registry's writes, and `SCOPE_super_admin or ROLE_SUPER_ADMIN` on uaa's admin API.
    *
-   * **Not `isSupport`.** Support is a real role in `Roles` and it appears in none of those
-   * expressions, so offering the Platform group to it would be offering four pages that 403. The
-   * impersonation requirement is where support gets a way in; until then it is honest to show them
-   * nothing rather than something broken.
+   * **Support too.** `ROLE_SUPPORT` is admitted to the reads it needs to find a merchant — the
+   * organizations, one organization and its stores, uaa's account list — and to nothing else; the
+   * rail it gets is the same, and the pages it cannot write to render the server's refusal. See
+   * lessons.md, "Platform — impersonation".
    *
    * This decides what is *offered*. `platformOnly` decides what is reachable, and the server decides
    * what is permitted; hiding the rail changes none of the latter two.
    */
   canAdministerPlatform(): boolean {
-    return this.auth.getRoles().isSuperAdmin;
+    const roles = this.auth.getRoles();
+    return roles.isSuperAdmin || roles.isSupport;
+  }
+
+  /**
+   * Mirrors uaa's `users:impersonate`, which the seed grants to `SUPER_ADMIN` and `SUPPORT` and to
+   * nobody else. The permission itself is in the token's `permissions` claim; the roles are the
+   * fallback for a token minted before the claim carried it.
+   */
+  canImpersonate(): boolean {
+    const account = this.auth.getCachedAuthUser();
+    if (account?.permissions?.includes('users:impersonate')) {
+      return true;
+    }
+    const roles = this.auth.getRoles();
+    return roles.isSuperAdmin || roles.isSupport;
   }
 
   /**

@@ -4,7 +4,9 @@ import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -12,6 +14,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.oidc.endpoint.OidcParameterNames;
+import org.springframework.security.oauth2.jwt.JwtClaimNames;
 import org.springframework.security.oauth2.server.authorization.OAuth2TokenType;
 import org.springframework.security.oauth2.server.authorization.token.JwtEncodingContext;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer;
@@ -24,6 +27,7 @@ import com.asrevo.cvhome.sso.realm.SsoRealmProperties;
 import com.asrevo.cvhome.sso.realm.SsoTenantIdentifierResolver;
 import com.asrevo.cvhome.sso.security.PrincipalNames;
 import com.asrevo.cvhome.sso.settings.SettingsService;
+import com.asrevo.cvhome.sso.token.ImpersonationContext;
 
 /**
  * What uaa puts into the tokens it mints.
@@ -49,14 +53,22 @@ import com.asrevo.cvhome.sso.settings.SettingsService;
  * </p>
  *
  * <p>
+ * <strong>An impersonated token says so.</strong> When the authorization behind the token is an impersonation
+ * ({@link ImpersonationContext}), {@code act} names the operator (RFC 8693 §4.1: identity only); the roles, org and
+ * store stay the target's own, and no impersonated token outlives the operator's own.
+ * </p>
+ *
+ * <p>
  * <strong>ID tokens</strong> get the standard profile claims, which the gateway's OIDC principal exposes to console-ui.
  * </p>
  */
 @Configuration
 public class JwtCustomizerConfig {
 
+    static final String STORE = "store";
+
     /** The user-metadata keys that may become claims. */
-    static final Set<String> METADATA_CLAIMS = Set.of("org", "store");
+    static final Set<String> METADATA_CLAIMS = Set.of("org", STORE);
 
     /** The client-setting keys that may become claims, beyond the {@code cvhome.} prefix. */
     static final Set<String> CLIENT_SETTING_CLAIMS = Set.of("resource");
@@ -74,6 +86,9 @@ public class JwtCustomizerConfig {
 
     /** The same value, under the name resource servers already read. */
     static final String CLIENT_ID = "clientId";
+
+    /** The operator behind an impersonated token — RFC 8693 §4.1. */
+    static final String ACT = "act";
 
     private final PrincipalNames principals;
 
@@ -107,6 +122,7 @@ public class JwtCustomizerConfig {
                 clampLifetime(context);
                 addClientSettingClaims(context);
                 addUserClaims(context, false);
+                addImpersonationClaims(context);
             } else if (OidcParameterNames.ID_TOKEN.equals(context.getTokenType().getValue())) {
                 addUserClaims(context, true);
             }
@@ -161,6 +177,26 @@ public class JwtCustomizerConfig {
             if (!roles.isEmpty()) {
                 context.getClaims().claim(ROLES, new ArrayList<>(roles));
             }
+        });
+    }
+
+    /**
+     * The impersonation claims. {@code exp} is pulled back to the exchange's ceiling — the operator's own token's
+     * expiry or fifteen minutes — because the generator set it from the client's lifetime, which knows nothing about
+     * either. The roles are left exactly as {@link #addUserClaims} wrote them: the target's own.
+     */
+    private static void addImpersonationClaims(JwtEncodingContext context) {
+        ImpersonationContext.from(context.getAuthorization()).ifPresent(impersonation -> {
+            Map<String, Object> act = new LinkedHashMap<>();
+            act.put(JwtClaimNames.SUB, impersonation.operatorUsername());
+            act.put(UID, impersonation.operatorId().toString());
+            context.getClaims().claim(ACT, act);
+            context.getClaims().claims(claims -> {
+                Object exp = claims.get(JwtClaimNames.EXP);
+                if (!(exp instanceof Instant expiresAt) || expiresAt.isAfter(impersonation.notAfter())) {
+                    claims.put(JwtClaimNames.EXP, impersonation.notAfter());
+                }
+            });
         });
     }
 

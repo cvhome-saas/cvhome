@@ -55,6 +55,24 @@ interface AuthenticationResponse {
   roles?: string[];
   permissions?: string[];
   authorities: {authority: string}[];
+  /**
+   * Present only through the gateway, and only while the session is acting as a merchant. The
+   * gateway's `MeView` carries it so a reload keeps the banner without a second call.
+   */
+  impersonation?: ImpersonationState | null;
+}
+
+/**
+ * What the gateway says this session is acting as.
+ *
+ * `actingAs` is the merchant's username; `expiresAt` is when the gateway hands the session back to
+ * the operator whatever else happens. The session is the merchant verbatim — their org, stores and roles.
+ */
+export interface ImpersonationState {
+  readonly actingAs: string;
+  readonly targetId: string;
+  readonly reason: string;
+  readonly expiresAt: string;
 }
 
 /** What the ID token actually carries. */
@@ -95,6 +113,7 @@ export class AuthService {
               roles: it.roles ?? [],
               permissions: it.permissions ?? [],
               authorities: it.authorities.map(a => a.authority),
+              impersonation: it.impersonation ?? null,
             };
           } else if (it?.username) {
             // uaa's own form-login session. There is no ID token, so there are no profile claims and
@@ -109,6 +128,7 @@ export class AuthService {
               roles: it.roles ?? [],
               permissions: it.permissions ?? [],
               authorities: (it.authorities ?? []).map(a => a.authority),
+              impersonation: null,
             };
           } else {
             throw new ApiError({
@@ -177,4 +197,6 @@ export interface AuthUser {
   /** Effective permission keys, e.g. `users:read`. Empty where the endpoint does not send them. */
   readonly permissions?: readonly string[];
   readonly authorities: readonly string[];
+  /** Who the session is acting as, through the gateway — null when it is itself. */
+  readonly impersonation: ImpersonationState | null;
 }

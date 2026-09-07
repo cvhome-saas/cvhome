@@ -1078,6 +1078,96 @@ every one of them fails silently rather than loudly.
 
 ---
 
+## IMP — Acting as a merchant
+
+_From `.agents/plans/user-impersonation.md`._ The platform operator's way into a merchant's console. The console
+holds no token, so the whole thing is a **gateway session swap** (`../../gateway/gateway-service/qa/gateway-qa.md`
+§IMP) behind a uaa grant (`../../uaa/qa/uaa-qa.md` §IMP); what this section proves is the console's half — the row
+action, the dialog, the banner, and that the page you land on is the merchant's.
+
+Design points a tester needs:
+
+- **The dialog asks one thing: why.** The account is the row it opened from; the session becomes that account —
+  its own stores and roles, whatever they are, an org admin with no store included. There is no store to choose and
+  no read/write mode: the operator *is* the merchant until they stop. (Both existed in earlier cuts and were
+  removed: the store choice had nothing to offer an organization without a store, and the mode doubled the
+  surface for a distinction the audit trail already makes.)
+- **Starting and ending reload the page.** Starting lands on `/dashboard` as the merchant, on their own first
+  store; ending lands on `/platform/users`. Identity, rail, store list and every page facade change at once, and a
+  reload is deliberate.
+- **The banner cannot be dismissed.** Its only control ends the session. The gateway's fifteen-minute ceiling ends
+  it too, whatever the banner shows — the countdown is minute-granular.
+- **Every write made while acting is audited as the operator** — `tenancy-qa.md` IMP-01.
+
+### IMP-01 — Act as a store admin from the account list · critical · [verified]
+- **Seen** — 2026-09-07, stack `impersonation`, Chrome: reload to `/dashboard`, merchant rail, ORG1-STORE1 selected,
+  the amber bar stacked above the plan notice with the countdown; the dashboard and the catalogue render as the
+  merchant sees them. (Seen with the earlier dialog that also asked for a store and a mode; the landing is the same.)
+
+- **Setup** — signed in as `super-admin`.
+- **Steps** — `/platform/users` → row menu of `org1-store1-admin` → **Act as this account** → the dialog names the
+  account, type a reason → **Start acting as Store1 Admin**.
+- **Expect** — a reload to `/dashboard` as the merchant: the merchant rail (no Platform group), ORG1-STORE1
+  selected, an amber banner *You are acting as org1-store1-admin · N minutes left*. The dashboard, the orders and
+  the catalogue load exactly as the merchant sees them; a save succeeds and is audited as the operator. Network
+  panel: `auth/me` carries `impersonation`, and every private call is `?store=65f023632bc46470c104b76f`.
+
+### IMP-02 — Act as an org admin with no store · high · [not verified]
+
+- **Setup** — a fresh sign-up (`/sign-up`) creates an organization with no store yet; or `org1-admin` for the
+  two-store case.
+- **Steps** — `/platform/users` → **Act as this account** on that org admin → reason → Start.
+- **Expect** — the dialog offers nothing but the reason (no empty store row, no refusal); the reload lands on the
+  merchant's console with the org's own state — the create-store first-run for a storeless org, the store rail for
+  `org1-admin`.
+
+### IMP-03 — The banner ends it, and ending lands on the account list · high · [verified]
+- **Seen** — The bar's *Stop acting as them* reloaded to `/platform/users` as `super-admin`, no bar;
+  `user.impersonation.ended` rows present.
+
+- **Steps** — click **Stop acting as them**.
+- **Expect** — a reload to `/platform/users` as `super-admin`; the Platform group is back; no banner;
+  `uaa.audit_events` has a `user.impersonation.ended` row for the merchant.
+
+### IMP-04 — The same action on the organization's Users tab · high · [verified]
+- **Seen** — `/platform/organizations/<ORG1>/users` → row menu → the same dialog, the same landing.
+
+- **Steps** — org detail → Users → row menu of `org1-store2-admin` → **Act as this account**.
+- **Expect** — the dialog names the account; Start → `/dashboard` as that account, ORG1-STORE2 selected.
+
+### IMP-05 — The gate: an org admin cannot impersonate · critical · [not verified]
+- **Seen** — API half verified (`gateway-qa.md` IMP-04): `org1-admin` 403. The `support` screens were not driven in
+  the browser.
+
+- **Steps** — sign in as `org1-admin`: the row menu on `/users` shows no impersonate entry (the page is not offered
+  the platform rail at all); `.http` `POST /api/v1/impersonation` with that session → **403**
+  `GATEWAY.IMPERSONATION.REFUSED`. Sign in as `support` (password `admin`): `/platform/users` renders and a start
+  succeeds.
+- **Expect** — as stated, plus a `user.impersonation.denied` row per refusal in uaa.
+
+### IMP-06 — Expiry hands the session back silently · high · [not verified]
+
+- **Setup** — lower the ceiling for the test: `update uaa.oauth2_registered_client set token_settings = replace(
+  token_settings, '900.000000000', '60.000000000') where client_id = 'console-impersonation'` and restart uaa
+  (`lcl restart uaa --stack <name>`). Put it back afterwards.
+- **Steps** — start an impersonation, wait past a minute, navigate.
+- **Expect** — the operator's rail, no banner, never a 401 and never the merchant's page again; the audit log has an
+  `ended` row.
+
+### IMP-07 — Logout mid-impersonation ends both sessions · critical · [not verified]
+
+- **Steps** — while acting as the merchant, profile menu → Sign out. Then open `/dashboard`.
+- **Expect** — the sign-in page, not the operator's console: the gateway restored the operator before building
+  uaa's end-session redirect, so uaa's session ended too.
+
+### IMP-08 — i18n and RTL · [verified]
+- **Seen** — Arabic: the dialog and the bar mirror (icons and the End control included), the countdown uses the ICU
+  `two`/`few`/`many` forms.
+
+- **Steps** — switch to Arabic before starting; start; end.
+- **Expect** — the dialog and the banner in Arabic, the banner's icon and End button mirrored, the countdown's plural
+  right at 1 minute, no raw key anywhere.
+
 ## REG — Regression watchlist
 
 Every row was a real defect, and several were invisible from the screen.
@@ -1208,9 +1298,10 @@ stack on 2026-09-03.
 ### SSO-UI-02 — The row menu offers only what a merchant may do · critical · [verified]
 
 - **Steps** — open a row's action menu.
-- **Expect** — unlock (on a locked account only), disable, delete, and the disabled impersonate placeholder.
-  **No password reset and no role editing**: cua exposes neither for a shopper, so a menu entry would answer 404.
-  Verified by reading the rendered menu, not by eye.
+- **Expect** — unlock (on a locked account only), disable, delete, and an impersonate entry that is **disabled** here:
+  a shopper cannot be acted as (the grant is uaa's, for staff accounts), and the entry says the capability is not
+  available rather than vanishing. **No password reset and no role editing**: cua exposes neither for a shopper, so a
+  menu entry would answer 404. Verified by reading the rendered menu, not by eye.
 
 ### SSO-UI-03 — The sessions pane says where an account is signed in · high · [verified]
 
@@ -1246,6 +1337,7 @@ stack on 2026-09-03.
   named for the job it does; `DESIGN.md` is the source and `npm run lint` is the enforcement.
 
 ## 99 — Known gaps
+
 
 **`app-load-error` shows a developer string.** See KIT-04b. `[message]="failure.message"` on ~15 pages
 renders `CODE [status]` where `ApiErrorService.messageFor()` would give a sentence.
