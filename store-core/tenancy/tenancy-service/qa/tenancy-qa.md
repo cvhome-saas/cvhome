@@ -283,6 +283,19 @@ a state check with no timing component, so the test exercises the same branch.
 Sign up with an email that already exists in uaa → an error, and **no new row** in `tenancy.manager_org`. The
 transaction is the whole change and it is one annotation, but the case was not exercised against the stack.
 
+### RBS-08 — A taken address is a refusal, not an outage · high · [unit only]
+- **Seen** — 2026-09-07, a real signup from the console with an address uaa already held answered **409** with
+  `code: UAA.USER.USERNAME_TAKEN` but `type: …/common/remote-unavailable`, `category: REMOTE_SERVICE` and
+  *"The uaa service did not complete the request."* — the one thing uaa had done. uaa had started naming the
+  condition (`UAA.USER.USERNAME_TAKEN` / `EMAIL_TAKEN`) and the SDK's catalog still mapped only the older
+  `COMMON.DATA_INTEGRITY_VIOLATION`, so the refusal fell through to the "unavailable" wrapper.
+
+- **Steps** — `POST /tenancy/api/v1/signup/public/create` (`http/sign-up-api.http`) twice with the same email.
+- **Expect** — the second answers **409** `CONTROL_PLANE.SIGNUP.EMAIL_TAKEN`, category `CONFLICT`, and the console
+  shows its own "that address already has an account" message — never `REMOTE_SERVICE` or a remote-unavailable
+  `type`. Pinned by `UaaApiErrorsTest` (`uaaNamingATakenUsernameOrAddressBecomesAConflict`); the stack run is
+  still owed.
+
 ---
 
 > **RBS-07 also touches uaa** — it is the signup ↔ uaa transactional boundary. It is kept here because signup
@@ -698,6 +711,7 @@ Every item here was a real defect, found by running the thing rather than readin
 | **The wrong service blamed during an incident** | A pod-registry timeout reported as *"The billing service could not be reached"* — because `RestClientBuilder` handed every client the **same mutable builder**, interceptors accumulated, and the earliest one wraps the call. | Stop one dependency of a service that builds several clients; confirm the error names **that** dependency. |
 | **Queries left pointing at the renamed schema** | Two statistics queries still said `manager.` — both screens would fail on first open. The completeness grep searched for `control-plane`, not the schema name. | Open both statistics screens after any rename. |
 | **The service would not start** | A second `OpenAPI` bean made springdoc ambiguous; `@Modifying` on a `select pg_advisory_xact_lock` made Postgres answer *"A result was returned when none was expected"*. | Start the service. Neither is visible from a build. |
+| **A refusal reported as an outage** | Signup with a taken address: 409 with the right code but a `remote-unavailable` type and *"uaa did not complete the request"*. uaa began naming the duplicate (`UAA.USER.USERNAME_TAKEN`) and the SDK catalog only knew the constraint's older `COMMON.DATA_INTEGRITY_VIOLATION`. | RBS-08. Assert on `type` and `category`, not only the status; a new uaa code is a catalog entry. |
 | **A created store failed provisioning with no reason** | Tenancy accepted a four-field create body and forwarded the rest untyped; the pod refused it off the outbox on `@NotNull`s and NOT NULL columns. The merchant saw "provisioning", then "failed", and never learned which field was wrong. | CRT-02 |
 
 ---

@@ -11,10 +11,11 @@ import com.asrevo.cvhome.errors.remote.RemoteErrorContext;
  * uaa refused a write because it conflicts with a user that already exists — a username or email already taken.
  *
  * <p>
- * Mapped from {@code COMMON.DATA_INTEGRITY_VIOLATION} rather than from a uaa-specific code, because that is genuinely
- * all uaa knows: it lets the unique constraint decide and the shared advice turns the database's refusal into a 409.
- * If uaa later checks up front and names the condition, this mapping gains a sibling and the caller-side type stays
- * the same.
+ * Mapped from {@code UAA.USER.USERNAME_TAKEN} and {@code UAA.USER.EMAIL_TAKEN} — uaa checks up front and names the
+ * field — and still from {@code COMMON.DATA_INTEGRITY_VIOLATION}, the shape the unique constraint's refusal took
+ * before uaa did. Unmapped, a 409 from uaa arrived as {@code UaaApiUnavailableException}: a refusal the caller could
+ * act on, reported as "uaa did not complete the request", and signup answered "remote unavailable" for a taken
+ * address.
  * </p>
  *
  * <p>
