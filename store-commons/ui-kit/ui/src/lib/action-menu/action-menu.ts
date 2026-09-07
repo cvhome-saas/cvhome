@@ -18,10 +18,17 @@ const LIST_PADDING = 12;
 /** The gap between trigger and list, matching `.popover`'s `.5rem`. */
 const GAP = 8;
 
+/**
+ * The list's fixed position, as insets only — one vertical and one horizontal edge, the others null.
+ * Deliberately no `transform`: `.popover`'s entrance keyframe animates `transform`, and a placement
+ * that relied on it was overridden for the animation's duration, so the list visibly jumped in from
+ * the wrong side.
+ */
 interface Placement {
-  readonly top: number;
-  readonly left: number;
-  readonly transform: string;
+  readonly top: number | null;
+  readonly bottom: number | null;
+  readonly left: number | null;
+  readonly right: number | null;
 }
 
 /** One entry of an action menu. `danger` draws it in the destructive hue; `disabled` keeps it listed but inert. */
@@ -77,8 +84,9 @@ export interface MenuAction {
           role="menu"
           tabindex="-1"
           [style.top.px]="placement().top"
+          [style.bottom.px]="placement().bottom"
           [style.left.px]="placement().left"
-          [style.transform]="placement().transform"
+          [style.right.px]="placement().right"
           (keydown)="onMenuKey($event)"
         >
           @for (action of actions(); track action.key; let i = $index) {
@@ -118,7 +126,7 @@ export class ActionMenu {
 
   protected readonly open = signal(false);
   /** Where the fixed list goes, computed from the trigger the moment it opens. */
-  protected readonly placement = signal<Placement>({top: 0, left: 0, transform: 'none'});
+  protected readonly placement = signal<Placement>({top: 0, bottom: null, left: null, right: 0});
   private readonly closeOnScroll = (): void => this.close();
   protected readonly enabledCount = computed(
     () => this.actions().filter((a) => !a.disabled).length,
@@ -144,8 +152,9 @@ export class ActionMenu {
 
   /**
    * The list's end edge sits on the trigger's end edge (the menu opens inward, whichever the writing
-   * direction), below the trigger when it fits and above it when it would run off the viewport. The
-   * height is estimated from the entries rather than measured, because the list does not exist yet.
+   * direction), below the trigger when it fits and above it when it would run off the viewport — all
+   * as viewport insets, so the list needs no measuring and no transform. The height is estimated from
+   * the entries rather than measured, because the list does not exist yet.
    */
   private place(): void {
     const trigger = this.trigger();
@@ -157,9 +166,10 @@ export class ActionMenu {
     const rtl = getComputedStyle(trigger).direction === 'rtl';
     const below = rect.bottom + GAP + estimated <= window.innerHeight - GAP;
     this.placement.set({
-      top: below ? rect.bottom + GAP : rect.top - GAP,
-      left: rtl ? rect.left : rect.right,
-      transform: `translate(${rtl ? '0' : '-100%'}, ${below ? '0' : '-100%'})`,
+      top: below ? rect.bottom + GAP : null,
+      bottom: below ? null : window.innerHeight - rect.top + GAP,
+      left: rtl ? rect.left : null,
+      right: rtl ? null : window.innerWidth - rect.right,
     });
     document.addEventListener('scroll', this.closeOnScroll, true);
     window.addEventListener('resize', this.closeOnScroll);
