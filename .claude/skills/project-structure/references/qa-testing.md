@@ -24,8 +24,9 @@ lcl start -d                               # infra + every Java service + both f
 under `--spring.profiles.active=lcl,test-stores` in dependency order (**uaa first — it issues the tokens**),
 then `console-ui` (:8011) and `landing-ui` (:8110), pre-building landing-ui's workspace libs in the service's
 `prepare` step. Java services run **on the host**, not in Docker; `spg`'s `extra_hosts` map service hostnames
-back to the host. The monitoring containers (otel-collector, loki, tempo, prometheus, grafana) are not in the
-default set — add them with `--infra all`.
+back to the host. There is no telemetry backend in the dev stack: logs are the `.lcl/<stack>/logs/*.log` files
+and `lcl logs`; Grafana with Loki, Tempo and Prometheus is the load-testing repo's compose stack (`make stack-up`
+there), which runs the platform as its images.
 
 **Several named stacks run side by side.** `--stack xxx` (default `default`) selects the stack every command
 acts on; each has its own supervisor, services, checkout-scoped Compose project, and `.lcl/<stack>/` state and
@@ -83,7 +84,6 @@ Seeded by the `test-stores` profile:
 | demo storefront | `http://org1-store1.spg-507f1f77.gateway.com` | `user` / `revo` |
 | other demo stores | `org1-store2.`, `org2-store1.`, `org2-store2.spg-507f1f77.gateway.com` | same |
 | uaa directly | `http://uaa.gateway.com:8001` | |
-| grafana | `http://localhost:3000` | — |
 
 Those credentials are local seed data only (`store-core/uaa/.../init-sql/data-test-stores.sql` and the pods'
 `init-sql/stores/*`) and exist solely because `test-stores` is active — not secrets, never present outside
@@ -197,7 +197,7 @@ is a 404 that looks like missing data, and it is the single most common false al
 | signal | where |
 |---|---|
 | service stdout | `.lcl/<stack>/logs/<service>.log`, or `lcl logs <service> -f` |
-| logs / traces / metrics | grafana `http://localhost:3000` (Loki, Tempo, Prometheus) |
+| logs / traces / metrics | load-testing's stack (`make stack-up` there): grafana `http://localhost:3000` (Loki, Tempo, Prometheus) |
 | a failing request's internals | the `traceId` on the ProblemDetail response, then that trace in Tempo |
 | "the event never arrived" | `select * from outbox_record where status='FAILED'` — read `failure_reason` |
 | "no instances available for X" | that service's entry in `lcl-config.yml` |
