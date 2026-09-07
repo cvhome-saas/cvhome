@@ -41,11 +41,21 @@ abstract class BootBuildImageTask extends DefaultTask {
 
     static String createBaseImageName(String repo) {
         String registry = System.getenv("REGISTRY")
-        return registry ? "${registry}/${repo}" : "${repo}}"
+        return registry ? "${registry}/${repo}" : repo
     }
 
+    /**
+     * The tags added beside {@code <repo>:<version>} (which {@link #createImageName} already produces).
+     * A release version {@code X.Y.Z} — what CI passes as {@code -Pversion} from the git tag — also gets
+     * {@code X.Y} and {@code latest}; a {@code -SNAPSHOT} (every local build, see gradle.properties) only
+     * {@code latest}, so a developer's push can never claim a release number.
+     */
     static List<String> createImageTags(String repo, String version) {
-        return [createImageName(repo, "latest")]
+        if (version.endsWith("-SNAPSHOT")) {
+            return [createImageName(repo, "latest")]
+        }
+        String majorMinor = version.tokenize('.').take(2).join('.')
+        return [createImageName(repo, majorMinor), createImageName(repo, "latest")]
     }
 
     static List<String> createBuildCmd(String repo, String version) {

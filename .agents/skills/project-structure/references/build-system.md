@@ -80,6 +80,27 @@ bootBuildImage {
 }
 ```
 
+## Versioning
+
+**The version is the git tag; no file carries it.** `gradle.properties` says `version=0.0.0-SNAPSHOT`
+permanently and is never bumped. A release is a tag `vX.Y.Z` on `main`, cut by the orchestrator repo
+(`cvhome-saas/orchestrator`, its `Release product` workflow) — never by hand and never from this repo.
+Images are built by cvhome-platform's CodeBuild `2-images` project, which checks this repo out at that
+tag and runs `bootBuildImage -Pversion=X.Y.Z` (a `-P` on the command line overrides `gradle.properties`),
+pushing to the environment's ECR under the platform's project prefix. This repo has no publish workflow.
+
+Image tags come from `createImageTags` in build-logic, identical in `docker-conventions` (npm apps) and
+`java-application-conventions` (Spring services):
+
+| `project.version` | image tags |
+|---|---|
+| `X.Y.Z` (CI, from the tag) | `X.Y.Z`, `X.Y`, `latest` |
+| `*-SNAPSHOT` (every local build) | `latest` only |
+
+So a local `./gradlew bootBuildImage` produces `<image>:0.0.0-SNAPSHOT` + `latest` and can never claim a
+release number; `-Pversion=2.0.0` reproduces exactly what CI does. `project.version` also reaches the running
+services as `service_version` (`@version@` in `common-config.yml`, see `extra/monitoring/docs/signals.md`).
+
 ## Toolchain, checkstyle and the test tasks
 
 **Java 25.** `java-common-conventions` sets the toolchain and CI installs Corretto 25. Toolchains are

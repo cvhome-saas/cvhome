@@ -8,8 +8,15 @@ plugins {
     id 'application'
 }
 
+// The tags added beside `imageName` (`<repo>:<version>`). Same rule as BootBuildImageTask in
+// docker-conventions: a release version X.Y.Z (CI's -Pversion from the git tag) adds X.Y and latest,
+// a -SNAPSHOT (every local build) adds only latest. Keep the two in step.
 static List<String> createImageTags(String repo, String version) {
-    return [createImageName(repo, "latest")]
+    if (version.endsWith("-SNAPSHOT")) {
+        return [createImageName(repo, "latest")]
+    }
+    String majorMinor = version.tokenize('.').take(2).join('.')
+    return [createImageName(repo, majorMinor), createImageName(repo, "latest")]
 }
 
 static String createImageName(String repo, String version) {

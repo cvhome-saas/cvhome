@@ -194,6 +194,12 @@ What binds every change:
 - **`/go` ships the working tree** (branch if needed → commit → push → PR into `main`, template filled,
   changelog label) and **`/reset` returns to a clean `main`** without losing work. Both live in
   `.AGENTS/commands/`; prefer them over doing the sequence by hand. Run `/go` from the worktree being shipped.
+- **Versioning: the version is the git tag, never a file.** `gradle.properties` says `0.0.0-SNAPSHOT`
+  forever — do not bump it. A release is a `vX.Y.Z` tag cut by the orchestrator repo
+  (`cvhome-saas/orchestrator`, `Release product`), never from here. Images are built by cvhome-platform's
+  CodeBuild, which checks this repo out at `vX.Y.Z` and runs `bootBuildImage -Pversion=X.Y.Z`, so every
+  image is tagged `X.Y.Z`, `X.Y` and `latest`. This repo has no publish workflow. Local builds are
+  `0.0.0-SNAPSHOT` and tag images `latest` only, so a developer's push can never claim a release number. Details: `references/build-system.md` → *Versioning*.
 - **PR body follows `.github/PULL_REQUEST_TEMPLATE.md`**: title `<type|area>: <what changed>`, then
   *Why* → *What* → *The parts that are not obvious* → *Deviations* → *Verification*, then the checklist with
   the untouched sections deleted. Label it before merge — `.github/release.yml` builds the changelog from
