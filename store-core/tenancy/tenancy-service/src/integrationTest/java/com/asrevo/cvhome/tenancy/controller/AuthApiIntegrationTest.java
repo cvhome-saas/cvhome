@@ -22,12 +22,17 @@ import static org.assertj.core.api.Assertions.assertThat;
  * "Who am I" — the console's first call after a sign-in.
  *
  * <p>
- * These endpoints took {@code @AuthenticationPrincipal Principal}, and the principal of a
+ * This endpoint took {@code @AuthenticationPrincipal Principal}, and the principal of a
  * {@code JwtAuthenticationToken} is a {@code Jwt}, which does not implement {@link java.security.Principal}.
  * Spring's resolver passes {@code null} for a parameter it cannot satisfy rather than failing, so {@code /current}
  * answered <strong>401 to a caller holding a valid token</strong> — the one answer an identity endpoint must never
- * give. Both now take the {@code Authentication}; the regression these tests catch is a 401 or a 500 where the
+ * give. It now takes the {@code Authentication}; the regression these tests catch is a 401 or a 500 where the
  * signed-in caller's own name should be.
+ * </p>
+ *
+ * <p>
+ * {@code /me}, which echoed the whole token back to its holder, is gone; nothing consumed it (the console asks the
+ * gateway's own {@code /api/v1/auth/me}). The last test pins its absence.
  * </p>
  */
 @ServiceIntegrationTest
@@ -38,6 +43,7 @@ class AuthApiIntegrationTest {
 
     private static final String CURRENT = path(BASE, "current");
 
+    /** The deleted token echo. */
     private static final String ME = path(BASE, "me");
 
     private static final String NAME = "name";
@@ -76,16 +82,8 @@ class AuthApiIntegrationTest {
     }
 
     @Test
-    void themeEndpointCarriesTheTokensClaims() {
-        var response = api.get(ME, api.orgAdmin(ORG_A));
-
-        expect(response, HttpStatus.OK);
-        assertThat(json(response).get(NAME).asString()).isNotBlank();
-    }
-
-    @Test
-    void themeEndpointIsAuthenticatedOnly() {
-        expect(api.get(ME, null), HttpStatus.UNAUTHORIZED);
+    void theTokenEchoIsGone() {
+        expect(api.get(ME, api.orgAdmin(ORG_A)), HttpStatus.NOT_FOUND);
     }
 
 }
