@@ -42,7 +42,7 @@ cross-tenant), **M** (wrong principal → non-public read, or abuse vector), **L
 | Id | Sev | Service | Where | What an attacker can do | Fix | Phase | Status |
 |---|---|---|---|---|---|---|---|
 | A1 | **C** (verify live) | all | `common-config.yml:291-299` exposure `*`, `gateway.access: unrestricted`; gateway `SecurityConfig.java:55` permitAll; store-core chains permit `/actuator/**` | Anonymous `/actuator/heapdump`, `/env`, `/configprops`, `/actuator/gateway/routes/**` through the public gateway and via `/tenancy/actuator/...` | Default `health,info,prometheus`; `when-authorized`; drop gateway unrestricted | P7, P8 | open |
-| A2 | **H** | payment | `ExternalPaymentGatewayApi.java:40,58` no `@PreAuthorize` | Any bearer from either issuer (a self-registered shopper of any store on the pod) initiates a provider checkout under any store's keys with a chosen `successUrl`, and reads any store's payment status by ref | Token `STORE-POD.PAYMENT.INITIATE` → `isSameStorePod`; only checkout calls it | P1, P2 | P1 done |
+| A2 | **H** | payment | `ExternalPaymentGatewayApi.java:40,58` no `@PreAuthorize` | Any bearer from either issuer (a self-registered shopper of any store on the pod) initiates a provider checkout under any store's keys with a chosen `successUrl`, and reads any store's payment status by ref | Token `STORE-POD.PAYMENT.INITIATE` → `isSameStorePod`; only checkout calls it | P1, P2 | P2 done |
 | A3 | **H** | checkout | `CheckoutApi.java:84-89`, `OrderServiceImpl.java:98` | Guest enumerates `GET /api/v1/order/{n}/status?store=` by integer id: order status, payment status, live provider redirect URL of somebody else's open order | Guest must present `?ref=<OrderRef>`; the redirect URL carries it beside `orderId` | P4 | open |
 | A4 | **H** | tenancy | `StoreLifecycleApi.java:40,62-63,74-75` | Store admin, moderator, or any holder of the shared store-core client secret archives or deletes the store: the read token `STORE-CORE.STORE-FIND-ONE` gates a destructive op. Cross-org is not possible (tenancy is `DELEGATED`, foreign store → 404) | Wire `STORE-CORE.STORE-DELETE` → `hasAccessOnStoreDelete` (org admin or super admin) | P1, P3 | P1 done |
 | A5 | **M** | payment | `PublicPaymentWebhookApi.java:32-42` | Anonymous POST writes an outbox row for any store id; the signature is checked later in `PaymentGatewayService.handleWebhook` and the row discarded — DB flooding, no 4xx to the sender | Verify the signature and the enabled configuration before `outbox.schedule` | P5 | open |
@@ -50,7 +50,7 @@ cross-tenant), **M** (wrong principal → non-public read, or abuse vector), **L
 | A7 | **M** | cua | `CuaSecurityConfig.java:59` | As A1 on the shopper auth server (heapdump holds signing keys) | health/info/prometheus public, the rest authenticated, as uaa does | P9 | open |
 | A8 | **M** | store-commons | `StoreRoleAccessChecker.java:146-148,164-166,188-190` | An `ORG_ADMIN`/staff token without a usable `org` claim on an org-private pod NPEs while logging the refusal → 500 with a stack trace instead of 403 | Null-safe log | P1 | done |
 | A9 | **L** | billing | `PermissionAccessChecker.hasAccessOnBillingEntitlementRead` uses `hasScopeStorePod` without the pod match | Any pod's service reads any store's entitlement snapshot (plan ceilings, no tenant data) | Accepted; documented in the javadoc, pinned by test | P1, P10 | documented |
-| A10 | **L** | payment, tenancy | `payment/controller/v1/auth/AuthController.java`, `tenancy/.../AuthApi.java:41` | Echo the entire JWT to its holder; payment's is outside `/private/`; no consumer | Delete payment's; tenancy keeps `current` behind `isAuthenticated()` | P2, P3 | open |
+| A10 | **L** | payment, tenancy | `payment/controller/v1/auth/AuthController.java`, `tenancy/.../AuthApi.java:41` | Echo the entire JWT to its holder; payment's is outside `/private/`; no consumer | Delete payment's; tenancy keeps `current` behind `isAuthenticated()` | P2, P3 | P2 done (payment); tenancy in P3 |
 | A11 | **L** | gateway | `ImpersonationController.java`, CSRF disabled, no `SameSite` on the session cookie | Cross-site POST/DELETE `/api/v1/impersonation` with the operator's cookie; mitigated by the JSON preflight | `same-site: lax`; a gate test on `operator()` | P8 | open |
 | A12 | **L** | merchant | `MerchantStoreApi.java:98` guard reads `#store.org` from the body; `hasAccessOnStoreCreate` skips the org check on a shared pod | Only `store_core` principals pass; the body org is what tenancy decided | By design; registered | — | accepted |
 | A13 | **L** | tenancy | `StoreManagerApi.java:127-129` | Any org admin probes platform-wide store-name existence | Names are globally unique and this is the create pre-flight | — | accepted |
@@ -180,6 +180,17 @@ column here.
 
 - P1: A8 is fixed by rendering the org null-safely in the log line rather than by an early return, because the
   refusal itself was already correct — only the log crashed.
+- P2: `PaymentApiTestSupport.s2s()` minted its token with `resource=payment`, which the ungated gateway never compared
+  to anything, and no payment integration class named the pod at all (`pod-info.pod.name` is unset under
+  `test-stores`, so `isScopeStorePod` had a null pod). The fixture now mints `resource=pod-507f1f77` and every class
+  importing `ExternalClientsTestConfiguration` carries `@TestPropertySource(POD_PROPERTY)`, as checkout's do — the
+  gate is not loosened. The two
+  `supported-*` enum reads on `PaymentConfigurationController` stay ungated (authenticated by the chain, nothing
+  tenant-scoped behind them) as the existing test already asserted; the walk carries them as an explicit allow-list.
+  `AuthApiIntegrationTest`, the one consumer of `AuthController`, is deleted with it. The webhook `.http` is written
+  against today's behaviour (200 to everything, the signature checked on the outbox); P5 adds its 4xx blocks.
+  `http-client.private.env.json.example` gains `WEBHOOK_SECRET` and `STRIPE_SIGNATURE`. No `Tokens` helper was added:
+  `s2s(scope, resource)` and `shopper(store, sub)` already mint the foreign-pod and shopper principals.
 
 ## Verification
 
@@ -189,3 +200,7 @@ receipt. P4 also builds and lints landing-ui.
 
 - P1 (2026-09-09): `:store-commons:autoconfigure:test` 257 tests green, checkstyle main and test clean;
   `extra/scripts/verify-before-push.sh` before the push.
+- P2 (2026-09-09): `:store-pod:payment:payment-service:checkstyleMain checkstyleTest checkstyleIntegrationTest`
+  clean; `:store-pod:payment:payment-service:test` and `:store-pod:checkout:checkout-service:test` green (checkout
+  mocks the client, unchanged); `:store-pod:payment:payment-service:integrationTest` with Docker green, including
+  the three new gate cases. Not driven through a stack: SEC-06 and SEC-08 in `payment-qa.md` are `[not verified]`.

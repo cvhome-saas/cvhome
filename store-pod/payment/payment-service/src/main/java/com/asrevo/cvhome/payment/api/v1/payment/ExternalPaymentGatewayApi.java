@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.payment.api.v1.payment;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,7 +28,13 @@ import lombok.extern.slf4j.Slf4j;
 
 import static com.asrevo.cvhome.commons.utils.DefaultStoresConstants.DEFAULT_ORG1_STORE1_STR;
 
-
+/**
+ * Checkout starting a payment and reading it back. Same-pod service principals only
+ * ({@code STORE-POD.PAYMENT.INITIATE} → the caller's {@code resource} claim must name this pod); a shopper or seller
+ * token is refused with 403. Before the gate, any bearer either issuer had signed — a self-registered shopper of any
+ * store on the pod included — could initiate a provider checkout under another store's keys with a {@code successUrl}
+ * of its choosing, and read any store's payment status by reference.
+ */
 @RestController
 @RequestMapping("/api/v1")
 @Tag(name = "Payment Gateway")
@@ -35,9 +42,12 @@ import static com.asrevo.cvhome.commons.utils.DefaultStoresConstants.DEFAULT_ORG
 @AllArgsConstructor
 public class ExternalPaymentGatewayApi implements IPaymentGatewayService {
 
+    private static final String INITIATE = "hasPermission(#store,'StoreMerchantId','STORE-POD.PAYMENT.INITIATE')";
+
     private final PaymentGatewayService paymentGatewayService;
 
     @PostMapping("/private/payments/initiate")
+    @PreAuthorize(INITIATE)
     @Operation(method = "POST", description = "Initiate Payment",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = PaymentInitiateResult.class))))
     @Parameter(name = "store",
@@ -56,6 +66,7 @@ public class ExternalPaymentGatewayApi implements IPaymentGatewayService {
     // @GetExchange("/payments/{ref}/status") by hand: the client half is a separate interface, so nothing checks the
     // two agree. This one had lost its /private segment, which no caller had noticed because status() has none yet.
     @GetMapping("/private/payments/{requestRef}/status")
+    @PreAuthorize(INITIATE)
     @Operation(method = "GET", description = "Payment Status",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = PaymentResponse.class))))
     @Parameter(name = "store",

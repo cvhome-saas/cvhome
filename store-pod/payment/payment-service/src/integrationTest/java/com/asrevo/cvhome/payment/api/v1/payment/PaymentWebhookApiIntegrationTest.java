@@ -9,6 +9,7 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.context.TestPropertySource;
 
 import com.asrevo.cvhome.checkout.services.order.ExternalOrderSignalService;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
@@ -65,6 +66,7 @@ import static org.mockito.Mockito.verify;
  */
 @StorageIntegrationTest
 @Import(ExternalClientsTestConfiguration.class)
+@TestPropertySource(properties = PaymentApiTestSupport.POD_PROPERTY)
 class PaymentWebhookApiIntegrationTest {
 
     /** The store this class owns; its Stripe webhook secret is rewritten below. */
