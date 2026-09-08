@@ -18,12 +18,14 @@ import {StatePlate} from '../components/StatePlate';
 export function CheckoutResult({ctx, data}: PageProps<CheckoutResultData>) {
     const t = useTranslations('PAGE.CHECKOUT');
     const ts = useTranslations('PAGE.CUSTOMER');
-    const orderIdParam = useSearchParams().get('orderId');
+    const searchParams = useSearchParams();
+    const orderIdParam = searchParams.get('orderId');
+    const ref = searchParams.get('ref') ?? undefined;
     const orderId = orderIdParam ? Number(orderIdParam) : undefined;
     const {user, loading: userLoading, login} = useUser(ctx.storeContext);
     const awaitingLogin = data.requireLogin && (userLoading || !user);
     useEffect(() => { if (data.requireLogin && !userLoading && !user) login(); }, [data.requireLogin, userLoading, user, login]);
-    const {orderStatus, loading} = useOrderStatus(ctx.storeContext, awaitingLogin ? undefined : orderId);
+    const {orderStatus, loading} = useOrderStatus(ctx.storeContext, awaitingLogin ? undefined : orderId, ref);
 
     const isLoading = awaitingLogin || (loading && !orderStatus);
     const isPaid = orderStatus?.orderStatus === 'CONFIRMED' || orderStatus?.paymentStatus === 'PAID';

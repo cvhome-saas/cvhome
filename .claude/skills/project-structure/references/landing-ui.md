@@ -121,6 +121,7 @@ idiom (`pages/{Login,Register}.tsx` + `sections/{LoginForm,RegisterForm}.tsx`); 
 
 ## Checkout redirect flow
 
-After payment the gateway returns to `{domain}/{locale}/checkout/success?code=&orderId=` (or `/cancel`).
-Both routes render `theme.pages.CheckoutResult` with `outcome`, which re-fetches the real order status
-(`useOrderStatus`) rather than trusting the URL.
+After payment the gateway returns to `{domain}/{locale}/checkout/success?orderId=<id>&ref=<orderRef>` (or
+`/cancel`). Both routes render `theme.pages.CheckoutResult` with `outcome`, which re-fetches the real order status
+(`useOrderStatus`, sending `ref`) rather than trusting the URL. `ref` is the guest's credential for that read: the
+service answers 404 for any id without it, so a page that drops it breaks every guest return.

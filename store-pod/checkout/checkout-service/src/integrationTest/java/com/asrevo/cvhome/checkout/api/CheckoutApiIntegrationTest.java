@@ -100,6 +100,14 @@ class CheckoutApiIntegrationTest {
 
     private static final String CANCELLED = "CANCELLED";
 
+    private static final String ORDER_REF = "orderRef";
+
+    private static final String ORDER_ID = "orderId";
+
+    private static final String REF_PARAM = "&ref=";
+
+    private static final String JOIN = "%s%s%s";
+
     private static final String SELECT_ORDER = """
             select order_status, payment_status, inventory_status, pending_action, needs_attention
               from checkout.sales_order where order_id = ?
@@ -161,7 +169,7 @@ class CheckoutApiIntegrationTest {
         assertThat(order.get("total").get("grandTotal").asString()).isEqualTo("$20.00");
         assertThat(order.get(PRODUCTS).get(0).get("productName").asString()).isEqualTo(String.format("Product %s", SKU));
         assertThat(order.get("billing").get("city").asString()).isEqualTo("London");
-        assertThat(order.get("orderRef").asString()).hasSize(36);
+        assertThat(order.get(ORDER_REF).asString()).hasSize(36);
 
         Map<String, Object> row = row(orderId);
         assertThat(row).containsEntry(ORDER_STATUS_2, PENDING_PAYMENT).containsEntry(INVENTORY_STATUS, RESERVED_2)
@@ -184,7 +192,7 @@ class CheckoutApiIntegrationTest {
                 Boolean.class, orderId)).isTrue();
 
         JsonNode status = json(api.get(scoped(path(V1, ORDER, orderId, STATUS), STORE_A), shopperA));
-        assertThat(status.get("orderId").asLong()).isEqualTo(orderId);
+        assertThat(status.get(ORDER_ID).asLong()).isEqualTo(orderId);
         assertThat(status.get(REDIRECT_URL).asString()).isEqualTo(ExternalClientsTestConfiguration.REDIRECT);
     }
 
@@ -341,5 +349,27 @@ class CheckoutApiIntegrationTest {
         expect(api.get(scoped(path(V1, ORDER, orderId, STATUS), STORE_B), api.shopper(STORE_B, SHOPPER_B)),
                 HttpStatus.NOT_FOUND);
         expect(api.get(scoped(path(V1, ORDER, 999_999, STATUS), STORE_A), null), HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    void aGuestReadsTheStatusWithTheRefTheRedirectCarriedAndNothingElse() {
+        JsonNode mine = api.placed(STORE_A, api.newCart(STORE_A, SKU, 1), null, STRIPE, GUEST_EXAMPLE_COM);
+        JsonNode theirs = api.placed(STORE_A, api.newCart(STORE_A, SKU, 1), null, STRIPE, EMAIL);
+        long orderId = mine.get(ID).asLong();
+        String status = scoped(path(V1, ORDER, orderId, STATUS), STORE_A);
+
+        ResponseEntity<String> withRef = api.get(withRef(status, mine), null);
+        expect(withRef, HttpStatus.OK);
+        assertThat(json(withRef).get(ORDER_ID).asLong()).isEqualTo(orderId);
+        assertThat(json(withRef).get(REDIRECT_URL).asString()).isEqualTo(ExternalClientsTestConfiguration.REDIRECT);
+
+        expect(api.get(status, null), HttpStatus.NOT_FOUND);
+        expect(api.get(withRef(status, theirs), null), HttpStatus.NOT_FOUND);
+        expect(api.get(String.format(JOIN, status, REF_PARAM, "not-a-ref"), null), HttpStatus.NOT_FOUND);
+        expect(api.get(withRef(scoped(path(V1, ORDER, orderId, STATUS), STORE_B), mine), null), HttpStatus.NOT_FOUND);
+    }
+
+    private static String withRef(String statusUrl, JsonNode order) {
+        return String.format(JOIN, statusUrl, REF_PARAM, order.get(ORDER_REF).asString());
     }
 }
