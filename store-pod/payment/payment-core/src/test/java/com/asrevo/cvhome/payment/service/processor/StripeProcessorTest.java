@@ -31,6 +31,7 @@ import com.stripe.net.Webhook;
 import com.stripe.param.checkout.SessionCreateParams;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mockStatic;
@@ -259,6 +260,22 @@ class StripeProcessorTest {
                 .isInstanceOfSatisfying(InvalidWebhookSignatureException.class,
                         e -> assertThat(e.params()).containsEntry(SIGNATURE_PRESENT, true));
         assertThatThrownBy(() -> processor.parseWebhook(STORE, payload, Map.of(), secret))
+                .isInstanceOfSatisfying(InvalidWebhookSignatureException.class,
+                        e -> assertThat(e.params()).containsEntry(SIGNATURE_PRESENT, false));
+    }
+
+    @Test
+    void authenticationPassesAnAuthenticBodyAndRefusesATamperedOrUnsignedOne() throws Exception {
+        String payload = sessionEvent(SESSION_COMPLETED, INTERNAL_REF);
+        Map<String, String> signed = Map.of(SIGNATURE_HEADER, sign(payload, WEBHOOK_SECRET));
+        // The signature is over the exact bytes: one character changed after signing is a forgery.
+        String tampered = sessionEvent(SESSION_COMPLETED, "tx-2");
+
+        assertThatNoException().isThrownBy(() -> processor.authenticateWebhook(STORE, payload, signed, secret));
+        assertThatThrownBy(() -> processor.authenticateWebhook(STORE, tampered, signed, secret))
+                .isInstanceOfSatisfying(InvalidWebhookSignatureException.class,
+                        e -> assertThat(e.params()).containsEntry(SIGNATURE_PRESENT, true));
+        assertThatThrownBy(() -> processor.authenticateWebhook(STORE, payload, Map.of(), secret))
                 .isInstanceOfSatisfying(InvalidWebhookSignatureException.class,
                         e -> assertThat(e.params()).containsEntry(SIGNATURE_PRESENT, false));
     }

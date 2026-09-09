@@ -44,6 +44,22 @@ public interface PaymentProcessor {
             throws PaymentInitiateRejectedException, PaymentProviderUnavailableException;
 
     /**
+     * Verifies that a webhook delivery is authentic — the provider's signature over the exact body, checked against the
+     * store's own signing secret — without decoding it.
+     *
+     * <p>
+     * Split from {@link #parseWebhook} so the public endpoint can refuse a forged or unsigned delivery <em>before</em>
+     * it schedules anything: the webhook is anonymous by design, so the signature is the only credential it has, and
+     * checking it only on the outbox meant every stranger could write a row for any store. The outbox handler still
+     * re-parses (and re-verifies) the same body later, which is cheap and keeps the two paths independent.
+     * </p>
+     *
+     * @throws InvalidWebhookSignatureException the signature is missing, or does not verify against the secret
+     */
+    void authenticateWebhook(StoreMerchantId storeMerchantId, String payload, Map<String, String> headers,
+                             PaymentSecret config) throws InvalidWebhookSignatureException;
+
+    /**
      * Verifies and decodes an incoming webhook. Every declared failure is permanent for the payload in hand — none of
      * them can succeed on a redelivery of the same body.
      *

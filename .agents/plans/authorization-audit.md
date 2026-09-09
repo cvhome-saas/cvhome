@@ -45,7 +45,7 @@ cross-tenant), **M** (wrong principal → non-public read, or abuse vector), **L
 | A2 | **H** | payment | `ExternalPaymentGatewayApi.java:40,58` no `@PreAuthorize` | Any bearer from either issuer (a self-registered shopper of any store on the pod) initiates a provider checkout under any store's keys with a chosen `successUrl`, and reads any store's payment status by ref | Token `STORE-POD.PAYMENT.INITIATE` → `isSameStorePod`; only checkout calls it | P1, P2 | P2 done |
 | A3 | **H** | checkout | `CheckoutApi.java:84-89`, `OrderServiceImpl.java:98` | Guest enumerates `GET /api/v1/order/{n}/status?store=` by integer id: order status, payment status, live provider redirect URL of somebody else's open order | Guest must present `?ref=<OrderRef>`; the redirect URL carries it beside `orderId` | P4 | open |
 | A4 | **H** | tenancy | `StoreLifecycleApi.java:40,62-63,74-75` | Store admin, moderator, or any holder of the shared store-core client secret archives or deletes the store: the read token `STORE-CORE.STORE-FIND-ONE` gates a destructive op. Cross-org is not possible (tenancy is `DELEGATED`, foreign store → 404) | Wire `STORE-CORE.STORE-DELETE` → `hasAccessOnStoreDelete` (org admin or super admin) | P1, P3 | P1 done |
-| A5 | **M** | payment | `PublicPaymentWebhookApi.java:32-42` | Anonymous POST writes an outbox row for any store id; the signature is checked later in `PaymentGatewayService.handleWebhook` and the row discarded — DB flooding, no 4xx to the sender | Verify the signature and the enabled configuration before `outbox.schedule` | P5 | open |
+| A5 | **M** | payment | `PublicPaymentWebhookApi.java:32-42` | Anonymous POST writes an outbox row for any store id; the signature is checked later in `PaymentGatewayService.handleWebhook` and the row discarded — DB flooding, no 4xx to the sender | Verify the signature and the enabled configuration before `outbox.schedule` | P5 | P5 done |
 | A6 | **M** | all | no gate test in billing, tenancy, pod-registry, content, merchant, gateway | The class of bug A2 recurs silently | ArchUnit rule: every handler gated or in an explicit anonymous allow-list; stale entries fail | P6, P6b | open |
 | A7 | **M** | cua | `CuaSecurityConfig.java:59` | As A1 on the shopper auth server (heapdump holds signing keys) | health/info/prometheus public, the rest authenticated, as uaa does | P9 | open |
 | A8 | **M** | store-commons | `StoreRoleAccessChecker.java:146-148,164-166,188-190` | An `ORG_ADMIN`/staff token without a usable `org` claim on an org-private pod NPEs while logging the refusal → 500 with a stack trace instead of 403 | Null-safe log | P1 | done |
@@ -178,6 +178,11 @@ column here.
 
 ## Deviations, as built
 
+- P5: the gate's success path needed a unit test of its own. Payment's unit floor is 0.98, the highest in the
+  repo, and `authenticateWebhook` returning without throwing was covered only by an integration test, which took
+  the domain to 0.9780. The case asserts what passing the gate does *not* do — no parse, no use case, no
+  transaction — which is the property the controller relies on when it schedules the outbox row afterwards.
+
 - P1: A8 is fixed by rendering the org null-safely in the log line rather than by an early return, because the
   refusal itself was already correct — only the log crashed.
 - P2: `PaymentApiTestSupport.s2s()` minted its token with `resource=payment`, which the ungated gateway never compared
@@ -191,6 +196,16 @@ column here.
   against today's behaviour (200 to everything, the signature checked on the outbox); P5 adds its 4xx blocks.
   `http-client.private.env.json.example` gains `WEBHOOK_SECRET` and `STRIPE_SIGNATURE`. No `Tokens` helper was added:
   `s2s(scope, resource)` and `shopper(store, sub)` already mint the foreign-pod and shopper principals.
+- P5: the offline processors (`CODProcessor`, `ManualTransferredProcessor`) had to take a position the plan did not
+  name: every store has those types enabled, so a no-op `authenticateWebhook` would have left
+  `/webhook/{store}/COD` as the flooding vector. They refuse with `InvalidWebhookSignatureException` (nothing can
+  sign for an offline provider). An enabled configuration for a type the pod has no processor for (`PAYPAL` in the
+  seed data) is the same 404 as no configuration, not the 422 `PROCESSOR_UNSUPPORTED`, because the endpoint is public
+  and must not say what a store has configured. The store id is checked with `ObjectId.isValid` in the controller
+  and a malformed one is also the 404, before any lookup. `handleWebhook` keeps its own verification and its
+  discard-on-failure catch, so a secret rotated between scheduling and handling is a discard rather than a retry
+  loop. The integration test counts `payment.outbox_record` rows by `record_type like '%WebhookEvent%'` and the
+  reference the body carries (the gateway ref for a staged transaction), as uaa's invitation test does.
 
 ## Verification
 
@@ -204,3 +219,8 @@ receipt. P4 also builds and lints landing-ui.
   clean; `:store-pod:payment:payment-service:test` and `:store-pod:checkout:checkout-service:test` green (checkout
   mocks the client, unchanged); `:store-pod:payment:payment-service:integrationTest` with Docker green, including
   the three new gate cases. Not driven through a stack: SEC-06 and SEC-08 in `payment-qa.md` are `[not verified]`.
+- P5 (2026-09-09): checkstyle main, test and integrationTest clean for payment-core and payment-service;
+  `:store-pod:payment:payment-core:test` and `:store-pod:payment:payment-service:test` green;
+  `:store-pod:payment:payment-service:integrationTest` with Docker green, including the four webhook cases (signed
+  200 and one outbox row, unsigned 400 and no row, unknown store 404, no enabled configuration 404). Not driven
+  through a stack: WHK-05 is `[not verified]`, WHK-06 `[unit only]`.
