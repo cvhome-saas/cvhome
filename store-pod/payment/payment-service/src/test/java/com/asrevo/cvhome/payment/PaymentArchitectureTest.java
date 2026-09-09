@@ -14,11 +14,9 @@ import com.tngtech.archunit.lang.ArchRule;
  * authorization gate: every request handler carries {@code @PreAuthorize} or is named in {@link #ANONYMOUS} with its
  * reason. The rule refuses a {@code /private/} entry and an entry that no longer names a handler.
  *
- * <p>Not listed on purpose, so the gate rule stays red until the fixes land: {@code ExternalPaymentGatewayApi}'s
- * {@code initiatePayment} and {@code status} (audit A2, gated on the P2 branch), {@code AuthController}'s two token
- * echoes (A10, the controller is deleted on the P2 branch) and the two {@code /private/} enum reads of
- * {@code PaymentConfigurationController} (A17). An entry for any of them would be a lie the rule refuses, or one
- * nobody can justify in a line.
+ * <p>Every private handler is gated: the gateway's initiate and status carry the same-pod token (audit A2), the
+ * token echo is gone (A10) and the two enum reads on {@code PaymentConfigurationController} ask for a signed-in
+ * principal (A17), so nothing under {@code /private/} needs, or may have, an entry here.</p>
  */
 @AnalyzeClasses(packages = PaymentArchitectureTest.DOMAIN, importOptions = ImportOption.DoNotIncludeTests.class)
 final class PaymentArchitectureTest {

@@ -64,10 +64,11 @@ class PaymentApisTest {
     private static final String MANAGE_STORE = "hasPermission(#store,'StoreMerchantId','STORE-POD.PAYMENT.*')";
     private static final String GATEWAY = "hasPermission(#store,'StoreMerchantId','STORE-POD.PAYMENT.INITIATE')";
     /**
-     * Authenticated by the filter chain but carrying no token: the two enum lists are the same for every store, so
-     * there is nothing tenant-scoped for a gate to protect. Anything else under {@code /private/} must be gated.
+     * The two enum lists are the same for every store, so there is no store to name in a token; they carry the
+     * authenticated-only gate so no private handler is left bare (audit A17).
      */
-    private static final Set<String> UNGATED_PRIVATE = Set.of("getSupportedPaymentTypes", "getSupportedPaymentStatuses");
+    private static final String AUTHENTICATED = "isAuthenticated()";
+    private static final Set<String> AUTHENTICATED_ONLY = Set.of("getSupportedPaymentTypes", "getSupportedPaymentStatuses");
 
     private final PaymentConfigurationService configurationService =
             Mockito.mock(PaymentConfigurationService.class);
@@ -153,12 +154,13 @@ class PaymentApisTest {
             String path = prefix + (mapping.path().length == 0 ? "" : mapping.path()[0]);
             PreAuthorize gate = AnnotatedElementUtils.findMergedAnnotation(method, PreAuthorize.class);
             String name = String.format("%s.%s", controller.getSimpleName(), method.getName());
-            if (!path.contains(PRIVATE_SEGMENT) || UNGATED_PRIVATE.contains(method.getName())) {
+            if (!path.contains(PRIVATE_SEGMENT)) {
                 assertThat(gate).as("%s is open", name).isNull();
                 continue;
             }
             assertThat(gate).as("%s must be gated", name).isNotNull();
-            String expected = controller == ExternalPaymentGatewayApi.class ? GATEWAY
+            String expected = AUTHENTICATED_ONLY.contains(method.getName()) ? AUTHENTICATED
+                    : controller == ExternalPaymentGatewayApi.class ? GATEWAY
                     : controller == PrivatePaymentApi.class ? MANAGE_STORE : MANAGE;
             assertThat(gate.value()).as(name).isEqualTo(expected);
         }
@@ -171,11 +173,12 @@ class PaymentApisTest {
     }
 
     @Test
-    void theSupportedTypeAndStatusListsAreDeliberatelyUngated() {
-        // They are the same two enums for every store, so there is nothing tenant-scoped to protect.
+    void theSupportedTypeAndStatusListsAskOnlyForASignedInPrincipal() {
+        // The same two enums for every store: no store to scope on, but no private handler is left without a gate.
         assertThat(Stream.of(PaymentConfigurationController.class.getDeclaredMethods())
                 .filter(m -> m.getName().startsWith(SUPPORTED_PREFIX))
-                .noneMatch(m -> m.isAnnotationPresent(PreAuthorize.class))).isTrue();
+                .allMatch(m -> m.isAnnotationPresent(PreAuthorize.class)
+                        && AUTHENTICATED.equals(m.getAnnotation(PreAuthorize.class).value()))).isTrue();
     }
 
     @Test
