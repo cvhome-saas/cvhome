@@ -46,7 +46,7 @@ cross-tenant), **M** (wrong principal → non-public read, or abuse vector), **L
 | A3 | **H** | checkout | `CheckoutApi.java:84-89`, `OrderServiceImpl.java:98` | Guest enumerates `GET /api/v1/order/{n}/status?store=` by integer id: order status, payment status, live provider redirect URL of somebody else's open order | Guest must present `?ref=<OrderRef>`; the redirect URL carries it beside `orderId` | P4 | P4 done |
 | A4 | **H** | tenancy | `StoreLifecycleApi.java:40,62-63,74-75` | Store admin, moderator, or any holder of the shared store-core client secret archives or deletes the store: the read token `STORE-CORE.STORE-FIND-ONE` gates a destructive op. Cross-org is not possible (tenancy is `DELEGATED`, foreign store → 404) | Wire `STORE-CORE.STORE-DELETE` → `hasAccessOnStoreDelete` (org admin or super admin) | P1, P3 | P1 done |
 | A5 | **M** | payment | `PublicPaymentWebhookApi.java:32-42` | Anonymous POST writes an outbox row for any store id; the signature is checked later in `PaymentGatewayService.handleWebhook` and the row discarded — DB flooding, no 4xx to the sender | Verify the signature and the enabled configuration before `outbox.schedule` | P5 | open |
-| A6 | **M** | all | no gate test in billing, tenancy, pod-registry, content, merchant, gateway | The class of bug A2 recurs silently | ArchUnit rule: every handler gated or in an explicit anonymous allow-list; stale entries fail | P6, P6b | open |
+| A6 | **M** | all | no gate test in billing, tenancy, pod-registry, content, merchant, gateway | The class of bug A2 recurs silently | ArchUnit rule: every handler gated or in an explicit anonymous allow-list; stale entries fail | P6, P6b | P6 done (rule + checkout); P6b open |
 | A7 | **M** | cua | `CuaSecurityConfig.java:59` | As A1 on the shopper auth server (heapdump holds signing keys) | health/info/prometheus public, the rest authenticated, as uaa does | P9 | open |
 | A8 | **M** | store-commons | `StoreRoleAccessChecker.java:146-148,164-166,188-190` | An `ORG_ADMIN`/staff token without a usable `org` claim on an org-private pod NPEs while logging the refusal → 500 with a stack trace instead of 403 | Null-safe log | P1 | done |
 | A9 | **L** | billing | `PermissionAccessChecker.hasAccessOnBillingEntitlementRead` uses `hasScopeStorePod` without the pod match | Any pod's service reads any store's entitlement snapshot (plan ceilings, no tenant data) | Accepted; documented in the javadoc, pinned by test | P1, P10 | documented |
@@ -66,6 +66,12 @@ cross-tenant), **M** (wrong principal → non-public read, or abuse vector), **L
   (the service answers `CHECKOUT.ORDER.LOGIN_REQUIRED` itself when the store demands a session); payment
   `PublicPaymentConfigurationController`. The Next.js storefront calls them with no token. Moving any under
   `/private/` breaks the guest storefront. They are the P6 allow-lists.
+- **How to add an anonymous endpoint** — write the handler with no `@PreAuthorize`, outside `/private/` on a pod
+  (under `/public/` on store-core), and add `SimpleClassName#methodName` to the `ANONYMOUS` set of that service's
+  `<Service>ArchitectureTest` with a one-line reason in the javadoc beside it. `handlersAreGatedOrDeclaredAnonymous`
+  fails the build until the entry exists, refuses a `/private/` entry (a token is never optional there) and an entry
+  on a handler that already has a gate; `anonymousAllowListIsLive` fails when the handler is deleted or renamed. The
+  allow-list is this register, per service, machine-checked — an entry nobody can justify in one line is a finding.
 - **Guest carts** — the cart code is a UUID; possession is the credential.
 - **Scope-only s2s tokens** with a null or org target (`STORE-CORE.BILLING.QUOTA-CHECK`, `STORE-CORE.POD.*`,
   `STORE-POD.MERCHANT.STORE-CREATE`): no store exists yet; only a service principal passes.
@@ -134,6 +140,13 @@ outbox row; `.http`; `payment-qa.md` WHK.
 `anonymousAllowListIsLive(domain, allowList)`; adopted in `CheckoutArchitectureTest`; the hand walk in
 `CheckoutApisTest` reduced to token assertions; the rule unit-tested against fixture controllers.
 
+As built: `HandlerPolicy { POD, CORE }` in test-support encodes the two mirror-image filter chains. A handler passes
+when the method or its class carries `@PreAuthorize`, or its `SimpleClassName#methodName` is allow-listed; `POD` fails
+a listed `/private/` handler, `CORE` fails a listed handler outside `/public/` unless it is in the optional fourth
+argument `authenticatedOnly` (a bare session is the gate — tenancy's `AuthApi#current` shape; `POD` rejects a
+non-empty set). Paths come from Spring's merged `@RequestMapping` (class prefix × method path) so `@GetMapping` & co.
+resolve; the gate is read from ArchUnit's model by name, so test-support gains no security dependency.
+
 ## Phase 6b — adopt the rule everywhere (PR 7, test-only)
 
 `*ArchitectureTest` in merchant, inventory, catalog, content, payment, cua (new), billing, tenancy, pod-registry,
@@ -189,6 +202,13 @@ column here.
   credential, like a cart code) and two `[not verified]` cases — PLC-13 / SEC-03 in checkout, LUI-06 in
   landing-ui — because no guest-checkout store with Stripe was driven live in this phase.
 
+- P6: the rule reads the effective path through `AnnotatedElementUtils` on the reflected method rather than from
+  ArchUnit's annotation model, because `@GetMapping` is a meta-annotation whose `path` alias only Spring merges;
+  spring-web was already a `compileOnly` of test-support, so no dependency is added for consumers, and test-support's
+  own `src/test` (which existed, one test) gains `spring-web` + `spring-boot-starter-security` for the fixture
+  controllers only. A gated handler that is also allow-listed fails, beyond the plan's wording, so the list can
+  never claim a handler is anonymous when it is not. The `.http`/QA files are untouched: no endpoint changed.
+
 ## Verification
 
 Per phase: `./gradlew checkstyleMain checkstyleTest checkstyleIntegrationTest`, `build -x test -x check`, the
@@ -202,3 +222,9 @@ receipt. P4 also builds and lints landing-ui.
   landing-ui `npm run lint` 0 errors (4 pre-existing warnings in `banner-image.tsx` / fashion `PosterImage.tsx`,
   untouched), `npm run build` clean across libs → storefront, `npm run test` clean. Not driven through a live
   stack; `verify-before-push.sh` before the push.
+- P6 (2026-09-09): `:store-commons:test-support:build` (compile, checkstyle main/test, verifyTestNaming, 15 tests /
+  0 failed — 14 new against the fixture controllers), `:store-pod:checkout:checkout-service:test` 26/0 (the two new
+  ArchUnit cases included), checkstyle main/test and verifyTestNaming clean on checkout-service. Negative probe by
+  hand: removing `CheckoutApi#status` from the allow-list fails with "has no @PreAuthorize: add one, or list
+  ... in the anonymous allow-list of CheckoutArchitectureTest"; a `CheckoutApi#gone` entry fails the live-list rule.
+  Test-only change, nothing to drive through a stack; `verify-before-push.sh` before the push.

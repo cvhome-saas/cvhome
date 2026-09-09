@@ -62,7 +62,8 @@ import static org.mockito.Mockito.when;
 
 /**
  * The controllers are one line each; what matters is that every one passes the store through unchanged, that the
- * redirect urls are built from the storefront's origin, and that every private endpoint carries its gate.
+ * redirect urls are built from the storefront's origin, and that every gate names the token of its audience. Whether
+ * a handler <em>has</em> a gate is {@code CheckoutArchitectureTest}'s job (the ArchUnit rule and its allow-list).
  */
 class CheckoutApisTest {
 
@@ -240,24 +241,20 @@ class CheckoutApisTest {
     }
 
     /**
-     * Every handler whose path is private carries a {@code @PreAuthorize}, and the token matches the audience the
-     * path implies: shopper endpoints take the customer token, the signal API the s2s token, the rest the seller's.
+     * The token matches the audience the path implies: shopper endpoints take the customer token, the signal API the
+     * s2s token, the rest the seller's. A wrong token is a working gate that lets the wrong principal in, which no
+     * presence check can see.
      */
     @ParameterizedTest
     @MethodSource("controllers")
-    void privateEndpointsAreGatedForTheirAudience(Class<?> controller) {
+    void gatedHandlersCarryTheTokenOfTheirAudience(Class<?> controller) {
         for (Method method : controller.getDeclaredMethods()) {
             RequestMapping mapping = AnnotatedElementUtils.findMergedAnnotation(method, RequestMapping.class);
-            if (mapping == null || mapping.path().length == 0) {
+            PreAuthorize gate = AnnotatedElementUtils.findMergedAnnotation(method, PreAuthorize.class);
+            if (mapping == null || mapping.path().length == 0 || gate == null) {
                 continue;
             }
             String path = mapping.path()[0];
-            PreAuthorize gate = AnnotatedElementUtils.findMergedAnnotation(method, PreAuthorize.class);
-            if (!path.contains("/private/")) {
-                assertThat(gate).as("%s.%s is public", controller.getSimpleName(), method.getName()).isNull();
-                continue;
-            }
-            assertThat(gate).as("%s.%s must be gated", controller.getSimpleName(), method.getName()).isNotNull();
             String expected = path.contains("/signals/") ? SIGNAL : path.contains("/private/customer/") ? CUSTOMER : MANAGE;
             assertThat(gate.value()).as("%s.%s", controller.getSimpleName(), method.getName()).contains(expected);
         }
