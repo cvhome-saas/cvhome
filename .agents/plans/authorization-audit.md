@@ -46,7 +46,7 @@ cross-tenant), **M** (wrong principal → non-public read, or abuse vector), **L
 | A3 | **H** | checkout | `CheckoutApi.java:84-89`, `OrderServiceImpl.java:98` | Guest enumerates `GET /api/v1/order/{n}/status?store=` by integer id: order status, payment status, live provider redirect URL of somebody else's open order | Guest must present `?ref=<OrderRef>`; the redirect URL carries it beside `orderId` | P4 | P4 done |
 | A4 | **H** | tenancy | `StoreLifecycleApi.java:40,62-63,74-75` | Store admin, moderator, or any holder of the shared store-core client secret archives or deletes the store: the read token `STORE-CORE.STORE-FIND-ONE` gates a destructive op. Cross-org is not possible (tenancy is `DELEGATED`, foreign store → 404) | Wire `STORE-CORE.STORE-DELETE` → `hasAccessOnStoreDelete` (org admin or super admin) | P1, P3 | P1 done |
 | A5 | **M** | payment | `PublicPaymentWebhookApi.java:32-42` | Anonymous POST writes an outbox row for any store id; the signature is checked later in `PaymentGatewayService.handleWebhook` and the row discarded — DB flooding, no 4xx to the sender | Verify the signature and the enabled configuration before `outbox.schedule` | P5 | open |
-| A6 | **M** | all | no gate test in billing, tenancy, pod-registry, content, merchant, gateway | The class of bug A2 recurs silently | ArchUnit rule: every handler gated or in an explicit anonymous allow-list; stale entries fail | P6, P6b | P6 done (rule + checkout); P6b open |
+| A6 | **M** | all | no gate test in billing, tenancy, pod-registry, content, merchant, gateway | The class of bug A2 recurs silently | ArchUnit rule: every handler gated or in an explicit anonymous allow-list; stale entries fail | P6, P6b | P6 done (rule + checkout); P6b done (every service; payment and tenancy red on A2/A10/A17 until P2, P3 land) |
 | A7 | **M** | cua | `CuaSecurityConfig.java:59` | As A1 on the shopper auth server (heapdump holds signing keys) | health/info/prometheus public, the rest authenticated, as uaa does | P9 | open |
 | A8 | **M** | store-commons | `StoreRoleAccessChecker.java:146-148,164-166,188-190` | An `ORG_ADMIN`/staff token without a usable `org` claim on an org-private pod NPEs while logging the refusal → 500 with a stack trace instead of 403 | Null-safe log | P1 | done |
 | A9 | **L** | billing | `PermissionAccessChecker.hasAccessOnBillingEntitlementRead` uses `hasScopeStorePod` without the pod match | Any pod's service reads any store's entitlement snapshot (plan ceilings, no tenant data) | Accepted; documented in the javadoc, pinned by test | P1, P10 | documented |
@@ -57,6 +57,7 @@ cross-tenant), **M** (wrong principal → non-public read, or abuse vector), **L
 | A14 | **L** | merchant | `ExternalMerchantStoreApi.java:33`, `MerchantStoreApi.java:52` | Anonymous store record including `audit` (creator) and domains; the storefront needs it | By design; consider trimming `audit` | P10 | accepted |
 | A15 | **L** | pod-registry | `PodApi.java:110-165` null target | Super-admin-only tokens; correct | — | accepted |
 | A16 | **L** | docs | `InternalStoreServiceImpl.java` ~L204, `SubscriptionApi.java:212-217` say `isOrgAdmin` ignores the store; `.claude/skills/project-structure` is a tracked, divergent copy of `.agents/skills/project-structure` | Misleads the next change | Rewrite comments; replace the copy with a symlink | P3, P10, P11 | open |
+| A17 | **L** | payment | `PaymentConfigurationController.java:59-66` `GET /private/payment-configuration/supported-payment-types`, `/supported-payment-statuses`, no `@PreAuthorize` | Any bearer from either issuer (a self-registered shopper of any store on the pod) reads the two enum lists — no tenant data, but a `/private/` handler with no token is the shape A2 had, and the P6b rule refuses to allow-list it | `@PreAuthorize` with `STORE-POD.PAYMENT.*` on both, or move them beside `PublicPaymentConfigurationController` under `/public/` | P2 (or a follow-up) | found in P6b, open |
 
 ## By-design register (not findings)
 
@@ -153,6 +154,22 @@ resolve; the gate is read from ArchUnit's model by name, so test-support gains n
 sso-core, each with its allow-list from the register. Anything flagged that is not in the register is a new
 finding, added to the table first.
 
+As built: ten `*ArchitectureTest`s bind both rules — `POD` in merchant (5 entries), inventory (2), catalog (12),
+content (12), payment (2), cua (1, new class, the shell's own `..cua.web..` controllers only; the SSO server's are
+sso-core's); `CORE` in billing (2 anonymous / 0 authenticated-only), tenancy (5 / 3), pod-registry (0 / 0, kept so
+the next handler cannot add an anonymous surface silently), sso-core (9 / 2). uaa has no controllers and its
+`UaaShellArchitectureTest` already forbids them; the gateway is WebFlux with no method security and stays out.
+Every entry is in the by-design register or public by its `/public/` path with a one-line reason beside it.
+
+Not allow-listed, so the gate rule is red in two modules until the fix branches land: payment
+`ExternalPaymentGatewayApi#initiatePayment`/`#status` (A2, `/private/`, gated on `fix/payment-initiate-gate`),
+payment `AuthController#current`/`#me` (A10, deleted there), tenancy `AuthApi#me` (A10, deleted on
+`fix/tenancy-store-delete-gate`) and `AuthApi#current` (A10, `isAuthenticated()` there — deliberately not in
+`AUTHENTICATED_ONLY`, so that branch turns tenancy green with no edit), and the two enum reads of
+`PaymentConfigurationController` (A17, new). Once P3 and P6b are both in, the interim handler walk in
+`TenancyApisTest` is superseded by `TenancyArchitectureTest`; the same goes for `PaymentApisTest`'s walk on the P2
+branch (its `UNGATED_PRIVATE` set is what A17 names).
+
 ## Phase 7 — store-commons: actuator default (PR 8)
 
 `common-config.yml`: `include: ${MANAGEMENT_ENDPOINTS_EXPOSURE:health,info,prometheus}`, `show-details:
@@ -208,6 +225,18 @@ column here.
   own `src/test` (which existed, one test) gains `spring-web` + `spring-boot-starter-security` for the fixture
   controllers only. A gated handler that is also allow-listed fails, beyond the plan's wording, so the list can
   never claim a handler is anonymous when it is not. The `.http`/QA files are untouched: no endpoint changed.
+- P6b: the rule's path join was a plain concatenation, and the services write `@RequestMapping("api/v1/signup")`
+  over `@PostMapping("public/create")` — read as `api/v1/signuppublic/create`, no `/public/` segment, so every
+  store-core anonymous entry failed the `CORE` check and a `/private/` segment could hide the same way on a pod.
+  `effectivePaths` now combines with `AntPathMatcher.combine`, as Spring does (spring-core, already on the path),
+  with a `SlashlessApi` fixture and one case per policy. That is the one change outside a `*ArchitectureTest`.
+  sso-core is scored as `CORE` although its chain is its own: `publicApiSecurity` permits `/api/v1/public/**` and
+  each shell authenticates the rest, which is the store-core shape — except two handlers a shell opens by an
+  explicit matcher outside `/public/` (`/api/v1/auth/me` on cua, `/api/v1/auth/link-confirm` on uaa). The rule has
+  no tier for "open by matcher"; they sit in `AUTHENTICATED_ONLY` (the no-token tier) with the matcher named in
+  the comment, rather than widening the rule for two entries. Two modules are left red on purpose (see Phase 6b):
+  an entry for a `/private/` handler is refused by the rule and an entry for A10 is one nobody can justify in a
+  line, and the plan does not ask for a green build ahead of the fix.
 
 ## Verification
 
@@ -228,3 +257,10 @@ receipt. P4 also builds and lints landing-ui.
   hand: removing `CheckoutApi#status` from the allow-list fails with "has no @PreAuthorize: add one, or list
   ... in the anonymous allow-list of CheckoutArchitectureTest"; a `CheckoutApi#gone` entry fails the live-list rule.
   Test-only change, nothing to drive through a stack; `verify-before-push.sh` before the push.
+- P6b (2026-09-09): `:store-commons:test-support:test` 17/0 (2 new, the slashless join), checkstyle main/test clean;
+  `:test` + `:checkstyleTest` per module — merchant 18/0, inventory 27/0, catalog 68/0, content 65/0, cua 78/0,
+  billing 334/0, pod-registry 70/0, sso-core 687/0; payment 29/1 and tenancy 200/1, the one failure in each being
+  `HANDLERS_ARE_GATED_OR_ANONYMOUS` on exactly the A2/A10/A17 handlers named in Phase 6b, expected to clear when
+  `fix/payment-initiate-gate` (plus A17) and `fix/tenancy-store-delete-gate` merge. Run first with every allow-list
+  empty: 63 ungated handlers surfaced, 55 of them in the register; the 8 left over are the findings above.
+  Test-only change (plus the rule's join), nothing to drive through a stack; `verify-before-push.sh` before the push.
