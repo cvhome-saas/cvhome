@@ -7,6 +7,7 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.context.TestPropertySource;
 
 import com.asrevo.cvhome.payment.config.ExternalClientsTestConfiguration;
 import com.asrevo.cvhome.testsupport.annotations.StorageIntegrationTest;
@@ -45,6 +46,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @StorageIntegrationTest
 @Import(ExternalClientsTestConfiguration.class)
+@TestPropertySource(properties = PaymentApiTestSupport.POD_PROPERTY)
 class PaymentConfigurationApiIntegrationTest {
 
     /** Read-only assertions and the permission cases. */

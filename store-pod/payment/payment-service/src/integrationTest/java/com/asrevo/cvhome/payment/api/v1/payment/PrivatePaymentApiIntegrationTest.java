@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.context.TestPropertySource;
 
 import com.asrevo.cvhome.checkout.api.errors.CheckoutApiUnavailableException;
 import com.asrevo.cvhome.checkout.services.order.ExternalOrderSignalService;
@@ -57,6 +58,7 @@ import static org.mockito.Mockito.verify;
  */
 @StorageIntegrationTest
 @Import(ExternalClientsTestConfiguration.class)
+@TestPropertySource(properties = PaymentApiTestSupport.POD_PROPERTY)
 class PrivatePaymentApiIntegrationTest {
 
     /** The store this class stages transactions in. */
