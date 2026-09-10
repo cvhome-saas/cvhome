@@ -12,7 +12,7 @@ Every other file is `<service>/qa/<module>-qa.md` — see
 - **Scope** — public `cvhome-saas/lcl` engine, `lcl.yml` (project), `docker-compose-lcl.yml`,
   `store-pod/spg/Caddyfile` (`{$LCL_PORT_*}`), local Docker infra, Java services, frontends
 - **Change** — rewrite of the bash supervisor as a TypeScript multi-stack runner with dynamic port sequences
-- **Cases** — 15
+- **Cases** — 16
 - **Also see** — [spg](../store-pod/spg/qa/spg-qa.md) (case 09's `X-Forwarded-Port` observation is asserted
   there as HDR-01), [uaa](../store-core/uaa/qa/uaa-qa.md) (case 09's redirect patching is AUT-08),
   [inventory](../store-pod/inventory/inventory-service/qa/inventory-qa.md) (case 06 is the fix for a
@@ -235,3 +235,25 @@ Images for that stack are a pre-step: `./gradlew bootBuildImage` here (tags `lat
 - **Expected here** — `OTEL_SDK_DISABLED=false lcl start -d` now has nothing to export to; the Java services
   retry the exporter and count errors in `lcl status`. Leave the SDK disabled on the dev stack.
 
+## 16 — heapdump and env through the gateway are 404 [not verified]
+
+The shared `common-config.yml` maps `health`, `info` and `prometheus` under `/actuator` and nothing else
+(`MANAGEMENT_ENDPOINTS_EXPOSURE`, default `health,info,prometheus`), and the health body carries no
+`components` for an anonymous caller (`show-details: when-authorized`). Every service but uaa serves its
+actuator anonymously and the gateway forwards `/tenancy/actuator/...`, so before this the heap dump — with the
+signing keys in it — was one GET away from the public edge (authorization audit, A1). Unit-tested against the
+shipped file in `store-commons/autoconfigure` (`ActuatorExposureTest`); this case is the live check.
+
+- **Setup** — the default stack up, `MANAGEMENT_ENDPOINTS_EXPOSURE` unset in the shell that started it.
+- **Steps** — through the gateway: `curl -si http://gateway.com:8000/tenancy/actuator/heapdump | head -1`,
+  the same for `/tenancy/actuator/env` and `/tenancy/actuator/configprops`; then
+  `curl -s http://gateway.com:8000/tenancy/actuator/health`; then directly on a pod service,
+  `curl -si localhost:8122/actuator/env | head -1` and `curl -s localhost:8122/actuator/health`.
+- **Expect** — every heapdump / env / configprops request is `404`; each health body is `{"status":"UP"}` with no
+  `components`; `lcl status` still shows every service `up` (the runner's own probe reads only `"status"`).
+- **The debugging lever** — `MANAGEMENT_ENDPOINTS_EXPOSURE='*' lcl restart tenancy` (or any one service) and
+  `/tenancy/actuator/env` answers 200 for that process only; restart it without the variable to close it again.
+- **Expected to fail until the gateway PR lands** — the gateway's own `/actuator/env` and
+  `/actuator/gateway/routes` are unmapped by this change as well, but its `/actuator/**` stays `permitAll` until
+  the gateway hardening PR puts a super-admin gate in front of it; see
+  [gateway](../store-core/gateway/gateway-service/qa/gateway-qa.md) § 99.
