@@ -4,13 +4,17 @@ import org.springframework.boot.security.autoconfigure.actuate.web.servlet.Endpo
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.savedrequest.RequestCache;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
+import org.springframework.security.web.util.matcher.AnyRequestMatcher;
 
 import com.asrevo.cvhome.cua.security.StorefrontBrokeredLoginSuccessHandler;
 import com.asrevo.cvhome.cua.security.StorefrontLoginSuccessHandler;
@@ -46,6 +50,8 @@ public class CuaSecurityConfig {
 
     private static final String LOGIN_PAGE = "/login";
 
+    private static final String ACTUATOR = "/actuator/**";
+
     @Bean
     @Order(3)
     SecurityFilterChain appSecurity(HttpSecurity http, SsoSecurityDefaults defaults, RequestCache requestCache,
@@ -56,7 +62,17 @@ public class CuaSecurityConfig {
         defaults.applyTo(http)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/.well-known/**").permitAll()
-                        .requestMatchers(EndpointRequest.toAnyEndpoint()).permitAll()
+                        /*
+                         * The probes a platform watches cua with, and nothing else. Every actuator endpoint was
+                         * permitted here (authorization audit, A7), so /actuator/env and /actuator/heapdump — which
+                         * on an authorization server holds its signing keys — answered anyone who could reach the
+                         * pod. Same shape as uaa. The audience is a uaa principal: a cua token is capped to
+                         * ROLE_CUSTOMER and SCOPE_OPENID by its realm's grants, so no shopper holds these however
+                         * its claims are written.
+                         */
+                        .requestMatchers(EndpointRequest.to("health", "info", "prometheus")).permitAll()
+                        .requestMatchers(EndpointRequest.toAnyEndpoint())
+                        .hasAnyAuthority("SCOPE_store_core", "SCOPE_STORE_CORE", "ROLE_SUPER_ADMIN")
                         .requestMatchers(LOGIN_PAGE, "/api/v1/auth/me").permitAll()
                         /*
                          * Permitted so a failure surfaces as a failure. /error was authenticated once, so any
@@ -94,7 +110,19 @@ public class CuaSecurityConfig {
                         .failureHandler(new HandoffLoginFailureHandler(loginPages,
                                 HandoffLoginFailureHandler.SOCIAL)))
                 .exceptionHandling(ex -> ex
-                        .authenticationEntryPoint(storefrontEntryPoint(requestCache, csrfCookies))
+                        /*
+                         * A shopper who is not signed in belongs on their storefront's login page; an operator's
+                         * curl belongs nowhere. Without this, a refused /actuator/env answered 302 to a storefront
+                         * — refused, but reading like an open endpoint to anything that follows redirects. The
+                         * whole path space rather than EndpointRequest, so an endpoint the exposure does not map
+                         * answers the same way as one it does.
+                         */
+                        .defaultAuthenticationEntryPointFor(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),
+                                PathPatternRequestMatcher.withDefaults().matcher(ACTUATOR))
+                        // Both as mappings, not one as the default: an explicit authenticationEntryPoint replaces
+                        // the delegating one outright, and the actuator's mapping would never be consulted.
+                        .defaultAuthenticationEntryPointFor(storefrontEntryPoint(requestCache, csrfCookies),
+                                AnyRequestMatcher.INSTANCE)
                         .accessDeniedHandler(new HandoffCsrfDeniedHandler(loginPages, requestCache, csrfCookies)));
         return http.build();
     }
