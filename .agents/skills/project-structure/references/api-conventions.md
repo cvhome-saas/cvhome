@@ -130,6 +130,9 @@ persisted) rather than passing a `String` around.
 
 ## 3. Authorization via `@PreAuthorize("hasPermission(...)")`
 
+> The whole model — the principals, what each check compares, which paths are open by layer, and how to add
+> a gated or a deliberately anonymous endpoint — is `authentication.md` → *The authorization model, end to end*.
+
 Endpoints don't check roles inline. They declare a **permission string** and let a central evaluator decide:
 
 ```java
