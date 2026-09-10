@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.core.annotation.AnnotatedElementUtils;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.tngtech.archunit.base.DescribedPredicate;
@@ -60,6 +61,8 @@ public final class CvhomeArchitectureRules {
     private static final String PUBLIC = "/public/";
 
     private static final String NO_PATH = "";
+
+    private static final AntPathMatcher PATHS = new AntPathMatcher();
 
     private CvhomeArchitectureRules() {
     }
@@ -196,7 +199,13 @@ public final class CvhomeArchitectureRules {
         return String.format("%s#%s", method.getOwner().getSimpleName(), method.getName());
     }
 
-    /** Class-level prefix times method-level path, as Spring merges {@code @GetMapping} & co. into a request mapping. */
+    /**
+     * Class-level prefix times method-level path, as Spring merges {@code @GetMapping} & co. into a request mapping.
+     * Combined the way Spring combines them, with a separator supplied when neither side spells one: the services
+     * write {@code @RequestMapping("api/v1/signup")} over {@code @PostMapping("public/create")}, and a plain
+     * concatenation would read that as {@code api/v1/signuppublic/create} — no {@code /public/} segment, and a
+     * {@code /private/} one hidden the same way.
+     */
     private static List<String> effectivePaths(JavaMethod method) {
         Method reflected = method.reflect();
         RequestMapping onClass = AnnotatedElementUtils.findMergedAnnotation(reflected.getDeclaringClass(), RequestMapping.class);
@@ -204,7 +213,7 @@ public final class CvhomeArchitectureRules {
         List<String> paths = new ArrayList<>();
         for (String prefix : pathsOf(onClass)) {
             for (String suffix : pathsOf(onMethod)) {
-                paths.add(prefix.concat(suffix));
+                paths.add(PATHS.combine(prefix, suffix));
             }
         }
         return paths;

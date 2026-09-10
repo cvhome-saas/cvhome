@@ -10,6 +10,7 @@ import com.asrevo.cvhome.testsupport.arch.fixtures.GatedApi;
 import com.asrevo.cvhome.testsupport.arch.fixtures.LeakyApi;
 import com.asrevo.cvhome.testsupport.arch.fixtures.NotAController;
 import com.asrevo.cvhome.testsupport.arch.fixtures.PublicApi;
+import com.asrevo.cvhome.testsupport.arch.fixtures.SlashlessApi;
 import com.asrevo.cvhome.testsupport.arch.fixtures.StorefrontApi;
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
@@ -38,6 +39,10 @@ class CvhomeArchitectureRulesTest {
     private static final String PUBLIC_ME = "PublicApi#me";
 
     private static final String GATED_ORDERS = "GatedApi#orders";
+
+    private static final String SLASHLESS_CREATE = "SlashlessApi#create";
+
+    private static final String SLASHLESS_KEYS = "SlashlessApi#keys";
 
     private static JavaClasses classes(Class<?>... fixtures) {
         return new ClassFileImporter().importClasses(fixtures);
@@ -108,6 +113,18 @@ class CvhomeArchitectureRulesTest {
         }
 
         @Test
+        void aPrivateSegmentIsSeenEvenWhenTheMappingsSpellNoSlash() {
+            ArchRule rule = CvhomeArchitectureRules.handlersAreGatedOrDeclaredAnonymous(DOMAIN, HandlerPolicy.POD,
+                    Set.of(SLASHLESS_CREATE, SLASHLESS_KEYS));
+
+            assertThatThrownBy(() -> rule.check(classes(SlashlessApi.class)))
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessageContaining(SLASHLESS_KEYS)
+                    .hasMessageContaining("api/v1/signup/private/keys")
+                    .hasMessageNotContaining(SLASHLESS_CREATE);
+        }
+
+        @Test
         void hasNoAuthenticatedOnlyTier() {
             Set<String> none = Set.of();
             Set<String> me = Set.of(PUBLIC_ME);
@@ -125,6 +142,14 @@ class CvhomeArchitectureRulesTest {
                     Set.of(PUBLIC_CATALOG), Set.of(PUBLIC_ME));
 
             assertThatCode(() -> rule.check(classes(PublicApi.class, GatedApi.class))).doesNotThrowAnyException();
+        }
+
+        @Test
+        void aPublicSegmentIsSeenEvenWhenTheMappingsSpellNoSlash() {
+            ArchRule rule = CvhomeArchitectureRules.handlersAreGatedOrDeclaredAnonymous(DOMAIN, HandlerPolicy.CORE,
+                    Set.of(SLASHLESS_CREATE), Set.of(SLASHLESS_KEYS));
+
+            assertThatCode(() -> rule.check(classes(SlashlessApi.class))).doesNotThrowAnyException();
         }
 
         @Test

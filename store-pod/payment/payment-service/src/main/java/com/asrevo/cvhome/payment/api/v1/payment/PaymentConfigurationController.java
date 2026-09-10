@@ -56,12 +56,19 @@ public class PaymentConfigurationController {
         service.deleteConfig(merchantStore, paymentType);
     }
 
+    /**
+     * The two enum lists are the same for every store, so there is nothing tenant-scoped to gate — but they sit under
+     * {@code /private/}, and a private handler with no gate is the shape of a missing one (audit A17). Authenticated
+     * is the honest audience: any signed-in principal, no store.
+     */
     @GetMapping("/supported-payment-types")
+    @PreAuthorize("isAuthenticated()")
     public PaymentType[] getSupportedPaymentTypes() {
         return PaymentType.values();
     }
 
     @GetMapping("/supported-payment-statuses")
+    @PreAuthorize("isAuthenticated()")
     public PaymentStatus[] getSupportedPaymentStatuses() {
         return PaymentStatus.values();
     }
