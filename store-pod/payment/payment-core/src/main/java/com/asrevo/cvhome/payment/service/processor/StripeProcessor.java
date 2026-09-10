@@ -169,6 +169,14 @@ public class StripeProcessor implements PaymentProcessor {
     }
 
     @Override
+    public void authenticateWebhook(StoreMerchantId storeMerchantId, String payload, Map<String, String> headers,
+                                    PaymentSecret configuration) throws InvalidWebhookSignatureException {
+        // The event is built and dropped: constructEvent is Stripe's verifier, and there is no cheaper entry point
+        // that checks the signature without also decoding the envelope.
+        getEvent(payload, headers, configuration);
+    }
+
+    @Override
     public WebhookResult parseWebhook(StoreMerchantId storeMerchantId, String payload, Map<String, String> headers,
                                       PaymentSecret configuration)
             throws InvalidWebhookSignatureException, UnreadableWebhookPayloadException,
