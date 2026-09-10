@@ -93,8 +93,20 @@ public class PermissionAccessChecker {
         return false;
     }
 
+    /**
+     * Archiving or soft-deleting a store: the org admin who owns it, or the platform operator.
+     *
+     * <p>
+     * Not the store admin — deleting the store is not administering it — and not the read audience, which was what
+     * {@code StoreLifecycleApi} actually asked for until {@code STORE-CORE.STORE-DELETE} was wired to this method:
+     * a store moderator, or anything holding the shared store-core client secret, could archive a store. The
+     * super-admin branch mirrors {@link #hasAccessOnBillingManage}: an operator who may suspend a store may also
+     * archive it, and the lifecycle service records who did.
+     * </p>
+     */
     public boolean hasAccessOnStoreDelete(Authentication authentication, StoreMerchantId requestedStoreId) {
-        return hasMaintainAccessOnStore(authentication, requestedStoreId);
+        return storeRoleAccessChecker.isSuperAdmin(authentication) || hasMaintainAccessOnStore(authentication,
+                requestedStoreId);
     }
 
     private boolean hasReadAccessOnStore(Authentication authentication, StoreMerchantId requestedStoreId) {
@@ -190,6 +202,14 @@ public class PermissionAccessChecker {
     /**
      * Reading a store's entitlement snapshot. Wider than {@link #hasAccessOnBillingRead}: the pods enforce those
      * ceilings, so a store-pod principal has to be able to ask, not only a human.
+     *
+     * <p>
+     * Deliberately not scoped to the pod that holds the store: billing is a store-core service with no pod of its
+     * own, so it cannot tell which pod a store lives on, and any pod's service principal may read any store's
+     * snapshot. What that exposes is the plan's ceilings (product and order limits) — no tenant data — to a
+     * principal that already holds a pod's client secret. Recorded as accepted in the authorization audit
+     * ({@code .agents/plans/authorization-audit.md}, A9) and pinned by {@code PermissionAccessCheckerTest}.
+     * </p>
      */
     public boolean hasAccessOnBillingEntitlementRead(Authentication authentication, StoreMerchantId requestedStoreId) {
         // The scope is checked directly rather than through isScopeStorePod, which additionally requires the caller's

@@ -71,7 +71,7 @@ class CustomPermissionEvaluatorDispatchTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"STORE-POD.CATALOG.RESERVE", "STORE-POD.INVENTORY.RESERVE",
-        "STORE-POD.CHECKOUT.SIGNAL", "STORE-POD.CONTENT.MEDIA-USAGE"})
+        "STORE-POD.CHECKOUT.SIGNAL", "STORE-POD.CONTENT.MEDIA-USAGE", "STORE-POD.PAYMENT.INITIATE"})
     void theServiceToServiceTokensAskOnlyThatTheCallerIsOnTheSamePod(String token) {
         when(checker.isSameStorePod(any(), any(), any())).thenReturn(true);
 
@@ -153,6 +153,18 @@ class CustomPermissionEvaluatorDispatchTest {
         assertThat(evaluator.hasPermission(authentication, STORE, TARGET_TYPE, "STORE-CORE.STORE-FIND-ONE")).isTrue();
 
         verify(checker).hasAccessOnStoreFindOne(authentication, STORE);
+    }
+
+    @Test
+    void theStoreDeleteTokenReachesTheDeleteCheckNotTheRead() {
+        when(checker.hasAccessOnStoreDelete(any(), any())).thenReturn(true);
+
+        assertThat(evaluator.hasPermission(authentication, STORE, TARGET_TYPE, "STORE-CORE.STORE-DELETE")).isTrue();
+
+        // The delete check existed and was tested for as long as the read token guarded the delete endpoint; the
+        // token is what was missing.
+        verify(checker).hasAccessOnStoreDelete(authentication, STORE);
+        verify(checker, Mockito.never()).hasAccessOnStoreFindOne(any(), any());
     }
 
     @Test
