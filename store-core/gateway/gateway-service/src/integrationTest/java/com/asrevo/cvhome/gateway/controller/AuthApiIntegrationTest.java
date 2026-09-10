@@ -32,6 +32,8 @@ class AuthApiIntegrationTest {
 
     private static final String IMPERSONATION = "/api/v1/impersonation";
 
+    private static final String SESSION_COOKIE = "STORE-CORE-GATEWAY-JSESSIONID";
+
     @LocalServerPort
     private int port;
 
@@ -70,7 +72,10 @@ class AuthApiIntegrationTest {
     void startingALoginForwardsTheDeepLinkToUaaOnThisOriginAndOpensASession() {
         client.get().uri("/oauth2/authorization/uaa?redirectTo={to}", DEEP_LINK).exchange()
                 .expectStatus().isFound()
-                .expectCookie().exists("STORE-CORE-GATEWAY-JSESSIONID")
+                .expectCookie().exists(SESSION_COOKIE)
+                // Boot's resolver, from server.reactive.session.cookie: the cross-site half of A11.
+                .expectCookie().sameSite(SESSION_COOKIE, "Lax")
+                .expectCookie().path(SESSION_COOKIE, "/")
                 .expectHeader().value(HttpHeaders.LOCATION, location -> {
                     var query = UriComponentsBuilder.fromUri(URI.create(location)).build().getQueryParams();
                     assertThat(location).startsWith("http://localhost:%d/uaa/oauth2/authorize".formatted(port));

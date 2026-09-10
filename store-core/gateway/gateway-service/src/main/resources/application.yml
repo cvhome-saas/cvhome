@@ -20,6 +20,21 @@ spring:
             client-id: console-impersonation
             client-secret: ${UAA_IMPERSONATION_SECRET:hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7}
             authorization-grant-type: urn:ietf:params:oauth:grant-type:token-exchange
+server:
+  reactive:
+    session:
+      cookie:
+        # The console's session. Boot builds the cookie resolver from these (it backs off if the application defines
+        # a WebSessionIdResolver bean, which is why SecurityConfig no longer does). SameSite=Lax is the CSRF answer
+        # for this gateway: CSRF is disabled on it because it is a bearer-first relay — every backend call carries the
+        # session's token, not a form — and the console's writes are JSON, which a cross-site form cannot send
+        # without a preflight. The session cookie riding along on a cross-site POST or DELETE to
+        # /api/v1/impersonation was the path that preflight did not close; a Lax cookie is not sent on one
+        # (authorization audit, A11). Lax rather than Strict so the return leg of the uaa login, a top-level
+        # navigation back to this origin, still carries the session that holds the authorization request.
+        name: STORE-CORE-GATEWAY-JSESSIONID
+        path: /
+        same-site: lax
 com:
   asrevo:
     cvhome:

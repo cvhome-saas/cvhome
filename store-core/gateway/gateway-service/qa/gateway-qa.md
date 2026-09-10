@@ -6,10 +6,10 @@ everything else, holds the seller's session, relays the token inward, and refuse
 subscription has lapsed.
 
 - **Scope** — the static route table and the dynamic pod routes, the console catch-all, token relay and host
-  preservation, the session, and `StoreBillingGuardFilter`
+  preservation, the session and its cookie, the gateway's own actuator, and `StoreBillingGuardFilter`
 - **Runs on** — `lcl start -d --stack <name>`; it *is* `http://gateway.com:8000` (read the live port from
   `lcl urls`)
-- **Cases** — 23 (16 verified, 1 unit only, 6 not verified)
+- **Cases** — 25 (16 verified, 1 unit only, 8 not verified)
 - **Also see** — [pod-registry](../../../pod-registry/pod-registry-service/qa/pod-registry-qa.md) (the source
   of the pod routes), [tenancy](../../../tenancy/tenancy-service/qa/tenancy-qa.md) (the router it used to read),
   [billing](../../../billing/billing-service/qa/billing-qa.md) (the blocked-store list),
@@ -388,6 +388,38 @@ Design points:
 - **Steps** — start one; `lcl restart store-core-gateway --stack <name>`; reload.
 - **Expect** — the sign-in page (SES-01), and nothing of the impersonation survives. Intended: sessions are in memory.
 
+## SEC — The gateway's own surface
+
+_From `.agents/plans/authorization-audit.md`, A1 and A11._ The gateway is a relay: its chain permits every exchange
+and the backend judges the token the session carries. Two things are the gateway's own and are gated here: the
+actuator (`SecurityConfig`), and the session cookie, which is what a cross-site page would need to ride
+`/api/v1/impersonation` (`server.reactive.session.cookie` in `application.yml`). CSRF stays disabled — § 99 says
+why.
+
+### SEC-01 — The actuator is a super-admin read; health stays open · high · [not verified]
+
+- **Covered by** `ActuatorGateIntegrationTest` over the real filter chain (anonymous 401 — not a redirect — for
+  `info`, `env`, `heapdump`, `gateway/routes`; super-admin session 200; org-admin session 403; health 200).
+- **Steps** — `curl -si http://gateway.com:8000/actuator/health | head -1`; `curl -si
+  http://gateway.com:8000/actuator/info | head -1`; the same `info` with `Cookie:
+  STORE-CORE-GATEWAY-JSESSIONID=<super-admin session>`, then with an `org1-admin` session.
+- **Expect** — 200 · 401 · 200 · 403. The ALB target group probes `/actuator/health` on this service and reads
+  only the status, so the first is the one that must never change. Whether `env` or `gateway/routes` then answer
+  200 or 404 for the super admin depends on `MANAGEMENT_ENDPOINTS_EXPOSURE` (§ 00, "Looking at the truth
+  underneath"); the gate is the same either way.
+
+### SEC-02 — The session cookie is `SameSite=Lax` and the login still returns · critical · [not verified]
+
+- **Covered by** `AuthApiIntegrationTest.startingALoginForwardsTheDeepLinkToUaaOnThisOriginAndOpensASession`
+  (`Set-Cookie … SameSite=Lax; Path=/`). The return leg is what only a stack proves: `Lax` is sent on a top-level
+  navigation, which the redirect back from uaa is, and not on a cross-site `POST`.
+- **Steps** — sign out; sign in at `http://gateway.com:8000/oauth2/authorization/uaa` and inspect the
+  `STORE-CORE-GATEWAY-JSESSIONID` cookie in the browser's storage panel; then from a page on another origin
+  (`data:` URL or `http://localhost:1234`) submit `<form method=post action=http://gateway.com:8000/api/v1/impersonation>`.
+- **Expect** — the cookie shows `SameSite: Lax`; the login completes (the authorization request saved in the session
+  is found on the way back, no "authorization_request_not_found"); the cross-site form gets 401
+  `GATEWAY.SESSION.REQUIRED` — the cookie did not travel, and the body is not JSON anyway.
+
 ## REG — Regression watchlist
 
 | What broke | How it looked | How to catch it again |
@@ -411,12 +443,17 @@ returns. This follows from choosing to fail open (ENF-04).
 **Sessions are in memory.** There is no shared session store, so a gateway restart logs every seller out and
 two gateway instances would not share sessions (SES-01).
 
-**The gateway's actuator is still anonymous.** `common-config.yml` now maps only `health`, `info` and
-`prometheus` (so `/actuator/env`, `/actuator/heapdump` and `/actuator/gateway/routes` are 404 by default —
-[lcl](../../../../qa/lcl-qa.md) § 16), but the gateway's chain is still `anyExchange().permitAll()` and a
-debugging session that widens the exposure widens it for everyone. The gateway hardening PR puts a super-admin
-gate in front of `/actuator/**` (health stays open for the ALB); until then, do not widen the exposure on a
-gateway that is reachable from outside the machine.
+**CSRF stays disabled, on purpose.** The gateway relays a bearer token; nothing behind it trusts the cookie, and
+the console's writes are JSON, which a cross-site form cannot send without a preflight the browser refuses. The
+one path that was left — the session cookie riding along on a cross-site `POST`/`DELETE` to the gateway's own
+`/api/v1/impersonation` — is closed by `SameSite=Lax` on the cookie (SEC-02) and by every impersonation handler
+demanding a session before it does anything (`ImpersonationControllerGateTest`). Turning the CSRF filter on would
+make every relayed write from the console need a token the console does not carry, for no path the cookie can
+still reach.
+
+**A widened actuator is widened for every super admin.** `MANAGEMENT_ENDPOINTS_EXPOSURE` is per process; once a
+debugging session sets it on the gateway, `heapdump` and `env` are readable by any super-admin session, not only
+the person debugging. Unset it when done (SEC-01).
 
 ---
 

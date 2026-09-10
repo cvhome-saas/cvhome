@@ -51,7 +51,7 @@ cross-tenant), **M** (wrong principal → non-public read, or abuse vector), **L
 | A8 | **M** | store-commons | `StoreRoleAccessChecker.java:146-148,164-166,188-190` | An `ORG_ADMIN`/staff token without a usable `org` claim on an org-private pod NPEs while logging the refusal → 500 with a stack trace instead of 403 | Null-safe log | P1 | done |
 | A9 | **L** | billing | `PermissionAccessChecker.hasAccessOnBillingEntitlementRead` uses `hasScopeStorePod` without the pod match | Any pod's service reads any store's entitlement snapshot (plan ceilings, no tenant data) | Accepted; documented in the javadoc, pinned by test | P1, P10 | documented |
 | A10 | **L** | payment, tenancy | `payment/controller/v1/auth/AuthController.java`, `tenancy/.../AuthApi.java:41` | Echo the entire JWT to its holder; payment's is outside `/private/`; no consumer | Delete payment's; tenancy keeps `current` behind `isAuthenticated()` | P2, P3 | open |
-| A11 | **L** | gateway | `ImpersonationController.java`, CSRF disabled, no `SameSite` on the session cookie | Cross-site POST/DELETE `/api/v1/impersonation` with the operator's cookie; mitigated by the JSON preflight | `same-site: lax`; a gate test on `operator()` | P8 | open |
+| A11 | **L** | gateway | `ImpersonationController.java`, CSRF disabled, no `SameSite` on the session cookie | Cross-site POST/DELETE `/api/v1/impersonation` with the operator's cookie; mitigated by the JSON preflight | `same-site: lax`; a gate test on `operator()` | P8 | done |
 | A12 | **L** | merchant | `MerchantStoreApi.java:98` guard reads `#store.org` from the body; `hasAccessOnStoreCreate` skips the org check on a shared pod | Only `store_core` principals pass; the body org is what tenancy decided | By design; registered | — | accepted |
 | A13 | **L** | tenancy | `StoreManagerApi.java:127-129` | Any org admin probes platform-wide store-name existence | Names are globally unique and this is the create pre-flight | — | accepted |
 | A14 | **L** | merchant | `ExternalMerchantStoreApi.java:33`, `MerchantStoreApi.java:52` | Anonymous store record including `audit` (creator) and domains; the storefront needs it | By design; consider trimming `audit` | P10 | accepted |
@@ -191,6 +191,15 @@ column here.
   ECS ALB target groups read only the status, so `when-authorized` costs nothing. The load stack takes metrics
   over OTLP, not `/actuator/prometheus`; `prometheus` stays exposed for a plain scrape. The A1 live result is not
   recorded yet — `qa/lcl-qa.md` § 16 is the case, `[not verified]`.
+- P8: the gateway built its own `WebSessionIdResolver` bean (cookie name and path), and Boot's
+  `server.reactive.session.cookie.*` auto-configuration backs off when one exists — so the property alone would
+  have been a silent no-op. The bean is gone and Boot owns the cookie: name, path and `same-site` from
+  `application.yml`, asserted on the login's `Set-Cookie`. Anonymous refusals on `/actuator/**` answer 401 rather
+  than the oauth2Login redirect (an explicit `HttpStatusServerEntryPoint`), because those exchanges are read by
+  tools; nothing else on the gateway can be refused, so no browser flow changes. The `.http` "no session — 401"
+  block and IMP-04 already existed; the gate test covers every handler and moves the one existing gate case out
+  of `ImpersonationControllerTest`. Signed-in actuator cases assert on `/actuator/info`, which stays mapped after
+  P7, so the test holds on either side of that merge.
 
 ## Verification
 
@@ -203,3 +212,5 @@ receipt. P4 also builds and lints landing-ui.
 - P7 (2026-09-09): `:store-commons:autoconfigure:test` 256 tests, 0 failures (4 new in `ActuatorExposureTest`);
   autoconfigure checkstyle clean; `build -x test -x check`; gateway `checkstyleIntegrationTest` and
   `:integrationTest` for the session-gauge change. `verify-before-push.sh` before the push.
+- P8 (2026-09-09): gateway `:test`, `:integrationTest` (Docker) and checkstyle — counts in the PR;
+  `verify-before-push.sh` before the push.
