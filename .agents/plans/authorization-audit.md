@@ -202,3 +202,5 @@ receipt. P4 also builds and lints landing-ui.
   landing-ui `npm run lint` 0 errors (4 pre-existing warnings in `banner-image.tsx` / fashion `PosterImage.tsx`,
   untouched), `npm run build` clean across libs → storefront, `npm run test` clean. Not driven through a live
   stack; `verify-before-push.sh` before the push.
+- P1 (2026-09-09): `:store-commons:autoconfigure:test` 257 tests green, checkstyle main and test clean;
+  `extra/scripts/verify-before-push.sh` before the push.
