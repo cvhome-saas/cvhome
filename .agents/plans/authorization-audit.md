@@ -49,14 +49,14 @@ cross-tenant), **M** (wrong principal → non-public read, or abuse vector), **L
 | A6 | **M** | all | no gate test in billing, tenancy, pod-registry, content, merchant, gateway | The class of bug A2 recurs silently | ArchUnit rule: every handler gated or in an explicit anonymous allow-list; stale entries fail | P6, P6b | open |
 | A7 | **M** | cua | `CuaSecurityConfig.java:59` | As A1 on the shopper auth server (heapdump holds signing keys) | health/info/prometheus public, the rest authenticated, as uaa does | P9 | open |
 | A8 | **M** | store-commons | `StoreRoleAccessChecker.java:146-148,164-166,188-190` | An `ORG_ADMIN`/staff token without a usable `org` claim on an org-private pod NPEs while logging the refusal → 500 with a stack trace instead of 403 | Null-safe log | P1 | done |
-| A9 | **L** | billing | `PermissionAccessChecker.hasAccessOnBillingEntitlementRead` uses `hasScopeStorePod` without the pod match | Any pod's service reads any store's entitlement snapshot (plan ceilings, no tenant data) | Accepted; documented in the javadoc, pinned by test | P1, P10 | documented |
+| A9 | **L** | billing | `PermissionAccessChecker.hasAccessOnBillingEntitlementRead` uses `hasScopeStorePod` without the pod match | Any pod's service reads any store's entitlement snapshot (plan ceilings, no tenant data) | Accepted; documented in the javadoc, pinned by test | P1, P10 | P1, P10 done |
 | A10 | **L** | payment, tenancy | `payment/controller/v1/auth/AuthController.java`, `tenancy/.../AuthApi.java:41` | Echo the entire JWT to its holder; payment's is outside `/private/`; no consumer | Delete payment's; tenancy keeps `current` behind `isAuthenticated()` | P2, P3 | open |
 | A11 | **L** | gateway | `ImpersonationController.java`, CSRF disabled, no `SameSite` on the session cookie | Cross-site POST/DELETE `/api/v1/impersonation` with the operator's cookie; mitigated by the JSON preflight | `same-site: lax`; a gate test on `operator()` | P8 | open |
 | A12 | **L** | merchant | `MerchantStoreApi.java:98` guard reads `#store.org` from the body; `hasAccessOnStoreCreate` skips the org check on a shared pod | Only `store_core` principals pass; the body org is what tenancy decided | By design; registered | — | accepted |
 | A13 | **L** | tenancy | `StoreManagerApi.java:127-129` | Any org admin probes platform-wide store-name existence | Names are globally unique and this is the create pre-flight | — | accepted |
 | A14 | **L** | merchant | `ExternalMerchantStoreApi.java:33`, `MerchantStoreApi.java:52` | Anonymous store record including `audit` (creator) and domains; the storefront needs it | By design; consider trimming `audit` | P10 | accepted |
 | A15 | **L** | pod-registry | `PodApi.java:110-165` null target | Super-admin-only tokens; correct | — | accepted |
-| A16 | **L** | docs | `InternalStoreServiceImpl.java` ~L204, `SubscriptionApi.java:212-217` say `isOrgAdmin` ignores the store; `.claude/skills/project-structure` is a tracked, divergent copy of `.agents/skills/project-structure` | Misleads the next change | Rewrite comments; replace the copy with a symlink | P3, P10, P11 | open |
+| A16 | **L** | docs | `InternalStoreServiceImpl.java` ~L204, `SubscriptionApi.java:212-217` say `isOrgAdmin` ignores the store; `.claude/skills/project-structure` is a tracked, divergent copy of `.agents/skills/project-structure` | Misleads the next change | Rewrite comments; replace the copy with a symlink | P3, P10, P11 | P3, P10 done; skill copies deferred |
 
 ## By-design register (not findings)
 
@@ -178,10 +178,25 @@ column here.
 
 ## Deviations, as built
 
+- P10 and P11 ship as one PR: both are documentation and comments with no behaviour change, and splitting them
+  would have cost a second full verification run for no reviewer benefit.
+- **The duplicated `project-structure` skill is not merged, and should not be merged blind.** The plan assumed
+  `.claude/skills/project-structure/` was a stale copy of `.agents/skills/project-structure/`. It is not: the two
+  have diverged in both directions across 23 files. `.agents` is ahead on `authentication.md` (293 lines vs 223)
+  and `frontends.md`; `.claude` is ahead on `store-pod.md` (207 vs 157), `uaa-client.md` (246 vs 218),
+  `SKILL.md` (400 vs 373) and `qa-testing.md` (330 vs 314), and carries a `references/testing.md` the other does
+  not have at all. Picking a side per file is a judgement about which document is current, and guessing wrong
+  deletes accurate documentation. The authorization-model section added here is written into **both** copies so
+  they do not diverge further on it. Reconciling the rest needs someone who knows which of the two the team has
+  been editing.
+
 - P1: A8 is fixed by rendering the org null-safely in the log line rather than by an early return, because the
   refusal itself was already correct — only the log crashed.
 
 ## Verification
+
+- P10/P11 (2026-09-10): `PermissionAccessCheckerTest` green with the new accepted-reach case; checkstyle clean on
+  autoconfigure and billing. Documentation only elsewhere.
 
 Per phase: `./gradlew checkstyleMain checkstyleTest checkstyleIntegrationTest`, `build -x test -x check`, the
 module `:test`, `integrationTest` with Docker for P2–P5, P8, P9, then `extra/scripts/verify-before-push.sh` for the
