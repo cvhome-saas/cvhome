@@ -209,11 +209,13 @@ public class SubscriptionApi {
      * The org a read must be confined to, or {@code null} for a caller entitled to span orgs.
      *
      * <p>
-     * Belt and braces on purpose. {@code @PreAuthorize} is the first gate, but the shared
-     * {@code StoreRoleAccessChecker} cannot currently tell which org a store belongs to — it carries a {@code TODO}
-     * saying so and returns true for any store once the caller holds the org-admin role. Billing does know, because
-     * every subscription row records its org, so it narrows the query rather than relying on that check alone. Remove
-     * this and one org's admin can read another org's spend.
+     * Belt and braces on purpose, and load-bearing here rather than merely careful. The shared
+     * {@code StoreRoleAccessChecker} can tell which org owns a store — it looks the owner up — but billing runs
+     * {@code com.asrevo.cvhome.s2s.store-ownership: DELEGATED} (see {@code application.yml}), which tells the gate
+     * to admit any org admin and leave the org check to this service. That is deliberate: billing knows the owner
+     * without a lookup, because every subscription row records its org, and it can answer a foreign store as empty
+     * rather than as a 403 that confirms the store exists. Remove this and one org's admin reads another org's
+     * spend, with the gate having been told not to stop them.
      * </p>
      */
     private ManagerOrgId tenantScopeOf(UserOrgStoreIdentity identity) {

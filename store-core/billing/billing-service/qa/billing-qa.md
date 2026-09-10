@@ -8,7 +8,7 @@ the blocked-store list the gateway enforces at the edge.
   the platform-wide admin endpoints, and the migration from the old per-org model
 - **Runs on** — `lcl start -d --stack <name>`; read the live port from `lcl urls`. Address it through the
   gateway, never `:8021`
-- **Cases** — 40 (22 verified, 0 unit only, 18 not verified)
+- **Cases** — 41 (22 verified, 1 unit only, 18 not verified)
 - **Also see** — [gateway](../../../gateway/gateway-service/qa/gateway-qa.md) (the edge that refuses a lapsed
   store), [catalog](../../../../store-pod/catalog/catalog-service/qa/catalog-qa.md) (the plan ceiling and the
   write gate), [tenancy](../../../tenancy/tenancy-service/qa/tenancy-qa.md) (store creation, which billing
@@ -374,6 +374,17 @@ actually refuse the request:
 | ENF-05 — the product ceiling refuses the one that would exceed it | catalog-qa.md |
 | ENF-06 — unlimited means unlimited | catalog-qa.md |
 | ENF-03 — the shopfront of a lapsed store keeps selling | [landing-ui-qa.md](../../../../store-pod/landing-ui/qa/landing-ui-qa.md) |
+
+### ENF-07 — The entitlement snapshot answers any pod, and only about ceilings · [unit only]
+
+- **Why it is here** — the pods enforce a plan's ceilings, so every pod's service principal has to be able to read
+  a store's snapshot. Billing has no pod of its own to compare a caller's `resource` claim against, so the check is
+  the scope alone: *any* pod's token reads *any* store's snapshot. That is accepted, not overlooked — the
+  authorization audit records it as A9.
+- **Steps** — `PermissionAccessCheckerTest.Billing.anyPodsServicePrincipalReadsThemAndThatIsTheAcceptedReach`.
+- **Expect** — a foreign pod's principal reads the snapshot, and the same principal still reads no store and
+  manages no billing. The reach stops at ceilings, which carry no tenant data. Tagged unit only on purpose: there
+  is no second pod in a local stack to run it against.
 
 ---
 

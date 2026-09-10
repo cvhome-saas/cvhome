@@ -59,6 +59,9 @@ dependencies {
     testImplementation libs.jakarta.validation.api
     // EcsTaskHealthIndicator is a HealthIndicator over an EcsTask; both are compileOnly above.
     testImplementation libs.spring.boot.starter.actuator
+    // ActuatorExposureTest boots the actuator's MVC endpoints against common-config.yml and asserts over HTTP which
+    // ones exist; the handler mapping that turns an exposed endpoint into a route lives in Boot's webmvc module.
+    testImplementation libs.spring.boot.starter.web
     // ReadOnlyActorConfigurationTest boots the filter's registration through a WebApplicationContextRunner.
     testImplementation libs.spring.boot.starter.test
     testImplementation project(":store-commons:ecs-commons:fargate-task-info")
