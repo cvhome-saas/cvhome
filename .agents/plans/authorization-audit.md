@@ -198,3 +198,5 @@ receipt. P4 also builds and lints landing-ui.
 
 - P1 (2026-09-09): `:store-commons:autoconfigure:test` and checkstyle — recorded below once run;
   `verify-before-push.sh` before the push.
+- P1 (2026-09-09): `:store-commons:autoconfigure:test` 257 tests green, checkstyle main and test clean;
+  `extra/scripts/verify-before-push.sh` before the push.
