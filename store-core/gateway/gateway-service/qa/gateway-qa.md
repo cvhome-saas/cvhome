@@ -41,6 +41,13 @@ Many cases here stop a *dependency* and watch the gateway behave. Use `lcl stop 
 
 ### Looking at the truth underneath
 
+The two actuator reads below need the gateway started with its actuator widened: the shared default maps only
+`health`, `info` and `prometheus`, and hides the health `components` from an anonymous caller (A1 in the
+authorization audit — `/actuator/gateway/routes` was public before). Start it as
+`MANAGEMENT_ENDPOINTS_EXPOSURE=health,info,prometheus,gateway MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS=always lcl
+restart store-core-gateway` for the QA session and restart it plain afterwards. Without that the first read is
+a 404 and the second prints `null`.
+
 ```bash
 curl -s http://gateway.com:8000/actuator/gateway/routes | jq '.[].route_id'   # the live route table
 curl -s http://gateway.com:8000/actuator/health | jq '.components.podRoutes'  # staleness, from PodRoutesHealthIndicator
@@ -403,6 +410,13 @@ returns. This follows from choosing to fail open (ENF-04).
 
 **Sessions are in memory.** There is no shared session store, so a gateway restart logs every seller out and
 two gateway instances would not share sessions (SES-01).
+
+**The gateway's actuator is still anonymous.** `common-config.yml` now maps only `health`, `info` and
+`prometheus` (so `/actuator/env`, `/actuator/heapdump` and `/actuator/gateway/routes` are 404 by default —
+[lcl](../../../../qa/lcl-qa.md) § 16), but the gateway's chain is still `anyExchange().permitAll()` and a
+debugging session that widens the exposure widens it for everyone. The gateway hardening PR puts a super-admin
+gate in front of `/actuator/**` (health stays open for the ALB); until then, do not widen the exposure on a
+gateway that is reachable from outside the machine.
 
 ---
 

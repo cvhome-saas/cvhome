@@ -1,0 +1,112 @@
+# ExternalPaymentGatewayApi — com.asrevo.cvhome.payment.api.v1.payment.ExternalPaymentGatewayApi
+#
+# Checkout starting a payment and reading it back. STORE-POD.PAYMENT.INITIATE → a service principal of this pod
+# only (the token's `resource` claim must name the pod); a shopper token or a seller session answers 403, no token
+# answers 401. To drive it by hand, mint an s2s token from uaa with the pod client and put it in S2S_TOKEN
+# (http-client.private.env.json):
+#
+#   curl -u 'store-pod-507f1f77@service.store-pod.internal:hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7' \
+#        -d grant_type=client_credentials -d scope=store_pod {{UAA_URL}}/oauth2/token
+#
+# Initiate is idempotent on `ref`: the same order reference twice answers the first transaction. A refusal is a
+# domain answer (status FAILED, 200), never an exception — a store with no configuration for the type says so
+# rather than 500ing. COD and MANUAL_TRANSFER are offline processors, so nothing below reaches a provider.
+#
+# Requires a running stack: lcl start -d
+
+### initiate an offline payment — 200 PENDING with a gatewayRef
+# @name initiate
+< {% client.global.set("PAYMENT_REF", "http-order-" + Date.now()); %}
+POST {{SPG_URL}}/payment/api/v1/private/payments/initiate?store={{STORE_ID}}&lang={{LANG}}
+Authorization: Bearer {{S2S_TOKEN}}
+Content-Type: application/json
+
+{
+  "ref": "{{PAYMENT_REF}}",
+  "amount": 42.50,
+  "currency": { "code": "USD" },
+  "paymentType": "COD",
+  "expireAt": "2099-12-31T00:00:00Z",
+  "successUrl": "{{LANDING_UI_URL}}/{{LANG}}/checkout/success",
+  "cancelUrl": "{{LANDING_UI_URL}}/{{LANG}}/checkout/cancel"
+}
+
+> {%
+    client.global.set("GATEWAY_REF", response.body.gatewayRef);
+    client.test("pending, with a gateway reference", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        client.assert(response.body.status === "PENDING", "status " + response.body.status);
+        client.assert(response.body.gatewayRef, "no gatewayRef");
+    });
+%}
+
+### the same ref again — the first transaction, not a second one
+POST {{SPG_URL}}/payment/api/v1/private/payments/initiate?store={{STORE_ID}}&lang={{LANG}}
+Authorization: Bearer {{S2S_TOKEN}}
+Content-Type: application/json
+
+{
+  "ref": "{{PAYMENT_REF}}",
+  "amount": 42.50,
+  "currency": { "code": "USD" },
+  "paymentType": "COD",
+  "expireAt": "2099-12-31T00:00:00Z",
+  "successUrl": "{{LANDING_UI_URL}}/{{LANG}}/checkout/success",
+  "cancelUrl": "{{LANDING_UI_URL}}/{{LANG}}/checkout/cancel"
+}
+
+### status by the order reference — 200 PENDING
+GET {{SPG_URL}}/payment/api/v1/private/payments/{{PAYMENT_REF}}/status?store={{STORE_ID}}&lang={{LANG}}
+Authorization: Bearer {{S2S_TOKEN}}
+
+### a reference this store never initiated — 200 FAILED, not a 404
+GET {{SPG_URL}}/payment/api/v1/private/payments/never-initiated/status?store={{STORE_ID}}&lang={{LANG}}
+Authorization: Bearer {{S2S_TOKEN}}
+
+### a type the store has no configuration for — 200 FAILED, nothing staged
+POST {{SPG_URL}}/payment/api/v1/private/payments/initiate?store={{STORE_ID}}&lang={{LANG}}
+Authorization: Bearer {{S2S_TOKEN}}
+Content-Type: application/json
+
+{
+  "ref": "http-order-unconfigured-{{$timestamp}}",
+  "amount": 42.50,
+  "currency": { "code": "USD" },
+  "paymentType": "PAYPAL",
+  "expireAt": "2099-12-31T00:00:00Z",
+  "successUrl": "{{LANDING_UI_URL}}/{{LANG}}/checkout/success",
+  "cancelUrl": "{{LANDING_UI_URL}}/{{LANG}}/checkout/cancel"
+}
+
+### a shopper token — 403
+POST {{SPG_URL}}/payment/api/v1/private/payments/initiate?store={{STORE_ID}}&lang={{LANG}}
+Authorization: Bearer {{SHOPPER_TOKEN}}
+Content-Type: application/json
+
+{
+  "ref": "http-order-shopper-{{$timestamp}}",
+  "amount": 42.50,
+  "currency": { "code": "USD" },
+  "paymentType": "COD",
+  "expireAt": "2099-12-31T00:00:00Z",
+  "successUrl": "{{LANDING_UI_URL}}/{{LANG}}/checkout/success",
+  "cancelUrl": "{{LANDING_UI_URL}}/{{LANG}}/checkout/cancel"
+}
+
+### a shopper token on the status read — 403
+GET {{SPG_URL}}/payment/api/v1/private/payments/{{PAYMENT_REF}}/status?store={{STORE_ID}}&lang={{LANG}}
+Authorization: Bearer {{SHOPPER_TOKEN}}
+
+### no token — 401
+POST {{SPG_URL}}/payment/api/v1/private/payments/initiate?store={{STORE_ID}}&lang={{LANG}}
+Content-Type: application/json
+
+{
+  "ref": "http-order-anonymous-{{$timestamp}}",
+  "amount": 42.50,
+  "currency": { "code": "USD" },
+  "paymentType": "COD",
+  "expireAt": "2099-12-31T00:00:00Z",
+  "successUrl": "{{LANDING_UI_URL}}/{{LANG}}/checkout/success",
+  "cancelUrl": "{{LANDING_UI_URL}}/{{LANG}}/checkout/cancel"
+}

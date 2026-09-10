@@ -14,6 +14,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.TestPropertySource;
 
 import com.asrevo.cvhome.commons.domain.CurrencyCode;
 import com.asrevo.cvhome.payment.config.ExternalClientsTestConfiguration;
@@ -59,6 +60,9 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 // containers and — without the storage one — fails outright when the S3 client tries to reach real AWS.
 @StorageIntegrationTest
 @Import(ExternalClientsTestConfiguration.class)
+// The same pod name the API tests declare (PaymentApiTestSupport.POD_PROPERTY, package-private), so this class keeps
+// sharing their context instead of booting a second one.
+@TestPropertySource(properties = "com.asrevo.cvhome.pod-info.pod.name=pod-507f1f77")
 class StripeProcessorContractIntegrationTest {
 
     private static final String REFERENCE = "internal-ref-1";

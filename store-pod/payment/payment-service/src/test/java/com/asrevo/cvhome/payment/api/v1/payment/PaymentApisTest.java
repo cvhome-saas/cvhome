@@ -1,23 +1,18 @@
 package com.asrevo.cvhome.payment.api.v1.payment;
 
 import java.lang.reflect.Method;
-import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Stream;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
+import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,7 +21,6 @@ import org.springframework.web.service.annotation.HttpExchange;
 import org.springframework.web.service.annotation.PostExchange;
 
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.payment.controller.v1.auth.AuthController;
 import com.asrevo.cvhome.payment.models.TransactionSearchFilter;
 import com.asrevo.cvhome.payment.service.PaymentApprovalService;
 import com.asrevo.cvhome.payment.service.PaymentConfigurationService;
@@ -49,6 +43,11 @@ import static org.mockito.Mockito.when;
  * mapping had lost its {@code /private} segment, and no caller noticed because nothing calls status() yet. The last
  * test here is the check the comment on that method asks for.
  * </p>
+ *
+ * <p>
+ * The gate walk covers every controller in the service rather than a list of method names: the earlier name-filtered
+ * source never saw {@code ExternalPaymentGatewayApi}, which is how initiate and status shipped with no gate at all.
+ * </p>
  */
 class PaymentApisTest {
 
@@ -60,6 +59,15 @@ class PaymentApisTest {
     private static final String STATUS = "status";
     private static final String INTERNAL_REF = "int-1";
     private static final String STORE_ID = STORE.storeMerchantId();
+    private static final String PRIVATE_SEGMENT = "/private/";
+    private static final String MANAGE = "hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.PAYMENT.*')";
+    private static final String MANAGE_STORE = "hasPermission(#store,'StoreMerchantId','STORE-POD.PAYMENT.*')";
+    private static final String GATEWAY = "hasPermission(#store,'StoreMerchantId','STORE-POD.PAYMENT.INITIATE')";
+    /**
+     * Authenticated by the filter chain but carrying no token: the two enum lists are the same for every store, so
+     * there is nothing tenant-scoped for a gate to protect. Anything else under {@code /private/} must be gated.
+     */
+    private static final Set<String> UNGATED_PRIVATE = Set.of("getSupportedPaymentTypes", "getSupportedPaymentStatuses");
 
     private final PaymentConfigurationService configurationService =
             Mockito.mock(PaymentConfigurationService.class);
@@ -73,18 +81,6 @@ class PaymentApisTest {
             new PublicPaymentConfigurationController(configurationService);
     private final PrivatePaymentApi privatePaymentApi = new PrivatePaymentApi(approvalService, transactionService);
     private final PublicPaymentWebhookApi webhookApi = new PublicPaymentWebhookApi(outbox);
-    private final AuthController authController = new AuthController();
-
-    @AfterEach
-    void clearContext() {
-        SecurityContextHolder.clearContext();
-    }
-
-    private static JwtAuthenticationToken token() {
-        Jwt jwt = Jwt.withTokenValue("token").header("alg", "none").subject("a-principal")
-                .issuedAt(Instant.EPOCH).expiresAt(Instant.EPOCH.plusSeconds(3600)).build();
-        return new JwtAuthenticationToken(jwt, List.of(new SimpleGrantedAuthority("SCOPE_store_pod")));
-    }
 
     @Test
     void readingAndWritingConfigurationAllPassTheStoreThrough() throws Exception {
@@ -135,44 +131,43 @@ class PaymentApisTest {
         verify(outbox).schedule(Mockito.any());
     }
 
-    @Test
-    void theCurrentPrincipalEndpointAnswersWithTheJwtItWasGiven() {
-        JwtAuthenticationToken authentication = token();
-
-        assertThat(authController.current(authentication).getBody())
-                .isSameAs(authentication.getPrincipal());
-        assertThat(authController.current(authentication).getStatusCode()).isEqualTo(HttpStatus.OK);
+    static Stream<Class<?>> controllers() {
+        return Stream.of(PaymentConfigurationController.class, PublicPaymentConfigurationController.class,
+                PrivatePaymentApi.class, PublicPaymentWebhookApi.class, ExternalPaymentGatewayApi.class);
     }
 
-    @Test
-    void theMeEndpointReadsWhoeverIsInTheSecurityContext() {
-        JwtAuthenticationToken authentication = token();
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        assertThat(authController.me()).isSameAs(authentication);
-    }
-
-    private static boolean isStoreScopedEndpoint(Method method) {
-        return List.of("getConfigs", "saveConfig", "updateConfig", "deleteConfig", "list", "approve", "reject")
-                .contains(method.getName());
-    }
-
-    private static Stream<Method> privateEndpoints() {
-        return Stream.concat(Stream.of(PaymentConfigurationController.class.getDeclaredMethods()),
-                        Stream.of(PrivatePaymentApi.class.getDeclaredMethods()))
-                .filter(PaymentApisTest::isStoreScopedEndpoint)
-                .filter(m -> !m.getName().startsWith(SUPPORTED_PREFIX))
-                .sorted((a, b) -> a.getName().compareTo(b.getName()));
-    }
-
+    /**
+     * Every handler whose path is private carries a {@code @PreAuthorize} for the audience the path implies — the
+     * seller's manage token, or the same-pod initiate token on the gateway — and every public handler carries none.
+     */
     @ParameterizedTest(name = "{0}")
-    @MethodSource("privateEndpoints")
-    void everyPrivateEndpointCarriesItsPermissionToken(Method endpoint) {
-        PreAuthorize gate = endpoint.getAnnotation(PreAuthorize.class);
+    @MethodSource("controllers")
+    void everyPrivateHandlerIsGatedForItsAudienceAndEveryPublicOneIsOpen(Class<?> controller) {
+        RequestMapping base = AnnotatedElementUtils.findMergedAnnotation(controller, RequestMapping.class);
+        String prefix = base == null || base.path().length == 0 ? "" : base.path()[0];
+        for (Method method : controller.getDeclaredMethods()) {
+            RequestMapping mapping = AnnotatedElementUtils.findMergedAnnotation(method, RequestMapping.class);
+            if (mapping == null) {
+                continue;
+            }
+            String path = prefix + (mapping.path().length == 0 ? "" : mapping.path()[0]);
+            PreAuthorize gate = AnnotatedElementUtils.findMergedAnnotation(method, PreAuthorize.class);
+            String name = String.format("%s.%s", controller.getSimpleName(), method.getName());
+            if (!path.contains(PRIVATE_SEGMENT) || UNGATED_PRIVATE.contains(method.getName())) {
+                assertThat(gate).as("%s is open", name).isNull();
+                continue;
+            }
+            assertThat(gate).as("%s must be gated", name).isNotNull();
+            String expected = controller == ExternalPaymentGatewayApi.class ? GATEWAY
+                    : controller == PrivatePaymentApi.class ? MANAGE_STORE : MANAGE;
+            assertThat(gate.value()).as(name).isEqualTo(expected);
+        }
+    }
 
-        assertThat(gate).as("%s.%s has no @PreAuthorize", endpoint.getDeclaringClass().getSimpleName(),
-                endpoint.getName()).isNotNull();
-        assertThat(gate.value()).contains("'StoreMerchantId','STORE-POD.PAYMENT.*'");
+    @Test
+    void theControllerListIsComplete() {
+        // A controller added to the service but not here is a controller the walk never sees.
+        assertThat(controllers()).hasSize(5);
     }
 
     @Test

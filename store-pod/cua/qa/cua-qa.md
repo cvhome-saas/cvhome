@@ -11,7 +11,7 @@ ports rather than about tokens.
   login configuration (`SocialLoginConfigApi`), and the `/cua` path-prefix handling the edge depends on
 - **Runs on** — `lcl start -d --stack <name>`; reached only through the pod edge at
   `http://<store>.spg-507f1f77.gateway.com/cua/**`, never on `:8124` directly
-- **Cases** — 22 (9 verified, 4 unit only, 9 not verified)
+- **Cases** — 25 (9 verified, 5 unit only, 11 not verified)
 - **Also see** — [spg](../../spg/qa/spg-qa.md) (which keeps the `/cua` prefix and sets `X-Forwarded-Port` for
   exactly this service), [merchant](../../merchant/merchant-service/qa/merchant-qa.md) (the store record cua
   caches), [landing-ui](../../landing-ui/qa/landing-ui-qa.md) (the storefront that starts the login),
@@ -462,6 +462,35 @@ unchanged, but it now constructs the merged `StoreMerchantId` type.
   not a bug).
 
 ---
+
+## SEC — The actuator, and who reads it
+
+cua is an authorization server: its heap holds the keys that sign every shopper's token. These cases are the
+authorization audit's A7 (`../../../.agents/plans/authorization-audit.md`).
+
+### SEC-01 — The probes answer, and nothing else does · critical · [not verified]
+
+- **Setup** — a running pod (`lcl start -d`), cua reachable on 8124.
+- **Steps** — `curl -si localhost:8124/actuator/health`, then the same for `/actuator/env`, `/actuator/heapdump`,
+  `/actuator/configprops` and `/actuator/beans`, with no credential.
+- **Expect** — health answers 200 with a status; every other one answers **401**, not a 302 to a storefront login
+  and not a body. The chain permitted every actuator endpoint before this, so `/heapdump` was one anonymous GET
+  away from the signing keys.
+
+### SEC-02 — A shopper session is not an operator · critical · [unit only]
+
+- **Steps** — sign in as a shopper (LGN-01), then call `/actuator/env` with that session or its token.
+- **Expect** — 401 or 403. A cua token cannot hold `SCOPE_store_core` or `ROLE_SUPER_ADMIN` whatever it claims:
+  the realm's `grants` cap it at `ROLE_CUSTOMER` and `SCOPE_OPENID`
+  (`RealmAwareJwtGrantedAuthoritiesConverterTest`), which is why this is tagged unit only — the integration test
+  beside it covers the anonymous half, and cua's context wires no token signer to mint the shopper half.
+
+### SEC-03 — An operator reads it with a uaa token · [not verified]
+
+- **Steps** — with a `store_core`-scoped or super-admin uaa token, `curl -si -H "Authorization: Bearer <token>"
+  localhost:8124/actuator/env`.
+- **Expect** — 200. cua decodes uaa's tokens through the multi-issuer decoder, so the platform's own tooling
+  reads a pod's authorization server without the endpoint being open to the pod's shoppers.
 
 ## 99 — Known gaps
 
