@@ -44,6 +44,22 @@ final class PaymentApiTestSupport {
 
     static final String WEBHOOK = "/api/v1/public/webhook";
 
+    /**
+     * The pod the test context runs as ({@code pod-info.pod.name}); the {@code resource} claim a same-pod service
+     * token must carry. Before {@code STORE-POD.PAYMENT.INITIATE} gated the gateway, {@link #s2s()} named "payment"
+     * here and nothing noticed, because nothing compared it to anything.
+     */
+    static final String POD = "pod-507f1f77";
+
+    /**
+     * The property that names this pod, so {@link #s2s()}'s {@code resource} claim matches. Every class that imports
+     * {@code ExternalClientsTestConfiguration} carries it, so they keep sharing one context.
+     */
+    static final String POD_PROPERTY = "com.asrevo.cvhome.pod-info.pod.name=pod-507f1f77";
+
+    /** A pod that is not this one: the same client credentials shape, refused by {@code isSameStorePod}. */
+    static final String OTHER_POD = "pod-other";
+
     static final String SUPPORTED_TYPES = "supported-payment-types";
 
     static final String STRIPE = "STRIPE";
@@ -169,8 +185,19 @@ final class PaymentApiTestSupport {
         return tokens.staff(Tokens.ROLE_STORE_MODERATOR, store);
     }
 
+    /** Checkout's service principal on this pod: the one audience the gateway admits. */
     String s2s() {
-        return tokens.s2s(Tokens.SCOPE_STORE_POD, "payment");
+        return tokens.s2s(Tokens.SCOPE_STORE_POD, POD);
+    }
+
+    /** A service principal of another pod — the same scope, a {@code resource} claim this pod does not answer to. */
+    String foreignPodS2s() {
+        return tokens.s2s(Tokens.SCOPE_STORE_POD, OTHER_POD);
+    }
+
+    /** A shopper cua minted against {@code store}; never an audience of the gateway. */
+    String shopper(String store) {
+        return tokens.shopper(store, String.format("shopper@%s", store));
     }
 
     ResponseEntity<String> get(String url, String token) {

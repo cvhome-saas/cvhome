@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.context.TestPropertySource;
 
 import com.asrevo.cvhome.payment.config.ExternalClientsTestConfiguration;
 import com.asrevo.cvhome.testsupport.annotations.StorageIntegrationTest;
@@ -42,9 +43,16 @@ import static org.assertj.core.api.Assertions.assertThat;
  * must not become two payments, and a store that cannot take a payment must be told so as a {@code FAILED} result
  * rather than an exception, because a caller has to distinguish "we decided no" from "we could not decide".
  * </p>
+ *
+ * <p>
+ * The gate cases are the audit finding A2 pinned over HTTP: {@code STORE-POD.PAYMENT.INITIATE} admits a service
+ * principal whose {@code resource} names this pod and nothing else — not a shopper of the store, not another pod's
+ * service. A refusal here is a 403 from the evaluator, never a domain answer, so the body is not read.
+ * </p>
  */
 @StorageIntegrationTest
 @Import(ExternalClientsTestConfiguration.class)
+@TestPropertySource(properties = PaymentApiTestSupport.POD_PROPERTY)
 class PaymentGatewayApiIntegrationTest {
 
     /** The store this class initiates against. */
@@ -125,6 +133,36 @@ class PaymentGatewayApiIntegrationTest {
     @Test
     void anUnknownOrderReferenceHasAFailedStatusRatherThanA404() {
         assertThat(status(STORE, slug("never-initiated")).get(STATUS).asString()).isEqualTo(FAILED);
+    }
+
+    @Test
+    void aShopperOfTheStoreMayNotInitiateOrReadAPayment() {
+        String ref = slug(ORDER);
+
+        expect(api.post(scoped(INITIATE, STORE), api.shopper(STORE), paymentRequestBody(ref, AMOUNT, COD)),
+                HttpStatus.FORBIDDEN);
+        expect(api.get(scoped(path(PAYMENTS, ref, STATUS_SEGMENT), STORE), api.shopper(STORE)), HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    void anotherPodsServicePrincipalMayNotInitiateOrReadAPayment() {
+        String ref = slug(ORDER);
+
+        expect(api.post(scoped(INITIATE, STORE), api.foreignPodS2s(), paymentRequestBody(ref, AMOUNT, COD)),
+                HttpStatus.FORBIDDEN);
+        expect(api.get(scoped(path(PAYMENTS, ref, STATUS_SEGMENT), STORE), api.foreignPodS2s()),
+                HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    void thisPodsServicePrincipalPassesTheGateOnBothHandlers() {
+        // The positive twin of the two refusals above: a 200 with a domain answer, never a 401 or 403. The other
+        // cases in this class already rely on it, but a gate that admitted nobody would fail them for a reason a
+        // reader has to dig for; this one names it.
+        String ref = slug(ORDER);
+
+        assertThat(initiate(STORE, ref, COD, HttpStatus.OK).get(STATUS).asString()).isEqualTo(PENDING);
+        assertThat(status(STORE, ref).get(STATUS).asString()).isEqualTo(PENDING);
     }
 
     @Test
