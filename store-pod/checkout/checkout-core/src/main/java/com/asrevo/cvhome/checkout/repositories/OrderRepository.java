@@ -31,6 +31,9 @@ public interface OrderRepository extends JpaRepository<Order, Long>, JpaSpecific
 
     Optional<Order> findByStoreMerchantIdAndOrderRef(StoreMerchantId store, OrderRef orderRef);
 
+    /** The guest status read: the id the page shows and the ref the redirect carried must name the same order. */
+    Optional<Order> findByStoreMerchantIdAndIdAndOrderRef(StoreMerchantId store, Long id, OrderRef orderRef);
+
     /** The latest order a cart became; a cart handed back after a refusal can become another. */
     Optional<Order> findFirstByStoreMerchantIdAndCartCodeOrderByIdDesc(StoreMerchantId store, CartCode cartCode);
 

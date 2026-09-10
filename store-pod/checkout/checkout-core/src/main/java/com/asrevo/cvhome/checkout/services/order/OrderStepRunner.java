@@ -121,7 +121,7 @@ public class OrderStepRunner {
             Duration window = properties.paymentWindow(order.getPaymentType());
             expireAt = now.plus(window == null ? properties.getPlacement().getCodPaymentExpiry() : window);
         }
-        RedirectUrls urls = new RedirectUrls(order.getSuccessUrl(), order.getCancelUrl()).withOrderId(order.getId());
+        RedirectUrls urls = new RedirectUrls(order.getSuccessUrl(), order.getCancelUrl()).withOrder(order.getId(), order.getOrderRef());
         PaymentRequest request = PaymentRequest.builder()
                 .ref(order.getOrderRef().value())
                 .amount(order.getTotal())

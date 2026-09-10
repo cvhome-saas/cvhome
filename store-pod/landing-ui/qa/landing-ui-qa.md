@@ -12,7 +12,7 @@ text direction, behind the pod's edge.
 - **Runs on** — `lcl start -d --stack <name>` (`npm run dev` alone is not enough — it needs the backend).
   Always reach it through the edge at `http://<store>.spg-507f1f77.gateway.com`; read the live port from
   `lcl urls`
-- **Cases** — 37 (25 verified, 1 unit only, 14 not verified; 3 cases have split verification tags)
+- **Cases** — 38 (25 verified, 1 unit only, 15 not verified; 3 cases have split verification tags)
 - **Also see** — [spg](../../spg/qa/spg-qa.md) (the edge in front of it), content, catalog, inventory,
   [checkout](../../checkout/checkout-service/qa/checkout-qa.md),
   [cua](../../cua/qa/cua-qa.md) (shopper login)
@@ -125,6 +125,18 @@ This is the one that breaks quietly: the agreement now comes only from the TERMS
 
 - **Steps** — add a product, reach checkout, look for the terms text.
 - **Expect** — the LIVE TERMS text for that store, in the shopper's locale. Repeat on **all four** demo stores.
+
+### LUI-06 — The checkout result page sends the order ref back · critical · [not verified]
+
+The payment provider returns the shopper to `/{lang}/checkout/success|cancel?orderId=<id>&ref=<orderRef>`. Every
+theme's `CheckoutResult` reads both and `useOrderStatus` → `OrderService.getOrderStatus` appends `&ref=` to
+`GET /order/{id}/status`; a guest is refused (404) without it. The full case, including the API side, is
+checkout's [PLC-13 / SEC-03](../../checkout/checkout-service/qa/checkout-qa.md#plc-13--the-guest-return-page-reads-the-status-with-the-ref--critical--not-verified).
+
+- **Steps** — on a store that allows guest checkout, signed out, pay by card and land on the result page; then
+  remove `ref` from the URL and reload.
+- **Expect** — the status request carries `ref` and the page shows the paid state; without it the page shows the
+  not-found state, not a spinner or an error page. Signed in, the page works with or without `ref`.
 
 ### LUI-05 — The CMS being down does not take the storefront down · high · [not verified]
 
