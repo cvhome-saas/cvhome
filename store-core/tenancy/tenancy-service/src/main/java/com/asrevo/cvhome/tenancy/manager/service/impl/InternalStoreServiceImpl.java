@@ -201,10 +201,13 @@ public class InternalStoreServiceImpl implements InternalStoreService {
      * Loads a store and refuses it if it belongs to another organization.
      *
      * <p>
-     * This is the guard that actually holds today. {@code @PreAuthorize} alone does not: the shared
-     * {@code StoreRoleAccessChecker.isOrgAdmin} ignores the store it is asked about and returns true for any store on
-     * the platform once the caller is an org admin, so every {@code hasPermission(#store,…)} on this service passes
-     * for a foreign store. Tenancy owns {@code manager_store.org_id}, so it can and must check here.
+     * This is where the org check lives on this service, by configuration rather than by accident. The shared
+     * {@code StoreRoleAccessChecker.isOrgAdmin} compares the caller's org with the store's owner through
+     * {@code ownsTheStore}, but tenancy sets {@code com.asrevo.cvhome.s2s.store-ownership: DELEGATED}
+     * ({@code application.yml}), so on this service the shared gate admits <em>any</em> org admin for
+     * <em>any</em> store and leaves ownership to us. Tenancy owns {@code manager_store.org_id}, so the answer is
+     * one query away — and doing it here rather than in the evaluator is what lets a foreign store answer 404: a
+     * permission gate can only say yes or no, and its no is a 403 that confirms the id exists.
      * </p>
      *
      * <p>
