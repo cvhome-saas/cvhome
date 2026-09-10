@@ -1,7 +1,8 @@
 # StoreLifecycleApi — com.asrevo.cvhome.tenancy.manager.controller.StoreLifecycleApi
 #
-# Suspend and resume are super-admin only; archive and delete belong to the store's owner. Use a super-admin
-# session for the first two.
+# Suspend and resume are super-admin only; archive and delete belong to the store's owner — the org admin whose
+# organization owns it, or a super admin (STORE-CORE.STORE-DELETE). Use a super-admin session for the first two.
+# STORE_ADMIN_SESSION_ID is a store admin of CREATED_STORE_ID, for the refusal block.
 #
 # Requires a running stack: lcl start -d
 
@@ -57,6 +58,17 @@ Cookie: SESSION={{SESSION_ID}}
     client.test("archived", function () {
         client.assert(response.status === 200, "status " + response.status);
         client.assert(response.body.status === "ARCHIVED", "status " + response.body.status);
+    });
+%}
+
+### as the store's own admin — 403; the store admin runs the store, closing it is the organization's decision
+POST {{SELLER_UI_URL}}/tenancy/api/v1/store-manager/private/store/archive?store={{CREATED_STORE_ID}}&lang={{LANG}}
+Cookie: SESSION={{STORE_ADMIN_SESSION_ID}}
+
+> {%
+    client.test("a store admin cannot archive their own store", function () {
+        client.assert(response.status === 403, "status " + response.status);
+        client.assert(response.body.code === "COMMON.ACCESS_DENIED", "code " + response.body.code);
     });
 %}
 
