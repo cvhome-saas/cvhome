@@ -168,8 +168,25 @@ class PermissionAccessCheckerTest {
         @Test
         void deletingAStoreIsTheOrgAdminsAloneNotTheStoreAdmins() {
             assertThat(checker.hasAccessOnStoreDelete(orgAdmin(ORG), STORE)).isTrue();
+            assertThat(checker.hasAccessOnStoreDelete(orgAdmin(OTHER_ORG), STORE)).isFalse();
             assertThat(checker.hasAccessOnStoreDelete(staff(Roles.ROLE_STORE_ADMIN), STORE)).isFalse();
             assertThat(checker.hasAccessOnStoreDelete(staff(Roles.ROLE_STORE_MODERATOR), STORE)).isFalse();
+        }
+
+        /**
+         * The read token used to guard archive and delete, and its audience is what a delete must not have: the
+         * moderator, and every store-core service, which reads any store by design.
+         */
+        @Test
+        void deletingAStoreIsNotTheReadAudience() {
+            assertThat(checker.hasAccessOnStoreFindOne(service(Roles.SCOPE_STORE_CORE), STORE)).isTrue();
+            assertThat(checker.hasAccessOnStoreDelete(service(Roles.SCOPE_STORE_CORE), STORE)).isFalse();
+            assertThat(checker.hasAccessOnStoreDelete(service(Roles.SCOPE_STORE_POD), STORE)).isFalse();
+        }
+
+        @Test
+        void thePlatformOperatorMayDeleteAnyStoreAsItMaySuspendOne() {
+            assertThat(checker.hasAccessOnStoreDelete(superAdmin(), STORE)).isTrue();
         }
 
         @Test

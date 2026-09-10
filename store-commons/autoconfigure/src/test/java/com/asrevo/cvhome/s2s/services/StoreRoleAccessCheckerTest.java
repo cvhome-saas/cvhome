@@ -166,6 +166,19 @@ class StoreRoleAccessCheckerTest {
 
             assertThat(blind.isOrgAdmin(principal(Map.of(ORG_CLAIM, ORG), Roles.ROLE_ORG_ADMIN), STORE)).isFalse();
         }
+
+        /**
+         * A token with no usable org claim parses to an org with a null id. On a dedicated pod the refusal used to
+         * render that id in its log line and crash — a 500 in place of the 403 already decided.
+         */
+        @Test
+        void anOrgAdminWithNoOrgClaimIsRefusedOnADedicatedPodRatherThanCrashing() {
+            assertThat(checker.isOrgAdmin(principal(Map.of(), Roles.ROLE_ORG_ADMIN), STORE, pod(OTHER_ORG))).isFalse();
+            assertThat(checker.isOrgAdmin(principal(Map.of(ORG_CLAIM, "not-an-object-id"), Roles.ROLE_ORG_ADMIN),
+                    STORE, pod(OTHER_ORG))).isFalse();
+            assertThat(checker.isStoreAdmin(principal(Map.of(STORE_CLAIM, STORE.storeMerchantId()),
+                    Roles.ROLE_STORE_ADMIN), STORE, pod(OTHER_ORG))).isFalse();
+        }
     }
 
     @Nested

@@ -41,6 +41,14 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
     private static final String CHECKOUT_SIGNAL = "STORE-POD.CHECKOUT.SIGNAL";
     private static final String CUA_ALL = "STORE-POD.CUA.*";
     private static final String PAYMENT_ALL = "STORE-POD.PAYMENT.*";
+
+    /**
+     * Pod-internal: checkout starting a payment and asking what became of it. Same shape as CHECKOUT_SIGNAL — a
+     * service principal of this pod, never a shopper or seller token. Before this token existed the two payment
+     * endpoints carried no gate at all, so any bearer the pod accepted (a self-registered shopper included) could
+     * open a provider checkout under any store's keys.
+     */
+    private static final String PAYMENT_INITIATE = "STORE-POD.PAYMENT.INITIATE";
     private static final String INVENTORY_ALL = "STORE-POD.INVENTORY.*";
     private static final String INVENTORY_RESERVE = "STORE-POD.INVENTORY.RESERVE";
     private static final String CUSTOMER_ALL = "STORE-POD.CUSTOMER.*";
@@ -88,7 +96,7 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
         return switch (action) {
             case STORE_CREATE, CATALOG_RESERVE, INVENTORY_RESERVE, CHECKOUT_SIGNAL, MERCHANT_ALL, MERCHANT_READ,
                  CONTENT_ALL, CONTENT_READ, CONTENT_MEDIA_USAGE, CATALOG_ALL, CHECKOUT_ALL, CUA_ALL, PAYMENT_ALL,
-                 INVENTORY_ALL, CUSTOMER_ALL -> hasStorePodPermission(authentication, targetId, action);
+                 PAYMENT_INITIATE, INVENTORY_ALL, CUSTOMER_ALL -> hasStorePodPermission(authentication, targetId, action);
             default -> hasStoreCorePermission(authentication, targetId, action);
         };
     }
@@ -97,7 +105,7 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
         return switch (action) {
             case STORE_CREATE -> checker.hasAccessOnStoreCreate(authentication, (String) targetId, this.pod);
 
-            case CATALOG_RESERVE, INVENTORY_RESERVE, CHECKOUT_SIGNAL, CONTENT_MEDIA_USAGE ->
+            case CATALOG_RESERVE, INVENTORY_RESERVE, CHECKOUT_SIGNAL, CONTENT_MEDIA_USAGE, PAYMENT_INITIATE ->
                     checker.isSameStorePod(authentication, (StoreMerchantId) targetId, this.pod);
 
             case MERCHANT_READ, CONTENT_READ -> checker.hasReadAccessOnStore(authentication, (StoreMerchantId) targetId,
@@ -116,6 +124,9 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
     private boolean hasStoreCorePermission(Authentication authentication, Serializable targetId, String action) {
         return switch (action) {
             case "STORE-CORE.STORE-FIND-ONE" -> checker.hasAccessOnStoreFindOne(authentication, (StoreMerchantId) targetId);
+            // Archiving or deleting a store. Its own token because the read one admits a moderator and any store-core
+            // service principal, and for a while that is what guarded the delete.
+            case "STORE-CORE.STORE-DELETE" -> checker.hasAccessOnStoreDelete(authentication, (StoreMerchantId) targetId);
 
             case "STORE-CORE.USERS.LIST" -> checker.hasAccessOnStoreUsersList(authentication, (StoreMerchantId) targetId);
             case "STORE-CORE.USERS.CREATE" -> checker.hasAccessOnStoreUsersCreate(authentication, (StoreMerchantId) targetId);
