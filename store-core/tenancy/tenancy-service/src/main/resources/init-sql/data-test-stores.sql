@@ -62,6 +62,14 @@ VALUES ('11111111111111111111bb04', 'DELETED-STORE', CURRENT_DATE, '111111111111
         '507f1f77bcf86cd799439011', 'SUCCESSFULLY_PROVISIONING', 'DELETED', 1)
 ON CONFLICT DO NOTHING;
 
+-- Archived and then deleted by the platform operator in StoreLifecycleApiIntegrationTest, which proves the delete
+-- gate admits the super admin as well as the owning org admin. On data.sql's second organization, whose own admin
+-- never touches it; nothing else may depend on it because DELETED is terminal.
+INSERT INTO tenancy.manager_store(id, name, created_date, org_id, pod_id, provisioning_state, status, version)
+VALUES ('11111111111111111111bb05', 'OPERATOR-CLOSED-STORE', CURRENT_DATE, '352023632b046970c104b76f',
+        '507f1f77bcf86cd799439011', 'SUCCESSFULLY_PROVISIONING', 'ACTIVE', 1)
+ON CONFLICT DO NOTHING;
+
 INSERT INTO tenancy.org_member(org_id, user_id, role, added_at, added_by)
 VALUES ('11111111111111111111aa04', 'member-one', 'STORE_ADMIN', now(), 'seed')
 ON CONFLICT DO NOTHING;

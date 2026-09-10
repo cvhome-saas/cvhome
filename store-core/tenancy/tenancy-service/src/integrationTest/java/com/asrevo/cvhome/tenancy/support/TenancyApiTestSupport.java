@@ -66,6 +66,9 @@ public final class TenancyApiTestSupport {
 
     public static final String DELETED_STORE = "11111111111111111111bb04";
 
+    /** ORG_B's third store, ACTIVE: the operator archives and deletes it, so nothing else may depend on it. */
+    public static final String OPERATOR_CLOSED_STORE = "11111111111111111111bb05";
+
     public static final String POD_ID = "507f1f77bcf86cd799439011";
 
     /** Every store on the {@code test-stores} seed sits on one pod, so this is the only pod a fixture names. */
