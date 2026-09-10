@@ -145,7 +145,7 @@ public class StoreRoleAccessChecker {
         UserOrgStoreIdentity identity = getOrgStoreIdentity(authentication);
         if (!isPodAllowOrg(pod, identity.org())) {
             log.debug("User {} does not have org admin role with roles {} on pod {} not allowed for org {}",
-                    authentication.getName(), getRoles(authentication), pod.name(), identity.org().id().toString());
+                    authentication.getName(), getRoles(authentication), pod.name(), describe(identity.org()));
             return false;
         }
         return ownsTheStore(identity.org(), requestedStoreId);
@@ -163,7 +163,7 @@ public class StoreRoleAccessChecker {
         UserOrgStoreIdentity identity = getOrgStoreIdentity(authentication);
         if (!isPodAllowOrg(pod, identity.org())) {
             log.debug("User {} does not have store admin role with roles {} on pod {} not allowed for org {}",
-                    authentication.getName(), getRoles(authentication), pod.name(), identity.org().id().toString());
+                    authentication.getName(), getRoles(authentication), pod.name(), describe(identity.org()));
             return false;
         }
         if (!requestedStoreId.equals(identity.store())) {
@@ -187,7 +187,7 @@ public class StoreRoleAccessChecker {
         UserOrgStoreIdentity identity = getOrgStoreIdentity(authentication);
         if (!isPodAllowOrg(pod, identity.org())) {
             log.debug("User {} does not have store moderator role with roles {} on pod {} not allowed for org {}",
-                    authentication.getName(), getRoles(authentication), pod.name(), identity.org().id().toString());
+                    authentication.getName(), getRoles(authentication), pod.name(), describe(identity.org()));
             return false;
         }
         if (!requestedStoreId.equals(identity.store())) {
@@ -197,6 +197,20 @@ public class StoreRoleAccessChecker {
             return false;
         }
         return true;
+    }
+
+    /**
+     * The org for a log line, when there may not be one.
+     *
+     * <p>
+     * A staff token whose {@code org} claim is missing or malformed parses to a {@link ManagerOrgId} with a null id,
+     * and on a pod dedicated to one organization the refusal above used to render it with {@code id().toString()}
+     * — a NullPointerException, so the request ended as a 500 with a stack trace instead of the 403 it had already
+     * decided on.
+     * </p>
+     */
+    private static String describe(ManagerOrgId orgId) {
+        return orgId == null || orgId.id() == null ? "none" : orgId.id().toString();
     }
 
     private boolean isPodAllowOrg(Pod pod, ManagerOrgId orgId) {
