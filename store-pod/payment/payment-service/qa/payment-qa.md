@@ -10,7 +10,7 @@ kept apart on purpose — so most of this document is about failure, not the hap
   `/api/v1/public/webhook/{storeId}/{paymentType}`
 - **Runs on** — `lcl start -d --stack <name>`; read the live port from `lcl urls`. Address it through an edge,
   never `:8125`
-- **Cases** — 23 (0 verified, 2 unit only, 21 not verified)
+- **Cases** — 26 (0 verified, 3 unit only, 23 not verified)
 - **Also see** — [checkout](../../../checkout/checkout-service/qa/checkout-qa.md) (the caller that places the
   order), [merchant](../../../merchant/merchant-service/qa/merchant-qa.md) (the store record it caches),
   [billing](../../../../store-core/billing/billing-service/qa/billing-qa.md) (**a different thing entirely** —
@@ -96,7 +96,8 @@ is what the storefront asks before rendering the payment step.
 ## PAY — Initiating and settling a payment
 
 `ExternalPaymentGatewayApi` is the s2s surface checkout calls: `POST /api/v1/private/payments/initiate` and
-`GET /api/v1/private/payments/{requestRef}/status`.
+`GET /api/v1/private/payments/{requestRef}/status`, both behind `STORE-POD.PAYMENT.INITIATE` — checkout's service
+principal on this pod, nobody else (SEC-06, SEC-07). Runnable blocks: `http/external-payment-gateway-api.http`.
 
 ### PAY-01 — A payment initiates and reports its status · critical · [not verified]
 
@@ -228,6 +229,38 @@ makes the signature check the only thing standing between a stranger and a paid 
 - **Steps** — run a full initiate → webhook → status cycle and read the log.
 - **Expect** — no card data, no provider secret, no full request body from the provider.
 
+### SEC-06 — Initiate and status with a shopper token → 403 · critical · [not verified]
+
+- **Why it matters** — audit finding A2 (`.agents/plans/authorization-audit.md`): until `STORE-POD.PAYMENT.INITIATE`
+  gated the gateway, any bearer either issuer had signed could initiate a provider checkout under any store's keys
+  with a `successUrl` of its choosing, and read any store's payment status by reference.
+- **Setup** — a shopper signed in on the storefront (`SHOPPER_TOKEN`, checkout-api.http says where).
+- **Steps** — the "a shopper token — 403" blocks in `http/external-payment-gateway-api.http`: `POST
+  /api/v1/private/payments/initiate` and `GET /api/v1/private/payments/{requestRef}/status` with the shopper bearer,
+  through `{{SPG_URL}}/payment`.
+- **Expect** — **403** on both, no transaction row. Then the s2s blocks with `S2S_TOKEN` → 200, which proves the gate
+  admits the right caller and not merely nobody.
+- **Also** — a seller session (`ORG_ADMIN_SESSION_ID` through `{{SELLER_UI_URL}}/spg/payment/...`) is 403 too: the
+  token names the pod's service principal, not a person.
+
+### SEC-07 — Initiate with a foreign pod's service token → 403 · critical · [unit only]
+
+- **Covered by** — `PaymentGatewayApiIntegrationTest.anotherPodsServicePrincipalMayNotInitiateOrReadAPayment`
+  (and `aShopperOfTheStoreMayNotInitiateOrReadAPayment`, `thisPodsServicePrincipalPassesTheGateOnBothHandlers`
+  for the two neighbours); `PaymentApisTest` walks every controller and pins the token on both handlers.
+- **Steps** — a `scope=store_pod` client-credentials token whose `resource` claim names another pod (uaa mints one
+  per pod client; `pod-other` in the test) against initiate and status.
+- **Expect** — **403** on both: `isSameStorePod` compares `resource` to this pod's name. A stack has one pod, so
+  this is not reproducible by hand without a second pod client in uaa — hence unit only.
+
+### SEC-08 — `GET /api/v1/auth/current` is gone → 404 · high · [not verified]
+
+- **Why it matters** — audit finding A10: `AuthController` echoed the whole JWT to its holder from outside
+  `/private/`, and nothing consumed it (the console's `auth/me` is uaa's and the gateway's; the storefront's is
+  cua's).
+- **Steps** — `GET {{SELLER_UI_URL}}/spg/payment/api/v1/auth/current` and `.../auth/me` with a seller session.
+- **Expect** — **404** on both. A 200 carrying claims means the controller came back.
+
 ---
 
 ## DEP — What depends on payment
@@ -253,10 +286,14 @@ makes the signature check the only thing standing between a stranger and a paid 
 
 ## 99 — Known gaps
 
-**Payment has no `http/` directory.** Every endpoint should ship a runnable block in
-`store-pod/payment/payment-service/http/<api-class>.http`; none exists. That is the single cheapest thing that
-would move most of this file off `[not verified]`, and it is a review-policy violation on the next PR that
-touches an endpoint here.
+**`http/` covers the gateway and the webhook only.** `external-payment-gateway-api.http` and
+`public-payment-webhook-api.http` exist; `PaymentConfigurationController`, `PublicPaymentConfigurationController`
+and `PrivatePaymentApi` still have no runnable block, which is the cheapest thing that would move CFG and PAY-03/04
+off `[not verified]`, and a review-policy violation on the next PR that touches one of them.
+
+**The webhook answers 200 to everything and verifies later, on the outbox** (WHK-01 is asserted by a transaction
+that stays PENDING, not by a 4xx). Phase 5 of `.agents/plans/authorization-audit.md` moves the check in front of
+the outbox; `public-payment-webhook-api.http` gains its 4xx blocks then.
 
 **Nothing in this file has been driven end to end.** The `[unit only]` tags on ERR-01 and ERR-02 are real —
 `PaymentExceptionsTest` and `StripeProcessorTest` exist and pass — but the stack path is unproven.

@@ -17,6 +17,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 
+import com.asrevo.cvhome.checkout.domain.OrderRef;
 import com.asrevo.cvhome.checkout.domain.ShopperId;
 import com.asrevo.cvhome.checkout.entity.Order;
 import com.asrevo.cvhome.checkout.entity.Orders;
@@ -61,6 +62,10 @@ class OrderServiceImplTest {
     private static final String ADMIN = "admin";
 
     private static final ShopperId SHOPPER = new ShopperId("sub-1");
+
+    private static final String REF = "11111111-1111-1111-1111-111111111111";
+
+    private static final String OTHER_REF = "22222222-2222-2222-2222-222222222222";
 
     private static final LanguageCode EN = LanguageCode.defaultLanguage();
 
@@ -133,10 +138,13 @@ class OrderServiceImplTest {
     @Test
     void anotherStoresOrderIs404() {
         when(orders.findByStoreMerchantIdAndId(Orders.STORE, 100L)).thenReturn(Optional.empty());
+        when(orders.findByStoreMerchantIdAndIdAndOrderRef(Orders.STORE, 100L, OrderRef.of(REF)))
+                .thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.get(Orders.STORE, EN, 100L)).isInstanceOf(OrderNotFoundException.class);
         assertThatThrownBy(() -> service.history(Orders.STORE, 100L)).isInstanceOf(OrderNotFoundException.class);
-        assertThatThrownBy(() -> service.status(Orders.STORE, 100L, null)).isInstanceOf(OrderNotFoundException.class);
+        assertThatThrownBy(() -> service.status(Orders.STORE, 100L, null, REF))
+                .isInstanceOf(OrderNotFoundException.class);
     }
 
     @Test
@@ -184,15 +192,39 @@ class OrderServiceImplTest {
 
     @Test
     void theStatusReadShowsTheRedirectOnlyWhileWaitingForPayment() throws Exception {
-        when(orders.findByStoreMerchantIdAndId(Orders.STORE, 100L))
+        when(orders.findByStoreMerchantIdAndIdAndOrderRef(Orders.STORE, 100L, OrderRef.of(REF)))
                 .thenReturn(Optional.of(Orders.awaitingPayment(PaymentType.STRIPE)));
 
-        ReadableOrderStatus pending = service.status(Orders.STORE, 100L, null);
+        ReadableOrderStatus pending = service.status(Orders.STORE, 100L, null, REF);
         assertThat(pending.getRedirectUrl()).isEqualTo("https://pay/redirect");
         assertThat(pending.getOrderId()).isEqualTo(100L);
 
-        when(orders.findByStoreMerchantIdAndId(Orders.STORE, 100L)).thenReturn(Optional.of(Orders.paid(PaymentType.STRIPE)));
-        assertThat(service.status(Orders.STORE, 100L, null).getRedirectUrl()).isNull();
+        when(orders.findByStoreMerchantIdAndIdAndOrderRef(Orders.STORE, 100L, OrderRef.of(REF)))
+                .thenReturn(Optional.of(Orders.paid(PaymentType.STRIPE)));
+        assertThat(service.status(Orders.STORE, 100L, null, REF).getRedirectUrl()).isNull();
+    }
+
+    @Test
+    void aGuestReadsTheStatusOnlyWithTheOrdersRef() throws Exception {
+        when(orders.findByStoreMerchantIdAndIdAndOrderRef(Orders.STORE, 100L, OrderRef.of(REF)))
+                .thenReturn(Optional.of(Orders.awaitingPayment(PaymentType.STRIPE)));
+        when(orders.findByStoreMerchantIdAndIdAndOrderRef(Orders.STORE, 100L, OrderRef.of(OTHER_REF)))
+                .thenReturn(Optional.empty());
+
+        assertThat(service.status(Orders.STORE, 100L, null, REF).getOrderStatus())
+                .isEqualTo(OrderStatus.PENDING_PAYMENT);
+        assertThatThrownBy(() -> service.status(Orders.STORE, 100L, null, OTHER_REF))
+                .isInstanceOf(OrderNotFoundException.class);
+    }
+
+    @Test
+    void aGuestWithoutARefIs404AndTheIdIsNeverLookedUp() {
+        assertThatThrownBy(() -> service.status(Orders.STORE, 100L, null, null))
+                .isInstanceOf(OrderNotFoundException.class);
+        assertThatThrownBy(() -> service.status(Orders.STORE, 100L, null, " "))
+                .isInstanceOf(OrderNotFoundException.class);
+        verify(orders, never()).findByStoreMerchantIdAndId(any(), any());
+        verify(orders, never()).findByStoreMerchantIdAndIdAndOrderRef(any(), any(), any());
     }
 
     @Test
@@ -207,13 +239,18 @@ class OrderServiceImplTest {
         ReadableOrderConfirmation own = service.getForShopper(Orders.STORE, EN, SHOPPER, 100L);
         assertThat(own.getId()).isEqualTo(100L);
         assertThat(service.historyForShopper(Orders.STORE, SHOPPER, 100L)).isNotEmpty();
-        assertThat(service.status(Orders.STORE, 100L, SHOPPER).getOrderStatus()).isEqualTo(OrderStatus.CONFIRMED);
+        assertThat(service.status(Orders.STORE, 100L, SHOPPER, null).getOrderStatus()).isEqualTo(OrderStatus.CONFIRMED);
+        assertThat(service.status(Orders.STORE, 100L, SHOPPER, OTHER_REF).getOrderStatus())
+                .as("a signed-in shopper is matched to the customer; the ref is ignored")
+                .isEqualTo(OrderStatus.CONFIRMED);
+        verify(orders, never()).findByStoreMerchantIdAndIdAndOrderRef(any(), any(), any());
         assertThat(service.listForShopper(Orders.STORE, EN, SHOPPER, PAGE).getContent()).singleElement()
                 .satisfies(readable -> assertThat(readable.getProducts()).hasSize(1));
 
         assertThatThrownBy(() -> service.getForShopper(Orders.STORE, EN, SHOPPER, 101L))
                 .isInstanceOf(OrderNotFoundException.class);
-        assertThatThrownBy(() -> service.status(Orders.STORE, 101L, SHOPPER)).isInstanceOf(OrderNotFoundException.class);
+        assertThatThrownBy(() -> service.status(Orders.STORE, 101L, SHOPPER, null))
+                .isInstanceOf(OrderNotFoundException.class);
     }
 
     @Test

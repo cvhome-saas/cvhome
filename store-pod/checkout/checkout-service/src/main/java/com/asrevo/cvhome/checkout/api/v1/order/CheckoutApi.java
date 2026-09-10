@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -49,7 +50,8 @@ import static com.asrevo.cvhome.commons.utils.DefaultStoresConstants.DEFAULT_ORG
 
 /**
  * Placing an order and reading its status back on the payment-return page. Not under {@code /private} because a store
- * may allow guest checkout; when it does not, the service answers 401 itself.
+ * may allow guest checkout; when it does not, the service answers 401 itself. A guest proves the order is theirs with
+ * the {@code ref} the redirect URL carried; a signed-in shopper is matched to the order's customer instead.
  */
 @RestController
 @RequestMapping("/api/v1")
@@ -84,8 +86,9 @@ public class CheckoutApi {
     @GetMapping("/order/{orderId}/status")
     @Parameter(name = "store", schema = @Schema(type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
     public ReadableOrderStatus status(@PathVariable Long orderId, StoreMerchantId merchantStore,
-                                      @CurrentShopper ShopperId shopper) throws OrderNotFoundException {
-        return orders.status(merchantStore, orderId, shopper);
+                                      @CurrentShopper ShopperId shopper,
+                                      @RequestParam(required = false) String ref) throws OrderNotFoundException {
+        return orders.status(merchantStore, orderId, shopper, ref);
     }
 
     /**

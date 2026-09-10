@@ -33,10 +33,13 @@ public interface OrderService {
                                           String actor) throws OrderNotFoundException, IllegalOrderTransitionException;
 
     /**
-     * The payment-return page's read. Owned by {@code shopper} when one is signed in; anonymous when the store
-     * allows guest checkout and none is.
+     * The payment-return page's read. Owned by {@code shopper} when one is signed in, and {@code ref} is ignored;
+     * anonymous when the store allows guest checkout and none is — then {@code ref} must be the order's
+     * {@link com.asrevo.cvhome.checkout.domain.OrderRef}, which only the redirect URL carries, or the order is not
+     * found. Never a 403: a numeric id must not be confirmed real.
      */
-    ReadableOrderStatus status(StoreMerchantId store, Long id, ShopperId shopper) throws OrderNotFoundException;
+    ReadableOrderStatus status(StoreMerchantId store, Long id, ShopperId shopper, String ref)
+            throws OrderNotFoundException;
 
     ReadableOrderList listForShopper(StoreMerchantId store, LanguageCode language, ShopperId shopper,
                                      Pageable pageable);

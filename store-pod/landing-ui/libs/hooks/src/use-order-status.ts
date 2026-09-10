@@ -2,7 +2,8 @@ import {useCallback, useEffect, useState} from 'react';
 import {OrderService} from '@store-front/services/order-service';
 import {OrderStatusResult, StoreContext} from '@store-front/types';
 
-export function useOrderStatus(storeContext: StoreContext, orderId: number | undefined) {
+/** `ref` is the order reference from the return URL; a guest cannot read the status without it. */
+export function useOrderStatus(storeContext: StoreContext, orderId: number | undefined, ref?: string) {
     const [orderStatus, setOrderStatus] = useState<OrderStatusResult | undefined>(undefined);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<Error | null>(null);
@@ -11,7 +12,7 @@ export function useOrderStatus(storeContext: StoreContext, orderId: number | und
         if (!orderId) return;
         setLoading(true);
         try {
-            const result = await OrderService.getOrderStatus(storeContext, orderId);
+            const result = await OrderService.getOrderStatus(storeContext, orderId, ref);
             setOrderStatus(result);
             return result;
         } catch (err) {
@@ -19,7 +20,7 @@ export function useOrderStatus(storeContext: StoreContext, orderId: number | und
         } finally {
             setLoading(false);
         }
-    }, [storeContext, orderId]);
+    }, [storeContext, orderId, ref]);
 
     useEffect(() => {
         fetchOrderStatus().then();

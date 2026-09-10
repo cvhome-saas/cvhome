@@ -216,6 +216,75 @@ scope `super_admin` — not the `s2s` registration. The contract covers the whol
 never be logged. Because that scope is platform-wide, the caller is responsible
 for tenant scoping via the `org`/`store` user metadata. Full guide: `uaa-client.md`.
 
+## The authorization model, end to end
+
+Authentication says who is asking; this says what they may touch. One evaluator answers that for the whole
+platform, and it is reached only through `@PreAuthorize`.
+
+```java
+@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
+```
+
+`CustomPermissionEvaluator` (`store-commons:autoconfigure`, `s2s/config/internal/`) dispatches on the permission
+string alone — `targetType` is decorative — into `PermissionAccessChecker`, which names the audience of each
+token, which asks `StoreRoleAccessChecker` the one question a claim can answer. An unknown token hits
+`default -> false`, so a token nobody wired up is a silent 403 rather than an opening. The three-argument
+overload of `hasPermission` always denies; every guard in the repo names the four-argument one.
+
+There is **no `@PermissionAccessChecker` annotation and no authorization aspect**. `PermissionAccessChecker` is a
+plain class, reachable only from the evaluator.
+
+### The principals, and what identifies each
+
+| Principal | Issued by | What the check compares |
+|---|---|---|
+| Super admin | uaa, `ROLE_SUPER_ADMIN` | nothing — but only billing and the pod registry widen to it, never a store read |
+| Org admin | uaa, `ROLE_ORG_ADMIN` + `org` claim | the store's owner, looked up through `StoreOrgOwnerRetriever` |
+| Store admin / moderator | uaa, role + `org` + `store` claims | the `store` claim against `?store=` |
+| Shopper | cua, `ROLE_CUSTOMER` + `realm` claim | the `realm` claim against `?store=` |
+| Pod service | uaa client credentials, `scope=store_pod`, `resource` = pod name | `resource` against this pod's own `pod-info.pod.name` |
+| Store-core service | uaa client credentials, `scope=store_core` | nothing — it reads any store by design |
+
+A service that cannot look up a store's owner refuses org admins rather than admitting them, and a pod with no
+`pod-info` refuses every same-pod check. Both fail closed on purpose.
+
+### `store-ownership: ENFORCED` or `DELEGATED`
+
+Tenancy and billing set `com.asrevo.cvhome.s2s.store-ownership: DELEGATED`, so the shared gate admits any org
+admin and the service does the org check itself. They earn it: both answer a foreign store **404**, which a gate
+that can only say yes or no cannot express, and a 403 would confirm the store exists. Everywhere else the
+default `ENFORCED` applies and the gate does the checking.
+
+### Which paths are open, and why that differs by layer
+
+- **Pod services** authenticate `/api/*/private/**` and permit everything else. Security is opt-in by path
+  spelling, because the storefront calls the rest with no token at all.
+- **store-core services** permit `/api/v1/*/public/**` and authenticate everything else.
+- **The gateway** permits every exchange: it is a token relay, the backend judges the token, and its own
+  session-bound endpoints gate themselves. Its actuator is the exception.
+
+So on a pod, a handler that forgets both `/private/` and `@PreAuthorize` is anonymous and nothing complains.
+That is what the architecture rule below exists to catch.
+
+### Adding an endpoint
+
+1. Take `StoreMerchantId merchantStore` and carry `@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','LAYER.DOMAIN.ACTION')")`.
+2. A genuinely new token needs a `case` in `CustomPermissionEvaluator` **and** a method on
+   `PermissionAccessChecker`. Half of it is a silent 403.
+3. Point `#merchantStore` at the parameter the service actually uses. A guard that checks one argument while the
+   body carries another checks nothing.
+
+### Adding a deliberately anonymous endpoint
+
+Storefront reads, the guest cart and the payment webhooks are anonymous on purpose. `CvhomeArchitectureRules`
+(`store-commons:test-support`) fails the build for a handler that is neither gated nor declared, so the way to
+add one is to put `ControllerName#methodName` in the `ANONYMOUS` set of that service's `*ArchitectureTest`, with
+a one-line reason. A stale entry fails too, so the list cannot outlive the endpoint. Under `POD` an entry whose
+path contains `/private/` is refused outright: a private handler carries a token or it is a finding.
+
+The register of what is deliberately anonymous, and the findings behind these rules, is the authorization audit
+(`.agents/plans/authorization-audit.md`).
+
 ## Related
 
 - Per-environment issuer/port values: `configuration.md`

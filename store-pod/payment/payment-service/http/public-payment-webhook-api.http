@@ -1,0 +1,36 @@
+# PublicPaymentWebhookApi — com.asrevo.cvhome.payment.api.v1.payment.PublicPaymentWebhookApi
+#
+# The provider telling payment what became of a checkout session. Public by necessity — Stripe holds no token of
+# ours — so the store's own webhook secret is the credential: the store id is in the path, and the delivery is
+# verified against that store's payment_configuration.webhook_secret. Addressed the way Stripe reaches it: through
+# the pod edge (spg strips the /payment prefix), which is what lcl's stripe-org1-store1-webhook listener forwards to.
+#
+# A real delivery is easiest from the Stripe CLI: `stripe trigger checkout.session.completed` while the listener is
+# up. The blocks below hand-sign a session-completed event with WEBHOOK_SECRET (the secret configured for the store;
+# http-client.private.env.json). Today the endpoint answers 200 to every delivery and verifies the signature later,
+# on the outbox — a bad signature is visible only as a transaction that stays PENDING. Phase 5 of
+# .agents/plans/authorization-audit.md moves the check in front of the outbox and adds the 4xx blocks here.
+#
+# Requires a running stack: lcl start -d
+
+### a signed checkout.session.completed — 200; the referenced transaction settles to PAID via the outbox
+# The signature is Stripe's scheme, t=<epoch>,v1=<hmac-sha256 hex of "<epoch>.<payload>">, over the exact body
+# bytes; compute it for the body below with WEBHOOK_SECRET and paste the whole header value into STRIPE_SIGNATURE
+# (a pre-request script cannot read the body). GATEWAY_REF is set by external-payment-gateway-api.http's initiate.
+POST {{SPG_URL}}/payment/api/v1/public/webhook/{{STORE_ID}}/STRIPE
+Content-Type: application/json
+Stripe-Signature: {{STRIPE_SIGNATURE}}
+
+{"id":"evt_http_1","object":"event","api_version":"2024-06-20","type":"checkout.session.completed","data":{"object":{"id":"cs_http_1","object":"checkout.session","client_reference_id":"{{GATEWAY_REF}}"}}}
+
+### no signature header — 200 today, and the transaction stays PENDING (WHK-01)
+POST {{SPG_URL}}/payment/api/v1/public/webhook/{{STORE_ID}}/STRIPE
+Content-Type: application/json
+
+{"id":"evt_http_2","object":"event","api_version":"2024-06-20","type":"checkout.session.completed","data":{"object":{"id":"cs_http_2","object":"checkout.session","client_reference_id":"{{GATEWAY_REF}}"}}}
+
+### a type the pod has no processor for — 200 today, discarded on the outbox
+POST {{SPG_URL}}/payment/api/v1/public/webhook/{{STORE_ID}}/PAYPAL
+Content-Type: application/json
+
+{"event":"nothing-handles-this"}
