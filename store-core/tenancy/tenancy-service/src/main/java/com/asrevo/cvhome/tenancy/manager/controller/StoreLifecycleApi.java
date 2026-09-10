@@ -27,8 +27,10 @@ import lombok.AllArgsConstructor;
  * <p>
  * Suspend and resume are the operator's lever and are super-admin only — suspending takes a merchant's business
  * offline, which is not something their own admin should be able to do to themselves by accident, nor something
- * they can undo unilaterally. Archive and delete belong to the owner, so they carry the store-scoped permission
- * token instead.
+ * they can undo unilaterally. Archive and delete belong to the owner — the org admin whose organization owns the
+ * store, or the platform operator — so they carry {@code STORE-CORE.STORE-DELETE}, which admits exactly those two.
+ * They used to carry the store's <em>read</em> token, {@code STORE-CORE.STORE-FIND-ONE}, which a store admin, a
+ * moderator and any store-core service principal all pass: everyone who could look at a store could close it.
  * </p>
  */
 @RestController
@@ -37,7 +39,7 @@ import lombok.AllArgsConstructor;
 @Tag(name = "Store lifecycle", description = "Suspend, resume, archive and delete a store")
 public class StoreLifecycleApi {
 
-    private static final String OWNER = "hasPermission(#store,'StoreMerchantId','STORE-CORE.STORE-FIND-ONE')";
+    private static final String OWNER = "hasPermission(#store,'StoreMerchantId','STORE-CORE.STORE-DELETE')";
 
     private final StoreLifecycleService lifecycleService;
 
