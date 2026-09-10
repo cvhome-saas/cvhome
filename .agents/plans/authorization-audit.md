@@ -47,7 +47,7 @@ cross-tenant), **M** (wrong principal → non-public read, or abuse vector), **L
 | A4 | **H** | tenancy | `StoreLifecycleApi.java:40,62-63,74-75` | Store admin, moderator, or any holder of the shared store-core client secret archives or deletes the store: the read token `STORE-CORE.STORE-FIND-ONE` gates a destructive op. Cross-org is not possible (tenancy is `DELEGATED`, foreign store → 404) | Wire `STORE-CORE.STORE-DELETE` → `hasAccessOnStoreDelete` (org admin or super admin) | P1, P3 | P1, P3 done |
 | A5 | **M** | payment | `PublicPaymentWebhookApi.java:32-42` | Anonymous POST writes an outbox row for any store id; the signature is checked later in `PaymentGatewayService.handleWebhook` and the row discarded — DB flooding, no 4xx to the sender | Verify the signature and the enabled configuration before `outbox.schedule` | P5 | open |
 | A6 | **M** | all | no gate test in billing, tenancy, pod-registry, content, merchant, gateway | The class of bug A2 recurs silently | ArchUnit rule: every handler gated or in an explicit anonymous allow-list; stale entries fail | P6, P6b | open |
-| A7 | **M** | cua | `CuaSecurityConfig.java:59` | As A1 on the shopper auth server (heapdump holds signing keys) | health/info/prometheus public, the rest authenticated, as uaa does | P9 | P9 done |
+| A7 | **M** | cua | `CuaSecurityConfig.java:59` | As A1 on the shopper auth server (heapdump holds signing keys) | health/info/prometheus public, the rest authenticated, as uaa does | P9 | open |
 | A8 | **M** | store-commons | `StoreRoleAccessChecker.java:146-148,164-166,188-190` | An `ORG_ADMIN`/staff token without a usable `org` claim on an org-private pod NPEs while logging the refusal → 500 with a stack trace instead of 403 | Null-safe log | P1 | done |
 | A9 | **L** | billing | `PermissionAccessChecker.hasAccessOnBillingEntitlementRead` uses `hasScopeStorePod` without the pod match | Any pod's service reads any store's entitlement snapshot (plan ceilings, no tenant data) | Accepted; documented in the javadoc, pinned by test | P1, P10 | documented |
 | A10 | **L** | payment, tenancy | `payment/controller/v1/auth/AuthController.java`, `tenancy/.../AuthApi.java:41` | Echo the entire JWT to its holder; payment's is outside `/private/`; no consumer | Delete payment's; tenancy keeps `current` behind `isAuthenticated()` | P2, P3 | P3 done (tenancy); P2 open |
@@ -178,12 +178,6 @@ column here.
 
 ## Deviations, as built
 
-- P9: cua also needed an entry point for the actuator. A refused `/actuator/env` answered 302 to the storefront's
-  login, which reads like an open endpoint to anything that follows redirects; it now answers 401 across the whole
-  `/actuator/**` space. Both entry points are registered as mappings, because naming one outright makes Spring
-  discard the mappings — the trap `UaaSecurityConfig` already documents. The shopper case is not an integration
-  test: cua's context wires no token signer, and the realm cap that makes it impossible is a unit test.
-
 - P1: A8 is fixed by rendering the org null-safely in the log line rather than by an early return, because the
   refusal itself was already correct — only the log crashed.
 - P3: the handler walk in `TenancyApisTest` carries an explicit `AUTHENTICATED_ONLY` list (`OrgMemberApi.accept`,
@@ -198,15 +192,10 @@ column here.
 
 ## Verification
 
-- P9 (2026-09-10): `:store-pod:cua:test` 74/0, `:store-pod:cua:integrationTest` 22/0, checkstyle main and
-  integrationTest clean. QA SEC-01 to SEC-03 written, tagged.
-
 Per phase: `./gradlew checkstyleMain checkstyleTest checkstyleIntegrationTest`, `build -x test -x check`, the
 module `:test`, `integrationTest` with Docker for P2–P5, P8, P9, then `extra/scripts/verify-before-push.sh` for the
 receipt. P4 also builds and lints landing-ui.
 
-- P1 (2026-09-09): `:store-commons:autoconfigure:test` and checkstyle — recorded below once run;
-  `verify-before-push.sh` before the push.
 - P1 (2026-09-09): `:store-commons:autoconfigure:test` 257 tests green, checkstyle main and test clean;
   `extra/scripts/verify-before-push.sh` before the push.
 - P3 (2026-09-09): `:store-core:tenancy:tenancy-service` checkstyle main, test and integrationTest clean; `:test`
