@@ -11,6 +11,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.asrevo.cvhome.checkout.domain.OrderRef;
 import com.asrevo.cvhome.checkout.domain.ShopperId;
 import com.asrevo.cvhome.checkout.entity.Customer;
 import com.asrevo.cvhome.checkout.entity.Order;
@@ -94,8 +95,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional(readOnly = true)
-    public ReadableOrderStatus status(StoreMerchantId store, Long id, ShopperId shopper) throws OrderNotFoundException {
-        Order order = shopper == null ? require(store, id) : requireForShopper(store, shopper, id);
+    public ReadableOrderStatus status(StoreMerchantId store, Long id, ShopperId shopper, String ref)
+            throws OrderNotFoundException {
+        Order order = shopper == null ? requireForGuest(store, id, ref) : requireForShopper(store, shopper, id);
         return OrderMapper.toStatus(order);
     }
 
@@ -129,6 +131,15 @@ public class OrderServiceImpl implements OrderService {
 
     private Order require(StoreMerchantId store, Long id) throws OrderNotFoundException {
         return orders.findByStoreMerchantIdAndId(store, id).orElseThrow(() -> OrderNotFoundException.of(id, store.getId()));
+    }
+
+    /** A guest's only credential is the reference the redirect carried; without it every id is unknown. */
+    private Order requireForGuest(StoreMerchantId store, Long id, String ref) throws OrderNotFoundException {
+        if (ref == null || ref.isBlank()) {
+            throw OrderNotFoundException.of(id, store.getId());
+        }
+        return orders.findByStoreMerchantIdAndIdAndOrderRef(store, id, OrderRef.of(ref))
+                .orElseThrow(() -> OrderNotFoundException.of(id, store.getId()));
     }
 
     private Order requireForShopper(StoreMerchantId store, ShopperId shopper, Long id) throws OrderNotFoundException {

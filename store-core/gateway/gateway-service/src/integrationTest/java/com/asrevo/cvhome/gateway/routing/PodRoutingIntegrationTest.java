@@ -7,6 +7,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.health.contributor.Health;
+import org.springframework.boot.health.contributor.Status;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -21,6 +23,7 @@ import com.asrevo.cvhome.commons.domain.PodEndpoint;
 import com.asrevo.cvhome.commons.domain.PodId;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.gateway.client.PodClient;
+import com.asrevo.cvhome.gateway.client.PodRoutesHealthIndicator;
 import com.asrevo.cvhome.gateway.client.StoreBillingStatusClient;
 import com.asrevo.cvhome.podregistry.api.ReactiveExternalPodService;
 import com.asrevo.cvhome.testsupport.annotations.ReactiveIntegrationTest;
@@ -52,6 +55,9 @@ class PodRoutingIntegrationTest {
 
     @Autowired
     private PodClient podClient;
+
+    @Autowired
+    private PodRoutesHealthIndicator podRoutesHealth;
 
     @Autowired
     private StoreBillingStatusClient billingStatusClient;
@@ -120,13 +126,21 @@ class PodRoutingIntegrationTest {
                 .expectBody().jsonPath(METHOD).isEqualTo("POST");
     }
 
+    /**
+     * The component is read from the indicator: the health body carries no {@code components} for an anonymous
+     * caller (common-config.yml, {@code show-details: when-authorized}), and what the probe sees is the aggregate.
+     */
     @Test
     void podRoutesReportHealthyOnceRefreshed() {
+        Health podRoutes = podRoutesHealth.health();
+
+        assertThat(podRoutes.getStatus()).isEqualTo(Status.UP);
+        assertThat(podRoutes.getDetails()).containsEntry("routes", 1);
         client.get().uri("/actuator/health").exchange()
                 .expectStatus().isOk()
                 .expectBody()
-                .jsonPath("$.components.podRoutes.status").isEqualTo("UP")
-                .jsonPath("$.components.podRoutes.details.routes").isEqualTo(1);
+                .jsonPath("$.status").isEqualTo("UP")
+                .jsonPath("$.components").doesNotExist();
     }
 
 }

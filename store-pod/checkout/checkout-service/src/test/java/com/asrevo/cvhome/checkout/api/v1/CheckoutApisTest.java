@@ -180,8 +180,10 @@ class CheckoutApisTest {
     @Test
     void statusAndConsoleReadsPassTheStoreThrough() throws Exception {
         Pageable page = PageRequest.of(0, 10);
-        checkoutApi.status(5L, STORE, SHOPPER);
-        verify(orderService).status(STORE, 5L, SHOPPER);
+        checkoutApi.status(5L, STORE, SHOPPER, null);
+        verify(orderService).status(STORE, 5L, SHOPPER, null);
+        checkoutApi.status(5L, STORE, null, REF);
+        verify(orderService).status(STORE, 5L, null, REF);
 
         OrderFilter filter = new OrderFilter(ADA, 5L, OrderStatus.CONFIRMED, LIT_1, A_B, 7L, null);
         orderApi.list(filter, STORE, EN, page);

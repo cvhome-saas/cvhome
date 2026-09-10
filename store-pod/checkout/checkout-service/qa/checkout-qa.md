@@ -11,7 +11,7 @@ console's order statistics.
 - **Runs on** — `lcl start -d --stack <name>`; read the live ports from `lcl urls`. Address it through the pod
   gateway (`http://spg-507f1f77.gateway.com/checkout/…`) or the platform gateway (`gateway.com:8000/spg/checkout/…`),
   never `:8123`
-- **Cases** — 48 (37 verified end to end or in part, 11 unit only, 0 not verified)
+- **Cases** — 50 (37 verified end to end or in part, 11 unit only, 2 not verified)
 - **Also see** — [payment](../../payment/payment-service/qa/payment-qa.md) (the transactions and the approve /
   reject that drive the signals), [inventory](../../inventory/inventory-service/qa/inventory-qa.md) (the
   reservation that placement takes and expiry releases), [landing-ui](../../landing-ui/qa/landing-ui-qa.md) (the
@@ -230,7 +230,20 @@ row at all — there is nothing to resume or recover, and the cart stays `ACTIVE
 ### PLC-10 — The status read is owned by the shopper · critical · [verified for the store-2 read — owner scoping not verified]
 
 - **Steps** — read another shopper's `/order/{id}/status` with your token; read it from store 2.
-- **Expect** — 404 both times.
+- **Expect** — 404 both times. The `ref` query parameter is ignored for a signed-in shopper: the session, not the
+  URL, is the credential (`OrderServiceImplTest.aShopperOnlySeesTheirOwnOrders`).
+
+### PLC-13 — The guest return page reads the status with the ref · critical · [not verified]
+
+`OrderServiceImplTest.aGuestReadsTheStatusOnlyWithTheOrdersRef`, `RedirectUrlsTest`,
+`CheckoutApiIntegrationTest.aGuestReadsTheStatusWithTheRefTheRedirectCarriedAndNothingElse`.
+
+- **Setup** — a store with `requireLoginForOrderPlacement` off, its Stripe configuration enabled.
+- **Steps** — signed out, check out with STRIPE; pay (or cancel) on the provider page and land on
+  `/{lang}/checkout/success?orderId=<id>&ref=<orderRef>`; watch the network tab.
+- **Expect** — the return URL carries both `orderId` and `ref`; the page calls `GET /order/{id}/status?…&ref=<ref>`
+  with no bearer and renders the paid / pending / cancelled state; `sales_order.order_ref` equals the `ref`. Open
+  the same URL with `ref` deleted → the page shows "order not found" (the API answered 404).
 
 ### PLC-11 — The order snapshot survives catalog edits · high · [verified via API — the console detail not verified]
 
@@ -426,6 +439,17 @@ both try, the second loses and skips, and the remotes are idempotent by ref anyw
 `CheckoutContextIntegrationTest.everyEnumValueIsAcceptedByItsCheckConstraint`. This is the test the old
 service needed: its DDL rejected `EXPIRED` and `CANCELLED`, so expiry and cancel failed at flush.
 
+### SEC-03 — Integer-id enumeration of order status is 404 without the ref · critical · [not verified]
+
+Authorization audit finding A3. On a store that allows guest checkout the status read is anonymous, so before this
+case anyone could walk `GET /order/{n}/status?store=` by integer id and read another guest's order status, payment
+status and live provider redirect URL.
+
+- **Steps** — `checkout-api.http`: "a guest without the ref", "a guest with another order's ref"; then the same two
+  against a store that allows guest checkout, with `{n}` an existing order id.
+- **Expect** — `404 CHECKOUT.ORDER.NOT_FOUND` every time, never 403 and never the order; with the right `ref` → 200.
+  A signed-in shopper's own order stays 200 with or without `ref`.
+
 ---
 
 ## REG — Regression watchlist
@@ -448,6 +472,7 @@ Defects that actually happened in checkout — most in the service this one repl
 | **The console lost the payment ↔ order link** | The order page's Payments card was empty and the ledger's order column was a bare UUID, because the console matched `requestRef` to the numeric order id while the rewrite hands payment the `orderRef`. | ORD-01 detail (Payments card lists the transaction); Payments → order link opens the summary; `GET /private/orders?ref=`. |
 | **The reject dialog promised nothing would happen** | Its copy said the order does not change status; SIG-02 cancels and releases. | SIG-02 — read the dialog. |
 | **Order ids walked by URL** | Another shopper's status read answered 403 (confirming the id) or worse, the order. | PLC-10, CUS-02 — 404, never 403. |
+| **A guest's order status readable by integer id** | On a guest-checkout store `GET /order/{n}/status` answered any order's status, payment status and provider redirect URL to anyone (audit A3). | SEC-03 — 404 without the `ref`; PLC-13 — the return URL carries it and the page sends it. |
 
 ---
 
@@ -462,9 +487,8 @@ what happened; nothing is lost, nothing is automatic.
 **No console filter for flagged orders.** `needsAttention` is on the detail and in the database; a list filter is a
 console change waiting on a product decision about the screen.
 
-**The status read is anonymous for stores that allow guest checkout.** A store that requires login gets the
-owner-scoped 404; a store that does not lets anyone who knows a numeric order id read `{orderStatus,
-paymentStatus}` — the storefront never passes the opaque `orderRef`, and changing that is a landing-ui change.
+**A guest's status read is keyed on the `ref` in the return URL.** Whoever holds that URL can read the order's
+status, as with a cart code: possession is the credential. There is no expiry on it; the read carries no PII.
 
 **No shipping, no tax.** Totals are `SUBTOTAL` and `TOTAL`, always equal; the codes `SHIPPING` and `TAX` are
 reserved in the CHECK constraint for when they exist.

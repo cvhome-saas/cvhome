@@ -288,15 +288,21 @@ management:
       enabled: true
   endpoint:
     health:
-      show-details: always
-    gateway:
-      access: unrestricted
+      # The status is public (the ALB, lcl and the load stack poll `/actuator/health` and read only `"status"`);
+      # the component breakdown names the datasource, the disk and every dependency, so it is for a signed-in
+      # principal only.
+      show-details: when-authorized
   endpoints:
     web:
       exposure:
-        # A placeholder so one service can narrow it (uaa does, in its application.yml): an imported config file
-        # outranks the file that imports it, so a plain override there would lose.
-        include: ${MANAGEMENT_ENDPOINTS_EXPOSURE:*}
+        # What every service maps under /actuator. Health for the probes, info for the build stamp, prometheus for
+        # a scrape. Nothing else: every service but uaa serves its actuator anonymously and the gateway forwards
+        # `/tenancy/actuator/...`, so the old default of `*` put `/heapdump` (with the signing keys in it), `/env`
+        # and `/configprops` one anonymous GET away from the public edge (authorization audit, A1). A debugging
+        # session widens it for one service through the env var — `MANAGEMENT_ENDPOINTS_EXPOSURE=*` — and a
+        # deployment leaves it unset. It is a placeholder rather than a plain key because an imported config file
+        # outranks the file that imports it: uaa pins the same three in its application.yml through this name.
+        include: ${MANAGEMENT_ENDPOINTS_EXPOSURE:health,info,prometheus}
 info:
   app:
     name: ${spring.application.name}

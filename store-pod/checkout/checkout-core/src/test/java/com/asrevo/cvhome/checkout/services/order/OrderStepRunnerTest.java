@@ -57,7 +57,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class OrderStepRunnerTest {
 
-    private static final String ORDERID_100 = "?orderId=100";
+    private static final String ORDERID_100 = "?orderId=100&ref=11111111-1111-1111-1111-111111111111";
 
     private static final String JOIN = "%s%s";
 

@@ -5,7 +5,9 @@
 # (`auth-tokens`) into SHOPPER_TOKEN in http-client.private.env.json. A guest checkout (no Authorization header)
 # is refused with 401 CHECKOUT.ORDER.LOGIN_REQUIRED on such a store.
 #
-# The Origin header is what the payment provider sends the shopper back to (…/{lang}/checkout/success|cancel).
+# The Origin header is what the payment provider sends the shopper back to (…/{lang}/checkout/success|cancel);
+# that URL carries `orderId` and `ref`. A signed-in shopper reads the status by their session; a guest only with
+# `ref` (the order's orderRef, captured below from the checkout response) — a numeric id alone is 404.
 #
 # Requires a running stack: lcl start -d
 
@@ -45,8 +47,17 @@ Content-Type: application/json
 > {% client.global.set("ORDER_ID", response.body.id); client.global.set("ORDER_REF", response.body.orderRef); %}
 
 ### the payment-return page's read — {orderId, orderStatus, paymentStatus, redirectUrl}
-GET {{SPG_URL}}/checkout/api/v1/order/{{ORDER_ID}}/status?store={{STORE_ID}}&lang={{LANG}}
+GET {{SPG_URL}}/checkout/api/v1/order/{{ORDER_ID}}/status?store={{STORE_ID}}&lang={{LANG}}&ref={{ORDER_REF}}
 Authorization: Bearer {{SHOPPER_TOKEN}}
+
+### the same read as a guest holding the return URL — 200 (on a store that allows guest checkout; 401-free either way)
+GET {{SPG_URL}}/checkout/api/v1/order/{{ORDER_ID}}/status?store={{STORE_ID}}&lang={{LANG}}&ref={{ORDER_REF}}
+
+### a guest without the ref — 404 CHECKOUT.ORDER.NOT_FOUND: integer ids cannot be walked
+GET {{SPG_URL}}/checkout/api/v1/order/{{ORDER_ID}}/status?store={{STORE_ID}}&lang={{LANG}}
+
+### a guest with another order's ref — 404, the same answer
+GET {{SPG_URL}}/checkout/api/v1/order/{{ORDER_ID}}/status?store={{STORE_ID}}&lang={{LANG}}&ref=00000000-0000-0000-0000-000000000000
 
 ### the same cart again — 409 CHECKOUT.CART.ALREADY_CONVERTED once its order is closed;
 ### 201 with the SAME order while the order is still open (a resubmit after a 502 resumes it)
@@ -108,6 +119,6 @@ Content-Type: application/json
   "customer": {"emailAddress": "user@example.com", "billing": {"firstName": "D", "lastName": "S", "country": "EG"}}
 }
 
-### someone else's order status — 404 (never 403: the id must not be confirmed real)
-GET {{SPG_URL}}/checkout/api/v1/order/1/status?store={{STORE_ID}}&lang={{LANG}}
+### someone else's order status — 404 (never 403: the id must not be confirmed real); the ref is ignored for a shopper
+GET {{SPG_URL}}/checkout/api/v1/order/1/status?store={{STORE_ID}}&lang={{LANG}}&ref={{ORDER_REF}}
 Authorization: Bearer {{SHOPPER_TOKEN}}

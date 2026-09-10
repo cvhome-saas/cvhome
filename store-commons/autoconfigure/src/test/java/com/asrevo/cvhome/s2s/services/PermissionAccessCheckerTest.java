@@ -232,6 +232,27 @@ class PermissionAccessCheckerTest {
             assertThat(checker.hasAccessOnBillingEntitlementRead(service(Roles.SCOPE_STORE_CORE), STORE)).isTrue();
         }
 
+        /**
+         * And it is any pod's, not only the one holding the store — accepted, not overlooked.
+         *
+         * <p>
+         * Billing has no pod of its own, so it has nothing to match a caller's {@code resource} claim against; the
+         * check is the scope alone. The reach is a plan's ceilings for a caller that already holds a pod's client
+         * secret, which is why the audit records it (A9) rather than narrowing it. Pinned here so that narrowing
+         * it later is a deliberate act with a failing test, and widening it further is not mistaken for this.
+         * </p>
+         */
+        @Test
+        void anyPodsServicePrincipalReadsThemAndThatIsTheAcceptedReach() {
+            Authentication anotherPod = principal(Map.of(SCOPE_CLAIM, Roles.SCOPE_STORE_POD.name(), "resource",
+                    "pod-somewhere-else"), Roles.SCOPE_STORE_POD);
+
+            assertThat(checker.hasAccessOnBillingEntitlementRead(anotherPod, OTHER_STORE)).isTrue();
+            // The reach stops at entitlements: the same principal reads no store and manages no billing.
+            assertThat(checker.hasAccessOnBillingRead(anotherPod, OTHER_STORE)).isFalse();
+            assertThat(checker.hasAccessOnStoreFindOne(anotherPod, OTHER_STORE)).isFalse();
+        }
+
         @Test
         void aHumanStillReachesEntitlementsThroughTheOrdinaryStoreRead() {
             assertThat(checker.hasAccessOnBillingEntitlementRead(staff(Roles.ROLE_STORE_ADMIN), STORE)).isTrue();

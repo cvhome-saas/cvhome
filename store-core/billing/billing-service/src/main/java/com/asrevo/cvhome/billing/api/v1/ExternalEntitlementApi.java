@@ -40,6 +40,13 @@ public class ExternalEntitlementApi implements IEntitlementService {
     private final EntitlementService entitlementService;
 
     @Override
+    /*
+     * The token is scope-only, and deliberately not scoped to the pod that holds the store: billing is a store-core
+     * service with no pod of its own to match a caller's resource claim against, so any pod's service principal
+     * reads any store's snapshot. What that exposes is the plan's ceilings, never tenant data, to a caller already
+     * holding a pod's client secret. Accepted and named in the authorization audit
+     * (.agents/plans/authorization-audit.md, A9) so it stays a decision rather than becoming an oversight.
+     */
     @GetMapping("private/snapshot")
     @PreAuthorize("hasPermission(#store,'StoreMerchantId','STORE-CORE.BILLING.ENTITLEMENT-READ')")
     public EntitlementSnapshot snapshot(@RequestParam("store") StoreMerchantId store)

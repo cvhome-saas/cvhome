@@ -5,6 +5,7 @@ import java.nio.charset.StandardCharsets;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -15,6 +16,8 @@ import org.springframework.web.util.UriUtils;
 import com.asrevo.cvhome.billing.services.entitlement.ReactiveExternalEntitlementService;
 import com.asrevo.cvhome.podregistry.api.ReactiveExternalPodService;
 import com.asrevo.cvhome.testsupport.annotations.ReactiveIntegrationTest;
+
+import io.micrometer.core.instrument.MeterRegistry;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -37,6 +40,9 @@ class AuthApiIntegrationTest {
 
     @MockitoBean
     private ReactiveExternalEntitlementService entitlementService;
+
+    @Autowired
+    private MeterRegistry meterRegistry;
 
     private WebTestClient client;
 
@@ -76,16 +82,15 @@ class AuthApiIntegrationTest {
 
     /**
      * The in-memory session count is a load-test capacity signal (Auth dashboard); starting a login opens a session,
-     * and the gauge reads the store the gateway actually holds them in.
+     * and the gauge reads the store the gateway actually holds them in. Read from the registry: the load stack takes
+     * it over OTLP, and {@code /actuator/metrics} is not exposed (common-config.yml maps health, info and
+     * prometheus only).
      */
     @Test
     void openSessionsAreCountedByTheSessionGauge() {
         client.get().uri("/oauth2/authorization/uaa").exchange().expectStatus().isFound();
 
-        client.get().uri("/actuator/metrics/cvhome.gateway.sessions").exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.measurements[0].value").value(v -> assertThat(((Number) v).doubleValue()).isGreaterThanOrEqualTo(1.0));
+        assertThat(meterRegistry.get("cvhome.gateway.sessions").gauge().value()).isGreaterThanOrEqualTo(1.0);
     }
 
     @Test
