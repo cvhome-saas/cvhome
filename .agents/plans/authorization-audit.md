@@ -1,8 +1,16 @@
 # Authorization audit — findings register and remediation plan
 
-This file is both the audit report and the plan: the findings table is the report, each phase is one PR, and
-the *status* column is updated as phases land. QA cases live in each owning service's `qa/<service>-qa.md`, never
-here.
+This file is both the audit report and the plan: the findings table is the report, each phase is one commit, and
+the *status* column says what landed. QA cases live in each owning service's `qa/<service>-qa.md`, never here.
+
+**Every finding below is closed.** The fixes are merged (cvhome#337 to #347); what stays open is recorded as
+accepted, with the reason, or as deferred with what it needs.
+
+> **How this shipped, and what was wrong with it.** These eleven phases went out as eleven stacked pull
+> requests, because `AGENTS.md` said a phase is one PR. That was expensive and bought nothing: each merge
+> re-conflicted this file on every remaining branch, and each branch then had to re-run the whole pipeline to
+> earn a new push receipt. The rule now reads *a plan is one PR; each phase is one commit*, changed in the same
+> PR as this note. A plan of this shape should be one branch with eleven commits.
 
 ## Context — the model as built
 
@@ -41,22 +49,22 @@ cross-tenant), **M** (wrong principal → non-public read, or abuse vector), **L
 
 | Id | Sev | Service | Where | What an attacker can do | Fix | Phase | Status |
 |---|---|---|---|---|---|---|---|
-| A1 | **C** (verify live) | all | `common-config.yml:291-299` exposure `*`, `gateway.access: unrestricted`; gateway `SecurityConfig.java:55` permitAll; store-core chains permit `/actuator/**` | Anonymous `/actuator/heapdump`, `/env`, `/configprops`, `/actuator/gateway/routes/**` through the public gateway and via `/tenancy/actuator/...` | Default `health,info,prometheus`; `when-authorized`; drop gateway unrestricted | P7, P8 | open |
-| A2 | **H** | payment | `ExternalPaymentGatewayApi.java:40,58` no `@PreAuthorize` | Any bearer from either issuer (a self-registered shopper of any store on the pod) initiates a provider checkout under any store's keys with a chosen `successUrl`, and reads any store's payment status by ref | Token `STORE-POD.PAYMENT.INITIATE` → `isSameStorePod`; only checkout calls it | P1, P2 | P1 done |
-| A3 | **H** | checkout | `CheckoutApi.java:84-89`, `OrderServiceImpl.java:98` | Guest enumerates `GET /api/v1/order/{n}/status?store=` by integer id: order status, payment status, live provider redirect URL of somebody else's open order | Guest must present `?ref=<OrderRef>`; the redirect URL carries it beside `orderId` | P4 | open |
-| A4 | **H** | tenancy | `StoreLifecycleApi.java:40,62-63,74-75` | Store admin, moderator, or any holder of the shared store-core client secret archives or deletes the store: the read token `STORE-CORE.STORE-FIND-ONE` gates a destructive op. Cross-org is not possible (tenancy is `DELEGATED`, foreign store → 404) | Wire `STORE-CORE.STORE-DELETE` → `hasAccessOnStoreDelete` (org admin or super admin) | P1, P3 | P1, P3 done |
-| A5 | **M** | payment | `PublicPaymentWebhookApi.java:32-42` | Anonymous POST writes an outbox row for any store id; the signature is checked later in `PaymentGatewayService.handleWebhook` and the row discarded — DB flooding, no 4xx to the sender | Verify the signature and the enabled configuration before `outbox.schedule` | P5 | open |
-| A6 | **M** | all | no gate test in billing, tenancy, pod-registry, content, merchant, gateway | The class of bug A2 recurs silently | ArchUnit rule: every handler gated or in an explicit anonymous allow-list; stale entries fail | P6, P6b | open |
-| A7 | **M** | cua | `CuaSecurityConfig.java:59` | As A1 on the shopper auth server (heapdump holds signing keys) | health/info/prometheus public, the rest authenticated, as uaa does | P9 | open |
-| A8 | **M** | store-commons | `StoreRoleAccessChecker.java:146-148,164-166,188-190` | An `ORG_ADMIN`/staff token without a usable `org` claim on an org-private pod NPEs while logging the refusal → 500 with a stack trace instead of 403 | Null-safe log | P1 | done |
-| A9 | **L** | billing | `PermissionAccessChecker.hasAccessOnBillingEntitlementRead` uses `hasScopeStorePod` without the pod match | Any pod's service reads any store's entitlement snapshot (plan ceilings, no tenant data) | Accepted; documented in the javadoc, pinned by test | P1, P10 | documented |
-| A10 | **L** | payment, tenancy | `payment/controller/v1/auth/AuthController.java`, `tenancy/.../AuthApi.java:41` | Echo the entire JWT to its holder; payment's is outside `/private/`; no consumer | Delete payment's; tenancy keeps `current` behind `isAuthenticated()` | P2, P3 | P3 done (tenancy); P2 open |
-| A11 | **L** | gateway | `ImpersonationController.java`, CSRF disabled, no `SameSite` on the session cookie | Cross-site POST/DELETE `/api/v1/impersonation` with the operator's cookie; mitigated by the JSON preflight | `same-site: lax`; a gate test on `operator()` | P8 | open |
+| A1 | **C** (verify live) | all | `common-config.yml:291-299` exposure `*`, `gateway.access: unrestricted`; gateway `SecurityConfig.java:55` permitAll; store-core chains permit `/actuator/**` | Anonymous `/actuator/heapdump`, `/env`, `/configprops`, `/actuator/gateway/routes/**` through the public gateway and via `/tenancy/actuator/...` | Default `health,info,prometheus`; `when-authorized`; drop gateway unrestricted | P7, P8 | done (P7, P8) |
+| A2 | **H** | payment | `ExternalPaymentGatewayApi.java:40,58` no `@PreAuthorize` | Any bearer from either issuer (a self-registered shopper of any store on the pod) initiates a provider checkout under any store's keys with a chosen `successUrl`, and reads any store's payment status by ref | Token `STORE-POD.PAYMENT.INITIATE` → `isSameStorePod`; only checkout calls it | P1, P2 | done (P1, P2) |
+| A3 | **H** | checkout | `CheckoutApi.java:84-89`, `OrderServiceImpl.java:98` | Guest enumerates `GET /api/v1/order/{n}/status?store=` by integer id: order status, payment status, live provider redirect URL of somebody else's open order | Guest must present `?ref=<OrderRef>`; the redirect URL carries it beside `orderId` | P4 | done (P4) |
+| A4 | **H** | tenancy | `StoreLifecycleApi.java:40,62-63,74-75` | Store admin, moderator, or any holder of the shared store-core client secret archives or deletes the store: the read token `STORE-CORE.STORE-FIND-ONE` gates a destructive op. Cross-org is not possible (tenancy is `DELEGATED`, foreign store → 404) | Wire `STORE-CORE.STORE-DELETE` → `hasAccessOnStoreDelete` (org admin or super admin) | P1, P3 | done (P1, P3) |
+| A5 | **M** | payment | `PublicPaymentWebhookApi.java:32-42` | Anonymous POST writes an outbox row for any store id; the signature is checked later in `PaymentGatewayService.handleWebhook` and the row discarded — DB flooding, no 4xx to the sender | Verify the signature and the enabled configuration before `outbox.schedule` | P5 | done (P5) |
+| A6 | **M** | all | no gate test in billing, tenancy, pod-registry, content, merchant, gateway | The class of bug A2 recurs silently | ArchUnit rule: every handler gated or in an explicit anonymous allow-list; stale entries fail | P6, P6b | done (P6, P6b) |
+| A7 | **M** | cua | `CuaSecurityConfig.java:59` | As A1 on the shopper auth server (heapdump holds signing keys) | health/info/prometheus public, the rest authenticated, as uaa does | P9 | done (P9) |
+| A8 | **M** | store-commons | `StoreRoleAccessChecker.java:146-148,164-166,188-190` | An `ORG_ADMIN`/staff token without a usable `org` claim on an org-private pod NPEs while logging the refusal → 500 with a stack trace instead of 403 | Null-safe log | P1 | done (P1) |
+| A9 | **L** | billing | `PermissionAccessChecker.hasAccessOnBillingEntitlementRead` uses `hasScopeStorePod` without the pod match | Any pod's service reads any store's entitlement snapshot (plan ceilings, no tenant data) | Accepted; documented in the javadoc, pinned by test | P1, P10 | accepted, documented (P1, P10) |
+| A10 | **L** | payment, tenancy | `payment/controller/v1/auth/AuthController.java`, `tenancy/.../AuthApi.java:41` | Echo the entire JWT to its holder; payment's is outside `/private/`; no consumer | Delete payment's; tenancy keeps `current` behind `isAuthenticated()` | P2, P3 | done (P2, P3) |
+| A11 | **L** | gateway | `ImpersonationController.java`, CSRF disabled, no `SameSite` on the session cookie | Cross-site POST/DELETE `/api/v1/impersonation` with the operator's cookie; mitigated by the JSON preflight | `same-site: lax`; a gate test on `operator()` | P8 | done (P8) |
 | A12 | **L** | merchant | `MerchantStoreApi.java:98` guard reads `#store.org` from the body; `hasAccessOnStoreCreate` skips the org check on a shared pod | Only `store_core` principals pass; the body org is what tenancy decided | By design; registered | — | accepted |
 | A13 | **L** | tenancy | `StoreManagerApi.java:127-129` | Any org admin probes platform-wide store-name existence | Names are globally unique and this is the create pre-flight | — | accepted |
 | A14 | **L** | merchant | `ExternalMerchantStoreApi.java:33`, `MerchantStoreApi.java:52` | Anonymous store record including `audit` (creator) and domains; the storefront needs it | By design; consider trimming `audit` | P10 | accepted |
 | A15 | **L** | pod-registry | `PodApi.java:110-165` null target | Super-admin-only tokens; correct | — | accepted |
-| A16 | **L** | docs | `InternalStoreServiceImpl.java` ~L204, `SubscriptionApi.java:212-217` say `isOrgAdmin` ignores the store; `.claude/skills/project-structure` is a tracked, divergent copy of `.agents/skills/project-structure` | Misleads the next change | Rewrite comments; replace the copy with a symlink | P3, P10, P11 | P3 done (tenancy comment); P10, P11 open |
+| A16 | **L** | docs | `InternalStoreServiceImpl.java` ~L204, `SubscriptionApi.java:212-217` say `isOrgAdmin` ignores the store; `.claude/skills/project-structure` is a tracked, divergent copy of `.agents/skills/project-structure` | Misleads the next change | Rewrite comments; replace the copy with a symlink | P3, P10, P11 | comments done (P3, P10); skill copies deferred |
 
 ## By-design register (not findings)
 

@@ -163,13 +163,16 @@ What binds every change:
   the PR merges: `lcl stop --stack <short-name>`, then `git worktree remove` the directory and delete the
   branch. Tiny same-file follow-ups to an open PR may stay in that PR's existing worktree; anything new gets
   a new one.
-- **A plan is phases; a phase is one PR.** Anything bigger than one PR is written first as
+- **A plan is one PR; each phase is one commit.** Anything bigger than one commit is written first as
   `.agents/plans/<kebab-name>.md` (skeleton: `.agents/plans/README.md`; `uaa-sso-platform.md` and
   `headless-cua-login.md` there show the shape): context, why the design is what it is, then
-  `## Phase N — <area> (PR N)` sections each small enough to review in one sitting, then deviations as built
-  and verification. One plan, one worktree, one branch; each phase is committed and shipped as its own PR
-  before the next begins (stacked if it must). A phase that touches another repo names it and hands it to
-  the orchestrator (`cross-repo-change`).
+  `## Phase N — <area>` sections each small enough to review in one sitting, then deviations as built
+  and verification. One plan, one worktree, one branch, **one PR**; each phase is a commit on it, easiest
+  first, so a reviewer reads the sequence and any one phase can be reverted alone. **Never a PR per phase**:
+  the authorization audit shipped that way once and every merge re-conflicted the plan file on the remaining
+  branches, each of which then had to re-earn its verify receipt. Split only where a change genuinely cannot
+  land with the rest — work in a second repo, which is already one PR per repo. A phase that touches another
+  repo names it and hands it to the orchestrator (`cross-repo-change`).
 - **The worktree rule is enforced, not trusted.** `.claude/hooks/worktree-guard.mjs` runs as a
   `PreToolUse` hook on every `Write`/`Edit`/`MultiEdit` and denies any path inside the primary
   checkout, telling the agent to cut a worktree and how to move edits already stranded on `main`.
