@@ -203,3 +203,5 @@ receipt. P4 also builds and lints landing-ui.
 - P7 (2026-09-09): `:store-commons:autoconfigure:test` 256 tests, 0 failures (4 new in `ActuatorExposureTest`);
   autoconfigure checkstyle clean; `build -x test -x check`; gateway `checkstyleIntegrationTest` and
   `:integrationTest` for the session-gauge change. `verify-before-push.sh` before the push.
+- P1 (2026-09-09): `:store-commons:autoconfigure:test` 257 tests green, checkstyle main and test clean;
+  `extra/scripts/verify-before-push.sh` before the push.
