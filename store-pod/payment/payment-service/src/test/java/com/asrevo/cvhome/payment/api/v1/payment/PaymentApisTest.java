@@ -21,9 +21,12 @@ import org.springframework.web.service.annotation.HttpExchange;
 import org.springframework.web.service.annotation.PostExchange;
 
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.payment.errors.InvalidWebhookSignatureException;
+import com.asrevo.cvhome.payment.errors.PaymentConfigurationNotFoundException;
 import com.asrevo.cvhome.payment.models.TransactionSearchFilter;
 import com.asrevo.cvhome.payment.service.PaymentApprovalService;
 import com.asrevo.cvhome.payment.service.PaymentConfigurationService;
+import com.asrevo.cvhome.payment.service.PaymentGatewayService;
 import com.asrevo.cvhome.payment.service.TransactionService;
 import com.asrevo.cvhome.payment.services.payment.ExternalPaymentGatewayService;
 import com.asrevo.cvhome.store.core.entity.payments.PaymentType;
@@ -31,7 +34,10 @@ import com.asrevo.cvhome.store.core.entity.payments.PaymentType;
 import io.namastack.outbox.Outbox;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -60,6 +66,10 @@ class PaymentApisTest {
     private static final String INTERNAL_REF = "int-1";
     private static final String STORE_ID = STORE.storeMerchantId();
     private static final String PRIVATE_SEGMENT = "/private/";
+    private static final String SIGNATURE_HEADER = "stripe-signature";
+    private static final String SIGNATURE = "sig";
+    private static final String STRIPE = "stripe";
+    private static final String NOT_AN_ID = "not-an-object-id";
     private static final String MANAGE = "hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.PAYMENT.*')";
     private static final String MANAGE_STORE = "hasPermission(#store,'StoreMerchantId','STORE-POD.PAYMENT.*')";
     private static final String GATEWAY = "hasPermission(#store,'StoreMerchantId','STORE-POD.PAYMENT.INITIATE')";
@@ -75,13 +85,14 @@ class PaymentApisTest {
     private final PaymentApprovalService approvalService = Mockito.mock(PaymentApprovalService.class);
     private final TransactionService transactionService = Mockito.mock(TransactionService.class);
     private final Outbox outbox = Mockito.mock(Outbox.class);
+    private final PaymentGatewayService gatewayService = Mockito.mock(PaymentGatewayService.class);
 
     private final PaymentConfigurationController configurationController =
             new PaymentConfigurationController(configurationService);
     private final PublicPaymentConfigurationController publicConfigurationController =
             new PublicPaymentConfigurationController(configurationService);
     private final PrivatePaymentApi privatePaymentApi = new PrivatePaymentApi(approvalService, transactionService);
-    private final PublicPaymentWebhookApi webhookApi = new PublicPaymentWebhookApi(outbox);
+    private final PublicPaymentWebhookApi webhookApi = new PublicPaymentWebhookApi(outbox, gatewayService);
 
     @Test
     void readingAndWritingConfigurationAllPassTheStoreThrough() throws Exception {
@@ -125,11 +136,41 @@ class PaymentApisTest {
     }
 
     @Test
-    void aWebhookIsScheduledOnTheOutboxRatherThanHandledInline() {
+    void aWebhookIsScheduledOnTheOutboxRatherThanHandledInline() throws Exception {
         // Handling it inline would make the provider's retry policy our availability policy.
-        webhookApi.webhook(STORE_ID, PaymentType.STRIPE, ANY_PATH_VARIABLE, Map.of("stripe-signature", "sig"));
+        Map<String, String> headers = Map.of(SIGNATURE_HEADER, SIGNATURE);
 
-        verify(outbox).schedule(Mockito.any());
+        webhookApi.webhook(STORE_ID, PaymentType.STRIPE, ANY_PATH_VARIABLE, headers);
+
+        // Authenticated first, scheduled second: the signature is the endpoint's only credential.
+        var order = Mockito.inOrder(gatewayService, outbox);
+        order.verify(gatewayService).authenticateWebhook(STORE, PaymentType.STRIPE, ANY_PATH_VARIABLE, headers);
+        order.verify(outbox).schedule(Mockito.any());
+    }
+
+    @Test
+    void aWebhookThatFailsAuthenticationIsNotScheduledOnTheOutbox() throws Exception {
+        // Scheduling first and verifying on the outbox let anyone write a row for any store, and told them nothing.
+        doThrow(InvalidWebhookSignatureException.verificationFailed(STRIPE, false, null))
+                .doThrow(PaymentConfigurationNotFoundException.of(PaymentType.STRIPE, STORE))
+                .when(gatewayService).authenticateWebhook(Mockito.eq(STORE), Mockito.eq(PaymentType.STRIPE),
+                        Mockito.anyString(), Mockito.any());
+
+        assertThatThrownBy(() -> webhookApi.webhook(STORE_ID, PaymentType.STRIPE, ANY_PATH_VARIABLE, Map.of()))
+                .isInstanceOf(InvalidWebhookSignatureException.class);
+        assertThatThrownBy(() -> webhookApi.webhook(STORE_ID, PaymentType.STRIPE, ANY_PATH_VARIABLE, Map.of()))
+                .isInstanceOf(PaymentConfigurationNotFoundException.class);
+
+        verifyNoInteractions(outbox);
+    }
+
+    @Test
+    void aStoreIdThatIsNotAnObjectIdIsNotFoundBeforeAnythingIsLookedUp() {
+        // Not a 400: a stranger probing the endpoint learns nothing about which ids are stores.
+        assertThatThrownBy(() -> webhookApi.webhook(NOT_AN_ID, PaymentType.STRIPE, ANY_PATH_VARIABLE, Map.of()))
+                .isInstanceOf(PaymentConfigurationNotFoundException.class);
+
+        verifyNoInteractions(gatewayService, outbox);
     }
 
     static Stream<Class<?>> controllers() {

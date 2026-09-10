@@ -13,7 +13,6 @@ import org.springframework.security.oauth2.client.authentication.OAuth2Authentic
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 
 import com.asrevo.cvhome.gateway.errors.ImpersonationInvalidException;
-import com.asrevo.cvhome.gateway.errors.SessionRequiredException;
 import com.asrevo.cvhome.gateway.impersonation.ImpersonationService;
 import com.asrevo.cvhome.gateway.impersonation.ImpersonationView;
 import com.asrevo.cvhome.gateway.impersonation.StartImpersonation;
@@ -25,13 +24,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * The session gate is explicit here because the gateway enables no method security; a request with no signed-in
- * session is 401 before the service is asked anything.
+ * The handlers with a signed-in session. The gate itself — every handler is 401 before the service is asked
+ * anything — is {@link ImpersonationControllerGateTest}.
  */
 class ImpersonationControllerTest {
 
@@ -52,13 +50,6 @@ class ImpersonationControllerTest {
             new DefaultOAuth2User(null, Map.of(SUB, "op"), SUB), List.of(), "uaa");
 
     private final StartImpersonation request = new StartImpersonation(TARGET, TICKET);
-
-    @Test
-    void startWithoutAsessionIs401BeforeTheServiceIsAsked() {
-        StepVerifier.create(controller.start(exchange, request)).expectError(SessionRequiredException.class).verify();
-
-        verify(impersonation, never()).start(any(), any(), any());
-    }
 
     @Test
     void startHandsAvalidatedRequestToTheService() {

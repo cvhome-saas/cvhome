@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.payment.entity.payment.PaymentSecret;
+import com.asrevo.cvhome.payment.errors.InvalidWebhookSignatureException;
 import com.asrevo.cvhome.payment.model.payment.PaymentInitiateResult;
 import com.asrevo.cvhome.payment.model.payment.PaymentInitiateStatus;
 import com.asrevo.cvhome.payment.model.payment.PaymentRequest;
@@ -20,12 +21,24 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class CODProcessor implements PaymentProcessor {
 
+    private static final String PROVIDER = "cod";
+
     @Override
     public PaymentInitiateResult initiate(String internalReference, PaymentSecret secret, PaymentRequest request) {
         log.info("Processing COD payment for internal reference: {}", internalReference);
         return PaymentInitiateResult.builder()
                 .status(PaymentInitiateStatus.PENDING)
                 .build();
+    }
+
+    /**
+     * Nothing can sign for an offline provider, so no delivery is authentic. Refusing here matters: every store has
+     * this type enabled, and a no-op would leave the public webhook writing an outbox row for any store under it.
+     */
+    @Override
+    public void authenticateWebhook(StoreMerchantId storeMerchantId, String payload, Map<String, String> headers,
+                                    PaymentSecret config) throws InvalidWebhookSignatureException {
+        throw InvalidWebhookSignatureException.verificationFailed(PROVIDER, false, null);
     }
 
     @Override

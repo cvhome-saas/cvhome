@@ -11,6 +11,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import com.asrevo.cvhome.commons.domain.CurrencyCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.payment.errors.InvalidWebhookSignatureException;
 import com.asrevo.cvhome.payment.model.payment.PaymentInitiateResult;
 import com.asrevo.cvhome.payment.model.payment.PaymentInitiateStatus;
 import com.asrevo.cvhome.payment.model.payment.PaymentRequest;
@@ -19,6 +20,7 @@ import com.asrevo.cvhome.payment.models.ReadablePaymentConfiguration;
 import com.asrevo.cvhome.store.core.entity.payments.PaymentType;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * Cash on delivery and manual transfer have no provider: they open a pending payment a seller settles by hand, and
@@ -29,6 +31,8 @@ class OfflineProcessorsTest {
     private static final StoreMerchantId STORE = new StoreMerchantId("store-1");
 
     private static final String URL = "https://shop.example";
+
+    private static final String EMPTY_BODY = "{}";
 
     static Stream<Arguments> processors() {
         return Stream.of(Arguments.of(new CODProcessor(), PaymentType.COD),
@@ -49,8 +53,12 @@ class OfflineProcessorsTest {
         assertThat(processor.type()).isEqualTo(type);
         assertThat(result.status()).isEqualTo(PaymentInitiateStatus.PENDING);
         assertThat(result.shouldRedirect()).isFalse();
-        assertThat(processor.parseWebhook(STORE, "{}", Map.of(), secret).paymentUseCase())
+        assertThat(processor.parseWebhook(STORE, EMPTY_BODY, Map.of(), secret).paymentUseCase())
                 .isEqualTo(PaymentUseCase.NONE);
+        // No provider, no signing secret, no authentic delivery — every store has these types enabled, so accepting
+        // one would reopen the public webhook as a way to write outbox rows for any store.
+        assertThatThrownBy(() -> processor.authenticateWebhook(STORE, EMPTY_BODY, Map.of(), secret))
+                .isInstanceOf(InvalidWebhookSignatureException.class);
     }
 
 }

@@ -10,7 +10,7 @@ kept apart on purpose — so most of this document is about failure, not the hap
   `/api/v1/public/webhook/{storeId}/{paymentType}`
 - **Runs on** — `lcl start -d --stack <name>`; read the live port from `lcl urls`. Address it through an edge,
   never `:8125`
-- **Cases** — 26 (0 verified, 3 unit only, 23 not verified)
+- **Cases** — 28 (0 verified, 4 unit only, 24 not verified)
 - **Also see** — [checkout](../../../checkout/checkout-service/qa/checkout-qa.md) (the caller that places the
   order), [merchant](../../../merchant/merchant-service/qa/merchant-qa.md) (the store record it caches),
   [billing](../../../../store-core/billing/billing-service/qa/billing-qa.md) (**a different thing entirely** —
@@ -166,14 +166,17 @@ This is the section the service exists to get right, and the rule
 ## WHK — Webhooks
 
 `PublicPaymentWebhookApi` is `POST /api/v1/public/webhook/{storeId}/{paymentType}` — open by necessity, which
-makes the signature check the only thing standing between a stranger and a paid order.
+makes the signature check the only thing standing between a stranger and a paid order. The delivery is
+authenticated against the store's enabled configuration *before* it is scheduled on the outbox
+(`PaymentGatewayService.authenticateWebhook`); the outbox handler verifies again on its own. Runnable blocks:
+`http/public-payment-webhook-api.http`.
 
 ### WHK-01 — A forged webhook is rejected · critical · [not verified]
 
-- **Steps** — post a well-formed body with a wrong or missing signature.
-- **Expect** — refused via `InvalidWebhookSignatureException`, nothing written, and the attempt logged. A
-  webhook that changes a transaction without a valid signature is a **critical** finding: it lets anyone mark
-  any order paid.
+- **Steps** — post a well-formed body signed with the wrong secret, or a valid signature over a different body.
+- **Expect** — **400** `PAYMENT.WEBHOOK.SIGNATURE_INVALID` with `signaturePresent: true`, nothing written, the
+  transaction stays PENDING, and the attempt logged once with the store id and never the body. A webhook that
+  changes a transaction without a valid signature is a **critical** finding: it lets anyone mark any order paid.
 
 ### WHK-02 — The same event twice does nothing twice · critical · [not verified]
 
@@ -191,6 +194,24 @@ makes the signature check the only thing standing between a stranger and a paid 
 
 - **Steps** — post a valid webhook to `{storeId}` A carrying a transaction belonging to store B.
 - **Expect** — ignored quietly, nothing written. The `storeId` in the path is not trusted on its own.
+
+### WHK-05 — An unsigned webhook is refused with 400 and leaves no outbox row · high · [not verified]
+
+- **Steps** — post the second block of `public-payment-webhook-api.http` (no `Stripe-Signature` header), then
+  `select count(*) from payment.outbox_record where record_type like '%WebhookEvent%'` before and after.
+- **Expect** — **400** `PAYMENT.WEBHOOK.SIGNATURE_INVALID` with `signaturePresent: false`; the count is unchanged.
+  Before this the endpoint answered 200 to everything and wrote a row for any store id, so anyone could fill the
+  table — a 200 here is a regression, not a tolerance.
+  `PaymentWebhookApiIntegrationTest.anUnsignedDeliveryIsRefusedWithoutTouchingTheOutbox` asserts it with Docker.
+
+### WHK-06 — A webhook for a store with no enabled configuration is 404 · medium · [unit only]
+
+- **Steps** — disable the store's Stripe configuration (CFG), post a correctly signed body; then post to a type
+  the pod has no processor for (`PAYPAL`); then to a store id nobody owns and to a string that is not an ObjectId.
+- **Expect** — **404** `PAYMENT.CONFIGURATION.NOT_FOUND` for all four, indistinguishable from each other: the
+  endpoint is public and must not confirm what a store has configured. No outbox row.
+  `PaymentGatewayServiceTest.authenticatingAWebhookWithoutAnEnabledConfigurationOrProcessorIsNotFound` and
+  `PaymentWebhookApiIntegrationTest.aStoreWithNoEnabledConfigurationForTheTypeIsNotFound` cover it.
 
 ---
 
@@ -291,12 +312,9 @@ makes the signature check the only thing standing between a stranger and a paid 
 and `PrivatePaymentApi` still have no runnable block, which is the cheapest thing that would move CFG and PAY-03/04
 off `[not verified]`, and a review-policy violation on the next PR that touches one of them.
 
-**The webhook answers 200 to everything and verifies later, on the outbox** (WHK-01 is asserted by a transaction
-that stays PENDING, not by a 4xx). Phase 5 of `.agents/plans/authorization-audit.md` moves the check in front of
-the outbox; `public-payment-webhook-api.http` gains its 4xx blocks then.
-
-**Nothing in this file has been driven end to end.** The `[unit only]` tags on ERR-01 and ERR-02 are real —
-`PaymentExceptionsTest` and `StripeProcessorTest` exist and pass — but the stack path is unproven.
+**Nothing in this file has been driven end to end.** The `[unit only]` tags on ERR-01, ERR-02 and WHK-06 are real —
+`PaymentExceptionsTest`, `StripeProcessorTest` and `PaymentGatewayServiceTest` exist and pass — but the stack path
+is unproven.
 
 **The console's payment section is listed under Store management** and belongs to this service; it is
 described in [console-ui-qa.md](../../../../store-core/console-ui/qa/console-ui-qa.md) §MER only because it shares

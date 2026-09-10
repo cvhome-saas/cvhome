@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.payment.errors.InvalidWebhookSignatureException;
+import com.asrevo.cvhome.payment.errors.PaymentConfigurationNotFoundException;
 import com.asrevo.cvhome.payment.errors.PaymentInitiateRejectedException;
 import com.asrevo.cvhome.payment.errors.PaymentProviderUnavailableException;
 import com.asrevo.cvhome.payment.errors.UnexpectedWebhookObjectException;
@@ -98,6 +99,45 @@ public class PaymentGatewayService {
         return transactionService.status(store, requestRef);
     }
 
+    /**
+     * Decides whether a webhook delivery may be accepted at all, before anything is written.
+     *
+     * <p>
+     * The public endpoint is anonymous by design, so the provider's signature is its only credential. This checks it
+     * synchronously, against the store's own enabled configuration, so a forged or unsigned delivery is refused with a
+     * 4xx instead of becoming an outbox row that {@link #handleWebhook} discards later. A store with no enabled
+     * configuration for the type — or a type this pod has no processor for — is a 404 rather than a 422: the endpoint
+     * is public, and it must not confirm what a store has configured.
+     * </p>
+     *
+     * @throws PaymentConfigurationNotFoundException nothing to verify against: no enabled configuration or no
+     *                                               processor for the type
+     * @throws InvalidWebhookSignatureException      the signature is missing or does not verify
+     */
+    public void authenticateWebhook(StoreMerchantId store, PaymentType paymentType, String payload,
+                                    Map<String, String> headers)
+            throws PaymentConfigurationNotFoundException, InvalidWebhookSignatureException {
+        ReadablePaymentConfiguration config = getPaymentConfiguration(store, paymentType);
+        PaymentProcessor processor = getProcessor(paymentType).orElse(null);
+        if (config == null || processor == null) {
+            log.warn("Refusing {} webhook for store {}: no enabled configuration or processor", paymentType, store);
+            throw PaymentConfigurationNotFoundException.of(paymentType, store);
+        }
+        try {
+            processor.authenticateWebhook(store, payload, headers, config);
+        } catch (InvalidWebhookSignatureException e) {
+            // Logged once, here, with the store context and without the body: an expected condition on a public
+            // endpoint, and a body that failed verification is not ours to keep.
+            log.warn("Refusing {} webhook for store {} [{}]: {} {}", paymentType, store, e.errorCode().code(),
+                    e.getMessage(), e.params());
+            throw e;
+        }
+    }
+
+    /**
+     * Handles a webhook from the outbox. Verifies again, on its own — the row was authenticated when it was scheduled,
+     * but a secret rotated in between makes the same body fail here, and that has to be a discard, not a retry loop.
+     */
     public void handleWebhook(StoreMerchantId store, PaymentType paymentType, String payload, Map<String, String> headers) {
         ReadablePaymentConfiguration config = getPaymentConfiguration(store, paymentType);
         if (config == null) {

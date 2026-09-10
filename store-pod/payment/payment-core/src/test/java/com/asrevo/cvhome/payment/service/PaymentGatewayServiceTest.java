@@ -15,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.asrevo.cvhome.commons.domain.CurrencyCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.payment.errors.InvalidWebhookSignatureException;
+import com.asrevo.cvhome.payment.errors.PaymentConfigurationNotFoundException;
 import com.asrevo.cvhome.payment.errors.PaymentInitiateRejectedException;
 import com.asrevo.cvhome.payment.errors.PaymentProviderUnavailableException;
 import com.asrevo.cvhome.payment.errors.UnexpectedWebhookObjectException;
@@ -34,6 +35,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -192,6 +194,63 @@ class PaymentGatewayServiceTest {
 
         verify(stripe, never()).parseWebhook(any(), anyString(), any(), any());
         verifyNoInteractions(useCases);
+    }
+
+    @Test
+    void authenticatingAWebhookWithoutAnEnabledConfigurationOrProcessorIsNotFound() throws Exception {
+        when(configurations.getConfig(STORE, PaymentType.STRIPE)).thenReturn(Optional.empty())
+                .thenReturn(Optional.of(config(false)));
+        when(configurations.getConfig(STORE, PaymentType.PAYPAL)).thenReturn(Optional.of(config(true)));
+        when(stripe.type()).thenReturn(PaymentType.STRIPE);
+
+        // No configuration, a disabled one, and an enabled one for a type with no processor: the same 404 for all
+        // three, because a public endpoint must not say which of them is the case.
+        assertThatThrownBy(() -> service.authenticateWebhook(STORE, PaymentType.STRIPE, PAYLOAD, HEADERS))
+                .isInstanceOf(PaymentConfigurationNotFoundException.class);
+        assertThatThrownBy(() -> service.authenticateWebhook(STORE, PaymentType.STRIPE, PAYLOAD, HEADERS))
+                .isInstanceOf(PaymentConfigurationNotFoundException.class);
+        assertThatThrownBy(() -> service.authenticateWebhook(STORE, PaymentType.PAYPAL, PAYLOAD, HEADERS))
+                .isInstanceOf(PaymentConfigurationNotFoundException.class);
+
+        verify(stripe, never()).authenticateWebhook(any(), anyString(), any(), any());
+        verifyNoInteractions(useCases, transactions);
+    }
+
+    /**
+     * The other half of the gate: an authentic body passes, and passing is all it does.
+     *
+     * <p>
+     * The controller schedules the outbox row only if this returns, so what matters here is that it returns
+     * without having applied anything — no parse, no use case, no transaction. The webhook is applied later, off
+     * the outbox, and verified again there.
+     * </p>
+     */
+    @Test
+    void anAuthenticWebhookPassesTheGateWithoutBeingApplied() throws Exception {
+        ReadablePaymentConfiguration config = config(true);
+        when(configurations.getConfig(STORE, PaymentType.STRIPE)).thenReturn(Optional.of(config));
+        when(stripe.type()).thenReturn(PaymentType.STRIPE);
+
+        service.authenticateWebhook(STORE, PaymentType.STRIPE, PAYLOAD, HEADERS);
+
+        verify(stripe).authenticateWebhook(STORE, PAYLOAD, HEADERS, config);
+        verify(stripe, never()).parseWebhook(any(), anyString(), any(), any());
+        verifyNoInteractions(useCases, transactions);
+    }
+
+    @Test
+    void authenticatingAWebhookVerifiesTheSignatureAndHandlesNothing() throws Exception {
+        ReadablePaymentConfiguration config = config(true);
+        when(configurations.getConfig(STORE, PaymentType.STRIPE)).thenReturn(Optional.of(config));
+        when(stripe.type()).thenReturn(PaymentType.STRIPE);
+        doThrow(InvalidWebhookSignatureException.verificationFailed(STRIPE, true, null))
+                .when(stripe).authenticateWebhook(STORE, PAYLOAD, HEADERS, config);
+
+        assertThatThrownBy(() -> service.authenticateWebhook(STORE, PaymentType.STRIPE, PAYLOAD, HEADERS))
+                .isInstanceOf(InvalidWebhookSignatureException.class);
+
+        verify(stripe, never()).parseWebhook(any(), anyString(), any(), any());
+        verifyNoInteractions(useCases, transactions);
     }
 
     @Test
