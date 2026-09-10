@@ -13,6 +13,25 @@ Cookie: SESSION={{SESSION_ID}}
     });
 %}
 
+### without a session — 401; the endpoint is isAuthenticated() and nothing else
+GET {{SELLER_UI_URL}}/tenancy/api/v1/auth/current?lang={{LANG}}
+
+> {%
+    client.test("anonymous is refused", function () {
+        client.assert(response.status === 401, "status " + response.status);
+    });
+%}
+
+### /api/v1/auth/me is gone — it echoed the whole token; the console uses the gateway's own /api/v1/auth/me
+GET {{SELLER_UI_URL}}/tenancy/api/v1/auth/me?lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+
+> {%
+    client.test("no token echo", function () {
+        client.assert(response.status === 404, "status " + response.status);
+    });
+%}
+
 ### the platform properties the console bootstraps from — public
 GET {{SELLER_UI_URL}}/tenancy/api/v1/saas/public/saas-properties?lang={{LANG}}
 
