@@ -8,7 +8,7 @@ starts as a row here and is provisioned outward over the outbox.
   the outbox that provisions a store into its pod, and the user-account endpoints the console drives
 - **Runs on** — `lcl start -d --stack <name>`; read the live port from `lcl urls`. Address it through the
   gateway, never `:8020`
-- **Cases** — 47 (33 verified, 3 unit only, 11 not verified)
+- **Cases** — 49 (33 verified, 4 unit only, 12 not verified)
 - **Also see** — [pod-registry](../../../pod-registry/pod-registry-service/qa/pod-registry-qa.md) (placement,
   capacity and pod health), [gateway](../../../gateway/gateway-service/qa/gateway-qa.md) (the route table this
   feeds), [billing](../../../billing/billing-service/qa/billing-qa.md) (which gates store creation),
@@ -156,8 +156,10 @@ out, and several endpoints taking a store or org id straight from the caller wit
 **A foreign store answers 404, not 403.** A 403 confirms the id exists, which turns id-probing into store
 enumeration. This is a deliberate deviation from the plan's wording and should not be "fixed" back.
 
-**`isOrgAdmin` itself is not fixed here** — see [99](#99--known-gaps). Tenancy closes the hole at the query
-layer, because `manager_store.org_id` is tenancy's own data.
+**Tenancy does the org check itself, by configuration.** `StoreRoleAccessChecker.isOrgAdmin` now compares the
+caller's org with the store's owner, but tenancy sets `store-ownership: DELEGATED` (`application.yml`), so the
+shared gate admits any org admin here and `InternalStoreServiceImpl#getManagerStoreEntity` decides — because
+`manager_store.org_id` is tenancy's own data, and because only that layer can answer 404 instead of 403.
 
 ### SEC-01 — Your own store is readable · [verified]
 
@@ -211,6 +213,17 @@ the *read* direction too — so test both halves.
 - **Expect** — 200 then 403.
 - **Blocked by** — no moderator login is seeded in `test-stores`; only `org1-admin` / `org2-admin` exist.
   Creating one is worth doing before the `isOrgAdmin` PR, which is where the distinction starts to bite.
+
+### SEC-08 — Closing a store takes the delete token, not the read token · high · [unit only]
+
+Archive and delete carry `STORE-CORE.STORE-DELETE` (owning org admin or super admin). They carried
+`STORE-CORE.STORE-FIND-ONE`, which a store admin, a moderator and the shared `store_core` service client all
+pass — everyone who could look at a store could close it.
+
+- **Covered by** `StoreLifecycleApiIntegrationTest`: store admin 403, moderator 403, `store_core` principal 403,
+  foreign org admin 404, owning org admin 200, super admin 200; `TenancyApisTest` pins the token on both handlers
+  and walks every handler on the service for a gate.
+- **Through the stack** — [LIF-08](#lif-08--a-store-admin-cannot-archive-or-delete-its-own-store--high--not-verified).
 
 ---
 
@@ -386,6 +399,18 @@ the actor, and `API` or `JOB`.
 
 The org path is unit-covered and shares its implementation with the store path, but was not exercised through
 the API. Worth doing precisely because it is the one that does **not** write to the store rows.
+
+### LIF-08 — A store admin cannot archive or delete its own store · high · [not verified]
+
+Closing a store is the organization's decision, not the store's. The gate is `STORE-CORE.STORE-DELETE`
+([SEC-08](#sec-08--closing-a-store-takes-the-delete-token-not-the-read-token--high--unit-only)).
+
+- **Setup** — a store created by `org1-admin`, and a store-admin session for it (`http/user-account-api.http`
+  creates the user; sign in as them). Uses the same blocker as SEC-07: `test-stores` seeds no store-level login.
+- **Steps** — as that store admin, `POST /store-manager/private/store/archive?store=<the store>`, then
+  `DELETE /store-manager/private/store?store=<the store>` (`http/store-lifecycle-api.http`, the 403 block).
+- **Expect** — **403** `COMMON.ACCESS_DENIED` for both, and the store still `ACTIVE`. Then as `org1-admin`:
+  archive → 200 `ARCHIVED`; and as `org2-admin`: delete → **404**, not 403.
 
 ---
 
@@ -722,13 +747,13 @@ Every item here was a real defect, found by running the thing rather than readin
 
 ## 99 — Known gaps
 
-**`isOrgAdmin` still ignores the store it is handed.** `StoreRoleAccessChecker.isOrgAdmin` in
-`store-commons/autoconfigure` returns `true` for any store on the platform once the caller holds
-`ROLE_ORG_ADMIN`, so **every pod service — catalog, checkout, payment, cua, merchant, content — still lets an
-org admin manage any store on the platform.** Tenancy closed this at the query layer (§SEC), which is why those
-cases pass; the pods have not. This is the largest open item on the whole plan and has its own PR.
+**Tenancy's org check is its own, on purpose.** `StoreRoleAccessChecker.isOrgAdmin` now compares the caller's
+org with the store's owner (`ownsTheStore`, `StoreOrgOwnerRetriever`); tenancy alone opts out with
+`store-ownership: DELEGATED` and decides in `InternalStoreServiceImpl#getManagerStoreEntity` (§SEC), so that a
+foreign store is a 404. Anyone flipping that flag back to `ENFORCED` turns every cross-org case in §SEC into a
+403 that confirms the store exists.
 `PermissionAccessChecker.hasReadAccessOnStore` never checking `isSuperAdmin` — so a super admin gets 403 on
-`store-info` — belongs with it.
+`store-info` — is still open.
 
 **No console screens for the lifecycle features.** Store suspend / archive / delete, org profile, members and
 invitations all have endpoints and none have screens. **Invitations most of all**, since the token is displayed
@@ -770,6 +795,8 @@ Not a substitute for the cases above, but it is what backs the **[unit only]** t
 | `StoreLifecycleServiceTest` | 6 |
 | `StoreProvisioningServiceTest` | 5 |
 | `StoreMerchantIdJsonTest` | 7 |
+| `TenancyApisTest` | 24, of which 13 walk every handler for its gate |
+| `StoreLifecycleApiIntegrationTest` | 12 — every principal against the delete gate |
 
 ---
 
