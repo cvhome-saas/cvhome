@@ -2,6 +2,7 @@ package com.asrevo.cloud.ecs.discovery;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -62,6 +63,7 @@ class EcsDiscoveryClientTest {
         discovery = mock(ServiceDiscoveryClient.class);
         properties = new EcsDiscoveryProperties();
         properties.setNamespace(CONFIGURED_NAMESPACE);
+        properties.setEnabled(true);
         properties.setDefaultPort(DEFAULT_PORT);
         when(discovery.discoverInstances(any(DiscoverInstancesRequest.class)))
                 .thenReturn(DiscoverInstancesResponse.builder().instances(instance()).build());
@@ -194,11 +196,39 @@ class EcsDiscoveryClientTest {
 
     @Test
     void theClientDescribesItselfForTheActuatorEndpoint() {
-        assertThat(new EcsDiscoveryClient(properties, discovery).description()).isEqualTo("ecs discovery client");
+        assertThat(new EcsDiscoveryClient(properties, () -> discovery).description()).isEqualTo("ecs discovery client");
     }
 
     @Test
     void theInstanceMethodDelegatesToTheStaticResolution() {
-        assertThat(new EcsDiscoveryClient(properties, discovery).getInstances(CATALOG)).hasSize(1);
+        assertThat(new EcsDiscoveryClient(properties, () -> discovery).getInstances(CATALOG)).hasSize(1);
+    }
+
+    @Test
+    void offCloudMapTheClientKnowsNoServicesAndNeverBuildsAnAwsClient() {
+        // lcl and the load-testing stack: the composite client falls through to the simple one, and no AWS SDK
+        // client is built — building one resolves a region and credentials a laptop does not have.
+        AtomicInteger built = new AtomicInteger();
+        EcsDiscoveryProperties off = new EcsDiscoveryProperties();
+        off.setNamespace(CONFIGURED_NAMESPACE);
+        EcsDiscoveryProperties blank = new EcsDiscoveryProperties();
+        blank.setEnabled(true);
+        blank.setNamespace(" ");
+
+        for (EcsDiscoveryProperties each : List.of(off, blank)) {
+            EcsDiscoveryClient client = new EcsDiscoveryClient(each, () -> {
+                built.incrementAndGet();
+                return discovery;
+            });
+            assertThat(client.getInstances(CATALOG)).isEmpty();
+            assertThat(client.getServices()).isEmpty();
+        }
+        assertThat(built).hasValue(0);
+    }
+
+    @Test
+    void discoveryIsOffUnlessADeploymentTurnsItOn() {
+        // The bean used to be conditional on the property being set at all; unset still has to mean off.
+        assertThat(new EcsDiscoveryProperties().isEnabled()).isFalse();
     }
 }

@@ -26,6 +26,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -90,6 +91,15 @@ class PlanCatalogSeederTest {
     }
 
     // ---------------------------------------------------------------------------------------------- creating
+
+    @Test
+    @DisplayName("with seeding off the declared catalog is never written")
+    void seedingOffWritesNothing() {
+        new PlanCatalogSeeder(new PlanCatalogProperties(false, false, List.of(plan(BASIC, 1000L, Map.of()))), plans,
+                prices, entitlements).run(null);
+
+        verifyNoInteractions(plans, prices, entitlements);
+    }
 
     @Test
     @DisplayName("a plan the database has never seen is created with its price and grants")

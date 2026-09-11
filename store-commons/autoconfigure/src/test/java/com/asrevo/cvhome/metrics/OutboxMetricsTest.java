@@ -88,6 +88,14 @@ class OutboxMetricsTest {
     }
 
     @Test
+    void aServiceWithTheSwitchOffGetsNoMeterAndNoQuery() {
+        // The bean exists in every service (no bean is conditional on configuration); only its binder differs.
+        OutboxMetrics.disabled().bindTo(registry);
+
+        assertThat(registry.getMeters()).isEmpty();
+    }
+
+    @Test
     void gaugesReflectTheSource() {
         FakeSource source = new FakeSource();
         new OutboxMetrics(source, Duration.ofSeconds(15), clock).bindTo(registry);

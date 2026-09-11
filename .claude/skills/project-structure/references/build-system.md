@@ -137,6 +137,16 @@ Tests are split by **source set**, not by tag (`@Tag` is gone — do not reintro
 A container failing to start is an environment problem, not a test failure. **Full rules, naming standard, the
 `test-support` catalogue and the coverage ratchet: `references/testing.md`.**
 
+**No bean exists or not because of configuration.** `verifyNoConfigurationSwitchedBeans` (in every module's `check`)
+fails on `@Profile`, `@ConditionalOnProperty`, `@ConditionalOnBooleanProperty` or `@ConditionalOnExpression` in main
+code. Anything that fixes the bean graph ahead of time — Spring AOT, a GraalVM native image — decides those once, at
+build, for Fargate, every flavour and the load-testing stack alike. Read a switch when the code runs instead: an
+initializer that returns early (the sso-core seeders, billing's catalog seeder), a client that knows no services when
+off (the ECS discovery client), an indicator that says where it runs (the ECS task health). `@ConditionalOnClass`,
+`@ConditionalOnMissingBean` and `@ConditionalOnWebApplication` are the same in every deployment and stay. Every module
+also compiles with `-parameters`, so Spring Data binds a query method's parameters by name in the `-core` libraries
+too.
+
 ## Configuration
 
 Shared configuration ships **inside** the `store-commons:autoconfigure` jar, and each service imports slices

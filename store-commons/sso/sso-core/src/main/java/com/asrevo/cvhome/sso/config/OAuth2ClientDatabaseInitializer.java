@@ -3,9 +3,9 @@ package com.asrevo.cvhome.sso.config;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.core.env.Environment;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
@@ -20,7 +20,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Component
-@ConditionalOnProperty(name = SeedProperties.APPLY_ON_BOOT, havingValue = "true")
 @RequiredArgsConstructor
 @Slf4j
 public class OAuth2ClientDatabaseInitializer {
@@ -29,10 +28,15 @@ public class OAuth2ClientDatabaseInitializer {
     private final AppProperties appProperties;
     private final RegisteredClientRepository registeredClientRepository;
     private final PasswordEncoder passwordEncoder;
+    private final Environment environment;
 
     @EventListener(ApplicationReadyEvent.class)
     @Transactional
     public void onApplicationReady() {
+        if (!SeedProperties.appliesOnBoot(environment)) {
+            log.debug("{} is off; leaving the seeded rows as they are", SeedProperties.APPLY_ON_BOOT);
+            return;
+        }
         if (oAuth2ClientProperties.clients() == null || oAuth2ClientProperties.clients().isEmpty()) {
             log.debug("No OAuth2 clients provided in configuration, skipping initialization");
         } else {

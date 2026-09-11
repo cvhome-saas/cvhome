@@ -66,6 +66,9 @@ binds every change:
 - **Docker must be running** for `./gradlew test` (Testcontainers).
 - Module paths come from `settings.gradle`; dependency versions from `gradle/libs.versions.toml`. Never
   hardcode a version in a `build.gradle`, and never add a module without `settings.gradle`.
+- **No bean may depend on a profile or a property** (`@Profile`, `@ConditionalOnProperty`): ahead-of-time processing
+  (Spring AOT, a GraalVM native image) fixes the bean graph at build time for every deployment. Read the switch at
+  run time; `verifyNoConfigurationSwitchedBeans` fails the build otherwise. Why and how: `references/build-system.md`.
 
 ## Frontends
 

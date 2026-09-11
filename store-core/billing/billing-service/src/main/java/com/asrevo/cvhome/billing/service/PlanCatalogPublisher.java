@@ -1,12 +1,12 @@
 package com.asrevo.cvhome.billing.service;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.asrevo.cvhome.billing.commons.errors.BillingProviderUnavailableException;
+import com.asrevo.cvhome.billing.config.PlanCatalogProperties;
 import com.asrevo.cvhome.billing.domain.PlanEntity;
 import com.asrevo.cvhome.billing.domain.PlanPriceEntity;
 import com.asrevo.cvhome.billing.repository.PlanPriceRepository;
@@ -30,13 +30,19 @@ import lombok.extern.slf4j.Slf4j;
  * subscriptions, entitlement reads — works without Stripe, and refusing to start would take those down too whenever
  * Stripe was unreachable.
  * </p>
+ *
+ * <p>
+ * Off unless {@code com.asrevo.cvhome.billing.catalog.stripe-sync-enabled} is set, which only the {@code lcl} slice
+ * does — read when the boot finishes rather than as a bean condition, because a native image fixes its beans once
+ * when it is built and every deployment runs that one image.
+ * </p>
  */
 @Slf4j
 @Component
 @RequiredArgsConstructor
-@ConditionalOnProperty(prefix = "com.asrevo.cvhome.billing.catalog", name = "stripe-sync-enabled",
-        havingValue = "true")
 public class PlanCatalogPublisher {
+
+    private final PlanCatalogProperties properties;
 
     private final PlanRepository planRepository;
 
@@ -47,6 +53,10 @@ public class PlanCatalogPublisher {
     @EventListener(ApplicationReadyEvent.class)
     @Transactional
     public void publish() {
+        if (!properties.stripeSyncEnabled()) {
+            log.debug("Stripe catalog sync is off; the catalog is not published");
+            return;
+        }
         int published = 0;
         for (PlanEntity plan : planRepository.findAllByActiveTrueOrderByTierAsc()) {
             try {

@@ -3,9 +3,9 @@ package com.asrevo.cvhome.sso.config;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.core.env.Environment;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,7 +18,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Component
-@ConditionalOnProperty(name = SeedProperties.APPLY_ON_BOOT, havingValue = "true")
 @RequiredArgsConstructor
 @Slf4j
 public class AdminUserDatabaseInitializer {
@@ -28,10 +27,15 @@ public class AdminUserDatabaseInitializer {
     private final AdminUserProperties adminUserProperties;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final Environment environment;
 
     @EventListener(ApplicationReadyEvent.class)
     @Transactional
     public void onApplicationReady() {
+        if (!SeedProperties.appliesOnBoot(environment)) {
+            log.debug("{} is off; leaving the seeded rows as they are", SeedProperties.APPLY_ON_BOOT);
+            return;
+        }
         String password = adminUserProperties.password();
         if (password == null || password.isBlank()) {
             log.debug("Super admin password not provided in properties, skipping initialization");

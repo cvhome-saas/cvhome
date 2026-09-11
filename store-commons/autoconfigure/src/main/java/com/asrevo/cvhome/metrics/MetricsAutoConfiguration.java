@@ -5,7 +5,6 @@ import javax.sql.DataSource;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -45,12 +44,20 @@ public class MetricsAutoConfiguration {
 
     }
 
+    /**
+     * The outbox gauges, when {@code cvhome.metrics.outbox.enabled} is set. Always a bean, and the switch read here
+     * rather than as a condition: a native image decides its beans when it is built, and the rule for this codebase is
+     * that no bean exists or not by configuration (the build's {@code verifyNoConfigurationSwitchedBeans}). The class
+     * condition names its class: gateway has no JDBC, and its AOT processing reads this method reflectively.
+     */
     @Bean
-    @ConditionalOnClass(JdbcTemplate.class)
-    @ConditionalOnProperty(prefix = "cvhome.metrics.outbox", name = "enabled", havingValue = "true")
+    @ConditionalOnClass(name = "org.springframework.jdbc.core.JdbcTemplate")
     @ConditionalOnMissingBean(OutboxMetrics.class)
     OutboxMetrics outboxMetrics(CvhomeMetricsProperties properties, ObjectProvider<DataSource> dataSource) {
         CvhomeMetricsProperties.Outbox outbox = properties.outbox();
+        if (!outbox.enabled()) {
+            return OutboxMetrics.disabled();
+        }
         // The DataSource is resolved on the first read, not here: this configuration is imported early and the
         // auto-configured DataSource may not exist yet when it is processed.
         OutboxMetrics.Source lazy = new OutboxMetrics.Source() {
