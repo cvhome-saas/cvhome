@@ -30,6 +30,8 @@ dependencies {
     compileOnly libs.spring.boot.starter.actuator
     // OutboxMetrics counts outbox rows through a JdbcTemplate; only services that enable cvhome.metrics.outbox have one.
     compileOnly libs.spring.jdbc
+    // PostgresJdbcConfiguration, the base of the Spring Data JDBC services' JdbcConfig; they bring the library.
+    compileOnly libs.spring.data.jdbc
     // TraceContextMdcFilter reads the current span; the API is on every service's runtime classpath via the starter.
     compileOnly libs.io.opentelemetry.api
     // With this library on the classpath the OpenTelemetry starter wraps the root logger's appenders with its MDC
@@ -71,5 +73,6 @@ dependencies {
     testImplementation libs.reactor.test
     testImplementation libs.spring.data.commons
     testImplementation libs.spring.jdbc
+    testImplementation libs.spring.data.jdbc
     testImplementation libs.io.opentelemetry.api
 }
