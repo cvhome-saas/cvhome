@@ -7,10 +7,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import org.springframework.context.annotation.ImportRuntimeHints;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.content.aot.LayoutCopyRuntimeHints;
 import com.asrevo.cvhome.content.entity.PageLayout;
 import com.asrevo.cvhome.content.entity.PageLayoutRevision;
 import com.asrevo.cvhome.content.errors.ContentConflictException;
@@ -44,6 +46,7 @@ import lombok.RequiredArgsConstructor;
  */
 @Service
 @RequiredArgsConstructor
+@ImportRuntimeHints(LayoutCopyRuntimeHints.class)
 public class PageLayoutService {
 
     private final PageLayoutRepository layouts;

@@ -1,0 +1,3 @@
+org.springframework.boot.EnvironmentPostProcessor=\
+com.asrevo.cvhome.aot.LoadBalancerClientsAotEnvironmentPostProcessor,\
+com.asrevo.cvhome.aot.OpenTelemetryAotEnvironmentPostProcessor

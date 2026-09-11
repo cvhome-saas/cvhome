@@ -122,6 +122,23 @@ com:
       crypto:
         type: LOCAL
 spring:
+  aot:
+    data:
+      accessors:
+        # Read by processAot, not at run time. Spring Data 4.0.1 generates a property accessor class per entity at
+        # build time; inside a native image the generated accessor for billing's PlanEntity received the wrong value
+        # for a property ("Can not set boolean field PlanEntity.active to java.lang.Integer") while the same jar on the
+        # JVM with spring.aot.enabled=true read it correctly. With generation off Spring Data uses reflective access,
+        # which its own entity hints already cover. JPA's generated repositories are unaffected and stay on.
+        enabled: false
+    jdbc:
+      repositories:
+        # Read by processAot. Spring Data JDBC 4.0.1's generated repositories convert a @Query's rows into the
+        # repository's entity even when the method returns a DTO: natively billing's findVisible (rows of
+        # PlatformSubscriptionRow) failed with "Required property store not found for class StoreSubscriptionEntity",
+        # and tenancy's storesPerPod the same way. Off, tenancy, billing and pod-registry run Spring Data's runtime
+        # repositories, which map a DTO by its own properties exactly as on the JVM.
+        enabled: false
   autoconfigure:
     # Spans come from the OpenTelemetry starter alone (semconv attributes: http.route, http.response.status_code,
     # db.*). Boot's Micrometer Tracing produced a second server span per request ("http get /api/...") and a second
