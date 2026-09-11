@@ -55,6 +55,7 @@ Gradle wrapper (9.2.0) drives Java *and* the npm apps. All commands from the rep
 ./gradlew :store-pod:catalog:catalog-service:test --tests '*PagesTest*'   # single test
 ./gradlew checkstyleMain checkstyleTest checkstyleIntegrationTest   # CI quality job; maxWarnings = 0
 ./gradlew :store-core:console-ui:bootBuildImage   # docker image (Spring apps and -ui apps alike)
+./gradlew bootBuildImage -Pnative                # Spring services as GraalVM native images (references/build-system.md)
 ```
 
 Toolchain and the checkstyle rule set: `references/build-system.md` in the skill. Test types, the naming standard
