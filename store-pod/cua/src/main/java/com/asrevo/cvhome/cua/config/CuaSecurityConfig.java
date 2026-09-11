@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.cua.config;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.security.autoconfigure.actuate.web.servlet.EndpointRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -57,7 +58,9 @@ public class CuaSecurityConfig {
     SecurityFilterChain appSecurity(HttpSecurity http, SsoSecurityDefaults defaults, RequestCache requestCache,
                                     CookieCsrfTokenRepository csrfCookies, BrokeredLogin brokered,
                                     BrokeredLoginSuccessHandler brokeredSuccess, SettingsService settings,
-                                    SessionAdminService sessions) throws Exception {
+                                    SessionAdminService sessions,
+                                    @Qualifier("authorizationServerEntryPoint") AuthenticationEntryPoint storefront)
+            throws Exception {
         LoginPageLocator loginPages = StorefrontUrls.locator(requestCache);
         defaults.applyTo(http)
                 .authorizeHttpRequests(auth -> auth
@@ -121,8 +124,10 @@ public class CuaSecurityConfig {
                                 PathPatternRequestMatcher.withDefaults().matcher(ACTUATOR))
                         // Both as mappings, not one as the default: an explicit authenticationEntryPoint replaces
                         // the delegating one outright, and the actuator's mapping would never be consulted.
-                        .defaultAuthenticationEntryPointFor(storefrontEntryPoint(requestCache, csrfCookies),
-                                AnyRequestMatcher.INSTANCE)
+                        // Injected, not called: an inter-bean call with arguments bypasses the bean a native
+                        // image generated and fails ("Could not resolve matching constructor on bean class
+                        // AuthenticationEntryPoint"); the parameter is the same singleton on the JVM.
+                        .defaultAuthenticationEntryPointFor(storefront, AnyRequestMatcher.INSTANCE)
                         .accessDeniedHandler(new HandoffCsrfDeniedHandler(loginPages, requestCache, csrfCookies)));
         return http.build();
     }
