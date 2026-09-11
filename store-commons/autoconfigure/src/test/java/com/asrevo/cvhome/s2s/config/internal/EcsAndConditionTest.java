@@ -88,7 +88,7 @@ class EcsAndConditionTest {
     @Test
     void theEcsHealthIndicatorReportsTheTaskItWasGiven() {
         EcsTaskHealthIndicator indicator =
-                new EcsTaskHealthIndicator(new EcsTask(), JsonMapper.builder().build());
+                new EcsTaskHealthIndicator(EcsTask::new, JsonMapper.builder().build());
 
         assertThat(indicator.health().getStatus()).isEqualTo(Status.UP);
         assertThat(indicator.health().getDetails()).isNotNull();
@@ -101,8 +101,28 @@ class EcsAndConditionTest {
         when(broken.convertValue(Mockito.any(), Mockito.<TypeReference<Map<String, Object>>>any()))
                 .thenThrow(new IllegalStateException("cannot convert"));
 
-        EcsTaskHealthIndicator indicator = new EcsTaskHealthIndicator(new EcsTask(), broken);
+        EcsTaskHealthIndicator indicator = new EcsTaskHealthIndicator(EcsTask::new, broken);
 
         assertThat(indicator.health().getStatus()).isEqualTo(Status.DOWN);
+    }
+
+    @Test
+    void offEcsTheIndicatorIsUpAndSaysWhyItHasNoTask() {
+        // lcl and the load-testing stack. The indicator is a bean everywhere now: a native image cannot leave it out
+        // by an environment variable the build never sees.
+        EcsTaskHealthIndicator indicator = new EcsTaskHealthIndicator(null, JsonMapper.builder().build());
+
+        assertThat(indicator.health().getStatus()).isEqualTo(Status.UP);
+        assertThat(indicator.health().getDetails()).containsEntry("ecs", EcsTaskHealthIndicator.NOT_ON_ECS);
+    }
+
+    @Test
+    void onlyAFargateTaskFetchesItsMetadataAndOnlyWhenFirstAsked() {
+        MockEnvironment fargate = new MockEnvironment().withProperty(EcsInfoConfig.EXECUTION_ENV, EcsInfoConfig.FARGATE);
+        MockEnvironment lambda = new MockEnvironment().withProperty(EcsInfoConfig.EXECUTION_ENV, "AWS_Lambda_java25");
+
+        assertThat(EcsInfoConfig.ecsTask(new MockEnvironment())).isNull();
+        assertThat(EcsInfoConfig.ecsTask(lambda)).isNull();
+        assertThat(EcsInfoConfig.ecsTask(fargate)).isNotNull();
     }
 }

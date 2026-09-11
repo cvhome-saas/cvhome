@@ -3,6 +3,7 @@ package com.asrevo.cloud.ecs.discovery;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
 
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.ReactiveDiscoveryClient;
@@ -25,9 +26,12 @@ public class EcsReactiveDiscoveryClient implements ReactiveDiscoveryClient {
 
     private final EcsDiscoveryProperties properties;
 
-    private final ServiceDiscoveryAsyncClient discoveryAsync;
+    private final Supplier<ServiceDiscoveryAsyncClient> discoveryAsync;
 
-    public EcsReactiveDiscoveryClient(EcsDiscoveryProperties properties, ServiceDiscoveryAsyncClient discoveryAsync) {
+    /**
+     * @param discoveryAsync built on first use, and only if Cloud Map is consulted at all
+     */
+    public EcsReactiveDiscoveryClient(EcsDiscoveryProperties properties, Supplier<ServiceDiscoveryAsyncClient> discoveryAsync) {
         this.properties = properties;
         this.discoveryAsync = discoveryAsync;
     }
@@ -79,12 +83,18 @@ public class EcsReactiveDiscoveryClient implements ReactiveDiscoveryClient {
 
     @Override
     public Flux<ServiceInstance> getInstances(String serviceId) {
-        return getDefaultServiceInstances(this.discoveryAsync, this.properties, serviceId);
+        if (!properties.discoversFromCloudMap()) {
+            return Flux.empty();
+        }
+        return getDefaultServiceInstances(this.discoveryAsync.get(), this.properties, serviceId);
     }
 
     @Override
     public Flux<String> getServices() {
-        return getEcsServices(this.discoveryAsync, this.properties);
+        if (!properties.discoversFromCloudMap()) {
+            return Flux.empty();
+        }
+        return getEcsServices(this.discoveryAsync.get(), this.properties);
     }
 
 }

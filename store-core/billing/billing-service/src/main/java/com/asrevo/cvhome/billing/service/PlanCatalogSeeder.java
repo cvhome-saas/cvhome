@@ -8,7 +8,6 @@ import java.util.Set;
 
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,7 +44,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-@ConditionalOnProperty(prefix = "com.asrevo.cvhome.billing.catalog", name = "seed-enabled", havingValue = "true")
 public class PlanCatalogSeeder implements ApplicationRunner {
 
     private final PlanCatalogProperties properties;
@@ -80,6 +78,11 @@ public class PlanCatalogSeeder implements ApplicationRunner {
     @Override
     @Transactional
     public void run(ApplicationArguments args) {
+        // A runtime switch rather than a bean condition: a native image fixes its beans when it is built.
+        if (!properties.seedEnabled()) {
+            log.debug("Plan catalog seeding is off");
+            return;
+        }
         List<PlanCatalogProperties.Plan> declared = properties.plans();
         if (declared.isEmpty()) {
             log.warn("Plan catalog seeding is on but no plans are declared — leaving the catalog untouched");

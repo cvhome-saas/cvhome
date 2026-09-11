@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.mock.env.MockEnvironment;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.asrevo.cvhome.s2s.model.AdminUserProperties;
@@ -80,6 +81,18 @@ class SeedInitializersTest {
     }
 
     @Test
+    void withTheSeedSwitchOffTheSuperAdminsPasswordIsLeftAlone() {
+        // Unset is off: a deployment's password, changed by an operator, must not revert on the next restart.
+        new AdminUserDatabaseInitializer(new AdminUserProperties(PASSWORD), users, encoder, new MockEnvironment())
+                .onApplicationReady();
+        new AdminUserDatabaseInitializer(new AdminUserProperties(PASSWORD), users, encoder,
+                new MockEnvironment().withProperty(SeedProperties.APPLY_ON_BOOT, "false")).onApplicationReady();
+
+        verify(users, never()).findById(any(UUID.class));
+        verify(users, never()).save(any());
+    }
+
+    @Test
     void everyConfiguredTestUsersPasswordIsSynced() {
         UUID first = UUID.randomUUID();
         UUID second = UUID.randomUUID();
@@ -118,7 +131,8 @@ class SeedInitializersTest {
     }
 
     private AdminUserDatabaseInitializer adminInitializer(String password) {
-        return new AdminUserDatabaseInitializer(new AdminUserProperties(password), users, encoder);
+        return new AdminUserDatabaseInitializer(new AdminUserProperties(password), users, encoder,
+                new MockEnvironment().withProperty(SeedProperties.APPLY_ON_BOOT, "true"));
     }
 
     private TestUserDatabaseInitializer testUserInitializer(TestStoreProperties.TestUser... testUsers) {

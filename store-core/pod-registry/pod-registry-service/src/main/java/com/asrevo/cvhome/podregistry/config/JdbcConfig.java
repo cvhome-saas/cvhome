@@ -5,12 +5,12 @@ import java.util.List;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
-import org.springframework.data.jdbc.repository.config.AbstractJdbcConfiguration;
 
 import com.asrevo.cvhome.commons.domain.Identifier;
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
 import com.asrevo.cvhome.commons.domain.PodId;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.jdbc.PostgresJdbcConfiguration;
 
 /**
  * Teaches Spring Data JDBC to read and write the identifier value objects stored as columns.
@@ -22,7 +22,7 @@ import com.asrevo.cvhome.commons.domain.StoreMerchantId;
  * </p>
  */
 @Configuration
-public class JdbcConfig extends AbstractJdbcConfiguration {
+public class JdbcConfig extends PostgresJdbcConfiguration {
 
     @Override
     protected List<?> userConverters() {

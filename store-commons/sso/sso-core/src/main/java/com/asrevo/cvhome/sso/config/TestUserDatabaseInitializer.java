@@ -3,7 +3,6 @@ package com.asrevo.cvhome.sso.config;
 import java.util.Optional;
 
 import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.EventListener;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -16,10 +15,20 @@ import com.asrevo.cvhome.sso.repo.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Gives the seeded test accounts the passwords the {@code test-stores} slice configures.
+ *
+ * <p>
+ * Present in every deployment and a no-op in all but one: {@code com.asrevo.cvhome.test-store.users} is only ever
+ * set by {@code application-test-stores.yml}, so without that profile there is nothing to sync. It used to be
+ * {@code @Profile("test-stores")}; a native image decides profiles when it is built, so the profile would have
+ * been fixed at whatever the build saw and the load-testing stack, which runs these images with
+ * {@code test-stores}, would have had no demo logins.
+ * </p>
+ */
 @Component
 @RequiredArgsConstructor
 @Slf4j
-@Profile("test-stores")
 public class TestUserDatabaseInitializer {
 
     private final TestStoreProperties testStoreProperties;

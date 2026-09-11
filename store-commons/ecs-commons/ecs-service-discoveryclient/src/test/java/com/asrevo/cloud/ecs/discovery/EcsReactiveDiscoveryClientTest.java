@@ -60,6 +60,7 @@ class EcsReactiveDiscoveryClientTest {
         discovery = mock(ServiceDiscoveryAsyncClient.class);
         properties = new EcsDiscoveryProperties();
         properties.setNamespace(NAMESPACE);
+        properties.setEnabled(true);
         properties.setDefaultPort(DEFAULT_PORT);
         when(discovery.discoverInstances(any(DiscoverInstancesRequest.class)))
                 .thenReturn(CompletableFuture.completedFuture(DiscoverInstancesResponse.builder()
@@ -136,15 +137,27 @@ class EcsReactiveDiscoveryClientTest {
 
     @Test
     void theClientDescribesItselfForTheActuatorEndpoint() {
-        assertThat(new EcsReactiveDiscoveryClient(properties, discovery).description())
+        assertThat(new EcsReactiveDiscoveryClient(properties, () -> discovery).description())
                 .isEqualTo("ecs reactive discovery client");
     }
 
     @Test
     void theInstanceMethodsDelegateToTheStaticResolution() {
-        EcsReactiveDiscoveryClient client = new EcsReactiveDiscoveryClient(properties, discovery);
+        EcsReactiveDiscoveryClient client = new EcsReactiveDiscoveryClient(properties, () -> discovery);
 
         assertThat(client.getInstances(CATALOG).collectList().block()).hasSize(1);
         assertThat(client.getServices().collectList().block()).containsExactly(CATALOG);
+    }
+
+    @Test
+    void offCloudMapTheClientKnowsNoServicesAndNeverBuildsAnAwsClient() {
+        EcsDiscoveryProperties off = new EcsDiscoveryProperties();
+        off.setNamespace(NAMESPACE);
+        EcsReactiveDiscoveryClient client = new EcsReactiveDiscoveryClient(off, () -> {
+            throw new AssertionError("no AWS client may be built off Cloud Map");
+        });
+
+        assertThat(client.getInstances(CATALOG).collectList().block()).isEmpty();
+        assertThat(client.getServices().collectList().block()).isEmpty();
     }
 }

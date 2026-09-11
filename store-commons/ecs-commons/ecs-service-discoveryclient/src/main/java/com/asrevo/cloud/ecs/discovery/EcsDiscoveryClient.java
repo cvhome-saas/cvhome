@@ -3,6 +3,7 @@ package com.asrevo.cloud.ecs.discovery;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
@@ -25,9 +26,12 @@ public class EcsDiscoveryClient implements DiscoveryClient {
 
     private final EcsDiscoveryProperties properties;
 
-    private final ServiceDiscoveryClient discovery;
+    private final Supplier<ServiceDiscoveryClient> discovery;
 
-    public EcsDiscoveryClient(EcsDiscoveryProperties properties, ServiceDiscoveryClient discovery) {
+    /**
+     * @param discovery built on first use, and only if Cloud Map is consulted at all
+     */
+    public EcsDiscoveryClient(EcsDiscoveryProperties properties, Supplier<ServiceDiscoveryClient> discovery) {
         this.properties = properties;
         this.discovery = discovery;
     }
@@ -93,12 +97,18 @@ public class EcsDiscoveryClient implements DiscoveryClient {
 
     @Override
     public List<ServiceInstance> getInstances(String serviceId) {
-        return getDefaultServiceInstances(this.discovery, this.properties, serviceId);
+        if (!properties.discoversFromCloudMap()) {
+            return List.of();
+        }
+        return getDefaultServiceInstances(this.discovery.get(), this.properties, serviceId);
     }
 
     @Override
     public List<String> getServices() {
-        return getEcsServices(this.discovery, this.properties);
+        if (!properties.discoversFromCloudMap()) {
+            return List.of();
+        }
+        return getEcsServices(this.discovery.get(), this.properties);
     }
 
 }

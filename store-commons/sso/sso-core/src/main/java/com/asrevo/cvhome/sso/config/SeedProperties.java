@@ -1,5 +1,7 @@
 package com.asrevo.cvhome.sso.config;
 
+import org.springframework.core.env.Environment;
+
 /**
  * The switch behind the boot-time seed writers.
  *
@@ -10,12 +12,25 @@ package com.asrevo.cvhome.sso.config;
  * operator would silently revert at the next restart. So the writers run only where
  * {@value #APPLY_ON_BOOT} is {@code true}, which the {@code lcl} and {@code test-stores} slices set and nothing else does.
  * </p>
+ *
+ * <p>
+ * Read when the writer runs, not as a bean condition. A native image fixes its beans when it is built, once, for
+ * every deployment; a condition on this switch would have frozen whatever the build saw — seeding on every start
+ * everywhere, or never, including for the operator who sets it for exactly one start.
+ * </p>
  */
 public final class SeedProperties {
 
     public static final String APPLY_ON_BOOT = "com.asrevo.cvhome.uaa.seed.apply-on-boot";
 
     private SeedProperties() {
+    }
+
+    /**
+     * Whether this start should write the configured secrets over the seeded ones. Off unless set.
+     */
+    public static boolean appliesOnBoot(Environment environment) {
+        return environment.getProperty(APPLY_ON_BOOT, Boolean.class, false);
     }
 
 }

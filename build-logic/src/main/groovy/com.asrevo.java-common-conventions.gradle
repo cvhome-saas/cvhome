@@ -24,6 +24,14 @@ repositories {
     gradlePluginPortal()
 }
 
+// Method parameter names in the bytecode, for every module. Spring Boot's plugin adds -parameters only to the module
+// it is applied to — the services — while the JPA repositories live in the -core libraries. Spring Data needs the
+// names to bind a query method's parameters, and its ahead-of-time repository generation (a GraalVM native build)
+// refuses a method without them: "MethodParameter.getParameterName() must not be null".
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs.add('-parameters')
+}
+
 checkstyle {
     toolVersion = "10.12.4"
     configDirectory = file("$rootDir/config/checkstyle")
@@ -111,6 +119,44 @@ tasks.register('verifyTestNaming') {
     }
 }
 
+// No bean exists or not because of configuration. The bean graph is the same in every deployment: @Profile and
+// @ConditionalOnProperty decide by whatever environment the context starts in, and anything that fixes the graph ahead
+// of time (Spring AOT, a GraalVM native image) decides it once, at build, for Fargate, every flavour and the
+// load-testing stack alike — Fargate's AWS_EXECUTION_ENV, the task's Cloud Map namespace, the test-stores profile, an
+// operator's one-shot seed switch. A switch is read when the code runs instead (a bean that returns early, a client
+// that knows no services when off). Class- and bean-presence conditions (@ConditionalOnClass,
+// @ConditionalOnMissingBean, @ConditionalOnWebApplication) are the same in every deployment and stay.
+tasks.register('verifyNoConfigurationSwitchedBeans') {
+    group = 'verification'
+    description = 'Fails when main code makes a bean depend on a profile or a property.'
+    def mainDirs = files(sourceSets.main.allJava.srcDirs)
+    inputs.files(mainDirs).skipWhenEmpty()
+    doLast {
+        def forbidden = ~/@(Profile|ConditionalOnProperty|ConditionalOnBooleanProperty|ConditionalOnExpression)\b/
+        def offenders = []
+        mainDirs.each { dir ->
+            if (dir.exists()) {
+                dir.eachFileRecurse { f ->
+                    if (f.name.endsWith('.java')) {
+                        f.readLines().eachWithIndex { line, i ->
+                            String code = line.trim()
+                            if (!code.startsWith('*') && !code.startsWith('//') && code =~ forbidden) {
+                                offenders << "${f}:${i + 1}: ${code}"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if (offenders) {
+            throw new GradleException("A bean may not depend on a profile or a property — ahead-of-time processing "
+                    + "decides it at build time, for every deployment. Read the switch at run time instead:\n  "
+                    + offenders.join("\n  "))
+        }
+    }
+}
+
 tasks.named('check') {
     dependsOn 'verifyTestNaming'
+    dependsOn 'verifyNoConfigurationSwitchedBeans'
 }

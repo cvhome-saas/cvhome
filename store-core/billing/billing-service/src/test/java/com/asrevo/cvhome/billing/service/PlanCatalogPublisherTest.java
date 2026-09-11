@@ -11,6 +11,7 @@ import com.asrevo.cvhome.billing.commons.StripePriceId;
 import com.asrevo.cvhome.billing.commons.StripeProductId;
 import com.asrevo.cvhome.billing.commons.StripeRequestOperation;
 import com.asrevo.cvhome.billing.commons.errors.BillingProviderUnavailableException;
+import com.asrevo.cvhome.billing.config.PlanCatalogProperties;
 import com.asrevo.cvhome.billing.domain.PlanEntity;
 import com.asrevo.cvhome.billing.domain.PlanPriceEntity;
 import com.asrevo.cvhome.billing.repository.PlanPriceRepository;
@@ -24,6 +25,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -65,13 +67,21 @@ class PlanCatalogPublisherTest {
         plans = mock(PlanRepository.class);
         prices = mock(PlanPriceRepository.class);
         gateway = mock(StripeCatalogGateway.class);
-        publisher = new PlanCatalogPublisher(plans, prices, gateway);
+        publisher = new PlanCatalogPublisher(new PlanCatalogProperties(true, true, List.of()), plans, prices, gateway);
         when(plans.save(any(PlanEntity.class))).thenAnswer(it -> it.getArgument(0, PlanEntity.class));
         when(prices.save(any(PlanPriceEntity.class))).thenAnswer(it -> it.getArgument(0, PlanPriceEntity.class));
     }
 
     private static PlanPriceEntity price(PlanEntity plan) {
         return PlanPriceEntity.create(plan.getId(), new CurrencyCode("USD"), 1000L, BillingInterval.MONTH, 0);
+    }
+
+    @Test
+    @DisplayName("with Stripe sync off the catalog is neither read nor pushed")
+    void syncOffPublishesNothing() {
+        new PlanCatalogPublisher(new PlanCatalogProperties(true, false, List.of()), plans, prices, gateway).publish();
+
+        verifyNoInteractions(plans, prices, gateway);
     }
 
     @Test

@@ -7,6 +7,7 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
+import org.springframework.mock.env.MockEnvironment;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
@@ -56,6 +57,7 @@ class OAuth2ClientDatabaseInitializerTest {
 
     private final RegisteredClientRepository clients = mock(RegisteredClientRepository.class);
     private final PasswordEncoder encoder = mock(PasswordEncoder.class);
+    private final MockEnvironment seedOn = new MockEnvironment().withProperty(SeedProperties.APPLY_ON_BOOT, "true");
 
     private static AppProperties app() {
         AppProperties properties = new AppProperties();
@@ -74,7 +76,8 @@ class OAuth2ClientDatabaseInitializerTest {
     }
 
     private OAuth2ClientDatabaseInitializer initializerFor(Map<String, OAuth2ClientProperties.ClientInfo> configured) {
-        return new OAuth2ClientDatabaseInitializer(new OAuth2ClientProperties(configured), app(), clients, encoder);
+        return new OAuth2ClientDatabaseInitializer(new OAuth2ClientProperties(configured), app(), clients, encoder,
+                seedOn);
     }
 
     private RegisteredClient saved() {
@@ -127,6 +130,17 @@ class OAuth2ClientDatabaseInitializerTest {
     }
 
     @Test
+    void withTheSeedSwitchOffNothingIsReadOrWrittenWhateverIsConfigured() {
+        // A deployment: an operator's rotated secret must survive the next restart.
+        new OAuth2ClientDatabaseInitializer(new OAuth2ClientProperties(Map.of(CLIENT_ID,
+                new OAuth2ClientProperties.ClientInfo(SECRET, null, null, null, null))), app(), clients, encoder,
+                new MockEnvironment()).onApplicationReady();
+
+        verify(clients, never()).findByClientId(any());
+        verify(clients, never()).save(any());
+    }
+
+    @Test
     void redirectPathsAreExpandedAcrossEveryConfiguredHost() {
         when(clients.findByClientId(CLIENT_ID)).thenReturn(seeded());
         AppProperties properties = app();
@@ -134,7 +148,7 @@ class OAuth2ClientDatabaseInitializerTest {
 
         new OAuth2ClientDatabaseInitializer(new OAuth2ClientProperties(Map.of(CLIENT_ID,
                 new OAuth2ClientProperties.ClientInfo(null, Set.of(CALLBACK), Set.of("/"), null, null))),
-                properties, clients, encoder).onApplicationReady();
+                properties, clients, encoder, seedOn).onApplicationReady();
 
         // One path times every host the app answers on; a store reachable on two hosts needs both registered.
         assertThat(saved().getRedirectUris()).anyMatch(it -> it.endsWith(CALLBACK));

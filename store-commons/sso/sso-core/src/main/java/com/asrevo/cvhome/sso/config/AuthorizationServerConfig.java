@@ -108,8 +108,16 @@ public class AuthorizationServerConfig {
         return new EnabledAwareRegisteredClientRepository(new JdbcRegisteredClientRepository(jdbcTemplate), extensions);
     }
 
+    /**
+     * Declared as the JDBC class, not the interface, on purpose. Spring Security's AOT processor recognises a
+     * {@code JdbcOAuth2AuthorizationService} bean by its declared type and only then registers what a native image
+     * needs to read stored authorizations and client settings back: the security Jackson modules (loaded by class
+     * name) and their mixins. Declared as the interface, the native uaa and cua failed on the first token —
+     * "ClassNotFoundException: CoreJacksonModule", then "Could not resolve type id
+     * 'java.util.Collections$UnmodifiableMap'".
+     */
     @Bean
-    OAuth2AuthorizationService authorizationService(JdbcTemplate jdbcTemplate, RegisteredClientRepository clients) {
+    JdbcOAuth2AuthorizationService authorizationService(JdbcTemplate jdbcTemplate, RegisteredClientRepository clients) {
         return new JdbcOAuth2AuthorizationService(jdbcTemplate, clients);
     }
 

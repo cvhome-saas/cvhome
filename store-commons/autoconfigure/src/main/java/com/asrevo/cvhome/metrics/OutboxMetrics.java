@@ -74,8 +74,18 @@ public class OutboxMetrics implements MeterBinder {
         this.clock = clock;
     }
 
+    /**
+     * The binder a service without an outbox gets: it registers no meter and never touches a table.
+     */
+    public static OutboxMetrics disabled() {
+        return new OutboxMetrics(null, Duration.ZERO);
+    }
+
     @Override
     public void bindTo(MeterRegistry registry) {
+        if (source == null) {
+            return;
+        }
         records = MultiGauge.builder(RECORDS)
                 .description("Outbox records by status")
                 .register(registry);
