@@ -32,6 +32,32 @@ tasks.withType(JavaCompile).configureEach {
     options.compilerArgs.add('-parameters')
 }
 
+/*
+ * Hibernate bytecode enhancement — lazy loading only, and only in a native build (-Pnative, or a native* task such as
+ * nativeCompile). A native image cannot generate Hibernate's proxy subclasses at run time ("Generation of
+ * HibernateProxy instances at runtime is not allowed when the configured BytecodeProvider is 'none'"), so there a
+ * lazy to-one association has to be an enhanced entity: an uninitialised instance of the entity class itself. The JVM
+ * generates its proxies and never needed it, and enhanced bytecode is not reproducible across machines (the same
+ * commit gave the same entity three different class checksums on two CI runners and a laptop), which CI's coverage
+ * job cannot survive: it recompiles, then matches JaCoCo's data to the classes by checksum. So a JVM build compiles
+ * plain entities, exactly as before native existed, and a native build enhances every module that applies the
+ * Hibernate plugin (the ones with lazy to-one associations; the services that apply it hold no entities). Dirty
+ * tracking and association management stay off. See .agents/plans/graalvm-native-images.md.
+ */
+boolean nativeBuild = providers.gradleProperty('native').map { it != 'false' }.getOrElse(false) ||
+        gradle.startParameter.taskNames.any { it.tokenize(':').last().startsWith('native') }
+pluginManager.withPlugin('org.hibernate.orm') {
+    if (nativeBuild) {
+        hibernate {
+            enhancement {
+                enableLazyInitialization = true
+                enableDirtyTracking = false
+                enableAssociationManagement = false
+            }
+        }
+    }
+}
+
 checkstyle {
     toolVersion = "10.12.4"
     configDirectory = file("$rootDir/config/checkstyle")
