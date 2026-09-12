@@ -13,4 +13,9 @@ dependencies {
     compileOnly libs.lombok
     implementation libs.commons.validator
     annotationProcessor libs.lombok
+
+    // The converters and the value objects they map compile against compileOnly JPA and Jackson; their tests need
+    // their own copies to load them.
+    testImplementation libs.jakarta.persistence.api
+    testImplementation libs.jackson.annotations
 }
