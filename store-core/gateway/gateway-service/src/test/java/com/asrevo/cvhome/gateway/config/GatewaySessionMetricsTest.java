@@ -41,6 +41,25 @@ class GatewaySessionMetricsTest {
         assertThat(registry.get(GatewaySessionMetrics.METER).gauge().value()).isEqualTo(1);
     }
 
+    /**
+     * Micrometer holds a gauge's state object weakly unless told otherwise, and in a test nothing but the gauge refers to
+     * this binder. A collection between two reads turned the count into NaN and failed the build now and then; in the
+     * running gateway the Spring context happens to hold the bean, which is why it never showed there.
+     */
+    @Test
+    void theGaugeOutlivesEveryOtherReferenceToItsBinder() {
+        DefaultWebSessionManager manager = new DefaultWebSessionManager();
+        manager.setSessionStore(new InMemoryWebSessionStore());
+        SimpleMeterRegistry registry = new SimpleMeterRegistry();
+        new GatewaySessionMetrics(provider(manager)).bindTo(registry);
+
+        for (int i = 0; i < 5; i++) {
+            System.gc();
+        }
+
+        assertThat(registry.get(GatewaySessionMetrics.METER).gauge().value()).isZero();
+    }
+
     @Test
     void reportsNanForAnotherStore() {
         assertThat(new GatewaySessionMetrics(provider(mock(WebSessionManager.class))).count()).isNaN();

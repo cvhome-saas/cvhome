@@ -175,6 +175,12 @@ union all select 'checkout.sales_order_line', count(*) from checkout.sales_order
   `docker-compose-lcl.yml` now pull the same release from `quay.io/minio/minio`; the index digest is identical
   (`sha256:13582eff…d883`). `MinIOContainer` checks the name against `minio/minio`, so the test config declares the
   quay.io name a compatible substitute. The other repos' references to `minio/minio` are the orchestrator's to sweep.
+- **A flaky gateway unit test, fixed at its cause (commit 9); unrelated to skus.** The second CI run failed
+  `GatewaySessionMetricsTest.countsTheSessionsInTheInMemoryStore`, which this branch does not touch: Micrometer
+  holds a gauge's state object weakly by default, and in the test nothing else refers to the binder. A collection
+  between two reads made the gauge read NaN. Reproduced by forcing `System.gc()` there (`expected: 1.0 but was: NaN`);
+  `GatewaySessionMetrics` now registers the gauge with `strongReference(true)`, and a regression test forces the
+  collection and fails without it.
 - **Found, not fixed: console-ui's `SKU_PATTERN` allows a dot** (`product-draft-form.service.ts`,
   `/^[A-Za-z0-9._-]+$/`). The server has never accepted one, so a product sku with a dot passes the form and fails
   the save with a 400. Out of scope for a backend type change; it wants the pattern made `Sku.FORMAT`'s.

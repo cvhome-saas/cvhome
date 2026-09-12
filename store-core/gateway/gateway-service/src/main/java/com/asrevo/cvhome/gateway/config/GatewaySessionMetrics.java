@@ -31,8 +31,10 @@ public class GatewaySessionMetrics implements MeterBinder {
 
     @Override
     public void bindTo(MeterRegistry registry) {
+        // Held strongly: Micrometer keeps a gauge's state object weakly by default, and a collected binder reads NaN.
         Gauge.builder(METER, this, GatewaySessionMetrics::count)
                 .description("Seller sessions held in the gateway's memory")
+                .strongReference(true)
                 .register(registry);
     }
 
