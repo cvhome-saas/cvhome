@@ -89,6 +89,26 @@ class SkuTest {
         assertThatThrownBy(() -> mapper.readValue("\"abc def\"", Sku.class)).isInstanceOf(JacksonException.class);
     }
 
+    /**
+     * Inside a body is where a malformed sku actually arrives. It must fail as Jackson's own error — Spring turns that
+     * into a 400 — and not as the constructor's {@code IllegalArgumentException}, which would escape as a 500.
+     */
+    @Test
+    void aMalformedValueInsideABodyIsAJacksonErrorNamingTheField() {
+        assertThatThrownBy(() -> mapper.readValue("{\"sku\":\"abc def\",\"skus\":[]}", Line.class))
+                .isInstanceOf(JacksonException.class).hasMessageContaining("sku");
+    }
+
+    @Test
+    void aNumberIsNotASku() {
+        assertThatThrownBy(() -> mapper.readValue("42", Sku.class)).isInstanceOf(JacksonException.class);
+    }
+
+    @Test
+    void anExplicitJsonNullReadsAsNull() {
+        assertThat(mapper.readValue("{\"sku\":null,\"skus\":[]}", Line.class).sku()).isNull();
+    }
+
     @Test
     void toStringIsTheValueBecauseThatIsWhatAQueryParameterCarries() {
         assertThat(Sku.of(SKU)).hasToString(SKU);

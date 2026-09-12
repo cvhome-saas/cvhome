@@ -3,8 +3,14 @@ package com.asrevo.cvhome.commons.domain;
 import java.io.Serializable;
 import java.util.regex.Pattern;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonParser;
+import tools.jackson.core.JsonToken;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.annotation.JsonDeserialize;
+import tools.jackson.databind.deser.std.StdDeserializer;
 
 /**
  * A stock-keeping unit: the key a sellable variant is known by in every pod. Catalog mints it (one per
@@ -20,7 +26,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * On the wire it is a bare JSON string, so no consumer — storefront, console, load tests — sees the type, and its
  * {@link #toString()} is that string, which is how an {@code @HttpExchange} client writes it into a query parameter. A
  * request <em>body</em> keeps a {@code String} annotated {@code @Pattern(regexp = Sku.FORMAT)} instead: bean validation
- * names the offending field in its 400, a failing JSON creator cannot.
+ * names the offending field in its 400, a failing JSON reader cannot.
  * </p>
  *
  * <p>
@@ -28,6 +34,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * that order must not change under it.
  * </p>
  */
+@JsonDeserialize(using = Sku.Reader.class)
 public record Sku(String value) implements Serializable, Comparable<Sku> {
 
     /**
@@ -43,7 +50,6 @@ public record Sku(String value) implements Serializable, Comparable<Sku> {
         }
     }
 
-    @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     public static Sku of(String value) {
         return new Sku(value);
     }
@@ -62,5 +68,35 @@ public record Sku(String value) implements Serializable, Comparable<Sku> {
     @Override
     public String toString() {
         return value;
+    }
+
+    /**
+     * Reads the bare string back through the constructor.
+     *
+     * <p>
+     * A deserializer rather than a delegating {@code @JsonCreator}, like {@code StoreMerchantId.Reader}: the creator's
+     * {@code JsonCreator.Mode} enum is compiled into every class that reads this one, and a module without Jackson's
+     * annotations on its classpath warned about it on every build. A value that is not a sku is a format error
+     * Jackson reports as one, so a request body carrying it is a 400, never a 500.
+     * </p>
+     */
+    static final class Reader extends StdDeserializer<Sku> {
+
+        Reader() {
+            super(Sku.class);
+        }
+
+        @Override
+        public Sku deserialize(JsonParser p, DeserializationContext ctxt) throws JacksonException {
+            if (p.currentToken() != JsonToken.VALUE_STRING) {
+                return (Sku) ctxt.handleUnexpectedToken(Sku.class, p);
+            }
+            String text = p.getString();
+            try {
+                return new Sku(text);
+            } catch (IllegalArgumentException e) {
+                throw ctxt.weirdStringException(text, Sku.class, e.getMessage());
+            }
+        }
     }
 }

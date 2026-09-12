@@ -43,8 +43,8 @@ So inventory will stock `"abc def"` or `"ABC "`, a sku catalog can never create 
      load-testing generates `K6-SKU-…` / `K6-EDIT-…`.
 
    The one path that could have written a non-conforming row is inventory's unvalidated API. See *Deploy note*.
-5. **The wire stays a bare string** — `@JsonValue` on the accessor and a delegating `@JsonCreator`, the way
-   `StoreMerchantId` serializes. landing-ui, console-ui, k6 and the `.http` files see no change.
+5. **The wire stays a bare string** — `@JsonValue` on the accessor and its own `Reader` deserializer, the way
+   `StoreMerchantId` does it. landing-ui, console-ui, k6 and the `.http` files see no change.
    - `toString()` returns the value, because an `@HttpExchange` client formats a `List<Sku>` query param through
      the conversion service's `toString()`.
    - Spring MVC binds `@PathVariable Sku` / `@RequestParam List<Sku>` through the `String` constructor. A bad value
@@ -67,7 +67,7 @@ So inventory will stock `"abc def"` or `"ABC "`, a sku catalog can never create 
 ## Phase 1 — the type (commit 1)
 
 - `store-commons/commons/src/main/java/com/asrevo/cvhome/commons/domain/Sku.java` — record, `FORMAT`,
-  `of(String)`, `@JsonValue value()`, delegating `@JsonCreator`, `toString()`.
+  `of(String)`, `@JsonValue value()`, a `Reader` deserializer, `toString()`.
 - `store-pod/commons/store-commons/.../store/core/converter/SkuConverter.java`, beside `CurrencyCodeConverter`.
 - Tests: `SkuTest` (the accepted/rejected table, bare-string JSON both ways, a malformed JSON value rejected,
   `toString`), `SkuConverterTest` (round trip, null both ways).
@@ -163,6 +163,18 @@ union all select 'checkout.sales_order_line', count(*) from checkout.sales_order
 - **`GET /private/product/unique?code=` keeps a `String`** (phase 3). It is the console's "is this sku taken?",
   asked while the merchant types; a string that cannot be a sku cannot be taken, so it answers `false` rather than
   400. Every other catalog sku edge binds a `Sku`.
+- **`Sku` reads JSON through its own `Reader`, not a delegating `@JsonCreator` (commit 8).** The creator's
+  `JsonCreator.Mode` enum is compiled into every class that reads `Sku`, and the 22 modules without Jackson's
+  annotations on their classpath warned `class file for JsonCreator$Mode not found` on every CI build. The reader is
+  `StoreMerchantId.Reader`'s pattern. It turns a bad value into Jackson's own format error (`weirdStringException`),
+  so a malformed sku inside a body is still a 400; `SkuTest` pins that, a number, and an explicit null.
+- **CI's storage tests could no longer start (commit 7), which is unrelated to skus.** Docker Hub stopped serving
+  `minio/minio` ("pull access denied … repository does not exist"), so every `@StorageIntegrationTest` failed on a
+  fresh runner — catalog, content, merchant and payment on this PR's first run. The registry's answer does not
+  depend on the branch, so `main`'s next run fails the same way. `MinioTestConfiguration` and
+  `docker-compose-lcl.yml` now pull the same release from `quay.io/minio/minio`; the index digest is identical
+  (`sha256:13582eff…d883`). `MinIOContainer` checks the name against `minio/minio`, so the test config declares the
+  quay.io name a compatible substitute. The other repos' references to `minio/minio` are the orchestrator's to sweep.
 - **Found, not fixed: console-ui's `SKU_PATTERN` allows a dot** (`product-draft-form.service.ts`,
   `/^[A-Za-z0-9._-]+$/`). The server has never accepted one, so a product sku with a dot passes the form and fails
   the save with a 400. Out of scope for a backend type change; it wants the pattern made `Sku.FORMAT`'s.
