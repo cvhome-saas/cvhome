@@ -12,9 +12,9 @@ import {
   MAX_VARIANTS,
   MAX_VARIANT_OPTIONS,
   PRODUCT_STEPS,
-  VARIANT_SKU_PATTERN,
   combinationSignature,
   emptyDraft,
+  isSku,
   type ProductDraft,
   type ProductImageItem,
   type ProductStep,
@@ -665,9 +665,17 @@ export class ProductFormFacade {
     }
   }
 
-  /** The product's own sku, made legal for a variant (the variant pattern allows no dot). */
+  /**
+   * The product's own sku, which the variant suggestions start from.
+   *
+   * Taken as it is. The matrix opens only on a saved product, whose sku control is disabled and holds
+   * the server's sku, and the server accepts nothing outside `SKU_PATTERN`. This used to rewrite a dot
+   * to a hyphen, from when the product form allowed a dot the variant rule did not; a dotted product
+   * sku was refused at the save, so there was never a saved one for the rewrite to act on. `'SKU'`
+   * only stands in for a form the snapshot has not filled yet.
+   */
   private baseVariantSku(): string {
-    return (this.formValue().sku || 'SKU').replace(/[^A-Za-z0-9_-]+/g, '-');
+    return this.formValue().sku || 'SKU';
   }
 
   /** `<productSku>-<VALUECODES>`, uniquified against the rows already generated. Editable after. */
@@ -718,7 +726,7 @@ export class ProductFormFacade {
       this.toast.danger(this.transloco.translate('productForm.variants.needsRow'));
       return;
     }
-    const illegal = rows.find((row) => !VARIANT_SKU_PATTERN.test(row.sku));
+    const illegal = rows.find((row) => !isSku(row.sku));
     if (illegal) {
       this.toast.danger(
         this.transloco.translate('productForm.variants.invalidSku', {sku: illegal.sku || '—'}),

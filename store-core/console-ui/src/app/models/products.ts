@@ -1,5 +1,5 @@
 import type {PageT} from '@cvhome-saas/ui-kit';
-import type {LocalisedCopy} from '@models/taxonomy';
+import {SKU_MAX, type LocalisedCopy} from '@models/taxonomy';
 
 /**
  * The product list's and the product form's view models.
@@ -124,15 +124,29 @@ export function isProductStep(value: string | null | undefined): value is Produc
 export const WEIGHT_UNITS: readonly string[] = ['g', 'kg', 'l', 'lb', 'T'];
 export const DIMENSION_UNITS: readonly string[] = ['cm', 'cu', 'ft', 'in', 'm'];
 
-/* -------------------------------------------------------------------------- variants ---- */
+/**
+ * What a sku may be, a product's or a variant's: the server's one rule, `Sku.FORMAT`
+ * (`store-commons/commons/src/main/java/com/asrevo/cvhome/commons/domain/Sku.java`,
+ * `^[A-Za-z0-9_-]{1,255}$`), which catalog, inventory and checkout all enforce.
+ *
+ * Letters, digits, hyphen and underscore. The `{1,255}` is not in this regex: the length is `SKU_MAX`,
+ * which the product form applies as `Validators.maxLength` beside `required`, and `isSku` below for a
+ * variant row. The product form used to allow a dot as well, which the server has never accepted, so a
+ * dotted sku passed the form and failed the save with a 400.
+ */
+export const SKU_PATTERN = /^[A-Za-z0-9_-]+$/;
 
 /**
- * What a variant sku may be — the pod's own `@Pattern` on `PersistableProductVariant.sku`.
+ * Whether `value` is a sku the server will accept: `SKU_PATTERN` within `SKU_MAX`.
  *
- * Stricter than the product form's `SKU_PATTERN`: no dot. The suggestion logic maps a base sku's
- * dots to hyphens rather than proposing something the server would refuse.
+ * For a sku with no form control to carry `maxLength` — a variant matrix row — so that a suggestion
+ * grown past 255 by its option suffix is flagged on its row instead of coming back as a 400.
  */
-export const VARIANT_SKU_PATTERN = /^[A-Za-z0-9_-]+$/;
+export function isSku(value: string): boolean {
+  return value.length <= SKU_MAX && SKU_PATTERN.test(value);
+}
+
+/* -------------------------------------------------------------------------- variants ---- */
 
 /** The pod's guardrails: at most this many assigned options and variants per product (422 beyond). */
 export const MAX_VARIANT_OPTIONS = 4;

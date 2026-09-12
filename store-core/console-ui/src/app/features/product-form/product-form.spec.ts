@@ -440,6 +440,48 @@ describe('ProductForm', () => {
     expect(element.querySelector('.check-taken')).toBeNull();
   }));
 
+  it('refuses a dotted SKU in the form, before asking whether it is taken and before saving', fakeAsync(() => {
+    /*
+     * The server's rule is `Sku.FORMAT`, which has never allowed a dot. The form's pattern did, so
+     * `ABC.1` passed here, was looked up on `/unique`, and came back from the save as a 400.
+     */
+    const asked = spyOn(api, 'skuTaken').and.callThrough();
+    const element = load();
+
+    nameEveryLanguage('ABC.1');
+    tick(1000);
+
+    const sku = fixture.componentInstance['facade'].form.controls.sku;
+    expect(sku.hasError('pattern')).toBe(true);
+    expect(asked).not.toHaveBeenCalled();
+
+    headerButton(element, 'Save draft').click();
+    tick();
+    fixture.detectChanges();
+
+    expect(api.created.length).toBe(0);
+    expect(element.querySelector('app-field-error')?.textContent).toContain(
+      'Use letters, digits, hyphens and underscores only.',
+    );
+  }));
+
+  it('takes a SKU with a hyphen and an underscore, and asks whether it is taken', fakeAsync(() => {
+    spyOn(TestBed.inject(Router), 'navigate');
+    const asked = spyOn(api, 'skuTaken').and.callThrough();
+    const element = load();
+
+    nameEveryLanguage('ABC_1-x');
+    tick(1000);
+
+    expect(fixture.componentInstance['facade'].form.controls.sku.valid).toBe(true);
+    expect(asked).toHaveBeenCalledOnceWith('ABC_1-x');
+
+    headerButton(element, 'Save draft').click();
+    tick();
+
+    expect(api.created.map((product) => product.sku)).toEqual(['ABC_1-x']);
+  }));
+
   it('edits the description with the rich editor, because the stored value is HTML', fakeAsync(() => {
     const element = load('7');
 
@@ -631,6 +673,40 @@ describe('ProductForm', () => {
     tick();
 
     expect(api.variantSets.length).toBe(0);
+  }));
+
+  it('refuses a variant sku the server would, dotted or too long, and names it', fakeAsync(() => {
+    // One rule for a product's sku and a variant's: `SKU_PATTERN` within `SKU_MAX`, as `Sku.FORMAT`.
+    load('7');
+    facade().addVariantAxis(9);
+    const toast = TestBed.inject(ToastService);
+
+    facade().updateVariantRow(1, {sku: 'ACM-7.BLUE'});
+    facade().saveVariants();
+    tick();
+    expect(api.variantSets.length).toBe(0);
+    expect(toast.messages().some((message) => message.text.includes('ACM-7.BLUE'))).toBe(true);
+
+    facade().updateVariantRow(1, {sku: 'A'.repeat(256)});
+    facade().saveVariants();
+    tick();
+    expect(api.variantSets.length).toBe(0);
+
+    facade().updateVariantRow(1, {sku: 'A'.repeat(255)});
+    facade().saveVariants();
+    tick();
+    expect(api.variantSets.map(({set}) => set.variants[1].sku)).toEqual(['A'.repeat(255)]);
+  }));
+
+  it('marks the matrix row whose sku the server would refuse', fakeAsync(() => {
+    const element = load('7');
+    facade().addVariantAxis(9);
+    facade().updateVariantRow(1, {sku: 'ACM-7.BLUE'});
+    facade().activeStep.set('variants');
+    fixture.detectChanges();
+
+    const fields = [...element.querySelectorAll('.matrix .cell-sku app-text-field')];
+    expect(fields.map((field) => field.classList.contains('text-invalid'))).toEqual([false, true]);
   }));
 
   it('reassigns the default when its row is removed', fakeAsync(() => {

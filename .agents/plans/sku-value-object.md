@@ -133,6 +133,25 @@ opened from an order listed 0 customers, and the search box never found anyone b
   and not from another store).
 - QA: `checkout-qa.md` CUS-06.
 
+## Phase 6 — console-ui: one sku rule, the server's (commit 10)
+
+Found in review: the console kept three copies of the rule, and one disagreed with the server. The product form's
+`SKU_PATTERN` (`/^[A-Za-z0-9._-]+$/`, `product-draft-form.service.ts`) allowed a dot, so a dotted product sku passed
+the form, was looked up on `/unique`, and failed the save with a 400. The variant matrix had `VARIANT_SKU_PATTERN`
+(`models/products.ts`) and a literal in `variants-step.ts`: no dot, but no 255 bound either.
+
+- `models/products.ts`: one `SKU_PATTERN = /^[A-Za-z0-9_-]+$/`, documented as `Sku.FORMAT`, replaces
+  `VARIANT_SKU_PATTERN`; the length stays `SKU_MAX` through the product form's `maxLength`. `isSku()` is the pattern
+  within `SKU_MAX`, for matrix rows, which have no control to carry `maxLength`.
+- `product-draft-form.service.ts` imports it; its dotted constant is gone, and the uniqueness check still skips a
+  value that fails it. `variants-step.ts` `skuInvalid()` and `ProductFormFacade.saveVariants` use `isSku`.
+- `baseVariantSku()` no longer rewrites a dot to a hyphen. The matrix opens only on a saved product, whose sku is
+  disabled and already the server's. Point 4 above cites that rewrite; the guard that mattered was always
+  `saveVariants`' refusal, which stays.
+- i18n: `productForm.essentials.skuInvalid` no longer lists dots, in `en` and `ar`.
+- Tests: `product-form.spec.ts`, four new.
+- QA: `console-ui-qa.md` CAT-12.
+
 ## Other repos
 
 None. The wire format is unchanged, and load-testing and e2e-testing already send conforming skus.
@@ -181,9 +200,6 @@ union all select 'checkout.sales_order_line', count(*) from checkout.sales_order
   between two reads made the gauge read NaN. Reproduced by forcing `System.gc()` there (`expected: 1.0 but was: NaN`);
   `GatewaySessionMetrics` now registers the gauge with `strongReference(true)`, and a regression test forces the
   collection and fails without it.
-- **Found, not fixed: console-ui's `SKU_PATTERN` allows a dot** (`product-draft-form.service.ts`,
-  `/^[A-Za-z0-9._-]+$/`). The server has never accepted one, so a product sku with a dot passes the form and fails
-  the save with a 400. Out of scope for a backend type change; it wants the pattern made `Sku.FORMAT`'s.
 - **The phase-3 checkout bridge replaced the phase-2 one** rather than stacking on it: the snapshot filters the cart's
   strings to well-formed skus once and asks catalog and inventory with the same `List<Sku>`, which keeps
   `snapshot()` inside checkstyle's complexity limit.
@@ -199,6 +215,7 @@ Per phase, before its commit:
 | 3 — catalog | catalog-core 246, catalog-service 69 (1 new), checkout-core 188 | catalog-service 80 (1 new), checkout-service 77 | clean |
 | 4 — checkout | checkout-commons, checkout-core 188, checkout-service 26 | checkout-service 78 (1 new) | clean |
 | 5 — customer search | checkout-core 188 | checkout-service 79 (1 new) | clean |
+| 6 — console-ui sku rule | console-ui 719 (Karma; `product-form.spec.ts` 32, 4 new) | — | `npm run lint` clean |
 
 What the integration suites prove beyond compiling: the converter binds in JPQL (`findBySkus`, `lockBySku` under
 `PESSIMISTIC_WRITE`, `findByStoreAndSkuIn`) and inside `lower(...)` for the listing's sku filter; the per-sku
@@ -231,6 +248,11 @@ QA files: `inventory-qa.md` INV-11, `catalog-qa.md` PRD-17 and PRD-07, `checkout
 Phase 5, live on the same stack after `lcl restart checkout --stack sku`: order 1001's **View profile** in the
 console went to `/customers?q=qa-sku@example.com&customer=1`, which listed 1 customer and opened the profile. Before
 the fix the same click listed 0. `checkout-qa.md` CUS-06 is `[verified]`.
+
+Phase 6, live on the same stack (console-ui's `ng serve` rebuilds on save): on `/products/new`, `QA-SKU.phase6` was
+refused in the field with no `/unique` call, and Save draft sent nothing; `QA-SKU_phase6` got one `/unique` call
+and its tick. On product 3's Variants step, `SKU-AD-CL-TPT03.BLUE` was framed red and refused by name with no
+request, then left unsaved. `console-ui-qa.md` CAT-12 is `[verified]`.
 
 Seen during QA, not caused by this change: after a full navigation to `/en/checkout`, the storefront's "Cart
 details" panel showed "Your cart is empty" for several seconds while the header counted one item. The cart in

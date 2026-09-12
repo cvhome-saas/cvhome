@@ -1,7 +1,7 @@
 import {Component, computed, inject, input, signal} from '@angular/core';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 
-import {MAX_VARIANTS, MAX_VARIANT_OPTIONS} from '@models/products';
+import {MAX_VARIANTS, MAX_VARIANT_OPTIONS, isSku} from '@models/products';
 import {Icon, NoticeBar, NumberField, Panel, Select, type SelectOption, TextField, Toggle} from '@cvhome-saas/ui-kit/ui';
 import {ProductFormFacade} from '../../facades/product-form.facade';
 
@@ -124,8 +124,9 @@ export class VariantsStep {
     return labels.join(' / ');
   }
 
+  /** The same rule `saveVariants` refuses on, so a row is marked before the save names it. */
   protected skuInvalid(sku: string): boolean {
-    return !/^[A-Za-z0-9_-]+$/.test(sku);
+    return !isSku(sku);
   }
 
   protected countLine(): string {
