@@ -154,7 +154,20 @@ the form, was looked up on `/unique`, and failed the save with a 400. The varian
 
 ## Other repos
 
-None. The wire format is unchanged, and load-testing and e2e-testing already send conforming skus.
+From the orchestrator's cross-repo review:
+
+- **`load-testing`** — `stack/docker-compose.yml` pinned the same `minio/minio:RELEASE.2025-09-07T16-13-09Z-cpuv1`,
+  which Docker Hub no longer serves (an anonymous manifest fetch answers 401). It moves to `quay.io/minio/minio:` with
+  the same tag (index digest `sha256:13582eff…d883`, identical). Branch `refactor/sku-value-object` in
+  cvhome-saas/load-testing.
+- **`orchestrator`** — the MinIO/Postgres image and the sku format become contract rows, each with a
+  `contract-check.py` check, so a future drift is caught nightly. Branch `refactor/sku-value-object` in
+  cvhome-saas/orchestrator.
+- **`assets`** — `fast-run/docker-compose.yml` uses `bitnami/minio:2025.4.22`, now 404 on Docker Hub. The whole
+  fast-run still describes the 1.0.x layout, so it is recorded as known drift in the orchestrator, not patched.
+- **No change** in cvhome-platform, lcl, e2e-testing, public-dkr, the image repos or the docs site: the wire format,
+  ports, env, routes and DDL are unchanged, and load-testing's k6 skus (`K6-SKU-0001`, `K6-EDIT-<vu>-<iter>-<rand>`,
+  the 11 seed skus) all conform.
 
 ## Deploy note
 
