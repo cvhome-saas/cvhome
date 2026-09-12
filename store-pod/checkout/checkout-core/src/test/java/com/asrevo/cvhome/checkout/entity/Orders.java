@@ -7,6 +7,7 @@ import com.asrevo.cvhome.checkout.domain.CartCode;
 import com.asrevo.cvhome.checkout.domain.OrderRef;
 import com.asrevo.cvhome.commons.domain.CurrencyCode;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
+import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.entity.payments.PaymentType;
 
@@ -23,7 +24,7 @@ public final class Orders {
 
     public static final Instant T2 = T0.plusSeconds(120);
 
-    public static final String SKU = "SKU-NK-RUN-001";
+    public static final Sku SKU = Sku.of("SKU-NK-RUN-001");
 
     public static final String TX = "tx-1";
 

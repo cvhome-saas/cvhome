@@ -10,6 +10,7 @@ import com.asrevo.cvhome.checkout.model.order.ReadableOrder;
 import com.asrevo.cvhome.checkout.model.order.ReadableOrderConfirmation;
 import com.asrevo.cvhome.checkout.model.order.ReadableOrderProduct;
 import com.asrevo.cvhome.checkout.model.order.ReadableOrderStatusHistory;
+import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.store.core.entity.common.InventoryStatus;
 import com.asrevo.cvhome.store.core.entity.common.PaymentStatus;
 import com.asrevo.cvhome.store.core.entity.order.orderstatus.OrderStatus;
@@ -83,7 +84,7 @@ class OrderMapperTest {
     @Test
     void aLineWithoutOptionsHasNullAttributesAsTheFrontendsExpect() {
         Order order = Orders.placed(PaymentType.STRIPE);
-        order.addLine("SKU-PLAIN", 2L, "Plain", new java.math.BigDecimal("1.00"), 1, null);
+        order.addLine(Sku.of("SKU-PLAIN"), 2L, "Plain", new java.math.BigDecimal("1.00"), 1, null);
         order.computeTotals();
 
         ReadableOrder readable = OrderMapper.toReadable(order, null, true, Locale.US);

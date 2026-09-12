@@ -2,6 +2,7 @@ package com.asrevo.cvhome.checkout.errors;
 
 import java.io.Serial;
 
+import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.errors.ErrorBuilder;
 import com.asrevo.cvhome.errors.ErrorPayload;
 import com.asrevo.cvhome.errors.OperationNotAllowedException;
@@ -19,10 +20,10 @@ public class ProductNotPurchasableException extends OperationNotAllowedException
         super(payload, cause);
     }
 
-    public static ProductNotPurchasableException of(String sku) {
+    public static ProductNotPurchasableException of(Sku sku) {
         return new ErrorBuilder<>(CheckoutErrors.PRODUCT_NOT_PURCHASABLE, ProductNotPurchasableException::new)
                 .detail("Product %s cannot be purchased.", sku)
-                .param("sku", sku)
+                .param("sku", sku.value())
                 .build();
     }
 

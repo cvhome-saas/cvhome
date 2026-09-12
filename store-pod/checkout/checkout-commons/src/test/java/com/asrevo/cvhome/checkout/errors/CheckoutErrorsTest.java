@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
+import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.errors.ErrorCategory;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -45,8 +46,8 @@ class CheckoutErrorsTest {
         assertThat(CartEmptyException.of(CODE).category()).isEqualTo(ErrorCategory.UNPROCESSABLE);
         assertThat(CartAlreadyConvertedException.of(CODE, 5L).category()).isEqualTo(ErrorCategory.CONFLICT);
         assertThat(CartAlreadyConvertedException.of(CODE, 5L).params()).containsEntry("orderId", 5L);
-        assertThat(ProductNotPurchasableException.of(SKU).params()).containsEntry(SKU, SKU);
-        assertThat(CartQuantityOutOfRangeException.of(SKU, 9, 1, 5).params()).containsEntry("maximum", 5)
+        assertThat(ProductNotPurchasableException.of(Sku.of(SKU)).params()).containsEntry(SKU, SKU);
+        assertThat(CartQuantityOutOfRangeException.of(Sku.of(SKU), 9, 1, 5).params()).containsEntry("maximum", 5)
                 .containsEntry("minimum", 1).containsEntry("quantity", 9);
         assertThat(OrderNotFoundException.of(1L, STORE).category()).isEqualTo(ErrorCategory.NOT_FOUND);
         assertThat(OrderNotFoundException.ofRef(REF, STORE).params()).containsEntry("orderRef", REF);

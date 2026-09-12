@@ -99,6 +99,18 @@ every read re-prices from inventory, and a line the catalog or inventory no long
 
 - **Expect** — `422 CHECKOUT.CART.PRODUCT_NOT_PURCHASABLE`, `params.sku` naming it.
 
+### CART-06 — A sku that could never exist is refused at the edge · high · [not verified]
+
+`CartApiIntegrationTest.aMalformedSkuIsRefusedAtTheEdgeInTheBodyAndInThePath`. Checkout keys cart and order lines
+by `Sku` now, whose rule (`Sku.FORMAT`: letters, digits, `_`, `-`, 1–255 characters) is the one catalog and
+inventory use.
+
+- **Steps** — `POST /cart` with `{"product": "SKU.DOT", "quantity": 1}`; on an existing cart,
+  `DELETE /cart/{code}/product/SKU.DOT`.
+- **Expect** — the add answers **400** `COMMON.VALIDATION_FAILED` with `fieldErrors[0].field = "product"`. It is
+  no longer the CART-03 **422**, because it is refused before catalog or inventory is asked. The delete answers
+  **400** `COMMON.MALFORMED_REQUEST`, and the cart still holds its line. A well-formed unknown sku is still CART-03.
+
 ### CART-04 — Another store cannot read the cart · critical · [verified]
 
 - **Steps** — `GET /cart/{code}?store=<store 2>`.
@@ -460,6 +472,7 @@ Defects that actually happened in checkout — most in the service this one repl
 |---|---|---|
 | **Expiry and cancel failed at flush** | Orders never expired; cancel 500ed with a CHECK violation. | SEC-02; JOB-03; SIG-02. |
 | **An order lost between two remote calls** | Reserved stock, no payment, order stuck `CREATED` forever. | PLC-05, PLC-06, JOB-01 — stop a service mid-placement and watch the order finish anyway. |
+| **Checkout took any string as a sku** | A cart line's sku was whatever the storefront posted, so a sku no service could hold was carried as far as catalog and inventory before being refused. | CART-06; the stored data check in `.agents/plans/sku-value-object.md` (*Deploy note*) |
 | **A refused payment left the stock held** | Cancelled order, inventory still decremented. | PLC-07: `inventory_status = RELEASED` and the quantity back. |
 | **A rejected transfer told nobody** | Payment `REJECTED`, order `PENDING_PAYMENT` forever. | SIG-02. |
 | **Any JWT could mark an order paid** | The callback had no permission gate. | SIG-06. |

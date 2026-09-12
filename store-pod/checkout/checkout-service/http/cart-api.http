@@ -53,6 +53,23 @@ Content-Type: application/json
   "quantity": 1
 }
 
+### a sku that could never exist — 400 COMMON.VALIDATION_FAILED on `product`, refused before any lookup (qa CART-06)
+POST {{SPG_URL}}/checkout/api/v1/cart?store={{STORE_ID}}&lang={{LANG}}
+Content-Type: application/json
+
+{
+  "product": "SKU.DOT",
+  "quantity": 1
+}
+
+> {%
+    client.test("a malformed sku names the field", function () {
+        client.assert(response.status === 400, "status " + response.status);
+        client.assert(response.body.code === "COMMON.VALIDATION_FAILED", "code " + response.body.code);
+        client.assert(response.body.fieldErrors[0].field === "product", "field " + response.body.fieldErrors[0].field);
+    });
+%}
+
 ### above the sku's per-order maximum (SKU-NK-RUN-001 allows 1) — 422 CHECKOUT.CART.QUANTITY_OUT_OF_RANGE
 POST {{SPG_URL}}/checkout/api/v1/cart?store={{STORE_ID}}&lang={{LANG}}
 Content-Type: application/json

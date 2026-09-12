@@ -52,6 +52,9 @@ class CartApiIntegrationTest {
 
     private static final String QUANTITY = "quantity";
 
+    /** A dot was never part of a sku, so no catalog variant can carry this one. */
+    private static final String MALFORMED = "SKU.DOT";
+
     @LocalServerPort
     private int port;
 
@@ -140,6 +143,27 @@ class CartApiIntegrationTest {
                 "{\"product\":\"\",\"quantity\":1}");
 
         expect(response, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * A line whose sku could never exist is a 400 naming the field, decided at the edge, rather than a "not
+     * purchasable" 422 learned from asking catalog and inventory about it. The path form is refused the same way, and
+     * the cart is untouched.
+     */
+    @Test
+    void aMalformedSkuIsRefusedAtTheEdgeInTheBodyAndInThePath() {
+        ResponseEntity<String> added = api.send(HttpMethod.POST, scoped(path(V1, CART), STORE_A), null,
+                cartBody(MALFORMED, 1));
+        expect(added, HttpStatus.BAD_REQUEST);
+        assertThat(json(added).get(CODE).asString()).isEqualTo("COMMON.VALIDATION_FAILED");
+        assertThat(json(added).path("fieldErrors").findValuesAsString("field")).containsExactly(PRODUCT);
+
+        String code = api.newCart(STORE_A, SKU, 1);
+        ResponseEntity<String> removed = api.send(HttpMethod.DELETE,
+                scoped(path(V1, CART, code, PRODUCT, MALFORMED), STORE_A), null, null);
+        expect(removed, HttpStatus.BAD_REQUEST);
+        assertThat(json(removed).get(CODE).asString()).isEqualTo("COMMON.MALFORMED_REQUEST");
+        assertThat(json(api.get(cartUrl(STORE_A, code), null)).get(QUANTITY).asInt()).isEqualTo(1);
     }
 
     @Test

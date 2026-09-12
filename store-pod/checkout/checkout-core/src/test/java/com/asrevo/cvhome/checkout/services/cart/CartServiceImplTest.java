@@ -61,9 +61,9 @@ class CartServiceImplTest {
 
     private static final CartCode CODE = CartCode.of("cart-1");
 
-    private static final String SKU_A = "SKU-A";
+    private static final Sku SKU_A = Sku.of("SKU-A");
 
-    private static final String SKU_B = "SKU-B";
+    private static final Sku SKU_B = Sku.of("SKU-B");
 
     @Mock
     private CartRepository carts;
@@ -87,19 +87,19 @@ class CartServiceImplTest {
         lenient().when(carts.save(any(Cart.class))).thenAnswer(inv -> inv.getArgument(0));
     }
 
-    static ProductSnapshot snapshot(String sku, String price, boolean purchasable, int min, int max) {
+    static ProductSnapshot snapshot(Sku sku, String price, boolean purchasable, int min, int max) {
         ReadableMinimalProduct product = new ReadableMinimalProduct();
-        product.setSku(Sku.of(sku));
+        product.setSku(sku);
         product.setId(3L);
         ProductDescription description = new ProductDescription();
-        description.setName(sku.toLowerCase());
+        description.setName(sku.value().toLowerCase());
         product.setDescription(description);
         return new ProductSnapshot(sku, product, new BigDecimal(price), new BigDecimal(price), false, purchasable, min, max);
     }
 
-    private static PersistableCartItem item(String sku, int quantity) {
+    private static PersistableCartItem item(Sku sku, int quantity) {
         PersistableCartItem item = new PersistableCartItem();
-        item.setProduct(sku);
+        item.setProduct(sku.value());
         item.setQuantity(quantity);
         return item;
     }
@@ -129,7 +129,7 @@ class CartServiceImplTest {
                 org.assertj.core.groups.Tuple.tuple("SUBTOTAL", LIT_20_00),
                 org.assertj.core.groups.Tuple.tuple("TOTAL", LIT_20_00));
         assertThat(cart.getProducts()).singleElement().satisfies(line -> {
-            assertThat(line.getSku()).isEqualTo(Sku.of(SKU_A));
+            assertThat(line.getSku()).isEqualTo(SKU_A);
             assertThat(line.getDescription().getName()).isEqualTo("sku-a");
             assertThat(line.getFinalPrice()).isEqualTo("$10.00");
             assertThat(line.getDisplaySubTotal()).isEqualTo(LIT_20_00);
@@ -193,7 +193,7 @@ class CartServiceImplTest {
 
         ReadableCart readable = service.removeLine(Orders.STORE, EN, CODE, SKU_B);
 
-        assertThat(readable.getProducts()).singleElement().satisfies(line -> assertThat(line.getSku()).isEqualTo(Sku.of(SKU_A)));
+        assertThat(readable.getProducts()).singleElement().satisfies(line -> assertThat(line.getSku()).isEqualTo(SKU_A));
         assertThat(cart.line(SKU_B)).isEmpty();
     }
 

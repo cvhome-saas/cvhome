@@ -120,10 +120,10 @@ class OrderPlacementTransactionTest {
         return request;
     }
 
-    static ProductSnapshot snapshot(String sku, String price, boolean purchasable, int min, int max) {
+    static ProductSnapshot snapshot(Sku sku, String price, boolean purchasable, int min, int max) {
         ReadableMinimalProduct product = new ReadableMinimalProduct();
         product.setId(1L);
-        product.setSku(Sku.of(sku));
+        product.setSku(sku);
         ProductDescription description = new ProductDescription();
         description.setName(RUNNER);
         product.setDescription(description);

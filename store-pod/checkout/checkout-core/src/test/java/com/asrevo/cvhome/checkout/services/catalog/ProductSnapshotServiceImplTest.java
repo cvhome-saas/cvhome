@@ -55,15 +55,15 @@ class ProductSnapshotServiceImplTest {
 
     private static final String RED = "Red";
 
-    private static final String A_2 = "A";
+    private static final Sku A_2 = Sku.of("A");
 
-    private static final String C_2 = "C";
+    private static final Sku C_2 = Sku.of("C");
 
-    private static final String B_2 = "B";
+    private static final Sku B_2 = Sku.of("B");
 
     private static final String LIT_0 = "0";
 
-    private static final String V_2 = "V";
+    private static final Sku V_2 = Sku.of("V");
 
     private static final String L = "l";
 
@@ -78,10 +78,10 @@ class ProductSnapshotServiceImplTest {
     @InjectMocks
     private ProductSnapshotServiceImpl service;
 
-    static ReadableMinimalProduct product(String sku, String name) {
+    static ReadableMinimalProduct product(Sku sku, String name) {
         ReadableMinimalProduct product = new ReadableMinimalProduct();
         product.setId(1L);
-        product.setSku(Sku.of(sku));
+        product.setSku(sku);
         product.setAvailable(true);
         ProductDescription description = new ProductDescription();
         description.setName(name);
@@ -92,19 +92,19 @@ class ProductSnapshotServiceImplTest {
         return product;
     }
 
-    static SkuInventory stock(String sku, String price, boolean purchasable) {
-        return new SkuInventory(Sku.of(sku), 1L, true, purchasable, 5, 1, 3,
+    static SkuInventory stock(Sku sku, String price, boolean purchasable) {
+        return new SkuInventory(sku, 1L, true, purchasable, 5, 1, 3,
                 new SkuPrice(new BigDecimal(LIT_12_00), new BigDecimal(price), true, 10, null, null, null));
     }
 
     @Test
     void mergesBothSourcesAndDropsWhatEitherLacks() {
-        when(products.getDetailedProducts(Orders.STORE, List.of(Sku.of(A_2), Sku.of(B_2), Sku.of(C_2)), EN))
+        when(products.getDetailedProducts(Orders.STORE, List.of(A_2, B_2, C_2), EN))
                 .thenReturn(List.of(product(A_2, ALPHA), product(B_2, BETA)));
-        when(inventory.queryBySkus(Orders.STORE, new AvailabilityQuery(List.of(Sku.of(A_2), Sku.of(B_2), Sku.of(C_2)))))
+        when(inventory.queryBySkus(Orders.STORE, new AvailabilityQuery(List.of(A_2, B_2, C_2))))
                 .thenReturn(List.of(stock(A_2, LIT_9_99, true), stock(C_2, LIT_1_00, true)));
 
-        Map<String, ProductSnapshot> snapshot = service.snapshot(Orders.STORE, EN, List.of(A_2, B_2, C_2, A_2));
+        Map<Sku, ProductSnapshot> snapshot = service.snapshot(Orders.STORE, EN, List.of(A_2, B_2, C_2, A_2));
 
         assertThat(snapshot).containsOnlyKeys(A_2);
         ProductSnapshot a = snapshot.get(A_2);
@@ -128,7 +128,7 @@ class ProductSnapshotServiceImplTest {
         when(products.getDetailedProducts(any(), any(), any())).thenReturn(List.of(unavailable, product(B_2, BETA)));
         when(inventory.queryBySkus(any(), any())).thenReturn(List.of(stock(A_2, LIT_1_00, true), stock(B_2, LIT_1_00, false)));
 
-        Map<String, ProductSnapshot> snapshot = service.snapshot(Orders.STORE, EN, List.of(A_2, B_2));
+        Map<Sku, ProductSnapshot> snapshot = service.snapshot(Orders.STORE, EN, List.of(A_2, B_2));
 
         assertThat(snapshot.get(A_2).canBePurchased()).isFalse();
         assertThat(snapshot.get(B_2).canBePurchased()).isFalse();
@@ -149,12 +149,12 @@ class ProductSnapshotServiceImplTest {
         variant.setVariant(selection);
         variant.setImage(null);
         when(products.getDetailedProducts(any(), any(), any())).thenReturn(List.of(variant));
-        when(inventory.queryBySkus(any(), any())).thenReturn(List.of(new SkuInventory(Sku.of(V_2), 1L, true, true, 5, 0, 0,
+        when(inventory.queryBySkus(any(), any())).thenReturn(List.of(new SkuInventory(V_2, 1L, true, true, 5, 0, 0,
                 new SkuPrice(null, null, false, 0, null, null, null))));
 
         ProductSnapshot snapshot = service.snapshot(Orders.STORE, EN, List.of(V_2)).get(V_2);
 
-        assertThat(snapshot.name()).as("no description → the sku").isEqualTo(V_2);
+        assertThat(snapshot.name()).as("no description → the sku").isEqualTo(V_2.value());
         assertThat(snapshot.imageUrl()).isNull();
         assertThat(snapshot.finalPrice()).isEqualByComparingTo(LIT_0);
         assertThat(snapshot.originalPrice()).isEqualByComparingTo(LIT_0);
@@ -168,7 +168,7 @@ class ProductSnapshotServiceImplTest {
     @Test
     void aSkuWithoutAPriceRowIsNotPurchasable() {
         when(products.getDetailedProducts(any(), any(), any())).thenReturn(List.of(product(A_2, ALPHA)));
-        when(inventory.queryBySkus(any(), any())).thenReturn(List.of(new SkuInventory(Sku.of(A_2), 1L, true, true, 5, 1, 0, null)));
+        when(inventory.queryBySkus(any(), any())).thenReturn(List.of(new SkuInventory(A_2, 1L, true, true, 5, 1, 0, null)));
 
         assertThat(service.snapshot(Orders.STORE, EN, List.of(A_2))).isEmpty();
     }
@@ -181,11 +181,11 @@ class ProductSnapshotServiceImplTest {
 
     @Test
     void duplicateSkusAreAskedOnce() {
-        when(products.getDetailedProducts(any(), eq(List.of(Sku.of(A_2))), any())).thenReturn(List.of());
+        when(products.getDetailedProducts(any(), eq(List.of(A_2)), any())).thenReturn(List.of());
         when(inventory.queryBySkus(any(), any())).thenReturn(List.of());
 
         service.snapshot(Orders.STORE, EN, List.of(A_2, A_2));
 
-        verify(products).getDetailedProducts(Orders.STORE, List.of(Sku.of(A_2)), EN);
+        verify(products).getDetailedProducts(Orders.STORE, List.of(A_2), EN);
     }
 }
