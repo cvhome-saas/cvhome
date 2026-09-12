@@ -8,6 +8,7 @@ import org.springframework.web.service.annotation.GetExchange;
 import org.springframework.web.service.annotation.HttpExchange;
 import org.springframework.web.service.annotation.PostExchange;
 
+import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.inventory.model.AvailabilityQuery;
 import com.asrevo.cvhome.inventory.model.SkuInventory;
@@ -21,7 +22,7 @@ import com.asrevo.cvhome.inventory.model.SkuInventory;
 public interface ExternalInventoryService {
 
     @GetExchange("/availability")
-    List<SkuInventory> getBySkus(StoreMerchantId store, @RequestParam("skus") List<String> skus);
+    List<SkuInventory> getBySkus(StoreMerchantId store, @RequestParam("skus") List<Sku> skus);
 
     @PostExchange("/availability/query")
     List<SkuInventory> queryBySkus(StoreMerchantId store, @RequestBody AvailabilityQuery query);

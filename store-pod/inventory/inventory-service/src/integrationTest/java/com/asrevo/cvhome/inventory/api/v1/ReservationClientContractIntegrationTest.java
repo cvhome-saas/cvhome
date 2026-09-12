@@ -12,6 +12,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.client.RestClient;
 
+import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.errors.UncheckedBaseException;
 import com.asrevo.cvhome.inventory.api.errors.InventoryApiErrors;
@@ -19,6 +20,7 @@ import com.asrevo.cvhome.inventory.api.errors.InventoryApiUnavailableException;
 import com.asrevo.cvhome.inventory.api.errors.ProductReservationRejectedException;
 import com.asrevo.cvhome.inventory.config.ExternalClientsTestConfiguration;
 import com.asrevo.cvhome.inventory.model.AvailabilityQuery;
+import com.asrevo.cvhome.inventory.model.SkuInventory;
 import com.asrevo.cvhome.inventory.services.ExternalInventoryService;
 import com.asrevo.cvhome.inventory.services.ExternalProductReservationService;
 import com.asrevo.cvhome.s2s.utils.WebClientsUtils;
@@ -117,7 +119,7 @@ class ReservationClientContractIntegrationTest {
     }
 
     private static ProductReservationList oneOf(String sku, int quantity) {
-        return new ProductReservationList(Set.of(new ReserveProductEntry(sku, quantity)));
+        return new ProductReservationList(Set.of(new ReserveProductEntry(Sku.of(sku), quantity)));
     }
 
     /**
@@ -166,8 +168,21 @@ class ReservationClientContractIntegrationTest {
         ExternalInventoryService reads = WebClientsUtils.build(authorized(),
                 String.format(LOCALHOST, port), ExternalInventoryService.class, InventoryApiErrors.INVENTORY);
 
-        assertThat(reads.queryBySkus(new StoreMerchantId(STORE_A), new AvailabilityQuery(List.of(SKU))))
+        assertThat(reads.queryBySkus(new StoreMerchantId(STORE_A), new AvailabilityQuery(List.of(Sku.of(SKU)))))
                 .isNotEmpty();
+    }
+
+    /**
+     * The GET form carries the skus in the query string, which the client writes through {@code Sku.toString()} —
+     * a sku rendered any other way would be asked for under a name no row has.
+     */
+    @Test
+    void theGetFormWritesEachSkuAsItsValueInTheQueryString() {
+        ExternalInventoryService reads = WebClientsUtils.build(authorized(),
+                String.format(LOCALHOST, port), ExternalInventoryService.class, InventoryApiErrors.INVENTORY);
+
+        assertThat(reads.getBySkus(new StoreMerchantId(STORE_A), List.of(Sku.of(SKU), Sku.of(SCARCE_SKU))))
+                .extracting(SkuInventory::sku).containsExactlyInAnyOrder(Sku.of(SKU), Sku.of(SCARCE_SKU));
     }
 
     private ExternalProductReservationService clientFor(int somePort) {

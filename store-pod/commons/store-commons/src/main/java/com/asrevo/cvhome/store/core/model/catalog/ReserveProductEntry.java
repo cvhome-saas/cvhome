@@ -1,4 +1,6 @@
 package com.asrevo.cvhome.store.core.model.catalog;
 
-public record ReserveProductEntry(String sku, Integer reserveQty) {
+import com.asrevo.cvhome.commons.domain.Sku;
+
+public record ReserveProductEntry(Sku sku, Integer reserveQty) {
 }

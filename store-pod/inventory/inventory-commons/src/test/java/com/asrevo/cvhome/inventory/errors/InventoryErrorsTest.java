@@ -2,6 +2,7 @@ package com.asrevo.cvhome.inventory.errors;
 
 import org.junit.jupiter.api.Test;
 
+import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.errors.ErrorCategory;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -32,7 +33,7 @@ class InventoryErrorsTest {
 
     @Test
     void insufficientInventoryCarriesTheSkuAndBothQuantities() {
-        InsufficientInventoryException failure = InsufficientInventoryException.of(SKU, 3, 1);
+        InsufficientInventoryException failure = InsufficientInventoryException.of(Sku.of(SKU), 3, 1);
 
         assertThat(failure.errorCode()).isEqualTo(InventoryErrors.RESERVATION_INSUFFICIENT_INVENTORY);
         assertThat(failure.payload().detail()).contains(SKU).contains("3").contains("1");
@@ -42,7 +43,7 @@ class InventoryErrorsTest {
 
     @Test
     void notStockedReportsZeroAvailable() {
-        InsufficientInventoryException failure = InsufficientInventoryException.notStocked(SKU, 2);
+        InsufficientInventoryException failure = InsufficientInventoryException.notStocked(Sku.of(SKU), 2);
 
         assertThat(failure.payload().params()).containsEntry(AVAILABLE, 0).containsEntry(REQUESTED, 2);
     }

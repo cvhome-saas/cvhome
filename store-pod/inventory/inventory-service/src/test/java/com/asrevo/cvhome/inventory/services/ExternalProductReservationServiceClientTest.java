@@ -12,6 +12,7 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 
+import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.inventory.api.errors.InventoryApiErrors;
 import com.asrevo.cvhome.inventory.api.errors.InventoryApiUnavailableException;
@@ -68,7 +69,7 @@ class ExternalProductReservationServiceClientTest {
     }
 
     private static ProductReservationList oneLine() {
-        return new ProductReservationList(Set.of(new ReserveProductEntry(SKU, 2)));
+        return new ProductReservationList(Set.of(new ReserveProductEntry(Sku.of(SKU), 2)));
     }
 
     @Test

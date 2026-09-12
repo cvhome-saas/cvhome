@@ -135,4 +135,13 @@ union all select 'checkout.sales_order_line', count(*) from checkout.sales_order
 
 ## Deviations, as built
 
+- **`Sku` implements `Comparable` (phase 2, not 1).** `ReservationServiceImpl` locks inventory rows in sku order so
+  two overlapping reservations cannot deadlock; `compareTo` is the string's, so that order is unchanged.
+  `SkuTest.skusSortAsTheirStringsSoInventoryKeepsItsLockOrder` pins it.
+- **The phase-2 checkout bridge skips a string that is not a sku** rather than calling `Sku.of` on it. Until
+  phase 4 validates `PersistableCartItem.product`, a cart line can hold whatever a shopper posted, and a strict
+  bridge would turn that into a 500 on the cart. Phase 4 deletes the bridge.
+- **`store-pod/commons/store-commons` got its first tests** (`SkuConverterTest`), and with them
+  `testImplementation` copies of its compileOnly JPA and Jackson APIs.
+
 ## Verification

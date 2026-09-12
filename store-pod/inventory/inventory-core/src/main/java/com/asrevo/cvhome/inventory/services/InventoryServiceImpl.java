@@ -9,6 +9,7 @@ import java.util.Map;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.inventory.entity.Inventory;
 import com.asrevo.cvhome.inventory.entity.InventoryPrice;
@@ -28,13 +29,13 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<SkuInventory> getBySkus(StoreMerchantId store, Collection<String> skus) {
+    public List<SkuInventory> getBySkus(StoreMerchantId store, Collection<Sku> skus) {
         if (skus.isEmpty()) {
             return List.of();
         }
         LocalDate today = LocalDate.now();
         // Legacy data may hold several rows per sku; the first by id wins, matching the reservation path.
-        Map<String, SkuInventory> bySku = new LinkedHashMap<>();
+        Map<Sku, SkuInventory> bySku = new LinkedHashMap<>();
         for (Inventory inventory : inventoryRepository.findBySkus(store, skus)) {
             bySku.putIfAbsent(inventory.getSku(), SkuInventoryMapper.toSkuInventory(inventory, today));
         }
@@ -49,7 +50,7 @@ public class InventoryServiceImpl implements InventoryService {
         }
         LocalDate today = LocalDate.now();
         // Same first-row-per-sku rule as getBySkus: legacy data may hold duplicates and every reader must agree.
-        Map<String, SkuInventory> bySku = new LinkedHashMap<>();
+        Map<Sku, SkuInventory> bySku = new LinkedHashMap<>();
         for (Inventory inventory : inventoryRepository.findByProductIds(store, productIds)) {
             bySku.putIfAbsent(inventory.getSku(), SkuInventoryMapper.toSkuInventory(inventory, today));
         }
@@ -58,7 +59,7 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Override
     @Transactional
-    public SkuInventory upsert(StoreMerchantId store, String sku, PersistableInventory source) {
+    public SkuInventory upsert(StoreMerchantId store, Sku sku, PersistableInventory source) {
         Inventory inventory = inventoryRepository.findBySku(store, sku).orElseGet(() -> new Inventory(store, sku));
         inventory.setProductId(source.productId());
         inventory.setQuantity(source.quantity());
@@ -89,7 +90,8 @@ public class InventoryServiceImpl implements InventoryService {
     @Override
     @Transactional
     public List<SkuInventory> bulkUpsert(StoreMerchantId store, List<PersistableSkuInventory> entries) {
-        return entries.stream().map(entry -> upsert(store, entry.sku(), entry.inventory())).toList();
+        // The entries were validated against Sku.FORMAT at the edge, so each converts.
+        return entries.stream().map(entry -> upsert(store, Sku.of(entry.sku()), entry.inventory())).toList();
     }
 
     @Override
@@ -100,7 +102,7 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Override
     @Transactional
-    public void deleteBySku(StoreMerchantId store, String sku) {
+    public void deleteBySku(StoreMerchantId store, Sku sku) {
         inventoryRepository.findBySku(store, sku).ifPresent(inventoryRepository::delete);
     }
 }

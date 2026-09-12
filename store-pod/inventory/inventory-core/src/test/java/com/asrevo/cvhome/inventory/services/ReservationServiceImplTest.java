@@ -13,6 +13,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.inventory.entity.Inventory;
 import com.asrevo.cvhome.inventory.entity.ProductReservation;
@@ -45,9 +46,9 @@ class ReservationServiceImplTest {
 
     private static final String REF = "order-1";
 
-    private static final String SKU_A = "SKU-A";
+    private static final Sku SKU_A = Sku.of("SKU-A");
 
-    private static final String SKU_B = "SKU-B";
+    private static final Sku SKU_B = Sku.of("SKU-B");
 
     private static final int EXPIRY_MINUTES = 30;
 
@@ -66,7 +67,7 @@ class ReservationServiceImplTest {
         service = new ReservationServiceImpl(reservationRepository, inventoryRepository, EXPIRY_MINUTES, MAX_EXPIRY_HOURS);
     }
 
-    private static Inventory stocked(String sku, int quantity) {
+    private static Inventory stocked(Sku sku, int quantity) {
         Inventory inventory = new Inventory(STORE, sku);
         inventory.setId(1L);
         inventory.setQuantity(quantity);
@@ -173,7 +174,7 @@ class ReservationServiceImplTest {
                     .isInstanceOf(InsufficientInventoryException.class)
                     .satisfies(e -> {
                         InsufficientInventoryException failure = (InsufficientInventoryException) e;
-                        assertThat(failure.payload().params()).containsEntry("sku", SKU_A)
+                        assertThat(failure.payload().params()).containsEntry("sku", SKU_A.value())
                                 .containsEntry("requested", 2).containsEntry("available", 0);
                     });
             verify(reservationRepository, never()).save(any());
@@ -187,7 +188,7 @@ class ReservationServiceImplTest {
 
             assertThatThrownBy(() -> service.reserve(STORE, REF, entries(new ReserveProductEntry(SKU_A, 2))))
                     .isInstanceOf(InsufficientInventoryException.class)
-                    .hasMessageContaining(SKU_A);
+                    .hasMessageContaining(SKU_A.value());
             assertThat(a.getQuantity()).isEqualTo(1);
             verify(reservationRepository, never()).save(any());
         }

@@ -9,6 +9,7 @@ import java.util.Set;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -19,8 +20,10 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.TableGenerator;
 
+import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.constants.SchemaConstant;
+import com.asrevo.cvhome.store.core.converter.SkuConverter;
 import com.asrevo.cvhome.store.core.entity.common.audit.AuditSection;
 import com.asrevo.cvhome.store.core.entity.common.audit.Auditable;
 import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
@@ -65,7 +68,8 @@ public class Inventory extends SalesManagerEntity<Long, Inventory> implements Au
     private StoreMerchantId storeMerchantId;
 
     @Column(name = "SKU", nullable = false)
-    private String sku;
+    @Convert(converter = SkuConverter.class)
+    private Sku sku;
 
     @Column(name = "PRODUCT_ID")
     private Long productId;
@@ -91,7 +95,7 @@ public class Inventory extends SalesManagerEntity<Long, Inventory> implements Au
     public Inventory() {
     }
 
-    public Inventory(StoreMerchantId storeMerchantId, String sku) {
+    public Inventory(StoreMerchantId storeMerchantId, Sku sku) {
         this.storeMerchantId = storeMerchantId;
         this.sku = sku;
     }

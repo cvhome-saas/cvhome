@@ -12,6 +12,7 @@ import org.mockito.Mockito;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.inventory.model.AvailabilityQuery;
 import com.asrevo.cvhome.inventory.model.PersistableInventory;
@@ -47,7 +48,7 @@ import static org.mockito.Mockito.when;
 class InventoryApisTest {
 
     private static final StoreMerchantId STORE = new StoreMerchantId("65f023632bc46470c104b76f");
-    private static final String SKU = "SKU-1";
+    private static final Sku SKU = Sku.of("SKU-1");
     private static final String REF = "order-1";
     private static final String MANAGE = "STORE-POD.INVENTORY.*";
     private static final String RESERVE = "STORE-POD.INVENTORY.RESERVE";
@@ -75,7 +76,7 @@ class InventoryApisTest {
     void aBulkUpsertForwardsTheBatchEntriesRatherThanTheWrapper() {
         PersistableInventory entry = new PersistableInventory(1L, 5, true, 1, 0, null);
         PersistableInventoryBatch batch =
-                new PersistableInventoryBatch(List.of(new PersistableSkuInventory(SKU, entry)));
+                new PersistableInventoryBatch(List.of(new PersistableSkuInventory(SKU.value(), entry)));
         when(inventoryService.bulkUpsert(eq(STORE), any())).thenReturn(List.of(sku()));
 
         assertThat(inventoryApi.bulkUpsert(batch, STORE)).hasSize(1);

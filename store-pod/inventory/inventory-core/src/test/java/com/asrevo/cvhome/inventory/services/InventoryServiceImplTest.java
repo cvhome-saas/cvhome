@@ -12,6 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.inventory.entity.Inventory;
 import com.asrevo.cvhome.inventory.entity.InventoryPrice;
@@ -36,9 +37,9 @@ class InventoryServiceImplTest {
 
     private static final StoreMerchantId STORE = new StoreMerchantId("store-1");
 
-    private static final String SKU = "SKU-1";
+    private static final Sku SKU = Sku.of("SKU-1");
 
-    private static final String SKU_2 = "SKU-2";
+    private static final Sku SKU_2 = Sku.of("SKU-2");
 
     private static final BigDecimal TEN = new BigDecimal("10");
 
@@ -50,7 +51,7 @@ class InventoryServiceImplTest {
     @InjectMocks
     private InventoryServiceImpl service;
 
-    private static Inventory row(long id, String sku, int quantity) {
+    private static Inventory row(long id, Sku sku, int quantity) {
         Inventory inventory = new Inventory(STORE, sku);
         inventory.setId(id);
         inventory.setQuantity(quantity);
@@ -193,8 +194,8 @@ class InventoryServiceImplTest {
         when(inventoryRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
         List<SkuInventory> result = service.bulkUpsert(STORE, List.of(
-                new PersistableSkuInventory(SKU_2, body(null, null, null)),
-                new PersistableSkuInventory(SKU, body(null, null, null))));
+                new PersistableSkuInventory(SKU_2.value(), body(null, null, null)),
+                new PersistableSkuInventory(SKU.value(), body(null, null, null))));
 
         assertThat(result).extracting(SkuInventory::sku).containsExactly(SKU_2, SKU);
     }

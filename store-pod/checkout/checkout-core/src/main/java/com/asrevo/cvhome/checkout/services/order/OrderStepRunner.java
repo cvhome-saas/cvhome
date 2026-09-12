@@ -16,6 +16,7 @@ import com.asrevo.cvhome.checkout.entity.Order;
 import com.asrevo.cvhome.checkout.model.order.PendingAction;
 import com.asrevo.cvhome.checkout.repositories.CartRepository;
 import com.asrevo.cvhome.checkout.repositories.OrderRepository;
+import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.inventory.api.errors.InventoryApiUnavailableException;
 import com.asrevo.cvhome.inventory.api.errors.ProductReservationRejectedException;
 import com.asrevo.cvhome.inventory.model.reservation.ProductReservationCommitResult;
@@ -95,7 +96,7 @@ public class OrderStepRunner {
         Duration window = properties.paymentWindow(order.getPaymentType());
         Instant holdUntil = window == null ? null : now.plus(window);
         Set<ReserveProductEntry> entries = order.getLines().stream()
-                .map(line -> new ReserveProductEntry(line.getSku(), line.getQuantity()))
+                .map(line -> new ReserveProductEntry(Sku.of(line.getSku()), line.getQuantity()))
                 .collect(Collectors.toSet());
         try {
             ProductReservationReserveResult result = reservations.reserve(order.getStoreMerchantId(),

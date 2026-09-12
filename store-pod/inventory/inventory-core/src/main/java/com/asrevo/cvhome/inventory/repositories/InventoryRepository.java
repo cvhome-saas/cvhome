@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 
+import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.inventory.entity.Inventory;
 
@@ -24,14 +25,14 @@ public interface InventoryRepository extends JpaRepository<Inventory, Long> {
             left join fetch i.prices
             where i.storeMerchantId = ?1 and i.sku in ?2
             order by i.id""")
-    List<Inventory> findBySkus(StoreMerchantId store, Collection<String> skus);
+    List<Inventory> findBySkus(StoreMerchantId store, Collection<Sku> skus);
 
     @Query("""
             select i from Inventory i
             left join fetch i.prices
             where i.storeMerchantId = ?1 and i.sku = ?2
             order by i.id limit 1""")
-    Optional<Inventory> findBySku(StoreMerchantId store, String sku);
+    Optional<Inventory> findBySku(StoreMerchantId store, Sku sku);
 
     /**
      * The reservation path's read: locked, so two orders cannot both take the last unit.
@@ -41,7 +42,7 @@ public interface InventoryRepository extends JpaRepository<Inventory, Long> {
             select i from Inventory i
             where i.storeMerchantId = ?1 and i.sku = ?2
             order by i.id limit 1""")
-    Optional<Inventory> lockBySku(StoreMerchantId store, String sku);
+    Optional<Inventory> lockBySku(StoreMerchantId store, Sku sku);
 
     List<Inventory> findByStoreMerchantIdAndProductId(StoreMerchantId store, Long productId);
 

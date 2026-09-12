@@ -18,6 +18,7 @@ import com.asrevo.cvhome.catalog.model.product.ReadableVariantSelection;
 import com.asrevo.cvhome.catalog.services.product.ExternalProductService;
 import com.asrevo.cvhome.checkout.entity.Orders;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
+import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.inventory.model.AvailabilityQuery;
 import com.asrevo.cvhome.inventory.model.SkuInventory;
 import com.asrevo.cvhome.inventory.model.SkuPrice;
@@ -92,7 +93,7 @@ class ProductSnapshotServiceImplTest {
     }
 
     static SkuInventory stock(String sku, String price, boolean purchasable) {
-        return new SkuInventory(sku, 1L, true, purchasable, 5, 1, 3,
+        return new SkuInventory(Sku.of(sku), 1L, true, purchasable, 5, 1, 3,
                 new SkuPrice(new BigDecimal(LIT_12_00), new BigDecimal(price), true, 10, null, null, null));
     }
 
@@ -100,7 +101,7 @@ class ProductSnapshotServiceImplTest {
     void mergesBothSourcesAndDropsWhatEitherLacks() {
         when(products.getDetailedProducts(Orders.STORE, List.of(A_2, B_2, C_2), EN))
                 .thenReturn(List.of(product(A_2, ALPHA), product(B_2, BETA)));
-        when(inventory.queryBySkus(Orders.STORE, new AvailabilityQuery(List.of(A_2, B_2, C_2))))
+        when(inventory.queryBySkus(Orders.STORE, new AvailabilityQuery(List.of(Sku.of(A_2), Sku.of(B_2), Sku.of(C_2)))))
                 .thenReturn(List.of(stock(A_2, LIT_9_99, true), stock(C_2, LIT_1_00, true)));
 
         Map<String, ProductSnapshot> snapshot = service.snapshot(Orders.STORE, EN, List.of(A_2, B_2, C_2, A_2));
@@ -148,7 +149,7 @@ class ProductSnapshotServiceImplTest {
         variant.setVariant(selection);
         variant.setImage(null);
         when(products.getDetailedProducts(any(), any(), any())).thenReturn(List.of(variant));
-        when(inventory.queryBySkus(any(), any())).thenReturn(List.of(new SkuInventory(V_2, 1L, true, true, 5, 0, 0,
+        when(inventory.queryBySkus(any(), any())).thenReturn(List.of(new SkuInventory(Sku.of(V_2), 1L, true, true, 5, 0, 0,
                 new SkuPrice(null, null, false, 0, null, null, null))));
 
         ProductSnapshot snapshot = service.snapshot(Orders.STORE, EN, List.of(V_2)).get(V_2);
@@ -167,7 +168,7 @@ class ProductSnapshotServiceImplTest {
     @Test
     void aSkuWithoutAPriceRowIsNotPurchasable() {
         when(products.getDetailedProducts(any(), any(), any())).thenReturn(List.of(product(A_2, ALPHA)));
-        when(inventory.queryBySkus(any(), any())).thenReturn(List.of(new SkuInventory(A_2, 1L, true, true, 5, 1, 0, null)));
+        when(inventory.queryBySkus(any(), any())).thenReturn(List.of(new SkuInventory(Sku.of(A_2), 1L, true, true, 5, 1, 0, null)));
 
         assertThat(service.snapshot(Orders.STORE, EN, List.of(A_2))).isEmpty();
     }

@@ -2,6 +2,7 @@ package com.asrevo.cvhome.inventory.errors;
 
 import java.io.Serial;
 
+import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.errors.ErrorBuilder;
 import com.asrevo.cvhome.errors.ErrorPayload;
 import com.asrevo.cvhome.errors.OperationNotAllowedException;
@@ -23,11 +24,11 @@ public class InsufficientInventoryException extends OperationNotAllowedException
         super(payload, cause);
     }
 
-    public static InsufficientInventoryException of(String sku, int requested, int available) {
+    public static InsufficientInventoryException of(Sku sku, int requested, int available) {
         return new ErrorBuilder<>(InventoryErrors.RESERVATION_INSUFFICIENT_INVENTORY,
                 InsufficientInventoryException::new)
                 .detail("Only %d of sku %s available, %d requested.", available, sku, requested)
-                .param("sku", sku)
+                .param("sku", sku.value())
                 .param("requested", requested)
                 .param("available", available)
                 .build();
@@ -37,7 +38,7 @@ public class InsufficientInventoryException extends OperationNotAllowedException
      * No availability row exists for the sku in this store — nothing is stocked, which the caller cannot distinguish
      * from a zero quantity and does not need to.
      */
-    public static InsufficientInventoryException notStocked(String sku, int requested) {
+    public static InsufficientInventoryException notStocked(Sku sku, int requested) {
         return of(sku, requested, 0);
     }
 

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import com.asrevo.cvhome.catalog.model.product.ReadableMinimalProduct;
 import com.asrevo.cvhome.catalog.services.product.ExternalProductService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
+import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.inventory.model.AvailabilityQuery;
 import com.asrevo.cvhome.inventory.model.SkuInventory;
@@ -36,8 +37,7 @@ public class ProductSnapshotServiceImpl implements ProductSnapshotService {
         List<String> distinct = skus.stream().distinct().toList();
         Map<String, ReadableMinimalProduct> byProductSku = products.getDetailedProducts(store, distinct, language)
                 .stream().collect(Collectors.toMap(ReadableMinimalProduct::getSku, Function.identity(), (a, b) -> a));
-        Map<String, SkuInventory> byStockSku = inventory.queryBySkus(store, new AvailabilityQuery(distinct)).stream()
-                .collect(Collectors.toMap(SkuInventory::sku, Function.identity(), (a, b) -> a));
+        Map<String, SkuInventory> byStockSku = stock(store, distinct);
 
         Map<String, ProductSnapshot> result = new LinkedHashMap<>();
         for (String sku : distinct) {
@@ -53,5 +53,17 @@ public class ProductSnapshotServiceImpl implements ProductSnapshotService {
                     stock.quantityOrderMinimum(), stock.quantityOrderMaximum()));
         }
         return result;
+    }
+
+    /**
+     * Cart lines are still strings here; one that is not a sku cannot be stocked, so it is not asked for.
+     */
+    private Map<String, SkuInventory> stock(StoreMerchantId store, List<String> skus) {
+        List<Sku> stockable = skus.stream().filter(sku -> sku.matches(Sku.FORMAT)).map(Sku::of).toList();
+        if (stockable.isEmpty()) {
+            return Map.of();
+        }
+        return inventory.queryBySkus(store, new AvailabilityQuery(stockable)).stream()
+                .collect(Collectors.toMap(stock -> stock.sku().value(), Function.identity(), (a, b) -> a));
     }
 }

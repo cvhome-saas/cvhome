@@ -3,6 +3,7 @@ package com.asrevo.cvhome.inventory.entity;
 import java.io.Serial;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -13,7 +14,9 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.TableGenerator;
 
+import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.store.core.constants.SchemaConstant;
+import com.asrevo.cvhome.store.core.converter.SkuConverter;
 import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
 
 import lombok.Getter;
@@ -48,7 +51,8 @@ public class ProductReservationLine extends SalesManagerEntity<Long, ProductRese
     private Inventory inventory;
 
     @Column(name = "SKU", nullable = false)
-    private String sku;
+    @Convert(converter = SkuConverter.class)
+    private Sku sku;
 
     @Column(name = "QUANTITY", nullable = false)
     private int quantity;

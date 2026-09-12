@@ -94,6 +94,14 @@ class SkuTest {
         assertThat(Sku.of(SKU)).hasToString(SKU);
     }
 
+    @Test
+    void skusSortAsTheirStringsSoInventoryKeepsItsLockOrder() {
+        List<String> values = List.of("b-2", "B-10", "a_1", "A-9", "b-10");
+
+        assertThat(values.stream().map(Sku::of).sorted().map(Sku::value).toList())
+                .isEqualTo(values.stream().sorted().toList());
+    }
+
     record Line(Sku sku, List<Sku> skus) {
     }
 }

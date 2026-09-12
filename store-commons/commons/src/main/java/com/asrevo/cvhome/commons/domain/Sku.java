@@ -22,8 +22,13 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * request <em>body</em> keeps a {@code String} annotated {@code @Pattern(regexp = Sku.FORMAT)} instead: bean validation
  * names the offending field in its 400, a failing JSON creator cannot.
  * </p>
+ *
+ * <p>
+ * Ordered as its string is: inventory locks rows in sku order so two overlapping reservations cannot deadlock, and
+ * that order must not change under it.
+ * </p>
  */
-public record Sku(String value) implements Serializable {
+public record Sku(String value) implements Serializable, Comparable<Sku> {
 
     /**
      * The whole rule, for {@code @Pattern} on a request body.
@@ -47,6 +52,11 @@ public record Sku(String value) implements Serializable {
     @Override
     public String value() {
         return value;
+    }
+
+    @Override
+    public int compareTo(Sku other) {
+        return value.compareTo(other.value);
     }
 
     @Override

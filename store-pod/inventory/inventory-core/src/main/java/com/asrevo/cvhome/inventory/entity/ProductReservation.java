@@ -20,6 +20,7 @@ import jakarta.persistence.Table;
 import jakarta.persistence.TableGenerator;
 import jakarta.persistence.UniqueConstraint;
 
+import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.constants.SchemaConstant;
 import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
@@ -76,7 +77,7 @@ public class ProductReservation extends SalesManagerEntity<Long, ProductReservat
         this.ref = ref;
     }
 
-    public boolean holds(String sku) {
+    public boolean holds(Sku sku) {
         return lines.stream().anyMatch(line -> line.getSku().equals(sku));
     }
 
