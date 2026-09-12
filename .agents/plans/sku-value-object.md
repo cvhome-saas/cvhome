@@ -154,3 +154,45 @@ union all select 'checkout.sales_order_line', count(*) from checkout.sales_order
   `snapshot()` inside checkstyle's complexity limit.
 
 ## Verification
+
+Per phase, before its commit:
+
+| Phase | Unit (`test`) | Integration (`integrationTest`, Testcontainers) | Checkstyle |
+|---|---|---|---|
+| 1 — type | `SkuTest` 25, `SkuConverterTest` 3 | — | clean |
+| 2 — inventory | inventory-core 47, inventory-service 27, checkout-core 188 | inventory-service 33 (3 new), checkout-service 77 | clean |
+| 3 — catalog | catalog-core 246, catalog-service 69 (1 new), checkout-core 188 | catalog-service 80 (1 new), checkout-service 77 | clean |
+| 4 — checkout | checkout-commons, checkout-core 188, checkout-service 26 | checkout-service 78 (1 new) | clean |
+
+What the integration suites prove beyond compiling: the converter binds in JPQL (`findBySkus`, `lockBySku` under
+`PESSIMISTIC_WRITE`, `findByStoreAndSkuIn`) and inside `lower(...)` for the listing's sku filter; the per-sku
+statistics query's `cast(l.sku as string)`; path and query binding to `Sku` with a malformed value as 400; the
+`@HttpExchange` client writing `List<Sku>` as plain query values (`ReservationClientContractIntegrationTest`); and
+every existing JSON assertion reading `sku` back as a string.
+
+Live, 2026-09-12, `lcl start -d --stack sku` from this worktree (every service up, default ports):
+
+- **Shopper path through spg (curl):** availability, `detailed-product(s)` and the cart answered `sku` as a bare
+  string. A malformed sku got 400 in every position: path, query and body. A well-formed unknown sku kept its old
+  answers (catalog 404, cart 422, absent from availability). The listing's sku filter worked. Another store got
+  `CHECKOUT.CART.NOT_FOUND` for a cart and `[]` for availability.
+- **Signed-in COD order in the browser:** order 1001 went `PLACED > RESERVED > PAYMENT_INITIATED > COMMITTED`.
+  `sales_order_line.sku` and `product_reservation_line.sku` were written through `SkuConverter`, and stock went
+  35 → 34. This is the one path the integration suites stub, because checkout's inventory client is a mock there.
+- **Seller path through `gateway.com:8000/spg` (browser session):**
+  - inventory PUT/DELETE by a malformed path → 400; a bulk body with one malformed entry → 400 naming
+    `entries[1].sku`, nothing written; a valid upsert, read and delete worked.
+  - catalog: a product was created and its variants replaced with two combinations, then their stock was
+    bulk-upserted. Checkout's read resolved both skus with labels. A variant sku `"a b"` → 400 naming
+    `variants[1].sku`; another product's sku → 409. `/unique` answered `false` for a malformed code and `true` for
+    a taken one. The throwaway product was then deleted.
+  - checkout: `product-statistic` answered `{"name": "SKU-AD-CL-TPT03", "value": 1}` (the `cast` query).
+- **OpenAPI:** SpringDoc renders `Sku` as `string` in every position (path, query, body field, list), since
+  swagger-core honours `@JsonValue`. No `SwaggerConfig` change was needed.
+
+QA files: `inventory-qa.md` INV-11, `catalog-qa.md` PRD-17 and PRD-07, `checkout-qa.md` CART-06, all `[verified]`.
+
+Seen during QA, not caused by this change: after a full navigation to `/en/checkout`, the storefront's "Cart
+details" panel showed "Your cart is empty" for several seconds while the header counted one item. The cart in
+`localStorage` was intact, and no cart request is made on that page. The cart manager is a client-side singleton,
+so this is a hydration matter in landing-ui.

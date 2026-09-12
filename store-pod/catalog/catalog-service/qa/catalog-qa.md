@@ -17,7 +17,7 @@ by [checkout](../../../checkout/checkout-service/qa/checkout-qa.md).
   product-image APIs; the console's Catalogue module as a client; the billing write gate on catalog writes
 - **Runs on** — `lcl start -d --stack <name>`; read the live port from `lcl urls`. Address it through the
   gateway, never `:8122`
-- **Cases** — 95 (33 verified, 1 unit only, 61 not verified)
+- **Cases** — 96 (35 verified, 1 unit only, 60 not verified)
 - **Also see** — inventory (stock and price), checkout (the composed cart line),
   [content](../../../content/content-service/qa/content-qa.md) (the media library the gallery reads from),
   [billing](../../../../store-core/billing/billing-service/qa/billing-qa.md) (the plan ceiling behind PRD-14/15)
@@ -257,7 +257,7 @@ product form writes the definition here and the price/stock to inventory in a **
   checking: record whether it is a typed 409 or a bare 500 — it is **expected to be a 500 today**
   ([99](#99--known-gaps)). The same sku in org1-store2 must succeed.
 
-### PRD-07 — The sku check · high · [not verified]
+### PRD-07 — The sku check · high · [verified for the taken and the malformed code — the other store not verified]
 
 - **Steps** — `GET /private/product/unique?code=SKU-NK-RUN-001`; then `?code=FREE-001`; then the same two as
   org1-store2; then `?code=SKU.DOT` (not a sku).
@@ -265,7 +265,7 @@ product form writes the definition here and the price/stock to inventory in a **
   code answers `{"exists": false}` with 200, **not** a 400: the console asks while the merchant is typing, and a
   string that cannot be a sku cannot be taken. `CatalogApisTest` and `ProductApiIntegrationTest` pin both.
 
-### PRD-17 — Checkout's reads by sku refuse a malformed one · high · [not verified]
+### PRD-17 — Checkout's reads by sku refuse a malformed one · high · [verified]
 
 `GET /api/v1/detailed-product?sku=` and `/detailed-products?skus=` are what checkout composes a cart from. The sku
 there is a `Sku`; `ProductApiIntegrationTest.aMalformedSkuIsRefusedByCheckoutsReadsAndIsSimplyNotTakenForTheConsole`.
@@ -274,6 +274,10 @@ there is a `Sku`; `ProductApiIntegrationTest.aMalformedSkuIsRefusedByCheckoutsRe
 - **Expect** — 200 with `"sku": "SKU-NK-RUN-001"`, a bare string exactly as before; then **400**
   `COMMON.MALFORMED_REQUEST` for both of the others. An unknown but well-formed sku is still what it was: a 404
   `CATALOG.PRODUCT.NOT_FOUND` for the single read, absent from the bulk one.
+- **Result** — 2026-09-12, stack `sku`, through spg: exactly as above. Also through the seller gateway: a product
+  created, its variants replaced with two combinations (`…-RD-M`, `…-BL-L`), their stock bulk-upserted, and both
+  resolved by `/detailed-products` to the product with labels `red/m`, `blue/l`; a variant sku `"a b"` answered 400
+  naming `variants[1].sku`, and another product's sku 409 with `params.sku`. The product was then deleted.
 
 ### PRD-08 — The inline switches (`PATCH`) touch nothing else · critical · [not verified]
 

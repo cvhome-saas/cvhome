@@ -9,7 +9,7 @@ paid for. It owns no product copy — that is
   reserve / commit / release / expire cycle
 - **Runs on** — `lcl start -d --stack <name>`; read the live port from `lcl urls`. Address it through the
   gateway, never `:8126`
-- **Cases** — 19 (10 verified, 3 unit only, 6 not verified)
+- **Cases** — 20 (11 verified, 3 unit only, 6 not verified)
 - **Also see** — catalog (SEC-01…05 sweep both services), checkout (the caller of every reservation),
   [billing](../../../../store-core/billing/billing-service/qa/billing-qa.md) (inventory has **no** write gate —
   see 99)
@@ -163,7 +163,7 @@ tables are gone.
 - **Expect** — catalog boots without them; nothing in either service references them. Do not run it before
   INV-09 has been checked on that database.
 
-### INV-11 — Inventory refuses a sku catalog could never create · high · [not verified]
+### INV-11 — Inventory refuses a sku catalog could never create · high · [verified]
 
 The sku rule (`Sku.FORMAT`: letters, digits, `_`, `-`, 1–255 characters, case kept, never trimmed) used to live
 on catalog's product form only; inventory stocked whatever string it was given. `InventoryApiIntegrationTest`
@@ -176,6 +176,10 @@ covers the four edges below.
   answers **400** `COMMON.VALIDATION_FAILED` with `fieldErrors[0].field = "entries[1].sku"`, and **neither**
   entry is written, including the valid first one. `SKU-NK-RUN-001` still reads and reserves as in INV-01 and
   RES-01: the wire shape is unchanged, a bare string.
+- **Result** — 2026-09-12, stack `sku`, seller session through `gateway.com:8000/spg/inventory`: all four 400s as
+  above; the bulk call named `entries[1].sku` and `QA-SKU-GOOD-1`, its valid entry, read back absent; the same sku
+  then upserted (200), read back with quantity 4, and deleted. A COD order on the storefront reserved and committed
+  `SKU-AD-CL-TPT03` (`product_reservation_line.sku` written, stock 35 → 34).
 
 ---
 

@@ -11,7 +11,7 @@ console's order statistics.
 - **Runs on** — `lcl start -d --stack <name>`; read the live ports from `lcl urls`. Address it through the pod
   gateway (`http://spg-507f1f77.gateway.com/checkout/…`) or the platform gateway (`gateway.com:8000/spg/checkout/…`),
   never `:8123`
-- **Cases** — 50 (37 verified end to end or in part, 11 unit only, 2 not verified)
+- **Cases** — 51 (38 verified end to end or in part, 11 unit only, 2 not verified)
 - **Also see** — [payment](../../payment/payment-service/qa/payment-qa.md) (the transactions and the approve /
   reject that drive the signals), [inventory](../../inventory/inventory-service/qa/inventory-qa.md) (the
   reservation that placement takes and expiry releases), [landing-ui](../../landing-ui/qa/landing-ui-qa.md) (the
@@ -99,7 +99,7 @@ every read re-prices from inventory, and a line the catalog or inventory no long
 
 - **Expect** — `422 CHECKOUT.CART.PRODUCT_NOT_PURCHASABLE`, `params.sku` naming it.
 
-### CART-06 — A sku that could never exist is refused at the edge · high · [not verified]
+### CART-06 — A sku that could never exist is refused at the edge · high · [verified]
 
 `CartApiIntegrationTest.aMalformedSkuIsRefusedAtTheEdgeInTheBodyAndInThePath`. Checkout keys cart and order lines
 by `Sku` now, whose rule (`Sku.FORMAT`: letters, digits, `_`, `-`, 1–255 characters) is the one catalog and
@@ -110,6 +110,10 @@ inventory use.
 - **Expect** — the add answers **400** `COMMON.VALIDATION_FAILED` with `fieldErrors[0].field = "product"`. It is
   no longer the CART-03 **422**, because it is refused before catalog or inventory is asked. The delete answers
   **400** `COMMON.MALFORMED_REQUEST`, and the cart still holds its line. A well-formed unknown sku is still CART-03.
+- **Result** — 2026-09-12, stack `sku`, through spg: both 400s as above, a `PUT` with `"abc def"` likewise; CART-01
+  to CART-04 unchanged (lines answer `sku` as a bare string, another store gets `CHECKOUT.CART.NOT_FOUND`). A signed-in
+  COD order in the browser then placed order 1001 — `PLACED > RESERVED > PAYMENT_INITIATED > COMMITTED`, the line's
+  `sku` written through `SkuConverter` — and `product-statistic` answered `{"name": "SKU-AD-CL-TPT03", "value": 1}`.
 
 ### CART-04 — Another store cannot read the cart · critical · [verified]
 
