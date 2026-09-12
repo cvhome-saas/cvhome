@@ -48,6 +48,7 @@ import com.asrevo.cvhome.catalog.repositories.ProductTypeRepository;
 import com.asrevo.cvhome.catalog.repositories.ProductVariantRepository;
 import com.asrevo.cvhome.catalog.services.image.ProductImageService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
+import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -70,7 +71,7 @@ class ProductServiceImplTest {
 
     private static final LanguageCode EN = new LanguageCode("en");
 
-    private static final String SKU = "SKU-1";
+    private static final Sku SKU = Sku.of("SKU-1");
 
     private static final String NIKE = "NIKE";
 
@@ -82,15 +83,15 @@ class ProductServiceImplTest {
 
     private static final String SLUG = "slug";
 
-    private static final String SKU_A = "SKU-A";
+    private static final Sku SKU_A = Sku.of("SKU-A");
 
-    private static final String SKU_B = "SKU-B";
+    private static final Sku SKU_B = Sku.of("SKU-B");
 
-    private static final String ONE = "ONE";
+    private static final Sku ONE = Sku.of("ONE");
 
-    private static final String TWO = "TWO";
+    private static final Sku TWO = Sku.of("TWO");
 
-    private static final String ONLY = "ONLY";
+    private static final Sku ONLY = Sku.of("ONLY");
 
     @Mock
     private ProductRepository productRepository;
@@ -161,7 +162,7 @@ class ProductServiceImplTest {
 
     private static PersistableProductDefinition definition() {
         PersistableProductDefinition source = new PersistableProductDefinition();
-        source.setSku(SKU);
+        source.setSku(SKU.value());
         ProductDescription copy = new ProductDescription();
         copy.setLanguage(EN);
         copy.setName("Shoe");
@@ -452,7 +453,7 @@ class ProductServiceImplTest {
                 .thenReturn(new com.asrevo.cvhome.catalog.model.product.ReadableMinimalProduct());
 
         // "missing" resolves to nothing and is skipped rather than yielding a null entry the caller must filter.
-        assertThat(service.getBySkus(STORE, List.of(SKU, SKU, "missing"), EN)).hasSize(1);
+        assertThat(service.getBySkus(STORE, List.of(SKU, SKU, Sku.of("missing")), EN)).hasSize(1);
     }
 
     @Test
@@ -460,12 +461,12 @@ class ProductServiceImplTest {
         Product product = new Product();
         product.setId(1L);
         product.setStore(STORE);
-        product.getVariants().add(new ProductVariant(product, "OLD"));
+        product.getVariants().add(new ProductVariant(product, Sku.of("OLD")));
         when(productRepository.findByStoreAndId(STORE, 1L)).thenReturn(Optional.of(product));
         when(variantRepository.existsByStoreMerchantIdAndSku(STORE, SKU)).thenReturn(true);
 
         PersistableProductDefinition source = new PersistableProductDefinition();
-        source.setSku(SKU);
+        source.setSku(SKU.value());
 
         assertThatThrownBy(() -> service.update(STORE, 1L, source))
                 .isInstanceOf(com.asrevo.cvhome.catalog.errors.DuplicateVariantSkuException.class);
@@ -481,7 +482,7 @@ class ProductServiceImplTest {
         when(productRepository.findByStoreAndId(STORE, 1L)).thenReturn(Optional.of(product));
 
         PersistableProductDefinition source = new PersistableProductDefinition();
-        source.setSku(SKU);
+        source.setSku(SKU.value());
         service.update(STORE, 1L, source);
 
         // With a real matrix the definition's sku is not any one variant's; renaming would pick an arbitrary row.

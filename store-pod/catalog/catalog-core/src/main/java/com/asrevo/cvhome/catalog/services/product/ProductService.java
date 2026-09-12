@@ -18,6 +18,7 @@ import com.asrevo.cvhome.catalog.model.product.ReadableMinimalProduct;
 import com.asrevo.cvhome.catalog.model.product.ReadableProduct;
 import com.asrevo.cvhome.catalog.model.product.ReadableProductDefinition;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
+import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.model.entity.ReadableEntityList;
 
@@ -42,20 +43,20 @@ public interface ProductService {
      * The product data a cart or order needs, by sku. Every sellable sku is a variant sku; a combination sku
      * answers with the owning product plus the {@code variant} label block.
      */
-    ReadableMinimalProduct getBySku(StoreMerchantId store, String sku, LanguageCode language)
+    ReadableMinimalProduct getBySku(StoreMerchantId store, Sku sku, LanguageCode language)
             throws ProductNotFoundException;
 
     /**
      * The bulk form of {@link #getBySku}: one call for a whole cart. Skus with no product are absent from the
      * answer, mirroring the inventory availability contract.
      */
-    java.util.List<ReadableMinimalProduct> getBySkus(StoreMerchantId store, java.util.List<String> skus,
+    java.util.List<ReadableMinimalProduct> getBySkus(StoreMerchantId store, java.util.List<Sku> skus,
                                                      LanguageCode language);
 
     ReadableProductDefinition getDefinition(StoreMerchantId store, Long id, LanguageCode language)
             throws ProductNotFoundException;
 
-    boolean exists(StoreMerchantId store, String sku);
+    boolean exists(StoreMerchantId store, Sku sku);
 
     /**
      * Creates the product <em>and its default variant</em> in one transaction — the invariant is that every

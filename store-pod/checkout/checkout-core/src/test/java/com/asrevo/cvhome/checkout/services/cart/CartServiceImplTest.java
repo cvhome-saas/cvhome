@@ -31,6 +31,7 @@ import com.asrevo.cvhome.checkout.services.catalog.ProductSnapshotService;
 import com.asrevo.cvhome.checkout.services.store.StoreSettings;
 import com.asrevo.cvhome.commons.domain.CurrencyCode;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
+import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.store.core.entity.payments.PaymentType;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -88,7 +89,7 @@ class CartServiceImplTest {
 
     static ProductSnapshot snapshot(String sku, String price, boolean purchasable, int min, int max) {
         ReadableMinimalProduct product = new ReadableMinimalProduct();
-        product.setSku(sku);
+        product.setSku(Sku.of(sku));
         product.setId(3L);
         ProductDescription description = new ProductDescription();
         description.setName(sku.toLowerCase());
@@ -128,7 +129,7 @@ class CartServiceImplTest {
                 org.assertj.core.groups.Tuple.tuple("SUBTOTAL", LIT_20_00),
                 org.assertj.core.groups.Tuple.tuple("TOTAL", LIT_20_00));
         assertThat(cart.getProducts()).singleElement().satisfies(line -> {
-            assertThat(line.getSku()).isEqualTo(SKU_A);
+            assertThat(line.getSku()).isEqualTo(Sku.of(SKU_A));
             assertThat(line.getDescription().getName()).isEqualTo("sku-a");
             assertThat(line.getFinalPrice()).isEqualTo("$10.00");
             assertThat(line.getDisplaySubTotal()).isEqualTo(LIT_20_00);
@@ -192,7 +193,7 @@ class CartServiceImplTest {
 
         ReadableCart readable = service.removeLine(Orders.STORE, EN, CODE, SKU_B);
 
-        assertThat(readable.getProducts()).singleElement().satisfies(line -> assertThat(line.getSku()).isEqualTo(SKU_A));
+        assertThat(readable.getProducts()).singleElement().satisfies(line -> assertThat(line.getSku()).isEqualTo(Sku.of(SKU_A)));
         assertThat(cart.line(SKU_B)).isEmpty();
     }
 

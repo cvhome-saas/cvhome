@@ -105,6 +105,9 @@ class ProductApiIntegrationTest {
 
     private static final String SKU_QUERY = "sku=%s";
 
+    /** Letters, digits, dash and underscore only: a dot was never a sku, so no variant can be named by it. */
+    private static final String MALFORMED_SKU = "SKU.DOT";
+
     /** Seeded in store A: a Nike running shoe in the MEN_SHOES tree, brand NIKE, type SHOES. */
     private static final String SEEDED_SKU = "SKU-NK-RUN-001";
 
@@ -478,4 +481,29 @@ class ProductApiIntegrationTest {
         expect(api.get(scoped(PRODUCTS, STORE_A), null), HttpStatus.OK);
     }
 
+    /**
+     * The sku is a {@code Sku} at catalog's edges. Checkout's reads refuse a malformed one outright, since it can
+     * name no variant; the console's "is it taken" question answers no instead, because it is asked while the
+     * merchant is still typing; and the definition's sku is bounded by its column now, a 400 rather than a failed
+     * insert.
+     */
+    @Test
+    void aMalformedSkuIsRefusedByCheckoutsReadsAndIsSimplyNotTakenForTheConsole() {
+        String s2s = api.token(ADMIN, STORE_A);
+        var one = api.get(scoped(query(DETAILED, String.format(SKU_QUERY, MALFORMED_SKU)), STORE_A), s2s);
+        expect(one, HttpStatus.BAD_REQUEST);
+        assertThat(json(one).get(CODE).asString()).isEqualTo("COMMON.MALFORMED_REQUEST");
+        expect(api.get(scoped(query(DETAILED_BULK, String.format("skus=%s,%s", SEEDED_SKU, MALFORMED_SKU)),
+                STORE_A), s2s), HttpStatus.BAD_REQUEST);
+
+        assertThat(json(api.get(scoped(query(UNIQUE, String.format(CODE_QUERY, MALFORMED_SKU)), STORE_A), admin))
+                .get(EXISTS).asBoolean()).isFalse();
+        assertThat(json(api.get(scoped(query(UNIQUE, String.format(CODE_QUERY, SEEDED_SKU)), STORE_A), admin))
+                .get(EXISTS).asBoolean()).isTrue();
+
+        var tooLong = api.send(HttpMethod.POST, scoped(PRIVATE_PRODUCT_V2, STORE_A), admin,
+                body("L".repeat(256), null, null, ""));
+        expect(tooLong, HttpStatus.BAD_REQUEST);
+        assertThat(json(tooLong).path("fieldErrors").findValuesAsString("field")).contains(SKU);
+    }
 }

@@ -81,7 +81,7 @@ class ProductSnapshotServiceImplTest {
     static ReadableMinimalProduct product(String sku, String name) {
         ReadableMinimalProduct product = new ReadableMinimalProduct();
         product.setId(1L);
-        product.setSku(sku);
+        product.setSku(Sku.of(sku));
         product.setAvailable(true);
         ProductDescription description = new ProductDescription();
         description.setName(name);
@@ -99,7 +99,7 @@ class ProductSnapshotServiceImplTest {
 
     @Test
     void mergesBothSourcesAndDropsWhatEitherLacks() {
-        when(products.getDetailedProducts(Orders.STORE, List.of(A_2, B_2, C_2), EN))
+        when(products.getDetailedProducts(Orders.STORE, List.of(Sku.of(A_2), Sku.of(B_2), Sku.of(C_2)), EN))
                 .thenReturn(List.of(product(A_2, ALPHA), product(B_2, BETA)));
         when(inventory.queryBySkus(Orders.STORE, new AvailabilityQuery(List.of(Sku.of(A_2), Sku.of(B_2), Sku.of(C_2)))))
                 .thenReturn(List.of(stock(A_2, LIT_9_99, true), stock(C_2, LIT_1_00, true)));
@@ -181,11 +181,11 @@ class ProductSnapshotServiceImplTest {
 
     @Test
     void duplicateSkusAreAskedOnce() {
-        when(products.getDetailedProducts(any(), eq(List.of(A_2)), any())).thenReturn(List.of());
+        when(products.getDetailedProducts(any(), eq(List.of(Sku.of(A_2))), any())).thenReturn(List.of());
         when(inventory.queryBySkus(any(), any())).thenReturn(List.of());
 
         service.snapshot(Orders.STORE, EN, List.of(A_2, A_2));
 
-        verify(products).getDetailedProducts(Orders.STORE, List.of(A_2), EN);
+        verify(products).getDetailedProducts(Orders.STORE, List.of(Sku.of(A_2)), EN);
     }
 }

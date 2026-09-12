@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.errors.BaseException;
 import com.asrevo.cvhome.errors.ErrorPayload;
 import com.tngtech.archunit.core.domain.JavaClasses;
@@ -37,6 +38,7 @@ class CatalogErrorFactoriesTest {
     private static final Map<Class<?>, Supplier<Object>> SAMPLES = Map.ofEntries(
             Map.entry(String.class, () -> SAMPLE),
             Map.entry(Object.class, () -> SAMPLE),
+            Map.entry(Sku.class, () -> Sku.of(SAMPLE)),
             Map.entry(long.class, () -> 1L),
             Map.entry(Long.class, () -> 1L),
             Map.entry(int.class, () -> 1),

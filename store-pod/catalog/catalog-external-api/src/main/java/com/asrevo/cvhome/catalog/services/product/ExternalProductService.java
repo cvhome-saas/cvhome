@@ -6,6 +6,7 @@ import org.springframework.web.service.annotation.HttpExchange;
 
 import com.asrevo.cvhome.catalog.model.product.ReadableMinimalProduct;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
+import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 
 /**
@@ -21,7 +22,7 @@ import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 public interface ExternalProductService {
 
     @GetExchange("/detailed-product")
-    ReadableMinimalProduct getDetailedProduct(StoreMerchantId store, @RequestParam("sku") String sku,
+    ReadableMinimalProduct getDetailedProduct(StoreMerchantId store, @RequestParam("sku") Sku sku,
                                               LanguageCode lang);
 
     /**
@@ -31,7 +32,7 @@ public interface ExternalProductService {
      */
     @GetExchange("/detailed-products")
     java.util.List<ReadableMinimalProduct> getDetailedProducts(StoreMerchantId store,
-                                                               @RequestParam("skus") java.util.List<String> skus,
+                                                               @RequestParam("skus") java.util.List<Sku> skus,
                                                                LanguageCode lang);
 
 }

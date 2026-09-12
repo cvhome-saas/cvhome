@@ -23,6 +23,7 @@ import com.asrevo.cvhome.catalog.model.product.PersistableVariantSet;
 import com.asrevo.cvhome.catalog.repositories.ProductOptionRepository;
 import com.asrevo.cvhome.catalog.repositories.ProductRepository;
 import com.asrevo.cvhome.catalog.repositories.ProductVariantRepository;
+import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -80,7 +81,7 @@ class ProductVariantServiceImplTest {
         Product product = new Product();
         product.setId(9L);
         product.setStore(STORE);
-        ProductVariant defaultVariant = new ProductVariant(product, "SKU-BASE");
+        ProductVariant defaultVariant = new ProductVariant(product, Sku.of("SKU-BASE"));
         defaultVariant.setId(1L);
         defaultVariant.setDefaultVariant(true);
         product.getVariants().add(defaultVariant);
@@ -145,11 +146,11 @@ class ProductVariantServiceImplTest {
 
         assertThat(product.getVariants()).hasSize(2);
         ProductVariant kept = product.getVariants().stream()
-                .filter(v -> SKU_RED_M.equals(v.getSku())).findFirst().orElseThrow();
+                .filter(v -> Sku.of(SKU_RED_M).equals(v.getSku())).findFirst().orElseThrow();
         assertThat(kept.getId()).as("the id-addressed row keeps its identity").isEqualTo(1L);
         assertThat(kept.getOptionSignature()).isEqualTo("11-21");
         ProductVariant created = product.getVariants().stream()
-                .filter(v -> SKU_RED_L.equals(v.getSku())).findFirst().orElseThrow();
+                .filter(v -> Sku.of(SKU_RED_L).equals(v.getSku())).findFirst().orElseThrow();
         assertThat(created.getOptionSignature()).as("signature is canonical whatever the input order")
                 .isEqualTo("11-22");
         assertThat(product.getOptionAssignments()).hasSize(2);
@@ -196,8 +197,8 @@ class ProductVariantServiceImplTest {
         vocabulary();
         Product other = new Product();
         other.setId(77L);
-        ProductVariant taken = new ProductVariant(other, SKU_TAKEN);
-        when(variantRepository.findByStoreAndSku(STORE, SKU_TAKEN)).thenReturn(Optional.of(taken));
+        ProductVariant taken = new ProductVariant(other, Sku.of(SKU_TAKEN));
+        when(variantRepository.findByStoreAndSku(STORE, Sku.of(SKU_TAKEN))).thenReturn(Optional.of(taken));
 
         assertThatThrownBy(() -> service.replaceAll(STORE, 9L, set(List.of(COLOR),
                 variant(null, SKU_TAKEN, true, 11L))))
@@ -231,7 +232,7 @@ class ProductVariantServiceImplTest {
         service.replaceAll(STORE, 9L, set(List.of(COLOR),
                 variant(1L, SKU_A, false, 11L), variant(null, SKU_B, false, 12L)));
         assertThat(product.getVariants().stream().filter(ProductVariant::isDefaultVariant))
-                .singleElement().extracting(ProductVariant::getSku).isEqualTo(SKU_A);
+                .singleElement().extracting(ProductVariant::getSku).isEqualTo(Sku.of(SKU_A));
 
         // two flagged: the first flagged wins, the rest are unflagged
         service.replaceAll(STORE, 9L, set(List.of(COLOR),
@@ -251,7 +252,7 @@ class ProductVariantServiceImplTest {
 
         assertThat(product.getVariants()).hasSize(1);
         ProductVariant only = product.getVariants().iterator().next();
-        assertThat(only.getSku()).isEqualTo(SKU_SIMPLE);
+        assertThat(only.getSku()).isEqualTo(Sku.of(SKU_SIMPLE));
         assertThat(only.isDefaultVariant()).isTrue();
         assertThat(only.getOptionSignature()).isEqualTo(ProductVariant.DEFAULT_SIGNATURE);
         assertThat(only.getOptionValues()).isEmpty();

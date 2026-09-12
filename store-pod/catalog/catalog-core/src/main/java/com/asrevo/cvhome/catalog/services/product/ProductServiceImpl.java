@@ -44,6 +44,7 @@ import com.asrevo.cvhome.catalog.services.Pages;
 import com.asrevo.cvhome.catalog.services.image.ProductImageService;
 import com.asrevo.cvhome.catalog.services.variant.ProductVariantMapper;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
+import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.model.entity.ReadableEntityList;
 
@@ -116,7 +117,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional(readOnly = true)
-    public ReadableMinimalProduct getBySku(StoreMerchantId store, String sku, LanguageCode language)
+    public ReadableMinimalProduct getBySku(StoreMerchantId store, Sku sku, LanguageCode language)
             throws ProductNotFoundException {
         ProductVariant variant = variantRepository.findByStoreAndSku(store, sku)
                 .orElseThrow(() -> ProductNotFoundException.of(sku, store));
@@ -127,12 +128,12 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ReadableMinimalProduct> getBySkus(StoreMerchantId store, List<String> skus,
+    public List<ReadableMinimalProduct> getBySkus(StoreMerchantId store, List<Sku> skus,
                                                   LanguageCode language) {
         if (skus == null || skus.isEmpty()) {
             return List.of();
         }
-        Map<String, ProductVariant> bySku = variantRepository.findByStoreAndSkuIn(store, skus).stream()
+        Map<Sku, ProductVariant> bySku = variantRepository.findByStoreAndSkuIn(store, skus).stream()
                 .collect(Collectors.toMap(ProductVariant::getSku, Function.identity(), (a, b) -> a));
         Map<Long, Product> products = productRepository.findAllHydrated(bySku.values().stream()
                         .map(variant -> variant.getProduct().getId()).collect(Collectors.toSet())).stream()
@@ -163,7 +164,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public boolean exists(StoreMerchantId store, String sku) {
+    public boolean exists(StoreMerchantId store, Sku sku) {
         return variantRepository.existsByStoreMerchantIdAndSku(store, sku);
     }
 
@@ -174,14 +175,16 @@ public class ProductServiceImpl implements ProductService {
             CategoryReferenceUnresolvableException, EntitlementExceededException, DuplicateVariantSkuException {
         // Only a new product can take the store past its plan's ceiling; the count runs only when a plan caps it.
         storeEntitlements.require(store, EntitlementKey.MAX_PRODUCTS, () -> productRepository.countByStore(store));
-        if (exists(store, source.getSku())) {
-            throw DuplicateVariantSkuException.of(source.getSku(), store);
+        // Checked against Sku.FORMAT by bean validation before it got here.
+        Sku sku = Sku.of(source.getSku());
+        if (exists(store, sku)) {
+            throw DuplicateVariantSkuException.of(sku, store);
         }
         Product product = new Product();
         product.setStore(store);
         applyDefinition(store, source, product);
         // The invariant: every product owns at least one variant. The definition's sku is the default one's.
-        ProductVariant defaultVariant = new ProductVariant(product, source.getSku());
+        ProductVariant defaultVariant = new ProductVariant(product, sku);
         defaultVariant.setDefaultVariant(true);
         defaultVariant.setSortOrder(0);
         product.getVariants().add(defaultVariant);
@@ -196,7 +199,7 @@ public class ProductServiceImpl implements ProductService {
             DuplicateVariantSkuException {
         Product product = require(store, id);
         applyDefinition(store, source, product);
-        renameDefaultVariant(store, product, source.getSku());
+        renameDefaultVariant(store, product, source.getSku() == null ? null : Sku.of(source.getSku()));
         productRepository.save(product.searchIndexStale());
     }
 
@@ -204,7 +207,7 @@ public class ProductServiceImpl implements ProductService {
      * The definition's sku edits the single default variant of a no-options product. Once real combinations
      * exist their skus are owned by the variants API, so the field is ignored here.
      */
-    private void renameDefaultVariant(StoreMerchantId store, Product product, String sku)
+    private void renameDefaultVariant(StoreMerchantId store, Product product, Sku sku)
             throws DuplicateVariantSkuException {
         if (sku == null || product.getVariants().size() != 1) {
             return;

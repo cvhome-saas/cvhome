@@ -44,6 +44,7 @@ import com.asrevo.cvhome.catalog.repositories.ProductSearchIndexRepository;
 import com.asrevo.cvhome.catalog.repositories.ProductTypeRepository;
 import com.asrevo.cvhome.catalog.services.image.ImageMapper;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
+import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -172,7 +173,7 @@ class ProductSearchServiceImplTest {
     private static Product product(long id, String sku, String name) {
         Product product = new Product();
         product.setId(id);
-        ProductVariant defaultVariant = new ProductVariant(product, sku);
+        ProductVariant defaultVariant = new ProductVariant(product, Sku.of(sku));
         defaultVariant.setDefaultVariant(true);
         product.getVariants().add(defaultVariant);
         product.setStore(STORE);
@@ -312,7 +313,7 @@ class ProductSearchServiceImplTest {
         ReadableProductSearchResult result = service.search(STORE, criteria(ANY_TERM), EN, PAGE);
 
         assertThat(result.getContent()).extracting(ReadableProduct::getSku)
-                .containsExactly(SKU_3, SKU_1, SKU_2);
+                .containsExactly(Sku.of(SKU_3), Sku.of(SKU_1), Sku.of(SKU_2));
     }
 
     @Test
@@ -324,7 +325,7 @@ class ProductSearchServiceImplTest {
 
         ReadableProductSearchResult result = service.search(STORE, criteria(ANY_TERM), EN, PAGE);
 
-        assertThat(result.getContent()).extracting(ReadableProduct::getSku).containsExactly(SKU_1);
+        assertThat(result.getContent()).extracting(ReadableProduct::getSku).containsExactly(Sku.of(SKU_1));
     }
 
     // -------------------------------------------------------------------------------------------------- facets
@@ -419,7 +420,7 @@ class ProductSearchServiceImplTest {
 
         assertThat(suggestions).singleElement().satisfies(suggestion -> {
             assertThat(suggestion.getName()).isEqualTo(SUNGLASSES);
-            assertThat(suggestion.getSku()).isEqualTo(SUN_SKU);
+            assertThat(suggestion.getSku()).isEqualTo(Sku.of(SUN_SKU));
             assertThat(suggestion.getFriendlyUrl()).isEqualTo("sku-ch-ac-sun06");
             assertThat(suggestion.getBrand()).isEqualTo(CHANEL);
         });
@@ -434,7 +435,7 @@ class ProductSearchServiceImplTest {
         when(productRepository.findAllHydrated(anyList())).thenReturn(List.of(one, two));
 
         assertThat(service.suggest(STORE, ANY_TERM, EN, 8))
-                .extracting(ReadableProductSuggestion::getSku).containsExactly(SKU_2, SKU_1);
+                .extracting(ReadableProductSuggestion::getSku).containsExactly(Sku.of(SKU_2), Sku.of(SKU_1));
     }
 
     @Test

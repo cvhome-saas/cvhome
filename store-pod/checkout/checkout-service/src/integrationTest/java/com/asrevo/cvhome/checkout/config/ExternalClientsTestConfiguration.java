@@ -89,8 +89,9 @@ public class ExternalClientsTestConfiguration {
     ExternalProductService stubExternalProductService() {
         ExternalProductService service = Mockito.mock(ExternalProductService.class);
         Mockito.when(service.getDetailedProducts(any(), any(), any())).thenAnswer(invocation -> {
-            List<String> skus = invocation.getArgument(1);
-            return skus.stream().filter(sku -> !SKU_UNKNOWN.equals(sku)).map(ExternalClientsTestConfiguration::product)
+            List<Sku> skus = invocation.getArgument(1);
+            return skus.stream().filter(sku -> !SKU_UNKNOWN.equals(sku.value()))
+                    .map(ExternalClientsTestConfiguration::product)
                     .toList();
         });
         return service;
@@ -152,9 +153,9 @@ public class ExternalClientsTestConfiguration {
         stubPaymentDefaults(payments);
     }
 
-    private static ReadableMinimalProduct product(String sku) {
+    private static ReadableMinimalProduct product(Sku sku) {
         ReadableMinimalProduct product = new ReadableMinimalProduct();
-        product.setId((long) Math.abs(sku.hashCode() % 10_000));
+        product.setId((long) Math.abs(sku.value().hashCode() % 10_000));
         product.setSku(sku);
         product.setAvailable(true);
         ProductDescription description = new ProductDescription();
@@ -163,7 +164,7 @@ public class ExternalClientsTestConfiguration {
         ReadableImage image = new ReadableImage();
         image.setImageUrl(String.format("https://cdn.example/%s.png", sku));
         product.setImage(image);
-        if (SKU_VARIANT.equals(sku)) {
+        if (SKU_VARIANT.equals(sku.value())) {
             ReadableVariantSelection selection = new ReadableVariantSelection();
             ReadableVariantOptionValue size = new ReadableVariantOptionValue();
             size.setOptionName("Size");

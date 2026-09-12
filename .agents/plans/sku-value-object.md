@@ -143,5 +143,14 @@ union all select 'checkout.sales_order_line', count(*) from checkout.sales_order
   bridge would turn that into a 500 on the cart. Phase 4 deletes the bridge.
 - **`store-pod/commons/store-commons` got its first tests** (`SkuConverterTest`), and with them
   `testImplementation` copies of its compileOnly JPA and Jackson APIs.
+- **`GET /private/product/unique?code=` keeps a `String`** (phase 3). It is the console's "is this sku taken?",
+  asked while the merchant types; a string that cannot be a sku cannot be taken, so it answers `false` rather than
+  400. Every other catalog sku edge binds a `Sku`.
+- **Found, not fixed: console-ui's `SKU_PATTERN` allows a dot** (`product-draft-form.service.ts`,
+  `/^[A-Za-z0-9._-]+$/`). The server has never accepted one, so a product sku with a dot passes the form and fails
+  the save with a 400. Out of scope for a backend type change; it wants the pattern made `Sku.FORMAT`'s.
+- **The phase-3 checkout bridge replaced the phase-2 one** rather than stacking on it: the snapshot filters the cart's
+  strings to well-formed skus once and asks catalog and inventory with the same `List<Sku>`, which keeps
+  `snapshot()` inside checkstyle's complexity limit.
 
 ## Verification

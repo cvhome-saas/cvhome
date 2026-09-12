@@ -31,16 +31,21 @@ public class ProductSnapshotServiceImpl implements ProductSnapshotService {
 
     @Override
     public Map<String, ProductSnapshot> snapshot(StoreMerchantId store, LanguageCode language, Collection<String> skus) {
-        if (skus.isEmpty()) {
+        // Cart lines are still strings here; one that is not a sku can be neither sold nor stocked, so it is not
+        // asked for.
+        List<Sku> askable = skus.stream().distinct().filter(sku -> sku.matches(Sku.FORMAT)).map(Sku::of).toList();
+        if (askable.isEmpty()) {
             return Map.of();
         }
-        List<String> distinct = skus.stream().distinct().toList();
-        Map<String, ReadableMinimalProduct> byProductSku = products.getDetailedProducts(store, distinct, language)
-                .stream().collect(Collectors.toMap(ReadableMinimalProduct::getSku, Function.identity(), (a, b) -> a));
-        Map<String, SkuInventory> byStockSku = stock(store, distinct);
+        Map<String, ReadableMinimalProduct> byProductSku = products.getDetailedProducts(store, askable, language)
+                .stream().collect(Collectors.toMap(product -> product.getSku().value(), Function.identity(),
+                        (a, b) -> a));
+        Map<String, SkuInventory> byStockSku = inventory.queryBySkus(store, new AvailabilityQuery(askable)).stream()
+                .collect(Collectors.toMap(stock -> stock.sku().value(), Function.identity(), (a, b) -> a));
 
         Map<String, ProductSnapshot> result = new LinkedHashMap<>();
-        for (String sku : distinct) {
+        for (Sku asked : askable) {
+            String sku = asked.value();
             ReadableMinimalProduct product = byProductSku.get(sku);
             SkuInventory stock = byStockSku.get(sku);
             if (product == null || stock == null || stock.price() == null) {
@@ -53,17 +58,5 @@ public class ProductSnapshotServiceImpl implements ProductSnapshotService {
                     stock.quantityOrderMinimum(), stock.quantityOrderMaximum()));
         }
         return result;
-    }
-
-    /**
-     * Cart lines are still strings here; one that is not a sku cannot be stocked, so it is not asked for.
-     */
-    private Map<String, SkuInventory> stock(StoreMerchantId store, List<String> skus) {
-        List<Sku> stockable = skus.stream().filter(sku -> sku.matches(Sku.FORMAT)).map(Sku::of).toList();
-        if (stockable.isEmpty()) {
-            return Map.of();
-        }
-        return inventory.queryBySkus(store, new AvailabilityQuery(stockable)).stream()
-                .collect(Collectors.toMap(stock -> stock.sku().value(), Function.identity(), (a, b) -> a));
     }
 }

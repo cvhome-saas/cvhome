@@ -18,6 +18,7 @@ import com.asrevo.cvhome.catalog.model.product.ReadableProductVariantDefinition;
 import com.asrevo.cvhome.catalog.model.product.ReadableVariantOptionValue;
 import com.asrevo.cvhome.catalog.model.product.ReadableVariantSelection;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
+import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -40,7 +41,7 @@ class ProductVariantMapperTest {
 
     private static final String RED = "red";
 
-    private static final String SKU = "SKU-RED-M";
+    private static final Sku SKU = Sku.of("SKU-RED-M");
 
     private static final String COLOR_NAME = "Color";
 
@@ -54,11 +55,11 @@ class ProductVariantMapperTest {
 
     private static final String MEDIUM_NAME = "M";
 
-    private static final String SKU_A = "A";
+    private static final Sku SKU_A = Sku.of("A");
 
-    private static final String SKU_B = "B";
+    private static final Sku SKU_B = Sku.of("B");
 
-    private static final String SKU_C = "C";
+    private static final Sku SKU_C = Sku.of("C");
 
     private static ProductOption option(long id, String code, Integer sortOrder, String enName, String frName) {
         ProductOption option = new ProductOption();
@@ -98,7 +99,7 @@ class ProductVariantMapperTest {
         return value;
     }
 
-    private static ProductVariant variant(long id, String sku, int sortOrder, boolean isDefault,
+    private static ProductVariant variant(long id, Sku sku, int sortOrder, boolean isDefault,
                                           ProductOptionValue... chosen) {
         ProductVariant variant = new ProductVariant();
         variant.setId(id);
@@ -160,7 +161,7 @@ class ProductVariantMapperTest {
 
     @Test
     void selectionIsNullForADefaultVariantBecauseNothingWasSelected() {
-        ProductVariant simple = variant(53L, "SKU-SIMPLE", 0, true);
+        ProductVariant simple = variant(53L, Sku.of("SKU-SIMPLE"), 0, true);
 
         assertThat(ProductVariantMapper.toSelection(simple, EN)).isNull();
     }
@@ -202,7 +203,7 @@ class ProductVariantMapperTest {
 
         List<ProductVariant> variants = List.of(
                 variant(60L, SKU, 0, true, red, medium),
-                variant(61L, "SKU-BLUE-M", 1, false, blue, medium));
+                variant(61L, Sku.of("SKU-BLUE-M"), 1, false, blue, medium));
 
         List<ReadableProductOption> options = ProductVariantMapper.toOptions(product, variants, EN);
 

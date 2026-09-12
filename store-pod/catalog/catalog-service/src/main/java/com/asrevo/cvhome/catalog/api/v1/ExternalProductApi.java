@@ -13,6 +13,7 @@ import com.asrevo.cvhome.catalog.model.product.ReadableMinimalProduct;
 import com.asrevo.cvhome.catalog.services.product.ExternalProductService;
 import com.asrevo.cvhome.catalog.services.product.ProductService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
+import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.errors.UncheckedBaseException;
 
@@ -38,7 +39,7 @@ public class ExternalProductApi implements ExternalProductService {
     @Override
     @GetMapping("/detailed-product")
     @Parameter(name = "store", schema = @Schema(type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
-    public ReadableMinimalProduct getDetailedProduct(StoreMerchantId store, @RequestParam String sku,
+    public ReadableMinimalProduct getDetailedProduct(StoreMerchantId store, @RequestParam Sku sku,
                                                      LanguageCode lang) {
         try {
             return productService.getBySku(store, sku, lang);
@@ -52,7 +53,7 @@ public class ExternalProductApi implements ExternalProductService {
     @GetMapping("/detailed-products")
     @Parameter(name = "store", schema = @Schema(type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
     public List<ReadableMinimalProduct> getDetailedProducts(StoreMerchantId store,
-                                                            @RequestParam List<String> skus, LanguageCode lang) {
+                                                            @RequestParam List<Sku> skus, LanguageCode lang) {
         return productService.getBySkus(store, skus, lang);
     }
 }
