@@ -11,7 +11,7 @@ console's order statistics.
 - **Runs on** — `lcl start -d --stack <name>`; read the live ports from `lcl urls`. Address it through the pod
   gateway (`http://spg-507f1f77.gateway.com/checkout/…`) or the platform gateway (`gateway.com:8000/spg/checkout/…`),
   never `:8123`
-- **Cases** — 51 (38 verified end to end or in part, 11 unit only, 2 not verified)
+- **Cases** — 52 (39 verified end to end or in part, 11 unit only, 2 not verified)
 - **Also see** — [payment](../../payment/payment-service/qa/payment-qa.md) (the transactions and the approve /
   reject that drive the signals), [inventory](../../inventory/inventory-service/qa/inventory-qa.md) (the
   reservation that placement takes and expiry releases), [landing-ui](../../landing-ui/qa/landing-ui-qa.md) (the
@@ -163,6 +163,20 @@ checkout keys the row on the lowercased email (`guest:<email>`), so a repeat gue
 `CustomerServiceImplTest.anUnknownCountryIsRefusedBeforeAnythingIsWritten`.
 
 - **Expect** — `400 CUSTOMER.COUNTRY.UNSUPPORTED`, no customer row, no order.
+
+### CUS-06 — An order's "View profile" opens its customer · high · [verified]
+
+`CustomerApiIntegrationTest.theConsolesOneSearchTermFindsACustomerByEmailAsWellAsByName`. The console's customer
+search is one box, sent to `GET /private/customers` as `name`; the order page's **View profile** searches the
+order's email with it (there is no customer-by-id endpoint to link to). The rewrite matched `name` against the
+first and last name only, so every profile opened from an order was a list of none.
+
+- **Steps** — open an order in the console (`/orders/<id>`), press **View profile**; then type part of a customer's
+  email into the customers page's search box.
+- **Expect** — `/customers?q=<email>&customer=<id>` lists exactly that customer and opens the profile drawer. The
+  search box finds a customer by first name, last name or email, within the current store only.
+- **Result** — 2026-09-12, stack `sku`: order 1001's **View profile** opened QA Sku (`qa-sku@example.com`,
+  1 order, the billing address); before the fix the same click listed 0 customers.
 
 ---
 
@@ -476,6 +490,7 @@ Defects that actually happened in checkout — most in the service this one repl
 |---|---|---|
 | **Expiry and cancel failed at flush** | Orders never expired; cancel 500ed with a CHECK violation. | SEC-02; JOB-03; SIG-02. |
 | **An order lost between two remote calls** | Reserved stock, no payment, order stuck `CREATED` forever. | PLC-05, PLC-06, JOB-01 — stop a service mid-placement and watch the order finish anyway. |
+| **"View profile" on an order listed no customer** | The console searches the order's email through `name`, which the rewrite matched against names only. `name` spans the email again. | CUS-06 |
 | **Checkout took any string as a sku** | A cart line's sku was whatever the storefront posted, so a sku no service could hold was carried as far as catalog and inventory before being refused. | CART-06; the stored data check in `.agents/plans/sku-value-object.md` (*Deploy note*) |
 | **A refused payment left the stock held** | Cancelled order, inventory still decremented. | PLC-07: `inventory_status = RELEASED` and the quantity back. |
 | **A rejected transfer told nobody** | Payment `REJECTED`, order `PENDING_PAYMENT` forever. | SIG-02. |

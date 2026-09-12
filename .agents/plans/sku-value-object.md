@@ -116,6 +116,23 @@ Nothing uses the type yet.
 - The bridges from phases 2–3 go away.
 - QA: `checkout-service/qa/checkout-qa.md`.
 
+## Phase 5 — checkout: an order's "View profile" finds its customer (commit 6)
+
+Found during this branch's QA and added to the same PR at the owner's request; it is not a sku change.
+
+The console's customer search is one box, sent to `GET /private/customers` as `name`
+(`customers.api.service.ts` `toCustomerQuery`, whose comment states the contract: `name` "spans the billing first
+name, the billing last name and the email address"). The order page's **View profile** has no customer-by-id
+endpoint to link to, so it searches the order's email with that box (`order-details.ts` `viewProfile`). The checkout
+rewrite's `OrderSpecifications.customers` matched `name` against the first and last name only, so every profile
+opened from an order listed 0 customers, and the search box never found anyone by email.
+
+- `OrderSpecifications.customers`: `name` matches first name, last name **or** email. The fix is in the shared
+  specification, at the root; the console already sends what it documents.
+- Test: `CustomerApiIntegrationTest.theConsolesOneSearchTermFindsACustomerByEmailAsWellAsByName` (by email, by name,
+  and not from another store).
+- QA: `checkout-qa.md` CUS-06.
+
 ## Other repos
 
 None. The wire format is unchanged, and load-testing and e2e-testing already send conforming skus.
@@ -163,6 +180,7 @@ Per phase, before its commit:
 | 2 — inventory | inventory-core 47, inventory-service 27, checkout-core 188 | inventory-service 33 (3 new), checkout-service 77 | clean |
 | 3 — catalog | catalog-core 246, catalog-service 69 (1 new), checkout-core 188 | catalog-service 80 (1 new), checkout-service 77 | clean |
 | 4 — checkout | checkout-commons, checkout-core 188, checkout-service 26 | checkout-service 78 (1 new) | clean |
+| 5 — customer search | checkout-core 188 | checkout-service 79 (1 new) | clean |
 
 What the integration suites prove beyond compiling: the converter binds in JPQL (`findBySkus`, `lockBySku` under
 `PESSIMISTIC_WRITE`, `findByStoreAndSkuIn`) and inside `lower(...)` for the listing's sku filter; the per-sku
@@ -191,6 +209,10 @@ Live, 2026-09-12, `lcl start -d --stack sku` from this worktree (every service u
   swagger-core honours `@JsonValue`. No `SwaggerConfig` change was needed.
 
 QA files: `inventory-qa.md` INV-11, `catalog-qa.md` PRD-17 and PRD-07, `checkout-qa.md` CART-06, all `[verified]`.
+
+Phase 5, live on the same stack after `lcl restart checkout --stack sku`: order 1001's **View profile** in the
+console went to `/customers?q=qa-sku@example.com&customer=1`, which listed 1 customer and opened the profile. Before
+the fix the same click listed 0. `checkout-qa.md` CUS-06 is `[verified]`.
 
 Seen during QA, not caused by this change: after a full navigation to `/en/checkout`, the storefront's "Cart
 details" panel showed "Your cart is empty" for several seconds while the header counted one item. The cart in

@@ -1,5 +1,7 @@
 package com.asrevo.cvhome.checkout.api;
 
+import java.util.UUID;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +46,8 @@ class CustomerApiIntegrationTest {
     private static final String CUA_EXTERNAL_ID = "cuaExternalId";
 
     private static final String PAGE_0_COUNT_50 = "page=0&count=50";
+
+    private static final String NAME_QUERY = "name=%s";
 
     private static final String BOB_EXAMPLE_COM = "bob@example.com";
 
@@ -162,5 +166,28 @@ class CustomerApiIntegrationTest {
 
         expect(api.get(scoped(path(V1_PRIVATE, CUSTOMERS), STORE_A), shopperA), HttpStatus.FORBIDDEN);
         expect(api.get(scoped(path(V1_PRIVATE, CUSTOMERS), STORE_A), api.admin(STORE_B)), HttpStatus.FORBIDDEN);
+    }
+
+    /**
+     * The console's customer search is one box sent as {@code name}, and the order page opens a customer's profile
+     * by searching their email with it. The rewrite matched that term against the names only, so "view profile" from
+     * any order listed nobody.
+     */
+    @Test
+    void theConsolesOneSearchTermFindsACustomerByEmailAsWellAsByName() {
+        String email = String.format("searched-%s@example.com", UUID.randomUUID().toString().substring(0, 8));
+        api.placed(STORE_A, api.newCart(STORE_A, SKU, 1), api.shopper(STORE_A, email), COD_2, email);
+
+        JsonNode byEmail = json(api.get(with(scoped(path(V1_PRIVATE, CUSTOMERS), STORE_A),
+                String.format(NAME_QUERY, email)), api.admin(STORE_A)));
+        assertThat(byEmail.get(CONTENT)).extracting(node -> node.get(EMAILADDRESS).asString()).containsExactly(email);
+
+        JsonNode byName = json(api.get(with(scoped(path(V1_PRIVATE, CUSTOMERS), STORE_A),
+                String.format("name=lovelace&%s", PAGE_0_COUNT_50)), api.admin(STORE_A)));
+        assertThat(byName.get(CONTENT)).extracting(node -> node.get(EMAILADDRESS).asString()).contains(email);
+
+        JsonNode otherStore = json(api.get(with(scoped(path(V1_PRIVATE, CUSTOMERS), STORE_B),
+                String.format(NAME_QUERY, email)), api.admin(STORE_B)));
+        assertThat(otherStore.get(CONTENT)).isEmpty();
     }
 }
