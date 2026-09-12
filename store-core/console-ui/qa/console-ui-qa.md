@@ -10,7 +10,7 @@ service's answer.
 - **Runs on** — `lcl start -d --stack <name>`; the console is served through the gateway at
   `http://gateway.com:8000/` and also answers on `http://console-ui.gateway.com:8000`. Read the live port from
   `lcl urls` — **never assume 8000**
-- **Cases** — 98 (48 verified, 12 unit only, 38 not verified)
+- **Cases** — 120 (65 verified, 12 unit only, 43 not verified)
 - **Also see** — the service behind each module:
   [tenancy](../../tenancy/tenancy-service/qa/tenancy-qa.md) (users, stores, invitations),
   [catalog](../../../store-pod/catalog/catalog-service/qa/catalog-qa.md),
@@ -492,6 +492,29 @@ brands, types, groups). Specs: `features/products/**`, `features/product-form/**
 - **Steps** — switch the console to `ar`, open Products, the form, Catalogue.
 - **Expect** — product and category names in Arabic (from `descriptions`, matched on `ar`), layout mirrored,
   the price column still showing the store currency correctly formatted.
+
+### CAT-12 — A SKU the server would refuse is refused by the form, before any request · high · [verified]
+
+The server's rule is `Sku.FORMAT` (`^[A-Za-z0-9_-]{1,255}$`), and catalog, inventory and checkout all enforce it.
+The form used to allow a dot as well, so `ABC.1` passed the form, was looked up on `/unique`, and came back from
+Save draft as a 400. The console now holds the one rule, `SKU_PATTERN` in `models/products.ts`.
+
+- **Steps** — `/products/new` as org1-admin on ORG1-STORE1, network panel open. Name the product in both
+  languages first, so the SKU is the only thing wrong. Type `QA-SKU.phase6`, wait a second, press **Save
+  draft**. Then replace it with `QA-SKU_phase6`.
+- **Expect** — the dotted SKU: the field says "Use letters, digits, hyphens and underscores only.", **no**
+  `GET …/private/product/unique` goes out, and Save draft sends nothing and stays on `/products/new`. The
+  hyphen and underscore SKU: the error clears, one `GET /spg/catalog/api/v1/private/product/unique?code=QA-SKU_phase6`
+  answers 200, and the field shows its tick.
+- **The variant matrix, same rule** — on a saved product's Variants step, a row whose sku has a dot (or runs past
+  255 characters) is framed red, and **Save variants** refuses it by name in a toast with no request.
+- **Result** — 2026-09-12, `lcl --stack sku`: as expected. The negative run was repeated after the `/unique`
+  call had shown the network log was capturing. Variant half on product 3: `SKU-AD-CL-TPT03.BLUE` framed red and
+  refused ("The SKU "SKU-AD-CL-TPT03.BLUE" is not valid…"), zero requests, left unsaved. Not driven: Save draft
+  with the conforming SKU (it would create a product), the Arabic message, and the 256-character variant.
+  `/unique`'s own answer for a malformed code is catalog's [PRD-07](../../../store-pod/catalog/catalog-service/qa/catalog-qa.md).
+- _Unit: `product-form.spec.ts` — the dotted and the conforming product SKU, the dotted and the over-long
+  variant sku, and the marked matrix row._
 
 ---
 

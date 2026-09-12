@@ -48,6 +48,7 @@ import com.asrevo.cvhome.checkout.services.order.OrderStatisticsService;
 import com.asrevo.cvhome.checkout.services.order.RedirectUrls;
 import com.asrevo.cvhome.checkout.services.reference.CountryService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
+import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.commons.domain.StatisticRange;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.entity.common.PaymentStatus;
@@ -71,7 +72,7 @@ class CheckoutApisTest {
 
     private static final String ADA = "ada";
 
-    private static final String SKU_2 = "SKU";
+    private static final Sku SKU_2 = Sku.of("SKU");
 
     private static final String A_B = "a@b";
 

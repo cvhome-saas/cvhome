@@ -5,6 +5,7 @@ import java.time.LocalDate;
 
 import org.junit.jupiter.api.Test;
 
+import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.inventory.entity.Inventory;
 import com.asrevo.cvhome.inventory.entity.InventoryPrice;
@@ -17,7 +18,7 @@ class SkuInventoryMapperTest {
 
     private static final LocalDate TODAY = LocalDate.of(2026, 8, 24);
 
-    private static final String SKU = "SKU-1";
+    private static final Sku SKU = Sku.of("SKU-1");
 
     private static final BigDecimal HUNDRED = new BigDecimal("100");
 

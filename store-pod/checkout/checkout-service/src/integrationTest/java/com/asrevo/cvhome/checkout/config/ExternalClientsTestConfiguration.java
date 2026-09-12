@@ -18,6 +18,7 @@ import com.asrevo.cvhome.catalog.model.product.ReadableVariantOptionValue;
 import com.asrevo.cvhome.catalog.model.product.ReadableVariantSelection;
 import com.asrevo.cvhome.catalog.services.product.ExternalProductService;
 import com.asrevo.cvhome.commons.domain.CurrencyCode;
+import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.inventory.model.AvailabilityQuery;
 import com.asrevo.cvhome.inventory.model.SkuInventory;
@@ -88,8 +89,9 @@ public class ExternalClientsTestConfiguration {
     ExternalProductService stubExternalProductService() {
         ExternalProductService service = Mockito.mock(ExternalProductService.class);
         Mockito.when(service.getDetailedProducts(any(), any(), any())).thenAnswer(invocation -> {
-            List<String> skus = invocation.getArgument(1);
-            return skus.stream().filter(sku -> !SKU_UNKNOWN.equals(sku)).map(ExternalClientsTestConfiguration::product)
+            List<Sku> skus = invocation.getArgument(1);
+            return skus.stream().filter(sku -> !SKU_UNKNOWN.equals(sku.value()))
+                    .map(ExternalClientsTestConfiguration::product)
                     .toList();
         });
         return service;
@@ -101,7 +103,7 @@ public class ExternalClientsTestConfiguration {
         ExternalInventoryService service = Mockito.mock(ExternalInventoryService.class);
         Mockito.when(service.queryBySkus(any(), any())).thenAnswer(invocation -> {
             AvailabilityQuery query = invocation.getArgument(1);
-            return query.skus().stream().filter(sku -> !SKU_UNKNOWN.equals(sku))
+            return query.skus().stream().filter(sku -> !SKU_UNKNOWN.equals(sku.value()))
                     .map(ExternalClientsTestConfiguration::stock).toList();
         });
         return service;
@@ -151,9 +153,9 @@ public class ExternalClientsTestConfiguration {
         stubPaymentDefaults(payments);
     }
 
-    private static ReadableMinimalProduct product(String sku) {
+    private static ReadableMinimalProduct product(Sku sku) {
         ReadableMinimalProduct product = new ReadableMinimalProduct();
-        product.setId((long) Math.abs(sku.hashCode() % 10_000));
+        product.setId((long) Math.abs(sku.value().hashCode() % 10_000));
         product.setSku(sku);
         product.setAvailable(true);
         ProductDescription description = new ProductDescription();
@@ -162,7 +164,7 @@ public class ExternalClientsTestConfiguration {
         ReadableImage image = new ReadableImage();
         image.setImageUrl(String.format("https://cdn.example/%s.png", sku));
         product.setImage(image);
-        if (SKU_VARIANT.equals(sku)) {
+        if (SKU_VARIANT.equals(sku.value())) {
             ReadableVariantSelection selection = new ReadableVariantSelection();
             ReadableVariantOptionValue size = new ReadableVariantOptionValue();
             size.setOptionName("Size");
@@ -173,8 +175,8 @@ public class ExternalClientsTestConfiguration {
         return product;
     }
 
-    private static SkuInventory stock(String sku) {
-        return new SkuInventory(sku, 1L, true, !SKU_OUT.equals(sku), 100, 1, 0,
+    private static SkuInventory stock(Sku sku) {
+        return new SkuInventory(sku, 1L, true, !SKU_OUT.equals(sku.value()), 100, 1, 0,
                 new SkuPrice(PRICE, PRICE, false, 0, null, null, null));
     }
 }

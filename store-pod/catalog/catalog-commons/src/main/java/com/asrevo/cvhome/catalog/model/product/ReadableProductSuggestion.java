@@ -3,6 +3,8 @@ package com.asrevo.cvhome.catalog.model.product;
 import java.io.Serial;
 import java.io.Serializable;
 
+import com.asrevo.cvhome.commons.domain.Sku;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -34,13 +36,13 @@ public class ReadableProductSuggestion implements Serializable {
     /**
      * The default variant's sku.
      */
-    private String sku;
+    private Sku sku;
 
     /**
      * Set when the typed query matched one concrete variant sku — the storefront deep-links the product page
      * with it ({@code ?sku=}) so the shopper lands preselected. Null otherwise.
      */
-    private String matchedVariantSku;
+    private Sku matchedVariantSku;
 
     private String imageUrl;
 

@@ -6,6 +6,7 @@ import java.time.LocalDate;
 
 import org.junit.jupiter.api.Test;
 
+import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -18,7 +19,7 @@ class InventoryTest {
 
     private static final StoreMerchantId STORE = new StoreMerchantId("store-1");
 
-    private static final String SKU = "SKU-1";
+    private static final Sku SKU = Sku.of("SKU-1");
 
     private static final LocalDate TODAY = LocalDate.of(2026, 8, 24);
 
@@ -86,7 +87,7 @@ class InventoryTest {
         reservation.addLine(inventory, 2);
 
         assertThat(reservation.holds(SKU)).isTrue();
-        assertThat(reservation.holds("other")).isFalse();
+        assertThat(reservation.holds(Sku.of("other"))).isFalse();
         assertThat(reservation.getLines().getFirst().getInventory()).isSameAs(inventory);
         assertThat(reservation.getLines().getFirst().getReservation()).isSameAs(reservation);
         assertThat(reservation.getLines().getFirst().getQuantity()).isEqualTo(2);

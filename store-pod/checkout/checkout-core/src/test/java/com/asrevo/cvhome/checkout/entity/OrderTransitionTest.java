@@ -17,6 +17,7 @@ import com.asrevo.cvhome.checkout.model.order.OrderEventSource;
 import com.asrevo.cvhome.checkout.model.order.OrderEventType;
 import com.asrevo.cvhome.checkout.model.order.PendingAction;
 import com.asrevo.cvhome.checkout.model.signal.SignalOutcome;
+import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.store.core.entity.common.InventoryStatus;
 import com.asrevo.cvhome.store.core.entity.common.PaymentStatus;
 import com.asrevo.cvhome.store.core.entity.order.orderstatus.OrderStatus;
@@ -94,7 +95,7 @@ class OrderTransitionTest {
         @Test
         void totalsAreTheSumOfTheLinesAsSubtotalAndTotal() {
             Order order = Orders.placed(PaymentType.STRIPE);
-            order.addLine("SKU-2", 2L, "Second", new BigDecimal("2.50"), 4, "img");
+            order.addLine(Sku.of("SKU-2"), 2L, "Second", new BigDecimal("2.50"), 4, "img");
             order.computeTotals();
 
             assertThat(order.getSubtotal()).isEqualByComparingTo(THIRTY);

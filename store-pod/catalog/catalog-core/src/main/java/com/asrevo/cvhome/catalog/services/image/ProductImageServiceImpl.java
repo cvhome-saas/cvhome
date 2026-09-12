@@ -175,7 +175,7 @@ public class ProductImageServiceImpl implements ProductImageService {
 
     /** What the media library shows beside the usage. Supplied by us so content never calls back into catalog. */
     private static String label(Product product) {
-        return product.defaultVariant().map(variant -> variant.getSku())
+        return product.defaultVariant().map(variant -> variant.getSku().value())
                 .orElseGet(() -> "product-%d".formatted(product.getId()));
     }
 

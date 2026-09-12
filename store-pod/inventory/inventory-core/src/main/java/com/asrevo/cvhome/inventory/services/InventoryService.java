@@ -3,6 +3,7 @@ package com.asrevo.cvhome.inventory.services;
 import java.util.Collection;
 import java.util.List;
 
+import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.inventory.model.PersistableInventory;
 import com.asrevo.cvhome.inventory.model.PersistableSkuInventory;
@@ -14,7 +15,7 @@ import com.asrevo.cvhome.inventory.model.SkuInventory;
  */
 public interface InventoryService {
 
-    List<SkuInventory> getBySkus(StoreMerchantId store, Collection<String> skus);
+    List<SkuInventory> getBySkus(StoreMerchantId store, Collection<Sku> skus);
 
     /**
      * Every sku of the given products, in one query. The console's list totals a product's variants from this
@@ -22,7 +23,7 @@ public interface InventoryService {
      */
     List<SkuInventory> getByProductIds(StoreMerchantId store, Collection<Long> productIds);
 
-    SkuInventory upsert(StoreMerchantId store, String sku, PersistableInventory inventory);
+    SkuInventory upsert(StoreMerchantId store, Sku sku, PersistableInventory inventory);
 
     /**
      * Upserts every entry in one transaction — the console saving a variant matrix. Answers in request order.
@@ -37,5 +38,5 @@ public interface InventoryService {
     /**
      * Cleanup for a single retired sku — a variant combination that was removed. No rows is a no-op.
      */
-    void deleteBySku(StoreMerchantId store, String sku);
+    void deleteBySku(StoreMerchantId store, Sku sku);
 }

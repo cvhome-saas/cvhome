@@ -33,6 +33,7 @@ import com.asrevo.cvhome.checkout.services.customer.CustomerMapper;
 import com.asrevo.cvhome.checkout.services.customer.CustomerService;
 import com.asrevo.cvhome.checkout.services.store.StoreSettings;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
+import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.customer.errors.UnsupportedCountryCodeException;
 
@@ -109,7 +110,7 @@ public class OrderPlacementTransaction {
 
     private void addLines(Order order, Cart cart, StoreMerchantId store, LanguageCode language)
             throws ProductNotPurchasableException, CartQuantityOutOfRangeException {
-        Map<String, ProductSnapshot> snapshot = snapshots.snapshot(store, language,
+        Map<Sku, ProductSnapshot> snapshot = snapshots.snapshot(store, language,
                 cart.getLines().stream().map(CartLine::getSku).toList());
         for (CartLine line : cart.getLines()) {
             ProductSnapshot product = snapshot.get(line.getSku());

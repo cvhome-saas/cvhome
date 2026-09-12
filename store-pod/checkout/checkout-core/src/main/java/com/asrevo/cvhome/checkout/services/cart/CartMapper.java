@@ -16,6 +16,7 @@ import com.asrevo.cvhome.checkout.model.order.ReadableOrderTotal;
 import com.asrevo.cvhome.checkout.services.catalog.ProductSnapshot;
 import com.asrevo.cvhome.checkout.services.money.MoneyFormatter;
 import com.asrevo.cvhome.commons.domain.CurrencyCode;
+import com.asrevo.cvhome.commons.domain.Sku;
 
 /**
  * Entity + live snapshot → the cart the storefront renders. A line whose sku is missing from the snapshot is left out.
@@ -25,7 +26,7 @@ public final class CartMapper {
     private CartMapper() {
     }
 
-    public static ReadableCart toReadable(Cart cart, Map<String, ProductSnapshot> snapshot, CurrencyCode currency,
+    public static ReadableCart toReadable(Cart cart, Map<Sku, ProductSnapshot> snapshot, CurrencyCode currency,
                                           Locale locale) {
         ReadableCart readable = new ReadableCart();
         readable.setId(cart.getId());

@@ -33,6 +33,7 @@ import com.asrevo.cvhome.catalog.repositories.ProductOptionRepository;
 import com.asrevo.cvhome.catalog.repositories.ProductRepository;
 import com.asrevo.cvhome.catalog.repositories.ProductVariantRepository;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
+import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 
 import lombok.RequiredArgsConstructor;
@@ -93,12 +94,12 @@ public class ProductVariantServiceImpl implements ProductVariantService {
                                        List<PersistableProductVariant> variants)
             throws VariantOptionsInvalidException, DuplicateVariantSkuException {
         if (variants.size() > 1 || variants.size() == 1 && !CollectionUtils.isEmpty(variants.getFirst().getOptionValueIds())) {
-            throw VariantOptionsInvalidException.of(variants.getFirst().getSku(),
+            throw VariantOptionsInvalidException.of(skuOf(variants.getFirst()),
                     "a product with no options owns exactly one variant with no option values");
         }
-        String sku = variants.isEmpty()
+        Sku sku = variants.isEmpty()
                 ? product.defaultVariant().map(ProductVariant::getSku).orElse(null)
-                : variants.getFirst().getSku();
+                : skuOf(variants.getFirst());
         if (sku == null) {
             throw VariantOptionsInvalidException.of(null, "no sku for the default variant");
         }
@@ -145,20 +146,21 @@ public class ProductVariantServiceImpl implements ProductVariantService {
         Map<Long, ProductVariant> byId = product.getVariants().stream()
                 .filter(v -> v.getId() != null)
                 .collect(Collectors.toMap(ProductVariant::getId, Function.identity()));
-        Map<String, ProductVariant> bySku = product.getVariants().stream()
+        Map<Sku, ProductVariant> bySku = product.getVariants().stream()
                 .collect(Collectors.toMap(ProductVariant::getSku, Function.identity(), (a, b) -> a));
         Set<ProductVariant> used = new HashSet<>();
         List<ProductVariant> resolved = new java.util.ArrayList<>();
         for (PersistableProductVariant source : variants) {
+            Sku sku = skuOf(source);
             ProductVariant variant = source.getId() == null ? null : byId.get(source.getId());
             if (variant == null) {
-                variant = bySku.get(source.getSku());
+                variant = bySku.get(sku);
             }
             if (variant == null || !used.add(variant)) {
-                variant = new ProductVariant(product, source.getSku());
+                variant = new ProductVariant(product, sku);
                 used.add(variant);
             }
-            variant.setSku(source.getSku());
+            variant.setSku(sku);
             variant.setSortOrder(source.getSortOrder());
             variant.setDefaultVariant(source.isDefaultVariant());
             variant.setOptionSignature(ProductVariant.signatureOf(source.getOptionValueIds()));
@@ -220,7 +222,7 @@ public class ProductVariantServiceImpl implements ProductVariantService {
             throws VariantOptionsInvalidException {
         List<Long> valueIds = source.getOptionValueIds();
         if (valueIds == null || valueIds.size() != optionsById.size()) {
-            throw VariantOptionsInvalidException.of(source.getSku(),
+            throw VariantOptionsInvalidException.of(skuOf(source),
                     "expected one value per declared option (%d), got %d"
                             .formatted(optionsById.size(), valueIds == null ? 0 : valueIds.size()));
         }
@@ -228,12 +230,12 @@ public class ProductVariantServiceImpl implements ProductVariantService {
         for (Long valueId : valueIds) {
             ProductOptionValue value = valuesById.get(valueId);
             if (value == null) {
-                throw VariantOptionsInvalidException.of(source.getSku(),
+                throw VariantOptionsInvalidException.of(skuOf(source),
                         "value %d does not belong to a declared option".formatted(valueId));
             }
             ProductOption option = optionsById.get(value.getOption().getId());
             if (desired.put(option.getId(), value) != null) {
-                throw VariantOptionsInvalidException.of(source.getSku(),
+                throw VariantOptionsInvalidException.of(skuOf(source),
                         "two values of option %s".formatted(option.getCode()));
             }
         }
@@ -254,12 +256,13 @@ public class ProductVariantServiceImpl implements ProductVariantService {
     private void requireDistinctSkus(StoreMerchantId store, Product product,
                                      List<PersistableProductVariant> variants)
             throws DuplicateVariantSkuException {
-        Set<String> seen = new HashSet<>();
+        Set<Sku> seen = new HashSet<>();
         for (PersistableProductVariant variant : variants) {
-            if (!seen.add(variant.getSku())) {
-                throw DuplicateVariantSkuException.of(variant.getSku(), store);
+            Sku sku = skuOf(variant);
+            if (!seen.add(sku)) {
+                throw DuplicateVariantSkuException.of(sku, store);
             }
-            requireSkuFree(store, product, variant.getSku());
+            requireSkuFree(store, product, sku);
         }
     }
 
@@ -268,7 +271,7 @@ public class ProductVariantServiceImpl implements ProductVariantService {
      * the store owning it is a conflict — caught here so the caller gets a 409 instead of the DB constraint's
      * opaque 500.
      */
-    private void requireSkuFree(StoreMerchantId store, Product product, String sku)
+    private void requireSkuFree(StoreMerchantId store, Product product, Sku sku)
             throws DuplicateVariantSkuException {
         boolean ownedHere = product.getVariants().stream().anyMatch(v -> sku.equals(v.getSku()));
         if (!ownedHere && variantRepository.findByStoreAndSku(store, sku)
@@ -320,5 +323,12 @@ public class ProductVariantServiceImpl implements ProductVariantService {
     private Product require(StoreMerchantId store, Long id) throws ProductNotFoundException {
         return productRepository.findByStoreAndId(store, id)
                 .orElseThrow(() -> ProductNotFoundException.of(id, store));
+    }
+
+    /**
+     * A payload's sku — checked against {@link Sku#FORMAT} by bean validation before the service is called.
+     */
+    private static Sku skuOf(PersistableProductVariant source) {
+        return Sku.of(source.getSku());
     }
 }

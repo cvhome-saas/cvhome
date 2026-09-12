@@ -2,6 +2,7 @@ package com.asrevo.cvhome.checkout.errors;
 
 import java.io.Serial;
 
+import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.errors.ErrorBuilder;
 import com.asrevo.cvhome.errors.ErrorPayload;
 import com.asrevo.cvhome.errors.OperationNotAllowedException;
@@ -19,10 +20,10 @@ public class CartQuantityOutOfRangeException extends OperationNotAllowedExceptio
         super(payload, cause);
     }
 
-    public static CartQuantityOutOfRangeException of(String sku, int quantity, int minimum, int maximum) {
+    public static CartQuantityOutOfRangeException of(Sku sku, int quantity, int minimum, int maximum) {
         return new ErrorBuilder<>(CheckoutErrors.CART_QUANTITY_OUT_OF_RANGE, CartQuantityOutOfRangeException::new)
                 .detail("Quantity %d of %s is outside the allowed range %d..%d.", quantity, sku, minimum, maximum)
-                .param("sku", sku)
+                .param("sku", sku.value())
                 .param("quantity", quantity)
                 .param("minimum", minimum)
                 .param("maximum", maximum)

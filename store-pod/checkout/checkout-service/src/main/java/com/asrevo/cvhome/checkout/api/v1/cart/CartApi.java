@@ -26,6 +26,7 @@ import com.asrevo.cvhome.checkout.model.cart.PersistableCartItem;
 import com.asrevo.cvhome.checkout.model.cart.ReadableCart;
 import com.asrevo.cvhome.checkout.services.cart.CartService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
+import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 
 import io.swagger.v3.oas.annotations.Parameter;
@@ -79,7 +80,7 @@ public class CartApi {
      */
     @DeleteMapping("/cart/{code}/product/{sku}")
     @Parameter(name = "store", schema = @Schema(type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
-    public ResponseEntity<ReadableCart> removeLine(@PathVariable String code, @PathVariable String sku,
+    public ResponseEntity<ReadableCart> removeLine(@PathVariable String code, @PathVariable Sku sku,
                                                    @RequestParam(defaultValue = "false") boolean body,
                                                    StoreMerchantId merchantStore, LanguageCode language)
             throws CartNotFoundException, CartAlreadyConvertedException {

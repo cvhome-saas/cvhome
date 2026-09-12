@@ -30,6 +30,8 @@ public final class OrderSpecifications {
 
     private static final String LAST_NAME = "lastName";
 
+    private static final String EMAIL = "email";
+
     private OrderSpecifications() {
     }
 
@@ -67,7 +69,7 @@ public final class OrderSpecifications {
             List<Predicate> predicates = new ArrayList<>();
             predicates.add(cb.equal(root.get(STORE), store));
             if (hasText(filter.email())) {
-                predicates.add(contains(cb, root.get("email"), filter.email()));
+                predicates.add(contains(cb, root.get(EMAIL), filter.email()));
             }
             if (hasText(filter.firstName())) {
                 predicates.add(contains(cb, root.get(FIRST_NAME), filter.firstName()));
@@ -80,7 +82,9 @@ public final class OrderSpecifications {
                         filter.country().toUpperCase(Locale.ROOT)));
             }
             if (hasText(filter.name())) {
-                predicates.add(nameMatches(cb, root, filter.name()));
+                // The console's one search box: a first name, a last name or an email. Its order page opens a
+                // customer's profile by searching the email, so a term that skips the email opens a list of none.
+                predicates.add(cb.or(nameMatches(cb, root, filter.name()), contains(cb, root.get(EMAIL), filter.name())));
             }
             return cb.and(predicates.toArray(Predicate[]::new));
         };

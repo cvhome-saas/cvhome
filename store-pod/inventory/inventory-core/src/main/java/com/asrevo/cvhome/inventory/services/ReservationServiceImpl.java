@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.inventory.entity.Inventory;
 import com.asrevo.cvhome.inventory.entity.ProductReservation;
@@ -85,7 +86,7 @@ public class ReservationServiceImpl implements ReservationService {
         return requested.isAfter(cap) ? cap : requested;
     }
 
-    private Inventory take(StoreMerchantId store, String sku, int quantity) throws InsufficientInventoryException {
+    private Inventory take(StoreMerchantId store, Sku sku, int quantity) throws InsufficientInventoryException {
         Inventory inventory = inventoryRepository.lockBySku(store, sku)
                 .orElseThrow(() -> InsufficientInventoryException.notStocked(sku, quantity));
         if (inventory.getQuantity() < quantity) {

@@ -31,6 +31,7 @@ import com.asrevo.cvhome.checkout.services.catalog.ProductSnapshotService;
 import com.asrevo.cvhome.checkout.services.store.StoreSettings;
 import com.asrevo.cvhome.commons.domain.CurrencyCode;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
+import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.store.core.entity.payments.PaymentType;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -60,9 +61,9 @@ class CartServiceImplTest {
 
     private static final CartCode CODE = CartCode.of("cart-1");
 
-    private static final String SKU_A = "SKU-A";
+    private static final Sku SKU_A = Sku.of("SKU-A");
 
-    private static final String SKU_B = "SKU-B";
+    private static final Sku SKU_B = Sku.of("SKU-B");
 
     @Mock
     private CartRepository carts;
@@ -86,19 +87,19 @@ class CartServiceImplTest {
         lenient().when(carts.save(any(Cart.class))).thenAnswer(inv -> inv.getArgument(0));
     }
 
-    static ProductSnapshot snapshot(String sku, String price, boolean purchasable, int min, int max) {
+    static ProductSnapshot snapshot(Sku sku, String price, boolean purchasable, int min, int max) {
         ReadableMinimalProduct product = new ReadableMinimalProduct();
         product.setSku(sku);
         product.setId(3L);
         ProductDescription description = new ProductDescription();
-        description.setName(sku.toLowerCase());
+        description.setName(sku.value().toLowerCase());
         product.setDescription(description);
         return new ProductSnapshot(sku, product, new BigDecimal(price), new BigDecimal(price), false, purchasable, min, max);
     }
 
-    private static PersistableCartItem item(String sku, int quantity) {
+    private static PersistableCartItem item(Sku sku, int quantity) {
         PersistableCartItem item = new PersistableCartItem();
-        item.setProduct(sku);
+        item.setProduct(sku.value());
         item.setQuantity(quantity);
         return item;
     }

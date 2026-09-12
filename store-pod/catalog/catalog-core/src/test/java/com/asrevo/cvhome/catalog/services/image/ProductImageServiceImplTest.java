@@ -18,6 +18,7 @@ import com.asrevo.cvhome.catalog.model.product.PersistableProductImage;
 import com.asrevo.cvhome.catalog.model.product.ReadableImage;
 import com.asrevo.cvhome.catalog.repositories.ProductImageRepository;
 import com.asrevo.cvhome.catalog.repositories.ProductRepository;
+import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.content.api.ExternalMediaService;
 import com.asrevo.cvhome.content.model.MediaOwnerKind;
@@ -40,7 +41,7 @@ class ProductImageServiceImplTest {
 
     private static final StoreMerchantId STORE = new StoreMerchantId("65f023632bc46470c104b76f");
 
-    private static final String SKU = "SKU-1";
+    private static final Sku SKU = Sku.of("SKU-1");
 
     private static final long PRODUCT_ID = 7L;
 
@@ -175,7 +176,7 @@ class ProductImageServiceImplTest {
         assertThat(usage.ownerKind()).isEqualTo(MediaOwnerKind.PRODUCT);
         assertThat(usage.ownerRef()).isEqualTo(String.valueOf(PRODUCT_ID));
         // The label travels with the call so content never has to ask catalog what a product is called.
-        assertThat(usage.ownerTitle()).isEqualTo(SKU);
+        assertThat(usage.ownerTitle()).isEqualTo(SKU.value());
         assertThat(usage.refs()).singleElement()
                 .satisfies(r -> assertThat(r.assetId()).isEqualTo(1L));
     }

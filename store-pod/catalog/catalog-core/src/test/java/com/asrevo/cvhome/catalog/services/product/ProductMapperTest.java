@@ -25,6 +25,7 @@ import com.asrevo.cvhome.catalog.model.product.ReadableProduct;
 import com.asrevo.cvhome.catalog.model.product.ReadableProductDefinition;
 import com.asrevo.cvhome.catalog.services.image.ImageMapper;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
+import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
 import com.asrevo.cvhome.merchant.model.merchant.ReadableMerchantStore;
@@ -55,7 +56,7 @@ class ProductMapperTest {
 
     private static final LanguageCode FR = new LanguageCode("fr");
 
-    private static final String SKU = "SKU-1";
+    private static final Sku SKU = Sku.of("SKU-1");
 
     private static final String NAME = "Running shoe";
 
@@ -273,7 +274,7 @@ class ProductMapperTest {
             ReadableProductDefinition definition = mapper.toDefinition(product, EN);
 
             assertThat(definition.getSku()).isEqualTo(SKU);
-            assertThat(definition.getIdentifier()).isEqualTo(SKU);
+            assertThat(definition.getIdentifier()).isEqualTo(SKU.value());
             assertThat(definition.getDescriptions()).hasSize(2);
             assertThat(definition.getDescription().getName()).isEqualTo(NAME);
             assertThat(definition.getManufacturer().getDescriptions()).hasSize(1);

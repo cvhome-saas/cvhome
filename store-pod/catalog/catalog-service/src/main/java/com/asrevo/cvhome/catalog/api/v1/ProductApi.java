@@ -20,6 +20,7 @@ import com.asrevo.cvhome.catalog.errors.CategoryNotFoundException;
 import com.asrevo.cvhome.catalog.errors.ProductNotFoundException;
 import com.asrevo.cvhome.catalog.model.product.LightPersistableProduct;
 import com.asrevo.cvhome.catalog.services.product.ProductService;
+import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.model.entity.EntityExists;
 
@@ -49,7 +50,8 @@ public class ProductApi {
     @Parameter(name = "store", schema = @Schema(type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
     @PreAuthorize(MANAGE)
     public EntityExists exists(@RequestParam String code, StoreMerchantId merchantStore) {
-        return new EntityExists(productService.exists(merchantStore, code));
+        // A question, not a validation: a string that is not a sku cannot be taken, so the answer is no, not 400.
+        return new EntityExists(code.matches(Sku.FORMAT) && productService.exists(merchantStore, Sku.of(code)));
     }
 
     @PatchMapping("/{id}")

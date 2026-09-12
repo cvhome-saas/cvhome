@@ -17,7 +17,7 @@ by [checkout](../../../checkout/checkout-service/qa/checkout-qa.md).
   product-image APIs; the console's Catalogue module as a client; the billing write gate on catalog writes
 - **Runs on** — `lcl start -d --stack <name>`; read the live port from `lcl urls`. Address it through the
   gateway, never `:8122`
-- **Cases** — 95 (33 verified, 1 unit only, 61 not verified)
+- **Cases** — 96 (35 verified, 1 unit only, 60 not verified)
 - **Also see** — inventory (stock and price), checkout (the composed cart line),
   [content](../../../content/content-service/qa/content-qa.md) (the media library the gallery reads from),
   [billing](../../../../store-core/billing/billing-service/qa/billing-qa.md) (the plan ceiling behind PRD-14/15)
@@ -243,9 +243,10 @@ product form writes the definition here and the price/stock to inventory in a **
 
 ### PRD-05 — Validation is a 400 with fields, never a 500 · high · [not verified]
 
-- **Steps** — `{"descriptions": []}` (no sku); `"sku": "has space"`; `"sku": "x/y"`.
-- **Expect** — 400 ProblemDetail with a `fields` entry for `sku` (`@NotEmpty`, then the `^[a-zA-Z0-9_-]*$`
-  pattern). A body with a description that has no `language` — record what happens; the entity column is
+- **Steps** — `{"descriptions": []}` (no sku); `"sku": "has space"`; `"sku": "x/y"`; a sku of 256 letters.
+- **Expect** — 400 ProblemDetail with a `fields` entry for `sku` (`@NotEmpty`, then `Sku.FORMAT`,
+  `^[A-Za-z0-9_-]{1,255}$` — the one sku rule every pod shares; the 255 cap is the column's width, and a longer
+  sku used to reach the insert). A body with a description that has no `language` — record what happens; the entity column is
   NOT NULL, so today that is a **500** from the database (see [99](#99--known-gaps)).
 
 ### PRD-06 — Duplicate sku in the same store · high · [not verified]
@@ -256,11 +257,27 @@ product form writes the definition here and the price/stock to inventory in a **
   checking: record whether it is a typed 409 or a bare 500 — it is **expected to be a 500 today**
   ([99](#99--known-gaps)). The same sku in org1-store2 must succeed.
 
-### PRD-07 — The sku check · high · [not verified]
+### PRD-07 — The sku check · high · [verified for the taken and the malformed code — the other store not verified]
 
 - **Steps** — `GET /private/product/unique?code=SKU-NK-RUN-001`; then `?code=FREE-001`; then the same two as
-  org1-store2.
-- **Expect** — `{"exists": true}`, `{"exists": false}`, and `false` for both from the other store.
+  org1-store2; then `?code=SKU.DOT` (not a sku).
+- **Expect** — `{"exists": true}`, `{"exists": false}`, and `false` for both from the other store. The malformed
+  code answers `{"exists": false}` with 200, **not** a 400: the console asks while the merchant is typing, and a
+  string that cannot be a sku cannot be taken. `CatalogApisTest` and `ProductApiIntegrationTest` pin both.
+
+### PRD-17 — Checkout's reads by sku refuse a malformed one · high · [verified]
+
+`GET /api/v1/detailed-product?sku=` and `/detailed-products?skus=` are what checkout composes a cart from. The sku
+there is a `Sku`; `ProductApiIntegrationTest.aMalformedSkuIsRefusedByCheckoutsReadsAndIsSimplyNotTakenForTheConsole`.
+
+- **Steps** — `?sku=SKU-NK-RUN-001`; `?sku=SKU.DOT`; `?skus=SKU-NK-RUN-001,SKU.DOT`.
+- **Expect** — 200 with `"sku": "SKU-NK-RUN-001"`, a bare string exactly as before; then **400**
+  `COMMON.MALFORMED_REQUEST` for both of the others. An unknown but well-formed sku is still what it was: a 404
+  `CATALOG.PRODUCT.NOT_FOUND` for the single read, absent from the bulk one.
+- **Result** — 2026-09-12, stack `sku`, through spg: exactly as above. Also through the seller gateway: a product
+  created, its variants replaced with two combinations (`…-RD-M`, `…-BL-L`), their stock bulk-upserted, and both
+  resolved by `/detailed-products` to the product with labels `red/m`, `blue/l`; a variant sku `"a b"` answered 400
+  naming `variants[1].sku`, and another product's sku 409 with `params.sku`. The product was then deleted.
 
 ### PRD-08 — The inline switches (`PATCH`) touch nothing else · critical · [not verified]
 
@@ -891,6 +908,7 @@ Every row was a real defect found while building or verifying the catalog rewrit
 | **Every request 500'd with "Cannot change HTTP Accept-Language header"** | The locale resolver bean looked unused and was removed; the shared request context writes the locale. | Any request at all — SEC-01's sample |
 | **The console's category tree showed codes instead of names** | The private hierarchy passed `nonLanguage`, so neither `description` nor `descriptions` was set. | CAT-02 |
 | **The old catalog listing hid products with no availability row** | Inner joins to `product_availability` in the fetch queries; the count was right only because every seed had one. | LST-01 (`totalElements` 45 with a product created by PRD-01 → 46) |
+| **Only catalog knew what a sku was** | The format lived on two catalog request DTOs, so inventory and checkout took any string; a 256-character sku reached the insert. One `Sku` type holds the rule now. | PRD-05, PRD-17, [inventory-qa.md INV-11](../../../inventory/inventory-service/qa/inventory-qa.md) |
 | **The store id column went blank in the console** | A template reached into the id (`{{ value.id }}`) after it became a bare string. A grep could not have caught it. | SID-06, and console-ui's SW cases |
 
 ---

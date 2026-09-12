@@ -81,7 +81,7 @@ public interface OrderRepository extends JpaRepository<Order, Long>, JpaSpecific
                                              @Param("to") Instant to);
 
     @Query("""
-            select new com.asrevo.cvhome.commons.domain.StatisticEntry(null, l.sku, sum(l.quantity))
+            select new com.asrevo.cvhome.commons.domain.StatisticEntry(null, cast(l.sku as string), sum(l.quantity))
             from OrderLine l join l.order o
             where o.storeMerchantId = :store and o.datePurchased between :from and :to
             group by l.sku

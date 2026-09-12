@@ -26,6 +26,7 @@ import com.asrevo.cvhome.checkout.domain.CartCode;
 import com.asrevo.cvhome.checkout.entity.converter.CartCodeConverter;
 import com.asrevo.cvhome.checkout.model.cart.CartStatus;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
+import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.constants.SchemaConstant;
 import com.asrevo.cvhome.store.core.converter.LanguageCodeConverter;
@@ -103,14 +104,14 @@ public class Cart extends SalesManagerEntity<Long, Cart> implements Auditable {
         this.language = language;
     }
 
-    public Optional<CartLine> line(String sku) {
+    public Optional<CartLine> line(Sku sku) {
         return lines.stream().filter(line -> line.getSku().equals(sku)).findFirst();
     }
 
     /**
      * Sets the line for {@code sku} to exactly {@code quantity}; zero removes it.
      */
-    public void put(String sku, int quantity) {
+    public void put(Sku sku, int quantity) {
         Optional<CartLine> existing = line(sku);
         if (quantity <= 0) {
             existing.ifPresent(lines::remove);
@@ -123,7 +124,7 @@ public class Cart extends SalesManagerEntity<Long, Cart> implements Auditable {
         }
     }
 
-    public void remove(String sku) {
+    public void remove(Sku sku) {
         lines.removeIf(line -> line.getSku().equals(sku));
     }
 

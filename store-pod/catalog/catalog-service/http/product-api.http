@@ -157,6 +157,16 @@ Content-Type: application/json
 ### the s2s bulk read: one call for a whole cart's skus (missing skus are simply absent)
 GET {{LANDING_UI_URL}}/catalog/api/v1/detailed-products?store={{STORE_ID}}&lang={{LANG}}&skus=SKU-NK-RUN-001,SKU-ZR-CL-DRS02-BL-M,NO-SUCH-SKU
 
+### a string that is not a sku — 400 COMMON.MALFORMED_REQUEST, not a 404 (qa PRD-17)
+GET {{LANDING_UI_URL}}/catalog/api/v1/detailed-product?store={{STORE_ID}}&lang={{LANG}}&sku=SKU.DOT
+
+> {%
+    client.test("a malformed sku is refused at the edge", function () {
+        client.assert(response.status === 400, "status " + response.status);
+        client.assert(response.body.code === "COMMON.MALFORMED_REQUEST", "code " + response.body.code);
+    });
+%}
+
 ### a combination sku resolves to its parent product, with the option/value label block
 GET {{LANDING_UI_URL}}/catalog/api/v1/detailed-product?store={{STORE_ID}}&lang={{LANG}}&sku=SKU-ZR-CL-DRS02-BL-M
 

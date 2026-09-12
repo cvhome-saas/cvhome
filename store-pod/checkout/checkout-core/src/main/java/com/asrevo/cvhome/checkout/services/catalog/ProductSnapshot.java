@@ -4,12 +4,13 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import com.asrevo.cvhome.catalog.model.product.ReadableMinimalProduct;
+import com.asrevo.cvhome.commons.domain.Sku;
 
 /**
  * One sku as the catalog and inventory describe it right now: the catalog's product (name, image, variant labels)
  * merged with inventory's price and purchasability.
  */
-public record ProductSnapshot(String sku, ReadableMinimalProduct product, BigDecimal finalPrice, BigDecimal originalPrice,
+public record ProductSnapshot(Sku sku, ReadableMinimalProduct product, BigDecimal finalPrice, BigDecimal originalPrice,
                               boolean discounted, boolean canBePurchased, int quantityOrderMinimum,
                               int quantityOrderMaximum) {
 
@@ -18,7 +19,7 @@ public record ProductSnapshot(String sku, ReadableMinimalProduct product, BigDec
     }
 
     public String name() {
-        return product.getDescription() == null || product.getDescription().getName() == null ? sku
+        return product.getDescription() == null || product.getDescription().getName() == null ? sku.value()
                 : product.getDescription().getName();
     }
 

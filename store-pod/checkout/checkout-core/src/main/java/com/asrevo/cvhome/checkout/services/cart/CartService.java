@@ -9,6 +9,7 @@ import com.asrevo.cvhome.checkout.errors.ProductNotPurchasableException;
 import com.asrevo.cvhome.checkout.model.cart.PersistableCartItem;
 import com.asrevo.cvhome.checkout.model.cart.ReadableCart;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
+import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 
 /**
@@ -26,6 +27,6 @@ public interface CartService {
 
     ReadableCart get(StoreMerchantId store, LanguageCode language, CartCode code) throws CartNotFoundException;
 
-    ReadableCart removeLine(StoreMerchantId store, LanguageCode language, CartCode code, String sku)
+    ReadableCart removeLine(StoreMerchantId store, LanguageCode language, CartCode code, Sku sku)
             throws CartNotFoundException, CartAlreadyConvertedException;
 }

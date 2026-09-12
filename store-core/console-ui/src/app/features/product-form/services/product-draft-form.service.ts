@@ -8,7 +8,7 @@ import {
   type FormGroup,
 } from '@angular/forms';
 
-import type {ProductDraft} from '@models/products';
+import {SKU_PATTERN, type ProductDraft} from '@models/products';
 import {
   HIGHLIGHTS_MAX,
   KEYWORDS_MAX,
@@ -58,15 +58,6 @@ export type ProductForm = FormGroup<{
 }>;
 
 /**
- * What a SKU may be.
- *
- * Letters, digits, hyphen, underscore and dot. The pod accepts anything a `String` holds, but a SKU
- * is a URL segment on `…/product/unique?code=` and an identifier in every export, and one with a
- * space or a slash in it is a support ticket waiting to happen.
- */
-export const SKU_PATTERN = /^[A-Za-z0-9._-]+$/;
-
-/**
  * The product form.
  *
  * Follows `store-settings-form.service.ts`: the service builds and patches, the facade owns the
@@ -91,6 +82,10 @@ export class ProductDraftFormService {
       /*
        * 255, matching `product.sku`. It was 100 — a limit this console invented, stricter than the
        * column and therefore refusing SKUs the platform would have accepted.
+       *
+       * The pattern is the server's as well: `SKU_PATTERN` is `Sku.FORMAT`, which catalog, inventory
+       * and checkout all enforce. The one this form had allowed a dot, so a dotted SKU passed here and
+       * came back from the save as a 400.
        *
        * The uniqueness check is an async validator rather than the hand-rolled `Subject` this used
        * to drive, so it reaches the operator through `app-field-error` like every other failure and
@@ -172,6 +167,9 @@ export class ProductDraftFormService {
    * product's own SKU and the server truthfully answers "yes, that exists". `disable()` nulls the
    * errors present at the time and cannot null one still in flight, so every saved product carried
    * a duplicate-SKU warning about itself.
+   *
+   * `when` keeps a SKU the server would refuse from being asked about: it cannot be taken, and the
+   * field already says what is wrong with it.
    */
   private uniqueSku(): AsyncValidatorFn {
     return uniqueAsync((sku) => this.api.skuTaken(sku), 'skuTaken', {

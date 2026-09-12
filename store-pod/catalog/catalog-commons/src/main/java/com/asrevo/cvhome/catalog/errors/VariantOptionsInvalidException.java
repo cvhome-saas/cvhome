@@ -2,6 +2,7 @@ package com.asrevo.cvhome.catalog.errors;
 
 import java.io.Serial;
 
+import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.errors.ErrorBuilder;
 import com.asrevo.cvhome.errors.ErrorPayload;
 import com.asrevo.cvhome.errors.ValidationException;
@@ -19,10 +20,10 @@ public class VariantOptionsInvalidException extends ValidationException {
         super(payload, cause);
     }
 
-    public static VariantOptionsInvalidException of(Object sku, String reason) {
+    public static VariantOptionsInvalidException of(Sku sku, String reason) {
         return new ErrorBuilder<>(CatalogErrors.PRODUCT_VARIANT_OPTIONS_INVALID, VariantOptionsInvalidException::new)
                 .detail("Variant %s does not fit the declared options: %s", sku, reason)
-                .param("sku", sku)
+                .param("sku", sku == null ? null : sku.value())
                 .param("reason", reason)
                 .build();
     }

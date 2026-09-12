@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.inventory.model.PersistableInventory;
 import com.asrevo.cvhome.inventory.model.PersistableInventoryBatch;
@@ -67,7 +68,7 @@ public class InventoryApi {
     @PutMapping("/{sku}")
     @Parameter(name = "store", schema = @Schema(type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.INVENTORY.*')")
-    public SkuInventory upsert(@PathVariable String sku, @Valid @RequestBody PersistableInventory inventory,
+    public SkuInventory upsert(@PathVariable Sku sku, @Valid @RequestBody PersistableInventory inventory,
                                StoreMerchantId merchantStore) {
         return inventoryService.upsert(merchantStore, sku, inventory);
     }
@@ -82,7 +83,7 @@ public class InventoryApi {
     @DeleteMapping("/{sku}")
     @Parameter(name = "store", schema = @Schema(type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.INVENTORY.*')")
-    public void deleteBySku(@PathVariable String sku, StoreMerchantId merchantStore) {
+    public void deleteBySku(@PathVariable Sku sku, StoreMerchantId merchantStore) {
         inventoryService.deleteBySku(merchantStore, sku);
     }
 }

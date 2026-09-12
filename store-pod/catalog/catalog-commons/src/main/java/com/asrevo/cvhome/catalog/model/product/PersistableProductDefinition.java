@@ -10,6 +10,7 @@ import jakarta.validation.constraints.Pattern;
 
 import com.asrevo.cvhome.catalog.model.category.CategoryReference;
 import com.asrevo.cvhome.commons.domain.Entity;
+import com.asrevo.cvhome.commons.domain.Sku;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -26,7 +27,7 @@ public class PersistableProductDefinition extends Entity {
     private static final long serialVersionUID = 1L;
 
     @NotEmpty
-    @Pattern(regexp = "^[a-zA-Z0-9_-]*$")
+    @Pattern(regexp = Sku.FORMAT)
     private String sku;
 
     private boolean visible = true;

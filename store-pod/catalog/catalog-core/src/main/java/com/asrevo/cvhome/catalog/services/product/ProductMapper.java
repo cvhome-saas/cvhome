@@ -68,7 +68,7 @@ public class ProductMapper {
         definition.setId(product.getId());
         product.defaultVariant().ifPresent(variant -> {
             definition.setSku(variant.getSku());
-            definition.setIdentifier(variant.getSku());
+            definition.setIdentifier(variant.getSku().value());
         });
         definition.setVisible(product.isAvailable());
         definition.setShipeable(product.isProductShipeable());

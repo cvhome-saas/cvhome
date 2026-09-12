@@ -38,6 +38,7 @@ import com.asrevo.cvhome.checkout.services.store.StoreSettings;
 import com.asrevo.cvhome.commons.domain.CountryIsoCode;
 import com.asrevo.cvhome.commons.domain.CurrencyCode;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
+import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.customer.model.customer.PersistableCustomer;
 import com.asrevo.cvhome.customer.model.customer.address.CustomerAddress;
 import com.asrevo.cvhome.store.core.entity.order.orderstatus.OrderStatus;
@@ -119,7 +120,7 @@ class OrderPlacementTransactionTest {
         return request;
     }
 
-    static ProductSnapshot snapshot(String sku, String price, boolean purchasable, int min, int max) {
+    static ProductSnapshot snapshot(Sku sku, String price, boolean purchasable, int min, int max) {
         ReadableMinimalProduct product = new ReadableMinimalProduct();
         product.setId(1L);
         product.setSku(sku);

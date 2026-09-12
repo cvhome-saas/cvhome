@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.asrevo.cvhome.commons.domain.Entity;
+import com.asrevo.cvhome.commons.domain.Sku;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -24,7 +25,7 @@ public class ReadableMinimalProduct extends Entity {
     /**
      * The default variant's sku — or, on a sku-addressed read, the sku that was asked for.
      */
-    private String sku;
+    private Sku sku;
 
     /**
      * How many variants the product owns (always at least 1). {@code > 1} is what a card derives "has options"

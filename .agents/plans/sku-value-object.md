@@ -1,0 +1,273 @@
+# `Sku` value object
+
+## Context
+
+The sku is the key three pods share — catalog owns it (`product_variant`), inventory keys stock and price by it,
+checkout keys carts and orders by it — and everywhere it is a raw `String`:
+
+| Where | Field |
+|---|---|
+| catalog | `ProductVariant.sku` (`catalog-core/.../entity/ProductVariant.java:91`) |
+| inventory | `Inventory.sku` (`Inventory.java:68`), `ProductReservationLine.sku` (`ProductReservationLine.java:51`) |
+| checkout | `CartLine.sku` (`CartLine.java:56`), `OrderLine.sku` (`OrderLine.java:55`), `Order.addLine(String sku, …)` |
+| s2s contracts | `ReadableMinimalProduct.sku`, `ExternalProductService.getDetailedProduct(s)`, `SkuInventory.sku`, `AvailabilityQuery.skus`, `ExternalInventoryService.getBySkus`, `ReserveProductEntry.sku` |
+
+No `Sku` exists in `store-commons/commons/.../domain/`, so the review rule *"a raw `String` where a
+`commons/domain/` value object exists"* never had anything to fire on.
+
+It is not only a typing gap. **The sku's format rule lives in one service.** Catalog's request DTOs carry
+`@Pattern(regexp = "^[a-zA-Z0-9_-]*$")` (`PersistableProductDefinition.java:29`,
+`PersistableProductVariant.java:28`); nothing else checks it:
+
+- `InventoryApi.upsert(@PathVariable String sku, …)` and `deleteBySku` — any string.
+- `PersistableSkuInventory(@NotEmpty String sku, …)` (the bulk upsert) — any non-empty string.
+- `CartApi.removeLine(@PathVariable String sku)`, `PersistableCartItem.product` — any string.
+
+So inventory will stock `"abc def"` or `"ABC "`, a sku catalog can never create and checkout will never find.
+
+## Why the design is what it is
+
+1. **Home: `store-commons/commons/.../domain/Sku.java`.** Three pods and two of the pod-shared libraries use it.
+   `CartCode` sits in `checkout-commons` because only checkout ever sees one; the sku is the opposite case.
+2. **The invariant is in the constructor: `^[A-Za-z0-9_-]{1,255}$`.** That is catalog's existing rule, bounded
+   by the column: all five sku columns are `varchar(255)`. `Sku.FORMAT` is a public constant, so the request DTOs'
+   `@Pattern` annotations reference it and the rule exists once.
+3. **Case-preserving, never trimmed.** The unique keys (`uk_product_variant_sku (store_merchant_id, sku)`,
+   `UK_CART_LINE_SKU`, inventory's `(store, sku)`) compare exactly; normalising would orphan existing rows.
+4. **Strict on read as well.** The JPA converter and the JSON creator both go through the constructor, so a row or
+   payload that breaks the rule fails loudly instead of being carried along. This is safe for existing data:
+   - every sku pattern catalog has ever had (`^[a-zA-Z0-9_]*$`, then `^[a-zA-Z0-9_-]*$`, per `git log -G`) is a
+     subset of the new rule, combined with `@NotEmpty`;
+   - all 590 skus in the seed SQL conform (scanned every `INSERT … sku …` in the repo);
+   - console-ui rewrites a variant sku to `[A-Za-z0-9_-]` before sending it (`product-form.facade.ts:668`), and
+     load-testing generates `K6-SKU-…` / `K6-EDIT-…`.
+
+   The one path that could have written a non-conforming row is inventory's unvalidated API. See *Deploy note*.
+5. **The wire stays a bare string** — `@JsonValue` on the accessor and its own `Reader` deserializer, the way
+   `StoreMerchantId` does it. landing-ui, console-ui, k6 and the `.http` files see no change.
+   - `toString()` returns the value, because an `@HttpExchange` client formats a `List<Sku>` query param through
+     the conversion service's `toString()`.
+   - Spring MVC binds `@PathVariable Sku` / `@RequestParam List<Sku>` through the `String` constructor. A bad value
+     is a `MethodArgumentTypeMismatchException`, which `GlobalErrorHandler.handleExceptionInternal` already renders
+     as 400 `MALFORMED_REQUEST` — no new advice.
+6. **Request bodies (`Persistable*`) keep a `String`, validated with `@Pattern(regexp = Sku.FORMAT)`.** Bean
+   validation answers 400 `VALIDATION_FAILED` with `fieldErrors[sku]`; a failure inside a Jackson creator can only
+   be a field-less `MALFORMED_REQUEST`. No request DTO in the repo carries a value object today, so this also
+   matches the neighbours. The service converts with `Sku.of(...)` after validation has passed.
+7. **Search input stays a `String`.** `ProductFilter.sku`, `ProductSpecifications.skuLike` and the suggestion's
+   `equalsIgnoreCase(query)` compare a partial, case-insensitive search term against skus. They are not skus.
+8. **Error factories take `Sku` and put `sku.value()` in their params** (`InsufficientInventoryException.of`,
+   `ProductNotPurchasableException.of`, `CartQuantityOutOfRangeException.of`, `DuplicateVariantSkuException.of`,
+   `VariantOptionsInvalidException.of`). The ProblemDetail params stay strings, so the client-side decoders
+   (`InventoryApiErrors`, `CheckoutErrors` …) do not change.
+9. **No DDL change, no event change.** The columns stay `varchar(255)`; no outbox event carries a sku.
+
+**Non-goals:** the unmapped Shopizer `ref_sku` column; renaming `PersistableCartItem.product` on the wire.
+
+## Phase 1 — the type (commit 1)
+
+- `store-commons/commons/src/main/java/com/asrevo/cvhome/commons/domain/Sku.java` — record, `FORMAT`,
+  `of(String)`, `@JsonValue value()`, a `Reader` deserializer, `toString()`.
+- `store-pod/commons/store-commons/.../store/core/converter/SkuConverter.java`, beside `CurrencyCodeConverter`.
+- Tests: `SkuTest` (the accepted/rejected table, bare-string JSON both ways, a malformed JSON value rejected,
+  `toString`), `SkuConverterTest` (round trip, null both ways).
+- Skill `references/api-conventions.md`: add `Sku` to the value-object list.
+
+Nothing uses the type yet.
+
+## Phase 2 — inventory (commit 2)
+
+- Entities `Inventory.sku`, `ProductReservationLine.sku` → `Sku` with `@Convert(converter = SkuConverter.class)`.
+- `InventoryRepository` (`findBySkus`, `findBySku`, `lockBySku`), `InventoryService(Impl)`,
+  `ReservationService(Impl)`, `SkuInventoryMapper`, `ProductReservation.holds`.
+- Contracts: `SkuInventory.sku`, `AvailabilityQuery.skus`, `ExternalInventoryService.getBySkus(List<Sku>)`,
+  `ReserveProductEntry.sku` (`store-pod/commons/store-commons`), `InsufficientInventoryException.of/notStocked`.
+- Edge — **the fix**: `InventoryApi` binds `@PathVariable Sku` (PUT and DELETE), `ExternalInventoryApi` binds
+  `List<Sku>`, `PersistableSkuInventory.sku` gains `@Pattern(regexp = Sku.FORMAT)`.
+- Checkout's two call sites into inventory (`ProductSnapshotServiceImpl`, `OrderStepRunner`) get the smallest
+  bridge that compiles; phase 4 removes it.
+- Tests: fixtures follow the type; integration cases for `PUT /private/inventory/{bad}` → 400 and a bulk upsert
+  with a malformed sku → 400 `VALIDATION_FAILED`.
+- QA: `inventory-service/qa/inventory-qa.md`.
+
+## Phase 3 — catalog (commit 3)
+
+- `ProductVariant.sku` + `@Convert`; `ProductVariantRepository` (`findByStoreAndSku`, `findByStoreAndSkuIn`,
+  `existsByStoreMerchantIdAndSku`); `ProductService(Impl)` (`getBySku`, `getBySkus`, `exists`,
+  `renameDefaultVariant`), `ProductVariantServiceImpl`, `ProductMapper`, `ProductVariantMapper`,
+  `ProductImageServiceImpl`, `ProductSearchServiceImpl`.
+- Contracts: `ReadableMinimalProduct.sku`, `ReadableProductDefinition.sku`, `ReadableProductVariant.sku`,
+  `ReadableVariantSelection.sku`, `ReadableProductSuggestion.sku` / `matchedVariantSku`,
+  `ExternalProductService.getDetailedProduct(Sku)` / `getDetailedProducts(List<Sku>)`,
+  `DuplicateVariantSkuException.of`, `VariantOptionsInvalidException.of`.
+- Request DTOs: `@Pattern(regexp = Sku.FORMAT)` replaces the two literals.
+- `ExternalProductApi` binds `Sku` / `List<Sku>`. Checkout's snapshot call bridged, removed in phase 4.
+- QA: `catalog-service/qa/catalog-qa.md`.
+
+## Phase 4 — checkout (commit 4)
+
+- `CartLine.sku`, `OrderLine.sku` + `@Convert`; `Cart.line/put/remove(Sku)`, `Order.addLine(Sku, …)`.
+- `CartService.removeLine(…, Sku)`, `CartServiceImpl`, `ProductSnapshot.sku`,
+  `ProductSnapshotService.snapshot(…, Collection<Sku>) → Map<Sku, ProductSnapshot>`, `OrderPlacementTransaction`,
+  `OrderStepRunner`, `CartMapper`, `OrderMapper`, `ReadableOrderProduct.sku`.
+- Errors: `ProductNotPurchasableException.of(Sku)`, `CartQuantityOutOfRangeException.of(Sku, …)`.
+- Edge: `CartApi.removeLine(@PathVariable Sku)`; `PersistableCartItem.product` gains
+  `@Pattern(regexp = Sku.FORMAT)`, so a malformed sku on cart add is a 400 rather than reaching `Sku.of`.
+- The bridges from phases 2–3 go away.
+- QA: `checkout-service/qa/checkout-qa.md`.
+
+## Phase 5 — checkout: an order's "View profile" finds its customer (commit 6)
+
+Found during this branch's QA and added to the same PR at the owner's request; it is not a sku change.
+
+The console's customer search is one box, sent to `GET /private/customers` as `name`
+(`customers.api.service.ts` `toCustomerQuery`, whose comment states the contract: `name` "spans the billing first
+name, the billing last name and the email address"). The order page's **View profile** has no customer-by-id
+endpoint to link to, so it searches the order's email with that box (`order-details.ts` `viewProfile`). The checkout
+rewrite's `OrderSpecifications.customers` matched `name` against the first and last name only, so every profile
+opened from an order listed 0 customers, and the search box never found anyone by email.
+
+- `OrderSpecifications.customers`: `name` matches first name, last name **or** email. The fix is in the shared
+  specification, at the root; the console already sends what it documents.
+- Test: `CustomerApiIntegrationTest.theConsolesOneSearchTermFindsACustomerByEmailAsWellAsByName` (by email, by name,
+  and not from another store).
+- QA: `checkout-qa.md` CUS-06.
+
+## Phase 6 — console-ui: one sku rule, the server's (commit 10)
+
+Found in review: the console kept three copies of the rule, and one disagreed with the server. The product form's
+`SKU_PATTERN` (`/^[A-Za-z0-9._-]+$/`, `product-draft-form.service.ts`) allowed a dot, so a dotted product sku passed
+the form, was looked up on `/unique`, and failed the save with a 400. The variant matrix had `VARIANT_SKU_PATTERN`
+(`models/products.ts`) and a literal in `variants-step.ts`: no dot, but no 255 bound either.
+
+- `models/products.ts`: one `SKU_PATTERN = /^[A-Za-z0-9_-]+$/`, documented as `Sku.FORMAT`, replaces
+  `VARIANT_SKU_PATTERN`; the length stays `SKU_MAX` through the product form's `maxLength`. `isSku()` is the pattern
+  within `SKU_MAX`, for matrix rows, which have no control to carry `maxLength`.
+- `product-draft-form.service.ts` imports it; its dotted constant is gone, and the uniqueness check still skips a
+  value that fails it. `variants-step.ts` `skuInvalid()` and `ProductFormFacade.saveVariants` use `isSku`.
+- `baseVariantSku()` no longer rewrites a dot to a hyphen. The matrix opens only on a saved product, whose sku is
+  disabled and already the server's. Point 4 above cites that rewrite; the guard that mattered was always
+  `saveVariants`' refusal, which stays.
+- i18n: `productForm.essentials.skuInvalid` no longer lists dots, in `en` and `ar`.
+- Tests: `product-form.spec.ts`, four new.
+- QA: `console-ui-qa.md` CAT-12.
+
+## Other repos
+
+From the orchestrator's cross-repo review:
+
+- **`load-testing`** — `stack/docker-compose.yml` pinned the same `minio/minio:RELEASE.2025-09-07T16-13-09Z-cpuv1`,
+  which Docker Hub no longer serves (an anonymous manifest fetch answers 401). It moves to `quay.io/minio/minio:` with
+  the same tag (index digest `sha256:13582eff…d883`, identical). Branch `refactor/sku-value-object` in
+  cvhome-saas/load-testing.
+- **`orchestrator`** — the MinIO/Postgres image and the sku format become contract rows, each with a
+  `contract-check.py` check, so a future drift is caught nightly. Branch `refactor/sku-value-object` in
+  cvhome-saas/orchestrator.
+- **`assets`** — `fast-run/docker-compose.yml` uses `bitnami/minio:2025.4.22`, now 404 on Docker Hub. The whole
+  fast-run still describes the 1.0.x layout, so it is recorded as known drift in the orchestrator, not patched.
+- **No change** in cvhome-platform, lcl, e2e-testing, public-dkr, the image repos or the docs site: the wire format,
+  ports, env, routes and DDL are unchanged, and load-testing's k6 skus (`K6-SKU-0001`, `K6-EDIT-<vu>-<iter>-<rand>`,
+  the 11 seed skus) all conform.
+
+## Deploy note
+
+Before this reaches an environment holding real data, each of these must return 0. A non-conforming row would fail
+to load with `IllegalArgumentException` from `SkuConverter` rather than be misread:
+
+```sql
+select 'catalog.product_variant', count(*) from catalog.product_variant where sku !~ '^[A-Za-z0-9_-]{1,255}$'
+union all select 'inventory.product_availability', count(*) from inventory.product_availability where sku !~ '^[A-Za-z0-9_-]{1,255}$'
+union all select 'inventory.product_reservation_line', count(*) from inventory.product_reservation_line where sku !~ '^[A-Za-z0-9_-]{1,255}$'
+union all select 'checkout.cart_line', count(*) from checkout.cart_line where sku !~ '^[A-Za-z0-9_-]{1,255}$'
+union all select 'checkout.sales_order_line', count(*) from checkout.sales_order_line where sku !~ '^[A-Za-z0-9_-]{1,255}$';
+```
+
+## Deviations, as built
+
+- **`Sku` implements `Comparable` (phase 2, not 1).** `ReservationServiceImpl` locks inventory rows in sku order so
+  two overlapping reservations cannot deadlock; `compareTo` is the string's, so that order is unchanged.
+  `SkuTest.skusSortAsTheirStringsSoInventoryKeepsItsLockOrder` pins it.
+- **The phase-2 checkout bridge skips a string that is not a sku** rather than calling `Sku.of` on it. Until
+  phase 4 validates `PersistableCartItem.product`, a cart line can hold whatever a shopper posted, and a strict
+  bridge would turn that into a 500 on the cart. Phase 4 deletes the bridge.
+- **`store-pod/commons/store-commons` got its first tests** (`SkuConverterTest`), and with them
+  `testImplementation` copies of its compileOnly JPA and Jackson APIs.
+- **`GET /private/product/unique?code=` keeps a `String`** (phase 3). It is the console's "is this sku taken?",
+  asked while the merchant types; a string that cannot be a sku cannot be taken, so it answers `false` rather than
+  400. Every other catalog sku edge binds a `Sku`.
+- **`Sku` reads JSON through its own `Reader`, not a delegating `@JsonCreator` (commit 8).** The creator's
+  `JsonCreator.Mode` enum is compiled into every class that reads `Sku`, and the 22 modules without Jackson's
+  annotations on their classpath warned `class file for JsonCreator$Mode not found` on every CI build. The reader is
+  `StoreMerchantId.Reader`'s pattern. It turns a bad value into Jackson's own format error (`weirdStringException`),
+  so a malformed sku inside a body is still a 400; `SkuTest` pins that, a number, and an explicit null.
+- **CI's storage tests could no longer start (commit 7), which is unrelated to skus.** Docker Hub stopped serving
+  `minio/minio` ("pull access denied … repository does not exist"), so every `@StorageIntegrationTest` failed on a
+  fresh runner — catalog, content, merchant and payment on this PR's first run. The registry's answer does not
+  depend on the branch, so `main`'s next run fails the same way. `MinioTestConfiguration` and
+  `docker-compose-lcl.yml` now pull the same release from `quay.io/minio/minio`; the index digest is identical
+  (`sha256:13582eff…d883`). `MinIOContainer` checks the name against `minio/minio`, so the test config declares the
+  quay.io name a compatible substitute. The other repos' references to `minio/minio` are the orchestrator's to sweep.
+- **A flaky gateway unit test, fixed at its cause (commit 9); unrelated to skus.** The second CI run failed
+  `GatewaySessionMetricsTest.countsTheSessionsInTheInMemoryStore`, which this branch does not touch: Micrometer
+  holds a gauge's state object weakly by default, and in the test nothing else refers to the binder. A collection
+  between two reads made the gauge read NaN. Reproduced by forcing `System.gc()` there (`expected: 1.0 but was: NaN`);
+  `GatewaySessionMetrics` now registers the gauge with `strongReference(true)`, and a regression test forces the
+  collection and fails without it.
+- **The phase-3 checkout bridge replaced the phase-2 one** rather than stacking on it: the snapshot filters the cart's
+  strings to well-formed skus once and asks catalog and inventory with the same `List<Sku>`, which keeps
+  `snapshot()` inside checkstyle's complexity limit.
+
+## Verification
+
+Per phase, before its commit:
+
+| Phase | Unit (`test`) | Integration (`integrationTest`, Testcontainers) | Checkstyle |
+|---|---|---|---|
+| 1 — type | `SkuTest` 25, `SkuConverterTest` 3 | — | clean |
+| 2 — inventory | inventory-core 47, inventory-service 27, checkout-core 188 | inventory-service 33 (3 new), checkout-service 77 | clean |
+| 3 — catalog | catalog-core 246, catalog-service 69 (1 new), checkout-core 188 | catalog-service 80 (1 new), checkout-service 77 | clean |
+| 4 — checkout | checkout-commons, checkout-core 188, checkout-service 26 | checkout-service 78 (1 new) | clean |
+| 5 — customer search | checkout-core 188 | checkout-service 79 (1 new) | clean |
+| 6 — console-ui sku rule | console-ui 719 (Karma; `product-form.spec.ts` 32, 4 new) | — | `npm run lint` clean |
+
+What the integration suites prove beyond compiling: the converter binds in JPQL (`findBySkus`, `lockBySku` under
+`PESSIMISTIC_WRITE`, `findByStoreAndSkuIn`) and inside `lower(...)` for the listing's sku filter; the per-sku
+statistics query's `cast(l.sku as string)`; path and query binding to `Sku` with a malformed value as 400; the
+`@HttpExchange` client writing `List<Sku>` as plain query values (`ReservationClientContractIntegrationTest`); and
+every existing JSON assertion reading `sku` back as a string.
+
+Live, 2026-09-12, `lcl start -d --stack sku` from this worktree (every service up, default ports):
+
+- **Shopper path through spg (curl):** availability, `detailed-product(s)` and the cart answered `sku` as a bare
+  string. A malformed sku got 400 in every position: path, query and body. A well-formed unknown sku kept its old
+  answers (catalog 404, cart 422, absent from availability). The listing's sku filter worked. Another store got
+  `CHECKOUT.CART.NOT_FOUND` for a cart and `[]` for availability.
+- **Signed-in COD order in the browser:** order 1001 went `PLACED > RESERVED > PAYMENT_INITIATED > COMMITTED`.
+  `sales_order_line.sku` and `product_reservation_line.sku` were written through `SkuConverter`, and stock went
+  35 → 34. This is the one path the integration suites stub, because checkout's inventory client is a mock there.
+- **Seller path through `gateway.com:8000/spg` (browser session):**
+  - inventory PUT/DELETE by a malformed path → 400; a bulk body with one malformed entry → 400 naming
+    `entries[1].sku`, nothing written; a valid upsert, read and delete worked.
+  - catalog: a product was created and its variants replaced with two combinations, then their stock was
+    bulk-upserted. Checkout's read resolved both skus with labels. A variant sku `"a b"` → 400 naming
+    `variants[1].sku`; another product's sku → 409. `/unique` answered `false` for a malformed code and `true` for
+    a taken one. The throwaway product was then deleted.
+  - checkout: `product-statistic` answered `{"name": "SKU-AD-CL-TPT03", "value": 1}` (the `cast` query).
+- **OpenAPI:** SpringDoc renders `Sku` as `string` in every position (path, query, body field, list), since
+  swagger-core honours `@JsonValue`. No `SwaggerConfig` change was needed.
+
+QA files: `inventory-qa.md` INV-11, `catalog-qa.md` PRD-17 and PRD-07, `checkout-qa.md` CART-06, all `[verified]`.
+
+Phase 5, live on the same stack after `lcl restart checkout --stack sku`: order 1001's **View profile** in the
+console went to `/customers?q=qa-sku@example.com&customer=1`, which listed 1 customer and opened the profile. Before
+the fix the same click listed 0. `checkout-qa.md` CUS-06 is `[verified]`.
+
+Phase 6, live on the same stack (console-ui's `ng serve` rebuilds on save): on `/products/new`, `QA-SKU.phase6` was
+refused in the field with no `/unique` call, and Save draft sent nothing; `QA-SKU_phase6` got one `/unique` call
+and its tick. On product 3's Variants step, `SKU-AD-CL-TPT03.BLUE` was framed red and refused by name with no
+request, then left unsaved. `console-ui-qa.md` CAT-12 is `[verified]`.
+
+Seen during QA, not caused by this change: after a full navigation to `/en/checkout`, the storefront's "Cart
+details" panel showed "Your cart is empty" for several seconds while the header counted one item. The cart in
+`localStorage` was intact, and no cart request is made on that page. The cart manager is a client-side singleton,
+so this is a hydration matter in landing-ui.

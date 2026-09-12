@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Map;
 
 import com.asrevo.cvhome.commons.domain.LanguageCode;
+import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 
 /**
@@ -13,5 +14,5 @@ import com.asrevo.cvhome.commons.domain.StoreMerchantId;
  */
 public interface ProductSnapshotService {
 
-    Map<String, ProductSnapshot> snapshot(StoreMerchantId store, LanguageCode language, Collection<String> skus);
+    Map<Sku, ProductSnapshot> snapshot(StoreMerchantId store, LanguageCode language, Collection<Sku> skus);
 }

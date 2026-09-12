@@ -5,6 +5,9 @@ import java.io.Serializable;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+
+import com.asrevo.cvhome.commons.domain.Sku;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -21,6 +24,7 @@ public class PersistableCartItem implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @NotBlank
+    @Pattern(regexp = Sku.FORMAT)
     private String product;
 
     @Min(0)

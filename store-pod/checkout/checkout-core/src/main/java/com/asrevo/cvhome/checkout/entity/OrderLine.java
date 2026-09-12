@@ -7,6 +7,7 @@ import java.util.List;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -19,7 +20,9 @@ import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import jakarta.persistence.TableGenerator;
 
+import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.store.core.constants.SchemaConstant;
+import com.asrevo.cvhome.store.core.converter.SkuConverter;
 import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
 
 import lombok.Getter;
@@ -52,7 +55,8 @@ public class OrderLine extends SalesManagerEntity<Long, OrderLine> {
     private Order order;
 
     @Column(name = "SKU", nullable = false)
-    private String sku;
+    @Convert(converter = SkuConverter.class)
+    private Sku sku;
 
     @Column(name = "PRODUCT_ID")
     private Long productId;
@@ -82,7 +86,7 @@ public class OrderLine extends SalesManagerEntity<Long, OrderLine> {
     public OrderLine() {
     }
 
-    public OrderLine(Order order, String sku, Long productId, String productName, BigDecimal unitPrice,
+    public OrderLine(Order order, Sku sku, Long productId, String productName, BigDecimal unitPrice,
                      int quantity, String imageUrl, int sortOrder) {
         this.order = order;
         this.sku = sku;

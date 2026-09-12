@@ -40,6 +40,7 @@ import com.asrevo.cvhome.checkout.model.order.PendingAction;
 import com.asrevo.cvhome.checkout.model.signal.SignalOutcome;
 import com.asrevo.cvhome.commons.domain.CurrencyCode;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
+import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.constants.SchemaConstant;
 import com.asrevo.cvhome.store.core.converter.CurrencyCodeConverter;
@@ -285,7 +286,7 @@ public class Order extends SalesManagerEntity<Long, Order> implements Auditable 
         return order;
     }
 
-    public OrderLine addLine(String sku, Long productId, String productName, BigDecimal unitPrice, int quantity,
+    public OrderLine addLine(Sku sku, Long productId, String productName, BigDecimal unitPrice, int quantity,
                              String imageUrl) {
         OrderLine line = new OrderLine(this, sku, productId, productName, unitPrice, quantity, imageUrl, lines.size());
         lines.add(line);

@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import com.asrevo.cvhome.catalog.entity.ProductVariant;
+import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 
 public interface ProductVariantRepository extends JpaRepository<ProductVariant, Long> {
@@ -24,7 +25,7 @@ public interface ProductVariantRepository extends JpaRepository<ProductVariant, 
             left join fetch val.option o
             left join fetch o.descriptions
             where v.storeMerchantId = ?1 and v.sku = ?2""")
-    Optional<ProductVariant> findByStoreAndSku(StoreMerchantId store, String sku);
+    Optional<ProductVariant> findByStoreAndSku(StoreMerchantId store, Sku sku);
 
     @Query("""
             select distinct v from ProductVariant v
@@ -34,9 +35,9 @@ public interface ProductVariantRepository extends JpaRepository<ProductVariant, 
             left join fetch val.option o
             left join fetch o.descriptions
             where v.storeMerchantId = ?1 and v.sku in ?2""")
-    List<ProductVariant> findByStoreAndSkuIn(StoreMerchantId store, Collection<String> skus);
+    List<ProductVariant> findByStoreAndSkuIn(StoreMerchantId store, Collection<Sku> skus);
 
-    boolean existsByStoreMerchantIdAndSku(StoreMerchantId store, String sku);
+    boolean existsByStoreMerchantIdAndSku(StoreMerchantId store, Sku sku);
 
     /**
      * One product's variants with combinations and labels loaded — the product page and the console matrix.

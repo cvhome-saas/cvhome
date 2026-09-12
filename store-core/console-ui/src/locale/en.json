@@ -1506,7 +1506,7 @@
       "identifiersSubtitle": "Shared across every language.",
       "sku": "SKU",
       "skuHint": "Your own code for this product. Fixed once the product exists.",
-      "skuInvalid": "Use letters, digits, dots, hyphens and underscores only.",
+      "skuInvalid": "Use letters, digits, hyphens and underscores only.",
       "dateAvailable": "Available from",
       "dateAvailableHint": "Leave it empty to make it available immediately.",
       "sortOrder": "Sort order",

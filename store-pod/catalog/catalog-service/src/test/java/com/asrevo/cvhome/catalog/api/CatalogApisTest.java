@@ -28,11 +28,13 @@ import com.asrevo.cvhome.catalog.services.product.ProductSearchService;
 import com.asrevo.cvhome.catalog.services.product.ProductService;
 import com.asrevo.cvhome.catalog.services.type.ProductTypeService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
+import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -104,7 +106,7 @@ class CatalogApisTest {
         when(productGroupService.exists(STORE, CODE)).thenReturn(true);
         when(productTypeService.exists(STORE, CODE)).thenReturn(true);
         when(productOptionService.exists(STORE, CODE)).thenReturn(true);
-        when(productService.exists(STORE, CODE)).thenReturn(true);
+        when(productService.exists(STORE, Sku.of(CODE))).thenReturn(true);
 
         assertThat(categoryApi.exists(CODE, STORE).isExists()).isTrue();
         assertThat(manufacturerApi.exists(CODE, STORE).isExists()).isFalse();
@@ -112,6 +114,16 @@ class CatalogApisTest {
         assertThat(productTypeApi.exists(CODE, STORE).isExists()).isTrue();
         assertThat(productOptionApi.exists(CODE, STORE).isExists()).isTrue();
         assertThat(productApi.exists(CODE, STORE).isExists()).isTrue();
+    }
+
+    /**
+     * The console asks while the merchant is still typing, so a string that cannot be a sku is simply not taken — a
+     * 400 there would read as an error on a question.
+     */
+    @Test
+    void aStringThatIsNotASkuIsNeverTakenAndNeverReachesTheService() {
+        assertThat(productApi.exists("a code", STORE).isExists()).isFalse();
+        verify(productService, never()).exists(any(), any());
     }
 
     @Test

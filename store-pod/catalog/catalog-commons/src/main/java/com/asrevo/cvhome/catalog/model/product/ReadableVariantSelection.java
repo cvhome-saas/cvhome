@@ -5,6 +5,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.asrevo.cvhome.commons.domain.Sku;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,7 +21,7 @@ public class ReadableVariantSelection implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private String sku;
+    private Sku sku;
 
     private List<ReadableVariantOptionValue> optionValues = new ArrayList<>();
 }

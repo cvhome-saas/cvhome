@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import com.asrevo.cvhome.catalog.model.product.ReadableMinimalProduct;
 import com.asrevo.cvhome.catalog.services.product.ExternalProductService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
+import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.inventory.model.AvailabilityQuery;
 import com.asrevo.cvhome.inventory.model.SkuInventory;
@@ -29,18 +30,18 @@ public class ProductSnapshotServiceImpl implements ProductSnapshotService {
     private final ExternalInventoryService inventory;
 
     @Override
-    public Map<String, ProductSnapshot> snapshot(StoreMerchantId store, LanguageCode language, Collection<String> skus) {
+    public Map<Sku, ProductSnapshot> snapshot(StoreMerchantId store, LanguageCode language, Collection<Sku> skus) {
         if (skus.isEmpty()) {
             return Map.of();
         }
-        List<String> distinct = skus.stream().distinct().toList();
-        Map<String, ReadableMinimalProduct> byProductSku = products.getDetailedProducts(store, distinct, language)
+        List<Sku> distinct = skus.stream().distinct().toList();
+        Map<Sku, ReadableMinimalProduct> byProductSku = products.getDetailedProducts(store, distinct, language)
                 .stream().collect(Collectors.toMap(ReadableMinimalProduct::getSku, Function.identity(), (a, b) -> a));
-        Map<String, SkuInventory> byStockSku = inventory.queryBySkus(store, new AvailabilityQuery(distinct)).stream()
+        Map<Sku, SkuInventory> byStockSku = inventory.queryBySkus(store, new AvailabilityQuery(distinct)).stream()
                 .collect(Collectors.toMap(SkuInventory::sku, Function.identity(), (a, b) -> a));
 
-        Map<String, ProductSnapshot> result = new LinkedHashMap<>();
-        for (String sku : distinct) {
+        Map<Sku, ProductSnapshot> result = new LinkedHashMap<>();
+        for (Sku sku : distinct) {
             ReadableMinimalProduct product = byProductSku.get(sku);
             SkuInventory stock = byStockSku.get(sku);
             if (product == null || stock == null || stock.price() == null) {

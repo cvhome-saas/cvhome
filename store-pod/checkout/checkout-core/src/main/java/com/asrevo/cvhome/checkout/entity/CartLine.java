@@ -3,6 +3,7 @@ package com.asrevo.cvhome.checkout.entity;
 import java.io.Serial;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
@@ -16,7 +17,9 @@ import jakarta.persistence.Table;
 import jakarta.persistence.TableGenerator;
 import jakarta.persistence.UniqueConstraint;
 
+import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.store.core.constants.SchemaConstant;
+import com.asrevo.cvhome.store.core.converter.SkuConverter;
 import com.asrevo.cvhome.store.core.entity.common.audit.AuditListener;
 import com.asrevo.cvhome.store.core.entity.common.audit.AuditSection;
 import com.asrevo.cvhome.store.core.entity.common.audit.Auditable;
@@ -53,7 +56,8 @@ public class CartLine extends SalesManagerEntity<Long, CartLine> implements Audi
     private Cart cart;
 
     @Column(name = "SKU", nullable = false)
-    private String sku;
+    @Convert(converter = SkuConverter.class)
+    private Sku sku;
 
     @Column(name = "QUANTITY", nullable = false)
     private int quantity;
@@ -61,7 +65,7 @@ public class CartLine extends SalesManagerEntity<Long, CartLine> implements Audi
     public CartLine() {
     }
 
-    public CartLine(Cart cart, String sku, int quantity) {
+    public CartLine(Cart cart, Sku sku, int quantity) {
         this.cart = cart;
         this.sku = sku;
         this.quantity = quantity;

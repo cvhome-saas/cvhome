@@ -2,6 +2,7 @@ package com.asrevo.cvhome.catalog.errors;
 
 import java.io.Serial;
 
+import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.errors.DuplicateResourceException;
 import com.asrevo.cvhome.errors.ErrorBuilder;
 import com.asrevo.cvhome.errors.ErrorPayload;
@@ -18,10 +19,10 @@ public class DuplicateVariantSkuException extends DuplicateResourceException {
         super(payload, cause);
     }
 
-    public static DuplicateVariantSkuException of(Object sku, Object store) {
+    public static DuplicateVariantSkuException of(Sku sku, Object store) {
         return new ErrorBuilder<>(CatalogErrors.PRODUCT_VARIANT_DUPLICATE_SKU, DuplicateVariantSkuException::new)
                 .detail("Sku %s is already taken in store %s.", sku, store)
-                .param("sku", sku)
+                .param("sku", sku.value())
                 .param("store", store)
                 .build();
     }

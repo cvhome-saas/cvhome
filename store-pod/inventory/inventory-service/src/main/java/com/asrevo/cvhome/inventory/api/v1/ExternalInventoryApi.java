@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.inventory.model.AvailabilityQuery;
 import com.asrevo.cvhome.inventory.model.SkuInventory;
@@ -40,7 +41,7 @@ public class ExternalInventoryApi implements ExternalInventoryService {
     @Override
     @GetMapping("/availability")
     @Parameter(name = "store", schema = @Schema(type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
-    public List<SkuInventory> getBySkus(StoreMerchantId store, @RequestParam List<String> skus) {
+    public List<SkuInventory> getBySkus(StoreMerchantId store, @RequestParam List<Sku> skus) {
         return inventoryService.getBySkus(store, skus);
     }
 

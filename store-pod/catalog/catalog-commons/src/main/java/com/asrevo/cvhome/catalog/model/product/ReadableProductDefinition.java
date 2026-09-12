@@ -9,6 +9,7 @@ import com.asrevo.cvhome.catalog.model.category.ReadableCategory;
 import com.asrevo.cvhome.catalog.model.manufacturer.ReadableManufacturer;
 import com.asrevo.cvhome.catalog.model.type.ReadableProductType;
 import com.asrevo.cvhome.commons.domain.Entity;
+import com.asrevo.cvhome.commons.domain.Sku;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -24,7 +25,7 @@ public class ReadableProductDefinition extends Entity {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private String sku;
+    private Sku sku;
 
     /**
      * Same value as {@code sku}; kept because the form was built against it.

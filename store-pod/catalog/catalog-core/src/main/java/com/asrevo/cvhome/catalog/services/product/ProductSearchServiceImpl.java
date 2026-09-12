@@ -342,7 +342,7 @@ public class ProductSearchServiceImpl implements ProductSearchService {
         product.defaultVariant().ifPresent(variant -> suggestion.setSku(variant.getSku()));
         // The shopper typed a concrete combination sku: let the storefront deep-link it (?sku=).
         product.getVariants().stream()
-                .filter(variant -> variant.getSku().equalsIgnoreCase(query))
+                .filter(variant -> variant.getSku().value().equalsIgnoreCase(query))
                 .findFirst()
                 .ifPresent(variant -> suggestion.setMatchedVariantSku(variant.getSku()));
         product.description(language).ifPresent(d -> {

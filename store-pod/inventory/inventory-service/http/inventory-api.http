@@ -40,6 +40,25 @@ Content-Type: application/json
   "available": true
 }
 
+### a sku catalog could never create — 400 COMMON.MALFORMED_REQUEST, nothing stocked (qa INV-11)
+PUT {{SELLER_UI_URL}}/spg/inventory/api/v1/private/inventory/SKU.DOT?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{
+  "productId": 46,
+  "quantity": 1,
+  "available": true,
+  "price": { "amount": 1 }
+}
+
+> {%
+    client.test("a malformed sku is refused at the edge", function () {
+        client.assert(response.status === 400, "status " + response.status);
+        client.assert(response.body.code === "COMMON.MALFORMED_REQUEST", "code " + response.body.code);
+    });
+%}
+
 ### public bulk read — stock and price for a set of skus (storefront path, no auth); unknown skus are absent
 GET {{LANDING_UI_URL}}/inventory/api/v1/availability?skus=SKU-YSL-MAKE-TEIPEN46,SKU-UNKNOWN&store={{STORE_ID}}&lang={{LANG}}
 Accept: application/json

@@ -68,7 +68,7 @@ response contains translatable content.
 `String`/`Long`**. There are ~40 of them:
 
 - **Identifiers:** `StoreMerchantId`, `ManagerOrgId`, `PodId`, `IdentityId`, `Identifier`
-- **Codes:** `LanguageCode`, `CurrencyCode`, `CountryIsoCode`, `ZoneCode`
+- **Codes:** `LanguageCode`, `CurrencyCode`, `CountryIsoCode`, `ZoneCode`, `Sku`
 - **Web/domain concepts:** `Email`, `Domain`, `DomainType`, `ManagerStoreDomain`, `SocialLink`, `SocialProvider`
 - **Infrastructure:** `Pod`, `PodEndpoint`, `EndpointType`, `ServiceDomain`, `StorageProviderType`
 - **Presentation/config:** `Theme`, `ColorTheme`, `SliderImage`
@@ -97,7 +97,10 @@ public record LanguageCode(String code) implements Serializable, Comparable<Lang
 `LanguageCode` is the clearest illustration of the payoff: the "all languages" and "no language" sentinels
 (`_all`, `_non`) are **encoded in the type** with `isAllLanguage()` / `isNonLanguage()` helpers, instead of
 magic strings scattered through the codebase. `PodId.shorten()` is another — the 8-char short form used in
-namespaces and route ids lives on the type that owns it.
+namespaces and route ids lives on the type that owns it. `Sku` carries an invariant instead: its constructor is
+the only place the sku format (`Sku.FORMAT`, `^[A-Za-z0-9_-]{1,255}$`) is enforced, so catalog, inventory and
+checkout accept exactly the same skus. A request body keeps a `String` with `@Pattern(regexp = Sku.FORMAT)`, which
+names the field in its 400; the service converts with `Sku.of`.
 
 What this buys, concretely:
 
@@ -114,7 +117,7 @@ What this buys, concretely:
 **Persistence:** JPA `AttributeConverter`s in `store-pod/commons/store-commons`
 (`com.asrevo.cvhome.store.core.converter`) map them to plain columns —
 `LanguageCodeConverter`, `CurrencyCodeConverter`, `CountryIsoCodeConverter`, `ZoneCodeConverter`,
-`LocaleConverter`:
+`LocaleConverter`, `SkuConverter`:
 
 ```java
 @Converter

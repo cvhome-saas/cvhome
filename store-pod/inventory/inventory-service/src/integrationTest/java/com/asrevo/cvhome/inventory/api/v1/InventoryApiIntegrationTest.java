@@ -74,6 +74,16 @@ class InventoryApiIntegrationTest {
 
     private static final String NULL = "null";
 
+    private static final String MALFORMED = "SKU.DOT";
+
+    private static final String CODE = "code";
+
+    private static final String ONE_SKU_QUERY = "{\"skus\":[\"%s\"]}";
+
+    private static final String BULK_OF_TWO = """
+            {"entries":[{"sku":"%s","inventory":%s},
+             {"sku":"%s","inventory":%s}]}""";
+
     private static final String BODY = """
             {"productId":%d,"quantity":%d,"available":%b,"quantityOrderMinimum":%s,"quantityOrderMaximum":%s,
              "price":{"amount":"20.00","specialAmount":%s,"specialStartDate":null,"specialEndDate":null}}""";
@@ -258,9 +268,7 @@ class InventoryApiIntegrationTest {
         String skuEdit = ApiClient.slug("SKU-BULK-EDIT");
         ApiClient.expect(upsert(STORE_A, admin, skuEdit, body(900003L, 1, true, NULL, NULL, NULL)), HttpStatus.OK);
 
-        String bulk = """
-                {"entries":[{"sku":"%s","inventory":%s},
-                 {"sku":"%s","inventory":%s}]}"""
+        String bulk = BULK_OF_TWO
                 .formatted(skuEdit, body(900003L, 9, true, NULL, NULL, NULL),
                         skuNew, body(900003L, 2, true, NULL, NULL, NULL));
         var response = api.send(HttpMethod.PUT, ApiClient.scoped(ApiClient.path(PRIVATE, BULK), STORE_A),
@@ -294,7 +302,7 @@ class InventoryApiIntegrationTest {
         assertThat(result.get(0).get(QUANTITY).asInt()).isEqualTo(25);
 
         var otherStore = api.send(HttpMethod.POST, ApiClient.scoped(AVAILABILITY_QUERY, STORE_B), null,
-                "{\"skus\":[\"%s\"]}".formatted(SEEDED_SKU));
+                ONE_SKU_QUERY.formatted(SEEDED_SKU));
         ApiClient.expect(otherStore, HttpStatus.OK);
         assertThat(ApiClient.json(otherStore)).isEmpty();
     }
@@ -313,5 +321,42 @@ class InventoryApiIntegrationTest {
                 admin, null);
         ApiClient.expect(deleted, HttpStatus.OK);
         assertThat(availability(STORE_A, sku)).isEmpty();
+    }
+
+    /**
+     * Inventory used to take any string as a sku, so it would stock one catalog can never create and checkout would
+     * never ask for. The rule is the sku type's now, at every edge inventory has: a path, a query, a body.
+     */
+    @Test
+    void aMalformedSkuIsRefusedAtEveryEdgeRatherThanStocked() {
+        var put = upsert(STORE_A, admin, MALFORMED, body(900006L, 1, true, NULL, NULL, NULL));
+        ApiClient.expect(put, HttpStatus.BAD_REQUEST);
+        assertThat(ApiClient.json(put).get(CODE).asString()).isEqualTo("COMMON.MALFORMED_REQUEST");
+
+        ApiClient.expect(api.send(HttpMethod.DELETE, ApiClient.scoped(ApiClient.path(PRIVATE, MALFORMED), STORE_A),
+                admin, null), HttpStatus.BAD_REQUEST);
+        ApiClient.expect(api.get(ApiClient.scoped(ApiClient.query(AVAILABILITY, SKUS + MALFORMED), STORE_A), null),
+                HttpStatus.BAD_REQUEST);
+        ApiClient.expect(api.send(HttpMethod.POST, ApiClient.scoped(AVAILABILITY_QUERY, STORE_A), null,
+                ONE_SKU_QUERY.formatted(MALFORMED)), HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * The bulk body keeps a String sku under {@code @Pattern(regexp = Sku.FORMAT)} precisely so the 400 can say which
+     * entry is wrong; a failing JSON creator could not. Validation runs before the service, so nothing is written.
+     */
+    @Test
+    void aBulkUpsertWithOneMalformedSkuNamesThatEntryAndWritesNothing() {
+        String good = ApiClient.slug("SKU-BULK-GOOD");
+        String bulk = BULK_OF_TWO.formatted(good, body(900006L, 1, true, NULL, NULL, NULL),
+                MALFORMED, body(900006L, 1, true, NULL, NULL, NULL));
+
+        var response = api.send(HttpMethod.PUT, ApiClient.scoped(ApiClient.path(PRIVATE, BULK), STORE_A), admin, bulk);
+
+        ApiClient.expect(response, HttpStatus.BAD_REQUEST);
+        JsonNode problem = ApiClient.json(response);
+        assertThat(problem.get(CODE).asString()).isEqualTo("COMMON.VALIDATION_FAILED");
+        assertThat(problem.path("fieldErrors").findValuesAsString("field")).containsExactly("entries[1].sku");
+        assertThat(availability(STORE_A, good)).isEmpty();
     }
 }

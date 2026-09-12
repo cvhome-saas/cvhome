@@ -9,7 +9,7 @@ paid for. It owns no product copy — that is
   reserve / commit / release / expire cycle
 - **Runs on** — `lcl start -d --stack <name>`; read the live port from `lcl urls`. Address it through the
   gateway, never `:8126`
-- **Cases** — 19 (10 verified, 3 unit only, 6 not verified)
+- **Cases** — 20 (11 verified, 3 unit only, 6 not verified)
 - **Also see** — catalog (SEC-01…05 sweep both services), checkout (the caller of every reservation),
   [billing](../../../../store-core/billing/billing-service/qa/billing-qa.md) (inventory has **no** write gate —
   see 99)
@@ -163,6 +163,24 @@ tables are gone.
 - **Expect** — catalog boots without them; nothing in either service references them. Do not run it before
   INV-09 has been checked on that database.
 
+### INV-11 — Inventory refuses a sku catalog could never create · high · [verified]
+
+The sku rule (`Sku.FORMAT`: letters, digits, `_`, `-`, 1–255 characters, case kept, never trimmed) used to live
+on catalog's product form only; inventory stocked whatever string it was given. `InventoryApiIntegrationTest`
+covers the four edges below.
+
+- **Steps** — with a store-admin session: `PUT /private/inventory/SKU.DOT` with a valid INV-05 body;
+  `DELETE /private/inventory/SKU.DOT`; `GET /availability?skus=SKU.DOT`; `POST /availability/query` with
+  `{"skus": ["SKU.DOT"]}`. Then `PUT /private/inventory/bulk` with two entries, the second's sku `"abc def"`.
+- **Expect** — the first four answer **400** `COMMON.MALFORMED_REQUEST`, and nothing is written. The bulk call
+  answers **400** `COMMON.VALIDATION_FAILED` with `fieldErrors[0].field = "entries[1].sku"`, and **neither**
+  entry is written, including the valid first one. `SKU-NK-RUN-001` still reads and reserves as in INV-01 and
+  RES-01: the wire shape is unchanged, a bare string.
+- **Result** — 2026-09-12, stack `sku`, seller session through `gateway.com:8000/spg/inventory`: all four 400s as
+  above; the bulk call named `entries[1].sku` and `QA-SKU-GOOD-1`, its valid entry, read back absent; the same sku
+  then upserted (200), read back with quantity 4, and deleted. A COD order on the storefront reserved and committed
+  `SKU-AD-CL-TPT03` (`product_reservation_line.sku` written, stock 35 → 34).
+
 ---
 
 ---
@@ -253,6 +271,7 @@ rather than split in half. Inventory's own gate cases are **INV-04** (cross-tena
 |---|---|---|
 | **Upsert 400'd from the console** | `PersistableInventory.sku` was `@NotEmpty`, validated before the controller could copy it from the path. | INV-05 |
 | **Generated seed inserts had 7 values for 6 columns** | A regex added `sku` to wrapped column lists inconsistently. | INV-09 — inventory boots and `select count(*) from inventory.product_availability` = 180 |
+| **Inventory stocked skus catalog could never create** | `PUT /private/inventory/{sku}` took any string, so `"ABC "` or `"a b"` was stocked and never found by checkout. The sku is a `Sku` now, validated once. | INV-11 |
 | **`restart inventory` took the whole stack down** | Under the old `run-lcl.sh` supervisor a restart read as a service exit and brought everything down. `lcl restart <svc>` replaces one service and leaves the rest up. | [`qa/lcl-qa.md`](../../../../qa/lcl-qa.md) case 06 |
 
 ---
@@ -288,6 +307,11 @@ The seeds no longer cap every fashion and beauty row at 1.
 
 **Dropping the old catalog price/availability tables is manual** (INV-10). The boot migration copies; it never
 drops.
+
+**A stored sku that breaks the rule fails to load.** `SkuConverter` reads through `Sku`'s constructor, so a
+row written before INV-11 held with, say, a space in its sku makes any read of that row throw rather than serve a
+sku nothing can match. Seeds and every catalog-created sku conform. Before deploying to a database with real
+data, run the conformance query in `.agents/plans/sku-value-object.md` (*Deploy note*); every count must be 0.
 
 ---
 
