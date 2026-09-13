@@ -1,6 +1,4 @@
 import {getTheme} from '@/shell/theme/get-theme';
+import {loadingScreen} from '@/shell/routes/loading';
 
-export default async function Loading() {
-    const theme = await getTheme();
-    return <theme.states.PageSkeleton.checkout/>;
-}
+export default loadingScreen(getTheme, 'checkout');
