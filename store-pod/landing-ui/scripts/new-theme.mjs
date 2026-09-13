@@ -7,10 +7,11 @@
  * What it does — and what you then do by hand is printed at the end:
  *  1. copies themes/starter → themes/<id> (fresh DESIGN.md placeholder, README stub)
  *  2. renames package name / theme id / tokens.css selector
- *  3. registers the theme: storefront theme ids + registry, themes.css import, next.config transpilePackages,
+ *  3. registers the theme: storefront theme ids + registry, next.config transpilePackages,
  *     legacy-theme-map entry, Theme enum value in libs/types (if absent), a default-palette seed in
  *     libs/types/scripts/build-color-schemas.mjs (THEME_DEFAULTS — regenerates themes/<id>/src/colors.ts)
- *  4. generates its route tree, storefront/src/app/(storefront)/t/<id> (scripts/theme-routes.mjs)
+ *  4. generates its route tree, storefront/src/app/(storefront)/t/<id>, and its Tailwind entry,
+ *     storefront/src/app/theme-css/<id>.css (scripts/theme-routes.mjs)
  *  5. runs `npm install` so the workspace link exists
  */
 import {cpSync, existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync} from 'node:fs';
@@ -78,7 +79,6 @@ function insertBefore(file, marker, line) {
 }
 insertBefore('storefront/src/shell/theme/theme-id.ts', '    // @themes:end', `    '${id}',`);
 insertBefore('storefront/src/shell/theme/registry.ts', '    // @themes:end', `    '${id}': () => import('@store-front/theme-${id}'),`);
-insertBefore('storefront/src/app/themes.css', '/* @themes:end */', `@source "../../../themes/${id}/src";`);
 insertBefore('storefront/next.config.ts', '        // @themes:end', `        '@store-front/theme-${id}',`);
 {
     // Legacy map: a same-name enum value (e.g. `beauty`) already has an entry — repoint it instead of duplicating the key.
