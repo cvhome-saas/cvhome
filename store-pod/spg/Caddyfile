@@ -25,8 +25,10 @@
 
     # Spring Boot leaves server.compression off, so every JSON body from merchant/catalog/checkout/
     # inventory/content/payment/cua used to reach the shopper uncompressed (a category hierarchy is
-    # ~6 KB that gzips to 1.5 KB). Caddy skips anything that already carries Content-Encoding, so
-    # landing-ui's HTML — Next gzips it itself — passes through untouched.
+    # ~6 KB that gzips to 1.5 KB). landing-ui's HTML is compressed here too: Next's own gzip is off
+    # (`compress: false` in its next.config.ts) because it cost 10-25 % of every render on the storefront's
+    # quarter vCPU. A streamed page stays streamed: Caddy flushes a response with no Content-Length as it
+    # arrives, and the encoder flushes with it. Caddy skips anything that already carries Content-Encoding.
     encode zstd gzip
 
     # Caddy sends X-Forwarded-Proto and X-Forwarded-Host but never X-Forwarded-Port, and Tomcat's RemoteIpValve

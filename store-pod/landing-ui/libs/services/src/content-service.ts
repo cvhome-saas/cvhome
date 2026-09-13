@@ -4,7 +4,7 @@ import {
 } from "@store-front/types/content";
 import {PageLayoutData} from "@store-front/types/layout";
 import {storeBaseServiceUrl, StoreContext} from "@store-front/types/store-context";
-import {apiFetch, get, orUndefined} from "./http-utils";
+import {apiFetch, get, LAYOUT_DATA_REVALIDATE_SECONDS, orUndefined, publicCachedGet} from "./http-utils";
 
 const sf = (ctx: StoreContext, path: string, query = '') =>
     `${storeBaseServiceUrl('content', ctx)}/api/v1/storefront/${path}?store=${ctx.store}&lang=${ctx.locale}${query}`;
@@ -17,7 +17,7 @@ export class ContentService {
 
     /** Degrades to an empty site: the layout must render even if the CMS is down. */
     public static getSite = async (ctx: StoreContext): Promise<SiteContent | undefined> => {
-        return orUndefined(apiFetch<SiteContent>(sf(ctx, 'site'), get()));
+        return orUndefined(apiFetch<SiteContent>(sf(ctx, 'site'), publicCachedGet(LAYOUT_DATA_REVALIDATE_SECONDS)));
     }
 
     /** Must fail: the page is what the route is for. `preview` is the editor's draft token. */

@@ -260,6 +260,23 @@ export function publicGet(): RequestInit {
     return {method: 'GET', headers: {}};
 }
 
+/** How long a store's layout data (store record, category tree, site document) is served from Next's data cache. */
+export const LAYOUT_DATA_REVALIDATE_SECONDS = 30;
+
+/**
+ * A {@link publicGet} that Next's data cache keeps across requests for `seconds` (a server-side render only; a
+ * browser ignores `next`).
+ *
+ * For reads every visitor of a store shares and a merchant changes rarely: the store record, the category tree and
+ * the site document behind every page's layout, which were fetched afresh on every render. Safe because Next keys
+ * the cache on the URL and these URLs carry `store=` and `lang=`, so one store's data never answers another's, and
+ * because the request carries no credential, so there is nothing of a visitor's in it. Next keeps only a 200. A
+ * merchant's edit reaches the storefront within `seconds`. Never use it for anything a shopper's session changes.
+ */
+export function publicCachedGet(seconds: number): RequestInit & { next: { revalidate: number } } {
+    return {method: 'GET', headers: {}, next: {revalidate: seconds}};
+}
+
 /** A POST that carries no credentials — the body form of a public read (`publicGet`'s reasoning applies). */
 export function publicPost<T>(it: T): RequestInit {
     return {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(it)};

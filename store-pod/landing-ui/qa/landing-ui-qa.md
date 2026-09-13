@@ -12,7 +12,7 @@ text direction, behind the pod's edge.
 - **Runs on** — `lcl start -d --stack <name>` (`npm run dev` alone is not enough — it needs the backend).
   Always reach it through the edge at `http://<store>.spg-507f1f77.gateway.com`; read the live port from
   `lcl urls`
-- **Cases** — 38 (25 verified, 1 unit only, 15 not verified; 3 cases have split verification tags)
+- **Cases** — 42 (29 verified, 1 unit only, 15 not verified; 3 cases have split verification tags)
 - **Also see** — [spg](../../spg/qa/spg-qa.md) (the edge in front of it), content, catalog, inventory,
   [checkout](../../checkout/checkout-service/qa/checkout-qa.md),
   [cua](../../cua/qa/cua-qa.md) (shopper login)
@@ -456,6 +456,86 @@ cua renders no pages any more. `/{locale}/login` starts the OAuth2 flow; cua sen
 
 - **Expect** — `libs/theme/test/define-theme.test.ts`: a theme with neither `Login` nor `Register` validates, a
   theme with both keeps them, and a required page is still required. `npm test --workspace=libs/theme`.
+
+---
+
+## PERF — What a render costs
+
+Every storefront page is rendered per request, on a task of a quarter vCPU on dev, so the CPU one render costs is
+the storefront's capacity. The measurement: the production build at `--cpus=0.25 --memory=512m` (`node:20-alpine`,
+`OTEL_SDK_DISABLED=true`), its server-side calls going to dev's pod, the headers spg's `domain_lookup` adds for
+org1-store2, and the container's cgroup `usage_usec` before and after 20 sequential renders of a page. Separate runs
+drift by ±25 %, so a change is compared in one session against the build before it, alternating rounds and taking
+the median; pages the change does not touch show the noise (about ±15 %). The method and the dev numbers that
+started it are in the orchestrator plan `.agents/plans/landing-ui-render-cost.md`.
+
+### PERF-01 — The category page loads its data once · high · [verified]
+
+- **Why** — `generateMetadata` and the page each called `loadCategory` with a `ListingQuery` built per caller.
+  React `cache()` compares arguments by identity, so the memo missed and the whole loader (listing, facets,
+  inventory merge, price formatting) ran twice per render. It now takes the query string.
+- **Steps** — render `/en/category/laptops` 20 times at 0.25 CPU and compare CPU per render with the build before;
+  render `/en/category/no-such-category` and `/en/category/laptops?sort=NEWEST`.
+- **Expect** — category CPU per render drops; the backend still sees one call per endpoint (Next's fetch dedupe
+  already collapsed the duplicate requests, so the waste was CPU only); the unknown slug is still a 404 (SF-04) and
+  the title still comes from the category.
+- **Seen** — 2026-09-13, against the local load stack (`../load-testing`, the seeded org1-store2): category 144.3 →
+  135.8 ms median (−6 %), 8 backend calls per render before and after; against dev's pod, where every call is TLS:
+  240.5 → 189.0 ms (−21 %). 404, title and sorted listing identical to the build before.
+
+### PERF-02 — A page carries its stylesheets as links, not inlined · high · [verified]
+
+- **Why** — `experimental.inlineCss` put the CSS of all twelve themes into every page twice, as `<style>` and
+  again as strings in the RSC payload (the theme registry imports every theme into the layout's entry): about
+  580 KiB of an 864 KiB home page, rebuilt on every request.
+- **Steps** — render `/en`; read the HTML; fetch each `<link rel="stylesheet">`; compare CPU per render with the
+  build before.
+- **Expect** — no `<style>` element and no CSS strings in the RSC payload; the page links its stylesheets (13 on
+  the home page), each answering 200 from `/_next/static/chunks/` (or the CDN prefix when the S3 sync is on); the
+  page looks the same in the browser; CPU per render drops on every page.
+- **Expected to differ** — a first visit waits on the stylesheet links; Lighthouse flags them as render-blocking,
+  which is what inlining was switched on for. A repeat visit takes them from the cache.
+- **Seen** — 2026-09-13, local load stack: home 864 → 265 KiB, 13 links, all 200. The linked files carry the same
+  2,600 CSS rules in the same order as the inlined `<style>` did (font `url()`s are relative in a file, absolute
+  inline: the same files). CPU per render against the build before: home −17 %, category −24 %, product −27 %,
+  search −36 % (medians, same session). Compared as CSS, not looked at in a browser.
+
+### PERF-03 — spg compresses the storefront's HTML, landing-ui does not · high · [verified]
+
+- **Why** — Next gzipped every page in the storefront's own process (`compress` defaults to true), 10–25 % of a
+  render on a quarter vCPU, while spg's Caddy, which already compresses the APIs, passed the HTML through. Next's
+  gzip is off (`compress: false`); `encode zstd gzip` in [spg's Caddyfile](../../spg/Caddyfile) takes it.
+- **Steps** — through spg (`http://org1-store2.spg-507f1f77.gateway.com/en`): request with
+  `Accept-Encoding: gzip`, with `zstd`, and with neither; decode the gzip body. Request landing-ui's own port with
+  `Accept-Encoding: gzip`. Time the first and last byte of the home page through spg.
+- **Expect** — through spg: `Content-Encoding: gzip`, `zstd`, and none respectively, with `Vary: Accept-Encoding`;
+  the gzip body decodes to the whole page. landing-ui's own port answers uncompressed whatever is asked. The first
+  byte arrives well before the last (the page still streams).
+- **Seen** — 2026-09-13, the load stack's spg (Caddyfile from `main`, the same `encode` line) with this build in
+  place of the stack's landing-ui: gzip, zstd and identity as expected; 42 KB of gzip decoding to 273 KB of HTML.
+  Home through spg, against the build before: first byte 0.276 → 0.099 s, last byte 0.573 → 0.387 s, 65 → 42 KB
+  (Caddy's gzip beats Next's chunk-by-chunk gzip). CPU per render with gzip requested: home −21 %, category −8 %,
+  product −7 %, search +2 % (noise).
+
+### PERF-04 — A store's layout data is fetched once per store every 30 s · high · [verified]
+
+- **Why** — the store record, the category tree and the site document behind every page's layout were fetched on
+  every render. They are the same for every visitor of a store and change rarely, so Next's data cache now keeps
+  them for 30 s (`publicCachedGet` in `libs/services/src/http-utils.ts`): keyed on the URL, which carries `store=`
+  and `lang=`, and sent without a credential.
+- **Setup** — point `INTERNAL_SPG` at a logging proxy in front of spg, so each backend call is visible.
+- **Steps** — render org1-store2's `/en` twice, then its category page, within 30 s; render org1-store1's `/ar`
+  twice; wait past 30 s and render org1-store2's `/en` twice more. Compare each store's page title.
+- **Expect** — the first render of a store fetches the three once; further renders of that store within 30 s
+  fetch none of them; another store fetches its own (`store=` its id) and shows its own name; after 30 s the next
+  render serves the cached copy and refreshes it in the background (one fetch each), then none again.
+- **Expected to differ** — a merchant's edit to the store record, the category tree or the site document (menus,
+  footer pages, announcement, branding, social links) reaches the storefront up to 30 s later than before.
+  Product, listing, search, inventory, page content and anything a shopper's session touches are not cached.
+- **Seen** — 2026-09-13, local load stack behind the logging proxy: exactly as expected, per store; org1-store2
+  and org1-store1 each titled with their own name through the shared cache. Backend calls per render: home 9 → 6,
+  category 8 → 5, search 5 → 2. CPU per render, two runs against the build before: search −21 % and −23 %; home,
+  category and product within the noise (−10 % to +14 %).
 
 ---
 

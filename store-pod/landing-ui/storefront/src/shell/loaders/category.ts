@@ -5,11 +5,17 @@ import {getTranslations} from 'next-intl/server';
 import {CategoryService} from '@store-front/services/category-service';
 import {ProductCategory} from '@store-front/services/product-category';
 import {toListingProducts} from '@store-front/services/product-presenter';
-import {isApiError, type ListingQuery, type ProductListingPage} from '@store-front/types';
+import {isApiError, parseListingQuery, type ProductListingPage} from '@store-front/types';
 import type {CategoryData} from '@store-front/theme';
 import {getStoreContext} from '@/shell/request/store-context';
 
-export const loadCategory = cache(async (url: string, query: ListingQuery): Promise<CategoryData> => {
+/**
+ * `search` is the page's query string, not a parsed `ListingQuery`: React `cache()` compares arguments by identity,
+ * so an object built per caller missed the memo and `generateMetadata` and the page each ran the whole loader —
+ * listing, facets, inventory merge and price formatting — twice per render. A string compares by value.
+ */
+export const loadCategory = cache(async (url: string, search: string): Promise<CategoryData> => {
+    const query = parseListingQuery(new URLSearchParams(search));
     const ctx = await getStoreContext();
     let category;
     try {

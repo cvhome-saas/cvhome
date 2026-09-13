@@ -17,10 +17,18 @@ const nextConfig: NextConfig = {
     images: {
         unoptimized: true,
     },
-    // Lighthouse flags 15 render-blocking CSS <link>s on the storefront; inlining puts the (small,
-    // post-PR-#303) CSS into the HTML so first render never waits on stylesheet round-trips.
+    // spg's Caddy compresses the HTML (`encode zstd gzip` in store-pod/spg/Caddyfile), not this process: gzip
+    // in Node cost 10-25 % of every render on a task of a quarter vCPU, while spg idles. Anything reaching
+    // landing-ui without spg (its own port) gets uncompressed HTML.
+    compress: false,
+    // Stylesheets as files, not inlined. Inlining (turned on because Lighthouse flagged 15 render-blocking CSS
+    // <link>s) put the CSS of every theme into every page twice: once as <style> and again as strings in the
+    // RSC payload, because the registry imports all themes into the layout's entry. That was ~580 KiB of an
+    // 864 KiB home page, serialised, escaped and compressed on every request: turning it off cut CPU per render by
+    // a fifth to a third on a 0.25 vCPU task. The cost is back on the browser's side: a first visit waits on the
+    // stylesheet links, which the CDN and the browser then cache.
     experimental: {
-        inlineCss: true,
+        inlineCss: false,
     },
     turbopack: {
         root: monorepoRoot,
