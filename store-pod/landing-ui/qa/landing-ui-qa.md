@@ -12,7 +12,7 @@ text direction, behind the pod's edge.
 - **Runs on** — `lcl start -d --stack <name>` (`npm run dev` alone is not enough — it needs the backend).
   Always reach it through the edge at `http://<store>.spg-507f1f77.gateway.com`; read the live port from
   `lcl urls`
-- **Cases** — 41 (28 verified, 1 unit only, 15 not verified; 3 cases have split verification tags)
+- **Cases** — 42 (29 verified, 1 unit only, 15 not verified; 3 cases have split verification tags)
 - **Also see** — [spg](../../spg/qa/spg-qa.md) (the edge in front of it), content, catalog, inventory,
   [checkout](../../checkout/checkout-service/qa/checkout-qa.md),
   [cua](../../cua/qa/cua-qa.md) (shopper login)
@@ -516,6 +516,26 @@ started it are in the orchestrator plan `.agents/plans/landing-ui-render-cost.md
   Home through spg, against the build before: first byte 0.276 → 0.099 s, last byte 0.573 → 0.387 s, 65 → 42 KB
   (Caddy's gzip beats Next's chunk-by-chunk gzip). CPU per render with gzip requested: home −21 %, category −8 %,
   product −7 %, search +2 % (noise).
+
+### PERF-04 — A store's layout data is fetched once per store every 30 s · high · [verified]
+
+- **Why** — the store record, the category tree and the site document behind every page's layout were fetched on
+  every render. They are the same for every visitor of a store and change rarely, so Next's data cache now keeps
+  them for 30 s (`publicCachedGet` in `libs/services/src/http-utils.ts`): keyed on the URL, which carries `store=`
+  and `lang=`, and sent without a credential.
+- **Setup** — point `INTERNAL_SPG` at a logging proxy in front of spg, so each backend call is visible.
+- **Steps** — render org1-store2's `/en` twice, then its category page, within 30 s; render org1-store1's `/ar`
+  twice; wait past 30 s and render org1-store2's `/en` twice more. Compare each store's page title.
+- **Expect** — the first render of a store fetches the three once; further renders of that store within 30 s
+  fetch none of them; another store fetches its own (`store=` its id) and shows its own name; after 30 s the next
+  render serves the cached copy and refreshes it in the background (one fetch each), then none again.
+- **Expected to differ** — a merchant's edit to the store record, the category tree or the site document (menus,
+  footer pages, announcement, branding, social links) reaches the storefront up to 30 s later than before.
+  Product, listing, search, inventory, page content and anything a shopper's session touches are not cached.
+- **Seen** — 2026-09-13, local load stack behind the logging proxy: exactly as expected, per store; org1-store2
+  and org1-store1 each titled with their own name through the shared cache. Backend calls per render: home 9 → 6,
+  category 8 → 5, search 5 → 2. CPU per render, two runs against the build before: search −21 % and −23 %; home,
+  category and product within the noise (−10 % to +14 %).
 
 ---
 

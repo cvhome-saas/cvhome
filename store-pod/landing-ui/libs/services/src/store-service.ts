@@ -1,6 +1,6 @@
 import {storeBaseServiceUrl, StoreContext} from "@store-front/types/store-context";
 import {Store} from "@store-front/types/store";
-import {apiFetch, get} from "./http-utils";
+import {apiFetch, LAYOUT_DATA_REVALIDATE_SECONDS, publicCachedGet} from "./http-utils";
 
 export class StoreService {
 
@@ -11,6 +11,6 @@ export class StoreService {
     public static getStore = async (storeContext: StoreContext): Promise<Store> => {
         return apiFetch<Store>(
             `${storeBaseServiceUrl('merchant', storeContext)}/api/v1/store?store=${storeContext.store}&lang=${storeContext.locale}`,
-            get());
+            publicCachedGet(LAYOUT_DATA_REVALIDATE_SECONDS));
     }
 }
