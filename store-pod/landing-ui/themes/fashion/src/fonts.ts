@@ -7,8 +7,9 @@ import type {ThemeFonts} from '@store-front/theme';
  * Arabic in one family) for everything that explains. Display elements are set at weight 400 so Anton
  * is never faux-bolded; Changa ships only its 800 face, so the same weight request resolves to it.
  *
- * `preload: false` on every face: all themes' font CSS lands in the SAME layout entry, so a preload
- * here fires on every storefront whatever theme is active. @font-face still fetches the faces the page
+ * `preload: false` on every face. It dates from when every theme's font CSS shared one layout entry and a
+ * preload fired on every storefront whatever theme was active; each theme now has its own route tree, so
+ * preloading is this theme's call, left for a measured change. @font-face still fetches the faces the page
  * actually uses; `display: swap` covers the extra hop.
  */
 const display = Anton({subsets: ['latin', 'latin-ext'], weight: '400', display: 'swap', preload: false, variable: '--font-fashion-display'});

@@ -1,4 +1,4 @@
-import type {RegisteredThemeId} from './registry';
+import type {RegisteredThemeId} from './theme-id';
 
 /**
  * Every value of the `Theme` enum (`libs/types/src/store.ts`), lowercased, mapped to the theme that serves

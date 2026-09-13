@@ -32,9 +32,11 @@ themes/<id>/
     states/              EmptyState, error states, skeletons
 ```
 
-Registration lives in the shell and is done by the scaffold: `storefront/src/shell/theme/registry.ts`
-(dynamic import), `themes.css` (Tailwind source), `next.config.ts` (transpile), `legacy-theme-map.ts`,
-the `Theme` enum in `libs/types`, and a palette seed. Merchant colors arrive as a `ColorTheme`
+Registration lives in the shell and is done by the scaffold: the id in `storefront/src/shell/theme/theme-id.ts`,
+`registry.ts` (for `/api/theme-manifest`), `next.config.ts` (transpile), `legacy-theme-map.ts`, the `Theme` enum in
+`libs/types`, a palette seed, and the generated route tree `app/(storefront)/t/<id>/` with its Tailwind entry
+`app/theme-css/<id>.css`. A store's pages render from that tree alone (`proxy.ts` rewrites into it), so a page loads
+this theme's CSS and JS and no other theme's. Merchant colors arrive as a `ColorTheme`
 preset through the contrast-guarded bridge in `libs/theme` — a theme may re-map roles
 (`tokens.mapMerchantColors`), never ignore them.
 

@@ -12,7 +12,7 @@ text direction, behind the pod's edge.
 - **Runs on** — `lcl start -d --stack <name>` (`npm run dev` alone is not enough — it needs the backend).
   Always reach it through the edge at `http://<store>.spg-507f1f77.gateway.com`; read the live port from
   `lcl urls`
-- **Cases** — 42 (29 verified, 1 unit only, 15 not verified; 3 cases have split verification tags)
+- **Cases** — 47 (34 verified, 1 unit only, 16 not verified; 4 cases have split verification tags)
 - **Also see** — [spg](../../spg/qa/spg-qa.md) (the edge in front of it), content, catalog, inventory,
   [checkout](../../checkout/checkout-service/qa/checkout-qa.md),
   [cua](../../cua/qa/cua-qa.md) (shopper login)
@@ -267,6 +267,63 @@ from a past run.
   Gothic One Latin 400 and a forced M PLUS Cyrillic 400 file from the storefront origin, all with 200; the
   browser console was clean.
 
+### THM-06 — A page loads its own theme's CSS and JS, no other theme's · critical · [verified]
+
+- **Why** — each theme has its own route tree (`app/(storefront)/t/<id>/`) and Tailwind entry
+  (`app/theme-css/<id>.css`); `proxy.ts` rewrites a store's `/{locale}/…` into its theme's tree. Before, every page
+  loaded all twelve themes' stylesheets and client chunks.
+- **Setup** — a production build (`npm run build`) behind spg, with `STOREFRONT_THEME_OVERRIDE=true`.
+- **Steps** — for each theme, open `/en?theme=<id>`, then its category, product, search (`?q=apple`), checkout,
+  login and a content page. List every `<link rel="stylesheet">` and `<script src>` and attribute each file: a CSS
+  file carries theme X when it has `[data-theme=X]` rules; a JS chunk carries X when it defines a module under
+  `themes/X/` (the module ids are in the build's `*_client-reference-manifest.js`).
+- **Expect** — 200 and `data-theme="<id>"` on every page, and no file carrying another theme. Two stylesheets: the
+  theme's Tailwind entry first, then its tokens. A theme's Tailwind file has no class only another theme uses:
+  `[animation-duration:2.4s]` (pink) appears in pink's file alone, `[--tilt:-0.6deg]` (fashion) in fashion's alone.
+- **Seen** — 2026-09-13, local production build at 0.25 CPU / 512 MB behind the load stack's spg: 84 of 84
+  page × theme pairs pass. Fashion home: 2 CSS (111 KiB) and 16 JS (1,108 KiB), none of another theme; before:
+  13 CSS and 31 JS, 22 of them another theme's. The twelve Tailwind files hold exactly the 1,419 classes the
+  single file held.
+
+### THM-07 — `/t/…` cannot be addressed from outside · high · [verified]
+
+- **Steps** — request `/t/fashion/en`, `/t/pink/en/product/apple-iphone-15-pro` and `/t` through spg.
+- **Expect** — 404, empty body. The shopper's URLs stay `/{locale}/…`: the proxy rewrites, it never redirects, so
+  `/t/` never shows in the address bar.
+- **Seen** — 2026-09-13: 404 for all three (before: a redirect to `/en/t/…`, then a 404).
+
+### THM-08 — `?theme=` switches the tree, and an empty value clears it · high · [verified]
+
+- **Steps** — on the fashion store (org1-store2): `/en?theme=pink`, then `/en` and a product page, then
+  `/en?theme=`, then `/en`. Also `?theme=bogus`, and the `Theme` header with legacy values (`MODERN`, `JEWELERY`,
+  `COSMETICS`) on the storefront's own port.
+- **Expect** — pink on the first three, fashion after clearing; an unknown id renders `starter`; legacy values map
+  as `legacy-theme-map.ts` says.
+- **Seen** — 2026-09-13: as expected, and the legacy values resolve exactly as on the build before.
+
+### THM-09 — Client navigation, back/forward and the locale switch stay in the theme's tree · critical · [verified]
+
+- **Steps** — in a browser on the fashion store: click a category link, then a product, add it to the cart, open
+  the cart and follow Checkout; go back twice and forward once; switch to French from the header's language menu.
+- **Expect** — every step is a client-side navigation (no document reload), `data-theme="fashion"` throughout,
+  checkout lists the item, and the language switch lands on `/fr/<same path>` with `lang="fr"`. No file loaded over
+  the session carries another theme.
+- **Expected to differ** — the language switch drops the query string (`?sku=…`); it did before this change too
+  (`usePathname()` carries no search).
+- **Seen** — 2026-09-13, k6 browser through spg: all steps pass; 18 CSS/JS files over the session, none of another
+  theme (the build before: 44, 22 of them another theme's).
+
+### THM-10 — Sign-in hand-off, checkout and the system routes are unchanged · high · [verified] / [not verified] (a real cua sign-in)
+
+- **Steps** — click the header's sign-in button; open `/en/callback?code=bogus&state=bogus`; open `/en/checkout`
+  with an item in the cart; request `/store-not-found`, `/sitemap.xml` and `/robots.txt`.
+- **Expect** — sign-in lands on `/en/login?auth=1` in the store's theme; the `redirect_uri` sent to cua stays
+  `<origin>/<locale>/callback` (built from the origin and locale, never the rewritten path); a bogus code fails the
+  exchange and returns to the login page; checkout renders the cart; the three system routes return what they
+  returned before.
+- **Seen** — 2026-09-13: as expected and identical to the build before (system routes differ only in build ids and
+  host). A full sign-in with real credentials through cua was not run.
+
 ---
 
 ## VAR — the variant model on the storefront
@@ -491,7 +548,7 @@ started it are in the orchestrator plan `.agents/plans/landing-ui-render-cost.md
 - **Steps** — render `/en`; read the HTML; fetch each `<link rel="stylesheet">`; compare CPU per render with the
   build before.
 - **Expect** — no `<style>` element and no CSS strings in the RSC payload; the page links its stylesheets (13 on
-  the home page), each answering 200 from `/_next/static/chunks/` (or the CDN prefix when the S3 sync is on); the
+  the home page at the time; 2 since each theme has its own route tree, THM-06), each answering 200 from `/_next/static/chunks/` (or the CDN prefix when the S3 sync is on); the
   page looks the same in the browser; CPU per render drops on every page.
 - **Expected to differ** — a first visit waits on the stylesheet links; Lighthouse flags them as render-blocking,
   which is what inlining was switched on for. A repeat visit takes them from the cache.

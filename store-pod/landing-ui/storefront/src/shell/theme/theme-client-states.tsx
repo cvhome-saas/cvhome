@@ -3,8 +3,9 @@ import {createContext, type ReactNode, useContext} from 'react';
 import type {ThemeStates} from '@store-front/theme';
 
 /**
- * Client-side access to the theme's state components. `error.tsx` is a client boundary and cannot call
- * `getTheme()`, so the root layout hands the (client) state components down through this context.
+ * Client-side access to the theme's state components. `error.tsx` is a client boundary and cannot take the theme
+ * (a ThemeDefinition carries server components), so the root layout hands the client state components down
+ * through this context.
  */
 export type ThemeClientStateSet = Pick<ThemeStates, 'ErrorState' | 'EmptyState' | 'Redirecting'>;
 
