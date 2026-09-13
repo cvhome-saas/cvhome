@@ -12,7 +12,7 @@ text direction, behind the pod's edge.
 - **Runs on** — `lcl start -d --stack <name>` (`npm run dev` alone is not enough — it needs the backend).
   Always reach it through the edge at `http://<store>.spg-507f1f77.gateway.com`; read the live port from
   `lcl urls`
-- **Cases** — 38 (25 verified, 1 unit only, 15 not verified; 3 cases have split verification tags)
+- **Cases** — 39 (26 verified, 1 unit only, 15 not verified; 3 cases have split verification tags)
 - **Also see** — [spg](../../spg/qa/spg-qa.md) (the edge in front of it), content, catalog, inventory,
   [checkout](../../checkout/checkout-service/qa/checkout-qa.md),
   [cua](../../cua/qa/cua-qa.md) (shopper login)
@@ -456,6 +456,32 @@ cua renders no pages any more. `/{locale}/login` starts the OAuth2 flow; cua sen
 
 - **Expect** — `libs/theme/test/define-theme.test.ts`: a theme with neither `Login` nor `Register` validates, a
   theme with both keeps them, and a required page is still required. `npm test --workspace=libs/theme`.
+
+---
+
+## PERF — What a render costs
+
+Every storefront page is rendered per request, on a task of a quarter vCPU on dev, so the CPU one render costs is
+the storefront's capacity. The measurement: the production build at `--cpus=0.25 --memory=512m` (`node:20-alpine`,
+`OTEL_SDK_DISABLED=true`), its server-side calls going to dev's pod, the headers spg's `domain_lookup` adds for
+org1-store2, and the container's cgroup `usage_usec` before and after 20 sequential renders of a page. Separate runs
+drift by ±25 %, so a change is compared in one session against the build before it, alternating rounds and taking
+the median; pages the change does not touch show the noise (about ±15 %). The method and the dev numbers that
+started it are in the orchestrator plan `.agents/plans/landing-ui-render-cost.md`.
+
+### PERF-01 — The category page loads its data once · high · [verified]
+
+- **Why** — `generateMetadata` and the page each called `loadCategory` with a `ListingQuery` built per caller.
+  React `cache()` compares arguments by identity, so the memo missed and the whole loader (listing, facets,
+  inventory merge, price formatting) ran twice per render. It now takes the query string.
+- **Steps** — render `/en/category/laptops` 20 times at 0.25 CPU and compare CPU per render with the build before;
+  render `/en/category/no-such-category` and `/en/category/laptops?sort=NEWEST`.
+- **Expect** — category CPU per render drops; the backend still sees one call per endpoint (Next's fetch dedupe
+  already collapsed the duplicate requests, so the waste was CPU only); the unknown slug is still a 404 (SF-04) and
+  the title still comes from the category.
+- **Seen** — 2026-09-13, against the local load stack (`../load-testing`, the seeded org1-store2): category 144.3 →
+  135.8 ms median (−6 %), 8 backend calls per render before and after; against dev's pod, where every call is TLS:
+  240.5 → 189.0 ms (−21 %). 404, title and sorted listing identical to the build before.
 
 ---
 
