@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "build": "npm run kit && ng build",
+    "build-app": "ng build",
     "dev": "npm run kit && ng serve",
     "i18n:extract": "transloco-keys-manager extract",
     "i18n:missing": "transloco-keys-manager find-missing",

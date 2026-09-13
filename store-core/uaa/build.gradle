@@ -87,8 +87,13 @@ tasks.named('npmInstall') {
     dependsOn ':store-commons:ui-kit:build'
 }
 
+/*
+ * `build-app`, not `build`: the npm `build` script rebuilds the kit first (`npm run kit`), which Gradle has
+ * already done, and under `--parallel` that rebuild deleted `dist/ui-kit` while console-ui compiled against
+ * it (CodeBuild cvhome-dev-2-images, 2026-09-13). The same reasoning is in console-ui's build.gradle.
+ */
 tasks.register('copyAngularApp', Copy) {
-    dependsOn('npm_run_build')
+    dependsOn('npm_run_build-app')
     from("${projectDir}/src/main/resources/uaa-fe/dist/uaa-fe/browser")
     into "${project.projectDir}/src/main/resources/static"
 }

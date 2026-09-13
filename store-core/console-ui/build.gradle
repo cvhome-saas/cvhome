@@ -26,3 +26,14 @@ tasks.named('check') {
 tasks.named('npmInstall') {
   dependsOn ':store-commons:ui-kit:build'
 }
+
+/*
+ * The npm `build` script starts with `npm run kit`, which rebuilds the library for someone working in this
+ * folder. Under Gradle the kit is already built (above), and the rebuild is harmful: ng-packagr deletes
+ * `dist/ui-kit` before writing it, and with `--parallel` uaa-fe's own `kit` did exactly that while this
+ * app compiled against it — "Cannot find module '@cvhome-saas/ui-kit/ui'" (CodeBuild cvhome-dev-2-images,
+ * 2026-09-13). So Gradle runs `build-app`, the app alone, in place of the convention's `npm_run_build`.
+ */
+tasks.named('build') {
+  setDependsOn(dependsOn.findAll { it != 'npm_run_build' } + 'npm_run_build-app')
+}

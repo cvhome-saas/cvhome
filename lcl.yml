@@ -137,7 +137,7 @@ services:
     description: OAuth2 authorization server for staff; issues the tokens every other service validates
     # No npm prepare step, unlike console-ui and landing-ui below, even though uaa ships an Angular app in
     # src/main/resources/uaa-fe: Gradle owns that install. `node { download = true; nodeProjectDir = 'uaa-fe' }`
-    # plus `processResources → copyAngularApp → npm_run_build → npmInstall` means bootRun installs and builds the
+    # plus `processResources → copyAngularApp → npm_run_build-app → npmInstall` means bootRun installs and builds the
     # frontend itself, with a Node it downloaded — adding a bare `npm install` here would run a *different* npm
     # over the same directory. That chain also builds @cvhome-saas/ui-kit first, because uaa's npmInstall
     # dependsOn ':store-commons:ui-kit:build' — the app links the library's dist as a file: dependency.
