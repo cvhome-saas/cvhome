@@ -11,7 +11,7 @@ somewhere else entirely — that is [cua](../../../store-pod/cua/qa/cua-qa.md).
   is where the platform's sign-in page lives
 - **Runs on** — `lcl start -d --stack <name>`; uaa is `http://uaa.gateway.com:8001` and is the **first**
   service the stack brings up, because it issues the tokens. Read the live port from `lcl urls`
-- **Cases** — 143 (114 verified, 14 unit only, 14 not verified; one case is a walkthrough with no single outcome)
+- **Cases** — 163 (133 verified, 16 unit only, 14 not verified; one case is a walkthrough with no single outcome)
 - **Also see** — [gateway](../../gateway/gateway-service/qa/gateway-qa.md) (which relays the token and holds
   the session), [tenancy](../../tenancy/tenancy-service/qa/tenancy-qa.md) (which owns the *store-scoped*
   accounts and calls uaa to create them),
@@ -1374,7 +1374,7 @@ how long a new secret lives (`clientSecretValidityDays`) and how long the one it
 
 ---
 
-### CLI-09 — A client secret is stored as a salted SHA-256, and an older bcrypt hash rewrites itself · critical · [verified]
+### CLI-09 — A client secret is stored as a salted SHA-256, and an older bcrypt hash rewrites itself · critical · [verified 2026-09-13: load stack, `ClientSecretHashingIntegrationTest`]
 
 - **Steps** — register `qa-machine` (CLI-01) and mint a token with its secret. In psql:
   `select client_id, left(client_secret, 9) from oauth2_registered_client;`. Then store a bcrypt hash of that same
@@ -1400,6 +1400,19 @@ how long a new secret lives (`clientSecretValidityDays`) and how long the one it
   trips it. With `com.asrevo.cvhome.uaa.seed.apply-on-boot` off, configured secrets are not applied and not checked.
 - **Mechanism** — `OAuth2ClientDatabaseInitializer.requireStrongSecret`, before any row is read.
   `OAuth2ClientDatabaseInitializerTest`.
+
+### CLI-11 — A token request costs no bcrypt, and a seller's sign-in half as much · high · [verified 2026-09-13: load stack, JVM uaa images of main and of this change, uaa capped at 0.25 CPU]
+
+- **Steps** — `LOAD_TAG=native make stack-up` in `load-testing`; run uaa from the image under test
+  (`docker compose -p cvhome-load -f stack/docker-compose.yml -f <override naming the image> up -d --no-deps uaa`),
+  warm it with 40 token requests, then `docker update --cpus 0.25 cvhome-load-uaa-1`, as on dev. Mint 30
+  `client_credentials` tokens for `admin-sdk` and read uaa's CPU from the Docker Engine stats before and after; then
+  `NO_PROM=1 make platform-gateway-login PROFILE=smoke` five times.
+- **Expect** — CPU per token request about 20 ms (it was 453 ms with bcrypt 12), 87 ms each on the wall (1.9 s). One
+  seller sign-in 1.8–2.0 s (3.7–4.2 s): what remains is the user's own bcrypt-12 password check, deliberately kept.
+- **Expected to fail** — `make platform-gateway-login PROFILE=load` at its fixed 30 sign-ins a minute still times
+  out on a 0.25-CPU uaa, because each sign-in's password check costs about 0.45 s of that CPU; 14 timeouts in two
+  minutes, against 28 with bcrypt on the client secret. The answer there is CPU for uaa, not a weaker password hash.
 
 ## KEY — Signing keys
 

@@ -116,4 +116,44 @@ and ui-kit and console-ui lint and tests.
 
 ## Deviations as built
 
+- **Load-test p95 replaced by single sign-in times.** `make platform-gateway-login PROFILE=load` runs at a fixed 30
+  sign-ins a minute, which saturates a 0.25-CPU uaa in both builds: every sign-in also pays the user's bcrypt-12
+  password check, about 0.45 s of that CPU. Its p95 is timeouts either way (28 in two minutes before, 14 after; 0
+  completed sign-ins before, 15 after). The clean comparison is one sign-in at a time, `PROFILE=smoke`, five runs each.
+- **One strength-12 check costs about 450 ms in the capped container**, not the 227 ms a warm JVM measured on a full
+  host core. The token endpoint made one check per request before this change, not two; the sign-in difference
+  (3.9 → 1.9 s at 0.25 CPU) accounts for exactly one.
+- **The 32-character guard is proved by a unit test** (`OAuth2ClientDatabaseInitializerTest`), not a context boot. It
+  runs in an `ApplicationReadyEvent` listener, and an exception there fails `SpringApplication.run`.
+- **`ClientSecretEncoder` has a package-private constructor over another encoder.**
+  `GraceAwareClientSecretAuthenticationProviderTest` uses it to keep its readable `{noop}` hashes and its
+  one-match-per-request count.
+- **The QA files' case counts were stale before this change** (uaa said 143 and has 163; cua said 25 and has 44).
+  They now state the real counts.
+- **cua is verified by unit and integration tests only.** It runs the same sso-core code; its QA case LGN-10 says so.
+
 ## Verification
+
+Measured on the local load stack (`load-testing`, `LOAD_TAG=native`, no AWS), with uaa run from JVM images built from
+`main` (`ed7eb7d8b`) and from this branch, capped at 0.25 CPU with `docker update --cpus 0.25` as on dev:
+
+| | Before (bcrypt 12) | After (salted SHA-256) |
+| --- | --- | --- |
+| Stored client secrets after boot | `{bcrypt}$2a$12$…` | `{sha256}…` |
+| uaa CPU per `/oauth2/token` (`client_credentials`, 30 calls, idle subtracted) | 453 ms | 20 ms (−96 %) |
+| Wall time per token request | 1,890 ms | 87 ms |
+| One seller sign-in through the gateway (5 runs) | 3.73–4.22 s | 1.84–2.01 s (−50 %) |
+| 30 sign-ins a minute for 2 min: completed / timed out | 0 / 28 | 15 / 14 |
+
+Tests:
+
+- sso-core unit tests: 709 pass. They include `ClientSecretEncoderTest` (19) and new cases in
+  `GraceAwareClientSecretAuthenticationProviderTest` (a live bcrypt hash is rewritten as `{sha256}`; a `{sha256}` one
+  is not re-saved; a retired bcrypt hash authenticates inside its window and is never written back) and
+  `OAuth2ClientDatabaseInitializerTest` (a secret under 32 characters stops startup, names the client, never the
+  secret, and touches nothing).
+- uaa integration tests: `ClientSecretHashingIntegrationTest` (4: a new secret is stored as `{sha256}`; a bcrypt row
+  refuses a wrong secret without rewriting, then authenticates and becomes `{sha256}`; `POST .../reset-secret` answers
+  404; the seeded `admin-sdk` is `{sha256}` once used), `ClientSecretRotationIntegrationTest`, `LoginFlowIntegrationTest` (authorization code with
+  PKCE and the seeded `web-app` secret), `AdminClientApiIntegrationTest`, `ClientDisableIntegrationTest`.
+- `extra/scripts/verify-before-push.sh`: see the PR.

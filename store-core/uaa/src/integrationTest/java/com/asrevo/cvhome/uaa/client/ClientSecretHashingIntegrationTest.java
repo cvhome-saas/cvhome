@@ -1,6 +1,7 @@
 package com.asrevo.cvhome.uaa.client;
 
 import java.io.IOException;
+import java.net.http.HttpResponse;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -77,6 +78,18 @@ class ClientSecretHashingIntegrationTest {
         assertThat(ClientApiSupport.tokenStatus(uaa, LEGACY, secret)).isEqualTo(200);
         assertThat(stored(LEGACY)).startsWith(SHA256_PREFIX);
         assertThat(ClientApiSupport.tokenStatus(uaa, LEGACY, secret)).as("and it keeps working").isEqualTo(200);
+    }
+
+    @Test
+    void thereIsNoWayToSetAsecretAPersonChose() throws IOException, InterruptedException {
+        JsonNode created = ClientApiSupport.register(uaa, "it-no-reset");
+        String id = created.get(ClientApiSupport.CLIENT).get("id").asText();
+
+        // The fast hash is safe only for secrets nobody chose; the operator-chosen reset endpoint is gone.
+        HttpResponse<String> reset = uaa.bearer(UaaClient.POST, ClientApiSupport.path(id, "/reset-secret"),
+                "{\"newSecret\": \"http-demo-secret\"}", uaa.superAdminToken());
+
+        assertThat(reset.statusCode()).isEqualTo(404);
     }
 
     @Test
