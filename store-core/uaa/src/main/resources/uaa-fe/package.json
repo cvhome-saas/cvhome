@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "build": "npm run kit && ng build",
+    "build-app": "ng build",
     "dev": "npm run kit && ng serve",
     "kit": "npm --prefix ../../../../../../store-commons/ui-kit run build",
     "lint": "eslint . && npm run lint:lessons",
