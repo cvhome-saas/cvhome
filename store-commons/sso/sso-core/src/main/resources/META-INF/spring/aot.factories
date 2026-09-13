@@ -1,0 +1,2 @@
+org.springframework.aot.hint.RuntimeHintsRegistrar=\
+com.asrevo.cvhome.sso.aot.AuthenticationStateRuntimeHints

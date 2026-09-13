@@ -5,7 +5,10 @@ import java.io.InputStream;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.aot.hint.RuntimeHints;
+import org.springframework.aot.hint.predicate.RuntimeHintsPredicates;
 
+import com.asrevo.cvhome.content.aot.LayoutCopyRuntimeHints;
 import com.asrevo.cvhome.content.model.layout.LayoutSection;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -73,6 +76,17 @@ class LayoutDefaultsTest {
         };
 
         assertThatThrownBy(() -> LayoutDefaults.read(unreadable)).isInstanceOf(IOException.class);
+    }
+
+    @Test
+    void theCopyFilesAreRegisteredForTheNativeImage() {
+        RuntimeHints hints = new RuntimeHints();
+        new LayoutCopyRuntimeHints().registerHints(hints, getClass().getClassLoader());
+
+        assertThat(RuntimeHintsPredicates.resource().forResource("layout-defaults/messages.properties"))
+                .accepts(hints);
+        assertThat(RuntimeHintsPredicates.resource().forResource("layout-defaults/messages_ar.properties"))
+                .accepts(hints);
     }
 
 }

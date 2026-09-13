@@ -2,6 +2,8 @@
 springBoot = "4.0.1"
 springDataCommons = "4.0.1"
 springDependencyManagement = "1.1.7"
+# GraalVM Native Build Tools: the version spring-boot-dependencies 4.0.1 names (native-build-tools-plugin.version).
+nativeBuildTools = "0.11.3"
 springWeb = "7.0.2"
 springCloudCommons = "5.0.0"
 springdoc = "3.0.1"
@@ -72,6 +74,7 @@ spring-boot-starter-cache = { module = "org.springframework.boot:spring-boot-sta
 namastack-outbox-starter-jdbc = { module = "io.namastack:namastack-outbox-starter-jdbc", version.ref = "namastack-outbox" }
 namastack-outbox-starter-jpa = { module = "io.namastack:namastack-outbox-starter-jpa", version.ref = "namastack-outbox" }
 namastack-outbox-api = { module = "io.namastack:namastack-outbox-api", version.ref = "namastack-outbox" }
+namastack-outbox-core = { module = "io.namastack:namastack-outbox-core", version.ref = "namastack-outbox" }
 
 spring-boot-starter-restclient = { module = "org.springframework.boot:spring-boot-starter-restclient", version.ref = "springBoot" }
 spring-boot-starter-restclient-test = { module = "org.springframework.boot:spring-boot-starter-restclient-test", version.ref = "springBoot" }
@@ -159,6 +162,7 @@ test-integration = ["spring-boot-starter-test", "spring-boot-testcontainers", "t
 spring-boot = { id = "org.springframework.boot", version.ref = "springBoot" }
 spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "springDependencyManagement" }
 hibernate-orm = { id = "org.hibernate.orm", version.ref = "hibernate" }
+graalvm-native = { id = "org.graalvm.buildtools.native", version.ref = "nativeBuildTools" }
 groovy-gradle-plugin = { id = "groovy-gradle-plugin" }
 java-library-conventions = { id = "com.asrevo.java-library-conventions" }
 java-application-conventions = { id = "com.asrevo.java-application-conventions" }

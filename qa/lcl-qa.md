@@ -12,7 +12,7 @@ Every other file is `<service>/qa/<module>-qa.md` — see
 - **Scope** — public `cvhome-saas/lcl` engine, `lcl.yml` (project), `docker-compose-lcl.yml`,
   `store-pod/spg/Caddyfile` (`{$LCL_PORT_*}`), local Docker infra, Java services, frontends
 - **Change** — rewrite of the bash supervisor as a TypeScript multi-stack runner with dynamic port sequences
-- **Cases** — 16
+- **Cases** — 17
 - **Also see** — [spg](../store-pod/spg/qa/spg-qa.md) (case 09's `X-Forwarded-Port` observation is asserted
   there as HDR-01), [uaa](../store-core/uaa/qa/uaa-qa.md) (case 09's redirect patching is AUT-08),
   [inventory](../store-pod/inventory/inventory-service/qa/inventory-qa.md) (case 06 is the fix for a
@@ -257,3 +257,53 @@ shipped file in `store-commons/autoconfigure` (`ActuatorExposureTest`); this cas
   `/actuator/gateway/routes` are unmapped by this change as well, but its `/actuator/**` stays `permitAll` until
   the gateway hardening PR puts a super-admin gate in front of it; see
   [gateway](../store-core/gateway/gateway-service/qa/gateway-qa.md) § 99.
+
+## 17 — Every Spring service as a native executable, against the same stack [verified 2026-09-10, feat/graalvm-native]
+
+The twelve Spring services build as GraalVM native executables (`references/build-system.md` → *Native images*;
+`.agents/plans/graalvm-native-images.md`). This case proves a native build behaves like the JVM one: each service's
+native executable replaces its JVM process on a running stack, with the same environment and profiles
+(`lcl,test-stores`), and every `http/*.http` file runs against both.
+
+- **Setup** — GraalVM 25 on the host (`sdk install java 25.0.2-graalce`; CE is what the buildpack's Liberica NIK is
+  built from), `GRAALVM_HOME` pointing at it; the stack up (`lcl start -d --stack <name>`) and green.
+- **Steps**
+  1. `./gradlew nativeCompile --parallel --max-workers=3` — twelve executables under
+     `<module>/build/native/nativeCompile/` (~17 min on a 14-core laptop; one service peaks ~9.5–12 GB, cap it with
+     `NATIVE_IMAGE_OPTIONS=-J-Xmx12g`).
+  2. Run every `.http` file under the twelve services' directories against the JVM stack and keep the pass/fail per
+     request (the IntelliJ HTTP client, or `npx httpyac send <file> --all --env lcl`, with the session ids of
+     `super-admin`, `org1-admin` and `org1-store1-admin` in `http-client.private.env.json`).
+  3. For each service: `lcl stop <svc>`, then start its executable from the module directory with the JVM's
+     environment and `--spring.profiles.active=lcl,test-stores`; wait for `/actuator/health` UP.
+  4. Sign in to the console through the gateway (native gateway, native uaa) and run step 2 again.
+- **Expect** — every service healthy; the console sign-in works; **the same requests pass as on the JVM** (2026-09-10:
+  392 of 592 on `main`'s JVM, 392 on this branch's JVM, 392 native — the 200 that fail do so identically on both:
+  `.http` blocks still sending `Cookie: SESSION=` instead of the gateway's cookie, variables the files never set,
+  state from earlier runs).
+- **Measured on the host, same workload** (macOS, indicative — the load-testing stack is where containers are measured):
+
+  | service | JVM start | native start | JVM memory | native memory |
+  |---|---|---|---|---|
+  | uaa | 3.9 s | 0.58 s | 552 MB | 118 MB |
+  | cua | 4.1 s | 0.57 s | 448 MB | 129 MB |
+  | store-core-gateway | 1.2 s | 0.12 s | 442 MB | 139 MB |
+  | tenancy | 2.2 s | 0.35 s | 415 MB | 131 MB |
+  | billing | 2.3 s | 0.35 s | 415 MB | 133 MB |
+  | pod-registry | 1.8 s | 0.27 s | 329 MB | 103 MB |
+  | merchant | 2.9 s | 0.36 s | 410 MB | 141 MB |
+  | content | 3.8 s | 0.75 s | 521 MB | 137 MB |
+  | catalog | 4.3 s | 1.07 s | 457 MB | 138 MB |
+  | checkout | 3.2 s | 0.40 s | 461 MB | 140 MB |
+  | payment | 3.2 s | 0.47 s | 474 MB | 137 MB |
+  | inventory | 2.9 s | 0.52 s | 393 MB | 128 MB |
+
+  "Start" is Spring's own `Started … in` line; "memory" is the process's physical footprint (`vmmap --summary`) after
+  the `.http` run. Every native service sits well inside a 512 MB task.
+- **Expected to fail** — nothing that passes on the JVM. A pod registered with an `INTERNAL` endpoint is called as
+  `lb://spg.<namespace>`, a name no build can know, and fails natively (every deployment registers pods
+  `EXTERNAL`). The `bootBuildImage -Pnative` path (Paketo, Liberica NIK) was not built locally for this case: the JVM
+  image with the plugin applied was (`./gradlew :…:bootBuildImage` stays a `java … JarLauncher` image), and the buildpack
+  resolved Liberica NIK 25.0.4 for it; the first native image is CodeBuild's (`cvhome-platform` `qa/platform-qa.md`
+  § 02.2b).
+

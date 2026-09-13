@@ -1,11 +1,16 @@
 plugins {
     alias(libs.plugins.java.library.conventions)
+    // Its entities are bytecode-enhanced in native builds: com.asrevo.java-common-conventions.
+    alias(libs.plugins.hibernate.orm)
 }
 
 dependencies {
     api project(':store-commons:commons')
     api project(':store-commons:errors')
     compileOnly libs.jakarta.persistence.api
+    // Enhanced in a native build, our entity classes implement Hibernate's ManagedComposite & co.; a module
+    // compiling against them then needs those types. Compile time only: every runtime that loads one has Hibernate.
+    compileOnlyApi libs.hibernate.core
     compileOnly libs.jakarta.validation.api
     compileOnly libs.jackson.databind
     compileOnly libs.spring.data.jpa

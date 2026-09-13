@@ -61,7 +61,7 @@ itself in the `include(...)` list. Plugins in
 | `com.asrevo.java-common-conventions` | (base) | Java toolchain, checkstyle, **unit-test wiring (`src/test`, JUnit/AssertJ/Mockito/ArchUnit) and JaCoCo** |
 | `com.asrevo.java-library-conventions` | every `-commons`, `-core`, `-external-api`, `-events` | `java-common-conventions` + `java-library` |
 | `com.asrevo.java-integration-test-conventions` | (applied by application conventions) | the `src/integrationTest` source set, its Testcontainers classpath, `store-commons:test-support`, and the module's integration coverage report |
-| `com.asrevo.java-application-conventions` | every `-service`, `uaa`, `cua` | integration-test conventions + `application` + image helpers |
+| `com.asrevo.java-application-conventions` | every `-service`, `uaa`, `cua` | integration-test conventions + `application` + image helpers, and the image itself: ECR registry, jlink, the JVM/native switch (`-Pnative`, see *Native images*) |
 | `com.asrevo.jacoco-aggregate-conventions` | the **root** project only | `coverageReport` (whole monorepo), `domainCoverage` / `printDomainCoverage` (unit, integration and merged reports per domain) and the three ratcheted gates `domainCoverageVerification` reads from `domainCoverageMinimum` in the root `build.gradle` |
 | `com.asrevo.docker-conventions` | services and UIs | `bootBuildImage` helpers `createImageName()` / `createImageTags()`, ECR publish wiring |
 | `com.asrevo.ui-conventions` | `console-ui`, `landing-ui` | node plugin + npm build/dev/clean wiring (see `frontends.md`) |
@@ -73,15 +73,81 @@ plugins {
     alias(libs.plugins.java.application.conventions)
     alias(libs.plugins.spring.boot)
     alias(libs.plugins.spring.dependency.management)
+    alias(libs.plugins.graalvm.native)          // processAot in every build; native on -Pnative
 }
 group = 'com.asrevo.cvhome'
 springBoot { buildInfo() }
 bootBuildImage {
-    imageName = createImageName("store-pod/<name>", project.version)
-    tags      = createImageTags("store-pod/<name>", project.version)
-    // JLink-slimmed JVM via BP_JVM_JLINK_ENABLED
+    imageName = createImageName("store-pod/<name>", project.version)   // cvhome-platform's drift check reads
+    tags      = createImageTags("store-pod/<name>", project.version)   // these two lines; keep them here
+    // everything else (registry, jlink, the native switch) is java-application-conventions
 }
 ```
+
+## Native images (GraalVM)
+
+Every Spring service can ship as a GraalVM native executable instead of a JVM: it starts in a fraction of a second
+and needs no code cache, metaspace or JIT, so it fits a 512 MB Fargate task where a JVM cannot start (the 1024 MB
+floor in `cvhome-platform/flavours.yaml` is the JVM's). The plan, the measurements and every decision are in
+`.agents/plans/graalvm-native-images.md`.
+
+```bash
+./gradlew bootBuildImage                           # JVM images, built as always (the default)
+./gradlew bootBuildImage -Pnative                  # native images: same names, same tags, same run image
+./gradlew bootBuildImage -Pnative -PnativeImageArgs='-J-Xmx12g'  # cap each compiler when several share a builder
+./gradlew :store-core:pod-registry:pod-registry-service:nativeCompile   # a host executable (needs GraalVM 25)
+```
+
+- **`processAot` runs in every build.** Spring decides the bean graph ahead of time and a native image keeps only
+  that. It is part of `bootJar`, so `./gradlew build` (and CI's build job) fails on an AOT error in the PR that
+  caused it, not in a release. `lcl` and `bootRun` still run the JVM; nothing about local development changed.
+- **No bean exists or not because of configuration** (*Toolchain, checkstyle and the test tasks* below): that
+  rule is what lets one image serve Fargate, the load-testing stack (`lcl,test-stores`) and every flavour. A
+  library's auto-configuration switched by an environment's property gets the same treatment at build time:
+  `OpenTelemetryAotEnvironmentPostProcessor` builds the real OpenTelemetry SDK (the SDK honours
+  `otel.sdk.disabled` itself at run time); without it every native service ran with telemetry frozen off.
+- **Reflection, proxies and resources are hints, as code.** A native image contains only what the build could see
+  being used. The shared registrars in `store-commons/autoconfigure/.../aot/` (listed in its
+  `META-INF/spring/aot.factories`) cover the patterns this codebase has: the root YAML and `init-sql/**`, every
+  `-external-api` client's two JDK proxies, the value objects, Stripe's Gson-bound models and params, Hibernate
+  `UserType`s and id arrays, the outbox's scheduled work, handlers and events, the uaa SDK's DTOs, validators and the
+  error contract, and every type in a `model` package — the JSON shapes, including the ones no controller names (a
+  meta kept as a JSON column, a generic list's element); sso-core's covers what uaa and cua persist about an
+  authentication. Each finds its targets by scanning, so a new client, param, type, handler or validator is covered
+  by existing. A new kind of reflection gets a registrar beside the code that needs it, with a
+  `RuntimeHintsPredicates` test — never a hand-kept `reflect-config.json`. A file the code reads itself is a
+  resource hint next to that code (`content/aot/LayoutCopyRuntimeHints`); read it as a classpath resource, not through
+  `java.util.ResourceBundle`, whose native support covers only the locales the image was built with.
+- **Spring Data JDBC runs its runtime repositories natively** (`spring.aot.jdbc.repositories.enabled: false` in
+  `common-config.yml`, read by `processAot`): 4.0.1's generated JDBC repositories map a DTO-returning `@Query`
+  onto the entity and fail. JPA's generated repositories stay on. Its generated property accessors are off too
+  (`spring.aot.data.accessors.enabled`).
+- **Lazy to-one associations need enhanced entities — in the native image only.** A native image cannot generate
+  Hibernate's proxy subclasses, so a native build (`-Pnative`, or a `native*` task such as `nativeCompile`) enhances
+  every module that applies the Hibernate plugin, lazy loading only (`java-common-conventions`). A JVM build compiles
+  plain entities: enhanced bytecode differs from one machine to the next, and CI's coverage job matches JaCoCo's data
+  to recompiled classes by checksum. A new module with lazy to-one associations applies the plugin
+  (`alias(libs.plugins.hibernate.orm)`, as catalog-core does) and nothing else. An enhanced class implements
+  Hibernate's interfaces, so a module whose entities others compile against exports Hibernate as `compileOnlyApi`, as
+  `store-pod/commons/store-commons` does.
+- **A `@Bean` declares the class it returns** when that class carries `@Cacheable`, `@Transactional` or another
+  proxy-driving annotation (catalog's `CachedExternalMerchantStoreService`, not `ExternalMerchantStoreService`):
+  Spring builds AOP proxies ahead of time from the declared type, and a bean declared as an interface is simply not
+  proxied in the native image — no error, just no cache.
+- **No `@Bean` method with parameters is called directly** inside its configuration class: take the bean as a method
+  parameter instead. An inter-bean call with arguments bypasses the generated bean and fails only in the native
+  image.
+- **Tests run on the JVM.** Only the application is native. `processTestAot` is off in
+  `java-application-conventions`: with both plugins applied, `test` would first boot every Spring test context at
+  build time, which costs minutes, and fails in a module whose tests are not Spring tests. `nativeTest` is not used.
+- **Finding a missing hint.** It fails at run time, on the path that needs it, usually as `ClassNotFoundException`,
+  `NoSuchMethodException` or "... is not registered for reflection / proxy". Reproduce on a native executable
+  (`nativeCompile`, then run it with the service's `lcl` environment); for a stubborn one, the GraalVM tracing
+  agent (`-agentlib:native-image-agent=config-output-dir=…` on the JVM) records what was touched — turn its finding
+  into a registrar, not a committed JSON file.
+- **Build cost.** On a 14-core laptop one service compiles in 52 s to 1m37s and the largest (payment) peaks at
+  11.9 GB of compiler heap (at 7 GB it runs out); the twelve take 17 minutes three at a time. The buildpack uses Liberica NIK (GraalVM CE: Serial GC, no PGO) and
+  `-march=compatibility`, so an x86-64 image runs on any Fargate host generation.
 
 ## Versioning
 
