@@ -1,4 +1,5 @@
 import type {ThemeDefinition} from '@store-front/theme';
+import type {RegisteredThemeId} from './theme-id';
 
 /**
  * Static map of dynamic imports: each theme becomes its own server chunk and only the resolved theme's
@@ -20,8 +21,4 @@ export const themeLoaders = {
     'sports': () => import('@store-front/theme-sports'),
     'jewellery': () => import('@store-front/theme-jewellery'),
     // @themes:end
-} satisfies Record<string, () => Promise<{ default: ThemeDefinition }>>;
-
-export type RegisteredThemeId = keyof typeof themeLoaders;
-
-export const isRegisteredTheme = (id: string): id is RegisteredThemeId => Object.hasOwn(themeLoaders, id);
+} satisfies Record<RegisteredThemeId, () => Promise<{ default: ThemeDefinition }>>;

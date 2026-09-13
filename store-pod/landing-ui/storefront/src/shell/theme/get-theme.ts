@@ -3,18 +3,9 @@ import {cache} from 'react';
 import {cookies} from 'next/headers';
 import type {ThemeDefinition} from '@store-front/theme';
 import {getStoreHeaders} from '@/shell/request/headers';
-import {isRegisteredTheme, type RegisteredThemeId, themeLoaders} from './registry';
-import {FALLBACK_THEME_ID, LEGACY_THEME_MAP} from './legacy-theme-map';
+import {themeLoaders} from './registry';
+import {resolveThemeId, type RegisteredThemeId} from './theme-id';
 import {THEME_OVERRIDE_COOKIE, themeOverrideEnabled} from './override';
-
-export function resolveThemeId(requested: string | undefined | null): RegisteredThemeId {
-    const id = (requested ?? '').trim().toLowerCase();
-    if (!id) return FALLBACK_THEME_ID;
-    if (isRegisteredTheme(id)) return id;
-    const legacy = LEGACY_THEME_MAP[id];
-    if (legacy && isRegisteredTheme(legacy)) return legacy;
-    return FALLBACK_THEME_ID;
-}
 
 /** Which theme id this request resolves to: override cookie (dev) → `theme` header → env → fallback. */
 export const getThemeId = cache(async (): Promise<RegisteredThemeId> => {

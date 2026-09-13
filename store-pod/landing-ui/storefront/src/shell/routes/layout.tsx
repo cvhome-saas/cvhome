@@ -1,4 +1,3 @@
-import '@/app/globals.css';
 import type {Metadata} from 'next';
 import type {ReactNode} from 'react';
 import {preconnect} from 'react-dom';
@@ -20,7 +19,10 @@ export async function generateMetadata(): Promise<Metadata> {
     return loadStoreMetadata();
 }
 
-/** The `[locale]` root layout: `<html>` with the theme's fonts and tokens, the merchant colours, the theme's Root. */
+/**
+ * The `[locale]` root layout: `<html>` with the theme's fonts and tokens, the merchant colours, the theme's Root. The
+ * stylesheet is imported by each tree's layout.tsx, ahead of its theme (see scripts/theme-routes.mjs).
+ */
 export function storefrontLayout(theme: ThemeSource) {
     return async function StorefrontLayout({children, params}: { children: ReactNode; params: Promise<{ locale: string }> }) {
         const {locale} = await params;
