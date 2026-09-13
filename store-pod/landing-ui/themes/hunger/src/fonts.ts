@@ -9,8 +9,9 @@ import type {ThemeFonts} from '@store-front/theme';
  * dish numbers and every price. Geologica sets what has to be read: dish names, descriptions, forms.
  * Alexandria leads both roles in Arabic (see the :lang(ar) block in tokens.css).
  *
- * `preload: false` on every face: all themes' font CSS lands in the SAME layout entry, so a preload
- * here fires on every storefront whatever theme is active. @font-face still fetches the faces the page
+ * `preload: false` on every face. It dates from when every theme's font CSS shared one layout entry and a
+ * preload fired on every storefront whatever theme was active; each theme now has its own route tree, so
+ * preloading is this theme's call, left for a measured change. @font-face still fetches the faces the page
  * actually uses; `display: swap` covers the extra hop.
  */
 const display = Alumni_Sans({

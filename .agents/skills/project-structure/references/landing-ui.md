@@ -36,20 +36,30 @@ packages** compiled by Next (`transpilePackages` + tsconfig paths in `storefront
 
 1. spg/Caddy `domain_lookup` injects `Store-Id`, `Theme`, `Color-Theme`, `Default-Language`,
    `Supported-Languages` request headers.
-2. `storefront/src/proxy.ts`: no `Store-Id` → `/store-not-found` (404); `/` → `/{lang}`; next-intl routing;
-   dev-only `?theme=<id>` override cookie.
-3. `getTheme()` (`src/shell/theme/get-theme.ts`): override cookie → `theme` header → `STOREFRONT_THEME` →
-   registry hit, else `legacy-theme-map.ts` (every `Theme` enum value, lowercased), else fallback (`starter`).
-4. `registry.ts` is a static map of dynamic imports — each theme is its own server chunk; only the rendered
-   theme's client components reach the browser.
-5. The root layout (`app/(storefront)/[locale]/layout.tsx`) fetches store + categories + pages + announcement
+2. `storefront/src/proxy.ts`: no `Store-Id` → `/store-not-found` (404); `/` → `/{lang}`; next-intl routing; then
+   the store's theme picks its route tree: `/{locale}/…` is **rewritten** (never redirected, so the browser keeps its
+   URL and client navigations take the same path) to `/t/<id>/{locale}/…`. `/t/…` requested from outside is a 404.
+   The id comes from `resolveThemeId()` (`src/shell/theme/theme-id.ts`, which imports no theme): dev-only
+   `?theme=<id>` / its override cookie → `Theme` header → `STOREFRONT_THEME` → a registered id, else
+   `legacy-theme-map.ts` (every `Theme` enum value, lowercased), else fallback (`starter`).
+3. One route tree per theme, `app/(storefront)/t/<id>/[locale]/**`: 25 generated one-line files that bind the route
+   factories in `src/shell/routes/` to that theme, imported statically. Next splits CSS and JS per route, so a page
+   loads only its own theme's CSS and JS. Never edit a tree: change the factory, or `ROUTES` in
+   `scripts/theme-routes.mjs` for a new route, then `npm run theme-routes` (`npm test` runs `--check`).
+4. `registry.ts` (every theme as a dynamic import, via `getTheme()`) serves `/api/theme-manifest` only. A page that
+   imported it would put every theme's client code back into its CSS and JS.
+5. The root layout (`src/shell/routes/layout.tsx`, bound by each tree) fetches store + categories + pages + announcement
    in parallel, derives the merchant colour-role tokens from the `Color-Theme` preset
    (`libs/theme/src/merchant-bridge.ts`, contrast-guarded) and renders
    `<html data-theme=<id> data-color-scheme style="--primary:…" class="<next/font vars>">` →
    `theme.layout.Root` → page → `theme.pages.X`.
-6. CSS: one Tailwind build. `globals.css` maps tokens → utilities once (`@theme inline`); `themes.css`
-   (generated) holds a `@source` + `tokens.css` import per theme; theme tokens are scoped to
-   `[data-theme="<id>"]`. The stock Tailwind palette is removed — colour is role-based only.
+6. CSS: one Tailwind entry per theme, `app/theme-css/<id>.css` (generated): `@import "../globals.css"` plus `@source`
+   for that theme's folder, so a page's utilities are the shared ones and its own theme's. `globals.css` is the shared
+   part: tokens → utilities (`@theme inline`), fallbacks, base, `libs/ui`'s `@source`; the `(system)` layout uses it
+   alone. A tree's layout imports its entry *before* the theme: Tailwind declares the cascade-layer order, and a
+   theme's `tokens.css` opening `@layer components` first would rank components below base (preflight would strip the
+   theme's buttons). Theme tokens are scoped to `[data-theme="<id>"]`. The stock Tailwind palette is removed — colour
+   is role-based only.
 
 Pages in the shell do loading + metadata only (`Suspense` with the theme's skeleton, `notFound()` on 404,
 `error.tsx` → the theme's `ErrorState`). Composition is owned by the theme.
@@ -61,7 +71,8 @@ npm run build      # build:libs (types → services → hooks) then next build (
 npm run dev        # build:libs then next dev -p 8110 --turbopack
 npm run lint | typecheck
 npm test --workspace=libs/theme     # colour bridge tests
-npm run new-theme <id>
+npm run new-theme <id>          # also writes the theme's route tree + Tailwind entry
+npm run theme-routes            # regenerate every tree (after changing ROUTES); npm test runs --check
 ```
 `lcl start -d` starts it (its `prepare` builds the workspace libs, then `next dev`). Docker: the
 image copies `storefront/.next/standalone` (build on host/CI first — see `docker.sh`); the container starts via

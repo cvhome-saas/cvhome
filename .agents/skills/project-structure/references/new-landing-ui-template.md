@@ -15,10 +15,12 @@ app (`storefront/`) owns routes, data loading, i18n, auth and theme resolution; 
 ```
 storefront/                 THE Next.js app (shell) — never edited for a theme
   src/proxy.ts                Store-Id gate, / → /{lang}, next-intl routing, ?theme= / ?color= dev overrides
-  src/app/(storefront)/[locale]/…   routes: loaders + metadata only; each renders theme.pages.X
-  src/app/globals.css         the ONLY Tailwind entry + @theme inline token mapping
-  src/app/themes.css          GENERATED: @source + tokens.css import per theme
-  src/shell/theme/registry.ts GENERATED entries: static map of dynamic imports, one per theme
+  src/shell/routes/*          the routes: one factory per route (loaders + metadata), each renders theme.pages.X
+  src/app/(storefront)/t/<id>/[locale]/…   GENERATED: the theme's route tree, binding every factory to it
+  src/app/theme-css/<id>.css  GENERATED: the theme's Tailwind entry (globals.css + @source of its folder)
+  src/app/globals.css         the shared part of every Tailwind entry + @theme inline token mapping
+  src/shell/theme/theme-id.ts GENERATED entries: the registered ids + resolveThemeId() (no theme imports)
+  src/shell/theme/registry.ts GENERATED entries: dynamic imports, one per theme — /api/theme-manifest only
   src/shell/theme/legacy-theme-map.ts   Theme enum value → theme id (fallback for old values)
   src/shell/tokens/merchant-tokens.ts   ColorTheme (DEFAULT → theme's own palette, else preset) → colour-role tokens (inline style on <html>)
 libs/theme                  @store-front/theme — ThemeDefinition, token schema, colour bridge, defineTheme()
@@ -31,8 +33,8 @@ locales/{en,ar,es,fr,ru}.json  SHARED translations — add keys to all five
 ```
 
 Request flow: spg/Caddy injects `Store-Id, Theme, Color-Theme, Default-Language, Supported-Languages` →
-`proxy.ts` → `getTheme()` (cookie override → `theme` header → `STOREFRONT_THEME` → legacy map → fallback)
-→ registry dynamic import → `getColorThemeRequest()` (cookie override → `Color-Theme` header → store record) →
+`proxy.ts` → `resolveThemeId()` (cookie override → `theme` header → `STOREFRONT_THEME` → legacy map → fallback)
+→ rewrite to `/t/<id>/{locale}/…`, the theme's own route tree → `getColorThemeRequest()` (cookie override → `Color-Theme` header → store record) →
 `resolveColorScheme()` (a fixed preset wins; `DEFAULT` / unset / unknown → `theme.tokens.defaultColors`) → root
 layout sets `<html data-theme=<id> data-color-scheme data-color-theme=<DEFAULT|PRESET> style="--primary:…"
 class="<font vars>">` → `theme.layout.Root` → page → `theme.pages.X`.
@@ -60,8 +62,9 @@ npm run new-theme <id>          # kebab-case, e.g. atelier
 ```
 
 The script copies `themes/starter` → `themes/<id>`, renames ids/selectors, and registers the theme in
-`registry.ts`, `themes.css`, `next.config.ts` (`transpilePackages`), `legacy-theme-map.ts`,
-`storefront/package.json` and the TS `Theme` enum, then runs `npm install`. Commit that as one change.
+`theme-id.ts`, `registry.ts`, `next.config.ts` (`transpilePackages`), `legacy-theme-map.ts`,
+`storefront/package.json` and the TS `Theme` enum, generates its route tree and Tailwind entry
+(`scripts/theme-routes.mjs`), then runs `npm install`. Commit that as one change.
 
 Run it with the local stack (`lcl start -d`) and open
 `http://org1-store1.spg-507f1f77.gateway.com/en?theme=<id>` — spg injects the store headers; `?theme=` is a dev-only

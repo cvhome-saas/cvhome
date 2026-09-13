@@ -9,8 +9,9 @@ import type {ThemeFonts} from '@store-front/theme';
  * The Latin faces ship without next/font's metric-adjusted fallback: that fallback (Arial-based) carries
  * Arabic glyphs and would catch them before Almarai does.
  *
- * `preload: false` on every face: all themes' font CSS lands in the SAME layout entry, so a preload
- * here fires on every storefront whatever theme is active. @font-face still fetches the faces the page
+ * `preload: false` on every face. It dates from when every theme's font CSS shared one layout entry and a
+ * preload fired on every storefront whatever theme was active; each theme now has its own route tree, so
+ * preloading is this theme's call, left for a measured change. @font-face still fetches the faces the page
  * actually uses; `display: swap` covers the extra hop.
  */
 const sans = Manrope({subsets: ['latin', 'latin-ext', 'cyrillic'], display: 'swap', preload: false, variable: '--font-grocery-sans', adjustFontFallback: false});

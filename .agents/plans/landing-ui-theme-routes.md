@@ -177,4 +177,82 @@ outside this plan.
 
 ## Deviations as built
 
+- **The design gate does not apply.** The 300 generated `page.tsx`/`layout.tsx`/`loading.tsx` stubs add no screen:
+  each binds an existing screen (`theme.pages.*`, the loading and error states, all unchanged) to one theme. They
+  are written only by `scripts/theme-routes.mjs`, never by hand, and `npm test` fails on a hand-edited or hand-added
+  file. The shared tree's files they replace were deleted, not redesigned.
+- **No `scripts/theme-css.mjs`.** The route generator also writes the Tailwind entries (phase 5): the layout stub
+  that imports `app/theme-css/<id>.css` comes from the same script and the same id list, so one `--check` covers
+  both. Phase 3 therefore had no CSS stub.
+- **`theme-trees.ts` existed in phase 3 only.** While the shared tree still served the other themes, the proxy
+  needed the list of themes that had a tree; phase 4 removed it with the shared tree.
+- **The factories take the theme, not a thunk** (phase 4). The async `ThemeSource` existed only so the shared tree
+  could call `getTheme()` per request.
+- **Stylesheet before theme.** A tree's layout imports its CSS entry before the theme. As first written (phases 3
+  and 4), the theme came first: fashion's `tokens.css` then opened `@layer components` before Tailwind declared its
+  layer order, which ranked components below base, and preflight stripped the padding and backgrounds of fashion's
+  chips and buttons (six themes use `@layer components`). The phase-5 screenshot comparison caught it; phases 3 and
+  4 were rewritten before anything was pushed, and the generator says why the order matters.
+- **The same stale "one layout entry" note** was in eleven themes' `fonts.ts`, not only fashion's (starter's copy
+  seeds every new theme); all eleven are corrected. `preload: false` itself is unchanged.
+- **Measured on the local load stack, not dev.** Dev's storefront DNS no longer resolves (dev is stopped), so the
+  data source was `load-testing`'s compose stack (seeded org1-store2) with each build in a container at dev's
+  caps (`node:20-alpine`, `--cpus=0.25 --memory=512m`) behind that stack's spg. "On dev after deploy" and the
+  first-visit Lighthouse run are not done: nothing was deployed, and Lighthouse was not available locally.
+- **Costs the plan did not list.** Memory: with every route of every theme warm, the process holds 130–160 MiB of
+  anonymous memory against 69–90 MiB before (204 route entries loaded instead of 17, about 0.35 MiB each; no
+  growth over 480 further renders). Idle it is 62 against 48 MiB, because Next 16 preloads every route entry at
+  start (`experimental.preloadEntriesOnStart`, default on); with it off, idle drops to 40 MiB and the warm figure
+  is unchanged. Server output: `.next/standalone` grows 164 → 246 MB, of which 89 MB is `page.js.nft.json`
+  build traces that the server never reads (the pages render with them deleted). Both are follow-ups, not done here.
+- **`npm test` runs `theme-routes --check`, but nothing runs landing-ui's `npm test` automatically**: neither CI
+  nor `extra/scripts/verify-before-push.sh` does (the colour-schema `--check` has the same gap). Wiring it in is a
+  separate change.
+
 ## Verification
+
+All on a local production build (`npm run build`, standalone output run the way the Dockerfile runs it) at
+`--cpus=0.25 --memory=512m`, behind the load stack's spg, data from its seeded org1-store2 (theme FASHION).
+Attribution: every `<link rel="stylesheet">` and `<script src>` of the page, a CSS file assigned to theme X by its
+`[data-theme=X]` rules and a JS chunk by the modules under `themes/X/` it defines (module ids from the build's
+client-reference manifests).
+
+**Fashion home, before (main `bede05362`) and after (this branch)**
+
+| | Before | After |
+| --- | --- | --- |
+| Stylesheets | 13 files, 285 KiB (53 KiB gz) | 2 files, 111 KiB (20 KiB gz) |
+| of them another theme's | 11 files, 141 KiB (29 KiB gz) | 0 |
+| Scripts | 31 files, 1,739 KiB (509 KiB gz) | 16 files, 1,108 KiB (348 KiB gz) |
+| of them another theme's | 11 files, 619 KiB (156 KiB gz) | 0 |
+| Tailwind utilities file | 127.6 KB (all themes) | 93.1 KB (shared + fashion) |
+| HTML | 267 KiB | 250 KiB |
+| Browser session (7 client navigations) | 44 CSS/JS files, 22 another theme's | 18 files, 0 |
+| CPU per render, 3 × 30 renders, all warm: home / category / product / search | 88.5 / 59.7 / 40.2 / 43.9 ms | 84.9 / 68.1 / 45.2 / 44.8 ms |
+| CPU per render, mean of the four | 58.1 ms | 60.7 ms |
+| `npm run build` | 25 s (Next compile 12.5 s), one run | 25–33 s (compile 9.7–14.8 s), four runs |
+| `.next/standalone` / `.next/static` | 164 MB / 4.5 MB | 246 MB / 7.7 MB |
+| Memory (cgroup anon), idle after the first render | 48 MiB | 62 MiB |
+| Memory (cgroup anon), every route of every theme warm | 69–90 MiB | 130–160 MiB |
+
+CPU per render moves within the harness's noise (rounds of the same page differ by up to ±15 %); category and
+product were 5–8 ms higher in all three rounds, home 4 % lower.
+
+**Per phase**
+
+- Phase 2 (factories): routes, statuses, attribution and CPU identical to main; lint, typecheck, tests pass.
+- Phase 3 (fashion tree) — the decision gate: fashion `/en`, a category, a product and a search page load 0 files of
+  another theme (main: 22), so the plan continued. Other themes still rendered from the shared tree unchanged.
+  Client navigation, back/forward, the locale switch, add to cart → checkout, the sign-in hand-off and the cua
+  callback behave as on main, in a browser (k6) through spg.
+- Phase 4 (every theme): for each of the 12 themes through `?theme=`, home, category, product, search, checkout,
+  login and a content page answer 200, render that theme, and load no file of another theme (84 of 84). `/t/…` from
+  outside is a 404; `/store-not-found`, `/sitemap.xml`, `/robots.txt` and `/api/theme-manifest` return what main
+  returns. The 23-route smoke matches main's statuses and themes; legacy `Theme` header values resolve as on main.
+- Phase 5 (Tailwind per theme): each theme's Tailwind file adds only classes that occur in that theme's own folder;
+  `[animation-duration:2.4s]` is in pink's file alone and `[--tilt:-0.6deg]` in fashion's alone; the twelve files
+  hold exactly main's 1,419 classes. Every theme's home, screenshotted full-page against main's: same height, and
+  pixel-identical except inside the third-party YouTube iframe (and cosmetics' broken hero image, whose alt text
+  depends on load timing; same markup).
+- Gates: `npm run lint` (0 errors, the 4 warnings main already has), `npm run typecheck`, `npm test` (with
+  `theme-routes --check`), then `extra/scripts/verify-before-push.sh`.

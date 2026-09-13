@@ -10,8 +10,9 @@ import type {ThemeFonts} from '@store-front/theme';
  * metric-adjusted local fallback: that fallback (Arial-based) carries Arabic glyphs and would catch them before
  * Cairo does, so Arabic would render in Arial instead of Cairo.
  *
- * `preload: false` on every face: all themes' font CSS lands in the SAME layout entry, so a preload
- * here fires on every storefront whatever theme is active. @font-face still fetches the faces the page
+ * `preload: false` on every face. It dates from when every theme's font CSS shared one layout entry and a
+ * preload fired on every storefront whatever theme was active; each theme now has its own route tree, so
+ * preloading is this theme's call, left for a measured change. @font-face still fetches the faces the page
  * actually uses; `display: swap` covers the extra hop.
  */
 const sans = Sofia_Sans({subsets: ['latin', 'latin-ext', 'cyrillic'], display: 'swap', preload: false, variable: '--font-basic-sans', adjustFontFallback: false});
