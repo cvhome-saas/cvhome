@@ -17,6 +17,10 @@ const nextConfig: NextConfig = {
     images: {
         unoptimized: true,
     },
+    // spg's Caddy compresses the HTML (`encode zstd gzip` in store-pod/spg/Caddyfile), not this process: gzip
+    // in Node cost 10-25 % of every render on a task of a quarter vCPU, while spg idles. Anything reaching
+    // landing-ui without spg (its own port) gets uncompressed HTML.
+    compress: false,
     // Stylesheets as files, not inlined. Inlining (turned on because Lighthouse flagged 15 render-blocking CSS
     // <link>s) put the CSS of every theme into every page twice: once as <style> and again as strings in the
     // RSC payload, because the registry imports all themes into the layout's entry. That was ~580 KiB of an

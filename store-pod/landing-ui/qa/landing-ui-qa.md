@@ -12,7 +12,7 @@ text direction, behind the pod's edge.
 - **Runs on** — `lcl start -d --stack <name>` (`npm run dev` alone is not enough — it needs the backend).
   Always reach it through the edge at `http://<store>.spg-507f1f77.gateway.com`; read the live port from
   `lcl urls`
-- **Cases** — 40 (27 verified, 1 unit only, 15 not verified; 3 cases have split verification tags)
+- **Cases** — 41 (28 verified, 1 unit only, 15 not verified; 3 cases have split verification tags)
 - **Also see** — [spg](../../spg/qa/spg-qa.md) (the edge in front of it), content, catalog, inventory,
   [checkout](../../checkout/checkout-service/qa/checkout-qa.md),
   [cua](../../cua/qa/cua-qa.md) (shopper login)
@@ -499,6 +499,23 @@ started it are in the orchestrator plan `.agents/plans/landing-ui-render-cost.md
   2,600 CSS rules in the same order as the inlined `<style>` did (font `url()`s are relative in a file, absolute
   inline: the same files). CPU per render against the build before: home −17 %, category −24 %, product −27 %,
   search −36 % (medians, same session). Compared as CSS, not looked at in a browser.
+
+### PERF-03 — spg compresses the storefront's HTML, landing-ui does not · high · [verified]
+
+- **Why** — Next gzipped every page in the storefront's own process (`compress` defaults to true), 10–25 % of a
+  render on a quarter vCPU, while spg's Caddy, which already compresses the APIs, passed the HTML through. Next's
+  gzip is off (`compress: false`); `encode zstd gzip` in [spg's Caddyfile](../../spg/Caddyfile) takes it.
+- **Steps** — through spg (`http://org1-store2.spg-507f1f77.gateway.com/en`): request with
+  `Accept-Encoding: gzip`, with `zstd`, and with neither; decode the gzip body. Request landing-ui's own port with
+  `Accept-Encoding: gzip`. Time the first and last byte of the home page through spg.
+- **Expect** — through spg: `Content-Encoding: gzip`, `zstd`, and none respectively, with `Vary: Accept-Encoding`;
+  the gzip body decodes to the whole page. landing-ui's own port answers uncompressed whatever is asked. The first
+  byte arrives well before the last (the page still streams).
+- **Seen** — 2026-09-13, the load stack's spg (Caddyfile from `main`, the same `encode` line) with this build in
+  place of the stack's landing-ui: gzip, zstd and identity as expected; 42 KB of gzip decoding to 273 KB of HTML.
+  Home through spg, against the build before: first byte 0.276 → 0.099 s, last byte 0.573 → 0.387 s, 65 → 42 KB
+  (Caddy's gzip beats Next's chunk-by-chunk gzip). CPU per render with gzip requested: home −21 %, category −8 %,
+  product −7 %, search +2 % (noise).
 
 ---
 
