@@ -1,10 +1,11 @@
 import type {Metadata} from 'next';
 import {getTranslations} from 'next-intl/server';
 import {parseSearchQuery} from '@store-front/types';
+import type {ThemeDefinition} from '@store-front/theme';
 import {DefaultSearchPage} from '@/shell/theme/default-search-page';
 import {loadSearch} from '@/shell/loaders/search';
 import {pageMetadata} from '@/shell/seo/metadata';
-import {themed, type ThemeSource} from './theme-source';
+import {loadPageContext} from '@/shell/loaders/page-context';
 
 type Props = { searchParams: Promise<Record<string, string | string[] | undefined>> };
 
@@ -28,10 +29,10 @@ export async function generateMetadata({searchParams}: Props): Promise<Metadata>
     };
 }
 
-export function searchPage(theme: ThemeSource) {
+export function searchPage(theme: ThemeDefinition) {
     return async function SearchPage({searchParams}: Props) {
-        const [{theme: resolved, ctx}, data] = await Promise.all([themed(theme), loadSearch(await query(searchParams))]);
-        const Page = resolved.pages.Search ?? DefaultSearchPage;
+        const [ctx, data] = await Promise.all([loadPageContext(theme), loadSearch(await query(searchParams))]);
+        const Page = theme.pages.Search ?? DefaultSearchPage;
         return <Page ctx={ctx} data={data}/>;
     };
 }

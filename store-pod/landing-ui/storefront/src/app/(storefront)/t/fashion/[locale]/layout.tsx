@@ -4,4 +4,4 @@ import theme from '@store-front/theme-fashion';
 import {storefrontLayout} from '@/shell/routes/layout';
 
 export {generateMetadata} from '@/shell/routes/layout';
-export default storefrontLayout(async () => theme);
+export default storefrontLayout(theme);

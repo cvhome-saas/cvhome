@@ -3,4 +3,4 @@ import theme from '@store-front/theme-fashion';
 import {loginPage} from '@/shell/routes/login';
 
 export {generateMetadata} from '@/shell/routes/login';
-export default loginPage(async () => theme);
+export default loginPage(theme);

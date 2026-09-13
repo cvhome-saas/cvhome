@@ -3,4 +3,4 @@ import theme from '@store-front/theme-fashion';
 import {customerPage} from '@/shell/routes/customer';
 
 export {generateMetadata} from '@/shell/routes/customer';
-export default customerPage(async () => theme);
+export default customerPage(theme);

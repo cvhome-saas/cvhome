@@ -3,4 +3,4 @@ import theme from '@store-front/theme-fashion';
 import {checkoutResultPage} from '@/shell/routes/checkout';
 
 export {generateMetadata} from '@/shell/routes/checkout';
-export default checkoutResultPage(async () => theme, 'success');
+export default checkoutResultPage(theme, 'success');

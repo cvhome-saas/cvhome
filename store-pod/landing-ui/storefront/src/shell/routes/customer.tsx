@@ -1,19 +1,20 @@
 import type {Metadata} from 'next';
 import {getTranslations} from 'next-intl/server';
+import type {ThemeDefinition} from '@store-front/theme';
 import {Secured} from '@/shell/auth/secured';
-import {themed, type ThemeSource} from './theme-source';
+import {loadPageContext} from '@/shell/loaders/page-context';
 
 export async function generateMetadata(): Promise<Metadata> {
     const t = await getTranslations('PAGE.CUSTOMER');
     return {title: t('TITLE'), robots: {index: false}};
 }
 
-export function customerPage(theme: ThemeSource) {
+export function customerPage(theme: ThemeDefinition) {
     return async function CustomerPage() {
-        const {theme: resolved, ctx} = await themed(theme);
+        const ctx = await loadPageContext(theme);
         return (
             <Secured storeContext={ctx.storeContext}>
-                <resolved.pages.Customer ctx={ctx} data={{}}/>
+                <theme.pages.Customer ctx={ctx} data={{}}/>
             </Secured>
         );
     };

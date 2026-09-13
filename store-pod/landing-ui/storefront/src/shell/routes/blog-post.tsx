@@ -1,7 +1,8 @@
 import type {Metadata} from 'next';
+import type {ThemeDefinition} from '@store-front/theme';
 import {loadBlogPost} from '@/shell/loaders/blog';
 import {pageMetadata} from '@/shell/seo/metadata';
-import {themed, type ThemeSource} from './theme-source';
+import {loadPageContext} from '@/shell/loaders/page-context';
 
 type Props = { params: Promise<{ slug: string }>; searchParams: Promise<{ preview?: string }> };
 
@@ -16,10 +17,10 @@ export async function generateMetadata({params, searchParams}: Props): Promise<M
 }
 
 /** No Suspense here on purpose: a notFound()/error must set the real HTTP status (SEO). */
-export function blogPostPage(theme: ThemeSource) {
+export function blogPostPage(theme: ThemeDefinition) {
     return async function BlogPostPage({params, searchParams}: Props) {
         const [{slug}, {preview}] = await Promise.all([params, searchParams]);
-        const [{theme: resolved, ctx}, data] = await Promise.all([themed(theme), loadBlogPost(slug, preview)]);
-        return <resolved.pages.BlogPost ctx={ctx} data={data}/>;
+        const [ctx, data] = await Promise.all([loadPageContext(theme), loadBlogPost(slug, preview)]);
+        return <theme.pages.BlogPost ctx={ctx} data={data}/>;
     };
 }

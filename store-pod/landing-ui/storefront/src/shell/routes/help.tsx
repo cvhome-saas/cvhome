@@ -1,8 +1,9 @@
 import type {Metadata} from 'next';
 import {getTranslations} from 'next-intl/server';
+import type {ThemeDefinition} from '@store-front/theme';
 import {loadFaq} from '@/shell/loaders/faq';
 import {pageMetadata} from '@/shell/seo/metadata';
-import {themed, type ThemeSource} from './theme-source';
+import {loadPageContext} from '@/shell/loaders/page-context';
 
 type Props = { searchParams: Promise<{ group?: string }> };
 
@@ -11,14 +12,14 @@ export async function generateMetadata(): Promise<Metadata> {
     return pageMetadata(t('TITLE'));
 }
 
-export function helpPage(theme: ThemeSource) {
+export function helpPage(theme: ThemeDefinition) {
     return async function HelpPage({searchParams}: Props) {
         const {group} = await searchParams;
-        const [{theme: resolved, ctx}, data] = await Promise.all([themed(theme), loadFaq(group)]);
+        const [ctx, data] = await Promise.all([loadPageContext(theme), loadFaq(group)]);
         return (
             <>
                 {data.faq.jsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{__html: data.faq.jsonLd}}/>}
-                <resolved.pages.Faq ctx={ctx} data={data}/>
+                <theme.pages.Faq ctx={ctx} data={data}/>
             </>
         );
     };

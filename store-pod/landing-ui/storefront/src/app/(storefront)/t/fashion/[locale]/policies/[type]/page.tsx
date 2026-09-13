@@ -3,4 +3,4 @@ import theme from '@store-front/theme-fashion';
 import {policyPage} from '@/shell/routes/policy';
 
 export {generateMetadata} from '@/shell/routes/policy';
-export default policyPage(async () => theme);
+export default policyPage(theme);

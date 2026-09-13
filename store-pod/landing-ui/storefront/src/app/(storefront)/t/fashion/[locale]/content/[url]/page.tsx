@@ -3,4 +3,4 @@ import theme from '@store-front/theme-fashion';
 import {contentPage} from '@/shell/routes/content';
 
 export {generateMetadata} from '@/shell/routes/content';
-export default contentPage(async () => theme);
+export default contentPage(theme);

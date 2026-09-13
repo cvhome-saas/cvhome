@@ -8,12 +8,12 @@ import {routing} from '@store-front/i18n/routing';
 import {getDirection} from '@store-front/i18n/direction';
 import {localSupported, redirectToSupportedLang} from '@store-front/services/locale-utils';
 import {isApiError} from '@store-front/types';
+import type {ThemeDefinition} from '@store-front/theme';
 import {getStore, getStoreContext} from '@/shell/request/store-context';
 import {ThemeClientStates} from '@/shell/theme/theme-client-states';
 import {getColorThemeRequest, resolveMerchantTokens} from '@/shell/tokens/merchant-tokens';
 import {loadLayoutData} from '@/shell/loaders/layout';
 import {loadStoreMetadata} from '@/shell/seo/metadata';
-import type {ThemeSource} from './theme-source';
 
 export async function generateMetadata(): Promise<Metadata> {
     return loadStoreMetadata();
@@ -23,7 +23,7 @@ export async function generateMetadata(): Promise<Metadata> {
  * The `[locale]` root layout: `<html>` with the theme's fonts and tokens, the merchant colours, the theme's Root. The
  * stylesheet is imported by each tree's layout.tsx, ahead of its theme (see scripts/theme-routes.mjs).
  */
-export function storefrontLayout(theme: ThemeSource) {
+export function storefrontLayout(theme: ThemeDefinition) {
     return async function StorefrontLayout({children, params}: { children: ReactNode; params: Promise<{ locale: string }> }) {
         const {locale} = await params;
 
@@ -35,8 +35,7 @@ export function storefrontLayout(theme: ThemeSource) {
         if (!(routing.locales as readonly string[]).includes(locale)) notFound();
 
         // Start the independent storefront reads together. React's request cache deduplicates the store read
-        // shared by the theme, loadLayoutData(), and getStore().
-        const themePromise = theme();
+        // shared by loadLayoutData() and getStore().
         const storeContextPromise = getStoreContext();
         const storePromise = getStore();
         const layoutDataPromise = loadLayoutData();
@@ -44,7 +43,7 @@ export function storefrontLayout(theme: ThemeSource) {
         // service failure cannot become an unhandled rejection during that early exit.
         void storePromise.catch(() => undefined);
         void layoutDataPromise.catch(() => undefined);
-        const [resolved, storeContext] = await Promise.all([themePromise, storeContextPromise]);
+        const storeContext = await storeContextPromise;
 
         let store;
         try {
@@ -69,30 +68,30 @@ export function storefrontLayout(theme: ThemeSource) {
         }
 
         const [data, colorThemeRequest] = await Promise.all([layoutDataPromise, getColorThemeRequest(store)]);
-        const merchant = resolveMerchantTokens(resolved, colorThemeRequest);
+        const merchant = resolveMerchantTokens(theme, colorThemeRequest);
         const dir = getDirection(locale);
-        const ctx = {store, storeContext, locale, dir, layout: resolved.layout.config};
+        const ctx = {store, storeContext, locale, dir, layout: theme.layout.config};
         const states = {
-            ErrorState: resolved.states.ErrorState,
-            EmptyState: resolved.states.EmptyState,
-            Redirecting: resolved.states.Redirecting,
+            ErrorState: theme.states.ErrorState,
+            EmptyState: theme.states.EmptyState,
+            Redirecting: theme.states.Redirecting,
         };
 
         return (
             <html
                 lang={locale}
                 dir={dir}
-                data-theme={resolved.id}
-                data-theme-version={resolved.version}
+                data-theme={theme.id}
+                data-theme-version={theme.version}
                 data-color-scheme={merchant.scheme}
                 data-color-theme={merchant.preset}
-                className={resolved.fonts.variables}
+                className={theme.fonts.variables}
                 style={merchant.style}
             >
             <body className="flex min-h-dvh flex-col">
             <NextIntlClientProvider>
                 <ThemeClientStates states={states}>
-                    <resolved.layout.Root ctx={ctx} data={data}>{children}</resolved.layout.Root>
+                    <theme.layout.Root ctx={ctx} data={data}>{children}</theme.layout.Root>
                 </ThemeClientStates>
             </NextIntlClientProvider>
             </body>

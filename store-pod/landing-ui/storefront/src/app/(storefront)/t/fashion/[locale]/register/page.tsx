@@ -3,4 +3,4 @@ import theme from '@store-front/theme-fashion';
 import {registerPage} from '@/shell/routes/register';
 
 export {generateMetadata} from '@/shell/routes/register';
-export default registerPage(async () => theme);
+export default registerPage(theme);

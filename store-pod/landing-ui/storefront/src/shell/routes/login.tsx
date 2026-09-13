@@ -1,13 +1,13 @@
 import type {Metadata} from 'next';
 import {cookies} from 'next/headers';
 import {getTranslations} from 'next-intl/server';
-import type {LoginData, LoginError} from '@store-front/theme';
+import type {LoginData, LoginError, ThemeDefinition} from '@store-front/theme';
 import {AuthService} from '@store-front/services/auth-service';
 import {orUndefined} from '@store-front/services/http-utils';
 import {getStoreContext} from '@/shell/request/store-context';
 import {DefaultLoginPage} from '@/shell/theme/default-login-page';
 import {LoginRedirect} from '@/shell/auth/login-redirect';
-import {themed, type ThemeSource} from './theme-source';
+import {loadPageContext} from '@/shell/loaders/page-context';
 
 type Props = { searchParams: Promise<Record<string, string | string[] | undefined>> };
 
@@ -30,15 +30,15 @@ export async function generateMetadata(): Promise<Metadata> {
  * form renders. The form posts straight to cua and the flow resumes to `/callback`. The marker page never
  * redirects on its own, so the two halves cannot loop.
  */
-export function loginPage(theme: ThemeSource) {
+export function loginPage(theme: ThemeDefinition) {
     return async function LoginPage({searchParams}: Props) {
         const sp = await searchParams;
         const storeContext = await getStoreContext();
         if (sp.auth !== '1') {
             return <LoginRedirect storeContext={storeContext}/>;
         }
-        const [{theme: resolved, ctx}, socialLogins, cookieJar] = await Promise.all([
-            themed(theme), orUndefined(AuthService.socialLogins(storeContext)), cookies(),
+        const [ctx, socialLogins, cookieJar] = await Promise.all([
+            loadPageContext(theme), orUndefined(AuthService.socialLogins(storeContext)), cookies(),
         ]);
         const error = typeof sp.error === 'string' && (ERRORS as readonly string[]).includes(sp.error)
             ? sp.error as LoginError : undefined;
@@ -54,7 +54,7 @@ export function loginPage(theme: ThemeSource) {
                 href: AuthService.socialLoginHref(storeContext, login),
             })),
         };
-        const Page = resolved.pages.Login ?? DefaultLoginPage;
+        const Page = theme.pages.Login ?? DefaultLoginPage;
         return <Page ctx={ctx} data={data}/>;
     };
 }

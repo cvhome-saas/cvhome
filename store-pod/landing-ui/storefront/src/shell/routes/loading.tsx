@@ -1,4 +1,4 @@
-import type {ThemeSource} from './theme-source';
+import type {ThemeDefinition} from '@store-front/theme';
 
 /** Which skeleton a route's `loading.tsx` shows. */
 type SkeletonKind = 'home' | 'checkout' | 'customer' | 'order' | 'search';
@@ -11,9 +11,9 @@ type SkeletonKind = 'home' | 'checkout' | 'customer' | 'order' | 'search';
  * it has no dynamic segment and every query is a valid page. The search skeleton is optional in the contract; a theme
  * without one gets its category skeleton, which is the same furniture — a rail, a toolbar and a grid.
  */
-export function loadingScreen(theme: ThemeSource, kind: SkeletonKind) {
-    return async function Loading() {
-        const {states} = await theme();
+export function loadingScreen(theme: ThemeDefinition, kind: SkeletonKind) {
+    return function Loading() {
+        const {states} = theme;
         const Skeleton = kind === 'search'
             ? states.PageSkeleton.search ?? states.PageSkeleton.category
             : states.PageSkeleton[kind];

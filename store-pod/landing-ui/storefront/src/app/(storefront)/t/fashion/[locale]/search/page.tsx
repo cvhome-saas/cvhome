@@ -3,4 +3,4 @@ import theme from '@store-front/theme-fashion';
 import {searchPage} from '@/shell/routes/search';
 
 export {generateMetadata} from '@/shell/routes/search';
-export default searchPage(async () => theme);
+export default searchPage(theme);

@@ -1,7 +1,8 @@
 import type {Metadata} from 'next';
+import type {ThemeDefinition} from '@store-front/theme';
 import {loadContent} from '@/shell/loaders/content';
 import {pageMetadata} from '@/shell/seo/metadata';
-import {themed, type ThemeSource} from './theme-source';
+import {loadPageContext} from '@/shell/loaders/page-context';
 
 type Props = { params: Promise<{ url: string }>; searchParams: Promise<{ preview?: string }> };
 
@@ -18,10 +19,10 @@ export async function generateMetadata({params, searchParams}: Props): Promise<M
 }
 
 /** No Suspense here on purpose: a notFound()/error must set the real HTTP status (SEO). */
-export function contentPage(theme: ThemeSource) {
+export function contentPage(theme: ThemeDefinition) {
     return async function ContentPage({params, searchParams}: Props) {
         const [{url}, {preview}] = await Promise.all([params, searchParams]);
-        const [{theme: resolved, ctx}, data] = await Promise.all([themed(theme), loadContent(url, preview)]);
-        return <resolved.pages.Content ctx={ctx} data={data}/>;
+        const [ctx, data] = await Promise.all([loadPageContext(theme), loadContent(url, preview)]);
+        return <theme.pages.Content ctx={ctx} data={data}/>;
     };
 }

@@ -2,4 +2,4 @@
 import theme from '@store-front/theme-fashion';
 import {loadingScreen} from '@/shell/routes/loading';
 
-export default loadingScreen(async () => theme, 'customer');
+export default loadingScreen(theme, 'customer');

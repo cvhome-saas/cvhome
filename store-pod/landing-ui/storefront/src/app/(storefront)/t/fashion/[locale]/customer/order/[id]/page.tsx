@@ -3,4 +3,4 @@ import theme from '@store-front/theme-fashion';
 import {orderPage} from '@/shell/routes/order';
 
 export {generateMetadata} from '@/shell/routes/order';
-export default orderPage(async () => theme);
+export default orderPage(theme);

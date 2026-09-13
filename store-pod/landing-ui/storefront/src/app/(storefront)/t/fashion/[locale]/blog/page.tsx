@@ -3,4 +3,4 @@ import theme from '@store-front/theme-fashion';
 import {blogIndexPage} from '@/shell/routes/blog-index';
 
 export {generateMetadata} from '@/shell/routes/blog-index';
-export default blogIndexPage(async () => theme);
+export default blogIndexPage(theme);

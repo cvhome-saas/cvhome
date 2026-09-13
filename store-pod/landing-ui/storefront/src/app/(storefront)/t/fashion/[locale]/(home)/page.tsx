@@ -2,4 +2,4 @@
 import theme from '@store-front/theme-fashion';
 import {homePage} from '@/shell/routes/home';
 
-export default homePage(async () => theme);
+export default homePage(theme);

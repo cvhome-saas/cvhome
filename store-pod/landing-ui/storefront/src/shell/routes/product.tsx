@@ -1,7 +1,8 @@
 import type {Metadata} from 'next';
+import type {ThemeDefinition} from '@store-front/theme';
 import {loadProduct} from '@/shell/loaders/product';
 import {pageMetadata} from '@/shell/seo/metadata';
-import {themed, type ThemeSource} from './theme-source';
+import {loadPageContext} from '@/shell/loaders/page-context';
 
 type Props = { params: Promise<{ url: string }> };
 
@@ -18,10 +19,10 @@ export async function generateMetadata({params}: Props): Promise<Metadata> {
 }
 
 /** No Suspense here on purpose: a notFound()/error must set the real HTTP status (SEO). */
-export function productPage(theme: ThemeSource) {
+export function productPage(theme: ThemeDefinition) {
     return async function ProductPage({params}: Props) {
         const {url} = await params;
-        const [{theme: resolved, ctx}, data] = await Promise.all([themed(theme), loadProduct(url)]);
-        return <resolved.pages.Product ctx={ctx} data={data}/>;
+        const [ctx, data] = await Promise.all([loadPageContext(theme), loadProduct(url)]);
+        return <theme.pages.Product ctx={ctx} data={data}/>;
     };
 }

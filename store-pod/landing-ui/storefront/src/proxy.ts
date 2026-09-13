@@ -4,7 +4,6 @@ import {routing} from '@store-front/i18n/routing';
 import {FALLBACK_STORE_ID} from '@store-front/types/constant';
 import {COLOR_OVERRIDE_COOKIE, THEME_OVERRIDE_COOKIE, themeOverrideEnabled} from '@/shell/theme/override';
 import {resolveThemeId, type RegisteredThemeId} from '@/shell/theme/theme-id';
-import {THEME_TREES} from '@/shell/theme/theme-trees';
 
 /**
  * Edge logic that used to live in the Express server (`templates-deprecated/express-app`):
@@ -15,20 +14,19 @@ import {THEME_TREES} from '@/shell/theme/theme-trees';
  *  4. The store's theme picks its route tree: `/{locale}/…` is rewritten (never redirected, so the browser keeps
  *     its URL and client navigations take the same path) to `/t/{theme}/{locale}/…`, a tree that imports that
  *     theme alone — which is what keeps every other theme's CSS and JS off the page. `/t/…` from outside is a 404.
- *  5. Dev/QA only: `?theme=<id>` and `?color=<ColorTheme|default>` persist override cookies read by
- *     `getTheme()` / `getColorThemeRequest()`; an empty value clears the cookie.
+ *  5. Dev/QA only: `?theme=<id>` and `?color=<ColorTheme|default>` persist override cookies, read here (the tree)
+ *     and by `getColorThemeRequest()`; an empty value clears the cookie.
  */
 const intlMiddleware = createMiddleware(routing);
 
 const OVERRIDE_PARAMS: readonly (readonly [param: string, cookie: string])[] = [['theme', THEME_OVERRIDE_COOKIE], ['color', COLOR_OVERRIDE_COOKIE]];
 
 const TREE_PREFIX = '/t';
-const TREES: ReadonlySet<string> = new Set(THEME_TREES);
 
 /**
  * The theme this request renders: the `?theme=` of this very request when overrides are on (its cookie is only set
  * on the response), then the override cookie, the `Theme` header spg adds, `STOREFRONT_THEME`, the fallback — the
- * same order as `getThemeId()`.
+ * order `getThemeId()` keeps for `/api/theme-manifest`.
  */
 function requestThemeId(req: NextRequest): RegisteredThemeId {
     let override: string | undefined;
@@ -83,9 +81,8 @@ export default function proxy(req: NextRequest) {
         res = NextResponse.redirect(target);
     } else {
         res = intlMiddleware(req);
-        const theme = requestThemeId(req);
         const isRedirect = res.status >= 300 && res.status < 400 && res.headers.has('location');
-        if (!isRedirect && TREES.has(theme)) res = intoThemeTree(req, res, theme);
+        if (!isRedirect) res = intoThemeTree(req, res, requestThemeId(req));
     }
 
     if (themeOverrideEnabled()) {

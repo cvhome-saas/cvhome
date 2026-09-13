@@ -1,7 +1,8 @@
 import type {Metadata} from 'next';
+import type {ThemeDefinition} from '@store-front/theme';
 import {loadPolicy} from '@/shell/loaders/policy';
 import {pageMetadata} from '@/shell/seo/metadata';
-import {themed, type ThemeSource} from './theme-source';
+import {loadPageContext} from '@/shell/loaders/page-context';
 
 type Props = { params: Promise<{ type: string }>; searchParams: Promise<{ v?: string }> };
 
@@ -15,10 +16,10 @@ export async function generateMetadata({params, searchParams}: Props): Promise<M
     }
 }
 
-export function policyPage(theme: ThemeSource) {
+export function policyPage(theme: ThemeDefinition) {
     return async function PolicyPage({params, searchParams}: Props) {
         const [{type}, {v}] = await Promise.all([params, searchParams]);
-        const [{theme: resolved, ctx}, data] = await Promise.all([themed(theme), loadPolicy(type, v ? Number(v) : undefined)]);
-        return <resolved.pages.Policy ctx={ctx} data={data}/>;
+        const [ctx, data] = await Promise.all([loadPageContext(theme), loadPolicy(type, v ? Number(v) : undefined)]);
+        return <theme.pages.Policy ctx={ctx} data={data}/>;
     };
 }

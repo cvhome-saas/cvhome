@@ -1,7 +1,8 @@
 import type {Metadata} from 'next';
+import type {ThemeDefinition} from '@store-front/theme';
 import {loadCategory} from '@/shell/loaders/category';
 import {pageMetadata} from '@/shell/seo/metadata';
-import {themed, type ThemeSource} from './theme-source';
+import {loadPageContext} from '@/shell/loaders/page-context';
 
 type Props = { params: Promise<{ url: string }>; searchParams: Promise<Record<string, string | string[] | undefined>> };
 
@@ -26,10 +27,10 @@ export async function generateMetadata({params, searchParams}: Props): Promise<M
 }
 
 /** No Suspense here on purpose: a notFound()/error must set the real HTTP status (SEO). */
-export function categoryPage(theme: ThemeSource) {
+export function categoryPage(theme: ThemeDefinition) {
     return async function CategoryPage({params, searchParams}: Props) {
         const {url} = await params;
-        const [{theme: resolved, ctx}, data] = await Promise.all([themed(theme), loadCategory(url, await search(searchParams))]);
-        return <resolved.pages.Category ctx={ctx} data={data}/>;
+        const [ctx, data] = await Promise.all([loadPageContext(theme), loadCategory(url, await search(searchParams))]);
+        return <theme.pages.Category ctx={ctx} data={data}/>;
     };
 }

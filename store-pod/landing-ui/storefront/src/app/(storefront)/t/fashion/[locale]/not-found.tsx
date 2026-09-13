@@ -2,4 +2,4 @@
 import theme from '@store-front/theme-fashion';
 import {notFoundPage} from '@/shell/routes/not-found';
 
-export default notFoundPage(async () => theme);
+export default notFoundPage(theme);

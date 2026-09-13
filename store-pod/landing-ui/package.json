@@ -18,8 +18,9 @@
     "build:libs-hooks": "npm run build --workspace=libs/hooks",
     "lint": "eslint storefront libs/ui libs/i18n libs/theme themes",
     "typecheck": "npm run typecheck --workspace=storefront",
-    "test": "npm run test --workspaces --if-present",
-    "new-theme": "node scripts/new-theme.mjs"
+    "test": "npm run theme-routes -- --check && npm run test --workspaces --if-present",
+    "new-theme": "node scripts/new-theme.mjs",
+    "theme-routes": "node scripts/theme-routes.mjs"
   },
   "devDependencies": {
     "@types/node": "^24.6.0",

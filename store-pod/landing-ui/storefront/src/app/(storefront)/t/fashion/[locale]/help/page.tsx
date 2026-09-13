@@ -3,4 +3,4 @@ import theme from '@store-front/theme-fashion';
 import {helpPage} from '@/shell/routes/help';
 
 export {generateMetadata} from '@/shell/routes/help';
-export default helpPage(async () => theme);
+export default helpPage(theme);
