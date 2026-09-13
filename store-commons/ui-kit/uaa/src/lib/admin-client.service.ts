@@ -213,11 +213,6 @@ export class AdminClientService {
     return this.crudService.put(`${this.base}/${id}`, request);
   }
 
-  /** Answers `void`: the new secret is only ever known to the caller that set it. */
-  resetSecret(id: string, newSecret: string): Observable<void> {
-    return this.crudService.post(`${this.base}/${id}/reset-secret`, {newSecret});
-  }
-
   delete(id: string): Observable<void> {
     return this.crudService.delete(`${this.base}/${id}`);
   }

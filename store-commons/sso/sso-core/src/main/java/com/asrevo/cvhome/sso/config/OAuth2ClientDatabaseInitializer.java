@@ -6,7 +6,6 @@ import java.util.Set;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.env.Environment;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
@@ -15,19 +14,34 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.asrevo.cvhome.s2s.model.AppProperties;
 import com.asrevo.cvhome.s2s.model.OAuth2ClientProperties;
+import com.asrevo.cvhome.sso.client.ClientSecretEncoder;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Reconciles the configured OAuth2 clients with their seeded rows on boot.
+ *
+ * <p>
+ * A configured secret is hashed with {@link ClientSecretEncoder}, a salted SHA-256, which is only as strong as the
+ * secret is unguessable. So a configured secret shorter than {@link ClientSecretEncoder#MIN_LENGTH} characters stops
+ * startup, before anything is written: the platform generates 43-character ones and the local profiles carry
+ * 32-character ones, so only a mistake trips it.
+ * </p>
+ */
 @Component
 @RequiredArgsConstructor
 @Slf4j
 public class OAuth2ClientDatabaseInitializer {
 
+    private static final String WEAK_SECRET = """
+            The configured secret of OAuth2 client '%s' is %d characters; at least %d are required, because a client \
+            secret is stored as a fast hash that only a random secret makes safe""";
+
     private final OAuth2ClientProperties oAuth2ClientProperties;
     private final AppProperties appProperties;
     private final RegisteredClientRepository registeredClientRepository;
-    private final PasswordEncoder passwordEncoder;
+    private final ClientSecretEncoder clientSecrets;
     private final Environment environment;
 
     @EventListener(ApplicationReadyEvent.class)
@@ -40,6 +54,7 @@ public class OAuth2ClientDatabaseInitializer {
         if (oAuth2ClientProperties.clients() == null || oAuth2ClientProperties.clients().isEmpty()) {
             log.debug("No OAuth2 clients provided in configuration, skipping initialization");
         } else {
+            oAuth2ClientProperties.clients().forEach(OAuth2ClientDatabaseInitializer::requireStrongSecret);
             log.info("Checking OAuth2 clients for updates");
             oAuth2ClientProperties.clients().forEach(this::updateClient);
         }
@@ -65,9 +80,17 @@ public class OAuth2ClientDatabaseInitializer {
         registeredClientRepository.save(builder.build());
     }
 
+    /** Names the client, never the secret: the message ends up in a log. */
+    private static void requireStrongSecret(String clientId, OAuth2ClientProperties.ClientInfo clientInfo) {
+        String secret = clientInfo.secret();
+        if (secret != null && !secret.isBlank() && secret.length() < ClientSecretEncoder.MIN_LENGTH) {
+            throw new IllegalStateException(String.format(WEAK_SECRET, clientId, secret.length(), ClientSecretEncoder.MIN_LENGTH));
+        }
+    }
+
     private void applySecret(OAuth2ClientProperties.ClientInfo clientInfo, RegisteredClient.Builder builder) {
         if (clientInfo.secret() != null && !clientInfo.secret().isBlank()) {
-            builder.clientSecret(passwordEncoder.encode(clientInfo.secret()));
+            builder.clientSecret(clientSecrets.encode(clientInfo.secret()));
         }
     }
 

@@ -195,7 +195,7 @@ Base path `{baseUrl}/api/v1/admin/users`. Use it directly only for what `UserAcc
 | `getAssignableRoles()` | `GET /assignable-roles` |
 
 `AdminClientClient` is the sibling for **OAuth2 client registrations** — `listClients`, `getClient`,
-`createClient`, `updateClient`, `deleteClient`, `resetSecret`, `getOptions`, over `ClientDetails` /
+`createClient`, `updateClient`, `deleteClient`, `getOptions`, over `ClientDetails` /
 `ClientSummary` / `ClientDetailsSettings` / `ClientDetailsTokens` / `OAuthGrantType` / `ClientAuthMethod` /
 `OAuth2TokenFormat`. No `UserAccountService`-style facade exists over it; construct it the same way
 (`new AdminClientClient(baseUrl, clientId, clientSecret)`).

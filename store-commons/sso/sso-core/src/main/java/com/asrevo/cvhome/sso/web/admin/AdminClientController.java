@@ -130,14 +130,6 @@ public class AdminClientController {
         adminClientService.revokePreviousSecret(id);
     }
 
-    /** Sets a secret the caller chose, with no grace window: the alias the SDK calls. */
-    @PreAuthorize(ADMIN)
-    @PostMapping("{id}/reset-secret")
-    public void resetSecret(@PathVariable String id, @RequestBody ResetSecretRequest req)
-            throws ClientNotFoundException, ClientNotConfidentialException {
-        adminClientService.resetSecret(id, req.newSecret());
-    }
-
     /** Danger zone: every secret-holding client gets a new secret. The list is the only time they are shown. */
     @PreAuthorize(ADMIN)
     @PostMapping("/rotate-all")
@@ -160,9 +152,6 @@ public class AdminClientController {
         options.put("accessTokenFormat", List.of(SELF_CONTAINED.getValue(), REFERENCE.getValue()));
         options.put("clientTypes", Stream.of(ClientType.values()).map(Enum::name).toList());
         return options;
-    }
-
-    public record ResetSecretRequest(String newSecret) {
     }
 
 }

@@ -54,7 +54,6 @@ class AdminClientControllerTest {
     private static final String ACCOUNT_ID = "00000000-0000-0000-0000-000000000001";
     private static final String OPERATOR = "ada";
     private static final String QUERY = "con";
-    private static final String NEW_SECRET = "new-secret";
     private static final String SCOPES = "scopes";
 
     private final AdminClientService clients = mock(AdminClientService.class);
@@ -122,11 +121,9 @@ class AdminClientControllerTest {
 
         controller.delete(CLIENT);
         controller.revokePreviousSecret(CLIENT);
-        controller.resetSecret(CLIENT, new AdminClientController.ResetSecretRequest(NEW_SECRET));
 
         verify(clients).delete(CLIENT);
         verify(clients).revokePreviousSecret(CLIENT);
-        verify(clients).resetSecret(CLIENT, NEW_SECRET);
     }
 
     @Test

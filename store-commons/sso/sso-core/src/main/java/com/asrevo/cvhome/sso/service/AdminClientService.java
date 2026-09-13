@@ -22,7 +22,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.keygen.Base64StringKeyGenerator;
 import org.springframework.security.crypto.keygen.StringKeyGenerator;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
@@ -34,6 +33,7 @@ import com.asrevo.cvhome.sso.audit.AuditEventType;
 import com.asrevo.cvhome.sso.audit.AuditRecord;
 import com.asrevo.cvhome.sso.audit.AuditService;
 import com.asrevo.cvhome.sso.audit.AuditTargetType;
+import com.asrevo.cvhome.sso.client.ClientSecretEncoder;
 import com.asrevo.cvhome.sso.client.ClientType;
 import com.asrevo.cvhome.sso.client.RedirectUriRules;
 import com.asrevo.cvhome.sso.domain.ClientExtension;
@@ -91,7 +91,8 @@ public class AdminClientService {
 
     private final RegisteredClientRepository clients;
 
-    private final PasswordEncoder encoder;
+    /** Client secrets only: a salted SHA-256, because every secret this service writes is 32 random bytes. */
+    private final ClientSecretEncoder encoder;
 
     private final JdbcTemplate jdbc;
 
@@ -385,25 +386,6 @@ public class AdminClientService {
             }
         }
         return retired;
-    }
-
-    /**
-     * Sets a secret the operator chose, with no grace window: the alias the SDK and the older console call. A missing
-     * client is a 404 rather than a silent success — the previous {@code if (client != null)} answered 200 without
-     * rotating anything.
-     */
-    @Transactional
-    public void resetSecret(String id, String newSecret) throws ClientNotFoundException, ClientNotConfidentialException {
-        RegisteredClient client = findOrThrow(id);
-        if (!ClientType.of(client).holdsSecret()) {
-            throw ClientNotConfidentialException.of(client.getClientId());
-        }
-        Instant now = clock.instant();
-        retireLive(id, now);
-        clients.save(RegisteredClient.from(client).clientSecret(encoder.encode(newSecret))
-                .clientSecretExpiresAt(secretExpiry(now)).build());
-        audit.record(AuditRecord.of(AuditEventType.CLIENT_SECRET_ROTATED).client(client.getClientId())
-                .target(AuditTargetType.CLIENT, id, client.getClientId()).detail("secret set by an operator"));
     }
 
     private Instant secretExpiry(Instant now) {

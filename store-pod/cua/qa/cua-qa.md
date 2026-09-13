@@ -11,7 +11,7 @@ ports rather than about tokens.
   login configuration (`SocialLoginConfigApi`), and the `/cua` path-prefix handling the edge depends on
 - **Runs on** — `lcl start -d --stack <name>`; reached only through the pod edge at
   `http://<store>.spg-507f1f77.gateway.com/cua/**`, never on `:8124` directly
-- **Cases** — 25 (9 verified, 5 unit only, 11 not verified)
+- **Cases** — 44 (26 verified, 7 unit only, 11 not verified)
 - **Also see** — [spg](../../spg/qa/spg-qa.md) (which keeps the `/cua` prefix and sets `X-Forwarded-Port` for
   exactly this service), [merchant](../../merchant/merchant-service/qa/merchant-qa.md) (the store record cua
   caches), [landing-ui](../../landing-ui/qa/landing-ui-qa.md) (the storefront that starts the login),
@@ -134,6 +134,16 @@ Logs: `.lcl/<stack>/logs/cua.log`.
 > module's jar on its classpath. If you rebuilt `sso-core` while the stack was up, restart **both** deployments —
 > `lcl restart uaa cua` — before trusting anything below. The symptom otherwise is a `ClassNotFoundException` for
 > a class that plainly exists, because the jar was replaced under a running JVM.
+
+### LGN-10 — A storefront client's secret is checked with a salted SHA-256, not bcrypt · high · [unit only]
+
+- **Steps** — sign a shopper in through a store host (LGN-01), then in psql
+  `select client_id, left(client_secret, 9) from cua.oauth2_registered_client;`.
+- **Expect** — the sign-in works as before; a confidential client that has authenticated holds `{sha256}…`, and a
+  row still holding `{bcrypt}…` becomes `{sha256}` the first time it authenticates. Shopper passwords stay bcrypt.
+- **Mechanism** — cua runs sso-core's `GraceAwareClientSecretAuthenticationProvider` and `ClientSecretEncoder`, the
+  same code as uaa (uaa CLI-09, CLI-11). Covered by sso-core's unit tests and cua's integration tests in
+  `verify-before-push.sh`; not exercised on a running stack for this change.
 
 ## RLM — Realms: one per store
 

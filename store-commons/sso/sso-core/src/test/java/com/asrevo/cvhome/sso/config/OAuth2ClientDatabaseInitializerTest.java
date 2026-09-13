@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.mock.env.MockEnvironment;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
@@ -16,8 +15,10 @@ import org.springframework.security.oauth2.server.authorization.client.Registere
 
 import com.asrevo.cvhome.s2s.model.AppProperties;
 import com.asrevo.cvhome.s2s.model.OAuth2ClientProperties;
+import com.asrevo.cvhome.sso.client.ClientSecretEncoder;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -43,9 +44,12 @@ class OAuth2ClientDatabaseInitializerTest {
 
     private static final String OPENID = "openid";
 
-    private static final String SECRET = "secret";
+    /** As long as the local profiles' demo secrets: the floor is 32 characters. */
+    private static final String SECRET = "hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7";
 
-    private static final String HASHED = "{bcrypt}hashed";
+    private static final String SHORT_SECRET = "http-demo-secret";
+
+    private static final String HASHED = "{sha256}hashed";
 
     private static final String STORE_CORE_SCOPE = "store_core";
 
@@ -56,7 +60,7 @@ class OAuth2ClientDatabaseInitializerTest {
     private static final String SEEDED_REDIRECT = "https://seeded.example.com/callback";
 
     private final RegisteredClientRepository clients = mock(RegisteredClientRepository.class);
-    private final PasswordEncoder encoder = mock(PasswordEncoder.class);
+    private final ClientSecretEncoder encoder = mock(ClientSecretEncoder.class);
     private final MockEnvironment seedOn = new MockEnvironment().withProperty(SeedProperties.APPLY_ON_BOOT, "true");
 
     private static AppProperties app() {
@@ -177,5 +181,29 @@ class OAuth2ClientDatabaseInitializerTest {
 
         assertThat(saved().getRedirectUris()).containsExactly(SEEDED_REDIRECT);
         assertThat(saved().getScopes()).containsExactly(OPENID);
+    }
+
+    @Test
+    void aConfiguredSecretShorterThanTheFloorStopsStartupBeforeAnythingIsReadOrWritten() {
+        OAuth2ClientDatabaseInitializer initializer = initializerFor(Map.of(CLIENT_ID,
+                new OAuth2ClientProperties.ClientInfo(SHORT_SECRET, null, null, null, null)));
+
+        assertThatThrownBy(initializer::onApplicationReady)
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining(CLIENT_ID)
+                .hasMessageContaining(String.valueOf(ClientSecretEncoder.MIN_LENGTH))
+                // The message ends up in a log; it names the client, never the secret.
+                .satisfies(e -> assertThat(e.getMessage()).doesNotContain(SHORT_SECRET));
+        Mockito.verifyNoInteractions(clients, encoder);
+    }
+
+    @Test
+    void oneWeakSecretStopsStartupEvenWhenAnotherClientIsFine() {
+        OAuth2ClientDatabaseInitializer initializer = initializerFor(Map.of(
+                CLIENT_ID, new OAuth2ClientProperties.ClientInfo(SECRET, null, null, null, null),
+                "admin-sdk", new OAuth2ClientProperties.ClientInfo(SHORT_SECRET, null, null, null, null)));
+
+        assertThatThrownBy(initializer::onApplicationReady).isInstanceOf(IllegalStateException.class);
+        verify(clients, never()).save(any());
     }
 }

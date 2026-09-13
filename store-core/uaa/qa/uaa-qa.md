@@ -11,7 +11,7 @@ somewhere else entirely — that is [cua](../../../store-pod/cua/qa/cua-qa.md).
   is where the platform's sign-in page lives
 - **Runs on** — `lcl start -d --stack <name>`; uaa is `http://uaa.gateway.com:8001` and is the **first**
   service the stack brings up, because it issues the tokens. Read the live port from `lcl urls`
-- **Cases** — 143 (114 verified, 14 unit only, 14 not verified; one case is a walkthrough with no single outcome)
+- **Cases** — 163 (133 verified, 16 unit only, 14 not verified; one case is a walkthrough with no single outcome)
 - **Also see** — [gateway](../../gateway/gateway-service/qa/gateway-qa.md) (which relays the token and holds
   the session), [tenancy](../../tenancy/tenancy-service/qa/tenancy-qa.md) (which owns the *store-scoped*
   accounts and calls uaa to create them),
@@ -352,8 +352,8 @@ uaa's own guard is what keeps this safe, which is why the negative cases matter 
 
 - **Steps** — `GET /uaa/api/v1/admin/clients` as super-admin, then one by id.
 - **Expect** — neither carries the secret in readable form. A secret in the response, or in `uaa.log`, is a
-  finding. Registration does not echo one either, and `reset-secret` answers `void` — so the only moment a
-  secret is readable is the moment it is set, which is what the console's notice says.
+  finding. Registration does not echo one either, and rotation answers the new one once — so the only moment a
+  secret is readable is the moment uaa generates it, which is what the console's notice says.
 
 ### ADM-07 — Reading one client does not exhaust the stack · critical · [verified]
 
@@ -1323,9 +1323,9 @@ how long a new secret lives (`clientSecretValidityDays`) and how long the one it
   `client.secret.rotated` twice, the second with detail *previous secret revoked early*.
 - **Mechanism** — `GraceAwareClientSecretAuthenticationProvider` hands Spring's own provider a one-client view carrying
   the retired hash; nothing about Spring's checks is re-implemented. `ClientSecretRotationIntegrationTest`.
-- **Watch for** — `bcrypt` strength upgrades: Spring re-encodes and *saves* a hash whose strength is below the
-  encoder's. On the grace view that save is a no-op on purpose (it would write the old hash back onto the
-  registration).
+- **Watch for** — hash upgrades: Spring re-encodes and *saves* a hash the encoder asks to upgrade, which since
+  CLI-09 is any bcrypt one. On the grace view that save is a no-op on purpose (it would write the old hash back onto
+  the registration).
 
 ### CLI-04 — Disable revokes and refuses; enable restores · critical · [verified]
 
@@ -1368,11 +1368,51 @@ how long a new secret lives (`clientSecretValidityDays`) and how long the one it
 ### CLI-08 — Delete revokes first · [verified]
 
 - **Steps** — delete `qa-machine` from its page, typing the id.
-- **Expect** — its authorizations are gone before the row is; `GET /clients/{id}` → 404. `reset-secret` (the SDK's
-  alias) still works and sets a chosen secret with no grace window; on a public client it answers **422**
-  `UAA.CLIENT.NOT_CONFIDENTIAL`.
+- **Expect** — its authorizations are gone before the row is; `GET /clients/{id}` → 404. There is no way to set a
+  secret an operator chose: `POST /clients/{id}/reset-secret` is gone (404), and rotation, which generates the
+  secret, is the only way to change one.
 
 ---
+
+### CLI-09 — A client secret is stored as a salted SHA-256, and an older bcrypt hash rewrites itself · critical · [verified 2026-09-13: load stack, `ClientSecretHashingIntegrationTest`]
+
+- **Steps** — register `qa-machine` (CLI-01) and mint a token with its secret. In psql:
+  `select client_id, left(client_secret, 9) from oauth2_registered_client;`. Then store a bcrypt hash of that same
+  secret on the row (`update ... set client_secret = '{bcrypt}' || <a $2a$ hash of the secret>`), mint with a wrong
+  secret, then with the right one, and read the row again.
+- **Expect** — a registered, rotated or seeded client that has authenticated holds `{sha256}…`, never the secret.
+  With the bcrypt row: wrong → **401** and the row is still `{bcrypt}`; right → **200** and the row is now
+  `{sha256}`; the next token → 200. User passwords are untouched: `select left(password_hash, 7) from users` still
+  reads bcrypt.
+- **Mechanism** — `ClientSecretEncoder` (sso-core): a 256-bit random secret needs no work factor, so a salted SHA-256
+  replaces bcrypt, which cost 227 ms of CPU per token request. Spring's `ClientSecretAuthenticationProvider` calls
+  `upgradeEncoding` and saves after a match, which rewrites a bcrypt row. `ClientSecretHashingIntegrationTest`,
+  `ClientSecretEncoderTest`, `GraceAwareClientSecretAuthenticationProviderTest`.
+- **Watch for** — a client secret a person typed: there is no way to set one (CLI-08), which is what makes the fast
+  hash safe.
+
+### CLI-10 — A configured client secret under 32 characters stops startup · high · [unit only]
+
+- **Steps** — in `application-lcl.yml`, set `UAA_WEB_APP_SECRET` to a 16-character value and restart uaa.
+- **Expect** — uaa does not start. The log says *The configured secret of OAuth2 client 'web-app' is 16 characters;
+  at least 32 are required …* and never prints the secret. Nothing is written to `oauth2_registered_client` first.
+  The local profiles carry 32-character secrets and the platform generates 43-character ones, so only a mistake
+  trips it. With `com.asrevo.cvhome.uaa.seed.apply-on-boot` off, configured secrets are not applied and not checked.
+- **Mechanism** — `OAuth2ClientDatabaseInitializer.requireStrongSecret`, before any row is read.
+  `OAuth2ClientDatabaseInitializerTest`.
+
+### CLI-11 — A token request costs no bcrypt, and a seller's sign-in half as much · high · [verified 2026-09-13: load stack, JVM uaa images of main and of this change, uaa capped at 0.25 CPU]
+
+- **Steps** — `LOAD_TAG=native make stack-up` in `load-testing`; run uaa from the image under test
+  (`docker compose -p cvhome-load -f stack/docker-compose.yml -f <override naming the image> up -d --no-deps uaa`),
+  warm it with 40 token requests, then `docker update --cpus 0.25 cvhome-load-uaa-1`, as on dev. Mint 30
+  `client_credentials` tokens for `admin-sdk` and read uaa's CPU from the Docker Engine stats before and after; then
+  `NO_PROM=1 make platform-gateway-login PROFILE=smoke` five times.
+- **Expect** — CPU per token request about 20 ms (it was 453 ms with bcrypt 12), 87 ms each on the wall (1.9 s). One
+  seller sign-in 1.8–2.0 s (3.7–4.2 s): what remains is the user's own bcrypt-12 password check, deliberately kept.
+- **Expected to fail** — `make platform-gateway-login PROFILE=load` at its fixed 30 sign-ins a minute still times
+  out on a 0.25-CPU uaa, because each sign-in's password check costs about 0.45 s of that CPU; 14 timeouts in two
+  minutes, against 28 with bcrypt on the client secret. The answer there is CPU for uaa, not a weaker password hash.
 
 ## KEY — Signing keys
 
