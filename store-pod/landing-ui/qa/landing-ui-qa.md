@@ -12,7 +12,7 @@ text direction, behind the pod's edge.
 - **Runs on** — `lcl start -d --stack <name>` (`npm run dev` alone is not enough — it needs the backend).
   Always reach it through the edge at `http://<store>.spg-507f1f77.gateway.com`; read the live port from
   `lcl urls`
-- **Cases** — 39 (26 verified, 1 unit only, 15 not verified; 3 cases have split verification tags)
+- **Cases** — 40 (27 verified, 1 unit only, 15 not verified; 3 cases have split verification tags)
 - **Also see** — [spg](../../spg/qa/spg-qa.md) (the edge in front of it), content, catalog, inventory,
   [checkout](../../checkout/checkout-service/qa/checkout-qa.md),
   [cua](../../cua/qa/cua-qa.md) (shopper login)
@@ -482,6 +482,23 @@ started it are in the orchestrator plan `.agents/plans/landing-ui-render-cost.md
 - **Seen** — 2026-09-13, against the local load stack (`../load-testing`, the seeded org1-store2): category 144.3 →
   135.8 ms median (−6 %), 8 backend calls per render before and after; against dev's pod, where every call is TLS:
   240.5 → 189.0 ms (−21 %). 404, title and sorted listing identical to the build before.
+
+### PERF-02 — A page carries its stylesheets as links, not inlined · high · [verified]
+
+- **Why** — `experimental.inlineCss` put the CSS of all twelve themes into every page twice, as `<style>` and
+  again as strings in the RSC payload (the theme registry imports every theme into the layout's entry): about
+  580 KiB of an 864 KiB home page, rebuilt on every request.
+- **Steps** — render `/en`; read the HTML; fetch each `<link rel="stylesheet">`; compare CPU per render with the
+  build before.
+- **Expect** — no `<style>` element and no CSS strings in the RSC payload; the page links its stylesheets (13 on
+  the home page), each answering 200 from `/_next/static/chunks/` (or the CDN prefix when the S3 sync is on); the
+  page looks the same in the browser; CPU per render drops on every page.
+- **Expected to differ** — a first visit waits on the stylesheet links; Lighthouse flags them as render-blocking,
+  which is what inlining was switched on for. A repeat visit takes them from the cache.
+- **Seen** — 2026-09-13, local load stack: home 864 → 265 KiB, 13 links, all 200. The linked files carry the same
+  2,600 CSS rules in the same order as the inlined `<style>` did (font `url()`s are relative in a file, absolute
+  inline: the same files). CPU per render against the build before: home −17 %, category −24 %, product −27 %,
+  search −36 % (medians, same session). Compared as CSS, not looked at in a browser.
 
 ---
 
