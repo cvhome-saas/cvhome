@@ -56,6 +56,11 @@ public final class ClientSecretEncoder {
         this.delegate = delegating;
     }
 
+    /** Over another encoder, for tests in this package that read a stored value as the secret it holds. */
+    ClientSecretEncoder(PasswordEncoder delegate) {
+        this.delegate = delegate;
+    }
+
     public String encode(CharSequence secret) {
         return delegate.encode(secret);
     }

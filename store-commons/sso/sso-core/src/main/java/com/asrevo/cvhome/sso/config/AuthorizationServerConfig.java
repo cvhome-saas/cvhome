@@ -15,7 +15,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
 import org.springframework.security.config.annotation.web.configurers.oauth2.server.authorization.OAuth2AuthorizationServerConfigurer;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.server.authorization.JdbcOAuth2AuthorizationConsentService;
 import org.springframework.security.oauth2.server.authorization.JdbcOAuth2AuthorizationService;
@@ -30,6 +29,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.savedrequest.RequestCache;
 
+import com.asrevo.cvhome.sso.client.ClientSecretEncoder;
 import com.asrevo.cvhome.sso.client.EnabledAwareRegisteredClientRepository;
 import com.asrevo.cvhome.sso.client.GraceAwareClientSecretAuthenticationProvider;
 import com.asrevo.cvhome.sso.repo.ClientExtensionRepository;
@@ -68,10 +68,11 @@ public class AuthorizationServerConfig {
                                                     AuthenticationEntryPoint entryPoint,
                                                     ObjectProvider<AuthorizationServerHttpCustomizer> customizers,
                                                     RegisteredClientRepository clients, OAuth2AuthorizationService authorizations,
-                                                    PasswordEncoder encoder, ClientSecretHistoryRepository history, Clock clock)
+                                                    ClientSecretEncoder clientSecrets, ClientSecretHistoryRepository history,
+                                                    Clock clock)
             throws Exception {
         // Built here rather than as a bean: a lone AuthenticationProvider bean becomes the global manager's provider.
-        var graceAware = new GraceAwareClientSecretAuthenticationProvider(clients, authorizations, encoder, history, clock);
+        var graceAware = new GraceAwareClientSecretAuthenticationProvider(clients, authorizations, clientSecrets, history, clock);
         OAuth2AuthorizationServerConfigurer serverConfigurer = new OAuth2AuthorizationServerConfigurer();
         http.with(serverConfigurer, configurer -> configurer.oidc(Customizer.withDefaults())
                         .clientAuthentication(clientAuth -> clientAuth.authenticationProviders(providers ->

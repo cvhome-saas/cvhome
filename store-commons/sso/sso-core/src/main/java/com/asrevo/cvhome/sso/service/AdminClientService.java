@@ -22,7 +22,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.keygen.Base64StringKeyGenerator;
 import org.springframework.security.crypto.keygen.StringKeyGenerator;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
@@ -34,6 +33,7 @@ import com.asrevo.cvhome.sso.audit.AuditEventType;
 import com.asrevo.cvhome.sso.audit.AuditRecord;
 import com.asrevo.cvhome.sso.audit.AuditService;
 import com.asrevo.cvhome.sso.audit.AuditTargetType;
+import com.asrevo.cvhome.sso.client.ClientSecretEncoder;
 import com.asrevo.cvhome.sso.client.ClientType;
 import com.asrevo.cvhome.sso.client.RedirectUriRules;
 import com.asrevo.cvhome.sso.domain.ClientExtension;
@@ -91,7 +91,8 @@ public class AdminClientService {
 
     private final RegisteredClientRepository clients;
 
-    private final PasswordEncoder encoder;
+    /** Client secrets only: a salted SHA-256, because every secret this service writes is 32 random bytes. */
+    private final ClientSecretEncoder encoder;
 
     private final JdbcTemplate jdbc;
 

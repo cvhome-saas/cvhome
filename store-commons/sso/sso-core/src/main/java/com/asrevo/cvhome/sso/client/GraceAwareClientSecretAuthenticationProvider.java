@@ -7,7 +7,6 @@ import java.util.Optional;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
@@ -28,7 +27,9 @@ import com.asrevo.cvhome.sso.repo.ClientSecretHistoryRepository;
  * first and, only when that is refused as {@code invalid_client}, looks for a retired hash still inside its window and
  * hands a one-client view carrying that hash to a fresh instance of Spring's provider. Everything the stock provider
  * checks, it still checks; the only thing that changes is the row it reads. The live secret is hashed once per
- * request, which is what keeps the token endpoint at one bcrypt.
+ * request. The hash is {@link ClientSecretEncoder}'s salted SHA-256, not bcrypt; a live bcrypt hash left from before is
+ * rewritten by Spring's provider the first time it matches, and a retired one is never written back (see
+ * {@link SingleClientRepository}).
  * </p>
  *
  * <p>
@@ -44,7 +45,7 @@ public class GraceAwareClientSecretAuthenticationProvider implements Authenticat
 
     private final OAuth2AuthorizationService authorizations;
 
-    private final PasswordEncoder encoder;
+    private final ClientSecretEncoder encoder;
 
     private final ClientSecretHistoryRepository history;
 
@@ -52,7 +53,7 @@ public class GraceAwareClientSecretAuthenticationProvider implements Authenticat
 
     public GraceAwareClientSecretAuthenticationProvider(RegisteredClientRepository clients,
                                                         OAuth2AuthorizationService authorizations,
-                                                        PasswordEncoder encoder, ClientSecretHistoryRepository history,
+                                                        ClientSecretEncoder encoder, ClientSecretHistoryRepository history,
                                                         Clock clock) {
         this.clients = clients;
         this.authorizations = authorizations;
@@ -68,8 +69,8 @@ public class GraceAwareClientSecretAuthenticationProvider implements Authenticat
             return null;
         }
         // The live registry first, and only that: the stock provider loads the client and matches the hash itself, so
-        // matching it here as well cost every token request a second bcrypt and a second client read — half of the
-        // ~0.5 s the s2s token endpoint took. The grace path is tried only once the live secret has been refused.
+        // matching it here as well cost every token request a second hash and a second client read — half of the
+        // ~0.5 s the s2s token endpoint took with bcrypt. The grace path is tried only once the live secret has been refused.
         try {
             return stock(clients).authenticate(authentication);
         } catch (OAuth2AuthenticationException refused) {
@@ -87,7 +88,7 @@ public class GraceAwareClientSecretAuthenticationProvider implements Authenticat
 
     private ClientSecretAuthenticationProvider stock(RegisteredClientRepository view) {
         ClientSecretAuthenticationProvider stock = new ClientSecretAuthenticationProvider(view, authorizations);
-        stock.setPasswordEncoder(encoder);
+        stock.setPasswordEncoder(encoder.asPasswordEncoder());
         return stock;
     }
 

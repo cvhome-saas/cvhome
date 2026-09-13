@@ -9,13 +9,13 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 
 import com.asrevo.cvhome.sso.audit.AuditService;
+import com.asrevo.cvhome.sso.client.ClientSecretEncoder;
 import com.asrevo.cvhome.sso.client.ClientType;
 import com.asrevo.cvhome.sso.client.ClientsProperties;
 import com.asrevo.cvhome.sso.client.RedirectUriRules;
@@ -74,7 +74,7 @@ class AdminClientServiceTest {
 
     private static final String KEPT_SECRET = "{bcrypt}kept";
 
-    private static final String GENERATED_SECRET = "{bcrypt}generated";
+    private static final String GENERATED_SECRET = "{sha256}generated";
 
     private static final String SCOPE = "store_core";
     private static final String CLIENT_B = "client-b";
@@ -83,7 +83,7 @@ class AdminClientServiceTest {
 
     private final RegisteredClientRepository clients = mock(RegisteredClientRepository.class);
 
-    private final PasswordEncoder encoder = mock(PasswordEncoder.class);
+    private final ClientSecretEncoder encoder = mock(ClientSecretEncoder.class);
 
     private final ClientExtensionRepository extensions = mock(ClientExtensionRepository.class);
 

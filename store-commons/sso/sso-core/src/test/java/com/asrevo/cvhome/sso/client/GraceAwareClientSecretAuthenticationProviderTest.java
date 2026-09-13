@@ -6,7 +6,9 @@ import java.time.ZoneOffset;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -20,6 +22,7 @@ import com.asrevo.cvhome.sso.repo.ClientSecretHistoryRepository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -27,7 +30,8 @@ import static org.mockito.Mockito.when;
 
 /**
  * The live secret and a secret inside its grace window both authenticate; a revoked, expired or unknown one does not.
- * The encoder is the plain-text one so the test reads as what it checks.
+ * The encoder is the plain-text one so the test reads as what it checks, except where a test is about the real
+ * {@link ClientSecretEncoder}: a bcrypt hash from before it is rewritten once it matches, and a retired one never is.
  */
 class GraceAwareClientSecretAuthenticationProviderTest {
 
@@ -48,6 +52,9 @@ class GraceAwareClientSecretAuthenticationProviderTest {
 
     private static final String LIVE_RAW = "live";
 
+    /** How a client secret was stored before ClientSecretEncoder: a prefixed bcrypt hash. */
+    private static final String PREFIXED_BCRYPT = "{bcrypt}%s";
+
     private final RegisteredClientRepository clients = mock(RegisteredClientRepository.class);
 
     private final ClientSecretHistoryRepository history = mock(ClientSecretHistoryRepository.class);
@@ -55,7 +62,13 @@ class GraceAwareClientSecretAuthenticationProviderTest {
     private final PlainEncoder encoder = new PlainEncoder();
 
     private final GraceAwareClientSecretAuthenticationProvider provider = new GraceAwareClientSecretAuthenticationProvider(
-            clients, mock(OAuth2AuthorizationService.class), encoder, history, Clock.fixed(NOW, ZoneOffset.UTC));
+            clients, mock(OAuth2AuthorizationService.class), new ClientSecretEncoder(encoder), history,
+            Clock.fixed(NOW, ZoneOffset.UTC));
+
+    private final ClientSecretEncoder real = new ClientSecretEncoder();
+
+    private final GraceAwareClientSecretAuthenticationProvider realProvider = new GraceAwareClientSecretAuthenticationProvider(
+            clients, mock(OAuth2AuthorizationService.class), real, history, Clock.fixed(NOW, ZoneOffset.UTC));
 
     private final RegisteredClient client = RegisteredClient.withId(ID).clientId(CLIENT_ID).clientSecret(LIVE)
             .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
@@ -82,7 +95,7 @@ class GraceAwareClientSecretAuthenticationProviderTest {
 
         provider.authenticate(presenting(LIVE_RAW));
 
-        // one bcrypt per token request: the stock provider's own match, nothing before it
+        // one hash per token request: the stock provider's own match, nothing before it
         assertThat(encoder.matches).isEqualTo(1);
         verify(history, never()).findByRegisteredClientIdAndRevokedAtIsNull(ID);
     }
@@ -122,6 +135,42 @@ class GraceAwareClientSecretAuthenticationProviderTest {
     void otherMethodsAreLeftToOtherProviders() {
         assertThat(provider.authenticate(new OAuth2ClientAuthenticationToken(CLIENT_ID, ClientAuthenticationMethod.NONE, null,
                 null))).isNull();
+    }
+
+    @Test
+    void aLiveBcryptHashFromBeforeAuthenticatesAndIsRewrittenAsSha256() {
+        String legacy = String.format(PREFIXED_BCRYPT, new BCryptPasswordEncoder(4).encode(LIVE_RAW));
+        when(clients.findByClientId(CLIENT_ID)).thenReturn(RegisteredClient.from(client).clientSecret(legacy).build());
+
+        Authentication result = realProvider.authenticate(presenting(LIVE_RAW));
+
+        assertThat(result.isAuthenticated()).isTrue();
+        ArgumentCaptor<RegisteredClient> saved = ArgumentCaptor.forClass(RegisteredClient.class);
+        verify(clients).save(saved.capture());
+        assertThat(saved.getValue().getClientSecret()).startsWith("{sha256}");
+        assertThat(real.matches(LIVE_RAW, saved.getValue().getClientSecret())).isTrue();
+    }
+
+    @Test
+    void aSha256HashIsNotRewrittenOnEveryRequest() {
+        when(clients.findByClientId(CLIENT_ID)).thenReturn(RegisteredClient.from(client).clientSecret(real.encode(LIVE_RAW)).build());
+
+        assertThat(realProvider.authenticate(presenting(LIVE_RAW)).isAuthenticated()).isTrue();
+
+        verify(clients, never()).save(any());
+    }
+
+    @Test
+    void aRetiredBcryptHashStillAuthenticatesInItsWindowButIsNeverWrittenBackOverTheLiveSecret() {
+        String retired = String.format(PREFIXED_BCRYPT, new BCryptPasswordEncoder(4).encode(OLD_RAW));
+        when(clients.findByClientId(CLIENT_ID)).thenReturn(RegisteredClient.from(client).clientSecret(real.encode(LIVE_RAW)).build());
+        when(history.findByRegisteredClientIdAndRevokedAtIsNull(ID))
+                .thenReturn(List.of(ClientSecretHistory.retire(ID, retired, NOW.minusSeconds(60), NOW.plusSeconds(3600))));
+
+        assertThat(realProvider.authenticate(presenting(OLD_RAW)).isAuthenticated()).isTrue();
+
+        // Spring's provider asks to upgrade the retired hash; the one-client view drops the write.
+        verify(clients, never()).save(any());
     }
 
     /** {@code {noop}} prefixed comparison, so the hashes above read as the secrets they hold. */

@@ -1323,9 +1323,9 @@ how long a new secret lives (`clientSecretValidityDays`) and how long the one it
   `client.secret.rotated` twice, the second with detail *previous secret revoked early*.
 - **Mechanism** — `GraceAwareClientSecretAuthenticationProvider` hands Spring's own provider a one-client view carrying
   the retired hash; nothing about Spring's checks is re-implemented. `ClientSecretRotationIntegrationTest`.
-- **Watch for** — `bcrypt` strength upgrades: Spring re-encodes and *saves* a hash whose strength is below the
-  encoder's. On the grace view that save is a no-op on purpose (it would write the old hash back onto the
-  registration).
+- **Watch for** — hash upgrades: Spring re-encodes and *saves* a hash the encoder asks to upgrade, which since
+  CLI-09 is any bcrypt one. On the grace view that save is a no-op on purpose (it would write the old hash back onto
+  the registration).
 
 ### CLI-04 — Disable revokes and refuses; enable restores · critical · [verified]
 
@@ -1373,6 +1373,33 @@ how long a new secret lives (`clientSecretValidityDays`) and how long the one it
   secret, is the only way to change one.
 
 ---
+
+### CLI-09 — A client secret is stored as a salted SHA-256, and an older bcrypt hash rewrites itself · critical · [verified]
+
+- **Steps** — register `qa-machine` (CLI-01) and mint a token with its secret. In psql:
+  `select client_id, left(client_secret, 9) from oauth2_registered_client;`. Then store a bcrypt hash of that same
+  secret on the row (`update ... set client_secret = '{bcrypt}' || <a $2a$ hash of the secret>`), mint with a wrong
+  secret, then with the right one, and read the row again.
+- **Expect** — a registered, rotated or seeded client that has authenticated holds `{sha256}…`, never the secret.
+  With the bcrypt row: wrong → **401** and the row is still `{bcrypt}`; right → **200** and the row is now
+  `{sha256}`; the next token → 200. User passwords are untouched: `select left(password_hash, 7) from users` still
+  reads bcrypt.
+- **Mechanism** — `ClientSecretEncoder` (sso-core): a 256-bit random secret needs no work factor, so a salted SHA-256
+  replaces bcrypt, which cost 227 ms of CPU per token request. Spring's `ClientSecretAuthenticationProvider` calls
+  `upgradeEncoding` and saves after a match, which rewrites a bcrypt row. `ClientSecretHashingIntegrationTest`,
+  `ClientSecretEncoderTest`, `GraceAwareClientSecretAuthenticationProviderTest`.
+- **Watch for** — a client secret a person typed: there is no way to set one (CLI-08), which is what makes the fast
+  hash safe.
+
+### CLI-10 — A configured client secret under 32 characters stops startup · high · [unit only]
+
+- **Steps** — in `application-lcl.yml`, set `UAA_WEB_APP_SECRET` to a 16-character value and restart uaa.
+- **Expect** — uaa does not start. The log says *The configured secret of OAuth2 client 'web-app' is 16 characters;
+  at least 32 are required …* and never prints the secret. Nothing is written to `oauth2_registered_client` first.
+  The local profiles carry 32-character secrets and the platform generates 43-character ones, so only a mistake
+  trips it. With `com.asrevo.cvhome.uaa.seed.apply-on-boot` off, configured secrets are not applied and not checked.
+- **Mechanism** — `OAuth2ClientDatabaseInitializer.requireStrongSecret`, before any row is read.
+  `OAuth2ClientDatabaseInitializerTest`.
 
 ## KEY — Signing keys
 

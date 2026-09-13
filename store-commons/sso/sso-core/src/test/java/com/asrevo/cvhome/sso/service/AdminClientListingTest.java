@@ -14,11 +14,11 @@ import org.mockito.Mockito;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 
 import com.asrevo.cvhome.sso.audit.AuditService;
+import com.asrevo.cvhome.sso.client.ClientSecretEncoder;
 import com.asrevo.cvhome.sso.client.ClientType;
 import com.asrevo.cvhome.sso.client.ClientsProperties;
 import com.asrevo.cvhome.sso.client.RedirectUriRules;
@@ -74,7 +74,7 @@ class AdminClientListingTest {
     private final TokenRevocationService revocation = mock(TokenRevocationService.class);
     private final AuditService audit = mock(AuditService.class);
 
-    private final AdminClientService service = new AdminClientService(clients, mock(PasswordEncoder.class), jdbc,
+    private final AdminClientService service = new AdminClientService(clients, mock(ClientSecretEncoder.class), jdbc,
             audit, extensions, mock(ClientSecretHistoryRepository.class), mock(SettingsService.class),
             new RedirectUriRules(new ClientsProperties(List.of("localhost"))), revocation,
             Clock.fixed(NOW, ZoneOffset.UTC));
