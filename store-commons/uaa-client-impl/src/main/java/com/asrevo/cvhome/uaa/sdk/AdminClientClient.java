@@ -77,14 +77,6 @@ public class AdminClientClient extends AbstractAdminClient {
         sendAndVerify(request);
     }
 
-    public void resetSecret(String id, String newSecret) throws UaaApiException {
-        HttpRequest request = authenticatedRequestBuilder(String.format("%s%s%s/reset-secret", clientsApiUrl, PATH_SEPARATOR, id))
-                .POST(HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(Map.of("newSecret", newSecret))))
-                .header(CONTENT_TYPE_HEADER, CONTENT_TYPE_APPLICATION_JSON)
-                .build();
-        sendAndVerify(request);
-    }
-
     public Map<String, Object> getOptions() throws UaaApiException {
         HttpRequest request = authenticatedRequestBuilder(String.format("%s/options", clientsApiUrl)).GET().build();
         return sendAndParse(request, new TypeReference<>() {

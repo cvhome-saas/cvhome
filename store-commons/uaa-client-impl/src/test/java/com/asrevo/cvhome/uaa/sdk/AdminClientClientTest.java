@@ -133,15 +133,11 @@ class AdminClientClientTest {
     }
 
     @Test
-    void deletingAndResettingASecretVerifyTheResponseWithoutParsingABody() throws Exception {
+    void deletingVerifiesTheResponseWithoutParsingABody() throws Exception {
         stubbing(204, "");
 
         client.deleteClient(CLIENT_ID);
         assertThat(apiRequest().method()).isEqualTo("DELETE");
-
-        sent.clear();
-        client.resetSecret(CLIENT_ID, "new-secret");
-        assertThat(apiRequest().uri().getPath()).endsWith("/reset-secret");
     }
 
     @Test

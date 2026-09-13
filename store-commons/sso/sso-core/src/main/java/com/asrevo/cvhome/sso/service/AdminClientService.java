@@ -387,25 +387,6 @@ public class AdminClientService {
         return retired;
     }
 
-    /**
-     * Sets a secret the operator chose, with no grace window: the alias the SDK and the older console call. A missing
-     * client is a 404 rather than a silent success — the previous {@code if (client != null)} answered 200 without
-     * rotating anything.
-     */
-    @Transactional
-    public void resetSecret(String id, String newSecret) throws ClientNotFoundException, ClientNotConfidentialException {
-        RegisteredClient client = findOrThrow(id);
-        if (!ClientType.of(client).holdsSecret()) {
-            throw ClientNotConfidentialException.of(client.getClientId());
-        }
-        Instant now = clock.instant();
-        retireLive(id, now);
-        clients.save(RegisteredClient.from(client).clientSecret(encoder.encode(newSecret))
-                .clientSecretExpiresAt(secretExpiry(now)).build());
-        audit.record(AuditRecord.of(AuditEventType.CLIENT_SECRET_ROTATED).client(client.getClientId())
-                .target(AuditTargetType.CLIENT, id, client.getClientId()).detail("secret set by an operator"));
-    }
-
     private Instant secretExpiry(Instant now) {
         int days = settings.current().tokens().clientSecretValidityDays();
         return days > 0 ? now.plus(days, ChronoUnit.DAYS) : null;

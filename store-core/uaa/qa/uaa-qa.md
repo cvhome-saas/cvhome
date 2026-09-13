@@ -352,8 +352,8 @@ uaa's own guard is what keeps this safe, which is why the negative cases matter 
 
 - **Steps** — `GET /uaa/api/v1/admin/clients` as super-admin, then one by id.
 - **Expect** — neither carries the secret in readable form. A secret in the response, or in `uaa.log`, is a
-  finding. Registration does not echo one either, and `reset-secret` answers `void` — so the only moment a
-  secret is readable is the moment it is set, which is what the console's notice says.
+  finding. Registration does not echo one either, and rotation answers the new one once — so the only moment a
+  secret is readable is the moment uaa generates it, which is what the console's notice says.
 
 ### ADM-07 — Reading one client does not exhaust the stack · critical · [verified]
 
@@ -1368,9 +1368,9 @@ how long a new secret lives (`clientSecretValidityDays`) and how long the one it
 ### CLI-08 — Delete revokes first · [verified]
 
 - **Steps** — delete `qa-machine` from its page, typing the id.
-- **Expect** — its authorizations are gone before the row is; `GET /clients/{id}` → 404. `reset-secret` (the SDK's
-  alias) still works and sets a chosen secret with no grace window; on a public client it answers **422**
-  `UAA.CLIENT.NOT_CONFIDENTIAL`.
+- **Expect** — its authorizations are gone before the row is; `GET /clients/{id}` → 404. There is no way to set a
+  secret an operator chose: `POST /clients/{id}/reset-secret` is gone (404), and rotation, which generates the
+  secret, is the only way to change one.
 
 ---
 

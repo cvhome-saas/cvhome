@@ -146,13 +146,6 @@ Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
 DELETE {{SELLER_UI_URL}}/uaa/api/v1/admin/clients/{{CLIENT_RECORD_ID}}/previous-secret
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
 
-### set a chosen secret, no grace — 200, empty body (the alias the SDK calls)
-POST {{SELLER_UI_URL}}/uaa/api/v1/admin/clients/{{CLIENT_RECORD_ID}}/reset-secret
-Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
-Content-Type: application/json
-
-{"newSecret": "http-demo-secret"}
-
 ### disable it — 200 ClientDetails with status.enabled false; its tokens are revoked and the token endpoint answers invalid_client
 POST {{SELLER_UI_URL}}/uaa/api/v1/admin/clients/{{CLIENT_RECORD_ID}}/disable
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}

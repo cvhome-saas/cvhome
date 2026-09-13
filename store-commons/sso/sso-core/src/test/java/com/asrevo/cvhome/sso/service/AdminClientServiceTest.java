@@ -80,7 +80,6 @@ class AdminClientServiceTest {
     private static final String CLIENT_B = "client-b";
     private static final String OPENID = "openid";
     private static final String THE_CONSOLE = "the console";
-    private static final String CHOSEN = "chosen";
 
     private final RegisteredClientRepository clients = mock(RegisteredClientRepository.class);
 
@@ -320,42 +319,6 @@ class AdminClientServiceTest {
         when(clients.findById(MISSING)).thenReturn(null);
 
         assertThatThrownBy(() -> service.revokePreviousSecret(MISSING))
-                .isInstanceOf(ClientNotFoundException.class);
-    }
-
-    @Test
-    void resettingAsecretWritesTheOperatorsChoiceWithNoGraceWindow() throws Exception {
-        ClientSecretHistory live = ClientSecretHistory.retire(A, KEPT_SECRET, NOW, NOW.plusSeconds(600));
-        when(clients.findById(A)).thenReturn(existing(A));
-        when(history.findByRegisteredClientIdAndRevokedAtIsNull(A)).thenReturn(List.of(live));
-        when(encoder.encode(CHOSEN)).thenReturn(GENERATED_SECRET);
-
-        service.resetSecret(A, CHOSEN);
-
-        ArgumentCaptor<RegisteredClient> saved = ArgumentCaptor.forClass(RegisteredClient.class);
-        verify(clients).save(saved.capture());
-        assertThat(saved.getValue().getClientSecret()).isEqualTo(GENERATED_SECRET);
-        // No grace window at all: the previous secret stops working the moment this returns.
-        assertThat(live.getRevokedAt()).isEqualTo(NOW);
-    }
-
-    @Test
-    void resettingTheSecretOfApublicClientIsRefused() {
-        when(clients.findById(A)).thenReturn(RegisteredClient.withId(A).clientId(CLIENT_A).clientName(A)
-                .clientAuthenticationMethod(ClientAuthenticationMethod.NONE)
-                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-                .redirectUri(CALLBACK).scope(OPENID).build());
-
-        assertThatThrownBy(() -> service.resetSecret(A, CHOSEN))
-                .isInstanceOf(ClientNotConfidentialException.class);
-    }
-
-    @Test
-    void resettingTheSecretOfAmissingClientIsNotFoundRatherThanAsilentSuccess() {
-        when(clients.findById(MISSING)).thenReturn(null);
-
-        // The previous `if (client != null)` answered 200 without rotating anything.
-        assertThatThrownBy(() -> service.resetSecret(MISSING, CHOSEN))
                 .isInstanceOf(ClientNotFoundException.class);
     }
 
