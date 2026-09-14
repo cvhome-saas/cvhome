@@ -12,6 +12,7 @@ import org.springframework.test.context.ActiveProfiles;
 import com.asrevo.cvhome.testsupport.containers.MinioTestConfiguration;
 import com.asrevo.cvhome.testsupport.containers.PostgresTestConfiguration;
 import com.asrevo.cvhome.testsupport.security.ServletTestSecurityConfiguration;
+import com.asrevo.cvhome.testsupport.sql.SqlStatements;
 
 /**
  * {@link ServiceIntegrationTest} plus a MinIO container, for services that store media (catalog, content, merchant,
@@ -19,7 +20,8 @@ import com.asrevo.cvhome.testsupport.security.ServletTestSecurityConfiguration;
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = {SqlStatements.INSPECTOR,
+        SqlStatements.NO_PAGING_IN_MEMORY})
 @ActiveProfiles("test-stores")
 @Import({PostgresTestConfiguration.class, MinioTestConfiguration.class, ServletTestSecurityConfiguration.class})
 public @interface StorageIntegrationTest {

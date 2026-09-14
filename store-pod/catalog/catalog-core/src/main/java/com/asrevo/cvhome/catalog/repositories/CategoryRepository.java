@@ -39,13 +39,19 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     /**
      * All of a store's categories, optionally narrowed by a name fragment in any language. Paged, because the
      * console's hierarchy read is a page.
+     *
+     * <p>
+     * No fetch join: paging a query that fetch-joins a collection makes Hibernate read every row and page in memory
+     * (HHH90003004), which behind {@code /api/v1/category-hierarchy} meant the whole store per request. The page is SQL
+     * now, and {@code descriptions} follows in one {@code @BatchSize} read.
+     * </p>
      */
-    @Query(value = "select distinct c from Category c left join fetch c.descriptions where c.storeMerchantId = ?1",
+    @Query(value = "select c from Category c where c.storeMerchantId = ?1",
             countQuery = "select count(c) from Category c where c.storeMerchantId = ?1")
     Page<Category> findByStore(StoreMerchantId store, Pageable pageable);
 
     @Query(value = """
-            select distinct c from Category c left join fetch c.descriptions d
+            select distinct c from Category c left join c.descriptions d
             where c.storeMerchantId = ?1 and lower(d.name) like lower(concat('%', ?2, '%'))""",
             countQuery = """
                     select count(distinct c) from Category c left join c.descriptions d

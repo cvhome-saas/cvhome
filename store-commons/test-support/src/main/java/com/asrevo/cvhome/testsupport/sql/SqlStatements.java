@@ -30,6 +30,14 @@ public final class SqlStatements implements StatementInspector {
             spring.jpa.properties.hibernate.session_factory.statement_inspector=\
             com.asrevo.cvhome.testsupport.sql.SqlStatements""";
 
+    /**
+     * Makes paging over a fetch-joined collection an error instead of Hibernate's HHH90003004 warning: it reads every
+     * row and pages in memory, which the 2026-09-14 load test found behind catalog's category hierarchy. Set beside
+     * {@link #INSPECTOR} by the same annotations.
+     */
+    public static final String NO_PAGING_IN_MEMORY = """
+            spring.jpa.properties.hibernate.query.fail_on_pagination_over_collection_fetch=true""";
+
     private static final ThreadLocal<List<String>> RECORDING = new ThreadLocal<>();
 
     @Override

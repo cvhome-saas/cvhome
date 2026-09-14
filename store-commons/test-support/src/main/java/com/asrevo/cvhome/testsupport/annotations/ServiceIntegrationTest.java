@@ -27,7 +27,8 @@ import com.asrevo.cvhome.testsupport.sql.SqlStatements;
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = SqlStatements.INSPECTOR)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = {SqlStatements.INSPECTOR,
+        SqlStatements.NO_PAGING_IN_MEMORY})
 @ActiveProfiles("test-stores")
 @Import({PostgresTestConfiguration.class, ServletTestSecurityConfiguration.class})
 public @interface ServiceIntegrationTest {
