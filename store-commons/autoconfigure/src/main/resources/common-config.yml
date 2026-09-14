@@ -2,6 +2,16 @@ com:
   asrevo:
     cvhome:
       s2s:
+        # Every peer call through RestClientBuilder (S2sHttpProperties). There were none: in the 2026-09-14 spike checkout
+        # waited on a slow catalog while holding its database connections, and everything behind them failed.
+        http:
+          connect-timeout: 1s
+          read-timeout: 3s
+          # Peers whose answer legitimately takes longer. payment waits on its provider (Stripe) before it answers
+          # checkout; an unanswered initiate already means "nothing was decided" to checkout, so this only spares a
+          # slow provider the spurious failure.
+          read-timeouts:
+            payment: 10s
       app:
         domain: gateway.com
         sub:
@@ -155,6 +165,10 @@ spring:
       schema: ${spring.application.name}
       # Named after the service so hikaricp_* series carry pool="<service>" instead of "HikariPool-1" everywhere.
       pool-name: ${spring.application.name}
+      # Hikari's default is 30 s. With 3 connections a task, a request that cannot get one soon will not get one at
+      # all during a spike, and 30 s of waiting per request only piles up threads: checkout answered 2,562 requests
+      # with a 500 after exactly 30 s in the 2026-09-14 spike. Fail in 3 s instead.
+      connection-timeout: 3000
   session:
     jdbc:
       initialize-schema: always

@@ -22,6 +22,7 @@ import org.springframework.security.oauth2.client.web.reactive.function.client.S
 import org.springframework.web.client.RestClient;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import com.asrevo.cvhome.s2s.model.S2sHttpProperties;
 import com.asrevo.cvhome.s2s.model.ServiceDomainProperties;
 
 import lombok.extern.slf4j.Slf4j;
@@ -156,8 +157,10 @@ public class WebClientServicesConfig {
         public RestClientBuilder restClientBuilder(Environment environment,
                                                    @Qualifier("microServiceRestClient") RestClient microServiceRestClient,
                                                    @Qualifier("defaultRestClient") RestClient defaultRestClient,
-                                                   ServiceDomainProperties serviceDomainProperties) {
-            return new RestClientBuilder(environment, microServiceRestClient.mutate(), defaultRestClient.mutate(), serviceDomainProperties);
+                                                   ServiceDomainProperties serviceDomainProperties,
+                                                   S2sHttpProperties s2sHttpProperties) {
+            return new RestClientBuilder(environment, microServiceRestClient.mutate(), defaultRestClient.mutate(),
+                    serviceDomainProperties, new S2sRequestFactories(s2sHttpProperties));
         }
 
     }
