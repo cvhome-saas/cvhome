@@ -1,7 +1,9 @@
 /**
- * Puts the OpenTelemetry instrumentation hook, and everything it needs at runtime, into the standalone output.
+ * Puts into the standalone output what `next build` leaves out: the OpenTelemetry instrumentation hook with everything
+ * it needs at runtime, and the packages the app loads outside Next's bundle (`serverExternalPackages`: the S3 SDK
+ * start.mjs syncs static assets with).
  *
- * Three gaps in `next build --output standalone`:
+ * Four gaps in `next build --output standalone`:
  *
  *  1. `<distDir>/server/instrumentation.js` is not copied. The server requires exactly that path
  *     (`getInstrumentationModule` in next/dist/server/lib/router-utils/instrumentation-globals.external) and
@@ -12,6 +14,10 @@
  *  3. Since Next 16.3, Turbopack requires an external package by a hashed alias (`require-in-the-middle-<hash>`),
  *     a symlink the build writes in `<distDir>/node_modules/`. The hook's trace lists them; standalone copies none.
  *     This one is loud: the hook throws while loading, and every page answers 500.
+ *  4. A package in `serverExternalPackages` that no route imports is not traced at all. The S3 SDK used to be forced
+ *     in with `outputFileTracingIncludes` globs, until Next 16.3: its Turbopack matches those globs anywhere in a path
+ *     and hashes every match, so `node_modules/@aws-sdk/**` found the directory symlinks `next dev` leaves in
+ *     `.next-<stack>/dev/node_modules/`, and every build after an lcl dev server failed with EISDIR.
  *
  * The result was a deployed storefront with no page-render spans, no upstream fetch spans and no entry in the
  * service graph, while `next start` from the full build directory traced perfectly, because there both the hook and
@@ -19,9 +25,10 @@
  * itself was put under load.
  *
  * So: copy the hook plus the chunks it references (transitively — the whole `server/chunks` directory is ~31 MB
- * against ~4 KB of instrumentation), and copy the telemetry packages plus their dependency closure. Nothing is
- * hand-listed: the seeds are the app's own `@opentelemetry` dependencies and the closure comes from each package's
- * `dependencies`, so a version bump or a new instrumentation needs no change here.
+ * against ~4 KB of instrumentation), and copy the telemetry packages and the server's external packages plus their
+ * dependency closure. Nothing is hand-listed: the seeds are the app's own `@opentelemetry` dependencies and the
+ * `serverExternalPackages` of the build's own config, and the closure comes from each package's `dependencies`, so a
+ * version bump, a new instrumentation or a new external package needs no change here.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -99,7 +106,14 @@ const packageDirOf = (name) => {
 };
 
 const manifest = JSON.parse(fs.readFileSync('package.json', 'utf8'));
-const seeds = Object.keys(manifest.dependencies ?? {}).filter((name) => name.startsWith('@opentelemetry/'));
+const serverFiles = path.join(dist, 'required-server-files.json');
+const externals = fs.existsSync(serverFiles)
+    ? JSON.parse(fs.readFileSync(serverFiles, 'utf8')).config?.serverExternalPackages ?? []
+    : [];
+const seeds = [
+    ...Object.keys(manifest.dependencies ?? {}).filter((name) => name.startsWith('@opentelemetry/')),
+    ...externals,
+];
 
 const packages = [];
 const pendingPackages = [...seeds];
@@ -144,4 +158,5 @@ for (const alias of aliases) {
 }
 
 console.log(`[instrumentation] standalone: ${chunks.length} build file(s), ${packages.length} package(s) copied `
-    + `(${seenPackages.size} in the telemetry closure), ${aliases.length} external alias(es) linked`);
+    + `(${seenPackages.size} in the closure of ${seeds.length} seed(s), external: ${externals.join(', ') || 'none'}), `
+    + `${aliases.length} external alias(es) linked`);

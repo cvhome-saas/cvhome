@@ -58,6 +58,28 @@ test('fails the build when an alias points at a package standalone does not have
     assert.match(result.stderr, /standalone does not have/);
 });
 
+test('copies the build\'s serverExternalPackages into standalone with their dependency closure', () => {
+    const {app} = build({aliases: false});
+    const pkg = (name, dependencies = {}) => {
+        const dir = path.join(app, 'node_modules', ...name.split('/'));
+        fs.mkdirSync(dir, {recursive: true});
+        fs.writeFileSync(path.join(dir, 'package.json'), JSON.stringify({name, version: '1.0.0', dependencies}));
+        fs.writeFileSync(path.join(dir, 'index.js'), 'module.exports = {};\n');
+    };
+    pkg('@scope/sdk', {'sdk-dep': '1.0.0'});
+    pkg('sdk-dep');
+    pkg('unrelated');
+    fs.writeFileSync(path.join(app, '.next', 'required-server-files.json'),
+        JSON.stringify({config: {serverExternalPackages: ['@scope/sdk']}}));
+    const result = run(app);
+    assert.equal(result.status, 0, result.stderr);
+    const modules = path.join(app, '.next', 'standalone', 'node_modules');
+    assert.ok(fs.existsSync(path.join(modules, '@scope', 'sdk', 'index.js')));
+    assert.ok(fs.existsSync(path.join(modules, 'sdk-dep', 'package.json')), 'its dependencies come along');
+    assert.equal(fs.existsSync(path.join(modules, 'unrelated')), false, 'and nothing else');
+    assert.match(result.stdout, /external: @scope\/sdk/);
+});
+
 test('a build without aliases (Next before 16.3) links nothing', () => {
     const {app, served} = build({aliases: false});
     const result = run(app);

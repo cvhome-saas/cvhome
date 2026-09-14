@@ -49,20 +49,12 @@ const nextConfig: NextConfig = {
     turbopack: {
         root: monorepoRoot,
     },
-    // Loaded lazily by scripts/static-assets/sync-s3.mjs, outside the Next bundle. The tracing
-    // includes force the SDK (and its runtime deps) into .next/standalone/node_modules so the
-    // Docker image can upload to S3 without an npm install.
+    // Loaded lazily by scripts/static-assets/sync-s3.mjs, outside the Next bundle. scripts/copy-instrumentation.mjs
+    // copies every package listed here, with its dependency closure, into .next/standalone/node_modules, so the Docker
+    // image can upload to S3 without an npm install. Not `outputFileTracingIncludes`: Turbopack matches those globs
+    // anywhere in a path, and since 16.3 it hashes every match, so `node_modules/@aws-sdk/**` found the directory
+    // symlinks `next dev` leaves in `.next-<stack>/dev/node_modules/` and failed the build (EISDIR).
     serverExternalPackages: ['@aws-sdk/client-s3'],
-    outputFileTracingIncludes: {
-        '/**': [
-            '../node_modules/@aws-sdk/**',
-            '../node_modules/@aws/**',
-            '../node_modules/@smithy/**',
-            '../node_modules/tslib/**',
-            '../node_modules/bowser/**',
-            '../node_modules/uuid/**',
-        ],
-    },
     // Source packages (no build step) compiled by Next. Themes are appended by scripts/new-theme.mjs.
     transpilePackages: [
         '@store-front/ui',
