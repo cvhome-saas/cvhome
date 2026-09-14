@@ -30,6 +30,7 @@ import com.asrevo.cvhome.catalog.model.product.ReadableProduct;
 import com.asrevo.cvhome.catalog.model.product.ReadableProductSearchResult;
 import com.asrevo.cvhome.catalog.model.product.ReadableProductSuggestion;
 import com.asrevo.cvhome.catalog.model.product.ReadableSearchFacets;
+import com.asrevo.cvhome.catalog.model.product.SearchFacetGroup;
 import com.asrevo.cvhome.catalog.repositories.CategoryRepository;
 import com.asrevo.cvhome.catalog.repositories.ManufacturerRepository;
 import com.asrevo.cvhome.catalog.repositories.ProductFacetRepository;
@@ -94,7 +95,8 @@ public class ProductSearchServiceImpl implements ProductSearchService {
                                               LanguageCode language, Pageable pageable) {
         ReadableProductSearchResult result = runSearch(store, criteria, language, pageable, criteria.trimmedQuery());
 
-        if (result.getTotalElements() > 0 || !criteria.hasQuery()) {
+        // Without rows there is no total to judge a near miss by; a rail is drawn for what was asked.
+        if (result.getTotalElements() > 0 || !criteria.hasQuery() || !criteria.isRows()) {
             return result;
         }
 
@@ -128,20 +130,24 @@ public class ProductSearchServiceImpl implements ProductSearchService {
                 .and(ProductSpecifications.hasOptionValues(valuesByOption(store, criteria.getOptionValueIds())))
                 .and(ProductSpecifications.matchesText(queryText, store, language));
 
-        ProductSearchSort sort = ProductSearchSort.orDefault(criteria.getSort());
-        boolean byRelevance = sort == ProductSearchSort.RELEVANCE && queryText != null && !queryText.isBlank();
-
-        Page<Product> page = productRepository.findAll(
-                byRelevance ? spec.and(orderByRelevance(queryText, store, language)) : spec,
-                byRelevance ? unsorted(pageable) : sorted(pageable, sort));
-
         ReadableProductSearchResult result = new ReadableProductSearchResult();
-        result.setContent(map(hydrate(page.getContent()), language));
-        result.setSize(result.getContent().size());
-        result.setTotalElements(page.getTotalElements());
-        result.setTotalPages(page.getTotalPages());
-        result.setPageNumber(page.getNumber());
         result.setLanguage(language.code());
+        if (criteria.isRows()) {
+            ProductSearchSort sort = ProductSearchSort.orDefault(criteria.getSort());
+            boolean byRelevance = sort == ProductSearchSort.RELEVANCE && queryText != null && !queryText.isBlank();
+
+            Page<Product> page = productRepository.findAll(
+                    byRelevance ? spec.and(orderByRelevance(queryText, store, language)) : spec,
+                    byRelevance ? unsorted(pageable) : sorted(pageable, sort));
+
+            result.setContent(map(hydrate(page.getContent()), language));
+            result.setSize(result.getContent().size());
+            result.setTotalElements(page.getTotalElements());
+            result.setTotalPages(page.getTotalPages());
+            result.setPageNumber(page.getNumber());
+        } else {
+            result.setContent(List.of());
+        }
         if (criteria.isFacets()) {
             result.setFacets(facets(spec, criteria, language, store));
         }
@@ -215,16 +221,24 @@ public class ProductSearchServiceImpl implements ProductSearchService {
     private ReadableSearchFacets facets(Specification<Product> spec, ProductSearchCriteria criteria,
                                         LanguageCode language, StoreMerchantId store) {
         ReadableSearchFacets facets = new ReadableSearchFacets();
-        facets.setCategories(buckets(facetRepository.countByCategory(spec), criteria.getCategoryIds(),
-                ids -> categoryRepository.findAllById(ids).stream()
-                        .collect(Collectors.toMap(Category::getId, c -> name(c, language)))));
-        facets.setBrands(buckets(facetRepository.countByManufacturer(spec), criteria.getManufacturerIds(),
-                ids -> manufacturerRepository.findAllById(ids).stream()
-                        .collect(Collectors.toMap(Manufacturer::getId, m -> name(m, language)))));
-        facets.setTypes(buckets(facetRepository.countByType(spec), criteria.getProductTypeIds(),
-                ids -> productTypeRepository.findAllById(ids).stream()
-                        .collect(Collectors.toMap(ProductType::getId, t -> name(t, language)))));
-        facets.setOptions(optionFacets(spec, criteria, language, store));
+        if (criteria.wantsFacets(SearchFacetGroup.CATEGORIES)) {
+            facets.setCategories(buckets(facetRepository.countByCategory(spec), criteria.getCategoryIds(),
+                    ids -> categoryRepository.findAllById(ids).stream()
+                            .collect(Collectors.toMap(Category::getId, c -> name(c, language)))));
+        }
+        if (criteria.wantsFacets(SearchFacetGroup.BRANDS)) {
+            facets.setBrands(buckets(facetRepository.countByManufacturer(spec), criteria.getManufacturerIds(),
+                    ids -> manufacturerRepository.findAllById(ids).stream()
+                            .collect(Collectors.toMap(Manufacturer::getId, m -> name(m, language)))));
+        }
+        if (criteria.wantsFacets(SearchFacetGroup.TYPES)) {
+            facets.setTypes(buckets(facetRepository.countByType(spec), criteria.getProductTypeIds(),
+                    ids -> productTypeRepository.findAllById(ids).stream()
+                            .collect(Collectors.toMap(ProductType::getId, t -> name(t, language)))));
+        }
+        if (criteria.wantsFacets(SearchFacetGroup.OPTIONS)) {
+            facets.setOptions(optionFacets(spec, criteria, language, store));
+        }
         return facets;
     }
 

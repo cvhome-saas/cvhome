@@ -92,6 +92,17 @@ GET {{LANDING_UI_URL}}/catalog/api/v2/products/search?store={{STORE_ID}}&lang={{
     });
 %}
 
+### the category page's rail — `rows=false&facetGroups=OPTIONS`: option facets only; no page, count or other facet block
+GET {{LANDING_UI_URL}}/catalog/api/v2/products/search?store={{STORE_ID}}&lang={{LANG}}&rows=false&facets=true&facetGroups=OPTIONS
+
+> {%
+    client.test("option facets without rows", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        client.assert(response.body.content.length === 0, "rows came back");
+        client.assert(response.body.facets.brands.length === 0, "a block that was not asked for was counted");
+    });
+%}
+
 ### the same term in Arabic — the merchant's own copy, not a transliteration
 GET {{LANDING_UI_URL}}/catalog/api/v2/products/search?store={{STORE_ID}}&lang=ar&q=نايكي&count=5
 
