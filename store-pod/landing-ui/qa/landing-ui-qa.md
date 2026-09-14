@@ -12,7 +12,7 @@ text direction, behind the pod's edge.
 - **Runs on** — `lcl start -d --stack <name>` (`npm run dev` alone is not enough — it needs the backend).
   Always reach it through the edge at `http://<store>.spg-507f1f77.gateway.com`; read the live port from
   `lcl urls`
-- **Cases** — 50 (37 verified, 1 unit only, 18 not verified; 6 cases have split verification tags)
+- **Cases** — 53 (40 verified, 1 unit only, 17 not verified; 5 cases have split verification tags)
 - **Also see** — [spg](../../spg/qa/spg-qa.md) (the edge in front of it), content, catalog, inventory,
   [checkout](../../checkout/checkout-service/qa/checkout-qa.md),
   [cua](../../cua/qa/cua-qa.md) (shopper login)
@@ -284,6 +284,11 @@ from a past run.
   page × theme pairs pass. Fashion home: 2 CSS (111 KiB) and 16 JS (1,108 KiB), none of another theme; before:
   13 CSS and 31 JS, 22 of them another theme's. The twelve Tailwind files hold exactly the 1,419 classes the
   single file held.
+- **Re-run** — 2026-09-14, on Next 16.3.5: the image on the load stack in CDN mode, with `make page-budget` in
+  `../load-testing`.
+  - 48 of 48 page × theme pairs (home, category, product, search) pass, and no file carries another theme.
+  - Fashion home: 2 CSS (112 KiB) and 15 JS (1,106 KiB).
+  - The attribution still reads the build's manifests: 222 theme modules.
 
 ### THM-07 — `/t/…` cannot be addressed from outside · high · [verified]
 
@@ -291,6 +296,8 @@ from a past run.
 - **Expect** — 404, empty body. The shopper's URLs stay `/{locale}/…`: the proxy rewrites, it never redirects, so
   `/t/` never shows in the address bar.
 - **Seen** — 2026-09-13: 404 for all three (before: a redirect to `/en/t/…`, then a 404).
+- **Re-run** — 2026-09-14, on Next 16.3.5 through spg: 404 for all three. The payload and prefetch forms of the same
+  URLs are SEC-02, which found the `.rsc` form open until the matcher listed `/t/:path*`.
 
 ### THM-08 — `?theme=` switches the tree, and an empty value clears it · high · [verified]
 
@@ -300,6 +307,8 @@ from a past run.
 - **Expect** — pink on the first three, fashion after clearing; an unknown id renders `starter`; legacy values map
   as `legacy-theme-map.ts` says.
 - **Seen** — 2026-09-13: as expected, and the legacy values resolve exactly as on the build before.
+- **Re-run** — 2026-09-14, on Next 16.3.5 on the load stack: pink, pink, pink, then fashion after clearing; `bogus`
+  renders starter; `MODERN` and `JEWELERY` map to starter and `COSMETICS` to cosmetics, as the map says.
 
 ### THM-09 — Client navigation, back/forward and the locale switch stay in the theme's tree · critical · [verified]
 
@@ -308,12 +317,22 @@ from a past run.
 - **Expect** — every step is a client-side navigation (no document reload), `data-theme="fashion"` throughout,
   checkout lists the item, and the language switch lands on `/fr/<same path>` with `lang="fr"`. No file loaded over
   the session carries another theme.
-- **Expected to differ** — the language switch drops the query string (`?sku=…`); it did before this change too
-  (`usePathname()` carries no search).
+- **Expected to differ**
+  - The language switch drops the query string (`?sku=…`); it did before this change too (`usePathname()` carries
+    no search).
+  - Switched on a product or category page, it lands on the not-found page. Slugs are per language, and the switch
+    keeps the path. `/fr/product/<English slug>` is a 404 on a direct load too.
 - **Seen** — 2026-09-13, k6 browser through spg: all steps pass; 18 CSS/JS files over the session, none of another
   theme (the build before: 44, 22 of them another theme's).
+- **Re-run** — 2026-09-14, on Next 16.3.5 (the image on the load stack), in Chrome through spg, which exercises 16.3's
+  client-router defaults:
+  - Category, then product (preselected `?sku=`), add to cart, the cart drawer, and Checkout are client-side
+    navigations. The same document runs the whole way, and `data-theme="fashion"` holds throughout.
+  - Checkout lists the item.
+  - Back twice and forward once stay in the same document.
+  - French from checkout lands on `/fr/checkout` with `lang="fr"`.
 
-### THM-10 — Sign-in hand-off, checkout and the system routes are unchanged · high · [verified] / [not verified] (a real cua sign-in)
+### THM-10 — Sign-in hand-off, checkout and the system routes are unchanged · high · [verified]
 
 - **Steps** — click the header's sign-in button; open `/en/callback?code=bogus&state=bogus`; open `/en/checkout`
   with an item in the cart; request `/store-not-found`, `/sitemap.xml` and `/robots.txt`.
@@ -323,6 +342,12 @@ from a past run.
   returned before.
 - **Seen** — 2026-09-13: as expected and identical to the build before (system routes differ only in build ids and
   host). A full sign-in with real credentials through cua was not run.
+- **Re-run** — 2026-09-14, on Next 16.3.5 on the load stack:
+  - `/store-not-found`, `/sitemap.xml` and `/robots.txt` answer 200 with the expected content, and the login page
+    renders in the store's theme.
+  - The real sign-in now runs as well. `make browser-shopper-auth` in `../load-testing` registered a shopper, then
+    signed in with its credentials through cua's hand-off pages and landed back on the storefront. It had 0 journey
+    errors, and 0 of its 80 browser requests failed.
 
 ---
 
@@ -568,6 +593,8 @@ The profile behind these cases, and the ideas measured and rejected, are in the 
   2,600 CSS rules in the same order as the inlined `<style>` did (font `url()`s are relative in a file, absolute
   inline: the same files). CPU per render against the build before: home −17 %, category −24 %, product −27 %,
   search −36 % (medians, same session). Compared as CSS, not looked at in a browser.
+- **Re-run** — 2026-09-14, on Next 16.3.5: `inlineCss: false` still holds. Every page page-budget renders (12 themes ×
+  4 pages) links 2 stylesheets from the CDN prefix and carries no duplicated inline CSS.
 
 ### PERF-03 — spg compresses the storefront's HTML, landing-ui does not · high · [verified]
 
@@ -605,6 +632,9 @@ The profile behind these cases, and the ideas measured and rejected, are in the 
   and org1-store1 each titled with their own name through the shared cache. Backend calls per render: home 9 → 6,
   category 8 → 5, search 5 → 2. CPU per render, two runs against the build before: search −21 % and −23 %; home,
   category and product within the noise (−10 % to +14 %).
+- **Re-run** — 2026-09-14, on Next 16.3.5: the data cache still holds.
+  - The same 24 renders make the same backend calls as on 16.0.0: 96 outgoing HTTP spans on each.
+  - The `fetch` spans are identical, name by name.
 
 ### PERF-05 — Prices come from one formatter per locale and currency · [verified]
 
@@ -663,7 +693,7 @@ The profile behind these cases, and the ideas measured and rejected, are in the 
 - **Not verified** — the real spg image with its full route set and the Java backend. The load stack was down; the
   Caddy used carries spg's `encode` line and nothing else.
 
-### PERF-07 — The storefront runs on Node 24 · critical · [verified] (runtime, build) / [not verified] (the image on the mirror, dev)
+### PERF-07 — The storefront runs on Node 24 · critical · [verified] (runtime, build, the image on the mirror) / [not verified] (dev)
 
 - **Why**
   - The image ran `gcr.io/distroless/nodejs20`, and Node 20 has been end-of-life since 2026-04-30.
@@ -696,10 +726,108 @@ The profile behind these cases, and the ideas measured and rejected, are in the 
   - Earlier, same harness: a burst of 300 shoppers with 30 s of patience on one task. Node 24 served all 300, with
     p50 9 s and p95 16 s, and peaked at about 210 MiB anon. Node 20 served 291–297, with p50 16 s and p95 29 s, and
     peaked at about 390 MiB.
-- **Not verified**
-  - The image built on the mirror. `public.ecr.aws/b2i4h4k9/nodejs24:latest` exists only after cvhome-saas/public-dkr#4
-    is merged and its job has run; until then this Dockerfile cannot build.
-  - Dev's x86 Fargate. Every ratio was measured on arm64.
+- **Seen, the image on the mirror** — 2026-09-14, after cvhome-saas/public-dkr#4 published:
+  - The Dockerfile builds on `public.ecr.aws/b2i4h4k9/nodejs24:latest` (linux/amd64), and the image reports
+    `v24.21.0`.
+  - It ran in place of the load stack's landing-ui: page-budget, the k6 browser journeys and the SEC-02 probes pass
+    (SEC-01).
+- **Re-run on Next 16.3.5** — 2026-09-14, same harness, three rounds against 16.0.0 (SEC-01):
+  - home 35.9 → 33.3, category 24.3 → 25.5, product 15.8 → 15.0, search 19.5 → 17.8 ms. The mean is 23.9 → 22.9 ms
+    (−4 %, within the noise).
+  - Anon memory after the renders is 179–185 → 172 MiB.
+- **Not verified** — dev's x86 Fargate. Every ratio was measured on arm64.
+
+---
+
+## SEC — The framework's own security
+
+The storefront runs Next 16.3.5 with React 19.2.8. The plan is `.agents/plans/next-react-security-upgrade.md`: the
+advisories, the versions that fix them, and what changed for this app between 16.0 and 16.3.
+
+### SEC-01 — The framework carries no known advisory, and the standalone build serves · critical · [verified]
+
+- **Why**
+  - 16.0.0 carried 37 advisories. They include the critical RSC flight-protocol RCE (GHSA-9qr9-h5gf-34mp), proxy
+    bypasses, RSC denial of service and SSRF in rewrites.
+  - A version bump also has to survive the production layout. On 16.3 the standalone build answered 500 on every
+    page until `copy-instrumentation.mjs` linked Turbopack's external aliases (REG).
+- **Steps**
+  - From `store-pod/landing-ui`, run a fresh `npm install` (no lockfile, as CodeBuild).
+  - Run `npm ls next react react-dom eslint-config-next`, then `npm audit`.
+  - Run `npm run build`, then serve the build as the Dockerfile lays it out (`storefront/start.mjs`, with
+    telemetry on). Render the four key pages.
+  - Run `next dev` once in the same checkout (any lcl stack does), stop it, and run `npm run build` again.
+- **Expect**
+  - One copy each: `next@16.3.5`, `react@19.2.8`, `react-dom@19.2.8`, `eslint-config-next@16.3.5`.
+  - No advisory against next, react or react-dom.
+  - 200 on every page, `✅ OpenTelemetry instrumentation started` in the log, and no error.
+  - The second build succeeds too. Standalone's `node_modules` holds the S3 SDK (`@aws-sdk/client-s3` and its
+    dependencies), copied by `copy-instrumentation.mjs`.
+- **Expected to differ**
+  - In traces, the proxy's span (`middleware GET`) is now the root of its own trace; on 16.0 it was a child of the
+    request's `GET`. Spans per render are the same: 562 for the same 24 renders on both.
+  - `npm audit` still lists the `@opentelemetry/*` pins: 4 high, 23 moderate. The highs need the Prometheus
+    exporter or the Jaeger propagator, and neither is configured. They are a separate upgrade (the plan's *Out of
+    scope*).
+- **Seen** — 2026-09-14:
+  - The versions are as expected, each a single copy.
+  - `npm audit` shows 0 advisories against the framework, and 27 in OpenTelemetry and `uuid`.
+  - On `gcr.io/distroless/nodejs24` at 0.5 vCPU / 1 GiB, every page returns 200 and the log is clean.
+  - The image built from the Dockerfile on the mirror's `nodejs24` ran on the load stack in CDN mode. It uploaded its
+    build to MinIO and rewrote the prefix. Telemetry started, with no error.
+  - A build after `next dev` failed with EISDIR while the S3 SDK was traced in by `outputFileTracingIncludes` (REG).
+    Now it builds, and the image, 86.8 MB instead of 107.5, still uploads to MinIO.
+
+### SEC-02 — A theme's tree cannot be reached in any URL form · high · [verified]
+
+- **Why**
+  - THM-07 keeps `/t/<theme>/…` private: the proxy answers 404.
+  - A tree's RSC payload also answers at `<path>.rsc`. The matcher skipped every path containing a dot, and Next
+    appends the payload suffixes after that pattern, so the proxy never ran for `/t/fashion/en.rsc`. The matcher now
+    also lists `/t/:path*`.
+  - Nothing private is exposed this way: the proxy holds no authorization, and a tree renders the same store's public
+    data. What broke was the contract: `/t/pink/en.rsc` rendered a fashion store in the pink tree.
+- **Steps** — through spg on org1-store2, request each of these, with and without `RSC: 1`:
+  - `/t/fashion/en`, `/t`
+  - `/t/fashion/en.rsc`, `/t/fashion/en/product/<slug>.rsc`
+  - `/t/fashion/en.segments/_tree.segment.rsc`
+  - `/t/fashion/en` with `Next-Router-Prefetch: 1`, with `Next-Router-Segment-Prefetch: /_tree`, with a forged
+    `x-middleware-subrequest`, with `x-nextjs-data: 1`, and with `?_rsc=…`
+  - `/%74/fashion/en`, `/t%2Ffashion%2Fen`, `//t/fashion/en`, `/t/fashion/en/`
+
+  Also request `/en` with `RSC: 1` alone, and follow redirects throughout.
+- **Expect**
+  - 404 for every form of a tree URL.
+  - The encoded and doubled forms redirect, then end at 404.
+  - `/en` with `RSC: 1` gets a 307 to `/en?_rsc…`, then the payload. Since 16.3, an RSC request whose `_rsc` does
+    not match its headers is redirected (`validateRSCRequestHeaders`); a browser always sends the matching pair.
+- **Seen** — 2026-09-14:
+  - Before, on `main`'s build (16.0.0): `/t/fashion/en.rsc` with `RSC: 1` answered 200 with the tree's 94 KB payload,
+    and so did the product form.
+  - On 16.3.5 without the matcher change, `/t/fashion/en.rsc` answered 200 with or without the header.
+    `/t/pink/en.rsc` answered with a different payload, pink's client chunks, for a fashion store.
+  - After, every form is 404: first against the build directly, then through spg on the load stack. `/en` with
+    `RSC: 1` gets 307, then 200 `text/x-component`.
+
+### SEC-03 — The dev server behind spg keeps hot reload · high · [verified]
+
+- **Why** — from 16.2, `next dev` refuses cross-origin requests to its `/_next` resources. Under lcl the browser
+  reaches it through spg as `<store>.spg-507f1f77.gateway.com`, so the HMR socket was refused. `next.config.ts` allows
+  the subdomains of the `INTERNAL_SPG` host, which lcl sets.
+- **Setup** — `next dev` from `storefront/`, with and without lcl's
+  `INTERNAL_SPG=http://spg-507f1f77.gateway.com:<port>`, reached through spg (or a proxy adding spg's headers) at
+  `http://org1-store2.spg-507f1f77.gateway.com…`.
+- **Steps** — open `/en`; from its console open `new WebSocket('ws://<host>/_next/hmr')` (the 16.3 path; it was
+  `/_next/webpack-hmr`); read the dev log. Look for new files in `storefront/`.
+- **Expect**
+  - With `INTERNAL_SPG`: the page renders, the socket opens, and the log has no "Blocked cross-origin request".
+  - Without it: the socket errors, and the log says `Blocked cross-origin request to Next.js dev resource /_next/hmr`.
+  - No `AGENTS.md` or `CLAUDE.md` appears in `storefront/` (`agentRules: false`).
+- **Seen** — 2026-09-14, on 16.3.5, through a Caddy that adds spg's headers for org1-store2 in front of `next dev`:
+  exactly as expected, both ways.
+  - Before `agentRules: false`, the first dev start wrote both files into `storefront/`.
+  - Not run through a full `lcl start`: the stand-in carries spg's headers and the WebSocket upgrade, which is all this
+    case depends on.
 
 ---
 
@@ -708,6 +836,9 @@ The profile behind these cases, and the ideas measured and rejected, are in the 
 | What broke | How it looked | Caught by |
 |---|---|---|
 | Pink's Google CJK font fan-out | Turbopack could not resolve its virtual font module. | THM-05; pink font source test |
+| Next 16.3's Turbopack requires external packages by a hashed alias (`require-in-the-middle-<hash>`, a symlink in `.next/node_modules`) | Every page 500 on the standalone build (`start.mjs`): `Failed to load external module require-in-the-middle-…`. `next build`, lint, typecheck and tests were all green. | `copy-instrumentation.test.mjs`; SEC-01 |
+| The `.rsc` form of a theme-tree URL skipped the proxy | `/t/fashion/en.rsc` answered 200 with the tree's payload | SEC-02 |
+| Next 16.3's Turbopack matches `outputFileTracingIncludes` globs anywhere in a path, and hashes every match | After any `next dev` in the checkout, `next build` failed: `reading file …/.next-<stack>/dev/node_modules/@aws-sdk/client-s3-<hash>: Is a directory` | SEC-01 (the build after `next dev`); `copy-instrumentation.test.mjs` |
 
 ---
 
@@ -728,6 +859,12 @@ The profile behind these cases, and the ideas measured and rejected, are in the 
 
 **The Next dev server 500s on unknown slugs** instead of rendering a 404 page (SF-04). Dev-only; the production
 build renders the 404.
+
+**A cart the checkout service no longer has is never replaced.** The browser keeps the cart's code in
+`localStorage` (`seller-ui-cart-data`). If checkout no longer has that cart, every add answers 404
+(`PUT /checkout/api/v1/cart/<code>`), and the storefront keeps the dead code instead of starting a new cart, so
+nothing can be bought. Clearing the key recovers it: the next add creates a cart (`POST … 201`). Seen 2026-09-14 on
+the load stack, whose database had been recreated since the browser's last visit.
 
 **Sorting the listing by anything but a direct `Product` column is a 500.** `SORT_MAP` here exposes only
 `dateAvailable`.
