@@ -1,6 +1,7 @@
 package com.asrevo.cvhome.catalog.model.product;
 
 import java.util.List;
+import java.util.Set;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -47,6 +48,23 @@ public class ProductSearchCriteria {
      * already drawn and the extra aggregate would be wasted.
      */
     private boolean facets = true;
+
+    /**
+     * Whether to read the page of products. Off when only the facet rail is wanted, as on the storefront's category
+     * page, whose listing comes from {@code /api/v2/products}: the page, its {@code COUNT} and the hydration are then
+     * skipped, and {@code content} comes back empty and {@code totalElements} uncounted.
+     */
+    private boolean rows = true;
+
+    /**
+     * Which facet blocks to count; empty counts them all. The category page's rail draws only {@code OPTIONS} (its
+     * brands come from the category's own endpoint), and each block left out is a grouped count and a label load saved.
+     */
+    private Set<SearchFacetGroup> facetGroups;
+
+    public boolean wantsFacets(SearchFacetGroup group) {
+        return facets && (facetGroups == null || facetGroups.isEmpty() || facetGroups.contains(group));
+    }
 
     public boolean hasQuery() {
         return q != null && !q.isBlank();
