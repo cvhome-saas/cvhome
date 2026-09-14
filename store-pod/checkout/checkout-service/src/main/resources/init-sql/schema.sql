@@ -73,8 +73,23 @@ create table if not exists checkout.cart_line
     cart_id       bigint       not null constraint fk_cart_line_cart references checkout.cart,
     sku           varchar(255) not null,
     quantity      integer      not null constraint cart_line_quantity_check check (quantity > 0),
+    -- what the catalogue said about the sku when the line was added, so a read asks it nothing (CartLine.remember)
+    product_id        bigint,
+    product_name      varchar(255),
+    friendly_url      varchar(255),
+    image_url         varchar(1024),
+    option_labels     varchar(2000),
+    catalog_available boolean,
+    snapshot_at       timestamp(6),
     constraint uk_cart_line_sku unique (cart_id, sku)
 );
+alter table checkout.cart_line add column if not exists product_id        bigint;
+alter table checkout.cart_line add column if not exists product_name      varchar(255);
+alter table checkout.cart_line add column if not exists friendly_url      varchar(255);
+alter table checkout.cart_line add column if not exists image_url         varchar(1024);
+alter table checkout.cart_line add column if not exists option_labels     varchar(2000);
+alter table checkout.cart_line add column if not exists catalog_available boolean;
+alter table checkout.cart_line add column if not exists snapshot_at       timestamp(6);
 
 -- The order aggregate. version is the optimistic lock every transition is applied under; pending_action is the remote
 -- step still owed, which the recovery job re-drives; the three status CHECKs list every value of their Java enum.

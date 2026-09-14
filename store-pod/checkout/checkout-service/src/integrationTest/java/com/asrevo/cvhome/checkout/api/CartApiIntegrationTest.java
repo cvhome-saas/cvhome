@@ -37,6 +37,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Import(ExternalClientsTestConfiguration.class)
 class CartApiIntegrationTest {
 
+    private static final String DESCRIPTION_FIELD = "description";
+
+    private static final String NAME_FIELD = "name";
+
+    private static final String PRODUCT_PREFIX = "Product ";
+
     private static final String DISPLAYSUBTOTAL = "displaySubTotal";
 
     private static final String PRODUCT = "product";
@@ -122,7 +128,7 @@ class CartApiIntegrationTest {
         assertThat(cart.get("totals")).hasSize(2);
         JsonNode line = cart.get(PRODUCTS).get(0);
         assertThat(line.get(SKU_2).asString()).isEqualTo(SKU);
-        assertThat(line.get("description").get("name").asString()).isEqualTo(String.format("Product %s", SKU));
+        assertThat(line.get(DESCRIPTION_FIELD).get(NAME_FIELD).asString()).isEqualTo(String.format("%s%s", PRODUCT_PREFIX, SKU));
         assertThat(line.get("finalPrice").asString()).isEqualTo("$10.00");
         assertThat(line.get(DISPLAYSUBTOTAL).asString()).isEqualTo(LIT_20_00);
         assertThat(line.get("image").get("imageUrl").asString()).contains(SKU);
@@ -131,6 +137,12 @@ class CartApiIntegrationTest {
         JsonNode updated = json(api.send(HttpMethod.PUT, cartUrl(STORE_A, code), null, cartBody(SKU_B, 1)));
         assertThat(updated.get(PRODUCTS)).hasSize(2);
         assertThat(updated.get(QUANTITY).asInt()).isEqualTo(3);
+        int catalogReadsAfterAdds = ExternalClientsTestConfiguration.CART_LINE_READS.get();
+        JsonNode reread = json(api.get(cartUrl(STORE_A, code), null));
+        assertThat(reread.get(PRODUCTS)).hasSize(2);
+        assertThat(reread.get(PRODUCTS).get(0).get(DESCRIPTION_FIELD).get(NAME_FIELD).asString()).startsWith(PRODUCT_PREFIX);
+        assertThat(ExternalClientsTestConfiguration.CART_LINE_READS.get())
+                .as("two lines remembered from their adds: a read asks the catalogue nothing").isEqualTo(catalogReadsAfterAdds);
 
         JsonNode set = json(api.send(HttpMethod.PUT, cartUrl(STORE_A, code), null, cartBody(SKU, 5)));
         assertThat(set.get(QUANTITY).asInt()).isEqualTo(6);
@@ -144,11 +156,15 @@ class CartApiIntegrationTest {
         expect(removedWithBody, HttpStatus.OK);
         assertThat(json(removedWithBody).get(PRODUCTS)).isEmpty();
 
+        int catalogReadsBefore = ExternalClientsTestConfiguration.CART_LINE_READS.get();
         JsonNode read = json(api.get(cartUrl(STORE_A, code), null));
         assertThat(read.get(CODE).asString()).isEqualTo(code);
         assertThat(read.get(QUANTITY).asInt()).isZero();
+        assertThat(ExternalClientsTestConfiguration.CART_LINE_READS.get())
+                .as("a cart read prices its lines from what they remember; the catalogue is not asked")
+                .isEqualTo(catalogReadsBefore);
         assertThat(ExternalClientsTestConfiguration.PRICED_INSIDE_A_TRANSACTION.get())
-                .as("catalog or inventory was called while a database transaction was open").isFalse();
+                .as("catalog, inventory or merchant was called while a database transaction was open").isFalse();
     }
 
     @Test
