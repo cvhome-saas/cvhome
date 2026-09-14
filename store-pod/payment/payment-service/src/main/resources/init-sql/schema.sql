@@ -1,9 +1,9 @@
 create schema if not exists payment;
-create table if not exists payment.sm_sequencer
-(
-    seq_name  varchar(255) not null primary key,
-    seq_count bigint
-);
+-- One sequence per table, fifty ids a fetch (SchemaConstant.ID_ALLOCATION_SIZE, pooled-lo). The Shopizer sm_sequencer
+-- table it replaces needed a second pooled connection and a row lock for every block: with three connections and three
+-- concurrent inserts, checkout deadlocked its own pool (the 2026-09-14 load test).
+drop table if exists payment.sm_sequencer;
+create sequence if not exists payment.transaction_seq increment by 50;
 
 create table if not exists payment.payment_configuration
 (

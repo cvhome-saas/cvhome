@@ -1,9 +1,24 @@
 create schema if not exists catalog;
-create table if not exists catalog.sm_sequencer
-(
-    seq_name  varchar(255) not null primary key,
-    seq_count bigint
-);
+-- One sequence per table, fifty ids a fetch (SchemaConstant.ID_ALLOCATION_SIZE, pooled-lo). The Shopizer sm_sequencer
+-- table it replaces needed a second pooled connection and a row lock for every block: with three connections and three
+-- concurrent inserts, checkout deadlocked its own pool (the 2026-09-14 load test).
+drop table if exists catalog.sm_sequencer;
+create sequence if not exists catalog.category_seq increment by 50;
+create sequence if not exists catalog.category_description_seq increment by 50;
+create sequence if not exists catalog.manufacturer_seq increment by 50;
+create sequence if not exists catalog.manufacturer_description_seq increment by 50;
+create sequence if not exists catalog.product_seq increment by 50;
+create sequence if not exists catalog.product_description_seq increment by 50;
+create sequence if not exists catalog.product_group_seq increment by 50;
+create sequence if not exists catalog.product_group_description_seq increment by 50;
+create sequence if not exists catalog.product_image_seq increment by 50;
+create sequence if not exists catalog.product_option_seq increment by 50;
+create sequence if not exists catalog.product_option_description_seq increment by 50;
+create sequence if not exists catalog.product_option_value_seq increment by 50;
+create sequence if not exists catalog.product_option_value_description_seq increment by 50;
+create sequence if not exists catalog.product_type_seq increment by 50;
+create sequence if not exists catalog.product_type_description_seq increment by 50;
+create sequence if not exists catalog.product_variant_seq increment by 50;
 create table if not exists catalog.category
 (
     category_id       bigint       not null primary key,

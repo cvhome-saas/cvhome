@@ -1,9 +1,17 @@
 create schema if not exists checkout;
-create table if not exists checkout.sm_sequencer
-(
-    seq_name  varchar(255) not null primary key,
-    seq_count bigint
-);
+-- One sequence per table, fifty ids a fetch (SchemaConstant.ID_ALLOCATION_SIZE, pooled-lo). The Shopizer sm_sequencer
+-- table it replaces needed a second pooled connection and a row lock for every block: with three connections and three
+-- concurrent inserts, checkout deadlocked its own pool (the 2026-09-14 load test).
+drop table if exists checkout.sm_sequencer;
+create sequence if not exists checkout.cart_seq increment by 50;
+create sequence if not exists checkout.cart_line_seq increment by 50;
+create sequence if not exists checkout.customer_account_seq increment by 50;
+create sequence if not exists checkout.sales_order_seq start with 1000 increment by 50;
+create sequence if not exists checkout.sales_order_event_seq increment by 50;
+create sequence if not exists checkout.sales_order_line_seq increment by 50;
+create sequence if not exists checkout.sales_order_line_option_seq increment by 50;
+create sequence if not exists checkout.sales_order_history_seq increment by 50;
+create sequence if not exists checkout.sales_order_total_seq increment by 50;
 
 -- A shopper as this store knows them. Unique per (store, cua account): the same cua account in two stores is two rows.
 create table if not exists checkout.customer_account

@@ -20,7 +20,7 @@ spring:
   sql:
     init:
       schema-locations: classpath:init-sql/schema.sql
-      data-locations: classpath:init-sql/data-common.sql
+      data-locations: classpath:init-sql/data-common.sql, classpath:init-sql/data-sequences.sql
   jpa:
     properties:
       hibernate:
