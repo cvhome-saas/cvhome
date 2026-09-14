@@ -63,7 +63,9 @@ public class OrderServiceImpl implements OrderService {
         Pageable sorted = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
                 pageable.getSortOr(NEWEST_FIRST));
         Page<Order> page = orders.findAll(OrderSpecifications.orders(store, filter), sorted);
-        return OrderMapper.toList(page, order -> OrderMapper.toReadable(order, customerOf(order), false,
+        // No customer: the list is not a detail view, and the mapper drops it there. Reading it anyway cost one query
+        // per row, 20 of the list's 42 statements in the 2026-09-14 load test; the totals batch now (phase 1).
+        return OrderMapper.toList(page, order -> OrderMapper.toReadable(order, null, false,
                 storeSettings.locale(language)));
     }
 
