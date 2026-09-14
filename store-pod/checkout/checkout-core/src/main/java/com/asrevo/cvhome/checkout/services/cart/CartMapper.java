@@ -6,7 +6,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import com.asrevo.cvhome.catalog.model.product.ReadableMinimalProduct;
+import com.asrevo.cvhome.catalog.model.product.ProductDescription;
+import com.asrevo.cvhome.catalog.model.product.ReadableCartLineProduct;
+import com.asrevo.cvhome.catalog.model.product.ReadableImage;
 import com.asrevo.cvhome.checkout.entity.Cart;
 import com.asrevo.cvhome.checkout.entity.CartLine;
 import com.asrevo.cvhome.checkout.entity.OrderTotal;
@@ -73,19 +75,22 @@ public final class CartMapper {
         return item;
     }
 
-    private static void copyProduct(ReadableMinimalProduct source, ReadableCartItem target) {
-        target.setId(source.getId());
+    /** The line's product in the item's shape: what the storefront's cart reads, name, slug, image and labels. */
+    private static void copyProduct(ReadableCartLineProduct source, ReadableCartItem target) {
+        target.setId(source.getProductId());
         target.setSku(source.getSku());
-        target.setVariantCount(source.getVariantCount());
         target.setVariant(source.getVariant());
-        target.setProductShipeable(source.isProductShipeable());
-        target.setProductVirtual(source.isProductVirtual());
-        target.setSortOrder(source.getSortOrder());
-        target.setDateAvailable(source.getDateAvailable());
-        target.setProductSpecifications(source.getProductSpecifications());
-        target.setDescription(source.getDescription());
-        target.setImage(source.getImage());
-        target.setImages(source.getImages());
+        target.setVariantCount(source.getVariant() == null ? 1 : 2);
+        ProductDescription description = new ProductDescription();
+        description.setName(source.getName());
+        description.setFriendlyUrl(source.getFriendlyUrl());
+        target.setDescription(description);
+        if (source.getImageUrl() != null) {
+            ReadableImage image = new ReadableImage();
+            image.setImageUrl(source.getImageUrl());
+            target.setImage(image);
+            target.setImages(List.of(image));
+        }
     }
 
     public static ReadableOrderTotal total(String code, String module, int order, BigDecimal value,

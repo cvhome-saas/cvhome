@@ -14,8 +14,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.asrevo.cvhome.catalog.model.product.ProductDescription;
-import com.asrevo.cvhome.catalog.model.product.ReadableMinimalProduct;
+import com.asrevo.cvhome.catalog.model.product.ReadableCartLineProduct;
 import com.asrevo.cvhome.checkout.domain.CartCode;
 import com.asrevo.cvhome.checkout.domain.ShopperId;
 import com.asrevo.cvhome.checkout.entity.Cart;
@@ -116,12 +115,11 @@ class OrderPlacementTransactionTest {
     }
 
     static ProductSnapshot snapshot(Sku sku, String price, boolean purchasable, int min, int max) {
-        ReadableMinimalProduct product = new ReadableMinimalProduct();
-        product.setId(1L);
+        ReadableCartLineProduct product = new ReadableCartLineProduct();
+        product.setProductId(1L);
         product.setSku(sku);
-        ProductDescription description = new ProductDescription();
-        description.setName(RUNNER);
-        product.setDescription(description);
+        product.setName(RUNNER);
+        product.setAvailable(true);
         return new ProductSnapshot(sku, product, new BigDecimal(price), new BigDecimal(price), false, purchasable, min,
                 max);
     }

@@ -558,6 +558,22 @@ the first; with a pool of 3, three concurrent inserts each held one and waited f
 - **Result** — `CheckoutApiIntegrationTest` and `CartApiIntegrationTest` now record the merchant stub too, and
   assert no peer was called inside a transaction (the old placement fails it once the STORE cache has expired).
 
+
+### LOAD-07 — A cart read asks the catalogue nothing; an add asks it about one sku · high · [unit only]
+
+The one mix spike on the whole branch (2026-09-15): 791 of checkout's 807 timeouts were the catalogue not
+answering `detailed-products` in 3 s, and every cart read made that call again.
+
+- **Expect** — a line keeps what the catalogue said when it was added (`cart_line.product_id`, `product_name`,
+  `friendly_url`, `image_url`, `option_labels`, `catalog_available`, `snapshot_at`); a read or a removal prices
+  the lines from that and asks inventory alone for the live price and stock; an add asks the catalogue's
+  `cart-lines` read about the one sku it adds; a line whose snapshot is older than a day, or was written before
+  these columns, asks again and is refreshed in place. The storefront's cart item still carries `description.name`,
+  `description.friendlyUrl`, `image.imageUrl` and `variant`.
+- **Result** — `CartApiIntegrationTest` (the catalogue's cart-line read count does not move across two reads of a
+  two-line cart), `ProductSnapshotServiceImplTest` (a remembered line is priced by inventory alone; a stale one asks
+  and remembers), `CartServiceImplTest`. **Not verified** on a stack.
+
 ---
 
 ## 99 — Known gaps
