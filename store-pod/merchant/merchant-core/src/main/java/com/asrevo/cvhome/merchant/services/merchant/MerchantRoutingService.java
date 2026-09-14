@@ -26,10 +26,13 @@ public class MerchantRoutingService {
 
     private final MerchantRepository merchantRepository;
 
+    @Transactional(readOnly = true)
     public boolean containsDomain(Domain domain, String podDomain) {
         return merchantRepository.findByDomain(domain.domain(), podDomain).isPresent();
     }
 
+    /** Read-only transaction: the headers read the store's languages, a lazy collection. */
+    @Transactional(readOnly = true)
     public Map<String, String> lookupHeaders(Domain domain, String podDomain) {
         return merchantRepository.findByDomain(domain.domain(), podDomain)
                 .map(MerchantRoutingService::mapHeaders)
@@ -38,7 +41,8 @@ public class MerchantRoutingService {
 
     @Transactional(readOnly = true)
     public Set<ManagerStoreDomain> domains(StoreMerchantId store) throws MerchantStoreNotFoundException {
-        return findStore(store).getStoreDomains();
+        // A copy: the entity's lazy set would be serialised after the transaction has closed.
+        return Set.copyOf(findStore(store).getStoreDomains());
     }
 
     @Transactional

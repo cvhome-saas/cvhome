@@ -162,8 +162,30 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: false
+    # Boot's default holds a request's connection from its first query until the response has been serialised. On a
+    # throttled half vCPU most of that hold is the JVM waiting for CPU: in the 2026-09-14 spike catalog had 135
+    # requests queued on its 3 connections while Postgres idled at 11 %. With it off, an entity is mapped inside its
+    # service's transaction and the connection goes back at commit; code that touched a lazy association after the
+    # transaction (checkout's signals, merchant's store facade) now fails loudly instead of quietly holding a
+    # connection, which is what the integration tests are for.
+    open-in-view: false
     properties:
       hibernate:
+        # One IN query per 50 parents for every lazy association and collection without its own @BatchSize, instead of
+        # one query per row (Category.parent, an order's totals and lines).
+        default_batch_fetch_size: 50
+        criteria:
+          # Specifications (catalog's listing, search and facets) are Criteria queries, whose plans Hibernate otherwise
+          # recompiles on every call.
+          plan_cache_enabled: true
+        query:
+          # IN lists padded to the next power of two, so a batch of 7 and one of 8 share a statement plan.
+          in_clause_parameter_padding: true
+        jdbc:
+          batch_size: 50
+        # Group inserts and updates per table so batch_size can batch them (an order's events, history and totals).
+        order_inserts: true
+        order_updates: true
         id:
           optimizer:
             pooled:

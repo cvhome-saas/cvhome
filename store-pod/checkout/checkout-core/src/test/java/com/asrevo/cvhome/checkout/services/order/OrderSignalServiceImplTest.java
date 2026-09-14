@@ -57,7 +57,8 @@ class OrderSignalServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        service = new OrderSignalServiceImpl(orders, steps, properties, Clock.fixed(Orders.T2, ZoneOffset.UTC));
+        service = new OrderSignalServiceImpl(orders, steps, properties, Clock.fixed(Orders.T2, ZoneOffset.UTC),
+                TestTransactions.inline());
     }
 
     private Order given(Order order) {
