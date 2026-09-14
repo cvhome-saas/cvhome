@@ -71,7 +71,7 @@ public class ExternalClientsTestConfiguration {
     public static final String GATEWAY_REF = "tx-";
 
     /**
-     * Set when catalog or inventory is asked to price a cart while the calling thread holds a database transaction: the
+     * Set when catalog, inventory or merchant is called while the calling thread holds a database transaction: the
      * shape the 2026-09-14 spike collapsed on, three connections held while catalog took seconds. A test resets it and
      * asserts it stayed false.
      */
@@ -82,6 +82,7 @@ public class ExternalClientsTestConfiguration {
     ExternalMerchantStoreService stubExternalMerchantStoreService() {
         ExternalMerchantStoreService service = Mockito.mock(ExternalMerchantStoreService.class);
         Mockito.when(service.getStore(any())).thenAnswer(invocation -> {
+            recordTransaction();
             StoreMerchantId store = invocation.getArgument(0, StoreMerchantId.class);
             ReadableMerchantStore merchantStore = new ReadableMerchantStore();
             merchantStore.setId(store.getId());
