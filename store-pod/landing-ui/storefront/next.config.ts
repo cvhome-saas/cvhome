@@ -6,8 +6,20 @@ import {SENTINEL as STATIC_ASSETS_SENTINEL} from './scripts/static-assets/consta
 
 const monorepoRoot = path.join(__dirname, '..');
 
+// `next dev` refuses cross-origin requests to its /_next resources, the HMR socket among them (blocked since Next 16.2,
+// a warning before). Under lcl the browser reaches it through spg as `<store>.<pod host>`, the host INTERNAL_SPG names,
+// so that host's subdomains are allowed. A production server ignores the option.
+function devOrigins(): string[] {
+    try {
+        return process.env.INTERNAL_SPG ? [`*.${new URL(process.env.INTERNAL_SPG).hostname}`] : [];
+    } catch {
+        return [];
+    }
+}
+
 const nextConfig: NextConfig = {
     reactStrictMode: true,
+    allowedDevOrigins: devOrigins(),
     // Two lcl stacks can run this app from one checkout; each needs its own build directory or they
     // overwrite each other's dev output. Unset (a plain `npm run dev`) keeps Next's default `.next`.
     distDir: process.env.NEXT_DIST_DIR || '.next',

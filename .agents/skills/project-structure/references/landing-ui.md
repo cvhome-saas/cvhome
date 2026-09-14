@@ -105,7 +105,9 @@ directly against a fresh build — it would serve the un-substituted sentinel.
 directly works for SSR only because the proxy falls back to `FALLBACK_STORE_ID` (env, then the demo-store constant) —
 but browser-side calls (cart, listing, auth) go to `/catalog`, `/checkout`, … on the same origin, which only spg routes;
 set `EXTERNAL_SPG=http://spg-507f1f77.gateway.com` if you must use localhost. `?theme=<id>` sets a dev-only override
-cookie (`?theme=` clears it); unknown ids resolve through the legacy map to the fallback theme.
+cookie (`?theme=` clears it); unknown ids resolve through the legacy map to the fallback theme. `next dev` refuses
+cross-origin requests to its `/_next` resources (the HMR socket among them), so `next.config.ts` allows the subdomains of
+the `INTERNAL_SPG` host (`*.spg-507f1f77.gateway.com` under lcl); any other dev host needs an `allowedDevOrigins` entry.
 
 ## Adding a theme
 
