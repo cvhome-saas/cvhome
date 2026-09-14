@@ -63,8 +63,6 @@ public class ProductSearchServiceImpl implements ProductSearchService {
      */
     private static final float SIMILARITY_FLOOR = 0.3f;
 
-    private static final int MAX_SUGGESTIONS = 10;
-
     private static final String ID = "id";
 
     private static final String DATE_AVAILABLE = "dateAvailable";

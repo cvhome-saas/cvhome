@@ -4,6 +4,8 @@ plugins {
 
 dependencies {
     api project(':store-pod:commons:store-commons')
+    // The storefront's cached reads key by store (StoreScopedKeyGenerator) so a write can drop one store's entries.
+    implementation project(':store-commons:autoconfigure')
     api project(':store-pod:content:content-commons')
     compileOnly libs.spring.data.jpa
     compileOnly libs.spring.tx

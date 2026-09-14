@@ -10,12 +10,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.asrevo.cvhome.cache.EntityCommitCacheEviction;
+import com.asrevo.cvhome.cache.StoreScopedKeyGenerator;
+import com.asrevo.cvhome.catalog.entity.CatalogEntityStore;
 import com.asrevo.cvhome.catalog.services.CachedStorefrontCatalog;
 import com.github.benmanes.caffeine.cache.Caffeine;
 
 /**
  * The merchant store read (STORE, common-config.yml) and the storefront's catalog reads ({@link CachedStorefrontCatalog}),
- * each held for thirty seconds, bounded, and counted like every other Spring cache. {@code spring.cache.cache-names}
+ * each held for a minute, bounded, and counted like every other Spring cache. {@code spring.cache.cache-names}
  * fixes the manager's caches, so the storefront's are registered by name.
  */
 @Configuration
@@ -31,14 +33,20 @@ public class CacheConfig {
                         .recordStats().build()));
     }
 
+    /** Every storefront read is keyed by its store first, so a store's write can drop its entries alone. */
+    @Bean(StoreScopedKeyGenerator.BEAN)
+    StoreScopedKeyGenerator storeScopedKeyGenerator() {
+        return new StoreScopedKeyGenerator();
+    }
+
     /**
-     * A merchant's change clears the storefront's catalog caches when it commits. Catalog emits events for product and
+     * A merchant's change drops their store's storefront caches when it commits. Catalog emits events for product and
      * brand changes only; categories, groups and options change without one.
      */
     @Bean
     EntityCommitCacheEviction storefrontCatalogCacheEviction(EntityManagerFactory entityManagerFactory,
                                                              CacheManager caches) {
         return new EntityCommitCacheEviction(entityManagerFactory, caches, "com.asrevo.cvhome.catalog.entity",
-                CachedStorefrontCatalog.CACHES);
+                CachedStorefrontCatalog.CACHES, CatalogEntityStore::of);
     }
 }

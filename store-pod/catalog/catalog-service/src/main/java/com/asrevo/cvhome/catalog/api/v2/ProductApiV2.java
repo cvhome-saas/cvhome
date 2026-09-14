@@ -70,12 +70,13 @@ public class ProductApiV2 {
     /**
      * Public, like every storefront read, and also what the console's product table reads: a merchant sees exactly
      * what the shop can, filtered by {@code sku}, {@code available}, {@code categoryIds} and {@code manufacturerId}.
+     * Cached per store, filter and page; a merchant's save drops their store's copy.
      */
     @GetMapping("/products")
     @Parameter(name = "store", schema = @Schema(type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
     public ReadableEntityList<ReadableProduct> list(ProductFilter filter, StoreMerchantId merchantStore,
                                                     LanguageCode language, Pageable pageable) {
-        return productService.list(merchantStore, filter, language, pageable);
+        return storefront.list(merchantStore, filter, language, pageable);
     }
 
     /**
@@ -83,14 +84,15 @@ public class ProductApiV2 {
      *
      * <p>
      * Public, like every storefront read. A blank {@code q} is legitimate and degrades to a filtered listing,
-     * which is what the results page needs when a shopper clears the term but keeps their filters.
+     * which is what the results page needs when a shopper clears the term but keeps their filters. Cached per store
+     * and criteria, like the listing.
      * </p>
      */
     @GetMapping("/products/search")
     @Parameter(name = "store", schema = @Schema(type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
     public ReadableProductSearchResult search(ProductSearchCriteria criteria, StoreMerchantId merchantStore,
                                               LanguageCode language, Pageable pageable) {
-        return productSearchService.search(merchantStore, criteria, language, pageable);
+        return storefront.search(merchantStore, criteria, language, pageable);
     }
 
     /**
@@ -105,7 +107,8 @@ public class ProductApiV2 {
             StoreMerchantId merchantStore, LanguageCode language) {
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.maxAge(Duration.ofSeconds(30)).cachePublic())
-                .body(storefront.suggest(merchantStore, query, language, limit));
+                .body(storefront.suggest(merchantStore, CachedStorefrontCatalog.suggestKey(query), language,
+                        CachedStorefrontCatalog.suggestLimit(limit)));
     }
 
     /**

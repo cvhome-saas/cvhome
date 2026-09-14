@@ -29,6 +29,9 @@ class CachedStorefrontIntegrationTest {
     /** A seeded store (languages en, fr). */
     private static final StoreMerchantId STORE = new StoreMerchantId("65f023632bc46470c104b75f");
 
+    /** The other seeded store. */
+    private static final StoreMerchantId OTHER_STORE = new StoreMerchantId("65f020632bc46470c104b76f");
+
     private static final LanguageCode EN = new LanguageCode("en");
 
     @Autowired
@@ -38,10 +41,11 @@ class CachedStorefrontIntegrationTest {
     private RedirectService redirects;
 
     @Test
-    void aSecondReadCostsNoStatementAndAContentWriteClearsTheCache() throws Exception {
+    void aSecondReadCostsNoStatementAndAContentWriteDropsItsStoresCacheAlone() throws Exception {
         storefront.site(STORE, EN);
         storefront.layout(STORE, EN, PageKind.HOME);
         storefront.menu(STORE, MenuHandle.MAIN, EN);
+        storefront.site(OTHER_STORE, EN);
 
         SqlStatements.Recorded<Object> cached = SqlStatements.during(() -> {
             storefront.site(STORE, EN);
@@ -54,6 +58,8 @@ class CachedStorefrontIntegrationTest {
         redirects.moved(STORE, String.format("/content/%s", slug), String.format("/content/%s-moved", slug));
 
         SqlStatements.Recorded<Object> afterWrite = SqlStatements.during(() -> storefront.site(STORE, EN));
-        assertThat(afterWrite.count()).isPositive();
+        assertThat(afterWrite.count()).as("the store that wrote reads the database again").isPositive();
+        SqlStatements.Recorded<Object> otherStore = SqlStatements.during(() -> storefront.site(OTHER_STORE, EN));
+        assertThat(otherStore.count()).as("another store's entries stayed warm").isZero();
     }
 }

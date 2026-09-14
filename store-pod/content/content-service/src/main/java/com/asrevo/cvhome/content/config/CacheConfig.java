@@ -10,6 +10,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.asrevo.cvhome.cache.EntityCommitCacheEviction;
+import com.asrevo.cvhome.cache.StoreScopedKeyGenerator;
+import com.asrevo.cvhome.content.entity.ContentEntityStore;
 import com.asrevo.cvhome.content.facade.CachedStorefront;
 import com.github.benmanes.caffeine.cache.Caffeine;
 
@@ -30,13 +32,19 @@ public class CacheConfig {
                         .recordStats().build()));
     }
 
+    /** Every storefront read is keyed by its store first, so a store's write can drop its entries alone. */
+    @Bean(StoreScopedKeyGenerator.BEAN)
+    StoreScopedKeyGenerator storeScopedKeyGenerator() {
+        return new StoreScopedKeyGenerator();
+    }
+
     /**
-     * An editor's change clears the storefront caches when it commits. Content has no change events, and the writes
+     * An editor's change drops their store's storefront caches when it commits. Content has no change events, and the writes
      * the storefront reads — pages, policies, menus, layouts, banners, site settings — are spread over a dozen services.
      */
     @Bean
     EntityCommitCacheEviction storefrontCacheEviction(EntityManagerFactory entityManagerFactory, CacheManager caches) {
         return new EntityCommitCacheEviction(entityManagerFactory, caches, "com.asrevo.cvhome.content.entity",
-                CachedStorefront.CACHES);
+                CachedStorefront.CACHES, ContentEntityStore::of);
     }
 }
