@@ -6,8 +6,24 @@ import {SENTINEL as STATIC_ASSETS_SENTINEL} from './scripts/static-assets/consta
 
 const monorepoRoot = path.join(__dirname, '..');
 
+// `next dev` refuses cross-origin requests to its /_next resources, the HMR socket among them (blocked since Next 16.2,
+// a warning before). Under lcl the browser reaches it through spg as `<store>.<pod host>`, the host INTERNAL_SPG names,
+// so that host's subdomains are allowed. A production server ignores the option.
+function devOrigins(): string[] {
+    try {
+        return process.env.INTERNAL_SPG ? [`*.${new URL(process.env.INTERNAL_SPG).hostname}`] : [];
+    } catch {
+        return [];
+    }
+}
+
 const nextConfig: NextConfig = {
     reactStrictMode: true,
+    allowedDevOrigins: devOrigins(),
+    // Since 16.3, `next dev` writes its own AGENTS.md and CLAUDE.md into storefront/ whenever it detects a coding agent,
+    // and re-creates them on every start. Agents run this app's lcl stacks all day; the repo's agent rules are its root
+    // AGENTS.md and the project-structure skill, and a vendor copy in the app directory would be a second, conflicting one.
+    agentRules: false,
     // Two lcl stacks can run this app from one checkout; each needs its own build directory or they
     // overwrite each other's dev output. Unset (a plain `npm run dev`) keeps Next's default `.next`.
     distDir: process.env.NEXT_DIST_DIR || '.next',
@@ -33,20 +49,12 @@ const nextConfig: NextConfig = {
     turbopack: {
         root: monorepoRoot,
     },
-    // Loaded lazily by scripts/static-assets/sync-s3.mjs, outside the Next bundle. The tracing
-    // includes force the SDK (and its runtime deps) into .next/standalone/node_modules so the
-    // Docker image can upload to S3 without an npm install.
+    // Loaded lazily by scripts/static-assets/sync-s3.mjs, outside the Next bundle. scripts/copy-instrumentation.mjs
+    // copies every package listed here, with its dependency closure, into .next/standalone/node_modules, so the Docker
+    // image can upload to S3 without an npm install. Not `outputFileTracingIncludes`: Turbopack matches those globs
+    // anywhere in a path, and since 16.3 it hashes every match, so `node_modules/@aws-sdk/**` found the directory
+    // symlinks `next dev` leaves in `.next-<stack>/dev/node_modules/` and failed the build (EISDIR).
     serverExternalPackages: ['@aws-sdk/client-s3'],
-    outputFileTracingIncludes: {
-        '/**': [
-            '../node_modules/@aws-sdk/**',
-            '../node_modules/@aws/**',
-            '../node_modules/@smithy/**',
-            '../node_modules/tslib/**',
-            '../node_modules/bowser/**',
-            '../node_modules/uuid/**',
-        ],
-    },
     // Source packages (no build step) compiled by Next. Themes are appended by scripts/new-theme.mjs.
     transpilePackages: [
         '@store-front/ui',

@@ -97,6 +97,11 @@ export default function proxy(req: NextRequest) {
 }
 
 export const config = {
-    // Skip API-ish paths, Next internals, the system 404 page and anything with a file extension.
-    matcher: '/((?!api|trpc|_next|_vercel|store-not-found|.*\\..*).*)',
+    matcher: [
+        // Skip API-ish paths, Next internals, the system 404 page and anything with a file extension.
+        '/((?!api|trpc|_next|_vercel|store-not-found|.*\\..*).*)',
+        // Except under /t: a tree's payload answers at `<path>.rsc` too, and the extension rule above would let that
+        // form reach the tree without the 404 below.
+        '/t/:path*',
+    ],
 };

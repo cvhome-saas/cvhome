@@ -1,7 +1,9 @@
 /**
- * Puts the OpenTelemetry instrumentation hook, and everything it needs at runtime, into the standalone output.
+ * Puts into the standalone output what `next build` leaves out: the OpenTelemetry instrumentation hook with everything
+ * it needs at runtime, and the packages the app loads outside Next's bundle (`serverExternalPackages`: the S3 SDK
+ * start.mjs syncs static assets with).
  *
- * Two gaps in `next build --output standalone`, both silent:
+ * Four gaps in `next build --output standalone`:
  *
  *  1. `<distDir>/server/instrumentation.js` is not copied. The server requires exactly that path
  *     (`getInstrumentationModule` in next/dist/server/lib/router-utils/instrumentation-globals.external) and
@@ -9,6 +11,13 @@
  *  2. Next keeps every `@opentelemetry` package except `api` external and never bundles it, and file tracing does
  *     not follow the dynamic `import('./src/shell/telemetry')` in instrumentation.ts. Even with the hook in place
  *     the SDK is not there — and the first missing module is only reported once (1) is fixed.
+ *  3. Since Next 16.3, Turbopack requires an external package by a hashed alias (`require-in-the-middle-<hash>`),
+ *     a symlink the build writes in `<distDir>/node_modules/`. The hook's trace lists them; standalone copies none.
+ *     This one is loud: the hook throws while loading, and every page answers 500.
+ *  4. A package in `serverExternalPackages` that no route imports is not traced at all. The S3 SDK used to be forced
+ *     in with `outputFileTracingIncludes` globs, until Next 16.3: its Turbopack matches those globs anywhere in a path
+ *     and hashes every match, so `node_modules/@aws-sdk/**` found the directory symlinks `next dev` leaves in
+ *     `.next-<stack>/dev/node_modules/`, and every build after an lcl dev server failed with EISDIR.
  *
  * The result was a deployed storefront with no page-render spans, no upstream fetch spans and no entry in the
  * service graph, while `next start` from the full build directory traced perfectly, because there both the hook and
@@ -16,9 +25,10 @@
  * itself was put under load.
  *
  * So: copy the hook plus the chunks it references (transitively — the whole `server/chunks` directory is ~31 MB
- * against ~4 KB of instrumentation), and copy the telemetry packages plus their dependency closure. Nothing is
- * hand-listed: the seeds are the app's own `@opentelemetry` dependencies and the closure comes from each package's
- * `dependencies`, so a version bump or a new instrumentation needs no change here.
+ * against ~4 KB of instrumentation), and copy the telemetry packages and the server's external packages plus their
+ * dependency closure. Nothing is hand-listed: the seeds are the app's own `@opentelemetry` dependencies and the
+ * `serverExternalPackages` of the build's own config, and the closure comes from each package's `dependencies`, so a
+ * version bump, a new instrumentation or a new external package needs no change here.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -96,7 +106,14 @@ const packageDirOf = (name) => {
 };
 
 const manifest = JSON.parse(fs.readFileSync('package.json', 'utf8'));
-const seeds = Object.keys(manifest.dependencies ?? {}).filter((name) => name.startsWith('@opentelemetry/'));
+const serverFiles = path.join(dist, 'required-server-files.json');
+const externals = fs.existsSync(serverFiles)
+    ? JSON.parse(fs.readFileSync(serverFiles, 'utf8')).config?.serverExternalPackages ?? []
+    : [];
+const seeds = [
+    ...Object.keys(manifest.dependencies ?? {}).filter((name) => name.startsWith('@opentelemetry/')),
+    ...externals,
+];
 
 const packages = [];
 const pendingPackages = [...seeds];
@@ -116,5 +133,30 @@ while (pendingPackages.length > 0) {
     pendingPackages.push(...Object.keys(own.dependencies ?? {}));
 }
 
+// ── the aliases Turbopack requires externals by ──────────────────────────────────────────────────────────────────
+/**
+ * Every entry of the hook's trace under `<distDir>/node_modules/` is such an alias. Each is recreated as the same
+ * relative link (`../../../node_modules/<package>`): standalone is rooted where the build is, so the link lands on
+ * the copy of the package above.
+ */
+const aliasDir = path.join(dist, 'node_modules');
+const trace = path.join(buildServer, `${hook}.nft.json`);
+const aliases = fs.existsSync(trace)
+    ? JSON.parse(fs.readFileSync(trace, 'utf8')).files
+        .map((file) => path.join(buildServer, file))
+        .filter((file) => file.startsWith(aliasDir + path.sep) && fs.lstatSync(file, {throwIfNoEntry: false})?.isSymbolicLink())
+    : [];
+for (const alias of aliases) {
+    const to = path.join(standalone, app, alias);
+    fs.mkdirSync(path.dirname(to), {recursive: true});
+    fs.rmSync(to, {force: true});
+    fs.symlinkSync(fs.readlinkSync(alias), to);
+    if (!fs.existsSync(to)) {
+        console.error(`[instrumentation] ${alias} points at ${fs.readlinkSync(alias)}, which standalone does not have`);
+        process.exit(1);
+    }
+}
+
 console.log(`[instrumentation] standalone: ${chunks.length} build file(s), ${packages.length} package(s) copied `
-    + `(${seenPackages.size} in the telemetry closure)`);
+    + `(${seenPackages.size} in the closure of ${seeds.length} seed(s), external: ${externals.join(', ') || 'none'}), `
+    + `${aliases.length} external alias(es) linked`);
