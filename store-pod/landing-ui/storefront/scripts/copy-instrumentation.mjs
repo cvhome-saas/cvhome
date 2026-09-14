@@ -1,7 +1,7 @@
 /**
  * Puts the OpenTelemetry instrumentation hook, and everything it needs at runtime, into the standalone output.
  *
- * Two gaps in `next build --output standalone`, both silent:
+ * Three gaps in `next build --output standalone`:
  *
  *  1. `<distDir>/server/instrumentation.js` is not copied. The server requires exactly that path
  *     (`getInstrumentationModule` in next/dist/server/lib/router-utils/instrumentation-globals.external) and
@@ -9,6 +9,9 @@
  *  2. Next keeps every `@opentelemetry` package except `api` external and never bundles it, and file tracing does
  *     not follow the dynamic `import('./src/shell/telemetry')` in instrumentation.ts. Even with the hook in place
  *     the SDK is not there — and the first missing module is only reported once (1) is fixed.
+ *  3. Since Next 16.3, Turbopack requires an external package by a hashed alias (`require-in-the-middle-<hash>`),
+ *     a symlink the build writes in `<distDir>/node_modules/`. The hook's trace lists them; standalone copies none.
+ *     This one is loud: the hook throws while loading, and every page answers 500.
  *
  * The result was a deployed storefront with no page-render spans, no upstream fetch spans and no entry in the
  * service graph, while `next start` from the full build directory traced perfectly, because there both the hook and
@@ -116,5 +119,29 @@ while (pendingPackages.length > 0) {
     pendingPackages.push(...Object.keys(own.dependencies ?? {}));
 }
 
+// ── the aliases Turbopack requires externals by ──────────────────────────────────────────────────────────────────
+/**
+ * Every entry of the hook's trace under `<distDir>/node_modules/` is such an alias. Each is recreated as the same
+ * relative link (`../../../node_modules/<package>`): standalone is rooted where the build is, so the link lands on
+ * the copy of the package above.
+ */
+const aliasDir = path.join(dist, 'node_modules');
+const trace = path.join(buildServer, `${hook}.nft.json`);
+const aliases = fs.existsSync(trace)
+    ? JSON.parse(fs.readFileSync(trace, 'utf8')).files
+        .map((file) => path.join(buildServer, file))
+        .filter((file) => file.startsWith(aliasDir + path.sep) && fs.lstatSync(file, {throwIfNoEntry: false})?.isSymbolicLink())
+    : [];
+for (const alias of aliases) {
+    const to = path.join(standalone, app, alias);
+    fs.mkdirSync(path.dirname(to), {recursive: true});
+    fs.rmSync(to, {force: true});
+    fs.symlinkSync(fs.readlinkSync(alias), to);
+    if (!fs.existsSync(to)) {
+        console.error(`[instrumentation] ${alias} points at ${fs.readlinkSync(alias)}, which standalone does not have`);
+        process.exit(1);
+    }
+}
+
 console.log(`[instrumentation] standalone: ${chunks.length} build file(s), ${packages.length} package(s) copied `
-    + `(${seenPackages.size} in the telemetry closure)`);
+    + `(${seenPackages.size} in the telemetry closure), ${aliases.length} external alias(es) linked`);
