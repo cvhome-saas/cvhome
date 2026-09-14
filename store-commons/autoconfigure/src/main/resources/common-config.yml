@@ -177,7 +177,10 @@ spring:
       initialize-schema: always
   jpa:
     hibernate:
-      ddl-auto: update
+      # schema.sql owns every table, column and index (AGENTS.md). update was a safety net that quietly built what the
+      # DDL did not say: a second copy of eight unique constraints in catalog and of content's code index. validate
+      # builds nothing and refuses to start on an entity the DDL does not match.
+      ddl-auto: validate
     show-sql: false
     # Boot's default holds a request's connection from its first query until the response has been serialised. On a
     # throttled half vCPU most of that hold is the JVM waiting for CPU: in the 2026-09-14 spike catalog had 135

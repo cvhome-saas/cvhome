@@ -59,6 +59,9 @@ create table if not exists inventory.product_price
     product_avail_id               bigint       not null
         constraint fk_prd_price_avail references inventory.product_availability
 );
+-- Prices are read by availability row. With only the primary key, 94 % of reads of this table were full scans in the
+-- 2026-09-14 load test.
+create index if not exists product_price_avail_idx on inventory.product_price (product_avail_id);
 
 create table if not exists inventory.product_reservation
 (
