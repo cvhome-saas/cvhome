@@ -9,7 +9,7 @@ paid for. It owns no product copy — that is
   reserve / commit / release / expire cycle
 - **Runs on** — `lcl start -d --stack <name>`; read the live port from `lcl urls`. Address it through the
   gateway, never `:8126`
-- **Cases** — 20 (11 verified, 3 unit only, 6 not verified)
+- **Cases** — 23 (12 verified, 5 unit only, 6 not verified)
 - **Also see** — catalog (SEC-01…05 sweep both services), checkout (the caller of every reservation),
   [billing](../../../../store-core/billing/billing-service/qa/billing-qa.md) (inventory has **no** write gate —
   see 99)
@@ -288,6 +288,25 @@ combination. The model itself is
   `sku` is `NOT NULL`, and `uk_prd_avail_store_sku (store_merchant_id, sku)` exists.
 - **Result** — confirmed. `checkout.order_product_option` exists; `order_product_attribute` and
   `shopping_cart_attr_item` are gone.
+
+---
+
+## LOAD — The 2026-09-14 load-test fixes
+
+Findings 5 and 6 of *Where cvhome Breaks* (orchestrator `.agents/plans/load-bottlenecks.md`).
+
+### LOAD-01 — A bulk upsert reads its skus in one statement · high · [unit only]
+
+- **Result** — `InventoryServiceIntegrationTest`: 20 skus, 1 select (was 21 statements).
+
+### LOAD-02 — A sku's row is read without an in-memory limit · medium · [unit only]
+
+- **Result** — `InventoryApiIntegrationTest` passes under the test suite's paging guard.
+
+### LOAD-03 — Prices are found by their availability row through an index · high · [verified]
+
+- **Result** — `product_price (product_avail_id)` plans an index scan on a throwaway Postgres 15 loaded with
+  `schema.sql` and 20k prices (it was 94 % full scans on the load stack).
 
 ---
 

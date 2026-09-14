@@ -11,7 +11,7 @@ console's order statistics.
 - **Runs on** — `lcl start -d --stack <name>`; read the live ports from `lcl urls`. Address it through the pod
   gateway (`http://spg-507f1f77.gateway.com/checkout/…`) or the platform gateway (`gateway.com:8000/spg/checkout/…`),
   never `:8123`
-- **Cases** — 52 (39 verified end to end or in part, 11 unit only, 2 not verified)
+- **Cases** — 56 (40 verified end to end or in part, 14 unit only, 2 not verified)
 - **Also see** — [payment](../../payment/payment-service/qa/payment-qa.md) (the transactions and the approve /
   reject that drive the signals), [inventory](../../inventory/inventory-service/qa/inventory-qa.md) (the
   reservation that placement takes and expiry releases), [landing-ui](../../landing-ui/qa/landing-ui-qa.md) (the
@@ -505,6 +505,38 @@ Defects that actually happened in checkout — most in the service this one repl
 | **The reject dialog promised nothing would happen** | Its copy said the order does not change status; SIG-02 cancels and releases. | SIG-02 — read the dialog. |
 | **Order ids walked by URL** | Another shopper's status read answered 403 (confirming the id) or worse, the order. | PLC-10, CUS-02 — 404, never 403. |
 | **A guest's order status readable by integer id** | On a guest-checkout store `GET /order/{n}/status` answered any order's status, payment status and provider redirect URL to anyone (audit A3). | SEC-03 — 404 without the `ref`; PLC-13 — the return URL carries it and the page sends it. |
+
+---
+
+## LOAD — The 2026-09-14 load-test fixes
+
+Finding 2 of *Where cvhome Breaks* (orchestrator `.agents/plans/load-bottlenecks.md`): the cart held its database
+connection while catalog and inventory priced it, and 94 % of purchases failed in the production mix.
+
+### LOAD-01 — A guest's cart and a COD order go through, pricing outside any transaction · critical · [verified]
+
+- **Steps** — create a cart, set a quantity over the sku's maximum, read it back, place it COD as a guest, touch the
+  spent cart. (Every seeded store requires a login to order; for a guest, set
+  `merchant.merchant_store.require_login_for_order_placement = false` for one store and restart checkout.)
+- **Expect** — 201 cart; 422 `CHECKOUT.CART.QUANTITY_OUT_OF_RANGE` and the cart unchanged; 201 order `CONFIRMED` with
+  its stock `COMMITTED` and nothing pending; 409 `CHECKOUT.CART.ALREADY_CONVERTED`.
+- **Result** — lcl stack `lb` from `fix/load-bottlenecks`, 2026-09-14, through spg (`org1-store1`, port 2080): all as expected, the placement in 0.4 s. `CartApiIntegrationTest` and
+  `CheckoutApiIntegrationTest` assert catalog and inventory are never called inside a transaction (the old code fails
+  both).
+
+### LOAD-02 — The console's order list is three statements a page · high · [unit only]
+
+- **Result** — `OrderServiceIntegrationTest`: ≤ 3 (page, count, one batch of totals) where it was 42 for 20 orders.
+
+### LOAD-03 — A payment signal is one transaction, and a refused payment releases the stock at once · critical · [unit only]
+
+- **Result** — `ExternalOrderSignalApiIntegrationTest`, `CheckoutApiIntegrationTest.aRefusedPaymentCancelsTheOrderAndReleasesTheStock`.
+  Both only passed before because open-in-view kept a session open.
+
+### LOAD-04 — A slow peer fails the call instead of holding the caller · high · [unit only]
+
+- **Expect** — 1 s to connect, 3 s to answer (payment 10 s), a connection wait of 3 s at most.
+- **Result** — `S2sRequestFactoriesTest`. **Not verified** on a stack: nothing there is slow enough to trip it.
 
 ---
 

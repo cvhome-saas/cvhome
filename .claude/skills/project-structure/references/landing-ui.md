@@ -86,6 +86,23 @@ cookie (`?theme=` clears it); unknown ids resolve through the legacy map to the 
 cross-origin requests to its `/_next` resources (the HMR socket among them), so `next.config.ts` allows the subdomains of
 the `INTERNAL_SPG` host (`*.spg-507f1f77.gateway.com` under lcl); any other dev host needs an `allowedDevOrigins` entry.
 
+### The page cache and the request signal (`start.mjs` only)
+
+`start.mjs` puts two things in front of Next (`storefront/scripts/server/`), neither of which `next dev` runs:
+
+- **The page cache** (`page-cache.mjs`). An anonymous page is served from memory for
+  `STOREFRONT_PAGE_CACHE_TTL_SECONDS` (30; 0 turns it off), then stale for `STOREFRONT_PAGE_CACHE_STALE_SECONDS` (300)
+  while the first request to find it stale renders it again; shoppers who miss while a page renders share that render;
+  `STOREFRONT_PAGE_CACHE_MAX_MB` (64) bounds it. Keyed by the URL, host, spg's store headers and Next's Vary headers. It
+  is safe because the server render reads no per-shopper state — **keep it that way**: a page that starts reading a
+  cookie or a session header must be added to its bypass rules (login, register, customer, checkout, callback, the
+  theme/colour override, `?preview=`, `Authorization`), or it will serve one shopper's page to another.
+  `x-storefront-cache` on every response says what happened.
+- **The request signal** (`request-scope.mjs`). A render's backend calls (`apiFetch`, server side) abort when its shopper
+  disconnects, and every server-side read gives up after `STOREFRONT_BACKEND_TIMEOUT_MS` (3000; 0 waits).
+
+To QA them under lcl, run the production build in place of lcl's `next dev` (`qa/landing-ui-qa.md` LOAD).
+
 ## Adding a theme
 
 **➡️ `new-landing-ui-template.md`** — scaffold, impeccable design flow, contract checklist, verification.

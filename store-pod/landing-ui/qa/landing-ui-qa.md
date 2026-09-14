@@ -12,7 +12,7 @@ text direction, behind the pod's edge.
 - **Runs on** — `lcl start -d --stack <name>` (`npm run dev` alone is not enough — it needs the backend).
   Always reach it through the edge at `http://<store>.spg-507f1f77.gateway.com`; read the live port from
   `lcl urls`
-- **Cases** — 53 (40 verified, 1 unit only, 17 not verified; 5 cases have split verification tags)
+- **Cases** — 57 (44 verified, 1 unit only, 17 not verified; 5 cases have split verification tags)
 - **Also see** — [spg](../../spg/qa/spg-qa.md) (the edge in front of it), content, catalog, inventory,
   [checkout](../../checkout/checkout-service/qa/checkout-qa.md),
   [cua](../../cua/qa/cua-qa.md) (shopper login)
@@ -839,6 +839,47 @@ advisories, the versions that fix them, and what changed for this app between 16
 | Next 16.3's Turbopack requires external packages by a hashed alias (`require-in-the-middle-<hash>`, a symlink in `.next/node_modules`) | Every page 500 on the standalone build (`start.mjs`): `Failed to load external module require-in-the-middle-…`. `next build`, lint, typecheck and tests were all green. | `copy-instrumentation.test.mjs`; SEC-01 |
 | The `.rsc` form of a theme-tree URL skipped the proxy | `/t/fashion/en.rsc` answered 200 with the tree's payload | SEC-02 |
 | Next 16.3's Turbopack matches `outputFileTracingIncludes` globs anywhere in a path, and hashes every match | After any `next dev` in the checkout, `next build` failed: `reading file …/.next-<stack>/dev/node_modules/@aws-sdk/client-s3-<hash>: Is a directory` | SEC-01 (the build after `next dev`); `copy-instrumentation.test.mjs` |
+
+---
+
+## LOAD — The 2026-09-14 load-test fixes
+
+Findings 1 and 7 of *Where cvhome Breaks* (orchestrator `.agents/plans/load-bottlenecks.md`). **lcl runs landing-ui
+under `next dev`, which never goes through `start.mjs`**, so the page cache and the request signal are off on a plain lcl
+stack. To QA them: `npm run build` in `store-pod/landing-ui`, `lcl stop landing-ui --stack <name>`, then from
+`storefront/` run `PORT=<landing-ui port> INTERNAL_SPG=http://spg-507f1f77.gateway.com:<spg port> node start.mjs`, and
+browse through spg as usual.
+
+### LOAD-01 — An anonymous page is served from memory after its first render · high · [verified]
+
+- **Steps** — request the same page twice through spg; read `x-storefront-cache`.
+- **Expect** — `miss`, then `hit`, with the same bytes; `Content-Encoding: gzip` still comes from spg on a hit.
+- **Result** — lcl stack `lb` from `fix/load-bottlenecks`, 2026-09-14, through spg (`org1-store1`, port 2080), production build: `miss` → `hit`, gzip from spg. Against the load stack's backend
+  (org1-store2's FASHION home page, 223 KB): a miss renders in 156 ms, a hit answers in ~1 ms with identical bytes;
+  100 views cost 40 ms of CPU cached against 1,650 ms uncached (0.4 against 16.5 ms a page, arm64).
+
+### LOAD-02 — Nothing that could carry a shopper, a draft or an override comes from memory · critical · [verified]
+
+- **Steps** — request `/en/login`, and `/en` with a `storefront-theme` cookie; each answers `x-storefront-cache: bypass`.
+- **Expect** — the same for `Authorization`, `?theme=`/`?color=`/`?preview=`, the register, customer, checkout and
+  callback routes, `/api/*` and `/_next/*`; a response that sets any cookie but `NEXT_LOCALE`, or is not a 200, is
+  never kept.
+- **Result** — login and the theme cookie verified on the stack; every other rule by
+  `storefront/scripts/server/page-cache.test.mjs` (11 cases).
+
+### LOAD-03 — Shoppers who arrive while a page is first rendering share one render · high · [verified]
+
+- **Steps** — 20 concurrent requests for a page nobody has asked for.
+- **Result** — against the load stack's backend: 1 `miss`, 19 `shared`, one render. Past 30 s a page is served `stale`
+  while the first request to find it stale renders it again (`stale-refresh`); past 5 min more it is a `miss`.
+
+### LOAD-04 — A render stops when its shopper leaves, and a slow backend read fails in 3 s · high · [verified]
+
+- **Steps** — the production build in front of a fake spg that holds every call 5 s; a client that gives up after
+  1 s, then one that waits.
+- **Result** — the render's four backend calls are aborted at 929 ms when the client leaves, and no further call is
+  made; for the waiting client each read is aborted at 3.0 s (`STOREFRONT_BACKEND_TIMEOUT_MS`, 0 waits). Writes have no
+  budget. Covered also by `libs/services/test/http-utils.test.ts` and `scripts/server/request-scope.test.mjs`.
 
 ---
 

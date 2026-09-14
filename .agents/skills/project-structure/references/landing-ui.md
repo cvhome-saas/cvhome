@@ -100,6 +100,23 @@ Implementation: `storefront/scripts/static-assets/` (constants, apply-prefix, sy
 `@aws-sdk/client-s3` reaches the image via `outputFileTracingIncludes`. Never run `storefront/server.js`
 directly against a fresh build — it would serve the un-substituted sentinel.
 
+### The page cache and the request signal (`start.mjs` only)
+
+`start.mjs` puts two things in front of Next (`storefront/scripts/server/`), neither of which `next dev` runs:
+
+- **The page cache** (`page-cache.mjs`). An anonymous page is served from memory for
+  `STOREFRONT_PAGE_CACHE_TTL_SECONDS` (30; 0 turns it off), then stale for `STOREFRONT_PAGE_CACHE_STALE_SECONDS` (300)
+  while the first request to find it stale renders it again; shoppers who miss while a page renders share that render;
+  `STOREFRONT_PAGE_CACHE_MAX_MB` (64) bounds it. Keyed by the URL, host, spg's store headers and Next's Vary headers. It
+  is safe because the server render reads no per-shopper state — **keep it that way**: a page that starts reading a
+  cookie or a session header must be added to its bypass rules (login, register, customer, checkout, callback, the
+  theme/colour override, `?preview=`, `Authorization`), or it will serve one shopper's page to another.
+  `x-storefront-cache` on every response says what happened.
+- **The request signal** (`request-scope.mjs`). A render's backend calls (`apiFetch`, server side) abort when its shopper
+  disconnects, and every server-side read gives up after `STOREFRONT_BACKEND_TIMEOUT_MS` (3000; 0 waits).
+
+To QA them under lcl, run the production build in place of lcl's `next dev` (`qa/landing-ui-qa.md` LOAD).
+
 **Local dev URLs.** The storefront needs the store headers spg injects, so the supported dev URL is through spg:
 `http://org1-store1.spg-507f1f77.gateway.com/en?theme=<id>` (stack up via `lcl start -d`). Hitting `http://localhost:8110/en`
 directly works for SSR only because the proxy falls back to `FALLBACK_STORE_ID` (env, then the demo-store constant) —
