@@ -1,7 +1,9 @@
 package com.asrevo.cvhome.inventory.services;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,6 +63,10 @@ public class InventoryServiceImpl implements InventoryService {
     @Transactional
     public SkuInventory upsert(StoreMerchantId store, Sku sku, PersistableInventory source) {
         Inventory inventory = inventoryRepository.findBySku(store, sku).orElseGet(() -> new Inventory(store, sku));
+        return write(inventory, source, LocalDate.now());
+    }
+
+    private SkuInventory write(Inventory inventory, PersistableInventory source, LocalDate today) {
         inventory.setProductId(source.productId());
         inventory.setQuantity(source.quantity());
         inventory.setAvailable(source.available());
@@ -71,7 +77,7 @@ public class InventoryServiceImpl implements InventoryService {
             inventory.setQuantityOrderMaximum(source.quantityOrderMaximum());
         }
         applyPrice(inventory, source.price());
-        return SkuInventoryMapper.toSkuInventory(inventoryRepository.save(inventory), LocalDate.now());
+        return SkuInventoryMapper.toSkuInventory(inventoryRepository.save(inventory), today);
     }
 
     private void applyPrice(Inventory inventory, PersistablePrice source) {
@@ -91,7 +97,20 @@ public class InventoryServiceImpl implements InventoryService {
     @Transactional
     public List<SkuInventory> bulkUpsert(StoreMerchantId store, List<PersistableSkuInventory> entries) {
         // The entries were validated against Sku.FORMAT at the edge, so each converts.
-        return entries.stream().map(entry -> upsert(store, Sku.of(entry.sku()), entry.inventory())).toList();
+        List<Sku> skus = entries.stream().map(entry -> Sku.of(entry.sku())).toList();
+        // One read for the whole batch, not one per sku (21 statements for 20 skus in the 2026-09-14 load test). The
+        // first row by id wins, as in getBySkus; a sku listed twice edits the one row, as two single upserts would.
+        Map<Sku, Inventory> rows = new HashMap<>();
+        for (Inventory inventory : inventoryRepository.findBySkus(store, skus)) {
+            rows.putIfAbsent(inventory.getSku(), inventory);
+        }
+        LocalDate today = LocalDate.now();
+        List<SkuInventory> written = new ArrayList<>(entries.size());
+        for (int i = 0; i < entries.size(); i++) {
+            Inventory inventory = rows.computeIfAbsent(skus.get(i), sku -> new Inventory(store, sku));
+            written.add(write(inventory, entries.get(i).inventory(), today));
+        }
+        return written;
     }
 
     @Override
