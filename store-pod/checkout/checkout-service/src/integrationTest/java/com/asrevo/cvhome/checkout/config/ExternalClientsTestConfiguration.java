@@ -5,11 +5,13 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import com.asrevo.cvhome.catalog.model.product.ProductDescription;
 import com.asrevo.cvhome.catalog.model.product.ReadableImage;
@@ -68,6 +70,13 @@ public class ExternalClientsTestConfiguration {
 
     public static final String GATEWAY_REF = "tx-";
 
+    /**
+     * Set when catalog or inventory is asked to price a cart while the calling thread holds a database transaction: the
+     * shape the 2026-09-14 spike collapsed on, three connections held while catalog took seconds. A test resets it and
+     * asserts it stayed false.
+     */
+    public static final AtomicBoolean PRICED_INSIDE_A_TRANSACTION = new AtomicBoolean();
+
     @Bean
     @Primary
     ExternalMerchantStoreService stubExternalMerchantStoreService() {
@@ -89,6 +98,7 @@ public class ExternalClientsTestConfiguration {
     ExternalProductService stubExternalProductService() {
         ExternalProductService service = Mockito.mock(ExternalProductService.class);
         Mockito.when(service.getDetailedProducts(any(), any(), any())).thenAnswer(invocation -> {
+            recordTransaction();
             List<Sku> skus = invocation.getArgument(1);
             return skus.stream().filter(sku -> !SKU_UNKNOWN.equals(sku.value()))
                     .map(ExternalClientsTestConfiguration::product)
@@ -102,6 +112,7 @@ public class ExternalClientsTestConfiguration {
     ExternalInventoryService stubExternalInventoryService() {
         ExternalInventoryService service = Mockito.mock(ExternalInventoryService.class);
         Mockito.when(service.queryBySkus(any(), any())).thenAnswer(invocation -> {
+            recordTransaction();
             AvailabilityQuery query = invocation.getArgument(1);
             return query.skus().stream().filter(sku -> !SKU_UNKNOWN.equals(sku.value()))
                     .map(ExternalClientsTestConfiguration::stock).toList();
@@ -123,6 +134,12 @@ public class ExternalClientsTestConfiguration {
         ExternalPaymentGatewayService service = Mockito.mock(ExternalPaymentGatewayService.class);
         stubPaymentDefaults(service);
         return service;
+    }
+
+    private static void recordTransaction() {
+        if (TransactionSynchronizationManager.isActualTransactionActive()) {
+            PRICED_INSIDE_A_TRANSACTION.set(true);
+        }
     }
 
     public static void stubReservationDefaults(ExternalProductReservationService service) throws Exception {

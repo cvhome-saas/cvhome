@@ -74,6 +74,7 @@ class CartApiIntegrationTest {
 
     @Test
     void aCartIsCreatedUpdatedReadAndEmptiedInTheStorefrontsShape() {
+        ExternalClientsTestConfiguration.PRICED_INSIDE_A_TRANSACTION.set(false);
         ResponseEntity<String> created = api.send(HttpMethod.POST, scoped(path(V1, CART), STORE_A), null,
                 cartBody(SKU, 2));
         expect(created, HttpStatus.CREATED);
@@ -112,6 +113,8 @@ class CartApiIntegrationTest {
         JsonNode read = json(api.get(cartUrl(STORE_A, code), null));
         assertThat(read.get(CODE).asString()).isEqualTo(code);
         assertThat(read.get(QUANTITY).asInt()).isZero();
+        assertThat(ExternalClientsTestConfiguration.PRICED_INSIDE_A_TRANSACTION.get())
+                .as("catalog or inventory was called while a database transaction was open").isFalse();
     }
 
     @Test

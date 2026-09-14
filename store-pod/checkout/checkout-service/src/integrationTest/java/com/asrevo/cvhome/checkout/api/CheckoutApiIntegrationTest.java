@@ -157,6 +157,7 @@ class CheckoutApiIntegrationTest {
 
     @Test
     void aCardOrderIsReservedInitiatedAndLeftWaitingWithARedirect() {
+        ExternalClientsTestConfiguration.PRICED_INSIDE_A_TRANSACTION.set(false);
         String cart = api.newCart(STORE_A, SKU, 2);
 
         JsonNode order = api.placed(STORE_A, cart, shopperA, STRIPE, EMAIL);
@@ -194,6 +195,8 @@ class CheckoutApiIntegrationTest {
         JsonNode status = json(api.get(scoped(path(V1, ORDER, orderId, STATUS), STORE_A), shopperA));
         assertThat(status.get(ORDER_ID).asLong()).isEqualTo(orderId);
         assertThat(status.get(REDIRECT_URL).asString()).isEqualTo(ExternalClientsTestConfiguration.REDIRECT);
+        assertThat(ExternalClientsTestConfiguration.PRICED_INSIDE_A_TRANSACTION.get())
+                .as("catalog or inventory was called while a database transaction was open").isFalse();
     }
 
     @Test
