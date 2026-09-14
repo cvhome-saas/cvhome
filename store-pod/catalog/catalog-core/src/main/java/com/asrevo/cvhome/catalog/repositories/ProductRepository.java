@@ -22,14 +22,19 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
     String ID = "id";
 
     /**
-     * The product with what the readers need already loaded: copy, images, brand and type. Categories stay lazy.
+     * The product with its brand and type attached. Its copy and images, and the brand's and type's copy, follow in
+     * {@code @BatchSize} reads; categories stay lazy.
+     *
+     * <p>
+     * Only to-one associations are fetched. Fetch-joining the four collections multiplied rows: descriptions × images
+     * × brand copy × type copy came to ~20 rows per product on the seed data and 625 with five languages and five
+     * images (2026-09-14 load test). Batched, each collection is read once and its rows are its own.
+     * </p>
      */
     @Query("""
-            select distinct p from Product p
-            left join fetch p.descriptions
-            left join fetch p.images
-            left join fetch p.manufacturer m left join fetch m.descriptions
-            left join fetch p.type t left join fetch t.descriptions
+            select p from Product p
+            left join fetch p.manufacturer
+            left join fetch p.type
             where p.store = ?1 and p.id = ?2""")
     Optional<Product> findByStoreAndId(StoreMerchantId store, Long id);
 
@@ -41,10 +46,8 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
     @Query("""
             select distinct p from Product p
             join p.descriptions slug
-            left join fetch p.descriptions
-            left join fetch p.images
-            left join fetch p.manufacturer m left join fetch m.descriptions
-            left join fetch p.type t left join fetch t.descriptions
+            left join fetch p.manufacturer
+            left join fetch p.type
             where p.store = ?1 and slug.seUrl = ?2 and slug.languageCode = ?3 and p.available = true""")
     Optional<Product> findByStoreAndFriendlyUrl(StoreMerchantId store, String friendlyUrl, LanguageCode language);
 
@@ -52,20 +55,19 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
     List<Product> findByStoreAndCategories(StoreMerchantId store, Collection<Long> categoryIds);
 
     /**
-     * Loads a page's worth of products with everything the mapper reads already attached.
+     * Loads a page's worth of products with their brand and type attached; copy and images follow in one
+     * {@code @BatchSize} read each for the whole page.
      *
      * <p>
-     * Deliberately unpaged and driven by a list of ids the caller has already paged: fetch-joining collections
-     * and paginating in the same query makes Hibernate fall back to paging in memory, which on a large
-     * catalogue means reading all of it to return twenty-four rows. Two cheap queries beat that.
+     * Deliberately unpaged and driven by a list of ids the caller has already paged: paging a query that fetches a
+     * collection makes Hibernate page in memory. And only to-one associations are fetched, for the reason
+     * {@link #findByStoreAndId} gives: fetch-joined collections multiply each other's rows.
      * </p>
      */
     @Query("""
-            select distinct p from Product p
-            left join fetch p.descriptions
-            left join fetch p.images
-            left join fetch p.manufacturer m left join fetch m.descriptions
-            left join fetch p.type t left join fetch t.descriptions
+            select p from Product p
+            left join fetch p.manufacturer
+            left join fetch p.type
             where p.id in ?1""")
     List<Product> findAllHydrated(Collection<Long> ids);
 
