@@ -306,20 +306,35 @@ export function postsModel(data: SectionResolvedData | undefined): PostCardModel
 
 // ------------------------------------------------------------------------------------------ video
 
-/** YouTube/Vimeo page URL → privacy-friendly embed URL; undefined for anything else. */
-export function embedUrl(raw: unknown): string | undefined {
+export interface VideoEmbed {
+    provider: 'youtube' | 'vimeo';
+    id: string;
+    /** The privacy-friendly player URL. */
+    embedSrc: string;
+    /** A still of the video, where the provider serves one without a script: YouTube's medium-quality thumbnail. */
+    posterSrc?: string;
+}
+
+/** YouTube/Vimeo page URL → the provider, the video's id and its embed and poster URLs; undefined for anything else. */
+export function videoEmbed(raw: unknown): VideoEmbed | undefined {
     if (typeof raw !== 'string' || !raw) return undefined;
     try {
         const url = new URL(raw);
         const host = url.hostname.replace(/^www\./, '');
-        if (host === 'youtube.com' && url.searchParams.get('v')) {
-            return `https://www.youtube-nocookie.com/embed/${url.searchParams.get('v')}`;
+        const youtube = (id: string | null): VideoEmbed | undefined => id && /^[\w-]{6,}$/.test(id) ? {
+            provider: 'youtube', id,
+            embedSrc: `https://www.youtube-nocookie.com/embed/${id}`,
+            posterSrc: `https://i.ytimg.com/vi/${id}/hqdefault.jpg`,
+        } : undefined;
+        if (host === 'youtube.com') {
+            return youtube(url.searchParams.get('v'));
         }
         if (host === 'youtu.be' && url.pathname.length > 1) {
-            return `https://www.youtube-nocookie.com/embed/${url.pathname.slice(1)}`;
+            return youtube(url.pathname.slice(1));
         }
         if (host === 'vimeo.com' && /^\/\d+/.test(url.pathname)) {
-            return `https://player.vimeo.com/video/${url.pathname.slice(1)}`;
+            const id = url.pathname.slice(1);
+            return {provider: 'vimeo', id, embedSrc: `https://player.vimeo.com/video/${id}`};
         }
     } catch {
         return undefined;
@@ -327,14 +342,22 @@ export function embedUrl(raw: unknown): string | undefined {
     return undefined;
 }
 
+/** YouTube/Vimeo page URL → privacy-friendly embed URL; undefined for anything else. */
+export function embedUrl(raw: unknown): string | undefined {
+    return videoEmbed(raw)?.embedSrc;
+}
+
 export interface VideoModel {
     title?: string;
     embedSrc?: string;
+    posterSrc?: string;
 }
 
 export function videoModel(section: LayoutSectionData): VideoModel {
+    const embed = videoEmbed(section.props.url);
     return {
         title: text(section.text.title),
-        embedSrc: embedUrl(section.props.url),
+        embedSrc: embed?.embedSrc,
+        posterSrc: embed?.posterSrc,
     };
 }

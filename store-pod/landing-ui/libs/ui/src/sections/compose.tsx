@@ -7,6 +7,7 @@ import {
 } from '@store-front/theme';
 import {getTranslations} from 'next-intl/server';
 import {NewsletterForm} from './newsletter-form';
+import {VideoFacade} from '../video-facade';
 
 /**
  * The section composer: ONE implementation of every composable section kind, built from the shared
@@ -213,11 +214,7 @@ export function sectionsFromChrome(chrome: SectionChrome,
     const Video: Renderer = ({section, preview}) => {
         const model = videoModel(section);
         if (!model.embedSrc) return <EmptyOrHint preview={preview} label="Video — paste a YouTube or Vimeo link"/>;
-        const player = (
-            <iframe src={model.embedSrc} title={model.title ?? 'Video'} className="absolute inset-0 size-full"
-                    allow="accelerometer; encrypted-media; picture-in-picture" allowFullScreen
-                    loading="lazy" referrerPolicy="no-referrer"/>
-        );
+        const player = <VideoFacade embedSrc={model.embedSrc} title={model.title ?? 'Video'} posterSrc={model.posterSrc}/>;
         return (
             <section className="mx-auto min-w-0 max-w-3xl">
                 {model.title && <Heading title={<bdi dir="auto">{model.title}</bdi>}/>}

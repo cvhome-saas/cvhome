@@ -28,4 +28,5 @@ export * from './table';
 export * from './tabs';
 export * from './textarea';
 export * from './tooltip';
+export * from './video-facade';
 export * from './visually-hidden';
