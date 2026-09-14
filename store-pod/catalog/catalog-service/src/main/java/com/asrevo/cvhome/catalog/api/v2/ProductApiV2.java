@@ -33,6 +33,7 @@ import com.asrevo.cvhome.catalog.model.product.ReadableProduct;
 import com.asrevo.cvhome.catalog.model.product.ReadableProductDefinition;
 import com.asrevo.cvhome.catalog.model.product.ReadableProductSearchResult;
 import com.asrevo.cvhome.catalog.model.product.ReadableProductSuggestion;
+import com.asrevo.cvhome.catalog.services.CachedStorefrontCatalog;
 import com.asrevo.cvhome.catalog.services.product.ProductSearchService;
 import com.asrevo.cvhome.catalog.services.product.ProductService;
 import com.asrevo.cvhome.commons.domain.Entity;
@@ -63,6 +64,8 @@ public class ProductApiV2 {
     private final ProductService productService;
 
     private final ProductSearchService productSearchService;
+
+    private final CachedStorefrontCatalog storefront;
 
     /**
      * Public, like every storefront read, and also what the console's product table reads: a merchant sees exactly
@@ -102,7 +105,7 @@ public class ProductApiV2 {
             StoreMerchantId merchantStore, LanguageCode language) {
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.maxAge(Duration.ofSeconds(30)).cachePublic())
-                .body(productSearchService.suggest(merchantStore, query, language, limit));
+                .body(storefront.suggest(merchantStore, query, language, limit));
     }
 
     /**
@@ -125,7 +128,7 @@ public class ProductApiV2 {
     @Parameter(name = "store", schema = @Schema(type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
     public ReadableProduct getByFriendlyUrl(@PathVariable String friendlyUrl, StoreMerchantId merchantStore,
                                             LanguageCode language) throws ProductNotFoundException {
-        return productService.getByFriendlyUrl(merchantStore, friendlyUrl, language);
+        return storefront.product(merchantStore, friendlyUrl, language);
     }
 
     @GetMapping("/private/product/{id}")

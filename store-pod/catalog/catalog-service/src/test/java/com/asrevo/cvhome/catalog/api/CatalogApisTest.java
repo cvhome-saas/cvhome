@@ -20,6 +20,7 @@ import com.asrevo.cvhome.catalog.api.v1.ProductTypeApi;
 import com.asrevo.cvhome.catalog.api.v2.ProductApiV2;
 import com.asrevo.cvhome.catalog.model.category.PersistableCategory;
 import com.asrevo.cvhome.catalog.model.manufacturer.PersistableManufacturer;
+import com.asrevo.cvhome.catalog.services.CachedStorefrontCatalog;
 import com.asrevo.cvhome.catalog.services.category.CategoryService;
 import com.asrevo.cvhome.catalog.services.group.ProductGroupService;
 import com.asrevo.cvhome.catalog.services.manufacturer.ManufacturerService;
@@ -66,13 +67,16 @@ class CatalogApisTest {
     private final ProductService productService = Mockito.mock(ProductService.class);
     private final ProductSearchService productSearchService = Mockito.mock(ProductSearchService.class);
 
-    private final CategoryApi categoryApi = new CategoryApi(categoryService);
-    private final ManufacturerApi manufacturerApi = new ManufacturerApi(manufacturerService);
-    private final ProductGroupApi productGroupApi = new ProductGroupApi(productGroupService);
+    // Unproxied, so nothing is cached here: these tests are about what each endpoint asks of its service.
+    private final CachedStorefrontCatalog storefront = new CachedStorefrontCatalog(productGroupService, categoryService,
+            manufacturerService, productService, productSearchService);
+    private final CategoryApi categoryApi = new CategoryApi(categoryService, storefront);
+    private final ManufacturerApi manufacturerApi = new ManufacturerApi(manufacturerService, storefront);
+    private final ProductGroupApi productGroupApi = new ProductGroupApi(productGroupService, storefront);
     private final ProductTypeApi productTypeApi = new ProductTypeApi(productTypeService);
     private final ProductOptionApi productOptionApi = new ProductOptionApi(productOptionService);
     private final ProductApi productApi = new ProductApi(productService);
-    private final ProductApiV2 productApiV2 = new ProductApiV2(productService, productSearchService);
+    private final ProductApiV2 productApiV2 = new ProductApiV2(productService, productSearchService, storefront);
 
     @Test
     void theShopperAndConsoleHierarchiesDifferOnlyInWhetherHiddenCategoriesAreIncluded() {

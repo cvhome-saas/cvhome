@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.asrevo.cvhome.catalog.errors.ProductGroupNotFoundException;
 import com.asrevo.cvhome.catalog.errors.ProductNotFoundException;
 import com.asrevo.cvhome.catalog.model.group.ReadableProductGroup;
+import com.asrevo.cvhome.catalog.services.CachedStorefrontCatalog;
 import com.asrevo.cvhome.catalog.services.group.ProductGroupService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
@@ -38,10 +39,12 @@ public class ProductRelationshipApi {
 
     private final ProductGroupService productGroupService;
 
+    private final CachedStorefrontCatalog storefront;
+
     @GetMapping("/products/{id}/relationship")
     @Parameter(name = "store", schema = @Schema(type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
     public ReadableProductGroup related(@PathVariable Long id, StoreMerchantId merchantStore, LanguageCode language) {
-        return productGroupService.related(merchantStore, id, language);
+        return storefront.related(merchantStore, id, language);
     }
 
     @PostMapping("/private/products/{id}/relationship/{productId}")

@@ -19,6 +19,7 @@ import com.asrevo.cvhome.catalog.errors.ProductGroupNotFoundException;
 import com.asrevo.cvhome.catalog.errors.ProductNotFoundException;
 import com.asrevo.cvhome.catalog.model.group.PersistableProductGroup;
 import com.asrevo.cvhome.catalog.model.group.ReadableProductGroup;
+import com.asrevo.cvhome.catalog.services.CachedStorefrontCatalog;
 import com.asrevo.cvhome.catalog.services.group.ProductGroupService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
@@ -46,10 +47,12 @@ public class ProductGroupApi {
 
     private final ProductGroupService productGroupService;
 
+    private final CachedStorefrontCatalog storefront;
+
     @GetMapping("/products/groups/{code}")
     @Parameter(name = "store", schema = @Schema(type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
     public ReadableProductGroup get(@PathVariable String code, StoreMerchantId merchantStore, LanguageCode language) {
-        return productGroupService.storefront(merchantStore, code, language);
+        return storefront.group(merchantStore, code, language);
     }
 
     @GetMapping("/private/products/groups/{code}")
