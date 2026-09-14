@@ -1105,6 +1105,20 @@ shared the generator.
   `schema.sql`); `ContentContextIntegrationTest` and `InventoryContextIntegrationTest` assert the sequences exist and
   the table does not.
 
+
+### LOAD-09 — Checkout reads a cart line's product in its own shape, from a per-sku cache · high · [unit only]
+
+The one mix spike on the whole branch (2026-09-15) showed `/api/v1/detailed-products` as catalog's largest cost:
+2,181 calls, 3,388 s of server time, every cart operation reading the full product (copy, every image, dimensions
+and their units) to render a line.
+
+- **Steps** — `GET /api/v1/cart-lines?store=…&lang=en&skus=<simple>,<combination>,<unknown>` (product-api.http).
+- **Expect** — one element per known sku with `sku`, `productId`, `name`, `friendlyUrl`, `imageUrl`, `available`
+  and, for a combination sku, `variant.optionValues` with the resolved labels; no `description`, `images` or
+  `productSpecifications`; the unknown sku absent. Three statements for any number of skus on a cold cache; the
+  second call for any subset of them costs none; another store's entries are its own.
+- **Result** — `ProductApiIntegrationTest.checkoutReadsCartLinesFromThePerSkuCache`. **Not verified** on a stack.
+
 ---
 
 ## 99 — Known gaps

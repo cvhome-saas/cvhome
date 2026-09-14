@@ -7,8 +7,10 @@ import org.springframework.stereotype.Component;
 
 import com.asrevo.cvhome.catalog.entity.Product;
 import com.asrevo.cvhome.catalog.entity.ProductDescription;
+import com.asrevo.cvhome.catalog.entity.ProductVariant;
 import com.asrevo.cvhome.catalog.model.product.PersistableProductDefinition;
 import com.asrevo.cvhome.catalog.model.product.ProductSpecification;
+import com.asrevo.cvhome.catalog.model.product.ReadableCartLineProduct;
 import com.asrevo.cvhome.catalog.model.product.ReadableMinimalProduct;
 import com.asrevo.cvhome.catalog.model.product.ReadableProduct;
 import com.asrevo.cvhome.catalog.model.product.ReadableProductDefinition;
@@ -16,6 +18,7 @@ import com.asrevo.cvhome.catalog.services.category.CategoryMapper;
 import com.asrevo.cvhome.catalog.services.image.ImageMapper;
 import com.asrevo.cvhome.catalog.services.manufacturer.ManufacturerMapper;
 import com.asrevo.cvhome.catalog.services.type.ProductTypeMapper;
+import com.asrevo.cvhome.catalog.services.variant.ProductVariantMapper;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
 import com.asrevo.cvhome.merchant.model.merchant.ReadableMerchantStore;
@@ -41,6 +44,27 @@ public class ProductMapper {
      */
     public ReadableMinimalProduct toMinimal(Product product, LanguageCode language) {
         return fill(new ReadableMinimalProduct(), product, language);
+    }
+
+    /**
+     * The cart-line shape addressed by one variant: the product's id, name and slug in the language (its first
+     * language when it has none in that one), its default image's URL, whether the catalogue offers it, and a
+     * combination variant's labels. Touches the descriptions, the images and the variant's own labels only.
+     */
+    public ReadableCartLineProduct toCartLine(Product product, ProductVariant variant, LanguageCode language) {
+        ReadableCartLineProduct line = new ReadableCartLineProduct();
+        line.setSku(variant.getSku());
+        line.setProductId(product.getId());
+        line.setAvailable(product.isAvailable());
+        product.description(language)
+                .or(() -> product.getDescriptions().stream().findFirst())
+                .ifPresent(description -> {
+                    line.setName(description.getName());
+                    line.setFriendlyUrl(description.getSeUrl());
+                });
+        product.defaultImage().map(imageMapper::url).ifPresent(line::setImageUrl);
+        line.setVariant(ProductVariantMapper.toSelection(variant, language));
+        return line;
     }
 
     /**

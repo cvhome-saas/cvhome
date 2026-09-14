@@ -193,3 +193,6 @@ GET {{LANDING_UI_URL}}/catalog/api/v2/products?store={{STORE_ID}}&lang={{LANG}}&
 
 ### search with option facets in the rail
 GET {{LANDING_UI_URL}}/catalog/api/v2/products/search?store={{STORE_ID}}&lang={{LANG}}&q=&optionValueIds=4&page=0&count=24
+
+### cart lines by sku (ExternalProductApi, what checkout reads on every cart operation) — 200 [{sku, productId, name, friendlyUrl, imageUrl, available, variant}]
+GET {{SELLER_UI_URL}}/spg/catalog/api/v1/cart-lines?store={{STORE_ID}}&lang={{LANG}}&skus=HTTP-DEMO-001&skus=DOES-NOT-EXIST

@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
@@ -31,6 +32,7 @@ import com.asrevo.cvhome.catalog.model.category.CategoryReference;
 import com.asrevo.cvhome.catalog.model.product.LightPersistableProduct;
 import com.asrevo.cvhome.catalog.model.product.PersistableProductDefinition;
 import com.asrevo.cvhome.catalog.model.product.ProductFilter;
+import com.asrevo.cvhome.catalog.model.product.ReadableCartLineProduct;
 import com.asrevo.cvhome.catalog.model.product.ReadableMinimalProduct;
 import com.asrevo.cvhome.catalog.model.product.ReadableProduct;
 import com.asrevo.cvhome.catalog.model.product.ReadableProductDefinition;
@@ -124,6 +126,21 @@ public class ProductServiceImpl implements ProductService {
         Product product = productRepository.findByStoreAndId(store, variant.getProduct().getId())
                 .orElseThrow(() -> ProductNotFoundException.of(sku, store));
         return minimalFor(product, variant, language);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ReadableCartLineProduct> getCartLines(StoreMerchantId store, List<Sku> skus, LanguageCode language) {
+        if (skus == null || skus.isEmpty()) {
+            return List.of();
+        }
+        Map<Sku, ProductVariant> bySku = variantRepository.findCartLinesByStoreAndSkuIn(store, skus).stream()
+                .collect(Collectors.toMap(ProductVariant::getSku, Function.identity(), (a, b) -> a));
+        return skus.stream().distinct()
+                .map(bySku::get)
+                .filter(Objects::nonNull)
+                .map(variant -> productMapper.toCartLine(variant.getProduct(), variant, language))
+                .toList();
     }
 
     @Override

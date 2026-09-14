@@ -16,6 +16,8 @@ dependencies {
     api project(':store-pod:commons:store-commons')
     // The storefront's cached reads key by store (StoreScopedKeyGenerator) so a write can drop one store's entries.
     implementation project(':store-commons:autoconfigure')
+    // CachedCartLines reads a cart's skus from the Caffeine cache in one getAll; the service brings the manager.
+    compileOnly libs.caffeine
     api project(':store-pod:catalog:catalog-commons')
     api project(':store-pod:merchant:merchant-external-api')
     api project(':store-core:billing:billing-external-api')
