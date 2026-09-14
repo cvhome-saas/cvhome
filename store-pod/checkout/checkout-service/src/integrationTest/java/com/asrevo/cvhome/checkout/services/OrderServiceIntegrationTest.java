@@ -1,5 +1,7 @@
 package com.asrevo.cvhome.checkout.services;
 
+import java.util.UUID;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.server.LocalServerPort;
@@ -48,16 +50,18 @@ class OrderServiceIntegrationTest {
     @Test
     void aPageOfTheOrderListIsThreeStatementsWhateverItsSize() throws Exception {
         CheckoutApiSupport api = new CheckoutApiSupport(port, signer);
+        // Other tests' orders share the store and may sort ahead of these; the email keeps the page to this test's.
+        String shopper = String.format("list-%s@example.com", UUID.randomUUID().toString().substring(0, 8));
         for (int i = 0; i < ORDERS; i++) {
-            api.placed(STORE_A, api.newCart(STORE_A, SKU, 1), null, "COD", String.format("list-%d@example.com", i));
+            api.placed(STORE_A, api.newCart(STORE_A, SKU, 1), null, "COD", shopper);
         }
+        OrderFilter theirs = new OrderFilter(null, null, null, null, shopper, null, null);
 
         SqlStatements.Recorded<ReadableOrderList> page = SqlStatements.during(() -> orders.list(
-                new StoreMerchantId(STORE_A), LanguageCode.defaultLanguage(), OrderFilter.none(), PageRequest.of(0, 20)));
+                new StoreMerchantId(STORE_A), LanguageCode.defaultLanguage(), theirs, PageRequest.of(0, 20)));
 
-        // The page is shared with every other test's orders, some of which never reached a total; ours all have one.
-        assertThat(page.result().getContent()).filteredOn(order -> !order.getTotals().isEmpty())
-                .hasSizeGreaterThanOrEqualTo(ORDERS);
+        assertThat(page.result().getContent()).hasSize(ORDERS)
+                .allSatisfy(order -> assertThat(order.getTotals()).isNotEmpty());
         assertThat(page.count()).as(page.toString()).isLessThanOrEqualTo(3);
     }
 }
