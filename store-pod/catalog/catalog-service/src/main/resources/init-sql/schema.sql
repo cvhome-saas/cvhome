@@ -440,6 +440,31 @@ create index if not exists product_search_trgm_idx on catalog.product_search_ind
 create index if not exists product_store_idx on catalog.product (store_merchant_id);
 create index if not exists product_category_category_idx on catalog.product_category (category_id);
 
+-- The lookups the 2026-09-14 load test found as full scans (pg_stat_user_tables on the load stack). The seed's 200
+-- products hide them; each is a scan that grows with the catalogue.
+-- Every image batch and fetch join filters on product_id: 59,142 full scans of product_image, 53.2M rows read.
+create index if not exists product_image_product_idx on catalog.product_image (product_id);
+-- /api/v1/category/{friendlyUrl}. The unique key leads with category_id, so a lookup by URL read every description.
+create index if not exists category_description_url_idx on catalog.category_description (sef_url, language_code);
+-- A subtree is lineage LIKE 'x%'. Under the database's en_US collation only a pattern_ops index can serve a prefix.
+create index if not exists category_store_lineage_idx on catalog.category (store_merchant_id, lineage varchar_pattern_ops);
+-- The brand filter and facet, and the product type facet.
+create index if not exists product_store_manufacturer_idx on catalog.product (store_merchant_id, manufacturer_id);
+create index if not exists product_type_idx on catalog.product (product_type_id);
+-- A product's groups: the primary key leads with the group.
+create index if not exists product_group_product_product_idx on catalog.product_group_product (product_id);
+
+-- ddl-auto: update gave eight unique constraints a second copy under generated names, because their entities name
+-- none. This file owns the schema now (ddl-auto: validate), so the copies go from databases that already have them.
+alter table catalog.product_variant drop constraint if exists uk6nil7q0cw91a5rdrrmaydpjxc;
+alter table catalog.product_variant drop constraint if exists ukb92n5vdy4yy02ig8m0834nycm;
+alter table catalog.product_group drop constraint if exists ukrkqoiuq3drtsegevjn5a47fjl;
+alter table catalog.product_group_description drop constraint if exists uk7y3omx4xpun42dx3hgqo8bj2k;
+alter table catalog.product_option drop constraint if exists uk3p86gh0oacfk0fiflg4uq909b;
+alter table catalog.product_option_description drop constraint if exists uke72cp8gsqy87kiqekrjrhx2fm;
+alter table catalog.product_option_value drop constraint if exists ukk37rj0p34tpstpo7rrx20fk01;
+alter table catalog.product_option_value_description drop constraint if exists ukmogtqqkc4e5h3g4mgph7hqkr7;
+
 -- The searchable form of every product, as a query. Kept as a view so the document is defined exactly once and
 -- both the per-product refresh and the whole-store rebuild are the same expression with a different filter.
 --

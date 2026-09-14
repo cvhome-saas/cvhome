@@ -31,6 +31,9 @@ create table if not exists content.content
     constraint content_store_code_unique unique (store_merchant_id, code)
 );
 create index if not exists content_code_idx on content.content (code);
+-- ddl-auto: update also built the entity's CODE_IDX, the same index under a second name. This file owns the schema now
+-- (ddl-auto: validate), so the copy goes from databases that already have it.
+drop index if exists content.code_idx;
 
 -- BOX held the store "snippets" (meta-title, header-message, agreement, LANDING_PAGE) — a workflow-less parallel
 -- to the components that say the same things better. Each moved to its successor: site SEO to site_settings, the
