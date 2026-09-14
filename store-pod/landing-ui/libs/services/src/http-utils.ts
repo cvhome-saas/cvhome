@@ -140,7 +140,7 @@ export async function handleResponse<T>(res: Response, url?: string): Promise<T>
 export async function apiFetch<T>(url: string, init?: RequestInit): Promise<T> {
     let response: Response;
     try {
-        response = await fetch(url, init);
+        response = await fetch(url, typeof window === 'undefined' ? withIdentityEncoding(init) : init);
     } catch (cause) {
         throw toNetworkError(cause, url);
     }
@@ -148,6 +148,27 @@ export async function apiFetch<T>(url: string, init?: RequestInit): Promise<T> {
         discardRejectedToken();
     }
     return handleResponse<T>(response, url);
+}
+
+/**
+ * A server-side call asks spg for an uncompressed body.
+ *
+ * Node's `fetch` sends `accept-encoding: gzip, deflate`, and spg's `encode zstd gzip` compresses whatever a client
+ * accepts, so every API response on the internal hop was gzipped by spg and inflated again here: 4.8 % of a
+ * storefront render's CPU on dev's 0.5 vCPU, plus spg's own compression, for bytes that never leave the VPC. A browser
+ * keeps its own `Accept-Encoding` (it may not set this header anyway), so what a shopper downloads stays compressed.
+ * A caller that sets the header itself wins. The caller's `init` is never mutated: some are shared constants.
+ */
+function withIdentityEncoding(init?: RequestInit): RequestInit {
+    const headers = new Headers(init?.headers);
+    if (!headers.has('Accept-Encoding')) {
+        headers.set('Accept-Encoding', 'identity');
+    }
+    const plain: Record<string, string> = {};
+    headers.forEach((value, name) => {
+        plain[name] = value;
+    });
+    return {...init, headers: plain};
 }
 
 function sentCredential(init?: RequestInit): boolean {

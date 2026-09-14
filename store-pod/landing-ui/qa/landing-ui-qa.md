@@ -12,7 +12,7 @@ text direction, behind the pod's edge.
 - **Runs on** — `lcl start -d --stack <name>` (`npm run dev` alone is not enough — it needs the backend).
   Always reach it through the edge at `http://<store>.spg-507f1f77.gateway.com`; read the live port from
   `lcl urls`
-- **Cases** — 48 (35 verified, 1 unit only, 16 not verified; 4 cases have split verification tags)
+- **Cases** — 49 (36 verified, 1 unit only, 17 not verified; 5 cases have split verification tags)
 - **Also see** — [spg](../../spg/qa/spg-qa.md) (the edge in front of it), content, catalog, inventory,
   [checkout](../../checkout/checkout-service/qa/checkout-qa.md),
   [cua](../../cua/qa/cua-qa.md) (shopper login)
@@ -627,6 +627,41 @@ The profile behind these cases, and the ideas measured and rejected, are in the 
     24.7 ms. The mean is −0.7 %, within the noise.
   - An A/B of this function alone, patched into the same build, gave home −4.2 % and category −5.0 % on Node 20,
     and −4.1 % on Node 24. Small and safe, not a lever.
+
+### PERF-06 — landing-ui's calls to spg come back uncompressed · high · [verified] (spg's `encode` line) / [not verified] (the full spg image)
+
+- **Why** — Node's `fetch` sends `accept-encoding: gzip, deflate`. spg's `encode zstd gzip` (the `(routes)` snippet,
+  the same line PERF-03 relies on) then gzipped every API response to landing-ui, and landing-ui inflated it again,
+  on an internal hop. `apiFetch` now sends `Accept-Encoding: identity` from the server
+  (`libs/services/src/http-utils.ts`). A browser's request is left as the caller built it.
+- **Setup** — a Caddy with spg's `encode zstd gzip` line and a JSON access log, in front of the backend, with
+  `INTERNAL_SPG` pointed at it.
+- **Steps**
+  - Render the four pages with the build before and with this one. Read each API call's `Accept-Encoding` and the
+    `Content-Encoding` it got back.
+  - Request the same Caddy as a browser would: `gzip, deflate, br, zstd`, then `gzip, deflate`, then `identity`.
+  - Run `npm test` in `libs/services` (`test/http-utils.test.ts`).
+- **Expect**
+  - Before: `gzip, deflate` asked, and `gzip` returned. Now: `identity` asked, and nothing encoded.
+  - The pages are unchanged.
+  - A browser still gets zstd or gzip.
+  - The tests show:
+    - every server-side call carries the header;
+    - a caller's own `Accept-Encoding` wins;
+    - the caller's `RequestInit` is not mutated;
+    - a browser's request is untouched.
+- **Expected to differ** — the internal hop carries the JSON uncompressed, about 4× the bytes, inside the VPC. spg no
+  longer spends CPU compressing landing-ui's calls.
+- **Seen** — 2026-09-14:
+  - **Before:** 24 API calls asked for `gzip, deflate` and got gzip, 60 KB on the hop.
+  - **Now:** 18 asked for `identity` and got it uncompressed, 257 KB.
+  - **Pages:** the same bytes; the HTML differs only in chunk hashes and the build id.
+  - **A browser through the same Caddy:** zstd (51 KB → 669 B), gzip (1.2 KB), identity (51 KB).
+  - **Tests:** `http-utils.test.ts` passes 5 of 5.
+  - **CPU per render** against the formatter commit, with the backend gzipping as spg does: home 63.0 → 59.4,
+    category 49.9 → 44.2, product 29.5 → 23.2, search 24.7 → 26.8 ms. The mean is 41.8 → 38.4 ms (−8.1 %).
+- **Not verified** — the real spg image with its full route set and the Java backend. The load stack was down; the
+  Caddy used carries spg's `encode` line and nothing else.
 
 ---
 
