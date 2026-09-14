@@ -17,7 +17,9 @@ public class CachedExternalMerchantStoreService implements ExternalMerchantStore
         this.delegate = delegate;
     }
 
-    @Cacheable(value = "STORE", key = "#store.storeMerchantId()", unless = "#result==null")
+    // Keyed by the argument itself (a record) rather than a SpEL key: the catalog's product mapper asks once per product
+    // mapped, 24 times for one product group in the 2026-09-14 load test, and a SpEL key is evaluated on every call.
+    @Cacheable(value = "STORE", unless = "#result==null")
     @Override
     public ReadableMerchantStore getStore(StoreMerchantId store) {
         return delegate.getStore(store);
