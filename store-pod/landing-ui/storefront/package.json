@@ -9,7 +9,7 @@
     "start": "node start.mjs",
     "lint": "cd .. && npm run lint",
     "typecheck": "tsc --noEmit",
-    "test": "node --test scripts/*.test.mjs"
+    "test": "node --test scripts/*.test.mjs scripts/server/*.test.mjs"
   },
   "browserslist": [
     "chrome >= 93",

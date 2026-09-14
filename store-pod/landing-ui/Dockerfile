@@ -30,6 +30,7 @@ COPY storefront/.next/static ./storefront/.next/static
 COPY storefront/public ./storefront/public
 COPY storefront/start.mjs ./storefront/start.mjs
 COPY storefront/scripts/static-assets ./storefront/scripts/static-assets
+COPY storefront/scripts/server ./storefront/scripts/server
 
 EXPOSE 8110
 

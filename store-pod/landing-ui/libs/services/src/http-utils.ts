@@ -140,7 +140,7 @@ export async function handleResponse<T>(res: Response, url?: string): Promise<T>
 export async function apiFetch<T>(url: string, init?: RequestInit): Promise<T> {
     let response: Response;
     try {
-        response = await fetch(url, typeof window === 'undefined' ? withIdentityEncoding(init) : init);
+        response = await fetch(url, typeof window === 'undefined' ? forServer(init) : init);
     } catch (cause) {
         throw toNetworkError(cause, url);
     }
@@ -148,6 +148,49 @@ export async function apiFetch<T>(url: string, init?: RequestInit): Promise<T> {
         discardRejectedToken();
     }
     return handleResponse<T>(response, url);
+}
+
+/** The global start.mjs sets to read the current request's abort signal (storefront/scripts/server/request-scope.mjs). */
+const REQUEST_SIGNAL = Symbol.for('cvhome.storefront.requestSignal');
+
+/** How long a server-side read waits for the backend unless STOREFRONT_BACKEND_TIMEOUT_MS says otherwise; 0 waits. */
+const DEFAULT_READ_TIMEOUT_MS = 3000;
+
+/**
+ * A server-side call: identity encoding, the shopper's request's abort signal, and a time budget for reads.
+ *
+ * - **Abort on disconnect.** A render went on for a shopper who had left: in the 2026-09-14 spike landing-ui stayed at
+ *   its CPU cap 53–75 s after the load stopped, rendering pages whose clients had given up. The request's signal
+ *   aborts when its connection closes early, so its next backend call fails at once and the render ends.
+ * - **A budget for reads.** A backend that has slowed to seconds is waited on for {@link DEFAULT_READ_TIMEOUT_MS}, not
+ *   for as long as it takes (catalog's p95 reached 6.6 s under the spike). A read wrapped in {@link orUndefined}
+ *   renders without its section; a required one fails the page quickly. Writes keep no budget: a sign-in may take
+ *   seconds under load, and giving up on it would not undo it.
+ */
+function forServer(init?: RequestInit): RequestInit {
+    const request = withIdentityEncoding(init);
+    const signals: AbortSignal[] = [];
+    if (init?.signal) {
+        signals.push(init.signal);
+    }
+    const requestSignal = (globalThis as {[REQUEST_SIGNAL]?: () => AbortSignal | undefined})[REQUEST_SIGNAL]?.();
+    if (requestSignal) {
+        signals.push(requestSignal);
+    }
+    const budget = readTimeoutMs();
+    if (budget > 0 && (init?.method ?? 'GET').toUpperCase() === 'GET') {
+        signals.push(AbortSignal.timeout(budget));
+    }
+    if (signals.length === 0) {
+        return request;
+    }
+    return {...request, signal: signals.length === 1 ? signals[0] : AbortSignal.any(signals)};
+}
+
+function readTimeoutMs(): number {
+    const configured = Number(process.env.STOREFRONT_BACKEND_TIMEOUT_MS);
+    return Number.isFinite(configured) && configured >= 0 && process.env.STOREFRONT_BACKEND_TIMEOUT_MS
+        ? configured : DEFAULT_READ_TIMEOUT_MS;
 }
 
 /**
