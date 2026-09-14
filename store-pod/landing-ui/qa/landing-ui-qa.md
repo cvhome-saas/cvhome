@@ -881,6 +881,41 @@ browse through spg as usual.
   made; for the waiting client each read is aborted at 3.0 s (`STOREFRONT_BACKEND_TIMEOUT_MS`, 0 waits). Writes have no
   budget. Covered also by `libs/services/test/http-utils.test.ts` and `scripts/server/request-scope.test.mjs`.
 
+
+### LOAD-05 — A stale page is served at once, and refreshed by the cache itself · high · [unit only]
+
+- **Expect** — past 30 s the first shopper to ask gets the stale copy (`stale`) without waiting; the cache asks this
+  same server for the page again (`x-storefront-revalidate: 1`, one refresh at a time) and the next shopper gets
+  `hit` with the new bytes; a refresh that fails leaves the stale copy for its window and is tried again on the next
+  request. Without a revalidator (the unit tests' plain cache) the first request renders in line (`stale-refresh`).
+- **Result** — `page-cache.test.mjs`.
+
+### LOAD-06 — A page with a hole in it, or one that stopped short, is never kept · critical · [unit only]
+
+- **Expect** — a render in which an optional backend read was aborted or timed out (`orUndefined`) is sent to its
+  shopper but not kept; an HTML body that does not end in `</html>` (Next cannot change the status once the shell is
+  out) is not kept; a client navigation or prefetch (the `rsc` request headers) bypasses the cache; a listener that
+  throws before answering ends the response with a 500 instead of leaving it open.
+- **Result** — `page-cache.test.mjs`, `request-scope.test.mjs`, `libs/services/test/http-utils.test.ts` (a 404 is
+  an answer and does not mark the render degraded).
+
+### LOAD-07 — A shared render outlives the shopper who started it, and a write is never aborted · high · [unit only]
+
+- **Expect** — while other shoppers are waiting on a first render, the first shopper leaving does not abort it; once
+  nobody waits, it does. The request signal and the 3 s budget are attached to GET only; the timer and the abort
+  listener of a read are released when it ends.
+- **Result** — `page-cache.test.mjs`, `request-scope.test.mjs`, `http-utils.test.ts`.
+
+### LOAD-08 — A video section loads its player only when the shopper presses play · high · [not verified]
+
+The re-run's browser failures on the home page were all the seeded YouTube embed: `load` came 13–26 s after the
+document with the stack idle.
+
+- **Steps** — open a page with a video section (org1-store2's home); watch the network panel; press play.
+- **Expect** — before the press: no request to youtube-nocookie.com, one still from `i.ytimg.com` (YouTube) or the
+  muted surface (Vimeo), a button labelled "Play video: <title>"; after it: the player's iframe with `autoplay=1`.
+- **Result** — `libs/theme/test/models.test.ts` (the provider, id and poster); the component itself not yet driven.
+
 ---
 
 ## 99 — Known gaps

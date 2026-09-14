@@ -538,6 +538,26 @@ connection while catalog and inventory priced it, and 94 % of purchases failed i
 - **Expect** — 1 s to connect, 3 s to answer (payment 10 s), a connection wait of 3 s at most.
 - **Result** — `S2sRequestFactoriesTest`. **Not verified** on a stack: nothing there is slow enough to trip it.
 
+
+### LOAD-05 — Three carts created at once do not deadlock the pool · critical · [unit only]
+
+The re-run of 2026-09-14 (*Where cvhome Breaks Now*): right after a restart 76 of 91 cart creations failed. Hibernate's
+`SM_SEQUENCER` table generator fetched its block on a *second* pooled connection while the cart's transaction held
+the first; with a pool of 3, three concurrent inserts each held one and waited for another.
+
+- **Expect** — ids come from `checkout.<table>_seq` (one per table, fifty at a time, on the transaction's own
+  connection); `sm_sequencer` is gone; three cart creations in parallel against a pool of 3 all answer 201, and an
+  order's id starts at 1000.
+- **Result** — `CartApiIntegrationTest`, `CheckoutApiIntegrationTest` (every id generated through the sequences).
+  **Not verified** with three concurrent creations on a pool of 3.
+
+### LOAD-06 — Placing an order reads the store's currency before its transaction, not inside it · high · [unit only]
+
+- **Expect** — merchant is never called while a checkout transaction is open: the currency is read beside the
+  catalog and inventory snapshot, and passed into `createOrResume`.
+- **Result** — `CheckoutApiIntegrationTest` and `CartApiIntegrationTest` now record the merchant stub too, and
+  assert no peer was called inside a transaction (the old placement fails it once the STORE cache has expired).
+
 ---
 
 ## 99 — Known gaps

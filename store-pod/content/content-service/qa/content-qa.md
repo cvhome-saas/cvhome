@@ -987,7 +987,8 @@ exists` so it is both the fresh DDL and the migration.
 
 ### MIG-04 — Seeded ids and generated ids cannot collide · high · [not verified]
 
-The Module 13 TERMS seeds use **negative** ids on purpose: `SM_SEQUENCER` only counts upward.
+The Module 13 TERMS seeds use **negative** ids on purpose: the tables' sequences only count upward, and
+`data-sequences.sql` sets each one above its table's highest id after the seeds.
 
 - **Steps** — on a seeded store, create several content items and policy versions.
 - **Expect** — new ids are positive and increasing; no primary-key violation on insert; the seeded TERMS policy
@@ -1063,6 +1064,19 @@ Finding 6 of *Where cvhome Breaks* (orchestrator `.agents/plans/load-bottlenecks
 ### LOAD-03 — The duplicate `code_idx` is dropped from an old database · low · [not verified]
 
 - A fresh database never gets it; an old one loses it on the next start (`drop index if exists content.code_idx`).
+
+
+### LOAD-04 — An editor's change drops their own store's cache and leaves the other stores' warm · high · [unit only]
+
+- **Expect** — a write in store A drops store A's site, layouts and menus; store B's second read still costs no
+  statement. A layout revision or a media usage row alone, which carry no store, clears every store.
+- **Result** — `CachedStorefrontIntegrationTest` (the other seeded store stays cached across a redirect write).
+
+### LOAD-05 — Every id comes from a Postgres sequence · critical · [unit only]
+
+- **Expect** — `content.content_seq` and `content.content_description_seq` replace `sm_sequencer`; the seeded
+  negative ids (MIG-04) and the positive ones from the store seeds sit below what the sequences hand out.
+- **Result** — `ContentContextIntegrationTest` asserts the sequences exist and the table does not.
 
 ---
 

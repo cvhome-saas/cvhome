@@ -217,7 +217,7 @@ product form writes the definition here and the price/stock to inventory in a **
 - **Expect** — **201** `{"id": n}`; `GET /private/product/{n}` shows `visible: true`, `identifier == sku`,
   `descriptions` with one entry, empty `categories`, no `type`, no `manufacturer`, `dateAvailable` set to now.
   In the DB: one `product` row and one `product_description` row; **no** inventory row — stock and price are
-  a separate write (INV-05). `sm_sequencer` `PRODUCT_SEQ_NEXT_VAL` advanced.
+  a separate write (INV-05). `catalog.product_seq` advanced.
 
 ### PRD-02 — Create with brand, type and categories by code / id · critical · [not verified]
 
@@ -1076,6 +1076,34 @@ Findings 3–5 of *Where cvhome Breaks* (orchestrator `.agents/plans/load-bottle
 
 - **Result** — all twelve Java services started on the stack above, and `./gradlew integrationTest` passes; the eight
   Hibernate-generated duplicate unique constraints are dropped by `schema.sql`.
+
+
+### LOAD-07 — A merchant's write drops their own store's cache, and the listing and search are cached too · high · [unit only]
+
+The re-run of 2026-09-14 (*Where cvhome Breaks Now*) left catalog at 99 % of its CPU on the two reads LOAD-04 did not
+cache, and every write cleared every store's entries.
+
+- **Expect** — `GET /api/v2/products` and `/api/v2/products/search` answer from the cache for 60 s per store, filter,
+  criteria and page (the console's product table reads the same listing: on another task than the one that took a
+  save it is up to 60 s behind); a write in store A drops store A's entries from every catalog cache and leaves store
+  B's warm; a collection-only change (a product added to a group) drops them once its transaction commits, not at
+  flush; the search index's outbox refresh drops the store's entries again after the index caught up. The suggest key
+  is the typed text lowered, trimmed and cut at 64 characters, so `Sho`, `sho ` and `sho` share one entry.
+- **Result** — `CachedStorefrontCatalogIntegrationTest` (store 2's group read costs no statement after store 1's
+  write; the listing and the rail read from the cache), `EntityCommitCacheEvictionTest` (store-commons: per-store
+  eviction, the collection eviction after commit, a failed commit). **Not verified** on a stack.
+
+### LOAD-08 — Every id comes from a Postgres sequence, and the seeds cannot collide with it · critical · [unit only]
+
+The re-run found checkout's `SM_SEQUENCER` table generator deadlocking its own pool (below, checkout LOAD-05); catalog
+shared the generator.
+
+- **Expect** — every service boots under `ddl-auto: validate` with one `<table>_seq` per table
+  (`\ds catalog.*`), `sm_sequencer` is gone, and a product created after the seeds gets an id above every seeded one
+  (`init-sql/data-sequences.sql` sets each sequence to `max(id) + 1` after the seeds, never backwards).
+- **Result** — the catalog, checkout, content, inventory and payment integration suites (each boots against its
+  `schema.sql`); `ContentContextIntegrationTest` and `InventoryContextIntegrationTest` assert the sequences exist and
+  the table does not.
 
 ---
 
