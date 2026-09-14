@@ -1,11 +1,15 @@
 package com.asrevo.cvhome.content.config;
 
+import jakarta.persistence.EntityManagerFactory;
+
 import org.springframework.boot.cache.autoconfigure.CacheManagerCustomizer;
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.caffeine.CaffeineCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.asrevo.cvhome.cache.EntityCommitCacheEviction;
 import com.asrevo.cvhome.content.facade.CachedStorefront;
 import com.github.benmanes.caffeine.cache.Caffeine;
 
@@ -24,5 +28,15 @@ public class CacheConfig {
         return manager -> CachedStorefront.CACHES.forEach(name -> manager.registerCustomCache(name,
                 Caffeine.newBuilder().expireAfterWrite(CachedStorefront.TTL).maximumSize(STOREFRONT_ENTRIES)
                         .recordStats().build()));
+    }
+
+    /**
+     * An editor's change clears the storefront caches when it commits. Content has no change events, and the writes
+     * the storefront reads — pages, policies, menus, layouts, banners, site settings — are spread over a dozen services.
+     */
+    @Bean
+    EntityCommitCacheEviction storefrontCacheEviction(EntityManagerFactory entityManagerFactory, CacheManager caches) {
+        return new EntityCommitCacheEviction(entityManagerFactory, caches, "com.asrevo.cvhome.content.entity",
+                CachedStorefront.CACHES);
     }
 }

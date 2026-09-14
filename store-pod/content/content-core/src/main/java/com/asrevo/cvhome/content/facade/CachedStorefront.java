@@ -29,7 +29,7 @@ import lombok.RequiredArgsConstructor;
  * </p>
  *
  * <p>
- * An editor's change clears all three caches when it commits (content-service's {@code StorefrontCacheEviction}), so the
+ * An editor's change clears all three caches when it commits (content-service's {@code CacheConfig}), so the
  * task that took the change serves it at once; another task serves it within {@link #TTL}. A preview never comes
  * through here: drafts are read live.
  * </p>

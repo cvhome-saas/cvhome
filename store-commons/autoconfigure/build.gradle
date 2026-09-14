@@ -32,6 +32,7 @@ dependencies {
     compileOnly libs.spring.jdbc
     // PostgresJdbcConfiguration, the base of the Spring Data JDBC services' JdbcConfig; they bring the library.
     compileOnly libs.spring.data.jdbc
+    compileOnly libs.hibernate.core
     // TraceContextMdcFilter reads the current span; the API is on every service's runtime classpath via the starter.
     compileOnly libs.io.opentelemetry.api
     // With this library on the classpath the OpenTelemetry starter wraps the root logger's appenders with its MDC
