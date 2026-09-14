@@ -1,6 +1,6 @@
 import {strict as assert} from 'node:assert';
 import {afterEach, beforeEach, test} from 'node:test';
-import {apiFetch, get, post, publicCachedGet, publicGet} from '../src/http-utils';
+import {apiFetch, get, orUndefined, post, publicCachedGet, publicGet} from '../src/http-utils';
 
 type Seen = { url: string; init?: RequestInit };
 let seen: Seen[] = [];
@@ -72,8 +72,6 @@ test('a server-side read carries a time budget, and a write does not', async () 
 
 test('a read gives up once its budget is spent', async () => {
     process.env.STOREFRONT_BACKEND_TIMEOUT_MS = '20';
-    // AbortSignal.timeout's timer does not hold the event loop open; a listening server does, and this stands in for it.
-    const server = setTimeout(() => undefined, 5000);
     try {
         globalThis.fetch = ((_url: string, init?: RequestInit) => new Promise((_resolve, reject) => {
             init?.signal?.addEventListener('abort', () => reject(init.signal?.reason));
@@ -81,22 +79,42 @@ test('a read gives up once its budget is spent', async () => {
         await assert.rejects(apiFetch('http://spg/slow', publicGet()), (error: {category?: string}) =>
             error.category === 'NETWORK');
     } finally {
-        clearTimeout(server);
         delete process.env.STOREFRONT_BACKEND_TIMEOUT_MS;
     }
 });
 
-test("the shopper's request signal reaches every server-side call, a write included", async () => {
+test("the shopper's request signal ends a server-side read, and is not attached to a write", async () => {
     const shopper = new AbortController();
     (globalThis as Record<symbol, unknown>)[REQUEST_SIGNAL] = () => shopper.signal;
     try {
         await apiFetch('http://spg/i', post({a: 1}));
-        await apiFetch('http://spg/j', publicGet());
-        assert.equal(seen[0].init?.signal, shopper.signal);
+        assert.equal(seen[0].init?.signal, undefined, 'a write is not given up on because the tab closed');
+        globalThis.fetch = ((_url: string, init?: RequestInit) => new Promise((_resolve, reject) => {
+            init?.signal?.addEventListener('abort', () => reject(init.signal?.reason));
+        })) as typeof fetch;
+        const read = apiFetch('http://spg/j', publicGet());
         shopper.abort(new Error('the client closed the connection'));
-        assert.equal(seen[1].init?.signal?.aborted, true);
+        await assert.rejects(read, (error: {category?: string}) => error.category === 'NETWORK');
     } finally {
         delete (globalThis as Record<symbol, unknown>)[REQUEST_SIGNAL];
+    }
+});
+
+test('a read that gave up marks the render degraded through orUndefined; an answer, even a 404, does not', async () => {
+    const REQUEST_DEGRADED = Symbol.for('cvhome.storefront.requestDegraded');
+    let marks = 0;
+    (globalThis as Record<symbol, unknown>)[REQUEST_DEGRADED] = () => {
+        marks += 1;
+    };
+    try {
+        globalThis.fetch = (() => Promise.reject(new TypeError('fetch failed'))) as typeof fetch;
+        assert.equal(await orUndefined(apiFetch('http://spg/down', publicGet())), undefined);
+        assert.equal(marks, 1);
+        globalThis.fetch = (() => Promise.resolve(new Response('', {status: 404}))) as typeof fetch;
+        assert.equal(await orUndefined(apiFetch('http://spg/missing', publicGet())), undefined);
+        assert.equal(marks, 1, 'a 404 is an answer: the page is whole without that section');
+    } finally {
+        delete (globalThis as Record<symbol, unknown>)[REQUEST_DEGRADED];
     }
 });
 
