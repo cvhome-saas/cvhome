@@ -39,6 +39,7 @@ import com.asrevo.cvhome.catalog.model.product.LightPersistableProduct;
 import com.asrevo.cvhome.catalog.model.product.PersistableProductDefinition;
 import com.asrevo.cvhome.catalog.model.product.ProductDescription;
 import com.asrevo.cvhome.catalog.model.product.ProductFilter;
+import com.asrevo.cvhome.catalog.model.product.ReadableCartLineProduct;
 import com.asrevo.cvhome.catalog.model.product.ReadableProduct;
 import com.asrevo.cvhome.catalog.repositories.CategoryRepository;
 import com.asrevo.cvhome.catalog.repositories.ManufacturerRepository;
@@ -66,6 +67,8 @@ import static org.mockito.Mockito.when;
  */
 @ExtendWith(MockitoExtension.class)
 class ProductServiceImplTest {
+
+    private static final String MISSING = "missing";
 
     private static final StoreMerchantId STORE = new StoreMerchantId("65f023632bc46470c104b76f");
 
@@ -453,7 +456,24 @@ class ProductServiceImplTest {
                 .thenReturn(new com.asrevo.cvhome.catalog.model.product.ReadableMinimalProduct());
 
         // "missing" resolves to nothing and is skipped rather than yielding a null entry the caller must filter.
-        assertThat(service.getBySkus(STORE, List.of(SKU, SKU, Sku.of("missing")), EN)).hasSize(1);
+        assertThat(service.getBySkus(STORE, List.of(SKU, SKU, Sku.of(MISSING)), EN)).hasSize(1);
+    }
+
+    @Test
+    void aCartLineLookupKeepsTheCallersOrderDropsDuplicatesAndSkipsWhatItCannotResolve() {
+        Product product = new Product();
+        product.setId(1L);
+        product.setStore(STORE);
+        ProductVariant variant = new ProductVariant(product, SKU);
+        when(variantRepository.findCartLinesByStoreAndSkuIn(eq(STORE), any())).thenReturn(List.of(variant));
+        ReadableCartLineProduct line = new ReadableCartLineProduct();
+        line.setSku(SKU);
+        when(productMapper.toCartLine(product, variant, EN)).thenReturn(line);
+
+        assertThat(service.getCartLines(STORE, List.of(SKU, SKU, Sku.of(MISSING)), EN)).containsExactly(line);
+        assertThat(service.getCartLines(STORE, List.of(), EN)).isEmpty();
+        assertThat(service.getCartLines(STORE, null, EN)).isEmpty();
+        verify(productRepository, never()).findAllHydrated(any());
     }
 
     @Test

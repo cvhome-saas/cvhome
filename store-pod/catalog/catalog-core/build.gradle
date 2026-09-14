@@ -13,6 +13,8 @@ dependencies {
     testImplementation libs.hibernate.core
     // StoreEntitlements is exercised for real rather than mocked: its cache is the behaviour under test.
     testImplementation libs.caffeine
+    // CachedCartLinesTest drives a real CaffeineCacheManager.
+    testImplementation libs.spring.boot.starter.cache
     api project(':store-pod:commons:store-commons')
     // The storefront's cached reads key by store (StoreScopedKeyGenerator) so a write can drop one store's entries.
     implementation project(':store-commons:autoconfigure')
