@@ -1,7 +1,7 @@
 import {strict as assert} from 'node:assert';
 import {test} from 'node:test';
 import type {LayoutSectionData} from '@store-front/types';
-import {brandsModel, embedUrl, faqModel, heroModel, imageModel, newsletterModel, promoModel, testimonialsModel, uspModel} from '../src/sections/models';
+import {brandsModel, embedUrl, faqModel, heroModel, imageModel, newsletterModel, promoModel, testimonialsModel, uspModel, videoEmbed} from '../src/sections/models';
 import {linkHref} from '../src/sections/links';
 import {slidesAsBanners} from '../src/sections/slides';
 
@@ -88,6 +88,18 @@ test('brands keeps a label with artwork or a name, never a blank one', () => {
         ],
     }));
     assert.deepEqual(brands.map(brand => brand.id), ['a', 'b']);
+});
+
+test('videoEmbed names the provider and the id, and a poster where YouTube serves one without a script', () => {
+    assert.deepEqual(videoEmbed('https://youtu.be/abc123'), {
+        provider: 'youtube', id: 'abc123',
+        embedSrc: 'https://www.youtube-nocookie.com/embed/abc123',
+        posterSrc: 'https://i.ytimg.com/vi/abc123/hqdefault.jpg',
+    });
+    assert.deepEqual(videoEmbed('https://vimeo.com/12345'),
+        {provider: 'vimeo', id: '12345', embedSrc: 'https://player.vimeo.com/video/12345'});
+    assert.equal(videoEmbed('https://www.youtube.com/watch?v=../x'), undefined, 'an id is a video id, not a path');
+    assert.equal(videoEmbed(42), undefined);
 });
 
 test('embedUrl maps only YouTube and Vimeo page urls', () => {

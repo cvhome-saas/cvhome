@@ -412,6 +412,7 @@
     "CLOSE": "Cerrar",
     "PREVIOUS": "Anterior",
     "NEXT": "Siguiente",
+    "PLAY_VIDEO": "Reproducir vídeo: {title}",
     "CAROUSEL_SLIDE": "Diapositiva {index} de {total}",
     "MENU": "Menú",
     "SKIP_TO_CONTENT": "Saltar al contenido",
