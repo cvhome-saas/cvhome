@@ -58,6 +58,7 @@ dependencies {
     testImplementation libs.jakarta.servlet.api
     testImplementation libs.jackson.databind
     testImplementation libs.spring.tx
+    testImplementation libs.hibernate.core
     // ConstraintViolationErrorHandler's advice is keyed on jakarta.validation types.
     testImplementation libs.jakarta.validation.api
     // EcsTaskHealthIndicator is a HealthIndicator over an EcsTask; both are compileOnly above.
