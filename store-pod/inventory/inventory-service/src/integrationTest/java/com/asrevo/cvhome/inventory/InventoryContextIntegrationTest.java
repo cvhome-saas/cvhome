@@ -28,7 +28,11 @@ class InventoryContextIntegrationTest {
                 select table_name from information_schema.tables where table_schema = 'inventory' order by table_name
                 """, String.class);
         assertThat(tables).contains("product_availability", "product_price", "product_reservation",
-                "product_reservation_line", "sm_sequencer");
+                "product_reservation_line").doesNotContain("sm_sequencer");
+        var sequences = jdbcTemplate.queryForList(
+                "select sequence_name from information_schema.sequences where sequence_schema = 'inventory'", String.class);
+        assertThat(sequences).contains("product_availability_seq", "product_price_seq", "product_reservation_seq",
+                "product_reservation_line_seq");
         Integer catalogSchemas = jdbcTemplate.queryForObject(
                 "select count(*) from information_schema.schemata where schema_name = 'catalog'", Integer.class);
         assertThat(catalogSchemas).isZero();

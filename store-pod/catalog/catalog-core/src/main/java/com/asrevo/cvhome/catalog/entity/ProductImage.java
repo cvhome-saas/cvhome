@@ -9,8 +9,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
-import jakarta.persistence.TableGenerator;
 
 import com.asrevo.cvhome.store.core.constants.SchemaConstant;
 import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
@@ -49,11 +49,9 @@ public class ProductImage extends SalesManagerEntity<Long, ProductImage> {
 
     @Id
     @Column(name = "PRODUCT_IMAGE_ID")
-    @TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME",
-            valueColumnName = "SEQ_COUNT", pkColumnValue = "PRODUCT_IMAGE_SEQ_NEXT_VAL",
-            allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
-            initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
+    @SequenceGenerator(name = "product_image_seq", sequenceName = "product_image_seq",
+            allocationSize = SchemaConstant.ID_ALLOCATION_SIZE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "product_image_seq")
     private Long id;
 
     @ManyToOne

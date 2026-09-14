@@ -134,7 +134,7 @@ spring:
 
 # application-lcl.yml       import lcl-config.yml + store-pod-lcl-config.yml
 # application-fargate.yml   import fargate-config.yml + store-pod-fargate-config.yml
-# application-test-stores.yml   data-locations += data-test-stores.sql, stores/*/*.sql
+# application-test-stores.yml   data-locations += stores/*/*.sql, then data-sequences.sql last
 ```
 
 The **s2s client is per layer, not per service** — reuse `store-pod-507f1f77@service.store-pod.internal`

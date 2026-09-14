@@ -16,8 +16,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
-import jakarta.persistence.TableGenerator;
 
 import org.hibernate.annotations.BatchSize;
 
@@ -54,11 +54,9 @@ public class ProductType extends SalesManagerEntity<Long, ProductType> implement
 
     @Id
     @Column(name = "PRODUCT_TYPE_ID", unique = true, nullable = false)
-    @TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME",
-            valueColumnName = "SEQ_COUNT", pkColumnValue = "PRODUCT_TYPE_SEQ_NEXT_VAL",
-            allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
-            initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
+    @SequenceGenerator(name = "product_type_seq", sequenceName = "product_type_seq",
+            allocationSize = SchemaConstant.ID_ALLOCATION_SIZE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "product_type_seq")
     private Long id;
 
     @Embedded

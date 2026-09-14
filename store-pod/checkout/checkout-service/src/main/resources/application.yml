@@ -17,7 +17,7 @@ spring:
     init:
       # drop-legacy.sql first: the pre-rewrite tables, dropped once; a no-op on every later boot.
       schema-locations: classpath:init-sql/drop-legacy.sql, classpath:init-sql/schema.sql
-      data-locations: classpath:init-sql/data-common.sql
+      data-locations: classpath:init-sql/data-common.sql, classpath:init-sql/data-sequences.sql
   jpa:
     properties:
       hibernate:

@@ -10,8 +10,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
-import jakarta.persistence.TableGenerator;
 
 import com.asrevo.cvhome.store.core.constants.SchemaConstant;
 import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
@@ -33,11 +33,9 @@ public class OrderLineOption extends SalesManagerEntity<Long, OrderLineOption> {
 
     @Id
     @Column(name = "OPTION_ID")
-    @TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME",
-            valueColumnName = "SEQ_COUNT", pkColumnValue = "SALES_ORDER_LINE_OPTION_SEQ_NEXT_VAL",
-            allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
-            initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
+    @SequenceGenerator(name = "sales_order_line_option_seq", sequenceName = "sales_order_line_option_seq",
+            allocationSize = SchemaConstant.ID_ALLOCATION_SIZE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sales_order_line_option_seq")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

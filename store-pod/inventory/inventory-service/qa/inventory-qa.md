@@ -69,7 +69,7 @@ docker exec cvhome-postgres-1 psql -U postgres -d cvhome -c \
             p.product_price_special_st_date, p.product_price_special_end_date, p.default_price
        from inventory.product_price p join inventory.product_availability a using (product_avail_id);"
 ... "select ref, status, expire_at from inventory.product_reservation order by id desc limit 10;"
-... "select * from inventory.sm_sequencer;"
+... "select sequencename, last_value from pg_sequences where schemaname = 'inventory';"
 ```
 
 Logs: `.lcl/<stack>/logs/inventory.log`.
@@ -150,10 +150,10 @@ tables are gone.
 
 - **Steps** — on a database that still has `catalog.product_availability` / `product_price` /
   `product_reservation*` rows (a pre-split dump, or the simulation the PR ran), start inventory; read the log
-  and `inventory.sm_sequencer`.
+  and `pg_sequences` for the `inventory` schema.
 - **Expect** — every availability row copied **with `sku` backfilled** from `catalog.product` (the column was
   NULL pre-split and it is now the reservation key); every price row copied with `store_merchant_id` from its
-  availability; reservations and lines copied; every sequencer **≥ the max copied id**; log line
+  availability; reservations and lines copied; every sequence **above the max copied id**; log line
   `Catalog-to-inventory data migration completed; all availability rows carry a sku`. A second start changes
   nothing. Any row left with a NULL sku logs an **ERROR** naming the count — that is a finding.
 
@@ -258,8 +258,8 @@ rather than split in half. Inventory's own gate cases are **INV-04** (cross-tena
 
 ### ARC-02 — The inventory schema holds no price descriptions · [verified]
 
-- **Expect** — `\dt inventory.*`: sequencer, product_availability, product_price, product_reservation,
-  product_reservation_line. Seeds create no description rows; the migration copies none.
+- **Expect** — `\dt inventory.*`: product_availability, product_price, product_reservation,
+  product_reservation_line, and `\ds inventory.*` one sequence per table. Seeds create no description rows; the migration copies none.
 
 > ARC-01, ARC-03 and ARC-04 are catalog's, in catalog-qa.md.
 

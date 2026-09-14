@@ -6,8 +6,8 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
-import jakarta.persistence.TableGenerator;
 import jakarta.persistence.UniqueConstraint;
 
 import com.asrevo.cvhome.store.core.constants.SchemaConstant;
@@ -19,10 +19,8 @@ import lombok.Setter;
 @Entity
 @Table(name = "PRODUCT_GROUP_DESCRIPTION",
         uniqueConstraints = @UniqueConstraint(columnNames = {"PRODUCT_GROUP_ID", "LANGUAGE_CODE"}))
-@TableGenerator(name = "description_gen", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME",
-        valueColumnName = "SEQ_COUNT", pkColumnValue = "PRODUCT_GROUP_DESC_SEQ_NEXT_VAL",
-        allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
-        initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
+@SequenceGenerator(name = "description_gen", sequenceName = "product_group_description_seq",
+        allocationSize = SchemaConstant.ID_ALLOCATION_SIZE)
 @Getter
 @Setter
 public class ProductGroupDescription extends BaseDescription {
