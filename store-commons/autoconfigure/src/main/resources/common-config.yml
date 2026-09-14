@@ -152,7 +152,10 @@ spring:
     caffeine:
       # Hit/miss/eviction counters for every Spring cache (cache_gets_total, cache_size, cache_evictions_total);
       # Boot's CacheMetricsAutoConfiguration binds them once the cache records statistics.
-      spec: recordStats
+      # Bounded, and it expires: nothing evicts STORE, so without a TTL a merchant's change to a store's currency, units
+      # or languages never reached catalog, checkout or payment until they restarted. Five minutes is the staleness a
+      # settings change may have; one entry per store, so the bound is never near.
+      spec: maximumSize=10000,expireAfterWrite=5m,recordStats
   docker:
     compose:
       file: ${spring.application.name}/compose.yml
