@@ -12,7 +12,7 @@ text direction, behind the pod's edge.
 - **Runs on** — `lcl start -d --stack <name>` (`npm run dev` alone is not enough — it needs the backend).
   Always reach it through the edge at `http://<store>.spg-507f1f77.gateway.com`; read the live port from
   `lcl urls`
-- **Cases** — 47 (34 verified, 1 unit only, 16 not verified; 4 cases have split verification tags)
+- **Cases** — 50 (37 verified, 1 unit only, 18 not verified; 6 cases have split verification tags)
 - **Also see** — [spg](../../spg/qa/spg-qa.md) (the edge in front of it), content, catalog, inventory,
   [checkout](../../checkout/checkout-service/qa/checkout-qa.md),
   [cua](../../cua/qa/cua-qa.md) (shopper login)
@@ -526,6 +526,18 @@ drift by ±25 %, so a change is compared in one session against the build before
 the median; pages the change does not touch show the noise (about ±15 %). The method and the dev numbers that
 started it are in the orchestrator plan `.agents/plans/landing-ui-render-cost.md`.
 
+From PERF-05 on, the measurement follows dev's task as it is now:
+
+- **Container:** 0.5 vCPU / 1 GiB, on production's base image (`gcr.io/distroless/nodejs20`, which the mirror copies).
+- **Telemetry:** on, exporting over OTLP.
+- **Backend:** org1-store2's API responses, recorded once from the load stack and replayed. The replay gzips a
+  response when the caller asks, as spg does. So a run touches no shared backend and repeats exactly.
+- **Readings:** CPU per render is read from the cgroup by a sidecar, over 20 renders of each page, in three rounds
+  interleaved with the build before.
+
+The profile behind these cases, and the ideas measured and rejected, are in the orchestrator plan
+`.agents/plans/landing-ui-cpu-memory.md`.
+
 ### PERF-01 — The category page loads its data once · high · [verified]
 
 - **Why** — `generateMetadata` and the page each called `loadCategory` with a `ListingQuery` built per caller.
@@ -593,6 +605,101 @@ started it are in the orchestrator plan `.agents/plans/landing-ui-render-cost.md
   and org1-store1 each titled with their own name through the shared cache. Backend calls per render: home 9 → 6,
   category 8 → 5, search 5 → 2. CPU per render, two runs against the build before: search −21 % and −23 %; home,
   category and product within the noise (−10 % to +14 %).
+
+### PERF-05 — Prices come from one formatter per locale and currency · [verified]
+
+- **Why** — `InventoryService.formatAmount` built a new `Intl.NumberFormat` for every price of every product on every
+  render: 3.9 % of a home render's CPU in a V8 profile. `currencyFormatter` (`libs/services/src/currency-format.ts`)
+  keeps one per `locale|currency` for the process. A code `Intl` rejects is remembered as rejected, and the map is
+  bounded.
+- **Steps**
+  - Run `npm test` in `libs/services` (`test/currency-format.test.ts`).
+  - Render home, a category, a product and a search, and compare every price with the build before.
+  - Compare CPU per render with the build before.
+- **Expect**
+  - The same prices in the same places. A store whose currency `Intl` rejects still shows the plain amount.
+  - CPU per render the same or lower on the pages with many prices.
+- **Seen** — 2026-09-14:
+  - The four pages carry the same 110 / 70 / 17 / 45 prices as `main`. The HTML differs from `main` only in chunk
+    hashes and the build id.
+  - `currency-format.test.ts` passes 4 of 4.
+  - CPU per render against `main`: home 63.4 → 63.0, category 50.5 → 49.9, product 27.3 → 29.5, search 27.0 →
+    24.7 ms. The mean is −0.7 %, within the noise.
+  - An A/B of this function alone, patched into the same build, gave home −4.2 % and category −5.0 % on Node 20,
+    and −4.1 % on Node 24. Small and safe, not a lever.
+
+### PERF-06 — landing-ui's calls to spg come back uncompressed · high · [verified] (spg's `encode` line) / [not verified] (the full spg image)
+
+- **Why** — Node's `fetch` sends `accept-encoding: gzip, deflate`. spg's `encode zstd gzip` (the `(routes)` snippet,
+  the same line PERF-03 relies on) then gzipped every API response to landing-ui, and landing-ui inflated it again,
+  on an internal hop. `apiFetch` now sends `Accept-Encoding: identity` from the server
+  (`libs/services/src/http-utils.ts`). A browser's request is left as the caller built it.
+- **Setup** — a Caddy with spg's `encode zstd gzip` line and a JSON access log, in front of the backend, with
+  `INTERNAL_SPG` pointed at it.
+- **Steps**
+  - Render the four pages with the build before and with this one. Read each API call's `Accept-Encoding` and the
+    `Content-Encoding` it got back.
+  - Request the same Caddy as a browser would: `gzip, deflate, br, zstd`, then `gzip, deflate`, then `identity`.
+  - Run `npm test` in `libs/services` (`test/http-utils.test.ts`).
+- **Expect**
+  - Before: `gzip, deflate` asked, and `gzip` returned. Now: `identity` asked, and nothing encoded.
+  - The pages are unchanged.
+  - A browser still gets zstd or gzip.
+  - The tests show:
+    - every server-side call carries the header;
+    - a caller's own `Accept-Encoding` wins;
+    - the caller's `RequestInit` is not mutated;
+    - a browser's request is untouched.
+- **Expected to differ** — the internal hop carries the JSON uncompressed, about 4× the bytes, inside the VPC. spg no
+  longer spends CPU compressing landing-ui's calls.
+- **Seen** — 2026-09-14:
+  - **Before:** 24 API calls asked for `gzip, deflate` and got gzip, 60 KB on the hop.
+  - **Now:** 18 asked for `identity` and got it uncompressed, 257 KB.
+  - **Pages:** the same bytes; the HTML differs only in chunk hashes and the build id.
+  - **A browser through the same Caddy:** zstd (51 KB → 669 B), gzip (1.2 KB), identity (51 KB).
+  - **Tests:** `http-utils.test.ts` passes 5 of 5.
+  - **CPU per render** against the formatter commit, with the backend gzipping as spg does: home 63.0 → 59.4,
+    category 49.9 → 44.2, product 29.5 → 23.2, search 24.7 → 26.8 ms. The mean is 41.8 → 38.4 ms (−8.1 %).
+- **Not verified** — the real spg image with its full route set and the Java backend. The load stack was down; the
+  Caddy used carries spg's `encode` line and nothing else.
+
+### PERF-07 — The storefront runs on Node 24 · critical · [verified] (runtime, build) / [not verified] (the image on the mirror, dev)
+
+- **Why**
+  - The image ran `gcr.io/distroless/nodejs20`, and Node 20 has been end-of-life since 2026-04-30.
+  - Every UI module was built with Node 23.8.0, end-of-life since mid-2025.
+  - On Node 24 a render costs about 40 % less CPU, and landing-ui is the service dev saturates first.
+  - The Dockerfile now runs `public.ecr.aws/b2i4h4k9/nodejs24:latest`, which cvhome-saas/public-dkr mirrors from
+    `gcr.io/distroless/nodejs24`.
+  - Every build Node moves to 24.21.0: `com.asrevo.ui-conventions` (console-ui and landing-ui), ui-kit, and uaa's
+    `uaa-fe`.
+- **Steps**
+  - Run the standalone build on `gcr.io/distroless/nodejs24:latest` (the image the mirror copies) at 0.5 vCPU /
+    1 GiB, telemetry on. Render the four pages, and compare CPU per render with `main` on Node 20.
+  - Run `./gradlew :store-commons:ui-kit:build :store-core:console-ui:build :store-pod:landing-ui:build
+    :store-core:uaa:build -x test -x check`.
+  - Once public-dkr has published, run `./gradlew :store-pod:landing-ui:bootBuildImage` and render through the
+    image.
+- **Expect**
+  - The same pages, and no errors in the log.
+  - CPU per render about 40 % lower.
+  - Memory at idle about 30 MiB higher, still far inside 1 GiB.
+  - Every UI module downloads and builds with Node 24.21.0.
+- **Seen** — 2026-09-14:
+  - The runtime reports `v24.21.0`. All four pages return 200 with the same prices and bytes as `main` (only chunk
+    hashes and the build id differ), and the log has 0 errors.
+  - CPU per render against `main` on Node 20, the three commits together: home 63.4 → 35.9, category 50.5 → 24.8,
+    product 27.3 → 14.4, search 27.0 → 19.8 ms. The mean is 42.0 → 23.7 ms (−43.6 %).
+  - Memory at idle went from 84–93 to 118–122 MiB.
+  - The Gradle build is `BUILD SUCCESSFUL`, and each of the four modules downloaded `node-v24.21.0` and ran
+    `npmInstall` and its build with it.
+  - Earlier, same harness: a burst of 300 shoppers with 30 s of patience on one task. Node 24 served all 300, with
+    p50 9 s and p95 16 s, and peaked at about 210 MiB anon. Node 20 served 291–297, with p50 16 s and p95 29 s, and
+    peaked at about 390 MiB.
+- **Not verified**
+  - The image built on the mirror. `public.ecr.aws/b2i4h4k9/nodejs24:latest` exists only after cvhome-saas/public-dkr#4
+    is merged and its job has run; until then this Dockerfile cannot build.
+  - Dev's x86 Fargate. Every ratio was measured on arm64.
 
 ---
 

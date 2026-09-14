@@ -4,6 +4,7 @@ export * from './cart-service';
 export * from './category-service';
 export * from './color-utils';
 export * from './content-service';
+export * from './currency-format';
 export * from './customer-service';
 export * from './description-view-util';
 export * from './direction-utils';

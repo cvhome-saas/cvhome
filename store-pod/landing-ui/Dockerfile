@@ -16,7 +16,9 @@
 # start.mjs substitutes the build-time sentinel assetPrefix, then starts Next exactly like the
 # generated server.js. Do not run storefront/server.js directly — it would serve the sentinel.
 ###############################################
-FROM public.ecr.aws/b2i4h4k9/nodejs20:latest
+# Node 24 (distroless, mirrored by cvhome-saas/public-dkr): a render costs 38 % less CPU than on Node 20, which is
+# end-of-life. The storefront is the service dev saturates first (qa/landing-ui-qa.md PERF-07).
+FROM public.ecr.aws/b2i4h4k9/nodejs24:latest
 
 ENV NODE_ENV=production \
     PORT=8110 \
