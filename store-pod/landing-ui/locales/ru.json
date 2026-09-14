@@ -412,6 +412,7 @@
     "CLOSE": "Закрыть",
     "PREVIOUS": "Назад",
     "NEXT": "Вперёд",
+    "PLAY_VIDEO": "Воспроизвести видео: {title}",
     "CAROUSEL_SLIDE": "Слайд {index} из {total}",
     "MENU": "Меню",
     "SKIP_TO_CONTENT": "Перейти к содержимому",

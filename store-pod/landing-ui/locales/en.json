@@ -412,6 +412,7 @@
     "CLOSE": "Close",
     "PREVIOUS": "Previous",
     "NEXT": "Next",
+    "PLAY_VIDEO": "Play video: {title}",
     "CAROUSEL_SLIDE": "Slide {index} of {total}",
     "MENU": "Menu",
     "SKIP_TO_CONTENT": "Skip to content",
