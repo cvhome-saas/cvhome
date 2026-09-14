@@ -81,7 +81,7 @@ class CartServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        service = new CartServiceImpl(carts, orders, snapshots, storeSettings);
+        service = new CartServiceImpl(new CartTransactions(carts, orders), snapshots, storeSettings);
         lenient().when(storeSettings.currency(Orders.STORE)).thenReturn(new CurrencyCode("USD"));
         lenient().when(storeSettings.locale(any())).thenReturn(Locale.US);
         lenient().when(carts.save(any(Cart.class))).thenAnswer(inv -> inv.getArgument(0));
