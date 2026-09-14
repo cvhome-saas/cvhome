@@ -80,8 +80,11 @@ public class OrderStepRunner {
                     case NONE -> order;
                 };
             } catch (PaymentGatewayRejectedException e) {
-                // The order is already CANCELLED with a RELEASE pending; keep going so the stock goes back now.
+                // The order is already CANCELLED with a RELEASE pending; keep going so the stock goes back now. Re-read
+                // it: the refusal was written to a fresh copy, and this one still says INITIATE_PAYMENT. (Open-in-view
+                // used to hand every load the same instance, which hid that.)
                 paymentRefused = e;
+                order = load(orderId);
             }
         }
         if (paymentRefused != null) {

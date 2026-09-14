@@ -1,6 +1,7 @@
 package com.asrevo.cvhome.merchant.service.populator.merchant;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
@@ -55,7 +56,8 @@ public class ReadableMerchantStorePopulator
         target.setUseCache(source.isUseCache());
         target.setRequireLoginForOrderPlacement(source.isRequireLoginForOrderPlacement());
 
-        target.setStoreDomains(source.getStoreDomains());
+        // A copy, not the entity's lazy set: the DTO is serialised after the transaction has closed.
+        target.setStoreDomains(new HashSet<>(source.getStoreDomains()));
 
         applySupportedLanguages(source, target);
         applyAudit(source, target);
