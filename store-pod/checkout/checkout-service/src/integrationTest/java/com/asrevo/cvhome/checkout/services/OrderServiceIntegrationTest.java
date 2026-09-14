@@ -55,8 +55,9 @@ class OrderServiceIntegrationTest {
         SqlStatements.Recorded<ReadableOrderList> page = SqlStatements.during(() -> orders.list(
                 new StoreMerchantId(STORE_A), LanguageCode.defaultLanguage(), OrderFilter.none(), PageRequest.of(0, 20)));
 
-        assertThat(page.result().getContent()).hasSizeGreaterThanOrEqualTo(ORDERS)
-                .allSatisfy(order -> assertThat(order.getTotals()).isNotEmpty());
+        // The page is shared with every other test's orders, some of which never reached a total; ours all have one.
+        assertThat(page.result().getContent()).filteredOn(order -> !order.getTotals().isEmpty())
+                .hasSizeGreaterThanOrEqualTo(ORDERS);
         assertThat(page.count()).as(page.toString()).isLessThanOrEqualTo(3);
     }
 }
