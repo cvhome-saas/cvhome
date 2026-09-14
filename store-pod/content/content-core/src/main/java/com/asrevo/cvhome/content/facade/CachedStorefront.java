@@ -4,9 +4,11 @@ import java.time.Clock;
 import java.time.Duration;
 import java.util.List;
 
+import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
+import com.asrevo.cvhome.cache.StoreScopedKeyGenerator;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.content.model.MenuHandle;
@@ -29,12 +31,14 @@ import lombok.RequiredArgsConstructor;
  * </p>
  *
  * <p>
- * An editor's change clears all three caches when it commits (content-service's {@code CacheConfig}), so the
- * task that took the change serves it at once; another task serves it within {@link #TTL}. A preview never comes
+ * An editor's change drops their store's entries from all three caches when it commits (content-service's
+ * {@code CacheConfig}), so the task that took the change serves it at once; another task serves it within
+ * {@link #TTL}. A preview never comes
  * through here: drafts are read live.
  * </p>
  */
 @Component
+@CacheConfig(keyGenerator = StoreScopedKeyGenerator.BEAN)
 @RequiredArgsConstructor
 public class CachedStorefront {
 

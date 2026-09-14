@@ -22,6 +22,10 @@ import com.asrevo.cvhome.commons.domain.StoreMerchantId;
  */
 public interface ProductSearchService {
 
+    /** The most suggestions one call returns, whatever limit it asked for. */
+    int MAX_SUGGESTIONS = 10;
+
+
     ReadableProductSearchResult search(StoreMerchantId store, ProductSearchCriteria criteria, LanguageCode language,
                                        Pageable pageable);
 

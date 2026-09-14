@@ -3,6 +3,7 @@ package com.asrevo.cvhome.catalog.model.product;
 import java.util.List;
 import java.util.Set;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,6 +18,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
+@EqualsAndHashCode
 public class ProductSearchCriteria {
 
     /**

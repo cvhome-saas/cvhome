@@ -2,18 +2,24 @@ package com.asrevo.cvhome.catalog.services;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.Locale;
 
+import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
+import com.asrevo.cvhome.cache.StoreScopedKeyGenerator;
 import com.asrevo.cvhome.catalog.errors.CategoryFriendlyUrlNotFoundException;
 import com.asrevo.cvhome.catalog.errors.CategoryNotFoundException;
 import com.asrevo.cvhome.catalog.errors.ProductNotFoundException;
 import com.asrevo.cvhome.catalog.model.category.ReadableCategory;
 import com.asrevo.cvhome.catalog.model.group.ReadableProductGroup;
 import com.asrevo.cvhome.catalog.model.manufacturer.ReadableManufacturer;
+import com.asrevo.cvhome.catalog.model.product.ProductFilter;
+import com.asrevo.cvhome.catalog.model.product.ProductSearchCriteria;
 import com.asrevo.cvhome.catalog.model.product.ReadableProduct;
+import com.asrevo.cvhome.catalog.model.product.ReadableProductSearchResult;
 import com.asrevo.cvhome.catalog.model.product.ReadableProductSuggestion;
 import com.asrevo.cvhome.catalog.services.category.CategoryService;
 import com.asrevo.cvhome.catalog.services.group.ProductGroupService;
@@ -32,17 +38,22 @@ import lombok.RequiredArgsConstructor;
  * <p>
  * Every storefront render asks for them and every shopper of a store gets the same answer: a product group (28 % of
  * catalog's requests in the 2026-09-14 load test), the category tree, a category or product by its slug, a category's
- * brands and the search box's suggestions. With nothing cached, catalog spent 90 s of the production mix at its CPU
- * cap. Price and stock are not in any of these answers (inventory owns them), so nothing a shopper pays is served
- * stale. The console's private reads never come through here.
+ * brands, the listing and the search results page, and the search box's suggestions. With nothing cached, catalog
+ * spent 90 s of the production mix at its CPU cap; with everything but the listing and the search cached it was still
+ * pinned at 99 % of its cap in the re-run, those two being the reads left. Price and stock are not in any of these
+ * answers (inventory owns them), so nothing a shopper pays is served stale. The console's product table reads the same
+ * listing, so a merchant on another task than the one that took their save sees it within {@link #TTL}.
  * </p>
  *
  * <p>
- * A merchant's change clears every cache when it commits (catalog-service's {@code CacheConfig}), so the task that took
- * it serves it at once and another task within {@link #TTL}. An absent category or product is not cached: it throws.
+ * Keys are {@link StoreScopedKeyGenerator store-scoped}: a merchant's change drops their own store's entries when it
+ * commits (catalog-service's {@code CacheConfig}) and leaves every other store's warm. An absent category or product
+ * is not cached: it throws. The suggest key is the typed text lowered, trimmed and cut at {@link #SUGGEST_KEY_LENGTH},
+ * so one shopper's typing cannot fill the cache with keys nobody else will hit.
  * </p>
  */
 @Component
+@CacheConfig(keyGenerator = StoreScopedKeyGenerator.BEAN)
 @RequiredArgsConstructor
 public class CachedStorefrontCatalog {
 
@@ -58,11 +69,19 @@ public class CachedStorefrontCatalog {
 
     public static final String PRODUCT = "CATALOG_PRODUCT";
 
+    public static final String LISTING = "CATALOG_LISTING";
+
+    public static final String SEARCH = "CATALOG_SEARCH";
+
     public static final String SUGGEST = "CATALOG_SUGGEST";
 
-    public static final List<String> CACHES = List.of(GROUP, RELATED, HIERARCHY, CATEGORY, BRANDS, PRODUCT, SUGGEST);
+    public static final List<String> CACHES = List.of(GROUP, RELATED, HIERARCHY, CATEGORY, BRANDS, PRODUCT, LISTING,
+            SEARCH, SUGGEST);
 
-    public static final Duration TTL = Duration.ofSeconds(30);
+    public static final Duration TTL = Duration.ofSeconds(60);
+
+    /** Longer than any product name a shopper types before the suggestions have answered. */
+    public static final int SUGGEST_KEY_LENGTH = 64;
 
     private final ProductGroupService groups;
 
@@ -109,6 +128,32 @@ public class CachedStorefrontCatalog {
         return products.getByFriendlyUrl(store, friendlyUrl, language);
     }
 
+    /** The category page's listing, keyed by its filter and page: what the re-run's shoppers hit catalog with most. */
+    @Cacheable(LISTING)
+    public ReadableEntityList<ReadableProduct> list(StoreMerchantId store, ProductFilter filter, LanguageCode language,
+                                                    Pageable pageable) {
+        return products.list(store, filter, language, pageable);
+    }
+
+    /** The results page with its rail, and the category rail alone ({@code rows=false}), keyed by the criteria. */
+    @Cacheable(SEARCH)
+    public ReadableProductSearchResult search(StoreMerchantId store, ProductSearchCriteria criteria,
+                                              LanguageCode language, Pageable pageable) {
+        return search.search(store, criteria, language, pageable);
+    }
+
+    /** The typed text as the suggest cache keys it: lowered, trimmed and cut at {@link #SUGGEST_KEY_LENGTH}. */
+    public static String suggestKey(String query) {
+        String typed = query == null ? "" : query.strip().toLowerCase(Locale.ROOT);
+        return typed.length() > SUGGEST_KEY_LENGTH ? typed.substring(0, SUGGEST_KEY_LENGTH) : typed;
+    }
+
+    /** The limit the suggest cache keys by: what the search would cap it to anyway. */
+    public static int suggestLimit(int limit) {
+        return Math.clamp(limit, 1, ProductSearchService.MAX_SUGGESTIONS);
+    }
+
+    /** Called with {@link #suggestKey} and {@link #suggestLimit}: a raw query would key a cache entry per keystroke. */
     @Cacheable(SUGGEST)
     public List<ReadableProductSuggestion> suggest(StoreMerchantId store, String query, LanguageCode language,
                                                    int limit) {
