@@ -20,7 +20,7 @@ import com.asrevo.cvhome.testsupport.sql.SqlStatements;
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-@DataJpaTest(properties = SqlStatements.INSPECTOR)
+@DataJpaTest(properties = {SqlStatements.INSPECTOR, SqlStatements.NO_PAGING_IN_MEMORY})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ActiveProfiles("test-stores")
 @Import(PostgresTestConfiguration.class)
