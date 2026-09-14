@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.content.api.v1.support.PreviewTokens;
+import com.asrevo.cvhome.content.facade.CachedStorefront;
 import com.asrevo.cvhome.content.facade.StorefrontFacade;
 import com.asrevo.cvhome.content.model.layout.PageKind;
 import com.asrevo.cvhome.content.service.MenuService;
@@ -53,7 +54,8 @@ class StorefrontApiTest {
     private final PreviewTokens previews = Mockito.mock(PreviewTokens.class);
     private final Clock clock = Clock.fixed(Instant.parse("2026-01-01T00:00:00Z"), ZoneOffset.UTC);
 
-    private final StorefrontApi api = new StorefrontApi(storefront, menus, previews, clock);
+    // Unproxied, so nothing is cached here: this test is about what the API asks for and the headers it sends.
+    private final StorefrontApi api = new StorefrontApi(storefront, new CachedStorefront(storefront, menus, clock), previews);
 
     @Test
     void aPublishedPageIsCachedAtTheEdge() throws Exception {
