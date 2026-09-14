@@ -59,3 +59,53 @@ test('in a browser the request goes out as the caller built it', async () => {
     assert.equal(seen[0].init, init);
     assert.equal(headersOf(seen[0]).get('Accept-Encoding'), null);
 });
+
+const REQUEST_SIGNAL = Symbol.for('cvhome.storefront.requestSignal');
+
+test('a server-side read carries a time budget, and a write does not', async () => {
+    await apiFetch('http://spg/g', publicGet());
+    await apiFetch('http://spg/h', post({a: 1}));
+    assert.ok(seen[0].init?.signal, 'a read has no signal');
+    assert.equal(seen[0].init?.signal?.aborted, false);
+    assert.equal(seen[1].init?.signal, undefined);
+});
+
+test('a read gives up once its budget is spent', async () => {
+    process.env.STOREFRONT_BACKEND_TIMEOUT_MS = '20';
+    // AbortSignal.timeout's timer does not hold the event loop open; a listening server does, and this stands in for it.
+    const server = setTimeout(() => undefined, 5000);
+    try {
+        globalThis.fetch = ((_url: string, init?: RequestInit) => new Promise((_resolve, reject) => {
+            init?.signal?.addEventListener('abort', () => reject(init.signal?.reason));
+        })) as typeof fetch;
+        await assert.rejects(apiFetch('http://spg/slow', publicGet()), (error: {category?: string}) =>
+            error.category === 'NETWORK');
+    } finally {
+        clearTimeout(server);
+        delete process.env.STOREFRONT_BACKEND_TIMEOUT_MS;
+    }
+});
+
+test("the shopper's request signal reaches every server-side call, a write included", async () => {
+    const shopper = new AbortController();
+    (globalThis as Record<symbol, unknown>)[REQUEST_SIGNAL] = () => shopper.signal;
+    try {
+        await apiFetch('http://spg/i', post({a: 1}));
+        await apiFetch('http://spg/j', publicGet());
+        assert.equal(seen[0].init?.signal, shopper.signal);
+        shopper.abort(new Error('the client closed the connection'));
+        assert.equal(seen[1].init?.signal?.aborted, true);
+    } finally {
+        delete (globalThis as Record<symbol, unknown>)[REQUEST_SIGNAL];
+    }
+});
+
+test('STOREFRONT_BACKEND_TIMEOUT_MS=0 turns the budget off', async () => {
+    process.env.STOREFRONT_BACKEND_TIMEOUT_MS = '0';
+    try {
+        await apiFetch('http://spg/k', publicGet());
+        assert.equal(seen[0].init?.signal, undefined);
+    } finally {
+        delete process.env.STOREFRONT_BACKEND_TIMEOUT_MS;
+    }
+});
