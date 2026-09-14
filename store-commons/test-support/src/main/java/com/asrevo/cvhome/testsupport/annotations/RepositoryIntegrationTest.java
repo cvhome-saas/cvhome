@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
 import com.asrevo.cvhome.testsupport.containers.PostgresTestConfiguration;
+import com.asrevo.cvhome.testsupport.sql.SqlStatements;
 
 /**
  * A JPA slice on a real Postgres container with the {@code test-stores} seed data, for the query classes an HTTP
@@ -19,7 +20,7 @@ import com.asrevo.cvhome.testsupport.containers.PostgresTestConfiguration;
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-@DataJpaTest
+@DataJpaTest(properties = SqlStatements.INSPECTOR)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ActiveProfiles("test-stores")
 @Import(PostgresTestConfiguration.class)

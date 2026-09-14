@@ -11,6 +11,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import com.asrevo.cvhome.testsupport.containers.PostgresTestConfiguration;
 import com.asrevo.cvhome.testsupport.security.ServletTestSecurityConfiguration;
+import com.asrevo.cvhome.testsupport.sql.SqlStatements;
 
 /**
  * The standard integration test of a servlet service: full context on a random port, a Postgres container, the
@@ -26,7 +27,7 @@ import com.asrevo.cvhome.testsupport.security.ServletTestSecurityConfiguration;
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = SqlStatements.INSPECTOR)
 @ActiveProfiles("test-stores")
 @Import({PostgresTestConfiguration.class, ServletTestSecurityConfiguration.class})
 public @interface ServiceIntegrationTest {
