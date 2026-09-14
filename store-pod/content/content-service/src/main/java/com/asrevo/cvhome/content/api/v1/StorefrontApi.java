@@ -17,6 +17,7 @@ import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.content.api.v1.support.PreviewTokens;
 import com.asrevo.cvhome.content.errors.ContentNotFoundException;
+import com.asrevo.cvhome.content.facade.CachedStorefront;
 import com.asrevo.cvhome.content.facade.StorefrontFacade;
 import com.asrevo.cvhome.content.model.BannerPlacement;
 import com.asrevo.cvhome.content.model.MenuHandle;
@@ -33,7 +34,6 @@ import com.asrevo.cvhome.content.model.storefront.StorefrontPolicy;
 import com.asrevo.cvhome.content.model.storefront.StorefrontPost;
 import com.asrevo.cvhome.content.model.storefront.StorefrontPostList;
 import com.asrevo.cvhome.content.model.storefront.StorefrontSite;
-import com.asrevo.cvhome.content.service.MenuService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -52,11 +52,9 @@ public class StorefrontApi {
 
     private final StorefrontFacade storefront;
 
-    private final MenuService menus;
+    private final CachedStorefront cachedStorefront;
 
     private final PreviewTokens previews;
-
-    private final java.time.Clock clock;
 
     private static <T> ResponseEntity<T> cached(T body) {
         return ResponseEntity.ok().cacheControl(CACHE).body(body);
@@ -64,7 +62,7 @@ public class StorefrontApi {
 
     @GetMapping("site")
     public ResponseEntity<StorefrontSite> site(StoreMerchantId merchantStore, LanguageCode language) {
-        return cached(storefront.site(merchantStore, language));
+        return cached(cachedStorefront.site(merchantStore, language));
     }
 
     @GetMapping("pages/{slug}")
@@ -116,8 +114,11 @@ public class StorefrontApi {
             StoreMerchantId merchantStore, LanguageCode language, @PathVariable PageKind page,
             @RequestParam(required = false) String preview) {
         boolean draft = previews.valid(preview, merchantStore, LayoutApi.previewSlug(page));
-        var layout = storefront.layout(merchantStore, language, page, draft);
-        return draft ? ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(layout) : cached(layout);
+        if (draft) {
+            return ResponseEntity.ok().cacheControl(CacheControl.noStore())
+                    .body(storefront.layout(merchantStore, language, page, true));
+        }
+        return cached(cachedStorefront.layout(merchantStore, language, page));
     }
 
     @GetMapping("faq")
@@ -129,7 +130,7 @@ public class StorefrontApi {
     @GetMapping("menus/{handle}")
     public ResponseEntity<List<StorefrontMenuNode>> menu(StoreMerchantId merchantStore, LanguageCode language,
                                                          @PathVariable MenuHandle handle) {
-        return cached(menus.resolved(merchantStore, handle, language, clock.instant()));
+        return cached(cachedStorefront.menu(merchantStore, handle, language));
     }
 
     @GetMapping("policies/{type}")
