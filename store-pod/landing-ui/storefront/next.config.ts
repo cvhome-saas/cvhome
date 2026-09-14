@@ -20,6 +20,10 @@ function devOrigins(): string[] {
 const nextConfig: NextConfig = {
     reactStrictMode: true,
     allowedDevOrigins: devOrigins(),
+    // Since 16.3, `next dev` writes its own AGENTS.md and CLAUDE.md into storefront/ whenever it detects a coding agent,
+    // and re-creates them on every start. Agents run this app's lcl stacks all day; the repo's agent rules are its root
+    // AGENTS.md and the project-structure skill, and a vendor copy in the app directory would be a second, conflicting one.
+    agentRules: false,
     // Two lcl stacks can run this app from one checkout; each needs its own build directory or they
     // overwrite each other's dev output. Unset (a plain `npm run dev`) keeps Next's default `.next`.
     distDir: process.env.NEXT_DIST_DIR || '.next',
