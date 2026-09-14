@@ -31,7 +31,7 @@ import com.asrevo.cvhome.checkout.repositories.OrderRepository;
 import com.asrevo.cvhome.checkout.services.catalog.ProductSnapshot;
 import com.asrevo.cvhome.checkout.services.customer.CustomerMapper;
 import com.asrevo.cvhome.checkout.services.customer.CustomerService;
-import com.asrevo.cvhome.checkout.services.store.StoreSettings;
+import com.asrevo.cvhome.commons.domain.CurrencyCode;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
@@ -56,8 +56,6 @@ public class OrderPlacementTransaction {
     private final CustomerService customers;
 
 
-    private final StoreSettings storeSettings;
-
     private final Clock clock;
 
     /**
@@ -76,15 +74,16 @@ public class OrderPlacementTransaction {
      * creating a second one, so a resubmit after a 502 is safe.
      *
      * <p>
-     * {@code snapshot} is the cart priced by catalog and inventory before this transaction opened: pricing inside it held
-     * a database connection for as long as those two took to answer. A line priced by nobody — the catalog dropped it,
-     * or it was added after the snapshot — is refused, as an unknown sku always was.
+     * {@code snapshot} is the cart priced by catalog and inventory before this transaction opened, and {@code currency}
+     * the store's, read from merchant the same way: a peer call inside this transaction held a database connection for
+     * as long as the peer took to answer. A line priced by nobody — the catalog dropped it, or it was added after the
+     * snapshot — is refused, as an unknown sku always was.
      * </p>
      */
     @Transactional(rollbackFor = Exception.class)
     public Long createOrResume(StoreMerchantId store, LanguageCode language, CartCode cartCode,
                                 PlaceOrderRequest request, ShopperId shopper, RedirectUrls redirects,
-                                Map<Sku, ProductSnapshot> snapshot)
+                                Map<Sku, ProductSnapshot> snapshot, CurrencyCode currency)
             throws CartNotFoundException, CartEmptyException, CartAlreadyConvertedException,
             ProductNotPurchasableException, CartQuantityOutOfRangeException, UnsupportedCountryCodeException {
         Cart cart = carts.findByStoreMerchantIdAndCode(store, cartCode)
@@ -107,7 +106,7 @@ public class OrderPlacementTransaction {
                 .getDelivery().getAddress()) ? billing : CustomerMapper.toSnapshot(request.getCustomer().getDelivery());
 
         Order order = Order.place(new PlacementDraft(store, OrderRef.newRef(), cartCode, customer, language,
-                storeSettings.currency(store), request.getPaymentType(), billing, delivery, request.getComments()),
+                currency, request.getPaymentType(), billing, delivery, request.getComments()),
                 redirects.success(), redirects.cancel(), now);
         addLines(order, cart, snapshot);
         order.computeTotals();
