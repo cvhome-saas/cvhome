@@ -309,7 +309,7 @@ no extra Gradle wiring.
 `settings.gradle`, and has no `build.gradle` of its own. The host module adds `alias(libs.plugins.node)` and:
 
 ```groovy
-node { version = '23.8.0'; download = true; nodeProjectDir = file('src/main/resources/uaa-fe') }
+node { version = '24.21.0'; download = true; nodeProjectDir = file('src/main/resources/uaa-fe') }
 
 tasks.register('copyAngularApp', Copy) {
     dependsOn('npm_run_build')

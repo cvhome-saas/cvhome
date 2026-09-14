@@ -12,7 +12,7 @@ text direction, behind the pod's edge.
 - **Runs on** — `lcl start -d --stack <name>` (`npm run dev` alone is not enough — it needs the backend).
   Always reach it through the edge at `http://<store>.spg-507f1f77.gateway.com`; read the live port from
   `lcl urls`
-- **Cases** — 49 (36 verified, 1 unit only, 17 not verified; 5 cases have split verification tags)
+- **Cases** — 50 (37 verified, 1 unit only, 18 not verified; 6 cases have split verification tags)
 - **Also see** — [spg](../../spg/qa/spg-qa.md) (the edge in front of it), content, catalog, inventory,
   [checkout](../../checkout/checkout-service/qa/checkout-qa.md),
   [cua](../../cua/qa/cua-qa.md) (shopper login)
@@ -662,6 +662,44 @@ The profile behind these cases, and the ideas measured and rejected, are in the 
     category 49.9 → 44.2, product 29.5 → 23.2, search 24.7 → 26.8 ms. The mean is 41.8 → 38.4 ms (−8.1 %).
 - **Not verified** — the real spg image with its full route set and the Java backend. The load stack was down; the
   Caddy used carries spg's `encode` line and nothing else.
+
+### PERF-07 — The storefront runs on Node 24 · critical · [verified] (runtime, build) / [not verified] (the image on the mirror, dev)
+
+- **Why**
+  - The image ran `gcr.io/distroless/nodejs20`, and Node 20 has been end-of-life since 2026-04-30.
+  - Every UI module was built with Node 23.8.0, end-of-life since mid-2025.
+  - On Node 24 a render costs about 40 % less CPU, and landing-ui is the service dev saturates first.
+  - The Dockerfile now runs `public.ecr.aws/b2i4h4k9/nodejs24:latest`, which cvhome-saas/public-dkr mirrors from
+    `gcr.io/distroless/nodejs24`.
+  - Every build Node moves to 24.21.0: `com.asrevo.ui-conventions` (console-ui and landing-ui), ui-kit, and uaa's
+    `uaa-fe`.
+- **Steps**
+  - Run the standalone build on `gcr.io/distroless/nodejs24:latest` (the image the mirror copies) at 0.5 vCPU /
+    1 GiB, telemetry on. Render the four pages, and compare CPU per render with `main` on Node 20.
+  - Run `./gradlew :store-commons:ui-kit:build :store-core:console-ui:build :store-pod:landing-ui:build
+    :store-core:uaa:build -x test -x check`.
+  - Once public-dkr has published, run `./gradlew :store-pod:landing-ui:bootBuildImage` and render through the
+    image.
+- **Expect**
+  - The same pages, and no errors in the log.
+  - CPU per render about 40 % lower.
+  - Memory at idle about 30 MiB higher, still far inside 1 GiB.
+  - Every UI module downloads and builds with Node 24.21.0.
+- **Seen** — 2026-09-14:
+  - The runtime reports `v24.21.0`. All four pages return 200 with the same prices and bytes as `main` (only chunk
+    hashes and the build id differ), and the log has 0 errors.
+  - CPU per render against `main` on Node 20, the three commits together: home 63.4 → 35.9, category 50.5 → 24.8,
+    product 27.3 → 14.4, search 27.0 → 19.8 ms. The mean is 42.0 → 23.7 ms (−43.6 %).
+  - Memory at idle went from 84–93 to 118–122 MiB.
+  - The Gradle build is `BUILD SUCCESSFUL`, and each of the four modules downloaded `node-v24.21.0` and ran
+    `npmInstall` and its build with it.
+  - Earlier, same harness: a burst of 300 shoppers with 30 s of patience on one task. Node 24 served all 300, with
+    p50 9 s and p95 16 s, and peaked at about 210 MiB anon. Node 20 served 291–297, with p50 16 s and p95 29 s, and
+    peaked at about 390 MiB.
+- **Not verified**
+  - The image built on the mirror. `public.ecr.aws/b2i4h4k9/nodejs24:latest` exists only after cvhome-saas/public-dkr#4
+    is merged and its job has run; until then this Dockerfile cannot build.
+  - Dev's x86 Fargate. Every ratio was measured on arm64.
 
 ---
 

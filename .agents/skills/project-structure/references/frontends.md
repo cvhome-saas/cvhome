@@ -14,7 +14,7 @@ plugins {
     id 'com.asrevo.docker-conventions'
     id 'com.github.node-gradle.node'
 }
-node { version = '23.8.0'; npmVersion = '11.6.1'; download = true }
+node { version = '24.21.0'; npmVersion = '11.6.1'; download = true }
 
 tasks.named('build')   { dependsOn('npm_run_build') }        // gradle build → npm run build
 tasks.register('bootRun') { dependsOn('npm_run_dev') }       // gradle bootRun → npm run dev
@@ -67,7 +67,7 @@ Spring Security actually points at.
 
 ```groovy
 node {
-    version = '23.8.0'
+    version = '24.21.0'
     download = true
     nodeProjectDir = file('src/main/resources/uaa-fe')   // point the node plugin at the nested app
 }

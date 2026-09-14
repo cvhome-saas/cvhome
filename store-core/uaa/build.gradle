@@ -72,7 +72,7 @@ dependencyManagement {
 }
 
 node {
-    version = '23.8.0'
+    version = '24.21.0'
     download = true
     nodeProjectDir = file('src/main/resources/uaa-fe')
 }
