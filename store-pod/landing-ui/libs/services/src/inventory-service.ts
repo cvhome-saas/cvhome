@@ -1,6 +1,7 @@
 import {Product, ProductVariant} from "@store-front/types/product-groups";
 import {Store} from "@store-front/types/store";
 import {storeBaseServiceUrl, StoreContext} from "@store-front/types/store-context";
+import {currencyFormatter} from "./currency-format";
 import {apiFetch, get, orUndefined, publicPost} from "./http-utils";
 import {StoreService} from "./store-service";
 
@@ -166,16 +167,12 @@ export class InventoryService {
         variant.discounted = !!price.discounted;
     }
 
-    /** Currency-formatted when the store record is at hand, a plain amount when it is not. */
+    /**
+     * Currency-formatted when the store record is at hand, a plain amount when it is not. An unknown currency code
+     * must not take the price down with it, so a code `Intl` rejects falls back to the plain amount too.
+     */
     private static formatAmount(amount: number, storeContext: StoreContext, store: Store | undefined): string {
-        if (store?.currency) {
-            try {
-                return new Intl.NumberFormat(storeContext.locale, {style: 'currency', currency: store.currency})
-                    .format(amount);
-            } catch {
-                // an unknown currency code must not take the price down with it
-            }
-        }
-        return amount.toFixed(2);
+        const formatter = store?.currency ? currencyFormatter(storeContext.locale, store.currency) : undefined;
+        return formatter ? formatter.format(amount) : amount.toFixed(2);
     }
 }

@@ -12,7 +12,7 @@ text direction, behind the pod's edge.
 - **Runs on** — `lcl start -d --stack <name>` (`npm run dev` alone is not enough — it needs the backend).
   Always reach it through the edge at `http://<store>.spg-507f1f77.gateway.com`; read the live port from
   `lcl urls`
-- **Cases** — 47 (34 verified, 1 unit only, 16 not verified; 4 cases have split verification tags)
+- **Cases** — 48 (35 verified, 1 unit only, 16 not verified; 4 cases have split verification tags)
 - **Also see** — [spg](../../spg/qa/spg-qa.md) (the edge in front of it), content, catalog, inventory,
   [checkout](../../checkout/checkout-service/qa/checkout-qa.md),
   [cua](../../cua/qa/cua-qa.md) (shopper login)
@@ -526,6 +526,18 @@ drift by ±25 %, so a change is compared in one session against the build before
 the median; pages the change does not touch show the noise (about ±15 %). The method and the dev numbers that
 started it are in the orchestrator plan `.agents/plans/landing-ui-render-cost.md`.
 
+From PERF-05 on, the measurement follows dev's task as it is now:
+
+- **Container:** 0.5 vCPU / 1 GiB, on production's base image (`gcr.io/distroless/nodejs20`, which the mirror copies).
+- **Telemetry:** on, exporting over OTLP.
+- **Backend:** org1-store2's API responses, recorded once from the load stack and replayed. The replay gzips a
+  response when the caller asks, as spg does. So a run touches no shared backend and repeats exactly.
+- **Readings:** CPU per render is read from the cgroup by a sidecar, over 20 renders of each page, in three rounds
+  interleaved with the build before.
+
+The profile behind these cases, and the ideas measured and rejected, are in the orchestrator plan
+`.agents/plans/landing-ui-cpu-memory.md`.
+
 ### PERF-01 — The category page loads its data once · high · [verified]
 
 - **Why** — `generateMetadata` and the page each called `loadCategory` with a `ListingQuery` built per caller.
@@ -593,6 +605,28 @@ started it are in the orchestrator plan `.agents/plans/landing-ui-render-cost.md
   and org1-store1 each titled with their own name through the shared cache. Backend calls per render: home 9 → 6,
   category 8 → 5, search 5 → 2. CPU per render, two runs against the build before: search −21 % and −23 %; home,
   category and product within the noise (−10 % to +14 %).
+
+### PERF-05 — Prices come from one formatter per locale and currency · [verified]
+
+- **Why** — `InventoryService.formatAmount` built a new `Intl.NumberFormat` for every price of every product on every
+  render: 3.9 % of a home render's CPU in a V8 profile. `currencyFormatter` (`libs/services/src/currency-format.ts`)
+  keeps one per `locale|currency` for the process. A code `Intl` rejects is remembered as rejected, and the map is
+  bounded.
+- **Steps**
+  - Run `npm test` in `libs/services` (`test/currency-format.test.ts`).
+  - Render home, a category, a product and a search, and compare every price with the build before.
+  - Compare CPU per render with the build before.
+- **Expect**
+  - The same prices in the same places. A store whose currency `Intl` rejects still shows the plain amount.
+  - CPU per render the same or lower on the pages with many prices.
+- **Seen** — 2026-09-14:
+  - The four pages carry the same 110 / 70 / 17 / 45 prices as `main`. The HTML differs from `main` only in chunk
+    hashes and the build id.
+  - `currency-format.test.ts` passes 4 of 4.
+  - CPU per render against `main`: home 63.4 → 63.0, category 50.5 → 49.9, product 27.3 → 29.5, search 27.0 →
+    24.7 ms. The mean is −0.7 %, within the noise.
+  - An A/B of this function alone, patched into the same build, gave home −4.2 % and category −5.0 % on Node 20,
+    and −4.1 % on Node 24. Small and safe, not a lever.
 
 ---
 

@@ -20,7 +20,8 @@
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "clean": "rimraf dist"
+    "clean": "rimraf dist",
+    "test": "tsx --test test/*.test.ts"
   },
   "dependencies": {
     "@store-front/types": "0.0.0",
