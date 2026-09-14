@@ -17,7 +17,9 @@ import com.asrevo.cvhome.commons.domain.PodEndpoint;
 import com.asrevo.cvhome.commons.domain.ServiceDomain;
 import com.asrevo.cvhome.errors.remote.RemoteErrorCatalog;
 import com.asrevo.cvhome.s2s.config.internal.RestClientBuilder;
+import com.asrevo.cvhome.s2s.config.internal.S2sRequestFactories;
 import com.asrevo.cvhome.s2s.config.internal.WebClientBuilder;
+import com.asrevo.cvhome.s2s.model.S2sHttpProperties;
 import com.asrevo.cvhome.s2s.model.ServiceDomainProperties;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -70,7 +72,7 @@ class WebClientsUtilsTest {
     @Test
     void aRestClientIsBuiltForAServiceAndForAPod() {
         RestClientBuilder builder = new RestClientBuilder(environmentNamed(), RestClient.builder(),
-                RestClient.builder(), domains());
+                RestClient.builder(), domains(), new S2sRequestFactories(new S2sHttpProperties(null, null, null)));
 
         assertThat(builder.buildClient(SERVICE, SampleClient.class, RemoteErrorCatalog.none())).isNotNull();
         assertThat(builder.buildClient(
