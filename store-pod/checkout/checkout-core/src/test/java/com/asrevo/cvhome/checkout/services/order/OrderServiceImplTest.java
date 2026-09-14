@@ -101,7 +101,6 @@ class OrderServiceImplTest {
         Order order = Orders.paid(PaymentType.STRIPE);
         when(orders.findAll(any(Specification.class), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of(order), PAGE, 1));
-        when(customers.findById(7L)).thenReturn(Optional.of(Orders.customer()));
 
         ReadableOrderList list = service.list(Orders.STORE, EN, OrderFilter.none(), PAGE);
 
@@ -111,6 +110,8 @@ class OrderServiceImplTest {
             assertThat(readable.getCustomer()).isNull();
             assertThat(readable.getTotal().getTotal()).isEqualTo("$20.00");
         });
+        // The list shows no customer, so it reads none: that was one query per row.
+        verify(customers, never()).findById(any());
     }
 
     @Test
