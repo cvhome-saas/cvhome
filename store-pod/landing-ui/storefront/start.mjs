@@ -15,11 +15,13 @@
 performance.mark('next-start');
 import path from 'node:path';
 import fs from 'node:fs';
+import http from 'node:http';
 import {fileURLToPath} from 'node:url';
 import module from 'node:module';
 import {ENV, SENTINEL} from './scripts/static-assets/constants.mjs';
 import {applyAssetPrefix, readState} from './scripts/static-assets/apply-prefix.mjs';
 import {syncStaticAssets} from './scripts/static-assets/sync-s3.mjs';
+import {installRequestSignal, withRequestSignal} from './scripts/server/request-scope.mjs';
 
 const require = module.createRequire(import.meta.url);
 const dir = fileURLToPath(new URL('.', import.meta.url));
@@ -77,6 +79,25 @@ if (Number.isNaN(keepAliveTimeout) || !Number.isFinite(keepAliveTimeout) || keep
 
 require('next');
 const {startServer} = require('next/dist/server/lib/start-server');
+
+// Every request runs with an abort signal that its render's backend calls carry (scripts/server/request-scope.mjs).
+installRequestSignal();
+const serve = (req, res, next) => withRequestSignal(res, next);
+
+// startServer builds its own http.Server and keeps it; its listener is the one thing we wrap. It calls
+// http.createServer(listener) synchronously, once, before its first await, so the wrapper is installed for exactly that
+// call and removes itself. Everything else startServer does — graceful shutdown, keep-alive, the upgrade handler — is
+// Next's own, unchanged.
+const createServer = http.createServer;
+http.createServer = (...args) => {
+    http.createServer = createServer;
+    const at = args.findIndex(arg => typeof arg === 'function');
+    if (at >= 0) {
+        const listener = args[at];
+        args[at] = (req, res) => serve(req, res, () => listener(req, res));
+    }
+    return createServer.apply(http, args);
+};
 
 startServer({
     dir,

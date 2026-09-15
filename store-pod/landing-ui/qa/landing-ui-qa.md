@@ -12,7 +12,7 @@ text direction, behind the pod's edge.
 - **Runs on** — `lcl start -d --stack <name>` (`npm run dev` alone is not enough — it needs the backend).
   Always reach it through the edge at `http://<store>.spg-507f1f77.gateway.com`; read the live port from
   `lcl urls`
-- **Cases** — 53 (40 verified, 1 unit only, 17 not verified; 5 cases have split verification tags)
+- **Cases** — 51 (42 verified, 0 unit only, 17 not verified; 5 cases have split verification tags)
 - **Also see** — [spg](../../spg/qa/spg-qa.md) (the edge in front of it), content, catalog, inventory,
   [checkout](../../checkout/checkout-service/qa/checkout-qa.md),
   [cua](../../cua/qa/cua-qa.md) (shopper login)
@@ -839,6 +839,35 @@ advisories, the versions that fix them, and what changed for this app between 16
 | Next 16.3's Turbopack requires external packages by a hashed alias (`require-in-the-middle-<hash>`, a symlink in `.next/node_modules`) | Every page 500 on the standalone build (`start.mjs`): `Failed to load external module require-in-the-middle-…`. `next build`, lint, typecheck and tests were all green. | `copy-instrumentation.test.mjs`; SEC-01 |
 | The `.rsc` form of a theme-tree URL skipped the proxy | `/t/fashion/en.rsc` answered 200 with the tree's payload | SEC-02 |
 | Next 16.3's Turbopack matches `outputFileTracingIncludes` globs anywhere in a path, and hashes every match | After any `next dev` in the checkout, `next build` failed: `reading file …/.next-<stack>/dev/node_modules/@aws-sdk/client-s3-<hash>: Is a directory` | SEC-01 (the build after `next dev`); `copy-instrumentation.test.mjs` |
+
+---
+
+## LOAD — The 2026-09-14 load-test fixes
+
+Findings 1 and 7 of *Where cvhome Breaks* (orchestrator `.agents/plans/load-bottlenecks.md`). **lcl runs landing-ui
+under `next dev`, which never goes through `start.mjs`**, so the page cache and the request signal are off on a plain lcl
+stack. (The page cache is its own PR; its cases LOAD-01/02/03/05/06/07 arrive with it.) To QA them: `npm run build` in `store-pod/landing-ui`, `lcl stop landing-ui --stack <name>`, then from
+`storefront/` run `PORT=<landing-ui port> INTERNAL_SPG=http://spg-507f1f77.gateway.com:<spg port> node start.mjs`, and
+browse through spg as usual.
+
+### LOAD-04 — A render stops when its shopper leaves, and a slow backend read fails in 3 s · high · [verified]
+
+- **Steps** — the production build in front of a fake spg that holds every call 5 s; a client that gives up after
+  1 s, then one that waits.
+- **Result** — the render's four backend calls are aborted at 929 ms when the client leaves, and no further call is
+  made; for the waiting client each read is aborted at 3.0 s (`STOREFRONT_BACKEND_TIMEOUT_MS`, 0 waits). Writes have no
+  budget. Covered also by `libs/services/test/http-utils.test.ts` and `scripts/server/request-scope.test.mjs`.
+
+
+### LOAD-08 — A video section loads its player only when the shopper presses play · high · [not verified]
+
+The re-run's browser failures on the home page were all the seeded YouTube embed: `load` came 13–26 s after the
+document with the stack idle.
+
+- **Steps** — open a page with a video section (org1-store2's home); watch the network panel; press play.
+- **Expect** — before the press: no request to youtube-nocookie.com, one still from `i.ytimg.com` (YouTube) or the
+  muted surface (Vimeo), a button labelled "Play video: <title>"; after it: the player's iframe with `autoplay=1`.
+- **Result** — `libs/theme/test/models.test.ts` (the provider, id and poster); the component itself not yet driven.
 
 ---
 
