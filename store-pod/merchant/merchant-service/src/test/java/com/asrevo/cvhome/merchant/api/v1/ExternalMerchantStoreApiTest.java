@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.merchant.model.merchant.ReadableMerchantStore;
-import com.asrevo.cvhome.merchant.service.facade.merchant.StoreFacade;
+import com.asrevo.cvhome.merchant.reads.MerchantStoreReads;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -16,11 +16,11 @@ class ExternalMerchantStoreApiTest {
 
     @Test
     void peerReadReturnsTheStoreInItsDefaultLanguage() {
-        StoreFacade facade = mock(StoreFacade.class);
+        MerchantStoreReads reads = mock(MerchantStoreReads.class);
         ReadableMerchantStore expected = new ReadableMerchantStore();
-        when(facade.getReadableMerchantStoreId(STORE)).thenReturn(expected);
+        when(reads.store(STORE)).thenReturn(expected);
 
-        assertThat(new ExternalMerchantStoreApi(facade).getStore(STORE)).isSameAs(expected);
+        assertThat(new ExternalMerchantStoreApi(reads).getStore(STORE)).isSameAs(expected);
     }
 
 }
