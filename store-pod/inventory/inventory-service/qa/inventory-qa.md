@@ -9,7 +9,7 @@ paid for. It owns no product copy — that is
   reserve / commit / release / expire cycle
 - **Runs on** — `lcl start -d --stack <name>`; read the live port from `lcl urls`. Address it through the
   gateway, never `:8126`
-- **Cases** — 23 (12 verified, 5 unit only, 6 not verified)
+- **Cases** — 24 (12 verified, 6 unit only, 6 not verified)
 - **Also see** — catalog (SEC-01…05 sweep both services), checkout (the caller of every reservation),
   [billing](../../../../store-core/billing/billing-service/qa/billing-qa.md) (inventory has **no** write gate —
   see 99)
@@ -307,6 +307,18 @@ Findings 5 and 6 of *Where cvhome Breaks* (orchestrator `.agents/plans/load-bott
 
 - **Result** — `product_price (product_avail_id)` plans an index scan on a throwaway Postgres 15 loaded with
   `schema.sql` and 20k prices (it was 94 % full scans on the load stack).
+
+### LOAD-04 — A sku's stock and price are cached in inventory itself, five seconds per store · high · [unit only]
+
+- **Expect** — `GET /api/v1/availability` and `POST /api/v1/availability/query` answer any subset of skus from the
+  `inventory.sku` region (`cache_gets_total{cache="inventory.sku"}` on inventory's `/actuator/prometheus`) plus one
+  read for the skus that have no entry; a sku with no row is asked again next time; a committed change to a stock or
+  price row, a reservation's decrement included, drops the store's entries at once on the task that took it, so the
+  next read shows the new figure; another store's entries stay warm; on another task the figure is at most five
+  seconds old. No caller keeps a copy of inventory's figures any more.
+- **Result** — `SkuInventoryReadsIntegrationTest` (a second read costs no statement; a committed quantity change is
+  read at once and leaves the other store warm), `SkuInventoryReadsTest`, `InventoryArchitectureTest`.
+  **Not verified** on a stack.
 
 ---
 

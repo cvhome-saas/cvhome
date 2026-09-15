@@ -4,6 +4,8 @@ plugins {
 
 dependencies {
     api project(':store-pod:commons:store-commons')
+    // The per-sku availability read (reads/) and the region it declares.
+    api project(':store-commons:cache')
     api project(':store-pod:inventory:inventory-commons')
     api project(':store-pod:checkout:checkout-external-api')
     compileOnly libs.spring.data.jpa
@@ -15,4 +17,7 @@ dependencies {
     testImplementation libs.spring.data.jpa
     // Mockito mocks the JPA repositories, whose annotations reference jakarta.persistence at load time.
     testImplementation libs.jakarta.persistence.api
+    // The reads drive a real registry on the Caffeine provider in their unit tests.
+    testImplementation libs.caffeine
+    testImplementation libs.spring.boot.starter.cache
 }

@@ -22,6 +22,7 @@ import jakarta.persistence.Table;
 
 import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.commons.domain.StoreScoped;
 import com.asrevo.cvhome.store.core.constants.SchemaConstant;
 import com.asrevo.cvhome.store.core.converter.SkuConverter;
 import com.asrevo.cvhome.store.core.entity.common.audit.AuditSection;
@@ -45,7 +46,7 @@ import lombok.Setter;
 @Table(name = "PRODUCT_AVAILABILITY")
 @Getter
 @Setter
-public class Inventory extends SalesManagerEntity<Long, Inventory> implements Auditable {
+public class Inventory extends SalesManagerEntity<Long, Inventory> implements Auditable, StoreScoped {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -109,5 +110,10 @@ public class Inventory extends SalesManagerEntity<Long, Inventory> implements Au
 
     public boolean canBePurchased() {
         return available && quantity > 0;
+    }
+
+    @Override
+    public StoreMerchantId scopedStore() {
+        return storeMerchantId;
     }
 }
