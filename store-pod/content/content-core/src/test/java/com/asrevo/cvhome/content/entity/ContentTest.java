@@ -1,7 +1,11 @@
 package com.asrevo.cvhome.content.entity;
 
-import org.junit.jupiter.api.Test;
+import java.util.Collection;
 
+import org.junit.jupiter.api.Test;
+import org.springframework.test.util.ReflectionTestUtils;
+
+import com.asrevo.cvhome.cache.event.ContentChanged;
 import com.asrevo.cvhome.content.ContentFixtures;
 import com.asrevo.cvhome.content.model.ContentStatus;
 import com.asrevo.cvhome.store.core.entity.content.ContentType;
@@ -22,6 +26,11 @@ class ContentTest {
      * The visible flag used to be the whole answer for the legacy BOX rows, so a draft that happened to carry
      * it leaked to the storefront. Status is the only gate now, whatever the row's type.
      */
+    /** {@code AbstractAggregateRoot.domainEvents()} is protected; Spring Data reads it reflectively after a save. */
+    private static Collection<Object> events(Object aggregate) {
+        return ReflectionTestUtils.invokeMethod(aggregate, "domainEvents");
+    }
+
     @Test
     void theVisibleFlagAloneNoLongerServesARow() {
         Content untyped = ContentFixtures.content(1L, null, SLUG);
@@ -74,4 +83,15 @@ class ContentTest {
         assertThat(ContentFixtures.content(1L, ContentType.PAGE, SLUG).getDescription()).isNull();
     }
 
+
+    @Test
+    void aSaveRaisesContentChangedOnceHoweverManyStepsRegisterIt() {
+        Content page = ContentFixtures.content(1L, ContentType.PAGE, SLUG);
+
+        assertThat(page.changed().changed()).isSameAs(page);
+
+        assertThat(events(page)).containsExactly(new ContentChanged(page.getStoreMerchantId(), "PAGE"));
+        Content untyped = ContentFixtures.content(2L, null, SLUG).changed();
+        assertThat(events(untyped)).containsExactly(new ContentChanged(untyped.getStoreMerchantId(), "CONTENT"));
+    }
 }

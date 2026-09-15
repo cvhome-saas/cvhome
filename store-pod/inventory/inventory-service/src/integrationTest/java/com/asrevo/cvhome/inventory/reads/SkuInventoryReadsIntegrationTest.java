@@ -5,6 +5,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import com.asrevo.cvhome.commons.domain.Sku;
@@ -36,6 +37,9 @@ class SkuInventoryReadsIntegrationTest {
 
     private static final Sku OTHER_STORES = Sku.of("ELEC-SKU-136");
 
+    private static final String STOCK_EVENTS =
+            "select count(*) from inventory.outbox_record where record_type like '%StockChanged%'";
+
     @Autowired
     private SkuInventoryReads reads;
 
@@ -44,6 +48,9 @@ class SkuInventoryReadsIntegrationTest {
 
     @Autowired
     private TransactionTemplate transactions;
+
+    @Autowired
+    private JdbcTemplate jdbc;
 
     @Test
     void aSecondReadCostsNoStatementAndACommittedStockChangeIsSeenAtOnce() throws Exception {
@@ -66,5 +73,19 @@ class SkuInventoryReadsIntegrationTest {
         assertThat(afterWrite.result().getFirst().quantity()).isEqualTo(quantity + 1);
         SqlStatements.Recorded<List<SkuInventory>> other = SqlStatements.during(() -> reads.bySkus(STORE_B, List.of(OTHER_STORES)));
         assertThat(other.count()).as("the other store's entry stays warm").isZero();
+    }
+
+    /** The row's events go through this service's own outbox tables, declared in schema.sql. */
+    @Test
+    void aStockWriteLeavesItsEventsInTheOutbox() {
+        Integer before = jdbc.queryForObject(STOCK_EVENTS, Integer.class);
+
+        transactions.executeWithoutResult(status -> {
+            Inventory row = inventories.findBySkus(STORE_A, List.of(SEEDED)).getFirst();
+            inventories.save(row.stockChanged());
+        });
+
+        Integer after = jdbc.queryForObject(STOCK_EVENTS, Integer.class);
+        assertThat(after).isEqualTo(before + 1);
     }
 }

@@ -7,8 +7,10 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import com.asrevo.cvhome.cache.event.ManufacturerChanged;
 import com.asrevo.cvhome.catalog.model.product.event.BrandRenamedEvent;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
+import com.asrevo.cvhome.commons.domain.ManufacturerId;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -100,7 +102,9 @@ class BrandRenameEventsTest {
     void renamingAnnouncesItToTheOutbox() {
         Manufacturer manufacturer = brand(EN, NIKE).renamed();
 
-        assertThat(events(manufacturer)).singleElement()
+        assertThat(events(manufacturer)).hasSize(2).element(1)
+                .isEqualTo(new ManufacturerChanged(STORE, new ManufacturerId(7L)));
+        assertThat(events(manufacturer)).first()
                 .isInstanceOfSatisfying(BrandRenamedEvent.class, event -> {
                     assertThat(event.manufacturerId()).isEqualTo(7L);
                     assertThat(event.storeId()).isEqualTo(STORE.getId());

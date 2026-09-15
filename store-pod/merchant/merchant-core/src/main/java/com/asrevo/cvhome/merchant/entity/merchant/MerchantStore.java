@@ -24,6 +24,7 @@ import jakarta.persistence.Transient;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 
+import com.asrevo.cvhome.cache.event.StoreChanged;
 import com.asrevo.cvhome.commons.domain.ColorTheme;
 import com.asrevo.cvhome.commons.domain.CountryIsoCode;
 import com.asrevo.cvhome.commons.domain.CurrencyCode;
@@ -185,6 +186,15 @@ public class MerchantStore extends SalesManagerEntity<StoreMerchantId, MerchantS
     }
 
     public MerchantStore() {
+    }
+
+    /**
+     * The store was written: its name, languages, currency, domains or settings. Every service holds a copy of this
+     * row through the merchant client, so the save raises {@link StoreChanged} for them.
+     */
+    public MerchantStore changed() {
+        this.registerEvent(new StoreChanged(id));
+        return this;
     }
 
     @Override

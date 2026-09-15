@@ -33,9 +33,11 @@ import jakarta.persistence.Transient;
 import org.hibernate.annotations.BatchSize;
 import org.springframework.data.domain.AfterDomainEventPublication;
 
+import com.asrevo.cvhome.cache.event.ProductChanged;
 import com.asrevo.cvhome.catalog.model.product.event.ProductSearchIndexPurgedEvent;
 import com.asrevo.cvhome.catalog.model.product.event.ProductSearchIndexStaleEvent;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
+import com.asrevo.cvhome.commons.domain.ProductId;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.commons.domain.StoreScoped;
 import com.asrevo.cvhome.store.core.constants.SchemaConstant;
@@ -240,14 +242,18 @@ public class Product extends SalesManagerEntity<Long, Product> implements Audita
     /**
      * Built here rather than at the call site because a newly created product has no id until the insert has run,
      * and Spring Data reads this after the repository call — so the event carries the real id, and a caller does
-     * not have to save twice to get one.
+     * not have to save twice to get one. Every save also raises {@link ProductChanged}: whatever changed, every cache
+     * that shows this product is stale, here and in the services that hold a copy.
      */
     @Override
     protected Collection<Object> domainEvents() {
-        if (!searchIndexStale && !searchIndexPurged) {
-            return super.domainEvents();
-        }
         List<Object> events = new ArrayList<>(super.domainEvents());
+        if (id != null && store != null) {
+            events.add(new ProductChanged(store, new ProductId(id)));
+        }
+        if (!searchIndexStale && !searchIndexPurged) {
+            return events;
+        }
         if (searchIndexPurged) {
             events.add(ProductSearchIndexPurgedEvent.from(id, store.getId()));
         } else {

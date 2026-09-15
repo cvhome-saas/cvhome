@@ -600,6 +600,23 @@ Every row was a real defect. Several were invisible from the screen.
 
 ---
 
+### LOAD-04 — Every store save raises `StoreChanged` through merchant's own outbox · medium · [unit only]
+
+- **Setup** — a stack with merchant's logs at DEBUG for `com.asrevo.cvhome.cache` (`logging.level` in its
+  `application.yml`, or the console's log level endpoint).
+- **Steps** — save the store in the console (`PUT /api/v1/private/store`), then within a few seconds read
+  `select record_type, record_key, status from merchant.outbox_record order by created_at desc limit 3`, and
+  `cvhome_outbox_records` on merchant's `/actuator/prometheus`.
+- **Expect** — one `StoreChanged` row keyed by the store id, `COMPLETED` after the next poll (2 s); a DEBUG line
+  `cache event StoreChanged of store … applied locally, no transport configured`; the three `merchant.*` regions of
+  that store dropped on the task that drained it (the same as LOAD-03 on the task that took the save). No consumer
+  drops its `merchant.store-client` copy yet: that needs a transport (`references/caching.md` § Cache events).
+- **Result** — `MerchantStoreTest` (a save registers `StoreChanged`), `MerchantStoreServiceImplTest`, the library's
+  `CacheEventOutboxHandlerTest` and `CacheEventApplierTest`; `MerchantStoreReadsIntegrationTest` boots the service
+  with the outbox tables in `schema.sql`. **Not verified** on a stack.
+
+---
+
 ## 99 — Known gaps
 
 Behaviour that is expected today. Please don't spend time raising these — but do shout if you see something
