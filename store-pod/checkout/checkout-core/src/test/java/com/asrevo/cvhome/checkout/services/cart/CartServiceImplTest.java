@@ -92,6 +92,7 @@ class CartServiceImplTest {
         product.setSku(sku);
         product.setProductId(3L);
         product.setName(sku.value().toLowerCase());
+        product.setImageUrl(String.format("https://cdn.example/%s.png", sku.value()));
         product.setAvailable(true);
         return new ProductSnapshot(sku, product, new BigDecimal(price), new BigDecimal(price), false, purchasable, min, max);
     }
@@ -130,6 +131,8 @@ class CartServiceImplTest {
         assertThat(cart.getProducts()).singleElement().satisfies(line -> {
             assertThat(line.getSku()).isEqualTo(SKU_A);
             assertThat(line.getDescription().getName()).isEqualTo("sku-a");
+            assertThat(line.getImage().getImageUrl()).endsWith("SKU-A.png");
+            assertThat(line.getImages()).hasSize(1);
             assertThat(line.getFinalPrice()).isEqualTo("$10.00");
             assertThat(line.getDisplaySubTotal()).isEqualTo(LIT_20_00);
             assertThat(line.isAvailable()).isTrue();

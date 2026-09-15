@@ -217,4 +217,28 @@ class ProductSnapshotServiceImplTest {
         assertThat(cart.line(C_2).orElseThrow().remembers(NOW)).isTrue();
         assertThat(cart.line(C_2).orElseThrow().getFriendlyUrl()).isEqualTo("gamma");
     }
+
+    @Test
+    void nothingIsAskedForNoSkusAndALineRefreshedFromACombinationSkuRemembersItsLabels() {
+        assertThat(service.snapshot(Orders.STORE, EN, List.of())).isEmpty();
+        assertThat(service.priced(Orders.STORE, EN, List.of())).isEmpty();
+        verify(products, never()).getCartLines(any(), any(), any());
+        verify(inventory, never()).queryBySkus(any(), any());
+
+        Cart cart = new Cart(Orders.STORE, CART, EN);
+        cart.put(V_2, 1);
+        ReadableCartLineProduct variant = product(V_2, null);
+        ReadableVariantSelection selection = new ReadableVariantSelection();
+        ReadableVariantOptionValue coded = new ReadableVariantOptionValue();
+        coded.setOptionCode(SIZE);
+        coded.setValueCode(L);
+        selection.setOptionValues(List.of(coded));
+        variant.setVariant(selection);
+        when(products.getCartLines(Orders.STORE, List.of(V_2), EN)).thenReturn(List.of(variant));
+        when(inventory.queryBySkus(any(), any())).thenReturn(List.of(stock(V_2, LIT_1_00, true)));
+
+        service.priced(Orders.STORE, EN, cart.getLines());
+
+        assertThat(cart.line(V_2).orElseThrow().getOptionLabels()).containsExactly(new OptionLabel(SIZE, L));
+    }
 }
