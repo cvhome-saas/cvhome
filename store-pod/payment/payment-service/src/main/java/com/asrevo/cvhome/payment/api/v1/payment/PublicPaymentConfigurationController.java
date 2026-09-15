@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.payment.service.PaymentConfigurationService;
+import com.asrevo.cvhome.payment.reads.PaymentTypeReads;
 import com.asrevo.cvhome.store.core.entity.payments.PaymentType;
 
 import lombok.RequiredArgsConstructor;
@@ -16,11 +16,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PublicPaymentConfigurationController {
 
-    private final PaymentConfigurationService service;
+    private final PaymentTypeReads reads;
 
     @GetMapping("/{storeId}/supported-payment-types")
     public PaymentType[] getSupportedPaymentTypes(@PathVariable("storeId") String storeId) {
-        return service.getSupportedPaymentTypes(new StoreMerchantId(storeId));
+        return reads.supported(new StoreMerchantId(storeId));
     }
 
 }
