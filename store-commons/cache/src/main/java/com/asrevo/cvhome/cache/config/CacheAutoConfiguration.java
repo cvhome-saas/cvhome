@@ -19,6 +19,10 @@ import org.springframework.context.annotation.Configuration;
 
 import com.asrevo.cvhome.cache.CacheRegions;
 import com.asrevo.cvhome.cache.CacheRegistry;
+import com.asrevo.cvhome.cache.event.CacheEventApplier;
+import com.asrevo.cvhome.cache.event.CacheEventOutboxHandler;
+import com.asrevo.cvhome.cache.event.CacheEventTransport;
+import com.asrevo.cvhome.cache.event.LoggingCacheEventTransport;
 import com.asrevo.cvhome.cache.eviction.AfterCommitEviction;
 import com.asrevo.cvhome.cache.eviction.CacheEvictionIntegrator;
 import com.asrevo.cvhome.cache.eviction.CommitEvictionListener;
@@ -80,6 +84,13 @@ public class CacheAutoConfiguration {
         return new StoreScopedKeyGenerator(registry);
     }
 
+    /** The service's rules, or none: an entity write evicts nothing and an event maps to nothing. */
+    @Bean
+    @ConditionalOnMissingBean(EvictionRules.class)
+    EvictionRules evictionRules() {
+        return EvictionRules.none();
+    }
+
     @Bean
     CacheableRegionsValidator cacheableRegionsValidator(ListableBeanFactory beans, CacheRegistry registry) {
         return new CacheableRegionsValidator(beans, registry);
@@ -101,12 +112,6 @@ public class CacheAutoConfiguration {
     @ConditionalOnClass(name = {"org.hibernate.integrator.spi.Integrator",
         "org.springframework.boot.hibernate.autoconfigure.HibernatePropertiesCustomizer"})
     static class Eviction {
-
-        @Bean
-        @ConditionalOnMissingBean(EvictionRules.class)
-        EvictionRules evictionRules() {
-            return EvictionRules.none();
-        }
 
         @Bean
         CommitEvictionListener commitEvictionListener(EvictionRules rules, CacheRegistry registry) {
@@ -133,6 +138,33 @@ public class CacheAutoConfiguration {
         EvictionRulesValidator evictionRulesValidator(EvictionRules rules, ObjectProvider<EntityManagerFactory> factory) {
             EntityManagerFactory present = factory.getIfAvailable();
             return new EvictionRulesValidator(rules, present);
+        }
+    }
+
+    /**
+     * The cache events, for the services that have the outbox: the applier that drops what a drained event names,
+     * the transport that tells everybody else (the logging one unless the service declares its own), and the
+     * handler that binds the two to the outbox. A service without the outbox on its classpath gets none of this
+     * and its aggregates register nothing.
+     */
+    @Configuration(proxyBeanMethods = false)
+    @ConditionalOnClass(name = "io.namastack.outbox.annotation.OutboxHandler")
+    static class Events {
+
+        @Bean
+        CacheEventApplier cacheEventApplier(EvictionRules rules, CacheRegistry registry) {
+            return new CacheEventApplier(rules, registry);
+        }
+
+        @Bean
+        @ConditionalOnMissingBean(CacheEventTransport.class)
+        LoggingCacheEventTransport loggingCacheEventTransport() {
+            return new LoggingCacheEventTransport();
+        }
+
+        @Bean
+        CacheEventOutboxHandler cacheEventOutboxHandler(CacheEventApplier applier, CacheEventTransport transport) {
+            return new CacheEventOutboxHandler(applier, transport);
         }
     }
 }
