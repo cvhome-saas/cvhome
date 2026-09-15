@@ -2,6 +2,7 @@ package com.asrevo.cvhome.s2s.config.internal;
 
 import java.util.function.Supplier;
 
+import org.springframework.aot.hint.annotation.RegisterReflectionForBinding;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
@@ -20,8 +21,14 @@ import tools.jackson.databind.ObjectMapper;
  * environment, and a native image fixes its beans at build time, where that variable never exists — a condition on it
  * would have left the indicator out of every image. Off Fargate the indicator reports UP and says so.
  * </p>
+ *
+ * <p>
+ * {@link EcsTask} is bound by Jackson twice — read from the task metadata endpoint, written back out as health
+ * details — so a native image needs its reflection metadata, which nothing else would register.
+ * </p>
  */
 @Configuration
+@RegisterReflectionForBinding(EcsTask.class)
 public class EcsInfoConfig {
 
     static final String EXECUTION_ENV = "AWS_EXECUTION_ENV";

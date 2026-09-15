@@ -74,5 +74,14 @@ dependencies {
     testImplementation libs.spring.data.commons
     testImplementation libs.spring.jdbc
     testImplementation libs.spring.data.jdbc
+    // StripeRuntimeHintsTest scans the real SDK; the registrar itself only ever names Stripe classes by string.
+    testImplementation libs.stripe.java
+    // HibernateUserTypeRuntimeHintsTest needs a UserType to find; the registrar names Hibernate by string only.
+    testImplementation libs.hibernate.core
+    // OutboxRuntimeHintsTest finds the library's real @Scheduled beans and a handler; named by string in main.
+    testImplementation libs.namastack.outbox.api
+    testImplementation libs.namastack.outbox.core
+    // UaaSdkRuntimeHintsTest reads the real SDK's private token record.
+    testImplementation project(':store-commons:uaa-client-impl')
     testImplementation libs.io.opentelemetry.api
 }

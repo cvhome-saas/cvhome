@@ -31,7 +31,8 @@ import lombok.SneakyThrows;
  * The files are read as plain classpath resources, not through {@link java.util.ResourceBundle}: a native image
  * includes the JDK's bundle support only for the locales it was built with, so the first native load test could not
  * find the bundle at all ("Can't find bundle for base name layout-defaults.messages") and, found, would have had
- * English for every language. Resources behave the same on the JVM and in a native image.
+ * English for every language. Resources behave the same in both; {@code LayoutCopyRuntimeHints} puts them in the
+ * image.
  * </p>
  */
 public final class LayoutDefaults {

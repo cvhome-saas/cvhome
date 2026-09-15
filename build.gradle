@@ -2,6 +2,10 @@
 // convention plugins in build-logic/. This file only aggregates coverage across modules.
 plugins {
     alias(libs.plugins.jacoco.aggregate.conventions)
+    // Loaded here, applied by each service. Twelve services each resolving the plugin into their own classloader
+    // gives its shared reachability-metadata build service twelve incompatible classes, and nativeCompile then fails
+    // with "GraalVMReachabilityMetadataService$Inject_ cannot be cast to GraalVMReachabilityMetadataService".
+    alias(libs.plugins.graalvm.native) apply false
 }
 
 // The aggregation resolves every module's runtime classpath, so the root needs the same repositories the

@@ -123,11 +123,19 @@ def awsOnlyExcludes = [
         '**/org/springframework/cloud/client/**',
 ]
 
+// Code that only runs while the build AOT-processes a service for a native image (`processAot`): the RuntimeHints
+// registrars and the build-time environment post-processors in every `aot` package under com.asrevo.cvhome. No integration test runs the AOT
+// engine, so none can reach it. Same treatment as the AWS-only code: out of the integration column alone, still
+// counted in unit and merged, where each registrar's RuntimeHintsPredicates test credits it.
+def buildTimeOnlyExcludes = [
+        '**/com/asrevo/cvhome/**/aot/**',
+]
+
 // kind -> [exec file names, task each module must have run, sub-directory of the report, extra class excludes]
 def kinds = [
         unit       : [execs: ['test.exec'], task: 'test', dir: 'unit', excludes: []],
         integration: [execs: ['integrationTest.exec'], task: 'integrationTest', dir: 'integration',
-                      excludes: awsOnlyExcludes],
+                      excludes: awsOnlyExcludes + buildTimeOnlyExcludes],
         merged     : [execs: ['test.exec', 'integrationTest.exec'], task: null, dir: '', excludes: []],
 ]
 

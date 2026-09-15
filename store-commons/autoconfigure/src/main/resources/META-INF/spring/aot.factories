@@ -1,0 +1,11 @@
+org.springframework.aot.hint.RuntimeHintsRegistrar=\
+com.asrevo.cvhome.aot.SharedResourcesRuntimeHints,\
+com.asrevo.cvhome.aot.HttpServiceClientRuntimeHints,\
+com.asrevo.cvhome.aot.StripeRuntimeHints,\
+com.asrevo.cvhome.aot.HibernateRuntimeHints,\
+com.asrevo.cvhome.aot.ValueObjectRuntimeHints,\
+com.asrevo.cvhome.aot.ModelTypeRuntimeHints,\
+com.asrevo.cvhome.aot.OutboxRuntimeHints,\
+com.asrevo.cvhome.aot.UaaSdkRuntimeHints,\
+com.asrevo.cvhome.aot.ErrorAndValidationRuntimeHints,\
+com.asrevo.cvhome.aot.ControllerParameterRuntimeHints

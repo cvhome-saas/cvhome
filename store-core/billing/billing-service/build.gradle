@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.java.application.conventions)
     alias(libs.plugins.spring.boot)
     alias(libs.plugins.spring.dependency.management)
+    alias(libs.plugins.graalvm.native)
 }
 
 group = 'com.asrevo.cvhome'
@@ -11,17 +12,8 @@ springBoot {
 }
 
 bootBuildImage {
-    environment["BP_JVM_JLINK_ENABLED"] = "true"
-    environment["BP_JVM_JLINK_ARGS"] = " --compress zip-6 --no-header-files --no-man-pages --vm client --add-modules java.base,java.se,jdk.unsupported,jdk.crypto.ec"
     imageName = createImageName("store-core/billing", project.version)
     tags = createImageTags("store-core/billing", project.version)
-    docker {
-        publishRegistry {
-            url = System.getenv("REGISTRY")
-            username = System.getenv("ECR_TOKEN") ? 'AWS' : null
-            password = System.getenv("ECR_TOKEN")
-        }
-    }
 }
 
 dependencies {

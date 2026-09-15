@@ -28,3 +28,72 @@ ext {
     createImageName = this.&createImageName
     createImageTags = this.&createImageTags
 }
+
+/*
+ * The container image every Spring service publishes. A service's own build.gradle names the image (imageName/tags —
+ * cvhome-platform's check-catalog-drift.py reads those two lines there); everything else is decided here once, so
+ * twelve copies cannot drift.
+ *
+ * JVM or native. Every service applies org.graalvm.buildtools.native, so `processAot` runs in every build and an AOT
+ * failure breaks the PR that caused it rather than a release. With that plugin Spring Boot also stamps
+ * Spring-Boot-Native-Processed into the jar manifest, and that attribute alone brings Paketo's native-image
+ * buildpack into the build: it compiles a native executable unless told not to, and even when told, the JVM image
+ * downloads Liberica NIK (GraalVM, ~450 MB, from GitHub) instead of the JDK it jlinks — eleven parallel builds on
+ * one machine failed fetching it. So the choice is stated in both directions, and only a native build carries the
+ * attribute:
+ *
+ *   ./gradlew bootBuildImage            a JVM image, built exactly as before native existed (jlink'd JDK runtime)
+ *   ./gradlew bootBuildImage -Pnative   a GraalVM native executable on the same run image
+ *
+ * `-march=compatibility`: GraalVM targets x86-64-v3 by default, and Fargate does not promise which CPU generation
+ * a task lands on. The native image then runs on any x86-64 (or armv8-a) host; the cost is a few percent of peak.
+ *
+ * A service without the GraalVM plugin always gets the JVM image, whatever -Pnative says — that is how one service is
+ * held back if it misbehaves natively.
+ *
+ * `-PnativeImageArgs='-J-Xmx12g'` appends to the native-image arguments. A native build of one of these services peaks
+ * at up to 12 GB (payment; at 7 GB it runs out) when it may take what it likes; a builder running several at once
+ * caps the compiler's heap there (cvhome-platform's 2-images-native does) rather than in this file.
+ *
+ * Only the application is native; its tests run on the JVM. With both plugins applied, `test` puts the AOT-processed
+ * test classes on its classpath, so every test run would first boot each Spring test context at build time
+ * (`processTestAot`) — minutes of work nothing reads, and a failure outright in a module whose tests are not Spring
+ * tests (gateway-service: no SpringBootTestAotProcessor). It is switched off; `nativeTest` is not used.
+ */
+boolean nativeImageRequested = providers.gradleProperty('native').map { it != 'false' }.getOrElse(false)
+String nativeImageArgs = (['-march=compatibility'] + providers.gradleProperty('nativeImageArgs').getOrElse('')
+        .tokenize()).join(' ')
+
+tasks.matching { it.name == 'processTestAot' }.configureEach {
+    enabled = false
+}
+
+pluginManager.withPlugin('org.springframework.boot') {
+    if (!nativeImageRequested) {
+        // After evaluation, so this runs after Spring Boot's own bootJar configuration that adds the attribute; set
+        // at configuration time, the manifest stays a declared input and a cached jar is never the other build's.
+        afterEvaluate {
+            tasks.named('bootJar') {
+                manifest.attributes.remove('Spring-Boot-Native-Processed')
+            }
+        }
+    }
+    tasks.named('bootBuildImage') {
+        boolean nativeImage = nativeImageRequested && project.pluginManager.hasPlugin('org.graalvm.buildtools.native')
+        environment.put('BP_NATIVE_IMAGE', nativeImage.toString())
+        if (nativeImage) {
+            environment.put('BP_NATIVE_IMAGE_BUILD_ARGUMENTS', nativeImageArgs)
+        } else {
+            environment.put('BP_JVM_JLINK_ENABLED', 'true')
+            environment.put('BP_JVM_JLINK_ARGS', ' --compress zip-6 --no-header-files --no-man-pages --vm client '
+                    + '--add-modules java.base,java.se,jdk.unsupported,jdk.crypto.ec')
+        }
+        docker {
+            publishRegistry {
+                url = System.getenv('REGISTRY')
+                username = System.getenv('ECR_TOKEN') ? 'AWS' : null
+                password = System.getenv('ECR_TOKEN')
+            }
+        }
+    }
+}
