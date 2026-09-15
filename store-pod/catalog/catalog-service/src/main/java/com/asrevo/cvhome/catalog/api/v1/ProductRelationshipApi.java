@@ -15,6 +15,7 @@ import com.asrevo.cvhome.catalog.errors.ProductNotFoundException;
 import com.asrevo.cvhome.catalog.model.group.ReadableProductGroup;
 import com.asrevo.cvhome.catalog.services.group.ProductGroupService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
+import com.asrevo.cvhome.commons.domain.ProductId;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 
 import io.swagger.v3.oas.annotations.Parameter;
@@ -40,8 +41,8 @@ public class ProductRelationshipApi {
 
     @GetMapping("/products/{id}/relationship")
     @Parameter(name = "store", schema = @Schema(type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
-    public ReadableProductGroup related(@PathVariable Long id, StoreMerchantId merchantStore, LanguageCode language) {
-        return productGroupService.related(merchantStore, id, language);
+    public ReadableProductGroup related(@PathVariable ProductId id, StoreMerchantId merchantStore, LanguageCode language) {
+        return productGroupService.related(merchantStore, id.value(), language);
     }
 
     @PostMapping("/private/products/{id}/relationship/{productId}")

@@ -23,6 +23,7 @@ import com.asrevo.cvhome.catalog.errors.ManufacturerNotFoundException;
 import com.asrevo.cvhome.catalog.model.manufacturer.PersistableManufacturer;
 import com.asrevo.cvhome.catalog.model.manufacturer.ReadableManufacturer;
 import com.asrevo.cvhome.catalog.services.manufacturer.ManufacturerService;
+import com.asrevo.cvhome.commons.domain.CategoryId;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.model.entity.EntityExists;
@@ -51,9 +52,9 @@ public class ManufacturerApi {
 
     @GetMapping("/category/{id}/manufacturer")
     @Parameter(name = "store", schema = @Schema(type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
-    public List<ReadableManufacturer> listByCategory(@PathVariable Long id, StoreMerchantId merchantStore,
+    public List<ReadableManufacturer> listByCategory(@PathVariable CategoryId id, StoreMerchantId merchantStore,
                                                      LanguageCode language) throws CategoryNotFoundException {
-        return manufacturerService.listByCategory(merchantStore, id, language);
+        return manufacturerService.listByCategory(merchantStore, id.value(), language);
     }
 
     @GetMapping("/private/manufacturers")

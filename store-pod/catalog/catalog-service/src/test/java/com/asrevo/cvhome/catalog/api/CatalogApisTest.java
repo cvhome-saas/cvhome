@@ -27,6 +27,7 @@ import com.asrevo.cvhome.catalog.services.option.ProductOptionService;
 import com.asrevo.cvhome.catalog.services.product.ProductSearchService;
 import com.asrevo.cvhome.catalog.services.product.ProductService;
 import com.asrevo.cvhome.catalog.services.type.ProductTypeService;
+import com.asrevo.cvhome.commons.domain.CategoryId;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
@@ -128,7 +129,7 @@ class CatalogApisTest {
 
     @Test
     void theBrandAndTypeEndpointsPassTheirIdentityThrough() throws Exception {
-        manufacturerApi.listByCategory(1L, STORE, ENGLISH);
+        manufacturerApi.listByCategory(CategoryId.of(1), STORE, ENGLISH);
         manufacturerApi.list(null, STORE, ENGLISH, PageRequest.of(0, 20));
         manufacturerApi.get(1L, STORE, ENGLISH);
         manufacturerApi.update(1L, new PersistableManufacturer(), STORE);
