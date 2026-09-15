@@ -33,7 +33,7 @@ import com.asrevo.cvhome.cache.spring.StoreScopedKeyGenerator;
 import com.github.benmanes.caffeine.cache.Caffeine;
 
 /**
- * Caching for every service that has this module: the Caffeine provider, the registry built from the service's
+ * Caching for every service that has this module: the Caffeine provider, the registry built from every
  * {@link CacheRegions} bean (none declared means no region and nothing cached), Spring's cache abstraction over it
  * with the store-scoped key generator, and the start-up check of the names {@code @Cacheable} uses.
  *
@@ -58,17 +58,15 @@ public class CacheAutoConfiguration {
         return new CaffeineCacheProvider();
     }
 
+    /**
+     * Every {@link CacheRegions} bean in the context, merged: the service's own enum and the ones a library it uses
+     * declares for its own reads (the merchant client's). None at all means nothing is cached.
+     */
     @Bean
-    @ConditionalOnMissingBean(CacheRegions.class)
-    CacheRegions cacheRegions() {
-        return CacheRegions.none();
-    }
-
-    @Bean
-    CacheRegistry cacheRegistry(CacheRegions regions, ObjectProvider<CacheProvider> providers,
+    CacheRegistry cacheRegistry(ObjectProvider<CacheRegions> declarations, ObjectProvider<CacheProvider> providers,
                                 CacheProperties properties) {
         List<CacheProvider> present = providers.orderedStream().toList();
-        return new CacheRegistry(regions, present, properties);
+        return new CacheRegistry(CacheRegions.merge(declarations.orderedStream().toList()), present, properties);
     }
 
     @Bean

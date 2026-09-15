@@ -68,7 +68,13 @@ class CacheAutoConfigurationTest {
 
         @Bean
         CacheRegions regions() {
-            return CacheRegions.of(TestRegions.values());
+            return CacheRegions.of(TestRegions.PRODUCT, TestRegions.LISTING);
+        }
+
+        /** A second declaration, as a library the service uses would bring. */
+        @Bean
+        CacheRegions libraryRegions() {
+            return CacheRegions.of(TestRegions.COUNTRY);
         }
 
         @Bean
@@ -112,7 +118,7 @@ class CacheAutoConfigurationTest {
                     .hasSingleBean(AfterCommitEviction.class).hasSingleBean(EvictionRulesValidator.class)
                     .hasSingleBean(RegionCacheMeterBinderProvider.class);
             assertThat(context.getBean(CacheManager.class).getCacheNames()).isEmpty();
-            assertThat(context.getBean(CacheRegions.class).regions()).isEmpty();
+            assertThat(context.getBean(CacheRegistry.class).names()).isEmpty();
             assertThat(context.getBean(EvictionRules.class).entityPackage()).isEmpty();
             Map<String, Object> properties = new HashMap<>();
             context.getBean(HibernatePropertiesCustomizer.class).customize(properties);
@@ -132,7 +138,7 @@ class CacheAutoConfigurationTest {
                     assertThat(reads.product(Stores.B, Stores.EN, SHOES)).isEqualTo(SHOES);
 
                     assertThat(reads.loads()).as("store A once, store B once").isEqualTo(2);
-                    assertThat(context.getBean(CacheManager.class).getCacheNames()).contains(PRODUCT);
+                    assertThat(context.getBean(CacheManager.class).getCacheNames()).contains(PRODUCT, "test.country");
                     assertThat(context.getBean(CacheProperties.class).region(PRODUCT).ttl()).hasSeconds(30);
                 });
     }

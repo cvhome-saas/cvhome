@@ -35,6 +35,11 @@ public record CacheRegions(List<CacheRegion> regions) {
         return new CacheRegions(List.of());
     }
 
+    /** Every region of several declarations as one: a service's own and those a library it uses brings along. */
+    public static CacheRegions merge(Collection<CacheRegions> declarations) {
+        return new CacheRegions(declarations.stream().flatMap(declared -> declared.regions().stream()).toList());
+    }
+
     public Optional<CacheRegion> byName(String name) {
         return regions.stream().filter(region -> region.regionName().equals(name)).findFirst();
     }
