@@ -1,0 +1,35 @@
+plugins {
+    alias(libs.plugins.java.library.conventions)
+}
+
+// The one cache library: regions, typed store-scoped keys, a provider port (Caffeine today), Spring's cache
+// abstraction on top, eviction on commit, and the cache events. A service caches by depending on this module and
+// declaring its regions; everything it compiles against is compileOnly, so a service without Hibernate or the
+// outbox still loads it.
+dependencies {
+    api project(':store-commons:commons')
+    implementation libs.caffeine
+    compileOnly libs.spring.boot.starter.cache
+    compileOnly libs.spring.boot.starter.autoconfigure
+    compileOnly libs.spring.data.commons
+    compileOnly libs.spring.tx
+    compileOnly libs.hibernate.core
+    compileOnly libs.jakarta.persistence.api
+    compileOnly libs.namastack.outbox.api
+    compileOnly libs.spring.boot.starter.actuator
+    compileOnly libs.lombok
+    annotationProcessor libs.lombok
+
+    testImplementation libs.spring.boot.starter.cache
+    testImplementation libs.spring.boot.starter.autoconfigure
+    testImplementation libs.spring.boot.starter.test
+    testImplementation libs.spring.data.commons
+    testImplementation libs.spring.tx
+    testImplementation libs.hibernate.core
+    testImplementation libs.jakarta.persistence.api
+    testImplementation libs.namastack.outbox.api
+    testImplementation libs.spring.boot.starter.actuator
+    // The typed ids carry Jackson readers; loading them in a test needs databind.
+    testImplementation libs.jackson.databind
+    testImplementation libs.jackson.annotations
+}
