@@ -11,7 +11,7 @@ console's order statistics.
 - **Runs on** — `lcl start -d --stack <name>`; read the live ports from `lcl urls`. Address it through the pod
   gateway (`http://spg-507f1f77.gateway.com/checkout/…`) or the platform gateway (`gateway.com:8000/spg/checkout/…`),
   never `:8123`
-- **Cases** — 55 (40 verified end to end or in part, 13 unit only, 2 not verified)
+- **Cases** — 56 (40 verified end to end or in part, 14 unit only, 2 not verified)
 - **Also see** — [payment](../../payment/payment-service/qa/payment-qa.md) (the transactions and the approve /
   reject that drive the signals), [inventory](../../inventory/inventory-service/qa/inventory-qa.md) (the
   reservation that placement takes and expiry releases), [landing-ui](../../landing-ui/qa/landing-ui-qa.md) (the
@@ -573,6 +573,14 @@ answering `detailed-products` in 3 s, and every cart read made that call again.
 - **Result** — `CartApiIntegrationTest` (the catalogue's cart-line read count does not move across two reads of a
   two-line cart), `ProductSnapshotServiceImplTest` (a remembered line is priced by inventory alone; a stale one asks
   and remembers), `CartServiceImplTest`. **Not verified** on a stack.
+
+### LOAD-08 — Checkout caches nothing of its own; the country list is computed once per language · low · [unit only]
+
+- **Expect** — `GET /api/v1/country` is an ISO list rendered once per language and held in memory for the life of
+  the task; it is not a cache region (nothing writes it, no store owns it). A cart read asks inventory live for
+  its prices and stock, and inventory answers from its own five-second region (inventory LOAD-04).
+- **Result** — `CountryServiceImplTest`; a cache region was considered and not added (orchestrator plan
+  `caching-architecture.md`, deviations).
 
 ## 99 — Known gaps
 
