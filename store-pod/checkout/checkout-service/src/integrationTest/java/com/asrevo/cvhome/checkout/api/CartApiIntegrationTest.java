@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.asrevo.cvhome.checkout.config.ExternalClientsTestConfiguration;
 import com.asrevo.cvhome.checkout.errors.CheckoutErrors;
@@ -55,11 +56,18 @@ class CartApiIntegrationTest {
     /** A dot was never part of a sku, so no catalog variant can carry this one. */
     private static final String MALFORMED = "SKU.DOT";
 
+    private static final String ALREADY_CONVERTED = "CHECKOUT.CART.ALREADY_CONVERTED";
+
+    private static final String ID = "id";
+
     @LocalServerPort
     private int port;
 
     @Autowired
     private TestJwtSigner signer;
+
+    @Autowired
+    private JdbcTemplate jdbc;
 
     private CheckoutApiSupport api;
 
@@ -73,6 +81,32 @@ class CartApiIntegrationTest {
     }
 
     @Test
+    void aLineTheCatalogNoLongerKnowsIsLeftOutOfTheCartAndPrunedFromIt() {
+        JsonNode created = json(api.send(HttpMethod.POST, scoped(path(V1, CART), STORE_A), null, cartBody(SKU, 1)));
+        long cartId = created.get(ID).asLong();
+        // A sku the catalog has dropped since it was added: the API refuses one now, so only a direct row makes it.
+        jdbc.update("insert into checkout.cart_line (line_id, cart_id, sku, quantity) values (?, ?, ?, 1)",
+                990_000L + cartId, cartId, ExternalClientsTestConfiguration.SKU_UNKNOWN);
+
+        JsonNode read = json(api.get(cartUrl(STORE_A, created.get(CODE).asString()), null));
+
+        assertThat(read.get(PRODUCTS)).hasSize(1);
+        assertThat(jdbc.queryForObject("select count(*) from checkout.cart_line where cart_id = ?", Integer.class,
+                cartId)).as("the read pruned the line, so placement will not refuse it").isEqualTo(1);
+    }
+
+    @Test
+    void aCartThatBecameAnOrderCannotBeChanged() {
+        String code = api.newCart(STORE_A, SKU, 1);
+        api.placed(STORE_A, code, null, "COD", "converted@example.com");
+
+        ResponseEntity<String> edit = api.send(HttpMethod.PUT, cartUrl(STORE_A, code), null, cartBody(SKU, 1));
+
+        expect(edit, HttpStatus.CONFLICT);
+        assertThat(json(edit).get(CODE).asString()).isEqualTo(ALREADY_CONVERTED);
+    }
+
+    @Test
     void aCartIsCreatedUpdatedReadAndEmptiedInTheStorefrontsShape() {
         ExternalClientsTestConfiguration.PRICED_INSIDE_A_TRANSACTION.set(false);
         ResponseEntity<String> created = api.send(HttpMethod.POST, scoped(path(V1, CART), STORE_A), null,
@@ -80,7 +114,7 @@ class CartApiIntegrationTest {
         expect(created, HttpStatus.CREATED);
         JsonNode cart = json(created);
         String code = cart.get(CODE).asString();
-        assertThat(cart.get("id").asLong()).isPositive();
+        assertThat(cart.get(ID).asLong()).isPositive();
         assertThat(cart.get(QUANTITY).asInt()).isEqualTo(2);
         assertThat(cart.get("subtotal").asDouble()).isEqualTo(20.0);
         assertThat(cart.get(DISPLAYSUBTOTAL).asString()).isEqualTo(LIT_20_00);
