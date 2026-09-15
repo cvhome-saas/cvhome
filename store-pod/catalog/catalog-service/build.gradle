@@ -40,7 +40,6 @@ dependencies {
     implementation libs.spring.boot.starter.security
     implementation libs.spring.boot.starter.oauth2.client
     implementation libs.spring.boot.starter.security.oauth2.resource.server
-    implementation libs.spring.boot.starter.cache
     implementation libs.spring.boot.starter.data.jpa
     implementation libs.namastack.outbox.starter.jpa
     runtimeOnly libs.postgresql
@@ -66,7 +65,6 @@ dependencies {
 
     implementation project(':store-commons:autoconfigure')
     implementation project(':store-core:billing:billing-external-api')
-    implementation libs.caffeine
 
 //    developmentOnly libs.spring.boot.docker.compose
     compileOnly libs.lombok

@@ -8,6 +8,7 @@ import com.asrevo.cvhome.errors.remote.RemoteErrorCatalog;
 import com.asrevo.cvhome.inventory.api.errors.InventoryApiErrors;
 import com.asrevo.cvhome.inventory.services.ExternalInventoryService;
 import com.asrevo.cvhome.inventory.services.ExternalProductReservationService;
+import com.asrevo.cvhome.merchant.api.CachedMerchantStoreReads;
 import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
 import com.asrevo.cvhome.payment.api.errors.PaymentApiErrors;
 import com.asrevo.cvhome.payment.services.payment.ExternalPaymentGatewayService;
@@ -30,12 +31,9 @@ public class ClientsConfig {
 
     /** Also what the authorization layer uses to learn which org owns a store. */
     @Bean
-    // Declared as the caching class, not its interface: Spring builds the @Cacheable proxy ahead of time from the
-    // declared type, and natively a bean declared as the interface was never proxied (the load test saw 0 STORE
-    // lookups and every product mapping calling merchant).
-    public CachedExternalMerchantStoreService externalMerchantStoreService(RestClientBuilder restClientBuilder) {
-        return new CachedExternalMerchantStoreService(restClientBuilder.buildClient(MERCHANT,
-                ExternalMerchantStoreService.class, RemoteErrorCatalog.none()));
+    public CachedMerchantStoreReads externalMerchantStoreService(RestClientBuilder restClientBuilder) {
+        return new CachedMerchantStoreReads(restClientBuilder.buildClient(MERCHANT, ExternalMerchantStoreService.class,
+                RemoteErrorCatalog.none()));
     }
 
     @Bean
