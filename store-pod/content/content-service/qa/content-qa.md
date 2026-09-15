@@ -9,7 +9,7 @@ posts, banners, FAQs, legal policies, navigation menus, the home page's sections
   library and its cross-service usage index, store appearance, and the `STORE-POD.CONTENT.*` permission gate
 - **Runs on** — `lcl start -d --stack <name>`; read the live port from `lcl urls`. Address it through the
   gateway, never `:8121`
-- **Cases** — 95 (24 verified, 21 unit only, 50 not verified)
+- **Cases** — 97 (24 verified, 23 unit only, 50 not verified)
 - **Also see** — [landing-ui](../../../landing-ui/qa/landing-ui-qa.md) (the storefront that renders this),
   catalog (the gallery that consumes media assets),
   [merchant](../../../merchant/merchant-service/qa/merchant-qa.md) (which no longer holds any appearance),
@@ -1050,6 +1050,13 @@ Found during the appearance and media move, and just as quiet:
 
 Finding 6 of *Where cvhome Breaks* (orchestrator `.agents/plans/load-bottlenecks.md`).
 
+### LOAD-01 — The site, a page's layout and a menu are cached for 10 s; any content write clears them · high · [unit only]
+
+- **Expect** — a second read costs no statement; an editor's change is served at once by the task that took it, and
+  by another within 10 s; a preview token still reads the draft, uncached.
+- **Result** — `CachedStorefrontIntegrationTest`, `StorefrontApiTest`. On lcl stack `lb` from `fix/load-bottlenecks`, 2026-09-14, through spg (`org1-store1`, port 2080) the three reads answer
+  200 through spg.
+
 ### LOAD-02 — The storefront reads survive open-in-view being off · high · [unit only]
 
 - **Result** — every content integration test passes with `spring.jpa.open-in-view: false`.
@@ -1058,6 +1065,12 @@ Finding 6 of *Where cvhome Breaks* (orchestrator `.agents/plans/load-bottlenecks
 
 - A fresh database never gets it; an old one loses it on the next start (`drop index if exists content.code_idx`).
 
+
+### LOAD-04 — An editor's change drops their own store's cache and leaves the other stores' warm · high · [unit only]
+
+- **Expect** — a write in store A drops store A's site, layouts and menus; store B's second read still costs no
+  statement. A layout revision or a media usage row alone, which carry no store, clears every store.
+- **Result** — `CachedStorefrontIntegrationTest` (the other seeded store stays cached across a redirect write).
 
 ### LOAD-05 — Every id comes from a Postgres sequence · critical · [unit only]
 

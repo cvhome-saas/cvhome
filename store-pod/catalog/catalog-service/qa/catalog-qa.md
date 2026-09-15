@@ -17,7 +17,7 @@ by [checkout](../../../checkout/checkout-service/qa/checkout-qa.md).
   product-image APIs; the console's Catalogue module as a client; the billing write gate on catalog writes
 - **Runs on** — `lcl start -d --stack <name>`; read the live port from `lcl urls`. Address it through the
   gateway, never `:8122`
-- **Cases** — 100 (40 verified, 2 unit only, 58 not verified)
+- **Cases** — 102 (40 verified, 2 unit only, 60 not verified)
 - **Also see** — inventory (stock and price), checkout (the composed cart line),
   [content](../../../content/content-service/qa/content-qa.md) (the media library the gallery reads from),
   [billing](../../../../store-core/billing/billing-service/qa/billing-qa.md) (the plan ceiling behind PRD-14/15)
@@ -1058,6 +1058,14 @@ Findings 3–5 of *Where cvhome Breaks* (orchestrator `.agents/plans/load-bottle
   store is a 404. Fetch joins no longer multiply descriptions × images × brand and type copy (~20 rows a product on
   the seed, 625 with five languages and five images).
 
+### LOAD-04 — The storefront's public reads are cached, and a merchant's write clears them · high · [unit only]
+
+- **Expect** — groups, related products, the tree, a category or product by slug, a category's brands and suggest:
+  a second read within 30 s costs no statement; any catalog write, a collection-only change included (a product added
+  to a group), clears them on the task that took it.
+- **Result** — `CachedStorefrontCatalogIntegrationTest`, `ProductGroupApiIntegrationTest` (related items).
+  On the stack the cached reads answer as before. **Not verified:** the 30 s staleness on a second task.
+
 ### LOAD-05 — The lookups that were full scans use their new indexes · high · [verified]
 
 - **Result** — a throwaway Postgres 15 (en_US.utf8) loaded with `schema.sql` and a synthetic 20k-product catalogue:
@@ -1069,6 +1077,21 @@ Findings 3–5 of *Where cvhome Breaks* (orchestrator `.agents/plans/load-bottle
 - **Result** — all twelve Java services started on the stack above, and `./gradlew integrationTest` passes; the eight
   Hibernate-generated duplicate unique constraints are dropped by `schema.sql`.
 
+
+### LOAD-07 — A merchant's write drops their own store's cache, and the listing and search are cached too · high · [unit only]
+
+The re-run of 2026-09-14 (*Where cvhome Breaks Now*) left catalog at 99 % of its CPU on the two reads LOAD-04 did not
+cache, and every write cleared every store's entries.
+
+- **Expect** — `GET /api/v2/products` and `/api/v2/products/search` answer from the cache for 60 s per store, filter,
+  criteria and page (the console's product table reads the same listing: on another task than the one that took a
+  save it is up to 60 s behind); a write in store A drops store A's entries from every catalog cache and leaves store
+  B's warm; a collection-only change (a product added to a group) drops them once its transaction commits, not at
+  flush; the search index's outbox refresh drops the store's entries again after the index caught up. The suggest key
+  is the typed text lowered, trimmed and cut at 64 characters, so `Sho`, `sho ` and `sho` share one entry.
+- **Result** — `CachedStorefrontCatalogIntegrationTest` (store 2's group read costs no statement after store 1's
+  write; the listing and the rail read from the cache), `EntityCommitCacheEvictionTest` (store-commons: per-store
+  eviction, the collection eviction after commit, a failed commit). **Not verified** on a stack.
 
 ### LOAD-08 — Every id comes from a Postgres sequence, and the seeds cannot collide with it · critical · [unit only]
 
@@ -1083,7 +1106,7 @@ shared the generator.
   the table does not.
 
 
-### LOAD-09 — Checkout reads a cart line's product in its own shape · high · [unit only]
+### LOAD-09 — Checkout reads a cart line's product in its own shape, from a per-sku cache · high · [unit only]
 
 The one mix spike on the whole branch (2026-09-15) showed `/api/v1/detailed-products` as catalog's largest cost:
 2,181 calls, 3,388 s of server time, every cart operation reading the full product (copy, every image, dimensions
@@ -1092,9 +1115,9 @@ and their units) to render a line.
 - **Steps** — `GET /api/v1/cart-lines?store=…&lang=en&skus=<simple>,<combination>,<unknown>` (product-api.http).
 - **Expect** — one element per known sku with `sku`, `productId`, `name`, `friendlyUrl`, `imageUrl`, `available`
   and, for a combination sku, `variant.optionValues` with the resolved labels; no `description`, `images` or
-  `productSpecifications`; the unknown sku absent. Three statements for any number of skus. (The per-sku cache in
-  front of this read ships with the storefront caches; LOAD-04 and LOAD-07 are its cases.)
-- **Result** — `ProductApiIntegrationTest.checkoutReadsCartLinesInTheirOwnShape`. **Not verified** on a stack.
+  `productSpecifications`; the unknown sku absent. Three statements for any number of skus on a cold cache; the
+  second call for any subset of them costs none; another store's entries are its own.
+- **Result** — `ProductApiIntegrationTest.checkoutReadsCartLinesFromThePerSkuCache`. **Not verified** on a stack.
 
 ---
 
