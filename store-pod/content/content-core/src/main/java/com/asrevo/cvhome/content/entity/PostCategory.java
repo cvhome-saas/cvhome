@@ -15,6 +15,9 @@ import jakarta.persistence.UniqueConstraint;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.commons.domain.StoreScoped;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -26,7 +29,7 @@ import lombok.Setter;
         columnNames = {"STORE_MERCHANT_ID", "SLUG"}))
 @Getter
 @Setter
-public class PostCategory implements Serializable {
+public class PostCategory implements Serializable, StoreScoped {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -50,4 +53,8 @@ public class PostCategory implements Serializable {
     @Column(name = "NAMES", nullable = false)
     private String names;
 
+    @Override
+    public StoreMerchantId scopedStore() {
+        return storeMerchantId == null ? null : new StoreMerchantId(storeMerchantId);
+    }
 }

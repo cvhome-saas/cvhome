@@ -12,6 +12,9 @@ import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.commons.domain.StoreScoped;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -20,7 +23,7 @@ import lombok.Setter;
         columnNames = {"STORE_MERCHANT_ID", "FOLDER_KEY"}))
 @Getter
 @Setter
-public class MediaFolder implements Serializable {
+public class MediaFolder implements Serializable, StoreScoped {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -46,4 +49,8 @@ public class MediaFolder implements Serializable {
     @Column(name = "SYSTEM_FOLDER", nullable = false)
     private boolean system;
 
+    @Override
+    public StoreMerchantId scopedStore() {
+        return storeMerchantId == null ? null : new StoreMerchantId(storeMerchantId);
+    }
 }

@@ -18,6 +18,8 @@ import jakarta.persistence.UniqueConstraint;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.commons.domain.StoreScoped;
 import com.asrevo.cvhome.content.model.PolicyVersionStatus;
 
 import lombok.Getter;
@@ -32,7 +34,7 @@ import lombok.Setter;
         columnNames = {"CONTENT_ID", "VERSION"}))
 @Getter
 @Setter
-public class PolicyVersion implements Serializable {
+public class PolicyVersion implements Serializable, StoreScoped {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -72,4 +74,8 @@ public class PolicyVersion implements Serializable {
     @Column(name = "PUBLISHED_BY", length = 120)
     private String publishedBy;
 
+    @Override
+    public StoreMerchantId scopedStore() {
+        return storeMerchantId == null ? null : new StoreMerchantId(storeMerchantId);
+    }
 }

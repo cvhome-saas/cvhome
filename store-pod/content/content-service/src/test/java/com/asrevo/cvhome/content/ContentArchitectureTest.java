@@ -49,6 +49,12 @@ final class ContentArchitectureTest {
     static final ArchRule NO_TEST_SUPPORT_IN_PRODUCTION = CvhomeArchitectureRules.noTestSupportInProduction();
 
     @ArchTest
+    static final ArchRule CACHED_READS_ARE_STORE_SCOPED = CvhomeArchitectureRules.cachedReadsAreStoreScoped(DOMAIN);
+
+    @ArchTest
+    static final ArchRule NO_CACHE_OF_ITS_OWN = CvhomeArchitectureRules.noCacheInternalsOutsideTheCacheModule(DOMAIN);
+
+    @ArchTest
     static final ArchRule HANDLERS_ARE_GATED_OR_ANONYMOUS =
             CvhomeArchitectureRules.handlersAreGatedOrDeclaredAnonymous(DOMAIN, HandlerPolicy.POD, ANONYMOUS);
 

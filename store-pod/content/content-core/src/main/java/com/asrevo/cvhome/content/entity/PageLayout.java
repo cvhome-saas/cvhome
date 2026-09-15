@@ -15,6 +15,9 @@ import jakarta.persistence.Version;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.commons.domain.StoreScoped;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -28,7 +31,7 @@ import lombok.Setter;
 @Table(name = "PAGE_LAYOUT")
 @Getter
 @Setter
-public class PageLayout implements Serializable {
+public class PageLayout implements Serializable, StoreScoped {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -81,4 +84,8 @@ public class PageLayout implements Serializable {
     @Column(name = "MODIFIED_BY", length = 120)
     private String modifiedBy;
 
+    @Override
+    public StoreMerchantId scopedStore() {
+        return storeMerchantId == null ? null : new StoreMerchantId(storeMerchantId);
+    }
 }

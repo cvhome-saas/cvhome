@@ -8,6 +8,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.commons.domain.StoreScoped;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,7 +21,7 @@ import lombok.Setter;
 @Table(name = "MEDIA_QUOTA")
 @Getter
 @Setter
-public class MediaQuota implements Serializable {
+public class MediaQuota implements Serializable, StoreScoped {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -33,4 +36,8 @@ public class MediaQuota implements Serializable {
     @Column(name = "FILE_COUNT", nullable = false)
     private long fileCount;
 
+    @Override
+    public StoreMerchantId scopedStore() {
+        return storeMerchantId == null ? null : new StoreMerchantId(storeMerchantId);
+    }
 }
