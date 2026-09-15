@@ -47,7 +47,8 @@ spring:
       schema: ${spring.application.name}  # default search path
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
+    open-in-view: false
 ```
 
 Then per service:
@@ -68,9 +69,14 @@ spring:
 `tenancy-service` puts its DDL at the Spring Boot default location (`classpath:schema.sql`), so it needs
 no `schema-locations` entry at all.
 
-> `ddl-auto: update` **and** a hand-written `schema.sql` both run. The SQL file is the source of truth
-> (everything is `CREATE TABLE IF NOT EXISTS`); Hibernate's `update` is a safety net that adds columns for
-> JPA entities. Don't rely on it — add new tables and columns to `schema.sql`.
+> The hand-written `schema.sql` runs first and is the source of truth (everything is `CREATE TABLE IF NOT
+> EXISTS`); Hibernate then only **validates** the entities against it (`ddl-auto: validate`) and refuses to start on a
+> mismatch. It used to be `update`, which quietly built what the DDL did not say — a second copy of every unique
+> constraint whose entity names none. Add new tables, columns and indexes to `schema.sql`.
+>
+> `open-in-view` is off: a request's connection goes back when its transaction commits, so map entities to DTOs
+> inside the `@Transactional` method. A lazy association touched afterwards throws `LazyInitializationException`,
+> and the integration tests are where that shows up.
 
 ### Where the DDL lives
 

@@ -178,7 +178,7 @@ cross-service foreign key. Two persistence stacks coexist:
   `src/main/resources/init-sql/schema.sql` plus `data-common.sql`.
 
 `spring.sql.init.mode: always` runs the SQL on every startup (everything is `CREATE TABLE IF NOT EXISTS`), and
-`ddl-auto: update` is only a safety net — **`schema.sql` is the source of truth.** Enums are `varchar` +
+Hibernate only validates against it (`ddl-auto: validate`) — **`schema.sql` is the source of truth.** Enums are `varchar` +
 `CHECK` constraints, so adding an enum value needs a DDL change too.
 
 Details: `references/database-schemas.md`.

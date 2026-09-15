@@ -222,7 +222,8 @@ What binds every change:
   `references/http-request-files.md` in the skill.
 - Use the value objects in `store-commons/commons/.../domain/` instead of raw `String`/`Long` ids.
 - `schema.sql` (`src/main/resources/schema.sql` for tenancy's Spring Data JDBC, `init-sql/schema.sql`
-  for the JPA pod services) is the source of truth for DDL — `ddl-auto: update` is only a safety net.
+  for the JPA pod services) is the source of truth for DDL, and Hibernate only checks it (`ddl-auto: validate`): an
+  entity the DDL does not match stops the service at start-up, so a column change is a `schema.sql` change.
 - Tenant secrets are encrypted in the mapper layer via `secret-crypto`; never add a plaintext credential
   column.
 - A new service needs entries in **all three** of `common-config.yml`, `lcl-config.yml`,

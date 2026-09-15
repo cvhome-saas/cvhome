@@ -17,7 +17,7 @@ by [checkout](../../../checkout/checkout-service/qa/checkout-qa.md).
   product-image APIs; the console's Catalogue module as a client; the billing write gate on catalog writes
 - **Runs on** — `lcl start -d --stack <name>`; read the live port from `lcl urls`. Address it through the
   gateway, never `:8122`
-- **Cases** — 96 (35 verified, 1 unit only, 60 not verified)
+- **Cases** — 100 (40 verified, 2 unit only, 58 not verified)
 - **Also see** — inventory (stock and price), checkout (the composed cart line),
   [content](../../../content/content-service/qa/content-qa.md) (the media library the gallery reads from),
   [billing](../../../../store-core/billing/billing-service/qa/billing-qa.md) (the plan ceiling behind PRD-14/15)
@@ -217,7 +217,7 @@ product form writes the definition here and the price/stock to inventory in a **
 - **Expect** — **201** `{"id": n}`; `GET /private/product/{n}` shows `visible: true`, `identifier == sku`,
   `descriptions` with one entry, empty `categories`, no `type`, no `manufacturer`, `dateAvailable` set to now.
   In the DB: one `product` row and one `product_description` row; **no** inventory row — stock and price are
-  a separate write (INV-05). `sm_sequencer` `PRODUCT_SEQ_NEXT_VAL` advanced.
+  a separate write (INV-05). `catalog.product_seq` advanced.
 
 ### PRD-02 — Create with brand, type and categories by code / id · critical · [not verified]
 
@@ -1030,6 +1030,71 @@ as well as demo data.
 - The per-order quantity refusal moved to its own `CartQuantityOutOfRangeException`: sharing
   `ProductNotPurchasableException` meant a caller wanting to retry smaller could not branch on the type.
 - `findByProductIdHydrated` is store-scoped, and an explicit `"optionValueIds": null` is a 400 rather than a 500.
+
+---
+
+## LOAD — The 2026-09-14 load-test fixes
+
+Findings 3–5 of *Where cvhome Breaks* (orchestrator `.agents/plans/load-bottlenecks.md`).
+
+### LOAD-01 — The category page's rail reads its option facets alone · high · [verified]
+
+- **Steps** — `GET .../api/v2/products/search?store=…&lang=en&rows=false&facets=true&facetGroups=OPTIONS`.
+- **Expect** — `content` empty, `facets.options` filled, the other facet blocks empty; without the two parameters the
+  search pages as before.
+- **Result** — lcl stack `lb` from `fix/load-bottlenecks`, 2026-09-14, through spg (`org1-store1`, port 2080): no rows, no brand block, a normal search still pages.
+  `ProductSearchServiceIntegrationTest`: 17 statements for the old request, ≤ 4 for the rail.
+
+### LOAD-02 — Categories and brands page in SQL, never in memory · high · [verified]
+
+- **Steps** — `GET .../api/v1/category-hierarchy?count=20&page=0`.
+- **Result** — on the stack the tree answers with every category named. The test annotations set
+  `fail_on_pagination_over_collection_fetch`, so HHH90003004 now fails the build (the old `findByStore` fails
+  `CategoryApiIntegrationTest` with "in-memory pagination was about to be applied").
+
+### LOAD-03 — A product is read with its brand and type; copy and images follow in batches · high · [verified]
+
+- **Result** — on the stack the product page by slug carries its copy and images, and the same slug asked of another
+  store is a 404. Fetch joins no longer multiply descriptions × images × brand and type copy (~20 rows a product on
+  the seed, 625 with five languages and five images).
+
+### LOAD-05 — The lookups that were full scans use their new indexes · high · [verified]
+
+- **Result** — a throwaway Postgres 15 (en_US.utf8) loaded with `schema.sql` and a synthetic 20k-product catalogue:
+  `product_image (product_id)`, `category_description (sef_url, language_code)`, `category (store_merchant_id, lineage
+  varchar_pattern_ops)` (as a range on the prefix), `product (store_merchant_id, manufacturer_id)` all plan index scans.
+
+### LOAD-06 — Every service boots with `ddl-auto: validate` · critical · [verified]
+
+- **Result** — all twelve Java services started on the stack above, and `./gradlew integrationTest` passes; the eight
+  Hibernate-generated duplicate unique constraints are dropped by `schema.sql`.
+
+
+### LOAD-08 — Every id comes from a Postgres sequence, and the seeds cannot collide with it · critical · [unit only]
+
+The re-run found checkout's `SM_SEQUENCER` table generator deadlocking its own pool (below, checkout LOAD-05); catalog
+shared the generator.
+
+- **Expect** — every service boots under `ddl-auto: validate` with one `<table>_seq` per table
+  (`\ds catalog.*`), `sm_sequencer` is gone, and a product created after the seeds gets an id above every seeded one
+  (`init-sql/data-sequences.sql` sets each sequence to `max(id) + 1` after the seeds, never backwards).
+- **Result** — the catalog, checkout, content, inventory and payment integration suites (each boots against its
+  `schema.sql`); `ContentContextIntegrationTest` and `InventoryContextIntegrationTest` assert the sequences exist and
+  the table does not.
+
+
+### LOAD-09 — Checkout reads a cart line's product in its own shape · high · [unit only]
+
+The one mix spike on the whole branch (2026-09-15) showed `/api/v1/detailed-products` as catalog's largest cost:
+2,181 calls, 3,388 s of server time, every cart operation reading the full product (copy, every image, dimensions
+and their units) to render a line.
+
+- **Steps** — `GET /api/v1/cart-lines?store=…&lang=en&skus=<simple>,<combination>,<unknown>` (product-api.http).
+- **Expect** — one element per known sku with `sku`, `productId`, `name`, `friendlyUrl`, `imageUrl`, `available`
+  and, for a combination sku, `variant.optionValues` with the resolved labels; no `description`, `images` or
+  `productSpecifications`; the unknown sku absent. Three statements for any number of skus. (The per-sku cache in
+  front of this read ships with the storefront caches; LOAD-04 and LOAD-07 are its cases.)
+- **Result** — `ProductApiIntegrationTest.checkoutReadsCartLinesInTheirOwnShape`. **Not verified** on a stack.
 
 ---
 

@@ -9,7 +9,7 @@ posts, banners, FAQs, legal policies, navigation menus, the home page's sections
   library and its cross-service usage index, store appearance, and the `STORE-POD.CONTENT.*` permission gate
 - **Runs on** — `lcl start -d --stack <name>`; read the live port from `lcl urls`. Address it through the
   gateway, never `:8121`
-- **Cases** — 94 (24 verified, 21 unit only, 49 not verified)
+- **Cases** — 95 (24 verified, 21 unit only, 50 not verified)
 - **Also see** — [landing-ui](../../../landing-ui/qa/landing-ui-qa.md) (the storefront that renders this),
   catalog (the gallery that consumes media assets),
   [merchant](../../../merchant/merchant-service/qa/merchant-qa.md) (which no longer holds any appearance),
@@ -987,7 +987,8 @@ exists` so it is both the fresh DDL and the migration.
 
 ### MIG-04 — Seeded ids and generated ids cannot collide · high · [not verified]
 
-The Module 13 TERMS seeds use **negative** ids on purpose: `SM_SEQUENCER` only counts upward.
+The Module 13 TERMS seeds use **negative** ids on purpose: the tables' sequences only count upward, and
+`data-sequences.sql` sets each one above its table's highest id after the seeds.
 
 - **Steps** — on a seeded store, create several content items and policy versions.
 - **Expect** — new ids are positive and increasing; no primary-key violation on insert; the seeded TERMS policy
@@ -1042,6 +1043,27 @@ Found during the appearance and media move, and just as quiet:
   single icon link** whenever the metadata changes.
 - **`social_links` came back from jsonb as maps, not `SocialLink`s.** A generic `List` deserialisation returns
   maps and the cast only fails later, when the response is written — as a 500 with "Failed to write request".
+
+---
+
+## LOAD — The 2026-09-14 load-test fixes
+
+Finding 6 of *Where cvhome Breaks* (orchestrator `.agents/plans/load-bottlenecks.md`).
+
+### LOAD-02 — The storefront reads survive open-in-view being off · high · [unit only]
+
+- **Result** — every content integration test passes with `spring.jpa.open-in-view: false`.
+
+### LOAD-03 — The duplicate `code_idx` is dropped from an old database · low · [not verified]
+
+- A fresh database never gets it; an old one loses it on the next start (`drop index if exists content.code_idx`).
+
+
+### LOAD-05 — Every id comes from a Postgres sequence · critical · [unit only]
+
+- **Expect** — `content.content_seq` and `content.content_description_seq` replace `sm_sequencer`; the seeded
+  negative ids (MIG-04) and the positive ones from the store seeds sit below what the sequences hand out.
+- **Result** — `ContentContextIntegrationTest` asserts the sequences exist and the table does not.
 
 ---
 

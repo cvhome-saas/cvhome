@@ -11,7 +11,7 @@ console's order statistics.
 - **Runs on** — `lcl start -d --stack <name>`; read the live ports from `lcl urls`. Address it through the pod
   gateway (`http://spg-507f1f77.gateway.com/checkout/…`) or the platform gateway (`gateway.com:8000/spg/checkout/…`),
   never `:8123`
-- **Cases** — 52 (39 verified end to end or in part, 11 unit only, 2 not verified)
+- **Cases** — 55 (40 verified end to end or in part, 13 unit only, 2 not verified)
 - **Also see** — [payment](../../payment/payment-service/qa/payment-qa.md) (the transactions and the approve /
   reject that drive the signals), [inventory](../../inventory/inventory-service/qa/inventory-qa.md) (the
   reservation that placement takes and expiry releases), [landing-ui](../../landing-ui/qa/landing-ui-qa.md) (the
@@ -507,6 +507,72 @@ Defects that actually happened in checkout — most in the service this one repl
 | **A guest's order status readable by integer id** | On a guest-checkout store `GET /order/{n}/status` answered any order's status, payment status and provider redirect URL to anyone (audit A3). | SEC-03 — 404 without the `ref`; PLC-13 — the return URL carries it and the page sends it. |
 
 ---
+
+## LOAD — The 2026-09-14 load-test fixes
+
+Finding 2 of *Where cvhome Breaks* (orchestrator `.agents/plans/load-bottlenecks.md`): the cart held its database
+connection while catalog and inventory priced it, and 94 % of purchases failed in the production mix.
+
+### LOAD-01 — A guest's cart and a COD order go through, pricing outside any transaction · critical · [verified]
+
+- **Steps** — create a cart, set a quantity over the sku's maximum, read it back, place it COD as a guest, touch the
+  spent cart. (Every seeded store requires a login to order; for a guest, set
+  `merchant.merchant_store.require_login_for_order_placement = false` for one store and restart checkout.)
+- **Expect** — 201 cart; 422 `CHECKOUT.CART.QUANTITY_OUT_OF_RANGE` and the cart unchanged; 201 order `CONFIRMED` with
+  its stock `COMMITTED` and nothing pending; 409 `CHECKOUT.CART.ALREADY_CONVERTED`.
+- **Result** — lcl stack `lb` from `fix/load-bottlenecks`, 2026-09-14, through spg (`org1-store1`, port 2080): all as expected, the placement in 0.4 s. `CartApiIntegrationTest` and
+  `CheckoutApiIntegrationTest` assert catalog and inventory are never called inside a transaction (the old code fails
+  both).
+
+### LOAD-02 — The console's order list is three statements a page · high · [unit only]
+
+- **Result** — `OrderServiceIntegrationTest`: ≤ 3 (page, count, one batch of totals) where it was 42 for 20 orders.
+
+### LOAD-03 — A payment signal is one transaction, and a refused payment releases the stock at once · critical · [unit only]
+
+- **Result** — `ExternalOrderSignalApiIntegrationTest`, `CheckoutApiIntegrationTest.aRefusedPaymentCancelsTheOrderAndReleasesTheStock`.
+  Both only passed before because open-in-view kept a session open.
+
+### LOAD-04 — A slow peer fails the call instead of holding the caller · high · [unit only]
+
+- **Expect** — 1 s to connect, 3 s to answer (payment 10 s), a connection wait of 3 s at most.
+- **Result** — `S2sRequestFactoriesTest`. **Not verified** on a stack: nothing there is slow enough to trip it.
+
+
+### LOAD-05 — Three carts created at once do not deadlock the pool · critical · [unit only]
+
+The re-run of 2026-09-14 (*Where cvhome Breaks Now*): right after a restart 76 of 91 cart creations failed. Hibernate's
+`SM_SEQUENCER` table generator fetched its block on a *second* pooled connection while the cart's transaction held
+the first; with a pool of 3, three concurrent inserts each held one and waited for another.
+
+- **Expect** — ids come from `checkout.<table>_seq` (one per table, fifty at a time, on the transaction's own
+  connection); `sm_sequencer` is gone; three cart creations in parallel against a pool of 3 all answer 201, and an
+  order's id starts at 1000.
+- **Result** — `CartApiIntegrationTest`, `CheckoutApiIntegrationTest` (every id generated through the sequences).
+  **Not verified** with three concurrent creations on a pool of 3.
+
+### LOAD-06 — Placing an order reads the store's currency before its transaction, not inside it · high · [unit only]
+
+- **Expect** — merchant is never called while a checkout transaction is open: the currency is read beside the
+  catalog and inventory snapshot, and passed into `createOrResume`.
+- **Result** — `CheckoutApiIntegrationTest` and `CartApiIntegrationTest` now record the merchant stub too, and
+  assert no peer was called inside a transaction (the old placement fails it once the STORE cache has expired).
+
+
+### LOAD-07 — A cart read asks the catalogue nothing; an add asks it about one sku · high · [unit only]
+
+The one mix spike on the whole branch (2026-09-15): 791 of checkout's 807 timeouts were the catalogue not
+answering `detailed-products` in 3 s, and every cart read made that call again.
+
+- **Expect** — a line keeps what the catalogue said when it was added (`cart_line.product_id`, `product_name`,
+  `friendly_url`, `image_url`, `option_labels`, `catalog_available`, `snapshot_at`); a read or a removal prices
+  the lines from that and asks inventory alone for the live price and stock; an add asks the catalogue's
+  `cart-lines` read about the one sku it adds; a line whose snapshot is older than a day, or was written before
+  these columns, asks again and is refreshed in place. The storefront's cart item still carries `description.name`,
+  `description.friendlyUrl`, `image.imageUrl` and `variant`.
+- **Result** — `CartApiIntegrationTest` (the catalogue's cart-line read count does not move across two reads of a
+  two-line cart), `ProductSnapshotServiceImplTest` (a remembered line is priced by inventory alone; a stale one asks
+  and remembers), `CartServiceImplTest`. **Not verified** on a stack.
 
 ## 99 — Known gaps
 
