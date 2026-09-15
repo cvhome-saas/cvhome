@@ -100,10 +100,22 @@ Implementation: `storefront/scripts/static-assets/` (constants, apply-prefix, sy
 `@aws-sdk/client-s3` reaches the image via `outputFileTracingIncludes`. Never run `storefront/server.js`
 directly against a fresh build — it would serve the un-substituted sentinel.
 
-### The request signal (`start.mjs` only)
+### The page cache and the request signal (`start.mjs` only)
 
-`start.mjs` puts the request signal in front of Next (`storefront/scripts/server/`), which `next dev` does not run (the page cache, its own PR, joins it here):
+`start.mjs` puts two things in front of Next (`storefront/scripts/server/`), neither of which `next dev` runs:
 
+- **The page cache** (`page-cache.mjs`). An anonymous document is served from memory for
+  `STOREFRONT_PAGE_CACHE_TTL_SECONDS` (30; 0 turns it off), then stale for `STOREFRONT_PAGE_CACHE_STALE_SECONDS` (300)
+  while the cache refreshes it with a request of its own to the same port (`x-storefront-revalidate`), so no shopper
+  waits on a refresh; shoppers who miss while a page renders share that render, which their waiting keeps alive;
+  `STOREFRONT_PAGE_CACHE_MAX_MB` (64) bounds it. Keyed by the URL, host and spg's store headers; a client navigation
+  or prefetch (Next's `rsc` headers) bypasses it. Never kept: a non-200, an HTML body that did not reach `</html>`, a
+  render with an optional read that was aborted or timed out (`orUndefined` marks it), a response setting any cookie
+  but `NEXT_LOCALE`. It is safe because the server render reads no per-shopper state — **keep it that way**: a page
+  that starts reading a cookie or a session header must be added to its bypass rules (login, register, customer,
+  checkout, callback, the theme/colour override, `?preview=`, `Authorization`), or it will serve one shopper's page to
+  another. `x-storefront-cache` on every response says what happened: `hit`, `miss`, `stale`, `stale-refresh`,
+  `shared`, `bypass`.
 - **The request signal** (`request-scope.mjs`). A render's backend reads (`apiFetch`, server side, GET only) abort when
   its shopper disconnects, and give up after `STOREFRONT_BACKEND_TIMEOUT_MS` (3000; 0 waits); a write carries neither.
 
