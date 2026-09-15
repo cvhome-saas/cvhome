@@ -14,6 +14,7 @@ import com.asrevo.cvhome.catalog.errors.ProductTypeReferenceUnresolvableExceptio
 import com.asrevo.cvhome.catalog.model.product.LightPersistableProduct;
 import com.asrevo.cvhome.catalog.model.product.PersistableProductDefinition;
 import com.asrevo.cvhome.catalog.model.product.ProductFilter;
+import com.asrevo.cvhome.catalog.model.product.ReadableCartLineProduct;
 import com.asrevo.cvhome.catalog.model.product.ReadableMinimalProduct;
 import com.asrevo.cvhome.catalog.model.product.ReadableProduct;
 import com.asrevo.cvhome.catalog.model.product.ReadableProductDefinition;
@@ -50,6 +51,13 @@ public interface ProductService {
      * The bulk form of {@link #getBySku}: one call for a whole cart. Skus with no product are absent from the
      * answer, mirroring the inventory availability contract.
      */
+    /**
+     * The cart-line shape of {@link #getBySkus}: what a cart or order line renders, and nothing more. Read through
+     * {@code CachedCartLines}, which holds each sku for a minute. Skus with no product are absent from the answer.
+     */
+    java.util.List<ReadableCartLineProduct> getCartLines(StoreMerchantId store, java.util.List<Sku> skus,
+                                                         LanguageCode language);
+
     java.util.List<ReadableMinimalProduct> getBySkus(StoreMerchantId store, java.util.List<Sku> skus,
                                                      LanguageCode language);
 

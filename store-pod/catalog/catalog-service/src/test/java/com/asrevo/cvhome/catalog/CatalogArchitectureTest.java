@@ -29,6 +29,7 @@ final class CatalogArchitectureTest {
             "CategoryApi#hierarchy", "CategoryApi#getByFriendlyUrl",
             // checkout and storefront read the priced product(s) by SKU
             "ExternalProductApi#getDetailedProduct", "ExternalProductApi#getDetailedProducts",
+            "ExternalProductApi#getCartLines",
             // storefront brand filter of a category
             "ManufacturerApi#listByCategory",
             // storefront listing, search, type-ahead and product page

@@ -37,6 +37,22 @@ public interface ProductVariantRepository extends JpaRepository<ProductVariant, 
             where v.storeMerchantId = ?1 and v.sku in ?2""")
     List<ProductVariant> findByStoreAndSkuIn(StoreMerchantId store, Collection<Sku> skus);
 
+    /**
+     * The cart-line read: the variants with their products and their label block in one statement; the products'
+     * descriptions and images follow in one batch each. Nothing else is touched, so a cart's skus cost three
+     * statements however many there are.
+     */
+    @Query("""
+            select distinct v from ProductVariant v
+            join fetch v.product p
+            left join fetch v.optionValues ov
+            left join fetch ov.optionValue val
+            left join fetch val.descriptions
+            left join fetch val.option o
+            left join fetch o.descriptions
+            where v.storeMerchantId = ?1 and v.sku in ?2""")
+    List<ProductVariant> findCartLinesByStoreAndSkuIn(StoreMerchantId store, Collection<Sku> skus);
+
     boolean existsByStoreMerchantIdAndSku(StoreMerchantId store, Sku sku);
 
     /**
