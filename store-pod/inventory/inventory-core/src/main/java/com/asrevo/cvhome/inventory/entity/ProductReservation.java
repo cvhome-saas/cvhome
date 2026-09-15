@@ -16,8 +16,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
-import jakarta.persistence.TableGenerator;
 import jakarta.persistence.UniqueConstraint;
 
 import com.asrevo.cvhome.commons.domain.Sku;
@@ -44,11 +44,9 @@ public class ProductReservation extends SalesManagerEntity<Long, ProductReservat
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
-    @TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME",
-            valueColumnName = "SEQ_COUNT", pkColumnValue = "PRODUCT_RESERVATION_SEQ_NEXT_VAL",
-            allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
-            initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "product_reservation_seq")
+    @SequenceGenerator(name = "product_reservation_seq", sequenceName = "product_reservation_seq",
+            allocationSize = SchemaConstant.ID_ALLOCATION_SIZE)
     private Long id;
 
     @Embedded

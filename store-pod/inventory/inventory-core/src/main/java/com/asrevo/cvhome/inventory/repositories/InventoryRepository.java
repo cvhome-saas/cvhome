@@ -27,12 +27,21 @@ public interface InventoryRepository extends JpaRepository<Inventory, Long> {
             order by i.id""")
     List<Inventory> findBySkus(StoreMerchantId store, Collection<Sku> skus);
 
+    /**
+     * A sku's row, the first by id if legacy data holds several. Every row of the sku is read and the first taken here:
+     * a {@code limit} over a fetch-joined collection is applied in memory by Hibernate anyway (HHH90003004), which the
+     * test suite now refuses.
+     */
+    default Optional<Inventory> findBySku(StoreMerchantId store, Sku sku) {
+        return findAllBySku(store, sku).stream().findFirst();
+    }
+
     @Query("""
             select i from Inventory i
             left join fetch i.prices
             where i.storeMerchantId = ?1 and i.sku = ?2
-            order by i.id limit 1""")
-    Optional<Inventory> findBySku(StoreMerchantId store, Sku sku);
+            order by i.id""")
+    List<Inventory> findAllBySku(StoreMerchantId store, Sku sku);
 
     /**
      * The reservation path's read: locked, so two orders cannot both take the last unit.

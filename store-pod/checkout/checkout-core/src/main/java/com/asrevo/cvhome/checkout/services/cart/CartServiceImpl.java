@@ -1,10 +1,12 @@
 package com.asrevo.cvhome.checkout.services.cart;
 
+import java.time.Clock;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.asrevo.cvhome.checkout.domain.CartCode;
 import com.asrevo.cvhome.checkout.domain.ShopperId;
@@ -16,10 +18,9 @@ import com.asrevo.cvhome.checkout.errors.CartQuantityOutOfRangeException;
 import com.asrevo.cvhome.checkout.errors.ProductNotPurchasableException;
 import com.asrevo.cvhome.checkout.model.cart.PersistableCartItem;
 import com.asrevo.cvhome.checkout.model.cart.ReadableCart;
-import com.asrevo.cvhome.checkout.repositories.CartRepository;
-import com.asrevo.cvhome.checkout.repositories.OrderRepository;
 import com.asrevo.cvhome.checkout.services.catalog.ProductSnapshot;
 import com.asrevo.cvhome.checkout.services.catalog.ProductSnapshotService;
+import com.asrevo.cvhome.checkout.services.catalog.ProductSnapshotServiceImpl;
 import com.asrevo.cvhome.checkout.services.store.StoreSettings;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.Sku;
@@ -27,104 +28,110 @@ import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 
 import lombok.RequiredArgsConstructor;
 
+/**
+ * Every operation reads the cart, prices it with no transaction open, then writes in a short transaction of its own
+ * ({@link CartTransactions}). No database connection is held while a peer answers. A read or a removal asks inventory
+ * for the live price and stock and the catalogue for nothing: what the catalogue said about a sku was kept on its
+ * line when it was added ({@link CartLine#remember}). An add asks the catalogue about the sku it adds.
+ */
 @Service
 @RequiredArgsConstructor
 public class CartServiceImpl implements CartService {
 
-    private final CartRepository carts;
-
-    private final OrderRepository orders;
+    private final CartTransactions transactions;
 
     private final ProductSnapshotService snapshots;
 
     private final StoreSettings storeSettings;
 
+    private final Clock clock;
+
     @Override
-    @Transactional
     public ReadableCart create(StoreMerchantId store, LanguageCode language, PersistableCartItem item, ShopperId shopper)
             throws ProductNotPurchasableException, CartQuantityOutOfRangeException {
         Sku sku = skuOf(item);
-        Cart cart = new Cart(store, CartCode.newCode(), language);
-        cart.setCuaExternalId(shopper == null ? null : shopper.sub());
         Map<Sku, ProductSnapshot> snapshot = snapshots.snapshot(store, language, List.of(sku));
         check(sku, item.getQuantity(), snapshot);
+        Cart cart = new Cart(store, CartCode.newCode(), language);
+        cart.setCuaExternalId(shopper == null ? null : shopper.sub());
         cart.put(sku, item.getQuantity());
-        return CartMapper.toReadable(carts.save(cart), snapshot, storeSettings.currency(store),
-                storeSettings.locale(language));
+        remember(cart, sku, snapshot);
+        return readable(store, language, transactions.create(cart), snapshot);
     }
 
     @Override
-    @Transactional
     public ReadableCart upsert(StoreMerchantId store, LanguageCode language, CartCode code, PersistableCartItem item)
             throws CartNotFoundException, CartAlreadyConvertedException, ProductNotPurchasableException,
             CartQuantityOutOfRangeException {
         Sku sku = skuOf(item);
-        Cart cart = editable(store, code);
-        cart.put(sku, item.getQuantity());
-        Map<Sku, ProductSnapshot> snapshot = price(store, language, cart);
-        if (item.getQuantity() > 0) {
-            check(sku, item.getQuantity(), snapshot);
+        int quantity = item.getQuantity();
+        Cart before = transactions.editable(store, code);
+        List<Sku> priced = skusOf(before, sku, quantity > 0);
+        Map<Sku, ProductSnapshot> snapshot = new LinkedHashMap<>(pricedWithout(store, language, before, sku));
+        if (quantity > 0) {
+            snapshot.putAll(snapshots.snapshot(store, language, List.of(sku)));
+            check(sku, quantity, snapshot);
         }
-        return CartMapper.toReadable(carts.save(cart), snapshot, storeSettings.currency(store),
-                storeSettings.locale(language));
+        Cart cart = transactions.edit(store, code, c -> {
+            c.put(sku, quantity);
+            remember(c, sku, snapshot);
+        }, priced, snapshot.keySet());
+        return readable(store, language, cart, snapshot);
     }
 
+    /**
+     * Read-only unless the catalog or inventory dropped one of the cart's skus: then that line is pruned, so the
+     * placement that follows does not refuse a line the shopper was never shown.
+     */
     @Override
-    @Transactional
     public ReadableCart get(StoreMerchantId store, LanguageCode language, CartCode code) throws CartNotFoundException {
-        Cart cart = open(store, code);
-        Map<Sku, ProductSnapshot> snapshot = price(store, language, cart);
-        return CartMapper.toReadable(carts.save(cart), snapshot, storeSettings.currency(store),
-                storeSettings.locale(language));
+        Cart cart = transactions.open(store, code);
+        Map<Sku, ProductSnapshot> snapshot = snapshots.priced(store, language, cart.getLines());
+        List<Sku> unknown = skusOf(cart).stream().filter(sku -> !snapshot.containsKey(sku)).toList();
+        if (cart.isActive() && !unknown.isEmpty()) {
+            transactions.prune(store, code, unknown);
+        }
+        return readable(store, language, cart, snapshot);
     }
 
     @Override
-    @Transactional
     public ReadableCart removeLine(StoreMerchantId store, LanguageCode language, CartCode code, Sku sku)
             throws CartNotFoundException, CartAlreadyConvertedException {
-        Cart cart = editable(store, code);
-        cart.remove(sku);
-        Map<Sku, ProductSnapshot> snapshot = price(store, language, cart);
-        return CartMapper.toReadable(carts.save(cart), snapshot, storeSettings.currency(store),
-                storeSettings.locale(language));
+        Cart before = transactions.editable(store, code);
+        List<Sku> priced = skusOf(before, sku, false);
+        Map<Sku, ProductSnapshot> snapshot = pricedWithout(store, language, before, sku);
+        Cart cart = transactions.edit(store, code, c -> c.remove(sku), priced, snapshot.keySet());
+        return readable(store, language, cart, snapshot);
     }
 
-    /**
-     * A cart that is still worth showing: active, or converted into an order that is still open. Once the order is
-     * closed the code is spent and the storefront should start over.
-     */
-    private Cart open(StoreMerchantId store, CartCode code) throws CartNotFoundException {
-        Cart cart = carts.findByStoreMerchantIdAndCode(store, code).orElseThrow(() -> CartNotFoundException.of(code,
-                store));
-        if (!cart.isActive()) {
-            boolean orderOpen = orders.findById(cart.getOrderId()).map(order -> !order.isClosed()).orElse(false);
-            if (!orderOpen) {
-                throw CartNotFoundException.of(code, store.getId());
-            }
-        }
-        return cart;
+    private ReadableCart readable(StoreMerchantId store, LanguageCode language, Cart cart,
+                                  Map<Sku, ProductSnapshot> snapshot) {
+        return CartMapper.toReadable(cart, snapshot, storeSettings.currency(store), storeSettings.locale(language));
     }
 
-    private Cart editable(StoreMerchantId store, CartCode code)
-            throws CartNotFoundException, CartAlreadyConvertedException {
-        Cart cart = open(store, code);
-        if (!cart.isActive()) {
-            throw CartAlreadyConvertedException.of(code, cart.getOrderId());
-        }
-        return cart;
+    /** The cart's other lines priced from their snapshots; nothing is asked when there are none. */
+    private Map<Sku, ProductSnapshot> pricedWithout(StoreMerchantId store, LanguageCode language, Cart cart, Sku sku) {
+        List<CartLine> others = cart.getLines().stream().filter(line -> !line.getSku().equals(sku)).toList();
+        return others.isEmpty() ? Map.of() : snapshots.priced(store, language, others);
     }
 
-    /**
-     * Prices the lines and prunes those the catalog or inventory no longer knows — a shopper is never shown a line
-     * they cannot buy.
-     */
-    private Map<Sku, ProductSnapshot> price(StoreMerchantId store, LanguageCode language, Cart cart) {
-        Map<Sku, ProductSnapshot> snapshot = snapshots.snapshot(store, language,
-                cart.getLines().stream().map(CartLine::getSku).toList());
-        if (cart.isActive()) {
-            cart.getLines().removeIf(line -> !snapshot.containsKey(line.getSku()));
+    /** Keeps what the catalogue said about {@code sku} on its line, if the cart holds one. */
+    private void remember(Cart cart, Sku sku, Map<Sku, ProductSnapshot> snapshot) {
+        ProductSnapshot product = snapshot.get(sku);
+        if (product != null) {
+            cart.line(sku).ifPresent(line -> ProductSnapshotServiceImpl.remember(line, product.product(),
+                    clock.instant()));
         }
-        return snapshot;
+    }
+
+    private static List<Sku> skusOf(Cart cart) {
+        return cart.getLines().stream().map(CartLine::getSku).toList();
+    }
+
+    /** The skus the cart will hold once {@code sku} is set ({@code keep}) or removed. */
+    private static List<Sku> skusOf(Cart cart, Sku sku, boolean keep) {
+        Stream<Sku> others = cart.getLines().stream().map(CartLine::getSku).filter(held -> !held.equals(sku));
+        return keep ? Stream.concat(others, Stream.of(sku)).toList() : others.toList();
     }
 
     /**

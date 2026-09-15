@@ -1,6 +1,7 @@
 package com.asrevo.cvhome.checkout.services.cart;
 
 import java.math.BigDecimal;
+import java.time.Clock;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
@@ -12,8 +13,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.asrevo.cvhome.catalog.model.product.ProductDescription;
-import com.asrevo.cvhome.catalog.model.product.ReadableMinimalProduct;
+import com.asrevo.cvhome.catalog.model.product.ReadableCartLineProduct;
 import com.asrevo.cvhome.checkout.domain.CartCode;
 import com.asrevo.cvhome.checkout.domain.ShopperId;
 import com.asrevo.cvhome.checkout.entity.Cart;
@@ -81,19 +81,19 @@ class CartServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        service = new CartServiceImpl(carts, orders, snapshots, storeSettings);
+        service = new CartServiceImpl(new CartTransactions(carts, orders), snapshots, storeSettings, Clock.systemUTC());
         lenient().when(storeSettings.currency(Orders.STORE)).thenReturn(new CurrencyCode("USD"));
         lenient().when(storeSettings.locale(any())).thenReturn(Locale.US);
         lenient().when(carts.save(any(Cart.class))).thenAnswer(inv -> inv.getArgument(0));
     }
 
     static ProductSnapshot snapshot(Sku sku, String price, boolean purchasable, int min, int max) {
-        ReadableMinimalProduct product = new ReadableMinimalProduct();
+        ReadableCartLineProduct product = new ReadableCartLineProduct();
         product.setSku(sku);
-        product.setId(3L);
-        ProductDescription description = new ProductDescription();
-        description.setName(sku.value().toLowerCase());
-        product.setDescription(description);
+        product.setProductId(3L);
+        product.setName(sku.value().toLowerCase());
+        product.setImageUrl(String.format("https://cdn.example/%s.png", sku.value()));
+        product.setAvailable(true);
         return new ProductSnapshot(sku, product, new BigDecimal(price), new BigDecimal(price), false, purchasable, min, max);
     }
 
@@ -131,6 +131,8 @@ class CartServiceImplTest {
         assertThat(cart.getProducts()).singleElement().satisfies(line -> {
             assertThat(line.getSku()).isEqualTo(SKU_A);
             assertThat(line.getDescription().getName()).isEqualTo("sku-a");
+            assertThat(line.getImage().getImageUrl()).endsWith("SKU-A.png");
+            assertThat(line.getImages()).hasSize(1);
             assertThat(line.getFinalPrice()).isEqualTo("$10.00");
             assertThat(line.getDisplaySubTotal()).isEqualTo(LIT_20_00);
             assertThat(line.isAvailable()).isTrue();
@@ -143,8 +145,10 @@ class CartServiceImplTest {
     @Test
     void upsertSetsTheAbsoluteQuantityAndZeroRemoves() throws Exception {
         Cart cart = existing();
-        when(snapshots.snapshot(eq(Orders.STORE), eq(EN), any())).thenReturn(Map.of(
-                SKU_A, snapshot(SKU_A, LIT_10_00, true, 1, 0), SKU_B, snapshot(SKU_B, "5.00", true, 1, 0)));
+        Map<Sku, ProductSnapshot> both = Map.of(
+                SKU_A, snapshot(SKU_A, LIT_10_00, true, 1, 0), SKU_B, snapshot(SKU_B, "5.00", true, 1, 0));
+        when(snapshots.snapshot(eq(Orders.STORE), eq(EN), any())).thenReturn(both);
+        lenient().when(snapshots.priced(eq(Orders.STORE), eq(EN), any())).thenReturn(both);
 
         ReadableCart afterAdd = service.upsert(Orders.STORE, EN, CODE, item(SKU_B, 3));
         assertThat(afterAdd.getQuantity()).isEqualTo(5);
@@ -163,7 +167,7 @@ class CartServiceImplTest {
     void readingACartPrunesLinesNobodyCanBuyAnyMore() throws Exception {
         Cart cart = existing();
         cart.put(SKU_B, 1);
-        when(snapshots.snapshot(eq(Orders.STORE), eq(EN), any()))
+        when(snapshots.priced(eq(Orders.STORE), eq(EN), any()))
                 .thenReturn(Map.of(SKU_A, snapshot(SKU_A, LIT_10_00, true, 1, 0)));
 
         ReadableCart readable = service.get(Orders.STORE, EN, CODE);
@@ -176,7 +180,7 @@ class CartServiceImplTest {
     @Test
     void aLineFlaggedNotPurchasableStaysButShowsUnavailable() throws Exception {
         existing();
-        when(snapshots.snapshot(eq(Orders.STORE), eq(EN), any()))
+        when(snapshots.priced(eq(Orders.STORE), eq(EN), any()))
                 .thenReturn(Map.of(SKU_A, snapshot(SKU_A, LIT_10_00, false, 1, 0)));
 
         ReadableCart readable = service.get(Orders.STORE, EN, CODE);
@@ -188,7 +192,7 @@ class CartServiceImplTest {
     void removeLineDropsTheSkuAndAnswersTheRest() throws Exception {
         Cart cart = existing();
         cart.put(SKU_B, 1);
-        when(snapshots.snapshot(eq(Orders.STORE), eq(EN), any()))
+        when(snapshots.priced(eq(Orders.STORE), eq(EN), any()))
                 .thenReturn(Map.of(SKU_A, snapshot(SKU_A, LIT_10_00, true, 1, 0)));
 
         ReadableCart readable = service.removeLine(Orders.STORE, EN, CODE, SKU_B);
@@ -236,7 +240,7 @@ class CartServiceImplTest {
         Cart cart = existing();
         cart.convertedInto(100L);
         when(orders.findById(100L)).thenReturn(Optional.of(Orders.awaitingPayment(PaymentType.STRIPE)));
-        when(snapshots.snapshot(eq(Orders.STORE), eq(EN), any()))
+        when(snapshots.priced(eq(Orders.STORE), eq(EN), any()))
                 .thenReturn(Map.of(SKU_A, snapshot(SKU_A, LIT_10_00, true, 1, 0)));
 
         ReadableCart readable = service.get(Orders.STORE, EN, CODE);
@@ -254,7 +258,7 @@ class CartServiceImplTest {
         Cart cart = existing();
         cart.convertedInto(100L);
         when(orders.findById(100L)).thenReturn(Optional.of(Orders.awaitingPayment(PaymentType.STRIPE)));
-        when(snapshots.snapshot(eq(Orders.STORE), eq(EN), any())).thenReturn(Map.of());
+        when(snapshots.priced(eq(Orders.STORE), eq(EN), any())).thenReturn(Map.of());
 
         ReadableCart readable = service.get(Orders.STORE, EN, CODE);
 

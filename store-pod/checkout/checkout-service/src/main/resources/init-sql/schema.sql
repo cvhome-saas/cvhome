@@ -1,9 +1,17 @@
 create schema if not exists checkout;
-create table if not exists checkout.sm_sequencer
-(
-    seq_name  varchar(255) not null primary key,
-    seq_count bigint
-);
+-- One sequence per table, fifty ids a fetch (SchemaConstant.ID_ALLOCATION_SIZE, pooled-lo). The Shopizer sm_sequencer
+-- table it replaces needed a second pooled connection and a row lock for every block: with three connections and three
+-- concurrent inserts, checkout deadlocked its own pool (the 2026-09-14 load test).
+drop table if exists checkout.sm_sequencer;
+create sequence if not exists checkout.cart_seq increment by 50;
+create sequence if not exists checkout.cart_line_seq increment by 50;
+create sequence if not exists checkout.customer_account_seq increment by 50;
+create sequence if not exists checkout.sales_order_seq start with 1000 increment by 50;
+create sequence if not exists checkout.sales_order_event_seq increment by 50;
+create sequence if not exists checkout.sales_order_line_seq increment by 50;
+create sequence if not exists checkout.sales_order_line_option_seq increment by 50;
+create sequence if not exists checkout.sales_order_history_seq increment by 50;
+create sequence if not exists checkout.sales_order_total_seq increment by 50;
 
 -- A shopper as this store knows them. Unique per (store, cua account): the same cua account in two stores is two rows.
 create table if not exists checkout.customer_account
@@ -65,8 +73,23 @@ create table if not exists checkout.cart_line
     cart_id       bigint       not null constraint fk_cart_line_cart references checkout.cart,
     sku           varchar(255) not null,
     quantity      integer      not null constraint cart_line_quantity_check check (quantity > 0),
+    -- what the catalogue said about the sku when the line was added, so a read asks it nothing (CartLine.remember)
+    product_id        bigint,
+    product_name      varchar(255),
+    friendly_url      varchar(255),
+    image_url         varchar(1024),
+    option_labels     varchar(2000),
+    catalog_available boolean,
+    snapshot_at       timestamp(6),
     constraint uk_cart_line_sku unique (cart_id, sku)
 );
+alter table checkout.cart_line add column if not exists product_id        bigint;
+alter table checkout.cart_line add column if not exists product_name      varchar(255);
+alter table checkout.cart_line add column if not exists friendly_url      varchar(255);
+alter table checkout.cart_line add column if not exists image_url         varchar(1024);
+alter table checkout.cart_line add column if not exists option_labels     varchar(2000);
+alter table checkout.cart_line add column if not exists catalog_available boolean;
+alter table checkout.cart_line add column if not exists snapshot_at       timestamp(6);
 
 -- The order aggregate. version is the optimistic lock every transition is applied under; pending_action is the remote
 -- step still owed, which the recovery job re-drives; the three status CHECKs list every value of their Java enum.

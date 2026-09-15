@@ -14,8 +14,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.asrevo.cvhome.catalog.model.product.ProductDescription;
-import com.asrevo.cvhome.catalog.model.product.ReadableMinimalProduct;
+import com.asrevo.cvhome.catalog.model.product.ReadableCartLineProduct;
 import com.asrevo.cvhome.checkout.domain.CartCode;
 import com.asrevo.cvhome.checkout.domain.ShopperId;
 import com.asrevo.cvhome.checkout.entity.Cart;
@@ -34,7 +33,6 @@ import com.asrevo.cvhome.checkout.repositories.OrderRepository;
 import com.asrevo.cvhome.checkout.services.catalog.ProductSnapshot;
 import com.asrevo.cvhome.checkout.services.catalog.ProductSnapshotService;
 import com.asrevo.cvhome.checkout.services.customer.CustomerService;
-import com.asrevo.cvhome.checkout.services.store.StoreSettings;
 import com.asrevo.cvhome.commons.domain.CountryIsoCode;
 import com.asrevo.cvhome.commons.domain.CurrencyCode;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
@@ -93,15 +91,11 @@ class OrderPlacementTransactionTest {
     @Mock
     private ProductSnapshotService snapshots;
 
-    @Mock
-    private StoreSettings storeSettings;
-
     private OrderPlacementTransaction placement;
 
     @BeforeEach
     void setUp() {
-        placement = new OrderPlacementTransaction(carts, orders, customers, snapshots, storeSettings,
-                Clock.fixed(Orders.T0, ZoneOffset.UTC));
+        placement = new OrderPlacementTransaction(carts, orders, customers, Clock.fixed(Orders.T0, ZoneOffset.UTC));
     }
 
     static PlaceOrderRequest request(PaymentType type) {
@@ -121,12 +115,11 @@ class OrderPlacementTransactionTest {
     }
 
     static ProductSnapshot snapshot(Sku sku, String price, boolean purchasable, int min, int max) {
-        ReadableMinimalProduct product = new ReadableMinimalProduct();
-        product.setId(1L);
+        ReadableCartLineProduct product = new ReadableCartLineProduct();
+        product.setProductId(1L);
         product.setSku(sku);
-        ProductDescription description = new ProductDescription();
-        description.setName(RUNNER);
-        product.setDescription(description);
+        product.setName(RUNNER);
+        product.setAvailable(true);
         return new ProductSnapshot(sku, product, new BigDecimal(price), new BigDecimal(price), false, purchasable, min,
                 max);
     }
@@ -138,11 +131,15 @@ class OrderPlacementTransactionTest {
         return cart;
     }
 
+    /** The cart as the placement service prices it, before the transaction opens. */
+    private Map<Sku, ProductSnapshot> priced() {
+        return snapshots.snapshot(Orders.STORE, EN, List.of(Orders.SKU));
+    }
+
     @Test
     void opensTheOrderFromTheCartAndFreezesTheCart() throws Exception {
         Cart cart = activeCart();
         when(customers.getOrCreate(eq(Orders.STORE), eq(SHOPPER), any())).thenReturn(Orders.customer());
-        when(storeSettings.currency(Orders.STORE)).thenReturn(new CurrencyCode(EUR_2));
         when(snapshots.snapshot(eq(Orders.STORE), eq(EN), any()))
                 .thenReturn(Map.of(Orders.SKU, snapshot(Orders.SKU, "12.50", true, 1, 0)));
         when(orders.saveAndFlush(any(Order.class))).thenAnswer(inv -> {
@@ -151,7 +148,8 @@ class OrderPlacementTransactionTest {
             return o;
         });
 
-        Long id = placement.createOrResume(Orders.STORE, EN, CODE, request(PaymentType.STRIPE), SHOPPER, URLS);
+        Long id = placement.createOrResume(Orders.STORE, EN, CODE, request(PaymentType.STRIPE), SHOPPER, URLS,
+                priced(), new CurrencyCode(EUR_2));
 
         assertThat(id).isEqualTo(55L);
         ArgumentCaptor<Order> saved = ArgumentCaptor.forClass(Order.class);
@@ -177,7 +175,6 @@ class OrderPlacementTransactionTest {
     void anExplicitDeliveryAddressIsKept() throws Exception {
         activeCart();
         when(customers.getOrCreate(eq(Orders.STORE), any(), any())).thenReturn(Orders.customer());
-        when(storeSettings.currency(Orders.STORE)).thenReturn(new CurrencyCode(USD_2));
         when(snapshots.snapshot(eq(Orders.STORE), eq(EN), any()))
                 .thenReturn(Map.of(Orders.SKU, snapshot(Orders.SKU, LIT_1_00, true, 1, 0)));
         when(orders.saveAndFlush(any(Order.class))).thenAnswer(inv -> inv.getArgument(0));
@@ -187,7 +184,7 @@ class OrderPlacementTransactionTest {
         delivery.setCity(BATH);
         request.getCustomer().setDelivery(delivery);
 
-        placement.createOrResume(Orders.STORE, EN, CODE, request, null, URLS);
+        placement.createOrResume(Orders.STORE, EN, CODE, request, null, URLS, priced(), new CurrencyCode(USD_2));
 
         ArgumentCaptor<Order> saved = ArgumentCaptor.forClass(Order.class);
         verify(orders).saveAndFlush(saved.capture());
@@ -199,7 +196,7 @@ class OrderPlacementTransactionTest {
         when(carts.findByStoreMerchantIdAndCode(Orders.STORE, CODE)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> placement.createOrResume(Orders.STORE, EN, CODE, request(PaymentType.COD), SHOPPER,
-                URLS)).isInstanceOf(CartNotFoundException.class);
+                URLS, priced(), new CurrencyCode(USD_2))).isInstanceOf(CartNotFoundException.class);
     }
 
     @Test
@@ -208,7 +205,7 @@ class OrderPlacementTransactionTest {
         when(carts.findByStoreMerchantIdAndCode(Orders.STORE, CODE)).thenReturn(Optional.of(cart));
 
         assertThatThrownBy(() -> placement.createOrResume(Orders.STORE, EN, CODE, request(PaymentType.COD), SHOPPER,
-                URLS)).isInstanceOf(CartEmptyException.class);
+                URLS, priced(), new CurrencyCode(USD_2))).isInstanceOf(CartEmptyException.class);
         verify(orders, never()).saveAndFlush(any());
     }
 
@@ -220,7 +217,8 @@ class OrderPlacementTransactionTest {
         when(orders.findFirstByStoreMerchantIdAndCartCodeOrderByIdDesc(Orders.STORE, CODE))
                 .thenReturn(Optional.of(Orders.reserved(PaymentType.STRIPE)));
 
-        Long id = placement.createOrResume(Orders.STORE, EN, CODE, request(PaymentType.STRIPE), SHOPPER, URLS);
+        Long id = placement.createOrResume(Orders.STORE, EN, CODE, request(PaymentType.STRIPE), SHOPPER, URLS,
+                priced(), new CurrencyCode(USD_2));
 
         assertThat(id).isEqualTo(100L);
         verify(orders, never()).saveAndFlush(any());
@@ -236,7 +234,7 @@ class OrderPlacementTransactionTest {
                 .thenReturn(Optional.of(Orders.cancelled(PaymentType.STRIPE)));
 
         assertThatThrownBy(() -> placement.createOrResume(Orders.STORE, EN, CODE, request(PaymentType.STRIPE), SHOPPER,
-                URLS)).isInstanceOf(CartAlreadyConvertedException.class);
+                URLS, priced(), new CurrencyCode(USD_2))).isInstanceOf(CartAlreadyConvertedException.class);
     }
 
     @Test
@@ -247,19 +245,18 @@ class OrderPlacementTransactionTest {
         when(orders.findFirstByStoreMerchantIdAndCartCodeOrderByIdDesc(Orders.STORE, CODE)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> placement.createOrResume(Orders.STORE, EN, CODE, request(PaymentType.STRIPE), SHOPPER,
-                URLS)).isInstanceOf(CartAlreadyConvertedException.class);
+                URLS, priced(), new CurrencyCode(USD_2))).isInstanceOf(CartAlreadyConvertedException.class);
     }
 
     @Test
     void aLineThatCannotBeBoughtStopsThePlacementBeforeAnyRow() throws Exception {
         activeCart();
         when(customers.getOrCreate(eq(Orders.STORE), any(), any())).thenReturn(Orders.customer());
-        when(storeSettings.currency(Orders.STORE)).thenReturn(new CurrencyCode(USD_2));
         when(snapshots.snapshot(eq(Orders.STORE), eq(EN), any()))
                 .thenReturn(Map.of(Orders.SKU, snapshot(Orders.SKU, LIT_1_00, false, 1, 0)));
 
         assertThatThrownBy(() -> placement.createOrResume(Orders.STORE, EN, CODE, request(PaymentType.COD), SHOPPER,
-                URLS)).isInstanceOf(ProductNotPurchasableException.class);
+                URLS, priced(), new CurrencyCode(USD_2))).isInstanceOf(ProductNotPurchasableException.class);
         verify(orders, never()).saveAndFlush(any());
     }
 
@@ -267,37 +264,33 @@ class OrderPlacementTransactionTest {
     void aMissingSkuIsNotPurchasable() throws Exception {
         activeCart();
         when(customers.getOrCreate(eq(Orders.STORE), any(), any())).thenReturn(Orders.customer());
-        when(storeSettings.currency(Orders.STORE)).thenReturn(new CurrencyCode(USD_2));
         when(snapshots.snapshot(eq(Orders.STORE), eq(EN), any())).thenReturn(Map.of());
 
         assertThatThrownBy(() -> placement.createOrResume(Orders.STORE, EN, CODE, request(PaymentType.COD), SHOPPER,
-                URLS)).isInstanceOf(ProductNotPurchasableException.class);
+                URLS, priced(), new CurrencyCode(USD_2))).isInstanceOf(ProductNotPurchasableException.class);
     }
 
     @Test
     void aQuantityOutsideTheSkusBoundsIsRefused() throws Exception {
         activeCart();
         when(customers.getOrCreate(eq(Orders.STORE), any(), any())).thenReturn(Orders.customer());
-        when(storeSettings.currency(Orders.STORE)).thenReturn(new CurrencyCode(USD_2));
         when(snapshots.snapshot(eq(Orders.STORE), eq(EN), any()))
                 .thenReturn(Map.of(Orders.SKU, snapshot(Orders.SKU, LIT_1_00, true, 1, 1)));
 
         assertThatThrownBy(() -> placement.createOrResume(Orders.STORE, EN, CODE, request(PaymentType.COD), SHOPPER,
-                URLS)).isInstanceOf(CartQuantityOutOfRangeException.class);
+                URLS, priced(), new CurrencyCode(USD_2))).isInstanceOf(CartQuantityOutOfRangeException.class);
     }
 
     @Test
-    void theSkusAskedOfTheSnapshotAreTheCartLines() throws Exception {
+    void theSkusToPriceAreTheActiveCartsLinesAndNoneForAConvertedCart() throws Exception {
         activeCart();
-        when(customers.getOrCreate(eq(Orders.STORE), any(), any())).thenReturn(Orders.customer());
-        when(storeSettings.currency(Orders.STORE)).thenReturn(new CurrencyCode(USD_2));
-        when(snapshots.snapshot(eq(Orders.STORE), eq(EN), eq(List.of(Orders.SKU))))
-                .thenReturn(Map.of(Orders.SKU, snapshot(Orders.SKU, LIT_1_00, true, 1, 0)));
-        when(orders.saveAndFlush(any(Order.class))).thenAnswer(inv -> inv.getArgument(0));
+        assertThat(placement.skus(Orders.STORE, CODE)).containsExactly(Orders.SKU);
 
-        placement.createOrResume(Orders.STORE, EN, CODE, request(PaymentType.COD), SHOPPER, URLS);
-
-        verify(snapshots).snapshot(Orders.STORE, EN, List.of(Orders.SKU));
+        Cart converted = new Cart(Orders.STORE, CODE, EN);
+        converted.put(Orders.SKU, 1);
+        converted.convertedInto(100L);
+        when(carts.findByStoreMerchantIdAndCode(Orders.STORE, CODE)).thenReturn(Optional.of(converted));
+        assertThat(placement.skus(Orders.STORE, CODE)).isEmpty();
     }
 
     @Test

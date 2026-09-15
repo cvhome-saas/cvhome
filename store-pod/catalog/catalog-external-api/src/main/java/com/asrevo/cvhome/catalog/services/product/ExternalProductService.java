@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.service.annotation.GetExchange;
 import org.springframework.web.service.annotation.HttpExchange;
 
+import com.asrevo.cvhome.catalog.model.product.ReadableCartLineProduct;
 import com.asrevo.cvhome.catalog.model.product.ReadableMinimalProduct;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.Sku;
@@ -35,4 +36,12 @@ public interface ExternalProductService {
                                                                @RequestParam("skus") java.util.List<Sku> skus,
                                                                LanguageCode lang);
 
+    /**
+     * The cart-line shape: one call for a whole cart's skus, each answered with what a line renders and nothing
+     * more, from catalog's per-sku cache. Skus with no product are absent, as above.
+     */
+    @GetExchange("/cart-lines")
+    java.util.List<ReadableCartLineProduct> getCartLines(StoreMerchantId store,
+                                                         @RequestParam("skus") java.util.List<Sku> skus,
+                                                         LanguageCode lang);
 }

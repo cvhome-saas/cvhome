@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
 import com.asrevo.cvhome.testsupport.containers.PostgresTestConfiguration;
+import com.asrevo.cvhome.testsupport.sql.SqlStatements;
 
 /**
  * A full context on a Postgres container with the {@code test-stores} seed data, and <em>no</em> test JWT decoder.
@@ -19,7 +20,8 @@ import com.asrevo.cvhome.testsupport.containers.PostgresTestConfiguration;
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = {SqlStatements.INSPECTOR,
+        SqlStatements.NO_PAGING_IN_MEMORY})
 @ActiveProfiles("test-stores")
 @Import(PostgresTestConfiguration.class)
 public @interface DatabaseIntegrationTest {

@@ -21,12 +21,13 @@ public interface ManufacturerRepository extends JpaRepository<Manufacturer, Long
 
     boolean existsByStoreMerchantIdAndCode(StoreMerchantId store, String code);
 
-    @Query(value = "select distinct m from Manufacturer m left join fetch m.descriptions where m.storeMerchantId = ?1",
+    /** Paged in SQL, without a fetch join (see {@code CategoryRepository.findByStore}); descriptions follow in a batch. */
+    @Query(value = "select m from Manufacturer m where m.storeMerchantId = ?1",
             countQuery = "select count(m) from Manufacturer m where m.storeMerchantId = ?1")
     Page<Manufacturer> findByStore(StoreMerchantId store, Pageable pageable);
 
     @Query(value = """
-            select distinct m from Manufacturer m left join fetch m.descriptions d
+            select distinct m from Manufacturer m left join m.descriptions d
             where m.storeMerchantId = ?1 and lower(d.name) like lower(concat('%', ?2, '%'))""",
             countQuery = """
                     select count(distinct m) from Manufacturer m left join m.descriptions d

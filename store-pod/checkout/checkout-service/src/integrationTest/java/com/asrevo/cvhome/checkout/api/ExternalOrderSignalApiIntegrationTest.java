@@ -1,5 +1,7 @@
 package com.asrevo.cvhome.checkout.api;
 
+import java.sql.Timestamp;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,6 +78,8 @@ class ExternalOrderSignalApiIntegrationTest {
 
     private static final String IGNORED = "IGNORED";
 
+    private static final String PROCESSING = "PROCESSING";
+
     @LocalServerPort
     private int port;
 
@@ -135,6 +139,22 @@ class ExternalOrderSignalApiIntegrationTest {
         ResponseEntity<String> late = payment(STORE_A, ref, s2s, "FAILED", TX_1);
         assertThat(json(late).get(OUTCOME).asString()).isEqualTo(IGNORED);
         assertThat(json(late).get(ORDER_STATUS).asString()).isEqualTo(CONFIRMED_2);
+    }
+
+    @Test
+    void aPaymentStillProcessingKeepsTheOrderOpenAndPushesItsExpiryOut() {
+        JsonNode order = placeCardOrder();
+        String ref = order.get(ORDERREF).asString();
+        long id = order.get(ID).asLong();
+        String expiry = "select expires_at from checkout.sales_order where order_id = ?";
+        Timestamp before = jdbc.queryForObject(expiry, Timestamp.class, id);
+
+        JsonNode outcome = json(payment(STORE_A, ref, s2s, PROCESSING, "tx-4"));
+
+        assertThat(outcome.get(OUTCOME).asString()).isEqualTo(APPLIED);
+        assertThat(outcome.get(PAYMENT_STATUS).asString()).isEqualTo(PROCESSING);
+        assertThat(outcome.get(ORDER_STATUS).asString()).isNotEqualTo(CANCELLED_2);
+        assertThat(jdbc.queryForObject(expiry, Timestamp.class, id)).isAfterOrEqualTo(before);
     }
 
     @Test

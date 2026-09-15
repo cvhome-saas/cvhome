@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.checkout.services.order;
 
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
@@ -13,8 +14,12 @@ import com.asrevo.cvhome.checkout.errors.OrderLoginRequiredException;
 import com.asrevo.cvhome.checkout.errors.ProductNotPurchasableException;
 import com.asrevo.cvhome.checkout.model.order.PlaceOrderRequest;
 import com.asrevo.cvhome.checkout.model.order.ReadableOrderConfirmation;
+import com.asrevo.cvhome.checkout.services.catalog.ProductSnapshot;
+import com.asrevo.cvhome.checkout.services.catalog.ProductSnapshotService;
 import com.asrevo.cvhome.checkout.services.store.StoreSettings;
+import com.asrevo.cvhome.commons.domain.CurrencyCode;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
+import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.customer.errors.UnsupportedCountryCodeException;
 import com.asrevo.cvhome.inventory.api.errors.InventoryApiUnavailableException;
@@ -33,6 +38,8 @@ public class OrderPlacementServiceImpl implements OrderPlacementService {
 
     private final OrderPlacementTransaction placement;
 
+    private final ProductSnapshotService snapshots;
+
     private final StoreSettings storeSettings;
 
     private final OrderStepRunner steps;
@@ -47,7 +54,12 @@ public class OrderPlacementServiceImpl implements OrderPlacementService {
         if (shopper == null && storeSettings.requiresLogin(store)) {
             throw OrderLoginRequiredException.of(store.getId());
         }
-        Long orderId = placement.createOrResume(store, language, cartCode, request, shopper, redirects);
+        // Priced, and the store's currency read, between two transactions, never inside one: catalog, inventory and
+        // merchant may take seconds under load.
+        Map<Sku, ProductSnapshot> snapshot = snapshots.snapshot(store, language, placement.skus(store, cartCode));
+        CurrencyCode currency = storeSettings.currency(store);
+        Long orderId = placement.createOrResume(store, language, cartCode, request, shopper, redirects, snapshot,
+                currency);
         steps.runUntilSettled(orderId, PLACEMENT_STEPS);
         return placement.confirmation(orderId, storeSettings.locale(language));
     }

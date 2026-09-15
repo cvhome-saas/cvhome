@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.asrevo.cvhome.checkout.config.ExternalClientsTestConfiguration;
 import com.asrevo.cvhome.checkout.errors.CheckoutErrors;
@@ -36,6 +37,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Import(ExternalClientsTestConfiguration.class)
 class CartApiIntegrationTest {
 
+    private static final String DESCRIPTION_FIELD = "description";
+
+    private static final String NAME_FIELD = "name";
+
+    private static final String PRODUCT_PREFIX = "Product ";
+
     private static final String DISPLAYSUBTOTAL = "displaySubTotal";
 
     private static final String PRODUCT = "product";
@@ -55,11 +62,18 @@ class CartApiIntegrationTest {
     /** A dot was never part of a sku, so no catalog variant can carry this one. */
     private static final String MALFORMED = "SKU.DOT";
 
+    private static final String ALREADY_CONVERTED = "CHECKOUT.CART.ALREADY_CONVERTED";
+
+    private static final String ID = "id";
+
     @LocalServerPort
     private int port;
 
     @Autowired
     private TestJwtSigner signer;
+
+    @Autowired
+    private JdbcTemplate jdbc;
 
     private CheckoutApiSupport api;
 
@@ -73,13 +87,40 @@ class CartApiIntegrationTest {
     }
 
     @Test
+    void aLineTheCatalogNoLongerKnowsIsLeftOutOfTheCartAndPrunedFromIt() {
+        JsonNode created = json(api.send(HttpMethod.POST, scoped(path(V1, CART), STORE_A), null, cartBody(SKU, 1)));
+        long cartId = created.get(ID).asLong();
+        // A sku the catalog has dropped since it was added: the API refuses one now, so only a direct row makes it.
+        jdbc.update("insert into checkout.cart_line (line_id, cart_id, sku, quantity) values (?, ?, ?, 1)",
+                990_000L + cartId, cartId, ExternalClientsTestConfiguration.SKU_UNKNOWN);
+
+        JsonNode read = json(api.get(cartUrl(STORE_A, created.get(CODE).asString()), null));
+
+        assertThat(read.get(PRODUCTS)).hasSize(1);
+        assertThat(jdbc.queryForObject("select count(*) from checkout.cart_line where cart_id = ?", Integer.class,
+                cartId)).as("the read pruned the line, so placement will not refuse it").isEqualTo(1);
+    }
+
+    @Test
+    void aCartThatBecameAnOrderCannotBeChanged() {
+        String code = api.newCart(STORE_A, SKU, 1);
+        api.placed(STORE_A, code, null, "COD", "converted@example.com");
+
+        ResponseEntity<String> edit = api.send(HttpMethod.PUT, cartUrl(STORE_A, code), null, cartBody(SKU, 1));
+
+        expect(edit, HttpStatus.CONFLICT);
+        assertThat(json(edit).get(CODE).asString()).isEqualTo(ALREADY_CONVERTED);
+    }
+
+    @Test
     void aCartIsCreatedUpdatedReadAndEmptiedInTheStorefrontsShape() {
+        ExternalClientsTestConfiguration.PRICED_INSIDE_A_TRANSACTION.set(false);
         ResponseEntity<String> created = api.send(HttpMethod.POST, scoped(path(V1, CART), STORE_A), null,
                 cartBody(SKU, 2));
         expect(created, HttpStatus.CREATED);
         JsonNode cart = json(created);
         String code = cart.get(CODE).asString();
-        assertThat(cart.get("id").asLong()).isPositive();
+        assertThat(cart.get(ID).asLong()).isPositive();
         assertThat(cart.get(QUANTITY).asInt()).isEqualTo(2);
         assertThat(cart.get("subtotal").asDouble()).isEqualTo(20.0);
         assertThat(cart.get(DISPLAYSUBTOTAL).asString()).isEqualTo(LIT_20_00);
@@ -87,7 +128,7 @@ class CartApiIntegrationTest {
         assertThat(cart.get("totals")).hasSize(2);
         JsonNode line = cart.get(PRODUCTS).get(0);
         assertThat(line.get(SKU_2).asString()).isEqualTo(SKU);
-        assertThat(line.get("description").get("name").asString()).isEqualTo(String.format("Product %s", SKU));
+        assertThat(line.get(DESCRIPTION_FIELD).get(NAME_FIELD).asString()).isEqualTo(String.format("%s%s", PRODUCT_PREFIX, SKU));
         assertThat(line.get("finalPrice").asString()).isEqualTo("$10.00");
         assertThat(line.get(DISPLAYSUBTOTAL).asString()).isEqualTo(LIT_20_00);
         assertThat(line.get("image").get("imageUrl").asString()).contains(SKU);
@@ -96,6 +137,12 @@ class CartApiIntegrationTest {
         JsonNode updated = json(api.send(HttpMethod.PUT, cartUrl(STORE_A, code), null, cartBody(SKU_B, 1)));
         assertThat(updated.get(PRODUCTS)).hasSize(2);
         assertThat(updated.get(QUANTITY).asInt()).isEqualTo(3);
+        int catalogReadsAfterAdds = ExternalClientsTestConfiguration.CART_LINE_READS.get();
+        JsonNode reread = json(api.get(cartUrl(STORE_A, code), null));
+        assertThat(reread.get(PRODUCTS)).hasSize(2);
+        assertThat(reread.get(PRODUCTS).get(0).get(DESCRIPTION_FIELD).get(NAME_FIELD).asString()).startsWith(PRODUCT_PREFIX);
+        assertThat(ExternalClientsTestConfiguration.CART_LINE_READS.get())
+                .as("two lines remembered from their adds: a read asks the catalogue nothing").isEqualTo(catalogReadsAfterAdds);
 
         JsonNode set = json(api.send(HttpMethod.PUT, cartUrl(STORE_A, code), null, cartBody(SKU, 5)));
         assertThat(set.get(QUANTITY).asInt()).isEqualTo(6);
@@ -109,9 +156,15 @@ class CartApiIntegrationTest {
         expect(removedWithBody, HttpStatus.OK);
         assertThat(json(removedWithBody).get(PRODUCTS)).isEmpty();
 
+        int catalogReadsBefore = ExternalClientsTestConfiguration.CART_LINE_READS.get();
         JsonNode read = json(api.get(cartUrl(STORE_A, code), null));
         assertThat(read.get(CODE).asString()).isEqualTo(code);
         assertThat(read.get(QUANTITY).asInt()).isZero();
+        assertThat(ExternalClientsTestConfiguration.CART_LINE_READS.get())
+                .as("a cart read prices its lines from what they remember; the catalogue is not asked")
+                .isEqualTo(catalogReadsBefore);
+        assertThat(ExternalClientsTestConfiguration.PRICED_INSIDE_A_TRANSACTION.get())
+                .as("catalog, inventory or merchant was called while a database transaction was open").isFalse();
     }
 
     @Test

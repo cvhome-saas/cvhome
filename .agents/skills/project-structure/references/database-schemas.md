@@ -47,7 +47,8 @@ spring:
       schema: ${spring.application.name}  # default search path
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
+    open-in-view: false
 ```
 
 Then per service:
@@ -68,19 +69,25 @@ spring:
 `tenancy-service` puts its DDL at the Spring Boot default location (`classpath:schema.sql`), so it needs
 no `schema-locations` entry at all.
 
-> `ddl-auto: update` **and** a hand-written `schema.sql` both run. The SQL file is the source of truth
-> (everything is `CREATE TABLE IF NOT EXISTS`); Hibernate's `update` is a safety net that adds columns for
-> JPA entities. Don't rely on it — add new tables and columns to `schema.sql`.
+> The hand-written `schema.sql` runs first and is the source of truth (everything is `CREATE TABLE IF NOT
+> EXISTS`); Hibernate then only **validates** the entities against it (`ddl-auto: validate`) and refuses to start on a
+> mismatch. It used to be `update`, which quietly built what the DDL did not say — a second copy of every unique
+> constraint whose entity names none. Add new tables, columns and indexes to `schema.sql`.
+>
+> `open-in-view` is off: a request's connection goes back when its transaction commits, so map entities to DTOs
+> inside the `@Transactional` method. A lazy association touched afterwards throws `LazyInitializationException`,
+> and the integration tests are where that shows up.
 
 ### Where the DDL lives
 
 | Service | DDL file | Data seed |
 |---|---|---|
 | `tenancy-service` | `src/main/resources/schema.sql` | — |
-| `payment-service` | `src/main/resources/init-sql/schema.sql` | `init-sql/data-common.sql`, `init-sql/data-test-stores.sql`, `init-sql/stores/` |
+| `payment-service` | `src/main/resources/init-sql/schema.sql` | `init-sql/data-common.sql`, `init-sql/data-sequences.sql`, `init-sql/stores/` |
 
 Pod services follow the `init-sql/` convention: `schema.sql` + `data-common.sql` (reference data loaded always)
-+ `data-test-stores.sql` (seeded demo stores, tied to the `test-stores` profile — see `configuration.md`).
++ `stores/<storeId>/*.sql` (seeded demo stores, tied to the `test-stores` profile — see `configuration.md`)
++ `data-sequences.sql` last, which sets every id sequence above its table's highest seeded id.
 
 ### Schemas actually created
 
@@ -96,8 +103,8 @@ context:
 That mirrors the module split (`tenancy-commons`, `tenancy-events`, `pod-external-api`) — the code
 boundaries are reflected in the database.
 
-**`payment-service`** uses a single `payment` schema: `payment_configuration`, `transaction`, `sm_sequencer`,
-plus the outbox tables.
+**`payment-service`** uses a single `payment` schema: `payment_configuration`, `transaction`, plus the outbox
+tables.
 
 ## Conventions visible in the DDL
 
@@ -105,8 +112,10 @@ plus the outbox tables.
   `StoreMerchantId` / `ManagerOrgId` (`api-conventions.md`). Pod-side ids are `varchar(50)`
   (`store_merchant_id`) — the same store id, in a wider column.
 - **`version int`** on tenancy tables — optimistic locking via Spring Data JDBC.
-- **`sm_sequencer`** in pod schemas is the Shopizer-inherited `@TableGenerator` sequence table
-  (`SEQ_NAME`/`SEQ_COUNT`), used by JPA entities like `Transaction` instead of a Postgres sequence.
+- **Ids come from one Postgres sequence per table** (`<table>_seq`, `increment by 50`, read fifty at a time by
+  `@SequenceGenerator` with Hibernate's pooled-lo optimizer). `init-sql/data-sequences.sql` runs last and sets each
+  sequence above its table's highest id, so seeds with explicit ids never collide with generated ones. The
+  Shopizer `sm_sequencer` table is gone: it needed a second pooled connection per block.
 - **Enums are `varchar` with a `CHECK` constraint**, not Postgres enum types:
   ```sql
   status varchar(255) check (status in ('PENDING','PROCESSING','PAID','FAILED','EXPIRED',

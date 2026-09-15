@@ -21,13 +21,16 @@ public class RestClientBuilder {
 
     private final ServiceDomainProperties serviceDomainProperties;
 
+    private final S2sRequestFactories requestFactories;
+
     public RestClientBuilder(Environment environment, RestClient.Builder defaultMicroServiceBuilder,
                              RestClient.Builder defaultRestClientBuilder,
-                             ServiceDomainProperties serviceDomainProperties) {
+                             ServiceDomainProperties serviceDomainProperties, S2sRequestFactories requestFactories) {
         this.environment = environment;
         this.defaultMicroServiceBuilder = defaultMicroServiceBuilder;
         this.defaultRestClientBuilder = defaultRestClientBuilder;
         this.serviceDomainProperties = serviceDomainProperties;
+        this.requestFactories = requestFactories;
     }
 
     /**
@@ -36,7 +39,7 @@ public class RestClientBuilder {
      */
     public <T> T buildClient(String serviceName, Class<T> tClass, RemoteErrorCatalog errors) {
         String url = new ServiceUrlBuilder(serviceDomainProperties, environment).getServiceUrl(serviceName);
-        return build(defaultMicroServiceBuilder, url, tClass, errors);
+        return build(timed(defaultMicroServiceBuilder, serviceName), url, tClass, errors);
     }
 
     /**
@@ -45,7 +48,12 @@ public class RestClientBuilder {
      */
     public <T> T buildClient(Pod pod, String serviceName, Class<T> tClass, RemoteErrorCatalog errors) {
         String url = new ServiceUrlBuilder(serviceDomainProperties, environment).getServiceUrl(pod, serviceName);
-        return build(defaultRestClientBuilder, url, tClass, errors);
+        return build(timed(defaultRestClientBuilder, serviceName), url, tClass, errors);
+    }
+
+    /** A copy of the shared builder with the called service's timeouts; the shared one is never mutated. */
+    private RestClient.Builder timed(RestClient.Builder builder, String serviceName) {
+        return builder.clone().requestFactory(requestFactories.forService(serviceName));
     }
 
 }

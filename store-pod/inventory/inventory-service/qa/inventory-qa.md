@@ -9,7 +9,7 @@ paid for. It owns no product copy — that is
   reserve / commit / release / expire cycle
 - **Runs on** — `lcl start -d --stack <name>`; read the live port from `lcl urls`. Address it through the
   gateway, never `:8126`
-- **Cases** — 20 (11 verified, 3 unit only, 6 not verified)
+- **Cases** — 23 (12 verified, 5 unit only, 6 not verified)
 - **Also see** — catalog (SEC-01…05 sweep both services), checkout (the caller of every reservation),
   [billing](../../../../store-core/billing/billing-service/qa/billing-qa.md) (inventory has **no** write gate —
   see 99)
@@ -69,7 +69,7 @@ docker exec cvhome-postgres-1 psql -U postgres -d cvhome -c \
             p.product_price_special_st_date, p.product_price_special_end_date, p.default_price
        from inventory.product_price p join inventory.product_availability a using (product_avail_id);"
 ... "select ref, status, expire_at from inventory.product_reservation order by id desc limit 10;"
-... "select * from inventory.sm_sequencer;"
+... "select sequencename, last_value from pg_sequences where schemaname = 'inventory';"
 ```
 
 Logs: `.lcl/<stack>/logs/inventory.log`.
@@ -150,10 +150,10 @@ tables are gone.
 
 - **Steps** — on a database that still has `catalog.product_availability` / `product_price` /
   `product_reservation*` rows (a pre-split dump, or the simulation the PR ran), start inventory; read the log
-  and `inventory.sm_sequencer`.
+  and `pg_sequences` for the `inventory` schema.
 - **Expect** — every availability row copied **with `sku` backfilled** from `catalog.product` (the column was
   NULL pre-split and it is now the reservation key); every price row copied with `store_merchant_id` from its
-  availability; reservations and lines copied; every sequencer **≥ the max copied id**; log line
+  availability; reservations and lines copied; every sequence **above the max copied id**; log line
   `Catalog-to-inventory data migration completed; all availability rows carry a sku`. A second start changes
   nothing. Any row left with a NULL sku logs an **ERROR** naming the count — that is a finding.
 
@@ -258,8 +258,8 @@ rather than split in half. Inventory's own gate cases are **INV-04** (cross-tena
 
 ### ARC-02 — The inventory schema holds no price descriptions · [verified]
 
-- **Expect** — `\dt inventory.*`: sequencer, product_availability, product_price, product_reservation,
-  product_reservation_line. Seeds create no description rows; the migration copies none.
+- **Expect** — `\dt inventory.*`: product_availability, product_price, product_reservation,
+  product_reservation_line, and `\ds inventory.*` one sequence per table. Seeds create no description rows; the migration copies none.
 
 > ARC-01, ARC-03 and ARC-04 are catalog's, in catalog-qa.md.
 
@@ -288,6 +288,25 @@ combination. The model itself is
   `sku` is `NOT NULL`, and `uk_prd_avail_store_sku (store_merchant_id, sku)` exists.
 - **Result** — confirmed. `checkout.order_product_option` exists; `order_product_attribute` and
   `shopping_cart_attr_item` are gone.
+
+---
+
+## LOAD — The 2026-09-14 load-test fixes
+
+Findings 5 and 6 of *Where cvhome Breaks* (orchestrator `.agents/plans/load-bottlenecks.md`).
+
+### LOAD-01 — A bulk upsert reads its skus in one statement · high · [unit only]
+
+- **Result** — `InventoryServiceIntegrationTest`: 20 skus, 1 select (was 21 statements).
+
+### LOAD-02 — A sku's row is read without an in-memory limit · medium · [unit only]
+
+- **Result** — `InventoryApiIntegrationTest` passes under the test suite's paging guard.
+
+### LOAD-03 — Prices are found by their availability row through an index · high · [verified]
+
+- **Result** — `product_price (product_avail_id)` plans an index scan on a throwaway Postgres 15 loaded with
+  `schema.sql` and 20k prices (it was 94 % full scans on the load stack).
 
 ---
 

@@ -6,13 +6,12 @@
 
 create schema if not exists content;
 
-create table if not exists content.sm_sequencer
-(
-    seq_name  varchar(255) not null primary key,
-    seq_count bigint
-);
-
+-- One sequence per table, fifty ids a fetch (SchemaConstant.ID_ALLOCATION_SIZE, pooled-lo). The Shopizer sm_sequencer
+-- table it replaces needed a second pooled connection and a row lock for every block: with three connections and three
+-- concurrent inserts, checkout deadlocked its own pool (the 2026-09-14 load test).
+drop table if exists content.sm_sequencer;
 create sequence if not exists content.content_seq increment by 50;
+create sequence if not exists content.content_description_seq increment by 50;
 
 -- ---------------------------------------------------------------------------------------------------------------
 -- content (legacy, extended)
@@ -31,6 +30,9 @@ create table if not exists content.content
     constraint content_store_code_unique unique (store_merchant_id, code)
 );
 create index if not exists content_code_idx on content.content (code);
+-- ddl-auto: update also built the entity's CODE_IDX, the same index under a second name. This file owns the schema now
+-- (ddl-auto: validate), so the copy goes from databases that already have it.
+drop index if exists content.code_idx;
 
 -- BOX held the store "snippets" (meta-title, header-message, agreement, LANDING_PAGE) — a workflow-less parallel
 -- to the components that say the same things better. Each moved to its successor: site SEO to site_settings, the

@@ -18,8 +18,10 @@ import com.asrevo.cvhome.catalog.entity.Product;
 import com.asrevo.cvhome.catalog.entity.ProductDescription;
 import com.asrevo.cvhome.catalog.entity.ProductImage;
 import com.asrevo.cvhome.catalog.entity.ProductType;
+import com.asrevo.cvhome.catalog.entity.ProductVariant;
 import com.asrevo.cvhome.catalog.model.product.PersistableProductDefinition;
 import com.asrevo.cvhome.catalog.model.product.ProductSpecification;
+import com.asrevo.cvhome.catalog.model.product.ReadableCartLineProduct;
 import com.asrevo.cvhome.catalog.model.product.ReadableMinimalProduct;
 import com.asrevo.cvhome.catalog.model.product.ReadableProduct;
 import com.asrevo.cvhome.catalog.model.product.ReadableProductDefinition;
@@ -34,6 +36,7 @@ import com.asrevo.cvhome.store.model.references.WeightUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -74,6 +77,8 @@ class ProductMapperTest {
 
     private static final String IMAGE_FILE = "shoe.jpg";
 
+    private static final String SLUG = "running-shoe";
+
     @Mock
     private ExternalMerchantStoreService merchantStoreService;
 
@@ -92,7 +97,7 @@ class ProductMapperTest {
         description.setLanguageCode(language);
         description.setName(name);
         description.setTitle(title);
-        description.setSeUrl("running-shoe");
+        description.setSeUrl(SLUG);
         description.setMetaKeywords("k");
         description.setMetaDescription("m");
         description.setHighlight("h");
@@ -198,6 +203,29 @@ class ProductMapperTest {
             assertThat(specification.getHeight()).isEqualTo(BigDecimal.ONE);
             assertThat(specification.getDimensionUnitOfMeasure().name()).isEqualTo("cm");
             assertThat(specification.getWeightUnitOfMeasure().name()).isEqualTo("kg");
+        }
+
+        @Test
+        void theCartLineShapeCarriesOnlyWhatALineRenders() {
+            Product product = product();
+            ProductImage image = new ProductImage(product, 5L, CDN, null, 1, false);
+            product.getImages().add(image);
+            ProductVariant variant = new ProductVariant(product, SKU);
+
+            ReadableCartLineProduct line = mapper.toCartLine(product, variant, EN);
+
+            assertThat(line.getProductId()).isEqualTo(7L);
+            assertThat(line.getSku()).isEqualTo(SKU);
+            assertThat(line.getName()).isEqualTo(NAME);
+            assertThat(line.getFriendlyUrl()).isEqualTo(SLUG);
+            assertThat(line.getImageUrl()).isEqualTo(CDN);
+            assertThat(line.getVariant()).as("a default variant has no labels").isNull();
+            // no merchant-store lookup, no units: nothing a line does not render
+            verifyNoInteractions(merchantStoreService);
+
+            ReadableCartLineProduct french = mapper.toCartLine(product, variant, FR);
+            assertThat(french.getName()).as("one of the product's own languages stands in for one it lacks").isNotBlank();
+            assertThat(mapper.toCartLine(new Product(), variant, EN).getImageUrl()).isNull();
         }
 
         @Test

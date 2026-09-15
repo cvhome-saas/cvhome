@@ -5,13 +5,17 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import com.asrevo.cvhome.catalog.model.product.ProductDescription;
+import com.asrevo.cvhome.catalog.model.product.ReadableCartLineProduct;
 import com.asrevo.cvhome.catalog.model.product.ReadableImage;
 import com.asrevo.cvhome.catalog.model.product.ReadableMinimalProduct;
 import com.asrevo.cvhome.catalog.model.product.ReadableVariantOptionValue;
@@ -68,11 +72,22 @@ public class ExternalClientsTestConfiguration {
 
     public static final String GATEWAY_REF = "tx-";
 
+    /**
+     * Set when catalog, inventory or merchant is called while the calling thread holds a database transaction: the
+     * shape the 2026-09-14 spike collapsed on, three connections held while catalog took seconds. A test resets it and
+     * asserts it stayed false.
+     */
+    public static final AtomicBoolean PRICED_INSIDE_A_TRANSACTION = new AtomicBoolean();
+
+    /** How many times checkout asked the catalogue for cart lines: a read must not, once the line remembers. */
+    public static final AtomicInteger CART_LINE_READS = new AtomicInteger();
+
     @Bean
     @Primary
     ExternalMerchantStoreService stubExternalMerchantStoreService() {
         ExternalMerchantStoreService service = Mockito.mock(ExternalMerchantStoreService.class);
         Mockito.when(service.getStore(any())).thenAnswer(invocation -> {
+            recordTransaction();
             StoreMerchantId store = invocation.getArgument(0, StoreMerchantId.class);
             ReadableMerchantStore merchantStore = new ReadableMerchantStore();
             merchantStore.setId(store.getId());
@@ -89,9 +104,18 @@ public class ExternalClientsTestConfiguration {
     ExternalProductService stubExternalProductService() {
         ExternalProductService service = Mockito.mock(ExternalProductService.class);
         Mockito.when(service.getDetailedProducts(any(), any(), any())).thenAnswer(invocation -> {
+            recordTransaction();
             List<Sku> skus = invocation.getArgument(1);
             return skus.stream().filter(sku -> !SKU_UNKNOWN.equals(sku.value()))
                     .map(ExternalClientsTestConfiguration::product)
+                    .toList();
+        });
+        Mockito.when(service.getCartLines(any(), any(), any())).thenAnswer(invocation -> {
+            recordTransaction();
+            CART_LINE_READS.incrementAndGet();
+            List<Sku> skus = invocation.getArgument(1);
+            return skus.stream().filter(sku -> !SKU_UNKNOWN.equals(sku.value()))
+                    .map(ExternalClientsTestConfiguration::cartLine)
                     .toList();
         });
         return service;
@@ -102,6 +126,7 @@ public class ExternalClientsTestConfiguration {
     ExternalInventoryService stubExternalInventoryService() {
         ExternalInventoryService service = Mockito.mock(ExternalInventoryService.class);
         Mockito.when(service.queryBySkus(any(), any())).thenAnswer(invocation -> {
+            recordTransaction();
             AvailabilityQuery query = invocation.getArgument(1);
             return query.skus().stream().filter(sku -> !SKU_UNKNOWN.equals(sku.value()))
                     .map(ExternalClientsTestConfiguration::stock).toList();
@@ -123,6 +148,12 @@ public class ExternalClientsTestConfiguration {
         ExternalPaymentGatewayService service = Mockito.mock(ExternalPaymentGatewayService.class);
         stubPaymentDefaults(service);
         return service;
+    }
+
+    private static void recordTransaction() {
+        if (TransactionSynchronizationManager.isActualTransactionActive()) {
+            PRICED_INSIDE_A_TRANSACTION.set(true);
+        }
     }
 
     public static void stubReservationDefaults(ExternalProductReservationService service) throws Exception {
@@ -151,6 +182,20 @@ public class ExternalClientsTestConfiguration {
         Mockito.reset(reservations, payments);
         stubReservationDefaults(reservations);
         stubPaymentDefaults(payments);
+    }
+
+    /** The cart-line shape of {@link #product}: the same product, as a line renders it. */
+    private static ReadableCartLineProduct cartLine(Sku sku) {
+        ReadableMinimalProduct product = product(sku);
+        ReadableCartLineProduct line = new ReadableCartLineProduct();
+        line.setSku(sku);
+        line.setProductId(product.getId());
+        line.setName(product.getDescription().getName());
+        line.setFriendlyUrl(product.getDescription().getFriendlyUrl());
+        line.setImageUrl(product.getImage().getImageUrl());
+        line.setAvailable(product.isAvailable());
+        line.setVariant(product.getVariant());
+        return line;
     }
 
     private static ReadableMinimalProduct product(Sku sku) {

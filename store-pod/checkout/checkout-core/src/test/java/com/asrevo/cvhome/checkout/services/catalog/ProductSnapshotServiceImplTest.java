@@ -1,6 +1,10 @@
 package com.asrevo.cvhome.checkout.services.catalog;
 
 import java.math.BigDecimal;
+import java.time.Clock;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
 
@@ -8,14 +12,16 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.asrevo.cvhome.catalog.model.product.ProductDescription;
-import com.asrevo.cvhome.catalog.model.product.ReadableImage;
-import com.asrevo.cvhome.catalog.model.product.ReadableMinimalProduct;
+import com.asrevo.cvhome.catalog.model.product.ReadableCartLineProduct;
 import com.asrevo.cvhome.catalog.model.product.ReadableVariantOptionValue;
 import com.asrevo.cvhome.catalog.model.product.ReadableVariantSelection;
 import com.asrevo.cvhome.catalog.services.product.ExternalProductService;
+import com.asrevo.cvhome.checkout.entity.Cart;
+import com.asrevo.cvhome.checkout.entity.CartLine;
+import com.asrevo.cvhome.checkout.entity.OptionLabel;
 import com.asrevo.cvhome.checkout.entity.Orders;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.Sku;
@@ -26,13 +32,13 @@ import com.asrevo.cvhome.inventory.services.ExternalInventoryService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
- * Catalog and inventory merged by sku; a sku either source does not know is simply absent.
+ * Catalog and inventory merged by sku; a sku either source does not know is simply absent. A cart's lines are priced
+ * from what they remember of the catalogue, and only a line that remembers nothing, or too long ago, asks it again.
  */
 @ExtendWith(MockitoExtension.class)
 class ProductSnapshotServiceImplTest {
@@ -61,13 +67,21 @@ class ProductSnapshotServiceImplTest {
 
     private static final Sku B_2 = Sku.of("B");
 
-    private static final String LIT_0 = "0";
+    private static final String V = "V";
 
-    private static final Sku V_2 = Sku.of("V");
+    private static final Sku V_2 = Sku.of(V);
 
     private static final String L = "l";
 
     private static final LanguageCode EN = LanguageCode.defaultLanguage();
+
+    private static final com.asrevo.cvhome.checkout.domain.CartCode CART = com.asrevo.cvhome.checkout.domain.CartCode.of("c");
+
+    private static final String ALPHA_SLUG = "alpha";
+
+    private static final String BETA_AGAIN = "Beta again";
+
+    private static final Instant NOW = Instant.parse("2026-09-15T00:00:00Z");
 
     @Mock
     private ExternalProductService products;
@@ -75,20 +89,20 @@ class ProductSnapshotServiceImplTest {
     @Mock
     private ExternalInventoryService inventory;
 
+    @Spy
+    private Clock clock = Clock.fixed(NOW, ZoneOffset.UTC);
+
     @InjectMocks
     private ProductSnapshotServiceImpl service;
 
-    static ReadableMinimalProduct product(Sku sku, String name) {
-        ReadableMinimalProduct product = new ReadableMinimalProduct();
-        product.setId(1L);
+    static ReadableCartLineProduct product(Sku sku, String name) {
+        ReadableCartLineProduct product = new ReadableCartLineProduct();
+        product.setProductId(1L);
         product.setSku(sku);
         product.setAvailable(true);
-        ProductDescription description = new ProductDescription();
-        description.setName(name);
-        product.setDescription(description);
-        ReadableImage image = new ReadableImage();
-        image.setImageUrl(HTTP_IMG_1_PNG);
-        product.setImage(image);
+        product.setName(name);
+        product.setFriendlyUrl(name == null ? null : name.toLowerCase());
+        product.setImageUrl(HTTP_IMG_1_PNG);
         return product;
     }
 
@@ -99,7 +113,7 @@ class ProductSnapshotServiceImplTest {
 
     @Test
     void mergesBothSourcesAndDropsWhatEitherLacks() {
-        when(products.getDetailedProducts(Orders.STORE, List.of(A_2, B_2, C_2), EN))
+        when(products.getCartLines(Orders.STORE, List.of(A_2, B_2, C_2), EN))
                 .thenReturn(List.of(product(A_2, ALPHA), product(B_2, BETA)));
         when(inventory.queryBySkus(Orders.STORE, new AvailabilityQuery(List.of(A_2, B_2, C_2))))
                 .thenReturn(List.of(stock(A_2, LIT_9_99, true), stock(C_2, LIT_1_00, true)));
@@ -123,9 +137,9 @@ class ProductSnapshotServiceImplTest {
 
     @Test
     void purchasabilityNeedsCatalogAndInventoryToAgree() {
-        ReadableMinimalProduct unavailable = product(A_2, ALPHA);
+        ReadableCartLineProduct unavailable = product(A_2, ALPHA);
         unavailable.setAvailable(false);
-        when(products.getDetailedProducts(any(), any(), any())).thenReturn(List.of(unavailable, product(B_2, BETA)));
+        when(products.getCartLines(any(), any(), any())).thenReturn(List.of(unavailable, product(B_2, BETA)));
         when(inventory.queryBySkus(any(), any())).thenReturn(List.of(stock(A_2, LIT_1_00, true), stock(B_2, LIT_1_00, false)));
 
         Map<Sku, ProductSnapshot> snapshot = service.snapshot(Orders.STORE, EN, List.of(A_2, B_2));
@@ -136,8 +150,7 @@ class ProductSnapshotServiceImplTest {
 
     @Test
     void variantLabelsFallBackToCodesAndMissingPricesToZero() {
-        ReadableMinimalProduct variant = product(V_2, null);
-        variant.setDescription(null);
+        ReadableCartLineProduct variant = product(V_2, null);
         ReadableVariantSelection selection = new ReadableVariantSelection();
         ReadableVariantOptionValue named = new ReadableVariantOptionValue();
         named.setOptionName(COLOR);
@@ -147,45 +160,85 @@ class ProductSnapshotServiceImplTest {
         coded.setValueCode(L);
         selection.setOptionValues(List.of(named, coded));
         variant.setVariant(selection);
-        variant.setImage(null);
-        when(products.getDetailedProducts(any(), any(), any())).thenReturn(List.of(variant));
-        when(inventory.queryBySkus(any(), any())).thenReturn(List.of(new SkuInventory(V_2, 1L, true, true, 5, 0, 0,
+        when(products.getCartLines(any(), any(), any())).thenReturn(List.of(variant));
+        when(inventory.queryBySkus(any(), any())).thenReturn(List.of(new SkuInventory(V_2, 1L, true, true, 5, 1, 0,
                 new SkuPrice(null, null, false, 0, null, null, null))));
 
-        ProductSnapshot snapshot = service.snapshot(Orders.STORE, EN, List.of(V_2)).get(V_2);
+        ProductSnapshot v = service.snapshot(Orders.STORE, EN, List.of(V_2)).get(V_2);
 
-        assertThat(snapshot.name()).as("no description → the sku").isEqualTo(V_2.value());
-        assertThat(snapshot.imageUrl()).isNull();
-        assertThat(snapshot.finalPrice()).isEqualByComparingTo(LIT_0);
-        assertThat(snapshot.originalPrice()).isEqualByComparingTo(LIT_0);
-        assertThat(snapshot.optionLabels()).extracting(ProductSnapshot.OptionLabel::option, ProductSnapshot.OptionLabel::value)
-                .containsExactly(org.assertj.core.groups.Tuple.tuple(COLOR, RED),
-                        org.assertj.core.groups.Tuple.tuple(SIZE, L));
-        assertThat(snapshot.allowsQuantity(1)).as("min 0 means at least one").isTrue();
-        assertThat(snapshot.allowsQuantity(999)).as("max 0 means unbounded").isTrue();
+        assertThat(v.name()).as("no name: the sku stands in").isEqualTo(V);
+        assertThat(v.finalPrice()).isEqualByComparingTo(BigDecimal.ZERO);
+        assertThat(v.originalPrice()).isEqualByComparingTo(BigDecimal.ZERO);
+        assertThat(v.optionLabels()).containsExactly(new OptionLabel(COLOR, RED), new OptionLabel(SIZE, L));
+        assertThat(v.allowsQuantity(99)).as("no maximum").isTrue();
     }
 
     @Test
-    void aSkuWithoutAPriceRowIsNotPurchasable() {
-        when(products.getDetailedProducts(any(), any(), any())).thenReturn(List.of(product(A_2, ALPHA)));
-        when(inventory.queryBySkus(any(), any())).thenReturn(List.of(new SkuInventory(A_2, 1L, true, true, 5, 1, 0, null)));
+    void aLineThatRemembersTheCatalogueIsPricedByInventoryAlone() {
+        Cart cart = new Cart(Orders.STORE, CART, EN);
+        cart.put(A_2, 1);
+        CartLine line = cart.line(A_2).orElseThrow();
+        line.remember(7L, ALPHA, ALPHA_SLUG, HTTP_IMG_1_PNG, true, List.of(new OptionLabel(COLOR, RED)), NOW);
+        when(inventory.queryBySkus(Orders.STORE, new AvailabilityQuery(List.of(A_2))))
+                .thenReturn(List.of(stock(A_2, LIT_9_99, true)));
 
-        assertThat(service.snapshot(Orders.STORE, EN, List.of(A_2))).isEmpty();
+        Map<Sku, ProductSnapshot> priced = service.priced(Orders.STORE, EN, cart.getLines());
+
+        verify(products, never()).getCartLines(any(), any(), any());
+        ProductSnapshot a = priced.get(A_2);
+        assertThat(a.productId()).isEqualTo(7L);
+        assertThat(a.name()).isEqualTo(ALPHA);
+        assertThat(a.product().getFriendlyUrl()).isEqualTo(ALPHA_SLUG);
+        assertThat(a.imageUrl()).isEqualTo(HTTP_IMG_1_PNG);
+        assertThat(a.optionLabels()).containsExactly(new OptionLabel(COLOR, RED));
+        assertThat(a.canBePurchased()).isTrue();
     }
 
     @Test
-    void noSkusMeansNoCalls() {
+    void aLineThatRemembersNothingOrTooLongAgoAsksTheCatalogueAndRemembersTheAnswer() {
+        Cart cart = new Cart(Orders.STORE, CART, EN);
+        cart.put(A_2, 1);
+        cart.put(B_2, 1);
+        cart.put(C_2, 1);
+        cart.line(A_2).orElseThrow().remember(7L, ALPHA, null, null, true, List.of(), NOW);
+        cart.line(B_2).orElseThrow().remember(8L, BETA, null, null, true, List.of(),
+                NOW.minus(CartLine.SNAPSHOT_FOR).minus(Duration.ofMinutes(1)));
+        when(products.getCartLines(Orders.STORE, List.of(B_2, C_2), EN))
+                .thenReturn(List.of(product(B_2, BETA_AGAIN), product(C_2, "Gamma")));
+        when(inventory.queryBySkus(Orders.STORE, new AvailabilityQuery(List.of(A_2, B_2, C_2))))
+                .thenReturn(List.of(stock(A_2, LIT_1_00, true), stock(B_2, LIT_1_00, true), stock(C_2, LIT_1_00, true)));
+
+        Map<Sku, ProductSnapshot> priced = service.priced(Orders.STORE, EN, cart.getLines());
+
+        assertThat(priced).containsOnlyKeys(A_2, B_2, C_2);
+        assertThat(priced.get(B_2).name()).isEqualTo(BETA_AGAIN);
+        assertThat(cart.line(B_2).orElseThrow().getProductName()).isEqualTo(BETA_AGAIN);
+        assertThat(cart.line(B_2).orElseThrow().getSnapshotAt()).isEqualTo(NOW);
+        assertThat(cart.line(C_2).orElseThrow().remembers(NOW)).isTrue();
+        assertThat(cart.line(C_2).orElseThrow().getFriendlyUrl()).isEqualTo("gamma");
+    }
+
+    @Test
+    void nothingIsAskedForNoSkusAndALineRefreshedFromACombinationSkuRemembersItsLabels() {
         assertThat(service.snapshot(Orders.STORE, EN, List.of())).isEmpty();
-        verifyNoInteractions(products, inventory);
-    }
+        assertThat(service.priced(Orders.STORE, EN, List.of())).isEmpty();
+        verify(products, never()).getCartLines(any(), any(), any());
+        verify(inventory, never()).queryBySkus(any(), any());
 
-    @Test
-    void duplicateSkusAreAskedOnce() {
-        when(products.getDetailedProducts(any(), eq(List.of(A_2)), any())).thenReturn(List.of());
-        when(inventory.queryBySkus(any(), any())).thenReturn(List.of());
+        Cart cart = new Cart(Orders.STORE, CART, EN);
+        cart.put(V_2, 1);
+        ReadableCartLineProduct variant = product(V_2, null);
+        ReadableVariantSelection selection = new ReadableVariantSelection();
+        ReadableVariantOptionValue coded = new ReadableVariantOptionValue();
+        coded.setOptionCode(SIZE);
+        coded.setValueCode(L);
+        selection.setOptionValues(List.of(coded));
+        variant.setVariant(selection);
+        when(products.getCartLines(Orders.STORE, List.of(V_2), EN)).thenReturn(List.of(variant));
+        when(inventory.queryBySkus(any(), any())).thenReturn(List.of(stock(V_2, LIT_1_00, true)));
 
-        service.snapshot(Orders.STORE, EN, List.of(A_2, A_2));
+        service.priced(Orders.STORE, EN, cart.getLines());
 
-        verify(products).getDetailedProducts(Orders.STORE, List.of(A_2), EN);
+        assertThat(cart.line(V_2).orElseThrow().getOptionLabels()).containsExactly(new OptionLabel(SIZE, L));
     }
 }

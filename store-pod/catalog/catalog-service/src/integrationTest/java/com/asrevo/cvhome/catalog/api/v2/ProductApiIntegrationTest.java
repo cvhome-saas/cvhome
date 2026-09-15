@@ -81,6 +81,18 @@ class ProductApiIntegrationTest {
 
     private static final String DETAILED_BULK = path(V1, "detailed-products");
 
+    private static final String CART_LINES = path(V1, "cart-lines");
+
+    /** A combination sku of the seed: its line carries the selection labels. */
+    private static final String COMBINATION_SKU = "SKU-ZR-CL-DRS02-BL-M";
+
+    /** A product with no options at all (SEEDED_SKU is not one: the seed promotes it to its size-M combination). */
+    private static final String SIMPLE_SKU = "SKU-HM-CL-SWT04";
+
+    private static final String THREE_SKUS = "skus=%s,%s,%s";
+
+    private static final String NO_SUCH_SKU = "no-such-sku";
+
     private static final String VARIANT_BLOCK = "variant";
 
     private static final String OPTION_VALUES_FIELD = "optionValues";
@@ -136,6 +148,7 @@ class ProductApiIntegrationTest {
 
     @Autowired
     private TestJwtSigner signer;
+
 
     private CatalogApiSupport api;
 
@@ -373,6 +386,31 @@ class ProductApiIntegrationTest {
     // ----------------------------------------------------------------------------------------- category membership
 
     @Test
+    void checkoutReadsCartLinesInTheirOwnShape() throws Exception {
+        /*
+         * The cart-line shape: what a line renders and nothing more. A whole cart's skus are one call.
+         */
+        String combination = COMBINATION_SKU;
+        String simple = SIMPLE_SKU;
+        String skus = String.format(THREE_SKUS, simple, combination, slug(NO_SUCH_SKU));
+
+        var response = api.get(scoped(query(CART_LINES, skus), STORE_A), api.token(ADMIN, STORE_A));
+        expect(response, HttpStatus.OK);
+        JsonNode lines = json(response);
+        assertThat(lines).hasSize(2);
+        JsonNode simpleLine = lines.valueStream().filter(line -> simple.equals(line.get(SKU).asString())).findFirst()
+                .orElseThrow();
+        assertThat(simpleLine.get("productId").asLong()).isPositive();
+        assertThat(simpleLine.get(NAME).asString()).isNotBlank();
+        assertThat(simpleLine.get("friendlyUrl").asString()).isNotBlank();
+        assertThat(simpleLine.get(AVAILABLE).asBoolean()).isTrue();
+        assertThat(simpleLine.has("description")).as("no copy, no images, no dimensions: a line's worth").isFalse();
+        JsonNode variantLine = lines.valueStream().filter(line -> combination.equals(line.get(SKU).asString()))
+                .findFirst().orElseThrow();
+        assertThat(variantLine.get(VARIANT_BLOCK).get(OPTION_VALUES_FIELD)).hasSize(2);
+    }
+
+    @Test
     void checkoutReadsAWholeCartsWorthOfLinesInOneCall() {
         /*
          * The bulk read behind a cart or an order: one call for every line's sku, so composing a cart costs
@@ -382,11 +420,9 @@ class ProductApiIntegrationTest {
          * failing the whole read (one dead line must not cost the shopper their basket).
          */
         String s2s = api.token(ADMIN, STORE_A);
-        String combination = "SKU-ZR-CL-DRS02-BL-M";
-        // A product with no options at all. Note SEEDED_SKU is NOT one: the seed promotes product 1's
-        // default variant to its size-M combination, so that sku legitimately carries a selection too.
-        String simple = "SKU-HM-CL-SWT04";
-        String skus = String.format("skus=%s,%s,%s", simple, combination, slug("no-such-sku"));
+        String combination = COMBINATION_SKU;
+        String simple = SIMPLE_SKU;
+        String skus = String.format(THREE_SKUS, simple, combination, slug(NO_SUCH_SKU));
 
         var response = api.get(scoped(query(DETAILED_BULK, skus), STORE_A), s2s);
         expect(response, HttpStatus.OK);

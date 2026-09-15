@@ -46,7 +46,10 @@ class ContentContextIntegrationTest {
                  order by table_name
                 """, String.class);
         assertThat(tables).contains("content", "content_description", "content_revision", "content_status_audit",
-                "redirect", "sm_sequencer");
+                "redirect").doesNotContain("sm_sequencer");
+        var sequences = jdbcTemplate.queryForList(
+                "select sequence_name from information_schema.sequences where sequence_schema = 'content'", String.class);
+        assertThat(sequences).contains("content_seq", "content_description_seq");
         Integer merchantSchemaCount = jdbcTemplate.queryForObject("""
                 select count(*)
                   from information_schema.schemata

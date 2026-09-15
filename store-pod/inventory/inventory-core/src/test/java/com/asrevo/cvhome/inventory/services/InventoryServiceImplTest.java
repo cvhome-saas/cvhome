@@ -189,8 +189,9 @@ class InventoryServiceImplTest {
     }
 
     @Test
-    void bulkUpsertUpsertsEveryEntryAndAnswersInRequestOrder() {
-        when(inventoryRepository.findBySku(any(), any())).thenReturn(Optional.empty());
+    void bulkUpsertReadsTheBatchOnceEditsAndCreatesAndAnswersInRequestOrder() {
+        Inventory existing = row(1, SKU, 1);
+        when(inventoryRepository.findBySkus(STORE, List.of(SKU_2, SKU))).thenReturn(List.of(existing));
         when(inventoryRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
         List<SkuInventory> result = service.bulkUpsert(STORE, List.of(
@@ -198,6 +199,8 @@ class InventoryServiceImplTest {
                 new PersistableSkuInventory(SKU.value(), body(null, null, null))));
 
         assertThat(result).extracting(SkuInventory::sku).containsExactly(SKU_2, SKU);
+        verify(inventoryRepository).save(existing);
+        verify(inventoryRepository, never()).findBySku(any(), any());
     }
 
     @Test

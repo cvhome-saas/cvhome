@@ -39,7 +39,8 @@ export class ProductCategory {
     /**
      * The filter rail's facets: manufacturers from the category's own endpoint, and the counted
      * option-value groups from the search endpoint's facet block — the one place the catalog counts
-     * them. The search runs with the category filter and no query (`count=1`, results discarded);
+     * them. The search runs with the category filter, no query, `rows=false` and `facetGroups=OPTIONS`, so the
+     * catalog reads no page of products and counts no facet block this rail does not draw (17 statements → 4);
      * value ids are store-wide, so a toggled value round-trips as `ListingQuery.optionValueIds`.
      * Both degrade: a rail without a group beats a listing page that fails on its filters.
      */
@@ -62,7 +63,7 @@ export class ProductCategory {
             };
         }
         const result = await orUndefined(apiFetch<FacetsPayload>(
-            `${storeBaseServiceUrl('catalog', storeContext)}/api/v2/products/search?store=${storeContext.store}&lang=${storeContext.locale}&categoryIds=${categoryId}&page=0&count=1&facets=true`,
+            `${storeBaseServiceUrl('catalog', storeContext)}/api/v2/products/search?store=${storeContext.store}&lang=${storeContext.locale}&categoryIds=${categoryId}&rows=false&facets=true&facetGroups=OPTIONS`,
             publicGet()));
         return result?.facets?.options?.map(option => ({
             id: option.optionId,

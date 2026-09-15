@@ -1,6 +1,7 @@
 package com.asrevo.cvhome.checkout.services.order;
 
 import java.util.Locale;
+import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,7 +15,9 @@ import com.asrevo.cvhome.checkout.entity.Orders;
 import com.asrevo.cvhome.checkout.errors.OrderLoginRequiredException;
 import com.asrevo.cvhome.checkout.model.order.PlaceOrderRequest;
 import com.asrevo.cvhome.checkout.model.order.ReadableOrderConfirmation;
+import com.asrevo.cvhome.checkout.services.catalog.ProductSnapshotService;
 import com.asrevo.cvhome.checkout.services.store.StoreSettings;
+import com.asrevo.cvhome.commons.domain.CurrencyCode;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.store.core.entity.order.orderstatus.OrderStatus;
 import com.asrevo.cvhome.store.core.entity.payments.PaymentType;
@@ -38,6 +41,8 @@ class OrderPlacementServiceImplTest {
 
     private static final RedirectUrls URLS = new RedirectUrls(Orders.SUCCESS_URL, Orders.CANCEL_URL);
 
+    private static final CurrencyCode USD = new CurrencyCode("USD");
+
     @Mock
     private OrderPlacementTransaction transaction;
 
@@ -47,6 +52,9 @@ class OrderPlacementServiceImplTest {
     @Mock
     private OrderStepRunner steps;
 
+    @Mock
+    private ProductSnapshotService snapshots;
+
     @InjectMocks
     private OrderPlacementServiceImpl service;
 
@@ -54,7 +62,9 @@ class OrderPlacementServiceImplTest {
     void placesThenRunsThreeStepsAndAnswersTheConfirmation() throws Exception {
         PlaceOrderRequest request = OrderPlacementTransactionTest.request(PaymentType.STRIPE);
         ShopperId shopper = new ShopperId("sub-1");
-        when(transaction.createOrResume(Orders.STORE, LanguageCode.defaultLanguage(), CODE, request, shopper, URLS))
+        when(storeSettings.currency(Orders.STORE)).thenReturn(USD);
+        when(transaction.createOrResume(Orders.STORE, LanguageCode.defaultLanguage(), CODE, request, shopper, URLS,
+                Map.of(), USD))
                 .thenReturn(100L);
         when(storeSettings.locale(any())).thenReturn(Locale.US);
         when(transaction.confirmation(100L, Locale.US))
@@ -75,7 +85,8 @@ class OrderPlacementServiceImplTest {
     void aGuestIsAllowedWhenTheStoreDoesNotRequireLogin() throws Exception {
         PlaceOrderRequest request = OrderPlacementTransactionTest.request(PaymentType.COD);
         when(storeSettings.requiresLogin(Orders.STORE)).thenReturn(false);
-        when(transaction.createOrResume(eq(Orders.STORE), any(), eq(CODE), eq(request), eq(null), eq(URLS)))
+        when(transaction.createOrResume(eq(Orders.STORE), any(), eq(CODE), eq(request), eq(null), eq(URLS), any(),
+                any()))
                 .thenReturn(100L);
         when(storeSettings.locale(any())).thenReturn(Locale.US);
         when(transaction.confirmation(100L, Locale.US))

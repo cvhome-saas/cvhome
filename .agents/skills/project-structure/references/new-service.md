@@ -134,7 +134,7 @@ spring:
 
 # application-lcl.yml       import lcl-config.yml + store-pod-lcl-config.yml
 # application-fargate.yml   import fargate-config.yml + store-pod-fargate-config.yml
-# application-test-stores.yml   data-locations += data-test-stores.sql, stores/*/*.sql
+# application-test-stores.yml   data-locations += stores/*/*.sql, then data-sequences.sql last
 ```
 
 The **s2s client is per layer, not per service** — reuse `store-pod-507f1f77@service.store-pod.internal`
@@ -142,7 +142,7 @@ The **s2s client is per layer, not per service** — reuse `store-pod-507f1f77@s
 registration is needed for a backend.
 
 Ship `init-sql/schema.sql` (+ `data-common.sql`) yourself: schema-per-service, name it after the app, no
-cross-service foreign keys. `schema.sql` is the source of truth — `ddl-auto: update` is only a net.
+cross-service foreign keys. `schema.sql` is the source of truth — Hibernate only validates against it.
 
 **Java** — the minimum is three classes, in `com.asrevo.cvhome.<domain>`:
 

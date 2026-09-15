@@ -18,8 +18,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
-import jakarta.persistence.TableGenerator;
 import jakarta.persistence.Version;
 
 import com.asrevo.cvhome.checkout.domain.CartCode;
@@ -54,11 +54,9 @@ public class Cart extends SalesManagerEntity<Long, Cart> implements Auditable {
 
     @Id
     @Column(name = "CART_ID")
-    @TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME",
-            valueColumnName = "SEQ_COUNT", pkColumnValue = "CART_SEQ_NEXT_VAL",
-            allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
-            initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
+    @SequenceGenerator(name = "cart_seq", sequenceName = "cart_seq",
+            allocationSize = SchemaConstant.ID_ALLOCATION_SIZE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "cart_seq")
     private Long id;
 
     /** Two checkouts of one cart racing each other: the second loses here instead of making a second order. */

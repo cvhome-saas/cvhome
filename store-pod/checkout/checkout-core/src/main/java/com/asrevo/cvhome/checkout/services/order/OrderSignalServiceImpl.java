@@ -2,9 +2,10 @@ package com.asrevo.cvhome.checkout.services.order;
 
 import java.time.Clock;
 import java.time.Instant;
+import java.util.function.Function;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import com.asrevo.cvhome.checkout.config.CheckoutProperties;
 import com.asrevo.cvhome.checkout.domain.OrderRef;
@@ -33,6 +34,8 @@ public class OrderSignalServiceImpl implements OrderSignalService {
 
     private final Clock clock;
 
+    private final TransactionTemplate transactions;
+
     @Override
     public SignalOutcome paymentSignal(StoreMerchantId store, String orderRef, PaymentSignal signal)
             throws OrderNotFoundException {
@@ -49,30 +52,46 @@ public class OrderSignalServiceImpl implements OrderSignalService {
         return applied.outcome();
     }
 
-    @Transactional(rollbackFor = Exception.class)
-    Applied applyPayment(StoreMerchantId store, String orderRef, PaymentSignal signal) throws OrderNotFoundException {
-        Order order = load(store, orderRef);
-        Instant now = clock.instant();
-        SignalOutcome outcome = order.applyPaymentSignal(signal.status(), signal.transactionRef(), now);
-        if (order.isPaymentInFlight()) {
-            order.extendExpiry(now.plus(properties.getPlacement().getProcessingGrace()), now);
-        }
-        orders.saveAndFlush(order);
-        return new Applied(order.getId(), outcome);
-    }
-
-    @Transactional(rollbackFor = Exception.class)
-    Applied applyExpiry(StoreMerchantId store, String orderRef, ReservationExpiredSignal signal)
+    private Applied applyPayment(StoreMerchantId store, String orderRef, PaymentSignal signal)
             throws OrderNotFoundException {
-        Order order = load(store, orderRef);
-        SignalOutcome outcome = order.applyReservationExpired(signal.reservationRef(), clock.instant());
-        orders.saveAndFlush(order);
-        return new Applied(order.getId(), outcome);
+        return apply(store, orderRef, order -> {
+            Instant now = clock.instant();
+            SignalOutcome outcome = order.applyPaymentSignal(signal.status(), signal.transactionRef(), now);
+            if (order.isPaymentInFlight()) {
+                order.extendExpiry(now.plus(properties.getPlacement().getProcessingGrace()), now);
+            }
+            return outcome;
+        });
     }
 
-    private Order load(StoreMerchantId store, String orderRef) throws OrderNotFoundException {
-        return orders.findByStoreMerchantIdAndOrderRef(store, OrderRef.of(orderRef))
-                .orElseThrow(() -> OrderNotFoundException.ofRef(orderRef, store.getId()));
+    private Applied applyExpiry(StoreMerchantId store, String orderRef, ReservationExpiredSignal signal)
+            throws OrderNotFoundException {
+        return apply(store, orderRef, order -> order.applyReservationExpired(signal.reservationRef(), clock.instant()));
+    }
+
+    /**
+     * Loads the order, applies the signal and saves it in one transaction, which ends before the pending action runs.
+     *
+     * <p>
+     * These were {@code @Transactional} methods called from this class, which a Spring proxy never sees: they ran
+     * with no transaction at all, and only open-in-view's request-long session let the order's events load. The
+     * load, the duplicate check and the write are one unit, so they are one transaction here.
+     * </p>
+     */
+    private Applied apply(StoreMerchantId store, String orderRef, Function<Order, SignalOutcome> signal)
+            throws OrderNotFoundException {
+        Applied applied = transactions.execute(status -> orders
+                .findByStoreMerchantIdAndOrderRef(store, OrderRef.of(orderRef))
+                .map(order -> {
+                    SignalOutcome outcome = signal.apply(order);
+                    orders.saveAndFlush(order);
+                    return new Applied(order.getId(), outcome);
+                })
+                .orElse(null));
+        if (applied == null) {
+            throw OrderNotFoundException.ofRef(orderRef, store.getId());
+        }
+        return applied;
     }
 
     /**

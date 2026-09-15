@@ -3,28 +3,28 @@ package com.asrevo.cvhome.checkout.services.catalog;
 import java.math.BigDecimal;
 import java.util.List;
 
-import com.asrevo.cvhome.catalog.model.product.ReadableMinimalProduct;
+import com.asrevo.cvhome.catalog.model.product.ReadableCartLineProduct;
+import com.asrevo.cvhome.checkout.entity.OptionLabel;
 import com.asrevo.cvhome.commons.domain.Sku;
 
 /**
- * One sku as the catalog and inventory describe it right now: the catalog's product (name, image, variant labels)
- * merged with inventory's price and purchasability.
+ * One sku as the catalog and inventory describe it right now: the catalog's cart-line product (name, slug, image,
+ * variant labels) merged with inventory's price and purchasability.
  */
-public record ProductSnapshot(Sku sku, ReadableMinimalProduct product, BigDecimal finalPrice, BigDecimal originalPrice,
-                              boolean discounted, boolean canBePurchased, int quantityOrderMinimum,
-                              int quantityOrderMaximum) {
+public record ProductSnapshot(Sku sku, ReadableCartLineProduct product, BigDecimal finalPrice,
+                              BigDecimal originalPrice, boolean discounted, boolean canBePurchased,
+                              int quantityOrderMinimum, int quantityOrderMaximum) {
 
     public Long productId() {
-        return product.getId();
+        return product.getProductId();
     }
 
     public String name() {
-        return product.getDescription() == null || product.getDescription().getName() == null ? sku.value()
-                : product.getDescription().getName();
+        return product.getName() == null ? sku.value() : product.getName();
     }
 
     public String imageUrl() {
-        return product.getImage() == null ? null : product.getImage().getImageUrl();
+        return product.getImageUrl();
     }
 
     /** The variant's option/value labels, or nothing for a default variant. */
@@ -42,8 +42,5 @@ public record ProductSnapshot(Sku sku, ReadableMinimalProduct product, BigDecima
     public boolean allowsQuantity(int quantity) {
         return quantity >= Math.max(1, quantityOrderMinimum)
                 && (quantityOrderMaximum <= 0 || quantity <= quantityOrderMaximum);
-    }
-
-    public record OptionLabel(String option, String value) {
     }
 }

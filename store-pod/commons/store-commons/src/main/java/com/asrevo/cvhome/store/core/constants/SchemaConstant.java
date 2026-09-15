@@ -7,15 +7,12 @@ import java.util.Map;
 public final class SchemaConstant {
 
     /**
-     * Ids per round-trip for every {@code @TableGenerator} in the pods. At 0 (Hibernate's "no optimizer") each insert
-     * paid a SELECT and an UPDATE on the sequencer row, on a second pooled connection, inside the request: an order
-     * with its lines, totals and event cost seven extra statements and serialised every checkout on one row. Fifty
-     * ids per fetch (Hibernate's pooled optimizer) makes that one round-trip per fifty inserts. Ids keep increasing;
-     * a restart skips what its JVM had left, so an id is unique, not consecutive.
+     * Ids per fetch for every {@code @SequenceGenerator} in the pods, with Hibernate's pooled-lo optimizer: one
+     * {@code nextval} hands the JVM this many ids, so an order with its lines, totals and event costs one round-trip,
+     * not seven. Each {@code schema.sql} declares its sequences with the same {@code increment by}. A restart skips
+     * what its JVM had left, so an id is unique, not consecutive.
      */
-    public static final int DESCRIPTION_ID_ALLOCATION_SIZE = 50;
-
-    public static final int DESCRIPTION_ID_START_VALUE = 1;
+    public static final int ID_ALLOCATION_SIZE = 50;
 
     /**
      * All regions

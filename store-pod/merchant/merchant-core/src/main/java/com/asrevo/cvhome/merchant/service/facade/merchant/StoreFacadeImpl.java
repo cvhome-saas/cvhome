@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.asrevo.cvhome.commons.domain.DomainType;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
@@ -25,6 +26,11 @@ import lombok.extern.slf4j.Slf4j;
 
 import static com.asrevo.cvhome.commons.utils.DefaultStoresConstants.DEFAULT_ORG1_STORE1;
 
+/**
+ * Every method that reads a store into a DTO runs in a transaction, and the DTO is filled inside it: a store's domains
+ * and languages are lazy collections, and without open-in-view there is no session left to load them once the method
+ * returns.
+ */
 @Service("storeFacade")
 @Slf4j
 public class StoreFacadeImpl implements StoreFacade {
@@ -49,6 +55,7 @@ public class StoreFacadeImpl implements StoreFacade {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ReadableMerchantStore getByMerchantStoreId(StoreMerchantId storeMerchantId, LanguageCode lang)
             throws MerchantStoreNotFoundException {
         MerchantStore store = getMerchantStoreByMerchantStoreId(storeMerchantId);
@@ -72,6 +79,7 @@ public class StoreFacadeImpl implements StoreFacade {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void create(PersistableMerchantStore store) throws DuplicateMerchantStoreException {
         MerchantStore storeForCheck = get(new StoreMerchantId(store.getId()));
         if (storeForCheck != null) {
@@ -97,6 +105,7 @@ public class StoreFacadeImpl implements StoreFacade {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void update(StoreMerchantId storeMerchantId, PersistableMerchantStore store)
             throws MerchantStoreNotFoundException {
         MerchantStore mStore = mergePersistableMerchantStoreToMerchantStore(store, storeMerchantId,
@@ -125,6 +134,7 @@ public class StoreFacadeImpl implements StoreFacade {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void delete(StoreMerchantId storeMerchantId)
             throws DefaultStoreNotRemovableException, MerchantStoreNotFoundException {
 
@@ -150,17 +160,19 @@ public class StoreFacadeImpl implements StoreFacade {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<LanguageCode> supportedLanguages(StoreMerchantId storeMerchantId) {
         MerchantStore store = merchantStoreService.getByMerchantStoreId(storeMerchantId);
 
         if (store != null) {
-            return store.getLanguages();
+            return List.copyOf(store.getLanguages());
         }
 
         return Collections.emptyList();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ReadableMerchantStore getReadableMerchantStoreId(StoreMerchantId storeMerchantId) {
         MerchantStore merchantStore = get(storeMerchantId);
         return convertMerchantStoreToReadableMerchantStore(merchantStore, merchantStore.getDefaultLanguageCode());

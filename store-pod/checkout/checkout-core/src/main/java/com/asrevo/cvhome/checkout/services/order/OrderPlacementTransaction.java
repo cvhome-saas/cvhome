@@ -2,6 +2,7 @@ package com.asrevo.cvhome.checkout.services.order;
 
 import java.time.Clock;
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -28,10 +29,9 @@ import com.asrevo.cvhome.checkout.model.order.ReadableOrderConfirmation;
 import com.asrevo.cvhome.checkout.repositories.CartRepository;
 import com.asrevo.cvhome.checkout.repositories.OrderRepository;
 import com.asrevo.cvhome.checkout.services.catalog.ProductSnapshot;
-import com.asrevo.cvhome.checkout.services.catalog.ProductSnapshotService;
 import com.asrevo.cvhome.checkout.services.customer.CustomerMapper;
 import com.asrevo.cvhome.checkout.services.customer.CustomerService;
-import com.asrevo.cvhome.checkout.services.store.StoreSettings;
+import com.asrevo.cvhome.commons.domain.CurrencyCode;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
@@ -55,19 +55,35 @@ public class OrderPlacementTransaction {
 
     private final CustomerService customers;
 
-    private final ProductSnapshotService snapshots;
-
-    private final StoreSettings storeSettings;
 
     private final Clock clock;
 
     /**
+     * The skus an active cart holds, for pricing before {@link #createOrResume} opens its transaction; none for a cart
+     * that already became an order, which resumes without pricing.
+     */
+    @Transactional(readOnly = true)
+    public List<Sku> skus(StoreMerchantId store, CartCode cartCode) throws CartNotFoundException {
+        Cart cart = carts.findByStoreMerchantIdAndCode(store, cartCode)
+                .orElseThrow(() -> CartNotFoundException.of(cartCode, store.getId()));
+        return cart.isActive() ? cart.getLines().stream().map(CartLine::getSku).toList() : List.of();
+    }
+
+    /**
      * The first transaction of a placement. A cart that already became an open order resumes that order rather than
      * creating a second one, so a resubmit after a 502 is safe.
+     *
+     * <p>
+     * {@code snapshot} is the cart priced by catalog and inventory before this transaction opened, and {@code currency}
+     * the store's, read from merchant the same way: a peer call inside this transaction held a database connection for
+     * as long as the peer took to answer. A line priced by nobody — the catalog dropped it, or it was added after the
+     * snapshot — is refused, as an unknown sku always was.
+     * </p>
      */
     @Transactional(rollbackFor = Exception.class)
     public Long createOrResume(StoreMerchantId store, LanguageCode language, CartCode cartCode,
-                                PlaceOrderRequest request, ShopperId shopper, RedirectUrls redirects)
+                                PlaceOrderRequest request, ShopperId shopper, RedirectUrls redirects,
+                                Map<Sku, ProductSnapshot> snapshot, CurrencyCode currency)
             throws CartNotFoundException, CartEmptyException, CartAlreadyConvertedException,
             ProductNotPurchasableException, CartQuantityOutOfRangeException, UnsupportedCountryCodeException {
         Cart cart = carts.findByStoreMerchantIdAndCode(store, cartCode)
@@ -90,9 +106,9 @@ public class OrderPlacementTransaction {
                 .getDelivery().getAddress()) ? billing : CustomerMapper.toSnapshot(request.getCustomer().getDelivery());
 
         Order order = Order.place(new PlacementDraft(store, OrderRef.newRef(), cartCode, customer, language,
-                storeSettings.currency(store), request.getPaymentType(), billing, delivery, request.getComments()),
+                currency, request.getPaymentType(), billing, delivery, request.getComments()),
                 redirects.success(), redirects.cancel(), now);
-        addLines(order, cart, store, language);
+        addLines(order, cart, snapshot);
         order.computeTotals();
         Order saved = orders.saveAndFlush(order);
         cart.convertedInto(saved.getId());
@@ -108,10 +124,8 @@ public class OrderPlacementTransaction {
         return OrderMapper.toConfirmation(order, locale);
     }
 
-    private void addLines(Order order, Cart cart, StoreMerchantId store, LanguageCode language)
+    private static void addLines(Order order, Cart cart, Map<Sku, ProductSnapshot> snapshot)
             throws ProductNotPurchasableException, CartQuantityOutOfRangeException {
-        Map<Sku, ProductSnapshot> snapshot = snapshots.snapshot(store, language,
-                cart.getLines().stream().map(CartLine::getSku).toList());
         for (CartLine line : cart.getLines()) {
             ProductSnapshot product = snapshot.get(line.getSku());
             if (product == null || !product.canBePurchased()) {

@@ -1,9 +1,12 @@
 create schema if not exists inventory;
-create table if not exists inventory.sm_sequencer
-(
-    seq_name  varchar(255) not null primary key,
-    seq_count bigint
-);
+-- One sequence per table, fifty ids a fetch (SchemaConstant.ID_ALLOCATION_SIZE, pooled-lo). The Shopizer sm_sequencer
+-- table it replaces needed a second pooled connection and a row lock for every block: with three connections and three
+-- concurrent inserts, checkout deadlocked its own pool (the 2026-09-14 load test).
+drop table if exists inventory.sm_sequencer;
+create sequence if not exists inventory.product_availability_seq increment by 50;
+create sequence if not exists inventory.product_price_seq increment by 50;
+create sequence if not exists inventory.product_reservation_seq increment by 50;
+create sequence if not exists inventory.product_reservation_line_seq increment by 50;
 
 -- One row per (store, sku): the sku is the cross-service key — the catalog owns the product/variant it belongs
 -- to, there is no foreign key. product_id is informational (lets a catalog product delete find its rows).
@@ -59,6 +62,9 @@ create table if not exists inventory.product_price
     product_avail_id               bigint       not null
         constraint fk_prd_price_avail references inventory.product_availability
 );
+-- Prices are read by availability row. With only the primary key, 94 % of reads of this table were full scans in the
+-- 2026-09-14 load test.
+create index if not exists product_price_avail_idx on inventory.product_price (product_avail_id);
 
 create table if not exists inventory.product_reservation
 (

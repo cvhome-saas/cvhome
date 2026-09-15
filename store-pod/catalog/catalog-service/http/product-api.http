@@ -92,6 +92,17 @@ GET {{LANDING_UI_URL}}/catalog/api/v2/products/search?store={{STORE_ID}}&lang={{
     });
 %}
 
+### the category page's rail — `rows=false&facetGroups=OPTIONS`: option facets only; no page, count or other facet block
+GET {{LANDING_UI_URL}}/catalog/api/v2/products/search?store={{STORE_ID}}&lang={{LANG}}&rows=false&facets=true&facetGroups=OPTIONS
+
+> {%
+    client.test("option facets without rows", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        client.assert(response.body.content.length === 0, "rows came back");
+        client.assert(response.body.facets.brands.length === 0, "a block that was not asked for was counted");
+    });
+%}
+
 ### the same term in Arabic — the merchant's own copy, not a transliteration
 GET {{LANDING_UI_URL}}/catalog/api/v2/products/search?store={{STORE_ID}}&lang=ar&q=نايكي&count=5
 
@@ -182,3 +193,6 @@ GET {{LANDING_UI_URL}}/catalog/api/v2/products?store={{STORE_ID}}&lang={{LANG}}&
 
 ### search with option facets in the rail
 GET {{LANDING_UI_URL}}/catalog/api/v2/products/search?store={{STORE_ID}}&lang={{LANG}}&q=&optionValueIds=4&page=0&count=24
+
+### cart lines by sku (ExternalProductApi, what checkout reads on every cart operation) — 200 [{sku, productId, name, friendlyUrl, imageUrl, available, variant}]
+GET {{SELLER_UI_URL}}/spg/catalog/api/v1/cart-lines?store={{STORE_ID}}&lang={{LANG}}&skus=HTTP-DEMO-001&skus=DOES-NOT-EXIST

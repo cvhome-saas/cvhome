@@ -22,8 +22,8 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
-import jakarta.persistence.TableGenerator;
 import jakarta.persistence.UniqueConstraint;
 
 import com.asrevo.cvhome.commons.domain.LanguageCode;
@@ -53,11 +53,9 @@ public class ProductGroup extends SalesManagerEntity<Long, ProductGroup> impleme
 
     @Id
     @Column(name = "PRODUCT_GROUP_ID", unique = true, nullable = false)
-    @TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME",
-            valueColumnName = "SEQ_COUNT", pkColumnValue = "PRODUCT_GROUP_SEQ_NEXT_VAL",
-            allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
-            initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
+    @SequenceGenerator(name = "product_group_seq", sequenceName = "product_group_seq",
+            allocationSize = SchemaConstant.ID_ALLOCATION_SIZE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "product_group_seq")
     private Long id;
 
     @Embedded

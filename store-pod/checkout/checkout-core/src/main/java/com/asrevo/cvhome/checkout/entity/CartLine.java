@@ -1,6 +1,10 @@
 package com.asrevo.cvhome.checkout.entity;
 
 import java.io.Serial;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
@@ -13,10 +17,11 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
-import jakarta.persistence.TableGenerator;
 import jakarta.persistence.UniqueConstraint;
 
+import com.asrevo.cvhome.checkout.entity.converter.OptionLabelsConverter;
 import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.store.core.constants.SchemaConstant;
 import com.asrevo.cvhome.store.core.converter.SkuConverter;
@@ -36,16 +41,17 @@ import lombok.Setter;
 @Setter
 public class CartLine extends SalesManagerEntity<Long, CartLine> implements Auditable {
 
+    /** How long a line trusts what the catalogue said before a read asks it again. */
+    public static final Duration SNAPSHOT_FOR = Duration.ofDays(1);
+
     @Serial
     private static final long serialVersionUID = 1L;
 
     @Id
     @Column(name = "LINE_ID")
-    @TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME",
-            valueColumnName = "SEQ_COUNT", pkColumnValue = "CART_LINE_SEQ_NEXT_VAL",
-            allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
-            initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
+    @SequenceGenerator(name = "cart_line_seq", sequenceName = "cart_line_seq",
+            allocationSize = SchemaConstant.ID_ALLOCATION_SIZE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "cart_line_seq")
     private Long id;
 
     @Embedded
@@ -62,6 +68,34 @@ public class CartLine extends SalesManagerEntity<Long, CartLine> implements Audi
     @Column(name = "QUANTITY", nullable = false)
     private int quantity;
 
+    /**
+     * What the catalogue said about the sku when the line was added, so a cart read asks inventory for the live
+     * price and stock and the catalogue for nothing: in the 2026-09-14 load test the cart's catalog read was
+     * catalog's largest cost, made again on every read of every cart. Null on a line written before this column;
+     * refreshed after {@link #SNAPSHOT_FOR}.
+     */
+    @Column(name = "PRODUCT_ID")
+    private Long productId;
+
+    @Column(name = "PRODUCT_NAME")
+    private String productName;
+
+    @Column(name = "FRIENDLY_URL")
+    private String friendlyUrl;
+
+    @Column(name = "IMAGE_URL", length = 1024)
+    private String imageUrl;
+
+    @Column(name = "OPTION_LABELS", length = 2000)
+    @Convert(converter = OptionLabelsConverter.class)
+    private List<OptionLabel> optionLabels = new ArrayList<>();
+
+    @Column(name = "CATALOG_AVAILABLE")
+    private Boolean catalogAvailable;
+
+    @Column(name = "SNAPSHOT_AT")
+    private Instant snapshotAt;
+
     public CartLine() {
     }
 
@@ -69,5 +103,22 @@ public class CartLine extends SalesManagerEntity<Long, CartLine> implements Audi
         this.cart = cart;
         this.sku = sku;
         this.quantity = quantity;
+    }
+
+    /** Keeps what the catalogue said about the sku, as of {@code now}. */
+    public void remember(Long product, String name, String slug, String image, boolean available,
+                         List<OptionLabel> labels, Instant now) {
+        this.productId = product;
+        this.productName = name;
+        this.friendlyUrl = slug;
+        this.imageUrl = image;
+        this.catalogAvailable = available;
+        this.optionLabels = new ArrayList<>(labels == null ? List.of() : labels);
+        this.snapshotAt = now;
+    }
+
+    /** Whether the line still carries a snapshot a read may trust at {@code now}. */
+    public boolean remembers(Instant now) {
+        return snapshotAt != null && catalogAvailable != null && !snapshotAt.plus(SNAPSHOT_FOR).isBefore(now);
     }
 }
