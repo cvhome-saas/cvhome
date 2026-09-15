@@ -23,6 +23,7 @@ import org.hibernate.annotations.BatchSize;
 
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.commons.domain.StoreScoped;
 import com.asrevo.cvhome.store.core.constants.SchemaConstant;
 import com.asrevo.cvhome.store.core.entity.common.audit.AuditListener;
 import com.asrevo.cvhome.store.core.entity.common.audit.AuditSection;
@@ -47,7 +48,7 @@ import lombok.Setter;
  * but it is the same fix and the same one line.
  */
 @BatchSize(size = 100)
-public class ProductType extends SalesManagerEntity<Long, ProductType> implements Auditable {
+public class ProductType extends SalesManagerEntity<Long, ProductType> implements Auditable, StoreScoped {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -91,5 +92,10 @@ public class ProductType extends SalesManagerEntity<Long, ProductType> implement
 
     public boolean isVisible() {
         return visible == null ? false : visible;
+    }
+
+    @Override
+    public StoreMerchantId scopedStore() {
+        return storeMerchantId;
     }
 }

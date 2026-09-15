@@ -28,6 +28,7 @@ import jakarta.persistence.UniqueConstraint;
 
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.commons.domain.StoreScoped;
 import com.asrevo.cvhome.store.core.constants.SchemaConstant;
 import com.asrevo.cvhome.store.core.entity.common.audit.AuditListener;
 import com.asrevo.cvhome.store.core.entity.common.audit.AuditSection;
@@ -46,7 +47,7 @@ import lombok.Setter;
 @Table(name = "PRODUCT_GROUP", uniqueConstraints = @UniqueConstraint(columnNames = {"STORE_MERCHANT_ID", "CODE"}))
 @Getter
 @Setter
-public class ProductGroup extends SalesManagerEntity<Long, ProductGroup> implements Auditable {
+public class ProductGroup extends SalesManagerEntity<Long, ProductGroup> implements Auditable, StoreScoped {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -104,5 +105,10 @@ public class ProductGroup extends SalesManagerEntity<Long, ProductGroup> impleme
 
     public boolean isActive() {
         return active == null ? true : active;
+    }
+
+    @Override
+    public StoreMerchantId scopedStore() {
+        return storeMerchantId;
     }
 }

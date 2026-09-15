@@ -12,6 +12,8 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.commons.domain.StoreScoped;
 import com.asrevo.cvhome.store.core.constants.SchemaConstant;
 import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
 
@@ -38,7 +40,7 @@ import lombok.Setter;
 @Table(name = "PRODUCT_IMAGE")
 @Getter
 @Setter
-public class ProductImage extends SalesManagerEntity<Long, ProductImage> {
+public class ProductImage extends SalesManagerEntity<Long, ProductImage> implements StoreScoped {
 
     public static final int TYPE_MEDIA_ASSET = 0;
 
@@ -122,5 +124,10 @@ public class ProductImage extends SalesManagerEntity<Long, ProductImage> {
 
     public int getSortOrder() {
         return sortOrder == null ? 0 : sortOrder;
+    }
+
+    @Override
+    public StoreMerchantId scopedStore() {
+        return product == null ? null : product.scopedStore();
     }
 }

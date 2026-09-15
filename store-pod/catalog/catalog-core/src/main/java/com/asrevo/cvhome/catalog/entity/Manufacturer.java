@@ -27,6 +27,7 @@ import org.hibernate.annotations.BatchSize;
 import com.asrevo.cvhome.catalog.model.product.event.BrandRenamedEvent;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.commons.domain.StoreScoped;
 import com.asrevo.cvhome.store.core.constants.SchemaConstant;
 import com.asrevo.cvhome.store.core.entity.common.audit.AuditListener;
 import com.asrevo.cvhome.store.core.entity.common.audit.AuditSection;
@@ -51,7 +52,7 @@ import lombok.Setter;
  * but it is the same fix and the same one line.
  */
 @BatchSize(size = 100)
-public class Manufacturer extends SalesManagerEntity<Long, Manufacturer> implements Auditable {
+public class Manufacturer extends SalesManagerEntity<Long, Manufacturer> implements Auditable, StoreScoped {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -108,5 +109,10 @@ public class Manufacturer extends SalesManagerEntity<Long, Manufacturer> impleme
     public Manufacturer renamed() {
         this.registerEvent(BrandRenamedEvent.from(this.id, this.storeMerchantId.getId()));
         return this;
+    }
+
+    @Override
+    public StoreMerchantId scopedStore() {
+        return storeMerchantId;
     }
 }

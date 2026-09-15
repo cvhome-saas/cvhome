@@ -37,6 +37,7 @@ import com.asrevo.cvhome.catalog.model.product.event.ProductSearchIndexPurgedEve
 import com.asrevo.cvhome.catalog.model.product.event.ProductSearchIndexStaleEvent;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.commons.domain.StoreScoped;
 import com.asrevo.cvhome.store.core.constants.SchemaConstant;
 import com.asrevo.cvhome.store.core.entity.common.audit.AuditListener;
 import com.asrevo.cvhome.store.core.entity.common.audit.AuditSection;
@@ -62,7 +63,7 @@ import lombok.Setter;
 @Table(name = "PRODUCT")
 @Getter
 @Setter
-public class Product extends SalesManagerEntity<Long, Product> implements Auditable {
+public class Product extends SalesManagerEntity<Long, Product> implements Auditable, StoreScoped {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -261,5 +262,10 @@ public class Product extends SalesManagerEntity<Long, Product> implements Audita
         super.clearDomainEvents();
         this.searchIndexStale = false;
         this.searchIndexPurged = false;
+    }
+
+    @Override
+    public StoreMerchantId scopedStore() {
+        return store;
     }
 }

@@ -24,6 +24,7 @@ import org.hibernate.annotations.BatchSize;
 
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.commons.domain.StoreScoped;
 import com.asrevo.cvhome.store.core.constants.SchemaConstant;
 import com.asrevo.cvhome.store.core.entity.common.audit.AuditListener;
 import com.asrevo.cvhome.store.core.entity.common.audit.AuditSection;
@@ -44,7 +45,7 @@ import lombok.Setter;
         uniqueConstraints = @UniqueConstraint(columnNames = {"STORE_MERCHANT_ID", "CODE"}))
 @Getter
 @Setter
-public class ProductOption extends SalesManagerEntity<Long, ProductOption> implements Auditable {
+public class ProductOption extends SalesManagerEntity<Long, ProductOption> implements Auditable, StoreScoped {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -89,5 +90,10 @@ public class ProductOption extends SalesManagerEntity<Long, ProductOption> imple
 
     public Optional<ProductOptionValue> value(Long valueId) {
         return values.stream().filter(v -> v.getId().equals(valueId)).findFirst();
+    }
+
+    @Override
+    public StoreMerchantId scopedStore() {
+        return storeMerchantId;
     }
 }

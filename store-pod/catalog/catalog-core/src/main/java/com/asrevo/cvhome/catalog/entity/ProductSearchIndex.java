@@ -17,6 +17,7 @@ import org.hibernate.annotations.Type;
 
 import com.asrevo.cvhome.catalog.entity.type.TsVectorType;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.commons.domain.StoreScoped;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -41,7 +42,7 @@ import lombok.Setter;
 @IdClass(ProductSearchIndexId.class)
 @Getter
 @Setter
-public class ProductSearchIndex implements Serializable {
+public class ProductSearchIndex implements Serializable, StoreScoped {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -82,4 +83,9 @@ public class ProductSearchIndex implements Serializable {
 
     @Column(name = "INDEXED_AT")
     private Instant indexedAt;
+
+    @Override
+    public StoreMerchantId scopedStore() {
+        return store;
+    }
 }

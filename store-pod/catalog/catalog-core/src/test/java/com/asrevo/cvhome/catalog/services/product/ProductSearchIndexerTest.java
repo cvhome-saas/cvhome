@@ -9,6 +9,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.asrevo.cvhome.cache.eviction.AfterCommitEviction;
 import com.asrevo.cvhome.catalog.repositories.ProductSearchIndexRepository;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 
@@ -37,19 +38,22 @@ class ProductSearchIndexerTest {
     @Mock
     private ProductSearchIndexRepository searchIndexRepository;
 
+    @Mock
+    private AfterCommitEviction caches;
+
     @InjectMocks
     private ProductSearchIndexer indexer;
 
     @Test
     void reindexRefreshesOneProduct() {
-        indexer.reindex(42L);
+        indexer.reindex(42L, STORE);
 
         verify(searchIndexRepository).refresh(42L);
     }
 
     @Test
     void purgeRemovesOneProduct() {
-        indexer.purge(42L);
+        indexer.purge(42L, STORE);
 
         verify(searchIndexRepository).purge(42L);
     }

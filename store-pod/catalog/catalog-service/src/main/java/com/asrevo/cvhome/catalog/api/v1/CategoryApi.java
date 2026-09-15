@@ -22,6 +22,7 @@ import com.asrevo.cvhome.catalog.errors.CategoryNotFoundException;
 import com.asrevo.cvhome.catalog.errors.CategoryReferenceUnresolvableException;
 import com.asrevo.cvhome.catalog.model.category.PersistableCategory;
 import com.asrevo.cvhome.catalog.model.category.ReadableCategory;
+import com.asrevo.cvhome.catalog.reads.StorefrontCatalogReads;
 import com.asrevo.cvhome.catalog.services.category.CategoryService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
@@ -50,19 +51,22 @@ public class CategoryApi {
 
     private final CategoryService categoryService;
 
+    private final StorefrontCatalogReads reads;
+
     @GetMapping("/category-hierarchy")
     @Parameter(name = "store", schema = @Schema(type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
     public ReadableEntityList<ReadableCategory> hierarchy(@RequestParam(required = false) String name,
                                                           StoreMerchantId merchantStore, LanguageCode language,
                                                           Pageable pageable) {
-        return categoryService.hierarchy(merchantStore, name, language, false, pageable);
+        return name == null || name.isBlank() ? reads.hierarchy(merchantStore, language, pageable)
+                : categoryService.hierarchy(merchantStore, name, language, false, pageable);
     }
 
     @GetMapping("/category/{friendlyUrl}")
     @Parameter(name = "store", schema = @Schema(type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
     public ReadableCategory getByFriendlyUrl(@PathVariable String friendlyUrl, StoreMerchantId merchantStore,
                                              LanguageCode language) throws CategoryFriendlyUrlNotFoundException {
-        return categoryService.getByFriendlyUrl(merchantStore, friendlyUrl, language);
+        return reads.category(merchantStore, language, friendlyUrl);
     }
 
     @GetMapping("/private/category-hierarchy")
