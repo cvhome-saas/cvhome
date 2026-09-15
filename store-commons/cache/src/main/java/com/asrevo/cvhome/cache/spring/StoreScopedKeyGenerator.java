@@ -26,7 +26,8 @@ import com.asrevo.cvhome.commons.domain.StoreMerchantId;
  * The generator is what keeps a cached read honest. A method of a store-scoped region without a store argument,
  * or with an argument that cannot be a key part (a raw id, a shopper's id, a mutable criteria object), fails at the
  * first call with the method and the type named, so a read is never cached under a key that would hand one
- * tenant's answer to another. A method of a global region takes no store and is keyed by the sentinel.
+ * tenant's answer to another. A method of a global region takes no store and is keyed by the sentinel; an optional
+ * argument left null keys as {@link CacheKey#ABSENT}.
  * </p>
  */
 public final class StoreScopedKeyGenerator implements KeyGenerator {
@@ -52,11 +53,8 @@ public final class StoreScopedKeyGenerator implements KeyGenerator {
                 store = found;
             } else if (param instanceof LanguageCode found && language == null) {
                 language = found;
-            } else if (param instanceof Pageable pageable) {
-                parts.add(PageableKeys.of(pageable));
             } else {
-                refuseShopper(method, param);
-                parts.add(param);
+                parts.add(partOf(method, param));
             }
         }
         if (global) {
@@ -73,6 +71,18 @@ public final class StoreScopedKeyGenerator implements KeyGenerator {
             throw new IllegalArgumentException(String.format("%s.%s: %s", method.getDeclaringClass().getSimpleName(),
                     method.getName(), e.getMessage()), e);
         }
+    }
+
+    /** A page reads normalised, an absent optional argument as {@link CacheKey#ABSENT}, the rest as itself. */
+    private static Object partOf(Method method, Object param) {
+        if (param instanceof Pageable pageable) {
+            return PageableKeys.of(pageable);
+        }
+        if (param == null) {
+            return CacheKey.ABSENT;
+        }
+        refuseShopper(method, param);
+        return param;
     }
 
     private boolean isGlobal(Method method) {

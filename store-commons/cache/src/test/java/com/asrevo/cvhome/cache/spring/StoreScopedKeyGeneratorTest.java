@@ -31,6 +31,8 @@ class StoreScopedKeyGeneratorTest {
 
     private static final String SHOES = "shoes";
 
+    private static final String PRODUCT = "product";
+
     private final CacheRegistry registry = new CacheRegistry(CacheRegions.of(TestRegions.values()),
             List.of(new CaffeineCacheProvider()), CacheProperties.defaults());
 
@@ -91,13 +93,16 @@ class StoreScopedKeyGeneratorTest {
     void storeAndLanguageAreFoundWhereverTheyStandAndTheRestBecomeParts() {
         Reads target = new Reads();
 
-        CacheKey key = (CacheKey) keys.generate(target, method("product"), Stores.EN, SHOES, Stores.A);
+        CacheKey key = (CacheKey) keys.generate(target, method(PRODUCT), Stores.EN, SHOES, Stores.A);
         CacheKey paged = (CacheKey) keys.generate(target, method("paged"), Stores.A, Stores.EN, PageRequest.of(1, 5));
         CacheKey byClass = (CacheKey) keys.generate(target, method("viaClass"), Stores.A, ProductId.of(3));
 
         assertThat(key).isEqualTo(CacheKey.slug(Stores.A, Stores.EN, SHOES));
         assertThat(paged.render()).endsWith("|en|p1s5");
         assertThat(byClass).isEqualTo(CacheKey.of(Stores.A, null).with(ProductId.of(3)));
+        CacheKey absent = (CacheKey) keys.generate(target, method(PRODUCT), Stores.EN, null, Stores.A);
+        assertThat(absent).isEqualTo(CacheKey.of(Stores.A, Stores.EN).with(CacheKey.ABSENT));
+        assertThat(absent.render()).endsWith("|en|-");
     }
 
     @Test

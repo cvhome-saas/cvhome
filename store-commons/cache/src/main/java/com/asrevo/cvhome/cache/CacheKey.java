@@ -37,6 +37,9 @@ public record CacheKey(StoreMerchantId store, LanguageCode language, List<Object
 
     private static final String NONE = "-";
 
+    /** An optional argument that was not given, as a part: reads as {@code -}. */
+    public static final KeyPart ABSENT = () -> NONE;
+
     public CacheKey {
         if (store == null) {
             throw new IllegalArgumentException("a cache key names its store");
