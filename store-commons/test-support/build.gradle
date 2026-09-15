@@ -30,4 +30,7 @@ dependencies {
     // src/test exercises the ArchUnit gate rule against fixture controllers, which need the annotations the rule reads.
     testImplementation libs.spring.web
     testImplementation libs.spring.boot.starter.security
+    // The cache rules' fixtures build a Caffeine cache and a @Cacheable read on purpose.
+    testImplementation libs.caffeine
+    testImplementation libs.spring.boot.starter.cache
 }

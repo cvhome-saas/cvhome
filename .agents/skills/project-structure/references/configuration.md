@@ -190,7 +190,8 @@ store-core calls into a pod. In production these come from the control plane, no
 ## Database schemas
 
 `common-config.yml` sets `spring.sql.init.mode: always`, `spring.datasource.hikari.schema:
-${spring.application.name}`, `spring.jpa.hibernate.ddl-auto: validate` and `spring.jpa.open-in-view: false` for everyone. Each service then owns a
+${spring.application.name}`, `spring.jpa.hibernate.ddl-auto: validate`, `spring.jpa.open-in-view: false` and the cache regions'
+defaults (`com.asrevo.cvhome.cache`, `references/caching.md`) for everyone. Each service then owns a
 Postgres schema and ships its own DDL — `init-sql/schema.sql` + `init-sql/data-common.sql` for pod services,
 plain `schema.sql` for tenancy (which owns three schemas: `tenancy`, `org`, `tenancy_outbox`).
 

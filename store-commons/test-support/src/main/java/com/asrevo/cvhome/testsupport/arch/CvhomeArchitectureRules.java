@@ -62,9 +62,25 @@ public final class CvhomeArchitectureRules {
 
     private static final String NO_PATH = "";
 
+    private static final String CACHEABLE = "org.springframework.cache.annotation.Cacheable";
+
+    private static final String CACHE_PUT = "org.springframework.cache.annotation.CachePut";
+
+    private static final String CACHE_EVICT = "org.springframework.cache.annotation.CacheEvict";
+
+    private static final String READS = "Reads";
+
+    private static final String SUBPACKAGES = "%s..";
+
+    private static final Set<String> WHO_ASKS = Set.of("ShopperId", "CustomerId", "Principal", "Authentication");
+
     private static final AntPathMatcher PATHS = new AntPathMatcher();
 
     private CvhomeArchitectureRules() {
+    }
+
+    private static String within(String domain) {
+        return String.format(SUBPACKAGES, domain);
     }
 
     /** Controllers orchestrate through services; they never reach this domain's repositories directly. */
@@ -112,6 +128,49 @@ public final class CvhomeArchitectureRules {
         return classes().that().areAnnotatedWith(REST_CONTROLLER)
                 .should().resideInAnyPackage(allowed)
                 .as("@RestController classes belong in a declared api package")
+                .allowEmptyShould(true);
+    }
+
+    /**
+     * A cached read lives in a {@code *Reads} class and never depends on who asks: a {@code @Cacheable},
+     * {@code @CachePut} or {@code @CacheEvict} method of the domain is declared in a class named {@code <Area>Reads}
+     * and takes no shopper, customer or principal. The store-scoped key generator refuses the same at run time; this
+     * fails the build instead.
+     */
+    public static ArchRule cachedReadsAreStoreScoped(String domain) {
+        return methods().that().areDeclaredInClassesThat().resideInAPackage(within(domain))
+                .and(annotatedWith(CACHEABLE).or(annotatedWith(CACHE_PUT)).or(annotatedWith(CACHE_EVICT)))
+                .should(new ArchCondition<>("be declared in a *Reads class and take no shopper") {
+                    @Override
+                    public void check(JavaMethod method, ConditionEvents events) {
+                        if (!method.getOwner().getSimpleName().endsWith(READS)) {
+                            events.add(SimpleConditionEvent.violated(method, String.format(
+                                    "%s is cached but %s is not a *Reads class: a cached read lives in <Area>Reads",
+                                    method.getFullName(), method.getOwner().getSimpleName())));
+                        }
+                        for (JavaClass parameter : method.getRawParameterTypes()) {
+                            if (WHO_ASKS.contains(parameter.getSimpleName())) {
+                                events.add(SimpleConditionEvent.violated(method, String.format(
+                                        "%s is cached but takes a %s: a read that depends on who asks is never cached",
+                                        method.getFullName(), parameter.getSimpleName())));
+                            }
+                        }
+                    }
+                })
+                .as("cached reads are store-scoped *Reads methods")
+                .allowEmptyShould(true);
+    }
+
+    /**
+     * A service caches through {@code store-commons:cache} only: no class of the domain touches Caffeine or Spring's
+     * {@code CacheManager} itself. What a region holds, how long and where is the library's and configuration's.
+     */
+    public static ArchRule noCacheInternalsOutsideTheCacheModule(String domain) {
+        return noClasses().that().resideInAPackage(within(domain))
+                .should().dependOnClassesThat(resideInAPackage("com.github.benmanes.caffeine..")
+                        .or(JavaClass.Predicates.belongToAnyOf(org.springframework.cache.CacheManager.class,
+                                org.springframework.cache.Cache.class)))
+                .as("a service caches through store-commons:cache, never Caffeine or a CacheManager of its own")
                 .allowEmptyShould(true);
     }
 
@@ -181,7 +240,7 @@ public final class CvhomeArchitectureRules {
     }
 
     private static DescribedPredicate<JavaMethod> handlersOf(String domain) {
-        DescribedPredicate<JavaClass> controllers = resideInAPackage(String.format("%s..", domain))
+        DescribedPredicate<JavaClass> controllers = resideInAPackage(within(domain))
                 .and(annotatedWith(REST_CONTROLLER));
         return DescribedPredicate.<JavaMethod>describe(
                 String.format("request handlers of @RestController classes in %s", domain),

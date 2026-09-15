@@ -312,6 +312,7 @@ See `references/frontends.md`.
 | Add a table or column | the service's `schema.sql` / `init-sql/schema.sql`, not just the entity |
 | Debug "the event never arrived" | query `outbox_record` for `status='FAILED'`, read `failure_reason` |
 | Pass an id or code around | use the value object from `store-commons/commons/.../domain/`, not a `String` |
+| Cache a read | a constant in `<Service>Regions`, a `@Cacheable` method in `<Area>Reads`, an `EvictionRules` line — `references/caching.md` |
 | Change business logic | `<domain>-core` (services/facades), not `-service` |
 | Add/change an entity or DTO | `<domain>-commons` |
 | Call another pod from a service | that pod's `-external-api` module + a bean in your `ClientsConfig` |
@@ -358,6 +359,7 @@ See `references/frontends.md`.
 - `references/service-discovery.md` — `lb://` resolution, simple discovery locally vs `ecs-service-discoveryclient` / Cloud Map on Fargate.
 - `references/uaa-client.md` — the UAA admin SDK: creating/reading users in `uaa`, tenant metadata, wiring.
 - `references/events-outbox.md` — aggregate roots, `@OutboxEvent`/`@OutboxHandler`, when to use events vs. calls.
+- `references/caching.md` — regions, store-scoped keys, providers, eviction on commit, cache events; the five steps to a cached read.
 
 **Running & QA**
 - `references/qa-testing.md` — **how QA is done here**, including where a QA script lives

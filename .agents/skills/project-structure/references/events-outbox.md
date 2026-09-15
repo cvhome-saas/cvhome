@@ -269,6 +269,13 @@ slow or failed responses, so this is deliberate.
 | Inbound webhook from an external provider | Persist to outbox, ack immediately, handle async |
 | Scheduled/batch work that must survive restarts | Outbox **command** |
 
+## Cache events
+
+A change a shopper sees is also a cache event (`store-commons:cache`, `com.asrevo.cvhome.cache.event`): the aggregate
+registers `ProductChanged`, `StockChanged`, `StoreChanged`… like any event, the library's `CacheEventOutboxHandler`
+drops the store's regions locally and hands the event to the `CacheEventTransport` port for the other tasks and
+services. `references/caching.md` has the design.
+
 ## Adding a new domain event
 
 1. Define the record in a dedicated `-events` module (see above — that is the default; only fall back to
