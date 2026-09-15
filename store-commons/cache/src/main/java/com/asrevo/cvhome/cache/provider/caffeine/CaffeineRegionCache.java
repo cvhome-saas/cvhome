@@ -61,15 +61,19 @@ final class CaffeineRegionCache<V> implements RegionCache<V> {
             asked.put(versioned(key), key);
         }
         Map<VersionedKey, V> found = cache.getAll(asked.keySet(), missing -> {
-            Set<CacheKey> plain = new LinkedHashSet<>();
+            // Loaded entries land under the version the reader asked for, not the one current when the load ends: a
+            // store write committed meanwhile has bumped it, and an entry stamped with the new version would be one
+            // Caffeine does not hand back for the keys requested, so the reader would take a row it just loaded for
+            // a row that does not exist. Under the old version the reader gets it and nobody else ever sees it.
+            Map<CacheKey, VersionedKey> requested = new LinkedHashMap<>();
             for (VersionedKey stamped : missing) {
-                plain.add(stamped.key());
+                requested.put(stamped.key(), stamped);
             }
-            Map<CacheKey, V> loaded = loader.apply(plain);
+            Map<CacheKey, V> loaded = loader.apply(requested.keySet());
             Map<VersionedKey, V> stamped = new LinkedHashMap<>();
             for (Map.Entry<CacheKey, V> entry : loaded.entrySet()) {
                 if (entry.getValue() != null) {
-                    stamped.put(versioned(entry.getKey()), entry.getValue());
+                    stamped.put(requested.getOrDefault(entry.getKey(), versioned(entry.getKey())), entry.getValue());
                 }
             }
             return stamped;
