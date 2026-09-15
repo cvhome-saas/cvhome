@@ -30,9 +30,10 @@ import lombok.RequiredArgsConstructor;
 
 /**
  * Every operation reads the cart, prices it with no transaction open, then writes in a short transaction of its own
- * ({@link CartTransactions}). No database connection is held while a peer answers. A read or a removal asks inventory
- * for the live price and stock and the catalogue for nothing: what the catalogue said about a sku was kept on its
- * line when it was added ({@link CartLine#remember}). An add asks the catalogue about the sku it adds.
+ * ({@link CartTransactions}). No database connection is held while a peer answers. A read or a removal takes the
+ * price and stock from the per-sku inventory cache (seconds old at most) and asks the catalogue nothing: what the
+ * catalogue said about a sku was kept on its line when it was added ({@link CartLine#remember}). An add asks the
+ * catalogue about the sku it adds, and inventory live.
  */
 @Service
 @RequiredArgsConstructor

@@ -574,6 +574,22 @@ answering `detailed-products` in 3 s, and every cart read made that call again.
   two-line cart), `ProductSnapshotServiceImplTest` (a remembered line is priced by inventory alone; a stale one asks
   and remembers), `CartServiceImplTest`. **Not verified** on a stack.
 
+### LOAD-08 — A cart read prices its lines from a per-sku inventory cache; an add and a placement stay live · high · [unit only]
+
+The single mix spike on the rebuilt images (2026-09-15): checkout was the wall at 12–15 ms of Fargate CPU a
+request, and every one of its 2,634 cart calls made one HTTP round trip to inventory for prices a cart shows
+unchanged between two page views.
+
+- **Expect** — a read or a removal takes each line's price and stock from the `INVENTORY_SKU` cache (one entry per
+  store and sku, five seconds, `cache_gets_total{name="INVENTORY_SKU"}` counts it); the cache asks inventory once
+  for whatever skus it lacks; a sku inventory does not know is asked again next time; an add checks the sku it adds
+  against inventory live; a placement prices the whole cart live and then forgets its skus, so the next read on that
+  task shows the units it took. A price change made in the console is visible in a cart within five seconds.
+- **Result** — `CachedSkuInventoryTest` (one read per missing sku, a forgotten sku asked again, a store's entries
+  its own), `ProductSnapshotServiceImplTest` (a read never calls inventory directly; an add does; a placed order is
+  forgotten), `OrderPlacementServiceImplTest`, `CartApiIntegrationTest` (the inventory stub's call count does not move
+  across two reads of the same cart). **Not verified** on a stack.
+
 ---
 
 ## 99 — Known gaps

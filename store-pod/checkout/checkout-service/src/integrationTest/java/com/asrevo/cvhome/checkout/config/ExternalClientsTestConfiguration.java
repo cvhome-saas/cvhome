@@ -82,6 +82,9 @@ public class ExternalClientsTestConfiguration {
     /** How many times checkout asked the catalogue for cart lines: a read must not, once the line remembers. */
     public static final AtomicInteger CART_LINE_READS = new AtomicInteger();
 
+    /** How many times checkout asked inventory for price and stock: two reads seconds apart cost one. */
+    public static final AtomicInteger INVENTORY_READS = new AtomicInteger();
+
     @Bean
     @Primary
     ExternalMerchantStoreService stubExternalMerchantStoreService() {
@@ -127,6 +130,7 @@ public class ExternalClientsTestConfiguration {
         ExternalInventoryService service = Mockito.mock(ExternalInventoryService.class);
         Mockito.when(service.queryBySkus(any(), any())).thenAnswer(invocation -> {
             recordTransaction();
+            INVENTORY_READS.incrementAndGet();
             AvailabilityQuery query = invocation.getArgument(1);
             return query.skus().stream().filter(sku -> !SKU_UNKNOWN.equals(sku.value()))
                     .map(ExternalClientsTestConfiguration::stock).toList();

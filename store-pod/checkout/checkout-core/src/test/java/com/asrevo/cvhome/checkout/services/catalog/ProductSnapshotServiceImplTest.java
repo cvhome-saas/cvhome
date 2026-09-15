@@ -5,6 +5,7 @@ import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneOffset;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -89,6 +90,9 @@ class ProductSnapshotServiceImplTest {
     @Mock
     private ExternalInventoryService inventory;
 
+    @Mock
+    private CachedSkuInventory cachedInventory;
+
     @Spy
     private Clock clock = Clock.fixed(NOW, ZoneOffset.UTC);
 
@@ -104,6 +108,14 @@ class ProductSnapshotServiceImplTest {
         product.setFriendlyUrl(name == null ? null : name.toLowerCase());
         product.setImageUrl(HTTP_IMG_1_PNG);
         return product;
+    }
+
+    static Map<Sku, SkuInventory> cached(SkuInventory... entries) {
+        Map<Sku, SkuInventory> stock = new LinkedHashMap<>();
+        for (SkuInventory entry : entries) {
+            stock.put(entry.sku(), entry);
+        }
+        return stock;
     }
 
     static SkuInventory stock(Sku sku, String price, boolean purchasable) {
@@ -179,12 +191,12 @@ class ProductSnapshotServiceImplTest {
         cart.put(A_2, 1);
         CartLine line = cart.line(A_2).orElseThrow();
         line.remember(7L, ALPHA, ALPHA_SLUG, HTTP_IMG_1_PNG, true, List.of(new OptionLabel(COLOR, RED)), NOW);
-        when(inventory.queryBySkus(Orders.STORE, new AvailabilityQuery(List.of(A_2))))
-                .thenReturn(List.of(stock(A_2, LIT_9_99, true)));
+        when(cachedInventory.stock(Orders.STORE, List.of(A_2))).thenReturn(cached(stock(A_2, LIT_9_99, true)));
 
         Map<Sku, ProductSnapshot> priced = service.priced(Orders.STORE, EN, cart.getLines());
 
         verify(products, never()).getCartLines(any(), any(), any());
+        verify(inventory, never()).queryBySkus(any(), any());
         ProductSnapshot a = priced.get(A_2);
         assertThat(a.productId()).isEqualTo(7L);
         assertThat(a.name()).isEqualTo(ALPHA);
@@ -205,8 +217,8 @@ class ProductSnapshotServiceImplTest {
                 NOW.minus(CartLine.SNAPSHOT_FOR).minus(Duration.ofMinutes(1)));
         when(products.getCartLines(Orders.STORE, List.of(B_2, C_2), EN))
                 .thenReturn(List.of(product(B_2, BETA_AGAIN), product(C_2, "Gamma")));
-        when(inventory.queryBySkus(Orders.STORE, new AvailabilityQuery(List.of(A_2, B_2, C_2))))
-                .thenReturn(List.of(stock(A_2, LIT_1_00, true), stock(B_2, LIT_1_00, true), stock(C_2, LIT_1_00, true)));
+        when(cachedInventory.stock(Orders.STORE, List.of(A_2, B_2, C_2)))
+                .thenReturn(cached(stock(A_2, LIT_1_00, true), stock(B_2, LIT_1_00, true), stock(C_2, LIT_1_00, true)));
 
         Map<Sku, ProductSnapshot> priced = service.priced(Orders.STORE, EN, cart.getLines());
 
@@ -224,6 +236,7 @@ class ProductSnapshotServiceImplTest {
         assertThat(service.priced(Orders.STORE, EN, List.of())).isEmpty();
         verify(products, never()).getCartLines(any(), any(), any());
         verify(inventory, never()).queryBySkus(any(), any());
+        verify(cachedInventory, never()).stock(any(), any());
 
         Cart cart = new Cart(Orders.STORE, CART, EN);
         cart.put(V_2, 1);
@@ -235,10 +248,23 @@ class ProductSnapshotServiceImplTest {
         selection.setOptionValues(List.of(coded));
         variant.setVariant(selection);
         when(products.getCartLines(Orders.STORE, List.of(V_2), EN)).thenReturn(List.of(variant));
-        when(inventory.queryBySkus(any(), any())).thenReturn(List.of(stock(V_2, LIT_1_00, true)));
+        when(cachedInventory.stock(any(), any())).thenReturn(cached(stock(V_2, LIT_1_00, true)));
 
         service.priced(Orders.STORE, EN, cart.getLines());
 
         assertThat(cart.line(V_2).orElseThrow().getOptionLabels()).containsExactly(new OptionLabel(SIZE, L));
+    }
+
+    @Test
+    void anAddAndAPlacementAreLiveAndAPlacedOrderIsForgotten() {
+        when(products.getCartLines(any(), any(), any())).thenReturn(List.of(product(A_2, ALPHA)));
+        when(inventory.queryBySkus(Orders.STORE, new AvailabilityQuery(List.of(A_2))))
+                .thenReturn(List.of(stock(A_2, LIT_9_99, true)));
+
+        assertThat(service.snapshot(Orders.STORE, EN, List.of(A_2))).containsOnlyKeys(A_2);
+        service.forget(Orders.STORE, List.of(A_2));
+
+        verify(cachedInventory, never()).stock(any(), any());
+        verify(cachedInventory).forget(Orders.STORE, List.of(A_2));
     }
 }

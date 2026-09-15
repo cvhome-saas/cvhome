@@ -10,6 +10,10 @@ dependencies {
     implementation project(':store-pod:catalog:catalog-external-api')
     implementation project(':store-pod:inventory:inventory-external-api')
     implementation project(':store-pod:payment:payment-external-api')
+    // CachedSkuInventory keys inventory's entries by store (StoreScopedKey) and reads them in one Caffeine getAll;
+    // the service brings the cache manager.
+    implementation project(':store-commons:autoconfigure')
+    compileOnly libs.caffeine
     compileOnly libs.spring.data.jpa
     compileOnly libs.spring.boot.starter.autoconfigure
     compileOnly libs.hibernate.core
@@ -22,4 +26,7 @@ dependencies {
     // Mockito mocks the JPA repositories, whose annotations reference jakarta.persistence at load time.
     testImplementation libs.jakarta.persistence.api
     testImplementation libs.spring.boot.starter.autoconfigure
+    // CachedSkuInventoryTest drives a real CaffeineCacheManager.
+    testImplementation libs.caffeine
+    testImplementation libs.spring.boot.starter.cache
 }

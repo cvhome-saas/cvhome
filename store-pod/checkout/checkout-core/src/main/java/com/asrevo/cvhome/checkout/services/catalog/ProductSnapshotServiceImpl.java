@@ -36,6 +36,8 @@ public class ProductSnapshotServiceImpl implements ProductSnapshotService {
 
     private final ExternalInventoryService inventory;
 
+    private final CachedSkuInventory cachedInventory;
+
     private final Clock clock;
 
     @Override
@@ -73,7 +75,12 @@ public class ProductSnapshotServiceImpl implements ProductSnapshotService {
                 }
             }
         }
-        return merge(skus, byProductSku, fromInventory(store, skus));
+        return merge(skus, byProductSku, cachedInventory.stock(store, skus));
+    }
+
+    @Override
+    public void forget(StoreMerchantId store, Collection<Sku> skus) {
+        cachedInventory.forget(store, skus);
     }
 
     /** Keeps what the catalogue answered on the line, so the next read need not ask again. */
@@ -89,6 +96,7 @@ public class ProductSnapshotServiceImpl implements ProductSnapshotService {
                         LinkedHashMap::new));
     }
 
+    /** Live: what an add and a placement check against. */
     private Map<Sku, SkuInventory> fromInventory(StoreMerchantId store, List<Sku> skus) {
         return inventory.queryBySkus(store, new AvailabilityQuery(skus)).stream()
                 .collect(Collectors.toMap(SkuInventory::sku, Function.identity(), (a, b) -> a));
