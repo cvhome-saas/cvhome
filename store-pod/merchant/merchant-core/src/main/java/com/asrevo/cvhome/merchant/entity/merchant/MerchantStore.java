@@ -30,6 +30,7 @@ import com.asrevo.cvhome.commons.domain.CurrencyCode;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.ManagerStoreDomain;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.commons.domain.StoreScoped;
 import com.asrevo.cvhome.commons.domain.Theme;
 import com.asrevo.cvhome.commons.domain.ZoneCode;
 import com.asrevo.cvhome.store.core.converter.CountryIsoCodeConverter;
@@ -49,7 +50,7 @@ import lombok.Setter;
 @Table(name = "MERCHANT_STORE")
 @Getter
 @Setter
-public class MerchantStore extends SalesManagerEntity<StoreMerchantId, MerchantStore> implements Auditable {
+public class MerchantStore extends SalesManagerEntity<StoreMerchantId, MerchantStore> implements Auditable, StoreScoped {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -186,4 +187,8 @@ public class MerchantStore extends SalesManagerEntity<StoreMerchantId, MerchantS
     public MerchantStore() {
     }
 
+    @Override
+    public StoreMerchantId scopedStore() {
+        return id;
+    }
 }

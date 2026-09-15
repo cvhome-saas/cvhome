@@ -9,6 +9,7 @@ import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.merchant.errors.MerchantStoreContextMismatchException;
 import com.asrevo.cvhome.merchant.model.merchant.PersistableMerchantStore;
 import com.asrevo.cvhome.merchant.model.merchant.ReadableMerchantStore;
+import com.asrevo.cvhome.merchant.reads.MerchantStoreReads;
 import com.asrevo.cvhome.merchant.service.facade.merchant.StoreFacade;
 import com.asrevo.cvhome.store.core.entity.content.InputContentFile;
 
@@ -43,7 +44,9 @@ class MerchantStoreApiTest {
 
     private final StoreFacade storeFacade = mock(StoreFacade.class);
 
-    private final MerchantStoreApi api = new MerchantStoreApi(storeFacade);
+    private final MerchantStoreReads reads = mock(MerchantStoreReads.class);
+
+    private final MerchantStoreApi api = new MerchantStoreApi(storeFacade, reads);
 
     @Test
     void compatibilityReadRejectsDifferentTenantContext() {
@@ -56,6 +59,7 @@ class MerchantStoreApiTest {
     @Test
     void compatibilityReadUsesResolvedTenantContext() throws Exception {
         ReadableMerchantStore expected = new ReadableMerchantStore();
+        when(reads.store(STORE, LANGUAGE)).thenReturn(expected);
         when(storeFacade.getByMerchantStoreId(STORE, LANGUAGE)).thenReturn(expected);
 
         assertThat(api.store(STORE.getId(), STORE, LANGUAGE)).isSameAs(expected);
@@ -64,7 +68,7 @@ class MerchantStoreApiTest {
 
     @Test
     void languagesComeFromTheFacade() {
-        when(storeFacade.supportedLanguages(STORE)).thenReturn(List.of(LANGUAGE));
+        when(reads.languages(STORE)).thenReturn(List.of(LANGUAGE));
 
         assertThat(api.supportedLanguages(STORE)).containsExactly(LANGUAGE);
     }

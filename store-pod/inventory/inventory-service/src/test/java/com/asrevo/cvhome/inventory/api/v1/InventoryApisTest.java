@@ -19,6 +19,7 @@ import com.asrevo.cvhome.inventory.model.PersistableInventory;
 import com.asrevo.cvhome.inventory.model.PersistableInventoryBatch;
 import com.asrevo.cvhome.inventory.model.PersistableSkuInventory;
 import com.asrevo.cvhome.inventory.model.SkuInventory;
+import com.asrevo.cvhome.inventory.reads.SkuInventoryReads;
 import com.asrevo.cvhome.inventory.services.InventoryService;
 import com.asrevo.cvhome.inventory.services.ReservationService;
 import com.asrevo.cvhome.store.core.model.catalog.ProductReservationList;
@@ -56,7 +57,9 @@ class InventoryApisTest {
     private final InventoryService inventoryService = Mockito.mock(InventoryService.class);
     private final ReservationService reservationService = Mockito.mock(ReservationService.class);
     private final InventoryApi inventoryApi = new InventoryApi(inventoryService);
-    private final ExternalInventoryApi externalInventoryApi = new ExternalInventoryApi(inventoryService);
+    private final SkuInventoryReads skuReads = Mockito.mock(SkuInventoryReads.class);
+
+    private final ExternalInventoryApi externalInventoryApi = new ExternalInventoryApi(inventoryService, skuReads);
     private final ExternalProductReservationApi reservationApi =
             new ExternalProductReservationApi(reservationService);
 
@@ -103,12 +106,12 @@ class InventoryApisTest {
 
     @Test
     void theStorefrontAvailabilityReadsBothAcceptSkusAndAnswerTheSameWay() {
-        when(inventoryService.getBySkus(STORE, List.of(SKU))).thenReturn(List.of(sku()));
+        when(skuReads.bySkus(STORE, List.of(SKU))).thenReturn(List.of(sku()));
 
         assertThat(externalInventoryApi.getBySkus(STORE, List.of(SKU))).containsExactly(sku());
         assertThat(externalInventoryApi.queryBySkus(STORE, new AvailabilityQuery(List.of(SKU))))
                 .containsExactly(sku());
-        verify(inventoryService, Mockito.times(2)).getBySkus(STORE, List.of(SKU));
+        verify(skuReads, Mockito.times(2)).bySkus(STORE, List.of(SKU));
     }
 
     @Test

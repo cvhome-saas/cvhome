@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
 import com.asrevo.cvhome.merchant.model.merchant.ReadableMerchantStore;
-import com.asrevo.cvhome.merchant.service.facade.merchant.StoreFacade;
+import com.asrevo.cvhome.merchant.reads.MerchantStoreReads;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -28,7 +28,7 @@ import static com.asrevo.cvhome.commons.utils.DefaultStoresConstants.DEFAULT_ORG
 @AllArgsConstructor
 public class ExternalMerchantStoreApi implements ExternalMerchantStoreService {
 
-    private final StoreFacade storeFacade;
+    private final MerchantStoreReads reads;
 
     @GetMapping(value = "/store")
     @Operation(method = "GET", description = "Get merchant store",
@@ -39,7 +39,7 @@ public class ExternalMerchantStoreApi implements ExternalMerchantStoreService {
 
     @Override
     public ReadableMerchantStore getStore(StoreMerchantId merchantStore) {
-        return storeFacade.getReadableMerchantStoreId(merchantStore);
+        return reads.store(merchantStore);
     }
 
 }
