@@ -12,7 +12,7 @@ text direction, behind the pod's edge.
 - **Runs on** — `lcl start -d --stack <name>` (`npm run dev` alone is not enough — it needs the backend).
   Always reach it through the edge at `http://<store>.spg-507f1f77.gateway.com`; read the live port from
   `lcl urls`
-- **Cases** — 51 (42 verified, 0 unit only, 17 not verified; 5 cases have split verification tags)
+- **Cases** — 57 (44 verified, 1 unit only, 17 not verified; 5 cases have split verification tags)
 - **Also see** — [spg](../../spg/qa/spg-qa.md) (the edge in front of it), content, catalog, inventory,
   [checkout](../../checkout/checkout-service/qa/checkout-qa.md),
   [cua](../../cua/qa/cua-qa.md) (shopper login)
@@ -846,9 +846,32 @@ advisories, the versions that fix them, and what changed for this app between 16
 
 Findings 1 and 7 of *Where cvhome Breaks* (orchestrator `.agents/plans/load-bottlenecks.md`). **lcl runs landing-ui
 under `next dev`, which never goes through `start.mjs`**, so the page cache and the request signal are off on a plain lcl
-stack. (The page cache is its own PR; its cases LOAD-01/02/03/05/06/07 arrive with it.) To QA them: `npm run build` in `store-pod/landing-ui`, `lcl stop landing-ui --stack <name>`, then from
+stack. To QA them: `npm run build` in `store-pod/landing-ui`, `lcl stop landing-ui --stack <name>`, then from
 `storefront/` run `PORT=<landing-ui port> INTERNAL_SPG=http://spg-507f1f77.gateway.com:<spg port> node start.mjs`, and
 browse through spg as usual.
+
+### LOAD-01 — An anonymous page is served from memory after its first render · high · [verified]
+
+- **Steps** — request the same page twice through spg; read `x-storefront-cache`.
+- **Expect** — `miss`, then `hit`, with the same bytes; `Content-Encoding: gzip` still comes from spg on a hit.
+- **Result** — lcl stack `lb` from `fix/load-bottlenecks`, 2026-09-14, through spg (`org1-store1`, port 2080), production build: `miss` → `hit`, gzip from spg. Against the load stack's backend
+  (org1-store2's FASHION home page, 223 KB): a miss renders in 156 ms, a hit answers in ~1 ms with identical bytes;
+  100 views cost 40 ms of CPU cached against 1,650 ms uncached (0.4 against 16.5 ms a page, arm64).
+
+### LOAD-02 — Nothing that could carry a shopper, a draft or an override comes from memory · critical · [verified]
+
+- **Steps** — request `/en/login`, and `/en` with a `storefront-theme` cookie; each answers `x-storefront-cache: bypass`.
+- **Expect** — the same for `Authorization`, `?theme=`/`?color=`/`?preview=`, the register, customer, checkout and
+  callback routes, `/api/*` and `/_next/*`; a response that sets any cookie but `NEXT_LOCALE`, or is not a 200, is
+  never kept.
+- **Result** — login and the theme cookie verified on the stack; every other rule by
+  `storefront/scripts/server/page-cache.test.mjs` (11 cases).
+
+### LOAD-03 — Shoppers who arrive while a page is first rendering share one render · high · [verified]
+
+- **Steps** — 20 concurrent requests for a page nobody has asked for.
+- **Result** — against the load stack's backend: 1 `miss`, 19 `shared`, one render. Past 30 s a page is served `stale`
+  while the first request to find it stale renders it again (`stale-refresh`); past 5 min more it is a `miss`.
 
 ### LOAD-04 — A render stops when its shopper leaves, and a slow backend read fails in 3 s · high · [verified]
 
@@ -858,6 +881,30 @@ browse through spg as usual.
   made; for the waiting client each read is aborted at 3.0 s (`STOREFRONT_BACKEND_TIMEOUT_MS`, 0 waits). Writes have no
   budget. Covered also by `libs/services/test/http-utils.test.ts` and `scripts/server/request-scope.test.mjs`.
 
+
+### LOAD-05 — A stale page is served at once, and refreshed by the cache itself · high · [unit only]
+
+- **Expect** — past 30 s the first shopper to ask gets the stale copy (`stale`) without waiting; the cache asks this
+  same server for the page again (`x-storefront-revalidate: 1`, one refresh at a time) and the next shopper gets
+  `hit` with the new bytes; a refresh that fails leaves the stale copy for its window and is tried again on the next
+  request. Without a revalidator (the unit tests' plain cache) the first request renders in line (`stale-refresh`).
+- **Result** — `page-cache.test.mjs`.
+
+### LOAD-06 — A page with a hole in it, or one that stopped short, is never kept · critical · [unit only]
+
+- **Expect** — a render in which an optional backend read was aborted or timed out (`orUndefined`) is sent to its
+  shopper but not kept; an HTML body that does not end in `</html>` (Next cannot change the status once the shell is
+  out) is not kept; a client navigation or prefetch (the `rsc` request headers) bypasses the cache; a listener that
+  throws before answering ends the response with a 500 instead of leaving it open.
+- **Result** — `page-cache.test.mjs`, `request-scope.test.mjs`, `libs/services/test/http-utils.test.ts` (a 404 is
+  an answer and does not mark the render degraded).
+
+### LOAD-07 — A shared render outlives the shopper who started it, and a write is never aborted · high · [unit only]
+
+- **Expect** — while other shoppers are waiting on a first render, the first shopper leaving does not abort it; once
+  nobody waits, it does. The request signal and the 3 s budget are attached to GET only; the timer and the abort
+  listener of a read are released when it ends.
+- **Result** — `page-cache.test.mjs`, `request-scope.test.mjs`, `http-utils.test.ts`.
 
 ### LOAD-08 — A video section loads its player only when the shopper presses play · high · [not verified]
 

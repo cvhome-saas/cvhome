@@ -1,0 +1,2 @@
+# The image carries the server's scripts, not their tests (storefront/scripts/server/*.test.mjs).
+**/*.test.mjs
