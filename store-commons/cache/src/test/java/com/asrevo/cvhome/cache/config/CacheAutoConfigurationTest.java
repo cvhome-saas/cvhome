@@ -43,7 +43,9 @@ class CacheAutoConfigurationTest {
     private static final String PRODUCT = "test.product";
 
     private final ApplicationContextRunner runner = new ApplicationContextRunner()
-            .withConfiguration(AutoConfigurations.of(CacheAutoConfiguration.class));
+            .withConfiguration(AutoConfigurations.of(CacheAutoConfiguration.class,
+                    org.springframework.boot.cache.autoconfigure.CacheAutoConfiguration.class))
+            .withPropertyValues("spring.cache.cache-names=STORE");
 
     /** A read as a service writes one. */
     static class ProductReads {
@@ -105,7 +107,8 @@ class CacheAutoConfigurationTest {
     void aServiceWithNoRegionsStillStartsWithAnEmptyManagerAndTheEvictionHookInstalled() {
         runner.run(context -> {
             assertThat(context).hasSingleBean(CvhomeCacheManager.class).hasSingleBean(CacheRegistry.class)
-                    .hasSingleBean(CommitEvictionListener.class).hasSingleBean(CacheEvictionIntegrator.class)
+                    .hasSingleBean(CacheManager.class).hasSingleBean(CommitEvictionListener.class)
+                    .hasSingleBean(CacheEvictionIntegrator.class)
                     .hasSingleBean(AfterCommitEviction.class).hasSingleBean(EvictionRulesValidator.class)
                     .hasSingleBean(RegionCacheMeterBinderProvider.class);
             assertThat(context.getBean(CacheManager.class).getCacheNames()).isEmpty();

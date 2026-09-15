@@ -7,6 +7,7 @@ import jakarta.persistence.EntityManagerFactory;
 import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -37,6 +38,8 @@ import com.github.benmanes.caffeine.cache.Caffeine;
  * with the store-scoped key generator, and the start-up check of the names {@code @Cacheable} uses.
  *
  * <p>
+ * Configured before Boot's own cache auto-configuration, which would otherwise build a Caffeine manager of its own
+ * from {@code spring.cache.*} and leave every {@code @Cacheable} of the service pointing at it.
  * Every bean here always exists; the switches (a region's provider, time-to-live, size, on or off) are read from
  * {@link CacheProperties} inside the registry, never as a bean condition, because a native image fixes the bean
  * graph when it is built. A remote provider is a bean of {@link CacheProvider} in its own module and needs nothing
@@ -44,6 +47,7 @@ import com.github.benmanes.caffeine.cache.Caffeine;
  * </p>
  */
 @AutoConfiguration
+@AutoConfigureBefore(name = "org.springframework.boot.cache.autoconfigure.CacheAutoConfiguration")
 @EnableCaching
 @ConditionalOnClass(Caffeine.class)
 @EnableConfigurationProperties(CacheProperties.class)
