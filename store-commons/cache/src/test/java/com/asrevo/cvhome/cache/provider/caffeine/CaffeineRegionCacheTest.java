@@ -93,6 +93,37 @@ class CaffeineRegionCacheTest {
         assertThat(cache.getAll(List.of(), keys -> Map.of())).isEmpty();
     }
 
+    /**
+     * The race the load stack found: a store write commits while a bulk read is loading, so the store's version moves
+     * before the loaded rows are stored. Stamped with the new version they would be rows Caffeine does not return for
+     * the keys asked, and a cart would be told its sku does not exist. They land under the version asked for, the
+     * reader gets them, and the next reader loads again.
+     */
+    @Test
+    void aBulkLoadThatCrossesAStoreEvictionStillAnswersAndIsNotKept() {
+        CacheKey a1 = CacheKey.sku(Stores.A, Stores.EN, A1);
+        CacheKey a2 = CacheKey.sku(Stores.A, Stores.EN, A2);
+        List<Set<CacheKey>> asked = new ArrayList<>();
+
+        Map<CacheKey, String> during = cache.getAll(List.of(a1, a2), keys -> {
+            asked.add(keys);
+            cache.evictStore(Stores.A);
+            Map<CacheKey, String> loaded = new HashMap<>();
+            keys.forEach(key -> loaded.put(key, key.render()));
+            return loaded;
+        });
+        Map<CacheKey, String> after = cache.getAll(List.of(a1, a2), keys -> {
+            asked.add(keys);
+            Map<CacheKey, String> loaded = new HashMap<>();
+            keys.forEach(key -> loaded.put(key, V1));
+            return loaded;
+        });
+
+        assertThat(during).containsOnlyKeys(a1, a2);
+        assertThat(after).containsEntry(a1, V1).containsEntry(a2, V1);
+        assertThat(asked).as("the rows loaded across the eviction are not served after it").hasSize(2);
+    }
+
     @Test
     void aStoresEvictionHidesItsEntriesAndNoOthers() {
         CacheKey a = CacheKey.of(Stores.A, Stores.EN);
