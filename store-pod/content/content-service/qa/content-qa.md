@@ -9,7 +9,7 @@ posts, banners, FAQs, legal policies, navigation menus, the home page's sections
   library and its cross-service usage index, store appearance, and the `STORE-POD.CONTENT.*` permission gate
 - **Runs on** — `lcl start -d --stack <name>`; read the live port from `lcl urls`. Address it through the
   gateway, never `:8121`
-- **Cases** — 95 (24 verified, 21 unit only, 50 not verified)
+- **Cases** — 96 (24 verified, 22 unit only, 50 not verified)
 - **Also see** — [landing-ui](../../../landing-ui/qa/landing-ui-qa.md) (the storefront that renders this),
   catalog (the gallery that consumes media assets),
   [merchant](../../../merchant/merchant-service/qa/merchant-qa.md) (which no longer holds any appearance),
@@ -1064,6 +1064,20 @@ Finding 6 of *Where cvhome Breaks* (orchestrator `.agents/plans/load-bottlenecks
 - **Expect** — `content.content_seq` and `content.content_description_seq` replace `sm_sequencer`; the seeded
   negative ids (MIG-04) and the positive ones from the store seeds sit below what the sequences hand out.
 - **Result** — `ContentContextIntegrationTest` asserts the sequences exist and the table does not.
+
+### LOAD-06 — Every published storefront read is cached per store; an editor's write drops their own store's entries · high · [unit only]
+
+- **Expect** — the site, a page's layout and a menu answer from the `content.site` / `content.layout` /
+  `content.menu` regions for 10 s; pages, posts, the post list, post categories, banners, the faq, the current
+  version of a policy and the sitemap for 60 s, per store, language and arguments
+  (`cache_gets_total{cache="content.site"}`); a preview token, a draft layout, a policy at a named version and a
+  redirect lookup read live; an editor's committed write in store A drops store A's entries of the regions its
+  `CacheConfig` rule names (a redirect drops the sitemap and nothing else; a content row drops pages, posts, banners,
+  the faq, the site and the sitemap) and leaves store B's warm. On another task than the one that took the save, the
+  storefront is up to the region's ttl behind.
+- **Result** — `StorefrontReadsIntegrationTest` (four reads cost no statement the second time; a redirect drops the
+  writing store's sitemap alone and leaves its site warm), `StorefrontReadsTest`, `ContentRegionsTest`,
+  `PostsFilterTest`, `StorefrontApiTest`, `ContentArchitectureTest`. **Not verified** on a stack.
 
 ---
 
