@@ -23,6 +23,7 @@ import com.asrevo.cvhome.cache.eviction.CacheEvictionIntegrator;
 import com.asrevo.cvhome.cache.eviction.CommitEvictionListener;
 import com.asrevo.cvhome.cache.eviction.EvictionRules;
 import com.asrevo.cvhome.cache.eviction.EvictionRulesValidator;
+import com.asrevo.cvhome.cache.metrics.RegionCacheMeterBinderProvider;
 import com.asrevo.cvhome.cache.spring.CvhomeCacheManager;
 import com.asrevo.cvhome.cache.spring.StoreScopedKeyGenerator;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
@@ -105,7 +106,8 @@ class CacheAutoConfigurationTest {
         runner.run(context -> {
             assertThat(context).hasSingleBean(CvhomeCacheManager.class).hasSingleBean(CacheRegistry.class)
                     .hasSingleBean(CommitEvictionListener.class).hasSingleBean(CacheEvictionIntegrator.class)
-                    .hasSingleBean(AfterCommitEviction.class).hasSingleBean(EvictionRulesValidator.class);
+                    .hasSingleBean(AfterCommitEviction.class).hasSingleBean(EvictionRulesValidator.class)
+                    .hasSingleBean(RegionCacheMeterBinderProvider.class);
             assertThat(context.getBean(CacheManager.class).getCacheNames()).isEmpty();
             assertThat(context.getBean(CacheRegions.class).regions()).isEmpty();
             assertThat(context.getBean(EvictionRules.class).entityPackage()).isEmpty();

@@ -23,6 +23,7 @@ import com.asrevo.cvhome.cache.eviction.CacheEvictionIntegrator;
 import com.asrevo.cvhome.cache.eviction.CommitEvictionListener;
 import com.asrevo.cvhome.cache.eviction.EvictionRules;
 import com.asrevo.cvhome.cache.eviction.EvictionRulesValidator;
+import com.asrevo.cvhome.cache.metrics.RegionCacheMeterBinderProvider;
 import com.asrevo.cvhome.cache.provider.CacheProvider;
 import com.asrevo.cvhome.cache.provider.caffeine.CaffeineCacheProvider;
 import com.asrevo.cvhome.cache.spring.CacheableRegionsValidator;
@@ -80,6 +81,13 @@ public class CacheAutoConfiguration {
     @Bean
     CacheableRegionsValidator cacheableRegionsValidator(ListableBeanFactory beans, CacheRegistry registry) {
         return new CacheableRegionsValidator(beans, registry);
+    }
+
+    /** Boot binds every region's meters at start-up through this, as it does a Caffeine cache's. */
+    @Bean
+    @ConditionalOnClass(name = "org.springframework.boot.cache.metrics.CacheMeterBinderProvider")
+    RegionCacheMeterBinderProvider regionCacheMeterBinderProvider() {
+        return new RegionCacheMeterBinderProvider();
     }
 
     /**
