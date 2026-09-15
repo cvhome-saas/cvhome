@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.catalog.api.v2;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -13,8 +14,13 @@ import org.springframework.http.HttpStatus;
 
 import com.asrevo.cvhome.catalog.api.CatalogApiSupport;
 import com.asrevo.cvhome.catalog.config.ExternalClientsTestConfiguration;
+import com.asrevo.cvhome.catalog.services.CachedCartLines;
+import com.asrevo.cvhome.commons.domain.LanguageCode;
+import com.asrevo.cvhome.commons.domain.Sku;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.testsupport.annotations.StorageIntegrationTest;
 import com.asrevo.cvhome.testsupport.security.TestJwtSigner;
+import com.asrevo.cvhome.testsupport.sql.SqlStatements;
 
 import tools.jackson.databind.JsonNode;
 
@@ -149,6 +155,8 @@ class ProductApiIntegrationTest {
     @Autowired
     private TestJwtSigner signer;
 
+    @Autowired
+    private CachedCartLines cartLines;
 
     private CatalogApiSupport api;
 
@@ -386,9 +394,10 @@ class ProductApiIntegrationTest {
     // ----------------------------------------------------------------------------------------- category membership
 
     @Test
-    void checkoutReadsCartLinesInTheirOwnShape() throws Exception {
+    void checkoutReadsCartLinesFromThePerSkuCache() throws Exception {
         /*
-         * The cart-line shape: what a line renders and nothing more. A whole cart's skus are one call.
+         * The cart-line shape: what a line renders and nothing more, each sku held in catalog's cache for a
+         * minute. A whole cart's skus are one call; the second call for any subset of them costs no statement.
          */
         String combination = COMBINATION_SKU;
         String simple = SIMPLE_SKU;
@@ -408,6 +417,15 @@ class ProductApiIntegrationTest {
         JsonNode variantLine = lines.valueStream().filter(line -> combination.equals(line.get(SKU).asString()))
                 .findFirst().orElseThrow();
         assertThat(variantLine.get(VARIANT_BLOCK).get(OPTION_VALUES_FIELD)).hasSize(2);
+
+        StoreMerchantId store = new StoreMerchantId(STORE_A);
+        LanguageCode language = LanguageCode.defaultLanguage();
+        SqlStatements.Recorded<Object> cached = SqlStatements.during(
+                () -> cartLines.cartLines(store, List.of(Sku.of(combination)), language));
+        assertThat(cached.count()).as(cached.toString()).isZero();
+        SqlStatements.Recorded<Object> otherStore = SqlStatements.during(
+                () -> cartLines.cartLines(new StoreMerchantId(STORE_B), List.of(Sku.of(simple)), language));
+        assertThat(otherStore.count()).as("another store's entries are its own").isPositive();
     }
 
     @Test

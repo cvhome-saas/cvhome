@@ -75,8 +75,11 @@ public class CachedStorefrontCatalog {
 
     public static final String SUGGEST = "CATALOG_SUGGEST";
 
+    /** Checkout's cart-line read, one entry per sku ({@link CachedCartLines}). */
+    public static final String CART_LINE = "CATALOG_CART_LINE";
+
     public static final List<String> CACHES = List.of(GROUP, RELATED, HIERARCHY, CATEGORY, BRANDS, PRODUCT, LISTING,
-            SEARCH, SUGGEST);
+            SEARCH, SUGGEST, CART_LINE);
 
     public static final Duration TTL = Duration.ofSeconds(60);
 

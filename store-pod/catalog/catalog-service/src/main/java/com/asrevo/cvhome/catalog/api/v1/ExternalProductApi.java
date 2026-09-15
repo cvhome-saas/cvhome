@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.asrevo.cvhome.catalog.errors.ProductNotFoundException;
 import com.asrevo.cvhome.catalog.model.product.ReadableCartLineProduct;
 import com.asrevo.cvhome.catalog.model.product.ReadableMinimalProduct;
+import com.asrevo.cvhome.catalog.services.CachedCartLines;
 import com.asrevo.cvhome.catalog.services.product.ExternalProductService;
 import com.asrevo.cvhome.catalog.services.product.ProductService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
@@ -37,6 +38,8 @@ public class ExternalProductApi implements ExternalProductService {
 
     private final ProductService productService;
 
+    private final CachedCartLines cartLines;
+
     @Override
     @GetMapping("/detailed-product")
     @Parameter(name = "store", schema = @Schema(type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
@@ -58,12 +61,12 @@ public class ExternalProductApi implements ExternalProductService {
         return productService.getBySkus(store, skus, lang);
     }
 
-    /** What a cart line renders, per sku, and nothing more; what checkout reads on every cart operation. */
+    /** What a cart line renders, per sku, from the per-sku cache; what checkout reads on every cart operation. */
     @Override
     @GetMapping("/cart-lines")
     @Parameter(name = "store", schema = @Schema(type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
     public List<ReadableCartLineProduct> getCartLines(StoreMerchantId store, @RequestParam List<Sku> skus,
                                                       LanguageCode lang) {
-        return skus == null || skus.isEmpty() ? List.of() : productService.getCartLines(store, skus, lang);
+        return cartLines.cartLines(store, skus, lang);
     }
 }
