@@ -3,6 +3,8 @@ plugins {
 }
 
 dependencies {
+    // The storefront's cached reads (reads/) and the regions they declare.
+    api project(':store-commons:cache')
     api project(':store-pod:commons:store-commons')
     api project(':store-pod:content:content-commons')
     compileOnly libs.spring.data.jpa
@@ -26,4 +28,5 @@ dependencies {
     testImplementation libs.jakarta.validation.api
     testImplementation libs.aws.sdk.s3
     testImplementation libs.slf4j.api
+    testImplementation libs.spring.data.commons
 }

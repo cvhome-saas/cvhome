@@ -5,10 +5,12 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 
+import com.asrevo.cvhome.cache.CacheRegions;
 import com.asrevo.cvhome.s2s.services.StoreOrgOwnerRetriever;
 
 /**
- * Gives a pod service the store-to-organization lookup its authorization needs, by having the merchant client.
+ * Gives a pod service the store-to-organization lookup its authorization needs, and the cache region of the store
+ * read, by having the merchant client.
  *
  * <p>
  * Registered rather than declared per service because the alternative is worse: without it,
@@ -24,6 +26,12 @@ public class MerchantStoreOrgOwnerAutoConfiguration {
     @ConditionalOnMissingBean(StoreOrgOwnerRetriever.class)
     StoreOrgOwnerRetriever merchantStoreOrgOwner(ExternalMerchantStoreService stores) {
         return new MerchantStoreOrgOwner(stores);
+    }
+
+    /** The client's own region, beside the service's; the cache registry merges every declaration. */
+    @Bean
+    CacheRegions merchantClientRegions() {
+        return CacheRegions.of(MerchantClientRegions.values());
     }
 
 }

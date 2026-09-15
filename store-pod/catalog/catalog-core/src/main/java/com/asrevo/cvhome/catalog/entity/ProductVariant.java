@@ -29,6 +29,7 @@ import org.hibernate.annotations.BatchSize;
 
 import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.commons.domain.StoreScoped;
 import com.asrevo.cvhome.store.core.constants.SchemaConstant;
 import com.asrevo.cvhome.store.core.converter.SkuConverter;
 import com.asrevo.cvhome.store.core.entity.common.audit.AuditListener;
@@ -59,7 +60,7 @@ import lombok.Setter;
         @UniqueConstraint(columnNames = {"PRODUCT_ID", "OPTION_SIGNATURE"})})
 @Getter
 @Setter
-public class ProductVariant extends SalesManagerEntity<Long, ProductVariant> implements Auditable {
+public class ProductVariant extends SalesManagerEntity<Long, ProductVariant> implements Auditable, StoreScoped {
 
     /**
      * The signature of the one variant a no-options product owns.
@@ -138,5 +139,10 @@ public class ProductVariant extends SalesManagerEntity<Long, ProductVariant> imp
             return DEFAULT_SIGNATURE;
         }
         return optionValueIds.stream().sorted().map(String::valueOf).collect(Collectors.joining("-"));
+    }
+
+    @Override
+    public StoreMerchantId scopedStore() {
+        return storeMerchantId;
     }
 }

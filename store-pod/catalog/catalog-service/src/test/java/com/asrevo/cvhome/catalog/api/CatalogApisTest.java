@@ -20,6 +20,10 @@ import com.asrevo.cvhome.catalog.api.v1.ProductTypeApi;
 import com.asrevo.cvhome.catalog.api.v2.ProductApiV2;
 import com.asrevo.cvhome.catalog.model.category.PersistableCategory;
 import com.asrevo.cvhome.catalog.model.manufacturer.PersistableManufacturer;
+import com.asrevo.cvhome.catalog.model.product.ProductFilter;
+import com.asrevo.cvhome.catalog.model.product.ProductSearchCriteria;
+import com.asrevo.cvhome.catalog.reads.StorefrontCatalogReads;
+import com.asrevo.cvhome.catalog.reads.SuggestQuery;
 import com.asrevo.cvhome.catalog.services.category.CategoryService;
 import com.asrevo.cvhome.catalog.services.group.ProductGroupService;
 import com.asrevo.cvhome.catalog.services.manufacturer.ManufacturerService;
@@ -27,6 +31,7 @@ import com.asrevo.cvhome.catalog.services.option.ProductOptionService;
 import com.asrevo.cvhome.catalog.services.product.ProductSearchService;
 import com.asrevo.cvhome.catalog.services.product.ProductService;
 import com.asrevo.cvhome.catalog.services.type.ProductTypeService;
+import com.asrevo.cvhome.commons.domain.CategoryId;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
@@ -66,13 +71,15 @@ class CatalogApisTest {
     private final ProductService productService = Mockito.mock(ProductService.class);
     private final ProductSearchService productSearchService = Mockito.mock(ProductSearchService.class);
 
-    private final CategoryApi categoryApi = new CategoryApi(categoryService);
-    private final ManufacturerApi manufacturerApi = new ManufacturerApi(manufacturerService);
-    private final ProductGroupApi productGroupApi = new ProductGroupApi(productGroupService);
+    private final StorefrontCatalogReads reads = Mockito.mock(StorefrontCatalogReads.class);
+
+    private final CategoryApi categoryApi = new CategoryApi(categoryService, reads);
+    private final ManufacturerApi manufacturerApi = new ManufacturerApi(manufacturerService, reads);
+    private final ProductGroupApi productGroupApi = new ProductGroupApi(productGroupService, reads);
     private final ProductTypeApi productTypeApi = new ProductTypeApi(productTypeService);
     private final ProductOptionApi productOptionApi = new ProductOptionApi(productOptionService);
     private final ProductApi productApi = new ProductApi(productService);
-    private final ProductApiV2 productApiV2 = new ProductApiV2(productService, productSearchService);
+    private final ProductApiV2 productApiV2 = new ProductApiV2(productService, productSearchService, reads);
 
     @Test
     void theShopperAndConsoleHierarchiesDifferOnlyInWhetherHiddenCategoriesAreIncluded() {
@@ -80,7 +87,7 @@ class CatalogApisTest {
         categoryApi.privateHierarchy(null, STORE, ENGLISH, PageRequest.of(0, 20));
 
         // false is the shopper's view. Handing true to the public endpoint publishes an unfinished category tree.
-        verify(categoryService).hierarchy(eq(STORE), eq(null), eq(ENGLISH), eq(false), any());
+        verify(reads).hierarchy(eq(STORE), eq(ENGLISH), any());
         verify(categoryService).hierarchy(eq(STORE), eq(null), eq(ENGLISH), eq(true), any());
     }
 
@@ -93,7 +100,7 @@ class CatalogApisTest {
         categoryApi.move(1L, 2L, STORE);
         categoryApi.delete(1L, STORE);
 
-        verify(categoryService).getByFriendlyUrl(STORE, SLUG, ENGLISH);
+        verify(reads).category(STORE, ENGLISH, SLUG);
         verify(categoryService).get(STORE, 1L, ENGLISH);
         verify(categoryService).move(STORE, 1L, 2L);
         verify(categoryService).delete(STORE, 1L);
@@ -128,7 +135,7 @@ class CatalogApisTest {
 
     @Test
     void theBrandAndTypeEndpointsPassTheirIdentityThrough() throws Exception {
-        manufacturerApi.listByCategory(1L, STORE, ENGLISH);
+        manufacturerApi.listByCategory(CategoryId.of(1), STORE, ENGLISH);
         manufacturerApi.list(null, STORE, ENGLISH, PageRequest.of(0, 20));
         manufacturerApi.get(1L, STORE, ENGLISH);
         manufacturerApi.update(1L, new PersistableManufacturer(), STORE);
@@ -138,7 +145,7 @@ class CatalogApisTest {
         productTypeApi.update(1L, null, STORE);
         productTypeApi.delete(1L, STORE);
 
-        verify(manufacturerService).listByCategory(STORE, 1L, ENGLISH);
+        verify(reads).brands(STORE, ENGLISH, CategoryId.of(1));
         verify(manufacturerService).get(STORE, 1L, ENGLISH);
         verify(manufacturerService).delete(STORE, 1L);
         verify(productTypeService).get(STORE, 1L, ENGLISH);
@@ -174,12 +181,12 @@ class CatalogApisTest {
 
     @Test
     void suggestionsAreCachedBrieflyAndPubliclyBecauseTheyAreTypedAheadOfEveryKeystroke() {
-        when(productSearchService.suggest(STORE, TERM, ENGLISH, 8)).thenReturn(List.of());
+        when(reads.suggest(STORE, ENGLISH, SuggestQuery.of(TERM, 8))).thenReturn(List.of());
 
         var response = productApiV2.suggest(TERM, 8, STORE, ENGLISH);
 
         assertThat(response.getHeaders().getCacheControl()).contains("max-age=30", "public");
-        verify(productSearchService).suggest(STORE, TERM, ENGLISH, 8);
+        verify(reads).suggest(STORE, ENGLISH, SuggestQuery.of(TERM, 8));
     }
 
     private static Stream<Method> privateEndpoints() {
@@ -253,15 +260,15 @@ class CatalogApisTest {
 
     @Test
     void theProductListingSearchAndDefinitionReadsAllCarryTheStoreAndLanguage() throws Exception {
-        productApiV2.list(null, STORE, ENGLISH, PageRequest.of(0, 20));
-        productApiV2.search(null, STORE, ENGLISH, PageRequest.of(0, 20));
+        productApiV2.list(new ProductFilter(), STORE, ENGLISH, PageRequest.of(0, 20));
+        productApiV2.search(new ProductSearchCriteria(), STORE, ENGLISH, PageRequest.of(0, 20));
         productApiV2.getByFriendlyUrl(SLUG, STORE, ENGLISH);
         productApiV2.get(1L, STORE, ENGLISH);
         productApiV2.rebuildSearchIndex(STORE);
 
-        verify(productService).list(eq(STORE), eq(null), eq(ENGLISH), any());
-        verify(productSearchService).search(eq(STORE), eq(null), eq(ENGLISH), any());
-        verify(productService).getByFriendlyUrl(STORE, SLUG, ENGLISH);
+        verify(reads).list(eq(STORE), eq(ENGLISH), any(), any());
+        verify(reads).search(eq(STORE), eq(ENGLISH), any(), any());
+        verify(reads).product(STORE, ENGLISH, SLUG);
         verify(productService).getDefinition(STORE, 1L, ENGLISH);
         verify(productSearchService).rebuildIndex(STORE);
     }

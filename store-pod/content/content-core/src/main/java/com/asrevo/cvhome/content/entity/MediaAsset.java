@@ -18,6 +18,8 @@ import jakarta.persistence.UniqueConstraint;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.commons.domain.StoreScoped;
 import com.asrevo.cvhome.content.model.MediaKind;
 
 import lombok.Getter;
@@ -32,7 +34,7 @@ import lombok.Setter;
         columnNames = {"STORE_MERCHANT_ID", "CHECKSUM"}))
 @Getter
 @Setter
-public class MediaAsset implements Serializable {
+public class MediaAsset implements Serializable, StoreScoped {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -99,4 +101,8 @@ public class MediaAsset implements Serializable {
     @Column(name = "UPLOADED_AT", nullable = false)
     private Instant uploadedAt = Instant.now();
 
+    @Override
+    public StoreMerchantId scopedStore() {
+        return storeMerchantId == null ? null : new StoreMerchantId(storeMerchantId);
+    }
 }

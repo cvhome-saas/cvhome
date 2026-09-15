@@ -5,6 +5,8 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.asrevo.cvhome.cache.eviction.AfterCommitEviction;
+import com.asrevo.cvhome.catalog.reads.CatalogRegions;
 import com.asrevo.cvhome.catalog.repositories.ProductSearchIndexRepository;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 
@@ -30,16 +32,23 @@ public class ProductSearchIndexer {
      */
     private static final int BRAND_BATCH = 200;
 
+    /** The derived table is refreshed natively, so Hibernate reports no entity: the search reads are dropped by hand. */
+    private static final List<CatalogRegions> SEARCH_REGIONS = List.of(CatalogRegions.SEARCH, CatalogRegions.SUGGEST);
+
     private final ProductSearchIndexRepository searchIndexRepository;
 
+    private final AfterCommitEviction caches;
+
     @Transactional
-    public void reindex(Long productId) {
+    public void reindex(Long productId, StoreMerchantId store) {
         searchIndexRepository.refresh(productId);
+        caches.evictStoreAfterCommit(store, SEARCH_REGIONS);
     }
 
     @Transactional
-    public void purge(Long productId) {
+    public void purge(Long productId, StoreMerchantId store) {
         searchIndexRepository.purge(productId);
+        caches.evictStoreAfterCommit(store, SEARCH_REGIONS);
     }
 
     /**
@@ -52,6 +61,7 @@ public class ProductSearchIndexer {
         for (int from = 0; from < productIds.size(); from += BRAND_BATCH) {
             reindexBatch(productIds.subList(from, Math.min(from + BRAND_BATCH, productIds.size())));
         }
+        caches.evictStoreAfterCommit(store, SEARCH_REGIONS);
     }
 
     @Transactional
@@ -67,5 +77,6 @@ public class ProductSearchIndexer {
     public void rebuild(StoreMerchantId store) {
         int rows = searchIndexRepository.rebuildStore(store.getId());
         log.info("rebuilt the product search index for store {}: {} rows", store.getId(), rows);
+        caches.evictStoreAfterCommit(store, SEARCH_REGIONS);
     }
 }

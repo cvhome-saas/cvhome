@@ -15,6 +15,9 @@ import jakarta.persistence.UniqueConstraint;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.commons.domain.StoreScoped;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -26,7 +29,7 @@ import lombok.Setter;
         columnNames = {"STORE_MERCHANT_ID", "GROUP_KEY"}))
 @Getter
 @Setter
-public class FaqGroup implements Serializable {
+public class FaqGroup implements Serializable, StoreScoped {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -50,4 +53,8 @@ public class FaqGroup implements Serializable {
     @Column(name = "NAMES", nullable = false)
     private String names;
 
+    @Override
+    public StoreMerchantId scopedStore() {
+        return storeMerchantId == null ? null : new StoreMerchantId(storeMerchantId);
+    }
 }

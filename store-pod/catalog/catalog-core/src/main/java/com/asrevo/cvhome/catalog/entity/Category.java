@@ -27,6 +27,7 @@ import org.hibernate.annotations.BatchSize;
 
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.commons.domain.StoreScoped;
 import com.asrevo.cvhome.store.core.constants.SchemaConstant;
 import com.asrevo.cvhome.store.core.entity.common.audit.AuditListener;
 import com.asrevo.cvhome.store.core.entity.common.audit.AuditSection;
@@ -46,7 +47,7 @@ import lombok.Setter;
         uniqueConstraints = @UniqueConstraint(columnNames = {"STORE_MERCHANT_ID", "CODE"}))
 @Getter
 @Setter
-public class Category extends SalesManagerEntity<Long, Category> implements Auditable {
+public class Category extends SalesManagerEntity<Long, Category> implements Auditable, StoreScoped {
 
     public static final String PATH_SEPARATOR = "/";
 
@@ -129,5 +130,10 @@ public class Category extends SalesManagerEntity<Long, Category> implements Audi
 
     public int getDepth() {
         return depth == null ? 0 : depth;
+    }
+
+    @Override
+    public StoreMerchantId scopedStore() {
+        return storeMerchantId;
     }
 }

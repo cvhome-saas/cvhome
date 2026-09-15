@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import com.asrevo.cvhome.checkout.api.errors.CheckoutApiErrors;
 import com.asrevo.cvhome.checkout.services.order.ExternalOrderSignalService;
 import com.asrevo.cvhome.errors.remote.RemoteErrorCatalog;
+import com.asrevo.cvhome.merchant.api.CachedMerchantStoreReads;
 import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
 import com.asrevo.cvhome.s2s.config.internal.RestClientBuilder;
 
@@ -15,14 +16,11 @@ public class ClientsConfig {
     private static final String MERCHANT_SERVICE_NAME = "merchant";
     private static final String CHECKOUT_SERVICE_NAME = "checkout";
 
+    /** The store record, read through the one cached client the merchant module provides. */
     @Bean
-    // Declared as the caching class, not its interface: Spring builds the @Cacheable proxy ahead of time from the
-    // declared type, and natively a bean declared as the interface was never proxied (the load test saw 0 STORE
-    // lookups and every product mapping calling merchant).
-    public CachedExternalMerchantStoreService externalMerchantStoreService(RestClientBuilder restClientBuilder) {
-        ExternalMerchantStoreService externalMerchantStoreService = restClientBuilder.buildClient(MERCHANT_SERVICE_NAME,
-                ExternalMerchantStoreService.class, RemoteErrorCatalog.none());
-        return new CachedExternalMerchantStoreService(externalMerchantStoreService);
+    public CachedMerchantStoreReads externalMerchantStoreService(RestClientBuilder restClientBuilder) {
+        return new CachedMerchantStoreReads(restClientBuilder.buildClient(MERCHANT_SERVICE_NAME, ExternalMerchantStoreService.class,
+                RemoteErrorCatalog.none()));
     }
 
     @Bean

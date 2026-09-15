@@ -9,7 +9,7 @@ supported languages, and the domains the edge routes on. It no longer owns appea
   being up
 - **Runs on** — `lcl start -d --stack <name>`; read the live port from `lcl urls`. Address it through the
   gateway, never `:8120`
-- **Cases** — 45 (6 verified, 4 unit only, 35 not verified)
+- **Cases** — 46 (6 verified, 5 unit only, 35 not verified)
 - **Also see** — [tenancy](../../../../store-core/tenancy/tenancy-service/qa/tenancy-qa.md) (which creates the
   store and calls merchant off the outbox), [spg](../../../spg/qa/spg-qa.md) (the edge that calls the router),
   [console-ui](../../../../store-core/console-ui/qa/console-ui-qa.md) (Store management),
@@ -578,6 +578,15 @@ Every row was a real defect. Several were invisible from the screen.
 - **Result** — on lcl stack `lb` from `fix/load-bottlenecks`, 2026-09-14, through spg (`org1-store1`, port 2080) the store read carries its languages and domains, and every storefront request
   resolved its store. `StoreFacadeImpl` and `MerchantRoutingService` now read in transactions and hand DTOs plain
   copies; `MerchantStoreApiIntegrationTest` and `RouterControllerIntegrationTest` failed without it.
+
+### LOAD-02 — Every consumer reads the store record through one cached client · high · [unit only]
+
+- **Expect** — catalog, checkout, payment, content, cua and inventory read `GET /api/v1/store` through
+  `CachedMerchantStoreReads` (merchant-external-api): the `merchant.store-client` region, 5 minutes per store, in each
+  consumer's own cache (`cache_gets_total{cache="merchant.store-client"}` on the consumer's `/actuator/prometheus`); a
+  store's currency, units or languages changed in the console reach a consumer within 5 minutes; the org-owner lookup
+  the authorization layer makes reads through the same entry.
+- **Result** — `CachedMerchantStoreReadsTest`; every consumer's unit and integration suite. **Not verified** on a stack.
 
 ---
 

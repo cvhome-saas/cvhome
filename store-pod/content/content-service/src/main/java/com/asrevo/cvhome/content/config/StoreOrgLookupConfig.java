@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.asrevo.cvhome.errors.remote.RemoteErrorCatalog;
+import com.asrevo.cvhome.merchant.api.CachedMerchantStoreReads;
 import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
 import com.asrevo.cvhome.s2s.config.internal.RestClientBuilder;
 
@@ -27,8 +28,8 @@ public class StoreOrgLookupConfig {
      * its own; without it every org admin is refused. See {@code MerchantStoreOrgOwnerAutoConfiguration}.
      */
     @Bean
-    public ExternalMerchantStoreService externalMerchantStoreService(RestClientBuilder restClientBuilder) {
-        return restClientBuilder.buildClient("merchant", ExternalMerchantStoreService.class,
-                RemoteErrorCatalog.none());
+    public CachedMerchantStoreReads externalMerchantStoreService(RestClientBuilder restClientBuilder) {
+        return new CachedMerchantStoreReads(restClientBuilder.buildClient("merchant", ExternalMerchantStoreService.class,
+                RemoteErrorCatalog.none()));
     }
 }

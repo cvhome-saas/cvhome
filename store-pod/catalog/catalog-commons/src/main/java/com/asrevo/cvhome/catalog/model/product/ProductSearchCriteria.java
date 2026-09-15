@@ -1,7 +1,9 @@
 package com.asrevo.cvhome.catalog.model.product;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -72,5 +74,19 @@ public class ProductSearchCriteria {
 
     public String trimmedQuery() {
         return q == null ? "" : q.trim();
+    }
+
+    /**
+     * The criteria as one canonical string, for a cache key: every field in a fixed order, lists sorted, the query
+     * trimmed and lower-cased (the index matches case-insensitively), so two requests that mean the same search
+     * share an entry and the mutable object itself never sits in a key.
+     */
+    public String normalised() {
+        String facetKeys = facetGroups == null ? "" : facetGroups.stream().map(Enum::name).sorted()
+                .collect(Collectors.joining(","));
+        return String.format("q=%s;categories=%s;manufacturers=%s;types=%s;options=%s;available=%s;sort=%s;facets=%s;rows=%s;groups=%s",
+                q == null ? "" : q.strip().toLowerCase(Locale.ROOT), ProductFilter.sorted(categoryIds),
+                ProductFilter.sorted(manufacturerIds), ProductFilter.sorted(productTypeIds),
+                ProductFilter.sorted(optionValueIds), available, sort, facets, rows, facetKeys);
     }
 }

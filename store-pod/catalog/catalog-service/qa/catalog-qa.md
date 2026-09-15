@@ -17,7 +17,7 @@ by [checkout](../../../checkout/checkout-service/qa/checkout-qa.md).
   product-image APIs; the console's Catalogue module as a client; the billing write gate on catalog writes
 - **Runs on** — `lcl start -d --stack <name>`; read the live port from `lcl urls`. Address it through the
   gateway, never `:8122`
-- **Cases** — 100 (40 verified, 2 unit only, 58 not verified)
+- **Cases** — 102 (40 verified, 4 unit only, 58 not verified)
 - **Also see** — inventory (stock and price), checkout (the composed cart line),
   [content](../../../content/content-service/qa/content-qa.md) (the media library the gallery reads from),
   [billing](../../../../store-core/billing/billing-service/qa/billing-qa.md) (the plan ceiling behind PRD-14/15)
@@ -1095,6 +1095,32 @@ and their units) to render a line.
   `productSpecifications`; the unknown sku absent. Three statements for any number of skus. (The per-sku cache in
   front of this read ships with the storefront caches; LOAD-04 and LOAD-07 are its cases.)
 - **Result** — `ProductApiIntegrationTest.checkoutReadsCartLinesInTheirOwnShape`. **Not verified** on a stack.
+
+### LOAD-10 — The storefront's public reads are cached per store; a merchant's write drops their own store's entries · high · [unit only]
+
+The single mix spike on rebuilt images (2026-09-15) put catalog at its cap on the same reads twice; the caches that
+fixed it were custom code, replaced here by `store-commons:cache` (`references/caching.md`).
+
+- **Expect** — groups, related items, the tree, a category and a product by slug, a category's brands, the listing,
+  the search and suggest answer from the `catalog.*` regions for 60 s per store, language and arguments
+  (`cache_gets_total{cache="catalog.product"}` on `/actuator/prometheus`); two listings that mean the same thing
+  (`categoryIds=2,1` and `1,2`) and two typed texts (`Sho`, `sho `) share one entry; a committed write in store A
+  (a product, a category, a brand, a group, an option, a type, an image, a description) drops store A's entries of
+  the regions its `CacheConfig` rule names and leaves store B's warm; a product added to a group drops them once its
+  transaction commits, not at flush; the search index's outbox refresh drops the search and suggest reads after it
+  commits. The console's private reads and the tree filtered by name are never cached. On another task than the one
+  that took a save, the storefront is up to 60 s behind.
+- **Result** — `StorefrontCatalogReadsIntegrationTest` (five reads cost no statement the second time; store 2's group
+  read costs none after store 1's write), `CartLineReadsTest`, `StorefrontCatalogReadsTest`, `CatalogRegionsTest`,
+  `CriteriaNormalisedTest`, `CatalogArchitectureTest` (a cached read lives in a `*Reads` class and takes no shopper;
+  no Caffeine of catalog's own). **Not verified** on a stack.
+
+### LOAD-11 — Checkout's per-sku reads are held one sku at a time · high · [unit only]
+
+- **Expect** — `GET /api/v1/cart-lines` and `/api/v1/detailed-products` answer any subset of a cart's skus from the
+  `catalog.cart-line` and `catalog.detailed-product` entries plus one read for the skus that have none; a sku the
+  catalogue does not know is asked again next time; a product write drops the store's entries.
+- **Result** — `CartLineReadsTest`, `ProductApiIntegrationTest`. **Not verified** on a stack.
 
 ---
 

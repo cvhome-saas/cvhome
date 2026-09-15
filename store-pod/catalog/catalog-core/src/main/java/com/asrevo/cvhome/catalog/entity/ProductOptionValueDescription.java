@@ -9,6 +9,8 @@ import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.commons.domain.StoreScoped;
 import com.asrevo.cvhome.store.core.constants.SchemaConstant;
 import com.asrevo.cvhome.store.core.entity.common.description.BaseDescription;
 
@@ -22,7 +24,7 @@ import lombok.Setter;
         allocationSize = SchemaConstant.ID_ALLOCATION_SIZE)
 @Getter
 @Setter
-public class ProductOptionValueDescription extends BaseDescription {
+public class ProductOptionValueDescription extends BaseDescription implements StoreScoped {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -36,5 +38,10 @@ public class ProductOptionValueDescription extends BaseDescription {
 
     public ProductOptionValueDescription(ProductOptionValue optionValue) {
         this.optionValue = optionValue;
+    }
+
+    @Override
+    public StoreMerchantId scopedStore() {
+        return optionValue == null ? null : optionValue.scopedStore();
     }
 }
