@@ -100,6 +100,15 @@ Implementation: `storefront/scripts/static-assets/` (constants, apply-prefix, sy
 `@aws-sdk/client-s3` reaches the image via `outputFileTracingIncludes`. Never run `storefront/server.js`
 directly against a fresh build — it would serve the un-substituted sentinel.
 
+### The request signal (`start.mjs` only)
+
+`start.mjs` puts the request signal in front of Next (`storefront/scripts/server/`), which `next dev` does not run (the page cache, its own PR, joins it here):
+
+- **The request signal** (`request-scope.mjs`). A render's backend reads (`apiFetch`, server side, GET only) abort when
+  its shopper disconnects, and give up after `STOREFRONT_BACKEND_TIMEOUT_MS` (3000; 0 waits); a write carries neither.
+
+To QA them under lcl, run the production build in place of lcl's `next dev` (`qa/landing-ui-qa.md` LOAD).
+
 **Local dev URLs.** The storefront needs the store headers spg injects, so the supported dev URL is through spg:
 `http://org1-store1.spg-507f1f77.gateway.com/en?theme=<id>` (stack up via `lcl start -d`). Hitting `http://localhost:8110/en`
 directly works for SSR only because the proxy falls back to `FALLBACK_STORE_ID` (env, then the demo-store constant) —

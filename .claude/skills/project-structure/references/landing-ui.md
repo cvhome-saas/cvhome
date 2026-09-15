@@ -86,6 +86,15 @@ cookie (`?theme=` clears it); unknown ids resolve through the legacy map to the 
 cross-origin requests to its `/_next` resources (the HMR socket among them), so `next.config.ts` allows the subdomains of
 the `INTERNAL_SPG` host (`*.spg-507f1f77.gateway.com` under lcl); any other dev host needs an `allowedDevOrigins` entry.
 
+### The request signal (`start.mjs` only)
+
+`start.mjs` puts the request signal in front of Next (`storefront/scripts/server/`), which `next dev` does not run (the page cache, its own PR, joins it here):
+
+- **The request signal** (`request-scope.mjs`). A render's backend reads (`apiFetch`, server side, GET only) abort when
+  its shopper disconnects, and give up after `STOREFRONT_BACKEND_TIMEOUT_MS` (3000; 0 waits); a write carries neither.
+
+To QA them under lcl, run the production build in place of lcl's `next dev` (`qa/landing-ui-qa.md` LOAD).
+
 ## Adding a theme
 
 **➡️ `new-landing-ui-template.md`** — scaffold, impeccable design flow, contract checklist, verification.
