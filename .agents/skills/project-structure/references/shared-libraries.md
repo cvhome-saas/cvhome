@@ -6,6 +6,7 @@ Pure libraries, nothing deployable. Grouping folder; the leaves are the Gradle m
 store-commons/
 ├── commons/                     domain primitives
 ├── autoconfigure/               Spring auto-config: security, JWT, web clients, shared YAML config
+├── cache/                       the one cache library: regions, store-scoped keys, providers, eviction on commit
 ├── uaa-client/                  UAA admin SDK (interfaces + DTOs)
 ├── uaa-client-impl/             its implementation
 ├── sso/                         the authorization server itself, deployed twice
@@ -64,6 +65,14 @@ merely depending on this module.
 - **Misc:** `CvhomeSharedConfig`, `WebClientBuilder`, `SwaggerConfig`, `RedirectionUrlBuilder`.
 - **Shared YAML config** in its resources (`common-config.yml`, `lcl-config.yml`, `fargate-config.yml`, …) —
   see `build-system.md`. This is why the module is on the classpath of services that need no Java class from it.
+
+## `store-commons:cache`
+
+How every service caches: `CacheRegion` enums per service, `CacheKey` (store first, then language, then typed
+parts), Spring's `@Cacheable` over `CvhomeCacheManager` with the `storeScopedKeys` generator, a `CacheProvider` port
+(Caffeine here), `EvictionRules` driving a post-commit Hibernate listener, and the Micrometer binder. Auto-configured
+by its own `AutoConfiguration.imports`; a service with no `CacheRegions` bean caches nothing. Read
+`references/caching.md` before adding a cached read.
 
 ## `store-commons:uaa-client` / `uaa-client-impl`
 

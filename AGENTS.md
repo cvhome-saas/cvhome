@@ -221,6 +221,10 @@ What binds every change:
   Reference: `store-pod/catalog/catalog-service/http/product-api.http`; rules:
   `references/http-request-files.md` in the skill.
 - Use the value objects in `store-commons/commons/.../domain/` instead of raw `String`/`Long` ids.
+- **A read is cached through `store-commons:cache` only**: a constant in the service's `<Service>Regions`, a
+  `@Cacheable` method in `<Area>Reads` keyed by `StoreMerchantId` first (`keyGenerator = storeScopedKeys`), an
+  `EvictionRules` line for the entities whose writes stale it, and ttl/size in configuration. Never a `Caffeine`
+  of one's own, never a `CacheManager` per service, never a read that depends on who asks. `references/caching.md`.
 - `schema.sql` (`src/main/resources/schema.sql` for tenancy's Spring Data JDBC, `init-sql/schema.sql`
   for the JPA pod services) is the source of truth for DDL, and Hibernate only checks it (`ddl-auto: validate`): an
   entity the DDL does not match stops the service at start-up, so a column change is a `schema.sql` change.
@@ -264,6 +268,9 @@ the change does not touch, and treat a section you keep as mandatory. The `proje
 - A hardcoded host, port, or service URL instead of `common-config.yml` + `lb://<service>`
 - A hardcoded dependency version in a `build.gradle` instead of `libs.versions.toml`
 - A raw `String`/`Long` where a `commons/domain/` value object exists
+- A `Caffeine`, `CacheManager` or `@Cacheable` outside a `*Reads` class; a cached read taking a `ShopperId` or a raw
+  `Long`; a new entity in a cached package that is not `StoreScoped` or has no `EvictionRules` line; a cached DTO
+  mutated after the read
 - A controller method missing `@PreAuthorize`, or authorization done with an inline role/authority check
 - A new permission token with no `case` in `CustomPermissionEvaluator` — it denies by default, so it 403s silently
 - An endpoint added or changed with no matching `.http` block, a `.http` request aimed at a service's own port

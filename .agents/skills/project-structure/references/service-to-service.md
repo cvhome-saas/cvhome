@@ -100,8 +100,10 @@ Business code then injects the interface like any local bean —
 `checkout-core`'s `OrderInventoryOrchestratorImpl` takes an `ExternalProductReservationService` in its
 constructor and calls `reserve(...)` / `commit(...)` / `release(...)` without knowing HTTP is involved.
 
-**Caching is a decorator, not a concern of the contract:** `CachedExternalProductService` and
-`CachedExternalMerchantStoreService` wrap the generated proxy. Add caching there, never in the interface.
+**Caching is a decorator, not a concern of the contract:** a cached client wraps the generated proxy, once, in the
+`-external-api` module that owns the contract (`CachedExternalMerchantStoreService` in `merchant-external-api`), as a
+`*Reads`-shaped `@Cacheable` over `store-commons:cache` — never in the interface, never a copy per caller. See
+`references/caching.md`.
 
 ## How the URL is resolved — `RestClientBuilder` + `ServiceUrlBuilder`
 
