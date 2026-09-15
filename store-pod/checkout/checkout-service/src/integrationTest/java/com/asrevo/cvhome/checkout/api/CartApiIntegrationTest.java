@@ -49,6 +49,10 @@ class CartApiIntegrationTest {
 
     private static final String LIT_20_00 = "$20.00";
 
+    private static final String LIT_10_00 = "$10.00";
+
+    private static final String FINAL_PRICE = "finalPrice";
+
     private static final String SKU_B = "SKU-B";
 
     private static final String CART = "cart";
@@ -129,7 +133,7 @@ class CartApiIntegrationTest {
         JsonNode line = cart.get(PRODUCTS).get(0);
         assertThat(line.get(SKU_2).asString()).isEqualTo(SKU);
         assertThat(line.get(DESCRIPTION_FIELD).get(NAME_FIELD).asString()).isEqualTo(String.format("%s%s", PRODUCT_PREFIX, SKU));
-        assertThat(line.get("finalPrice").asString()).isEqualTo("$10.00");
+        assertThat(line.get(FINAL_PRICE).asString()).isEqualTo(LIT_10_00);
         assertThat(line.get(DISPLAYSUBTOTAL).asString()).isEqualTo(LIT_20_00);
         assertThat(line.get("image").get("imageUrl").asString()).contains(SKU);
         assertThat(line.get("available").asBoolean()).isTrue();
@@ -143,6 +147,13 @@ class CartApiIntegrationTest {
         assertThat(reread.get(PRODUCTS).get(0).get(DESCRIPTION_FIELD).get(NAME_FIELD).asString()).startsWith(PRODUCT_PREFIX);
         assertThat(ExternalClientsTestConfiguration.CART_LINE_READS.get())
                 .as("two lines remembered from their adds: a read asks the catalogue nothing").isEqualTo(catalogReadsAfterAdds);
+        int inventoryReadsAfterFirstRead = ExternalClientsTestConfiguration.INVENTORY_READS.get();
+        JsonNode rereadAgain = json(api.get(cartUrl(STORE_A, code), null));
+        assertThat(rereadAgain.get(PRODUCTS)).hasSize(2);
+        assertThat(rereadAgain.get(PRODUCTS).get(0).get(FINAL_PRICE).asString()).isEqualTo(LIT_10_00);
+        assertThat(ExternalClientsTestConfiguration.INVENTORY_READS.get())
+                .as("the second read of the same cart within seconds prices from the per-sku cache")
+                .isEqualTo(inventoryReadsAfterFirstRead);
 
         JsonNode set = json(api.send(HttpMethod.PUT, cartUrl(STORE_A, code), null, cartBody(SKU, 5)));
         assertThat(set.get(QUANTITY).asInt()).isEqualTo(6);

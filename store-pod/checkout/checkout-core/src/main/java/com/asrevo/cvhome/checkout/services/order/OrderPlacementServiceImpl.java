@@ -60,7 +60,12 @@ public class OrderPlacementServiceImpl implements OrderPlacementService {
         CurrencyCode currency = storeSettings.currency(store);
         Long orderId = placement.createOrResume(store, language, cartCode, request, shopper, redirects, snapshot,
                 currency);
-        steps.runUntilSettled(orderId, PLACEMENT_STEPS);
+        try {
+            steps.runUntilSettled(orderId, PLACEMENT_STEPS);
+        } finally {
+            // Reserved or released, inventory's figures for these skus moved: the next cart read on this task asks.
+            snapshots.forget(store, snapshot.keySet());
+        }
         return placement.confirmation(orderId, storeSettings.locale(language));
     }
 }

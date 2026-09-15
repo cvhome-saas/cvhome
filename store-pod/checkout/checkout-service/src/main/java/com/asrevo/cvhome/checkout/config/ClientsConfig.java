@@ -43,7 +43,7 @@ public class ClientsConfig {
         return restClientBuilder.buildClient(CATALOG, ExternalProductService.class, RemoteErrorCatalog.none());
     }
 
-    /** Deliberately uncached: a price or a stock figure is only right if it is live. */
+    /** Live; a cart read goes through {@code CachedSkuInventory} in front of it, an add and a placement come here. */
     @Bean
     public ExternalInventoryService externalInventoryService(RestClientBuilder restClientBuilder) {
         return restClientBuilder.buildClient(INVENTORY, ExternalInventoryService.class, RemoteErrorCatalog.none());

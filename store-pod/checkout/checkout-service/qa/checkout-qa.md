@@ -11,7 +11,7 @@ console's order statistics.
 - **Runs on** — `lcl start -d --stack <name>`; read the live ports from `lcl urls`. Address it through the pod
   gateway (`http://spg-507f1f77.gateway.com/checkout/…`) or the platform gateway (`gateway.com:8000/spg/checkout/…`),
   never `:8123`
-- **Cases** — 55 (40 verified end to end or in part, 13 unit only, 2 not verified)
+- **Cases** — 56 (40 verified end to end or in part, 14 unit only, 2 not verified)
 - **Also see** — [payment](../../payment/payment-service/qa/payment-qa.md) (the transactions and the approve /
   reject that drive the signals), [inventory](../../inventory/inventory-service/qa/inventory-qa.md) (the
   reservation that placement takes and expiry releases), [landing-ui](../../landing-ui/qa/landing-ui-qa.md) (the
@@ -573,6 +573,24 @@ answering `detailed-products` in 3 s, and every cart read made that call again.
 - **Result** — `CartApiIntegrationTest` (the catalogue's cart-line read count does not move across two reads of a
   two-line cart), `ProductSnapshotServiceImplTest` (a remembered line is priced by inventory alone; a stale one asks
   and remembers), `CartServiceImplTest`. **Not verified** on a stack.
+
+### LOAD-08 — A cart read prices its lines from a per-sku inventory cache; an add and a placement stay live · high · [unit only]
+
+The single mix spike on the rebuilt images (2026-09-15): checkout was the wall at 12–15 ms of Fargate CPU a
+request, and every one of its 2,634 cart calls made one HTTP round trip to inventory for prices a cart shows
+unchanged between two page views.
+
+- **Expect** — a read or a removal takes each line's price and stock from the `INVENTORY_SKU` cache (one entry per
+  store and sku, five seconds, `cache_gets_total{name="INVENTORY_SKU"}` counts it); the cache asks inventory once
+  for whatever skus it lacks; a sku inventory does not know is asked again next time; an add checks the sku it adds
+  against inventory live; a placement prices the whole cart live and then forgets its skus, so the next read on that
+  task shows the units it took. A price change made in the console is visible in a cart within five seconds.
+- **Result** — `CachedSkuInventoryTest` (one read per missing sku, a forgotten sku asked again, a store's entries
+  its own), `ProductSnapshotServiceImplTest` (a read never calls inventory directly; an add does; a placed order is
+  forgotten), `OrderPlacementServiceImplTest`, `CartApiIntegrationTest` (the inventory stub's call count does not move
+  across two reads of the same cart). **Not verified** on a stack.
+
+---
 
 ## 99 — Known gaps
 
