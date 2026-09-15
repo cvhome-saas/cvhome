@@ -18,6 +18,9 @@ drop its store's entries. What a region holds, how long, how much and on which p
 | `StoreScoped` | `commons/domain` | what an entity implements to say its store |
 | `AfterCommitEviction` | bean | for bulk JPQL and native writes Hibernate reports no entity for |
 | meters | Micrometer | `cache_gets_total{cache,result}`, `cache_puts_total`, `cache_evictions_total`, `cache_size` per region |
+| `CacheEvent` | `…cache.event` | the sealed family an aggregate raises through the outbox: `ProductChanged`, `VariantChanged`, `CategoryChanged`, `ManufacturerChanged`, `StockChanged`, `PriceChanged`, `StoreChanged`, `ContentChanged` |
+| `CacheEventOutboxHandler` | bean, where the outbox is | drains the events: `CacheEventApplier` drops what `EvictionRules.onEvent(...)` names, then `CacheEventTransport` is told |
+| `CacheEventTransport` | port, bean | where an event goes after this task: `LoggingCacheEventTransport` unless the service declares its own |
 
 ## Rules
 
@@ -35,7 +38,9 @@ drop its store's entries. What a region holds, how long, how much and on which p
   under the old version are never seen again and die of age or size. `cache_evictions_total` counts the provider's
   own evictions, not store bumps. An entity of the package with no rule is logged once at start-up and evicts
   nothing; a ruled entity that is not `StoreScoped` stops the service.
-- **Another task lags by the region's ttl** after a write, until the cache events (PR 4) reach it.
+- **Another task lags by the region's ttl** after a write until a transport carries the aggregate's `CacheEvent` to
+  it; with the logging transport, the ttl is the bound. A consumer holding a copy of another service's data lags the
+  same way until it maps that service's event (`rules.onEvent(StoreChanged.class).evict(...)`).
 - **Names** are `<service>.<read>`, lowercase, a hyphen inside a read (`catalog.cart-line`): the `cache` label on
   every meter and the key of a configuration override.
 
@@ -66,13 +71,50 @@ Code defaults come from the enum; YAML wins. The registry reads it at run time, 
 5. `<Area>ReadsIntegrationTest` with `SqlStatements.during(...)`: the second read costs no statement; a write in
    store A makes A's next read pay and leaves B's warm. A QA case in `<service>/qa/<svc>-qa.md`.
 
-## Cache events (PR 4, designed)
+## Cache events
 
-A change a shopper sees is also a typed event registered on the aggregate and published through the outbox:
-`ProductChanged`, `VariantChanged`, `CategoryChanged`, `ManufacturerChanged`, `StockChanged`, `PriceChanged`,
-`StoreChanged`, `ContentChanged`, partitioned by store. `CacheEventOutboxHandler` applies it locally (the same
-eviction as a commit) and hands it to `CacheEventTransport`, a port: the logging transport now; later an HTTP
-fan-out to every replica of the consuming services (`POST /internal/cache-events`, s2s scope, body polymorphic by
-`eventType`), a broker, or nothing at all once a region is on a shared provider (the applier's refresh mode reloads
-and puts instead of evicting). A consumer maps a foreign event with the same builder:
-`rules.onEvent(StockChanged.class).evict(...)`.
+A change a shopper sees is also a typed event, registered on the aggregate in the transaction that changed it and
+written to the outbox with it: `Product.domainEvents()` adds `ProductChanged` to every save, `Manufacturer.renamed()`
+raises `ManufacturerChanged`, `MerchantStore.changed()` raises `StoreChanged`, `Inventory.stockChanged()` and
+`priceChanged()` raise `StockChanged` and `PriceChanged` (an upsert, a reservation taken or released), and
+`Content.changed()` raises `ContentChanged` once per save. Every event names its store and partitions on it, carries
+typed ids (`ProductId`, `Sku`) and survives the outbox's JSON as such; `VariantChanged` and `CategoryChanged` exist
+for the reads that will key by them and are raised by nobody yet.
+
+The flow, on the one task the outbox hands the event to:
+
+```
+aggregate.registerEvent(new StockChanged(store, sku))   →  outbox row, same transaction
+→ CacheEventOutboxHandler.onStockChanged                →  CacheEventApplier.apply: evictStore(store, rules.regionsForEvent(StockChanged))
+                                                        →  CacheEventTransport.publish(event)
+```
+
+The applier is the same eviction a commit does, so on the task that took the write it is free; its worth is on
+every other task, once a transport exists. `EvictionRules` map events with the same builder as entities:
+`.onEvent(StockChanged.class, PriceChanged.class).evict(SKU)`; a service with no tables of its own starts from
+`EvictionRules.onEvents()`. An event no rule names drops nothing and is logged at DEBUG.
+
+**The transport is a port, and choosing one is a bean, never a switch.** `LoggingCacheEventTransport` is the default:
+the event is applied here and written to the log at DEBUG, every other task keeps its ttl. The options this leaves
+open, each a `CacheEventTransport` bean in its own module:
+
+| Transport | What it does | When |
+|---|---|---|
+| logging (now) | applies locally, logs | until a region's ttl is too long to wait out |
+| HTTP fan-out | `POST /internal/cache-events` (s2s scope, body polymorphic by `eventType`) to every replica of every consuming service through the discovery client; the receiver calls the applier | few replicas, no broker |
+| broker | RabbitMQ or Redis pub-sub; every replica subscribes and calls the applier | many replicas or many consumers |
+| none | a region on a shared provider (Redis): the applier updates the one copy and `publish` is a no-op | once `cache-redis` exists |
+
+A consumer maps a foreign event exactly as its own: `rules.onEvent(StoreChanged.class).evict(MerchantClientRegions.STORE)`
+in the service that holds the copy. Which services raise what, and who will map it:
+
+| Event | Raised by | Mapped locally | Consumers to map it (once a transport carries it) |
+|---|---|---|---|
+| `ProductChanged` | catalog, every product save | `catalog.product`, listing, search, suggest, related, group, cart-line, detailed-product | checkout (cart line) |
+| `ManufacturerChanged` | catalog, a rename | `catalog.brands`, listing, search, product, suggest | — |
+| `StoreChanged` | merchant, every store save | `merchant.store`, store-by-language, languages | every service's `merchant.store-client` |
+| `StockChanged`, `PriceChanged` | inventory, an upsert or a reservation | `inventory.sku` | catalog (cart-line, detailed-product), checkout |
+| `ContentChanged` | content, an edit or a status change | `content.page`, post, posts, post-categories, banners, faq, site, sitemap, menu | — |
+
+Merchant, inventory and content gained the outbox for this (the JPA starter, the `namastack.outbox` block, the three
+tables in their `schema.sql`, the `cvhome_outbox_*` gauges); `events-outbox.md` has the outbox itself.

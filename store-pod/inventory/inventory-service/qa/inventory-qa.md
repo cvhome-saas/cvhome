@@ -322,6 +322,24 @@ Findings 5 and 6 of *Where cvhome Breaks* (orchestrator `.agents/plans/load-bott
 
 ---
 
+### LOAD-05 — A stock or price write, a reservation included, raises its event through inventory's own outbox · high · [unit only]
+
+- **Setup** — a stack with inventory's logs at DEBUG for `com.asrevo.cvhome.cache`.
+- **Steps** — upsert a sku (`PUT /api/v1/inventory/{sku}`), then reserve it from checkout (`POST /api/v1/reservation`)
+  and release the reservation; after each, read
+  `select record_type, record_key, status from inventory.outbox_record order by created_at desc limit 5`.
+- **Expect** — the upsert leaves one `StockChanged` and one `PriceChanged` row keyed by the store; the reservation
+  and the release leave one `StockChanged` each (the managed row is saved on purpose so the event is published);
+  every row `COMPLETED` after the next poll; a DEBUG line per event from `LoggingCacheEventTransport`;
+  `cvhome_outbox_records` on inventory's `/actuator/prometheus`. `inventory.sku` of the store is dropped on the task
+  that drained the event (LOAD-04 covers the task that took the write). Catalog's and checkout's copies of the figure
+  keep their own ttl until a transport carries the event.
+- **Result** — `InventoryTest` (the two events), `ReservationServiceImplTest` (each taken row is saved),
+  `SkuInventoryReadsIntegrationTest` (a stock write leaves a `StockChanged` row in `inventory.outbox_record`).
+  **Not verified** on a stack.
+
+---
+
 ## 99 — Known gaps
 
 **Inventory has no billing write gate.** `StoreBillingWriteGate` is catalog's; a store with a lapsed

@@ -12,6 +12,9 @@ dependencies {
     compileOnly libs.spring.data.jpa
     compileOnly libs.jakarta.validation.api
     compileOnly libs.jackson.annotations
+    // The cache events are outbox events; the annotation is read here, the starter lives in the service.
+    compileOnly libs.namastack.outbox.api
+    testImplementation libs.namastack.outbox.api
     compileOnly libs.lombok
     compileOnly libs.hibernate.core
     annotationProcessor libs.lombok

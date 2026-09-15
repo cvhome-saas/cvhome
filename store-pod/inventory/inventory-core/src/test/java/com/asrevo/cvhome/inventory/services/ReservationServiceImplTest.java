@@ -32,6 +32,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -120,6 +121,8 @@ class ReservationServiceImplTest {
             assertThat(result.expireAt()).isAfterOrEqualTo(before.plus(Duration.ofMinutes(EXPIRY_MINUTES)));
             assertThat(a.getQuantity()).isEqualTo(6);
             assertThat(b.getQuantity()).isZero();
+            // Each taken row is saved so its StockChanged event is published; the rows compare equal while unsaved.
+            verify(inventoryRepository, times(2)).save(any());
             ArgumentCaptor<ProductReservation> captor = ArgumentCaptor.forClass(ProductReservation.class);
             verify(reservationRepository).save(captor.capture());
             ProductReservation saved = captor.getValue();

@@ -18,6 +18,11 @@ import com.asrevo.cvhome.cache.CacheRegions;
 import com.asrevo.cvhome.cache.CacheRegistry;
 import com.asrevo.cvhome.cache.Stores;
 import com.asrevo.cvhome.cache.TestRegions;
+import com.asrevo.cvhome.cache.event.CacheEvent;
+import com.asrevo.cvhome.cache.event.CacheEventApplier;
+import com.asrevo.cvhome.cache.event.CacheEventOutboxHandler;
+import com.asrevo.cvhome.cache.event.CacheEventTransport;
+import com.asrevo.cvhome.cache.event.LoggingCacheEventTransport;
 import com.asrevo.cvhome.cache.eviction.AfterCommitEviction;
 import com.asrevo.cvhome.cache.eviction.CacheEvictionIntegrator;
 import com.asrevo.cvhome.cache.eviction.CommitEvictionListener;
@@ -41,6 +46,8 @@ class CacheAutoConfigurationTest {
     private static final String SHOES = "shoes";
 
     private static final String PRODUCT = "test.product";
+
+    private static final String OWN = "own";
 
     private final ApplicationContextRunner runner = new ApplicationContextRunner()
             .withConfiguration(AutoConfigurations.of(CacheAutoConfiguration.class,
@@ -83,6 +90,29 @@ class CacheAutoConfigurationTest {
         }
     }
 
+    /** A service's own transport replaces the logging one. */
+    static final class OwnTransport implements CacheEventTransport {
+
+        @Override
+        public String name() {
+            return OWN;
+        }
+
+        @Override
+        public void publish(CacheEvent event) {
+            // Nothing to tell in a test.
+        }
+    }
+
+    @Configuration(proxyBeanMethods = false)
+    static class WithOwnTransport {
+
+        @Bean
+        CacheEventTransport ownTransport() {
+            return new OwnTransport();
+        }
+    }
+
     @Configuration(proxyBeanMethods = false)
     static class OwnManager {
 
@@ -116,7 +146,8 @@ class CacheAutoConfigurationTest {
                     .hasSingleBean(CacheManager.class).hasSingleBean(CommitEvictionListener.class)
                     .hasSingleBean(CacheEvictionIntegrator.class)
                     .hasSingleBean(AfterCommitEviction.class).hasSingleBean(EvictionRulesValidator.class)
-                    .hasSingleBean(RegionCacheMeterBinderProvider.class);
+                    .hasSingleBean(RegionCacheMeterBinderProvider.class).hasSingleBean(CacheEventApplier.class)
+                    .hasSingleBean(CacheEventOutboxHandler.class).hasSingleBean(LoggingCacheEventTransport.class);
             assertThat(context.getBean(CacheManager.class).getCacheNames()).isEmpty();
             assertThat(context.getBean(CacheRegistry.class).names()).isEmpty();
             assertThat(context.getBean(EvictionRules.class).entityPackage()).isEmpty();
@@ -141,6 +172,14 @@ class CacheAutoConfigurationTest {
                     assertThat(context.getBean(CacheManager.class).getCacheNames()).contains(PRODUCT, "test.country");
                     assertThat(context.getBean(CacheProperties.class).region(PRODUCT).ttl()).hasSeconds(30);
                 });
+    }
+
+    @Test
+    void aServicesOwnTransportReplacesTheLoggingOne() {
+        runner.withUserConfiguration(WithOwnTransport.class).run(context -> {
+            assertThat(context).doesNotHaveBean(LoggingCacheEventTransport.class).hasSingleBean(CacheEventTransport.class);
+            assertThat(context.getBean(CacheEventTransport.class).name()).isEqualTo(OWN);
+        });
     }
 
     @Test

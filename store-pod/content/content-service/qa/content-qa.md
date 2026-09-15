@@ -1081,6 +1081,22 @@ Finding 6 of *Where cvhome Breaks* (orchestrator `.agents/plans/load-bottlenecks
 
 ---
 
+### LOAD-07 — An edit or a status change raises `ContentChanged` through content's own outbox · medium · [unit only]
+
+- **Setup** — a stack with content's logs at DEBUG for `com.asrevo.cvhome.cache`.
+- **Steps** — edit a page in the console, then publish it (`POST …/transition`), then schedule one and wait for the
+  scheduler's tick; after each, read
+  `select record_type, record_key, payload, status from content.outbox_record order by created_at desc limit 3`.
+- **Expect** — one `ContentChanged` row per save keyed by the store, its payload naming the content kind
+  (`"kind":"PAGE"`); an edit that also transitions raises it once, not twice; the scheduler's promotion raises it too;
+  every row `COMPLETED` after the next poll and one DEBUG line each from `LoggingCacheEventTransport`; the store's
+  page, post, banner, faq, site, sitemap and menu regions dropped on the task that drained it.
+- **Result** — `ContentTest` (once per save, the kind, the untyped fallback), `PublishingServiceTest`,
+  `StorefrontReadsIntegrationTest` boots the service with the outbox tables in `schema.sql`. **Not verified** on a
+  stack.
+
+---
+
 ## 99 — Known gaps
 
 Behaviour that is expected today. Please don't spend time raising these — but do shout if you see something

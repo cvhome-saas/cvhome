@@ -79,7 +79,7 @@ public class ContentItemService {
      */
     private Content saveAndTouch(Content entity, String actor) {
         entity.setUpdatedBy(actor);
-        Content saved = repository.saveAndFlush(entity);
+        Content saved = repository.saveAndFlush(entity.changed());
         Long id = saved.getId();
         repository.touch(id, Instant.now(clock), actor);
         return repository.findById(id).orElse(saved);

@@ -77,6 +77,7 @@ public class InventoryServiceImpl implements InventoryService {
             inventory.setQuantityOrderMaximum(source.quantityOrderMaximum());
         }
         applyPrice(inventory, source.price());
+        inventory.stockChanged().priceChanged();
         return SkuInventoryMapper.toSkuInventory(inventoryRepository.save(inventory), today);
     }
 

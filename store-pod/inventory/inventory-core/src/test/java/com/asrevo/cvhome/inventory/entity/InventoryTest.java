@@ -3,9 +3,13 @@ package com.asrevo.cvhome.inventory.entity;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.Collection;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.test.util.ReflectionTestUtils;
 
+import com.asrevo.cvhome.cache.event.PriceChanged;
+import com.asrevo.cvhome.cache.event.StockChanged;
 import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 
@@ -29,6 +33,11 @@ class InventoryTest {
         price.setDefaultPrice(defaultPrice);
         inventory.getPrices().add(price);
         return price;
+    }
+
+    /** {@code AbstractAggregateRoot.domainEvents()} is protected; Spring Data reads it reflectively after a save. */
+    private static Collection<Object> events(Object aggregate) {
+        return ReflectionTestUtils.invokeMethod(aggregate, "domainEvents");
     }
 
     @Test
@@ -94,5 +103,14 @@ class InventoryTest {
         assertThat(reservation.getStatus()).isEqualTo(ProductReservationStatus.TEMPORARY_RESERVED);
         assertThat(reservation.isExpired(now)).as("expiry is exclusive").isFalse();
         assertThat(reservation.isExpired(now.plusMillis(1))).isTrue();
+    }
+
+    @Test
+    void aStockOrPriceWriteRaisesItsEventForTheSku() {
+        Inventory inventory = new Inventory(STORE, SKU);
+
+        assertThat(inventory.stockChanged().priceChanged()).isSameAs(inventory);
+
+        assertThat(events(inventory)).containsExactly(new StockChanged(STORE, SKU), new PriceChanged(STORE, SKU));
     }
 }

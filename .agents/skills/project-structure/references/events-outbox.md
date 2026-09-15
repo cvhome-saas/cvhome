@@ -2,11 +2,12 @@
 
 Where a service-to-service **call** would create temporal coupling (the caller fails if the callee is down),
 cvhome uses **domain events published through a transactional outbox** instead. Currently wired in
-`tenancy-service`, `payment-service` and `catalog-service`.
+`tenancy-service`, `payment-service`, `catalog-service`, and since the cache events in `merchant-service`,
+`inventory-service` and `content-service`.
 
 Library: `io.namastack:namastack-outbox` (`namastack-outbox = 1.7.1` in the version catalog) —
-`-starter-jpa` in payment and catalog, `-starter-jdbc` in tenancy, `-api` in the `-commons`/`-events`
-modules that only need the annotations.
+`-starter-jpa` in payment, catalog, merchant, inventory and content, `-starter-jdbc` in tenancy, `-api` in the
+`-commons`/`-events`/`-core` modules that only need the annotations.
 
 Not every use is cross-service. `catalog-service` uses the outbox to keep its own **product search index**
 current: a product edit registers `ProductSearchIndexStaleEvent`, and the handler rebuilds that product's
@@ -272,9 +273,14 @@ slow or failed responses, so this is deliberate.
 ## Cache events
 
 A change a shopper sees is also a cache event (`store-commons:cache`, `com.asrevo.cvhome.cache.event`): the aggregate
-registers `ProductChanged`, `StockChanged`, `StoreChanged`… like any event, the library's `CacheEventOutboxHandler`
-drops the store's regions locally and hands the event to the `CacheEventTransport` port for the other tasks and
-services. `references/caching.md` has the design.
+registers `ProductChanged`, `StockChanged`, `StoreChanged`… like any event, from a method of its own
+(`Inventory.stockChanged()`, `MerchantStore.changed()`, `Product.domainEvents()`), and the library's
+`CacheEventOutboxHandler` — a bean wherever the outbox is on the classpath — drops the store's regions locally and hands
+the event to the `CacheEventTransport` port for the other tasks and services. The events are partitioned by store,
+carry typed ids, and the handler is idempotent (a second delivery evicts what is already gone). A managed row whose
+quantity changes inside a transaction still has to be `save()`d for Spring Data to publish its events: a flush alone
+publishes nothing, which is why the reservation paths save the inventory rows they touch. `references/caching.md`
+has the events, the transports and who maps what.
 
 ## Adding a new domain event
 

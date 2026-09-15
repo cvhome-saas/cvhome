@@ -1124,6 +1124,22 @@ fixed it were custom code, replaced here by `store-commons:cache` (`references/c
 
 ---
 
+### LOAD-12 — Every product save and every brand rename raises its cache event through the outbox · medium · [unit only]
+
+- **Setup** — a stack with catalog's logs at DEBUG for `com.asrevo.cvhome.cache`.
+- **Steps** — save a product in the console (any field), rename a brand, then read
+  `select record_type, record_key, status from catalog.outbox_record order by created_at desc limit 5`.
+- **Expect** — the product save leaves a `ProductChanged` row keyed by the store beside the search index's
+  `ProductSearchIndexStaleEvent` row keyed by the product; the rename leaves `ManufacturerChanged` beside
+  `BrandRenamedEvent`; each `COMPLETED` after the next poll; a DEBUG line per cache event from
+  `LoggingCacheEventTransport`; the store's `catalog.*` regions dropped on the task that drained it (LOAD-10 covers
+  the task that took the save). Checkout's cart-line copy keeps its ttl until a transport carries the event.
+- **Result** — `ProductSearchEventsTest` (every save announces `ProductChanged`, the search events beside it),
+  `BrandRenameEventsTest`, the library's `CacheEventsTest` (typed ids survive the outbox's JSON). **Not verified**
+  on a stack.
+
+---
+
 ## 99 — Known gaps
 
 - **`GET /api/v1/detailed-products?skus=` takes an uncapped sku list.** Its siblings cap (`AvailabilityQuery`

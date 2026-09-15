@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.asrevo.cvhome.cache.CacheRegion;
+import com.asrevo.cvhome.cache.event.CacheEvent;
 
 /**
  * Which regions a committed write to an entity drops: the service's one {@code EvictionRules} bean.
@@ -20,16 +21,28 @@ import com.asrevo.cvhome.cache.CacheRegion;
  * shopper sees); an entity of the package with no rule is left alone and named once at start-up, never taken as a
  * reason to clear every store.
  * </p>
+ *
+ * <p>
+ * The same builder maps a {@link CacheEvent} to regions ({@code .onEvent(StockChanged.class).evict(SKU)}): the
+ * service's own events, applied again when the outbox drains them, and the foreign events a transport brings in.
+ * An event with no rule drops nothing.
+ * </p>
  */
 public final class EvictionRules {
+
+    private static final String NO_REGION = "a rule names at least one region";
 
     private final String entityPackage;
 
     private final Map<Class<?>, Set<CacheRegion>> byEntity;
 
-    private EvictionRules(String entityPackage, Map<Class<?>, Set<CacheRegion>> byEntity) {
+    private final Map<Class<? extends CacheEvent>, Set<CacheRegion>> byEvent;
+
+    private EvictionRules(String entityPackage, Map<Class<?>, Set<CacheRegion>> byEntity,
+                          Map<Class<? extends CacheEvent>, Set<CacheRegion>> byEvent) {
         this.entityPackage = entityPackage;
         this.byEntity = byEntity;
+        this.byEvent = byEvent;
     }
 
     /** Rules for the entities under {@code entityPackage}. */
@@ -42,7 +55,12 @@ public final class EvictionRules {
 
     /** A service that caches nothing of its own tables. */
     public static EvictionRules none() {
-        return new EvictionRules("", Map.of());
+        return new EvictionRules("", Map.of(), Map.of());
+    }
+
+    /** Rules for a service that caches nothing of its own tables but maps the events a transport brings in. */
+    public static Builder onEvents() {
+        return new Builder("");
     }
 
     public String entityPackage() {
@@ -64,12 +82,24 @@ public final class EvictionRules {
         return byEntity.keySet();
     }
 
+    /** The regions a received {@code event} drops; empty when no rule names it. */
+    public Set<CacheRegion> regionsForEvent(Class<? extends CacheEvent> event) {
+        Set<CacheRegion> regions = byEvent.get(event);
+        return regions == null ? Set.of() : regions;
+    }
+
+    public Set<Class<? extends CacheEvent>> events() {
+        return byEvent.keySet();
+    }
+
     /** Builds the rules: {@code .on(entities).evict(regions)} as often as needed. */
     public static final class Builder {
 
         private final String entityPackage;
 
         private final Map<Class<?>, Set<CacheRegion>> byEntity = new LinkedHashMap<>();
+
+        private final Map<Class<? extends CacheEvent>, Set<CacheRegion>> byEvent = new LinkedHashMap<>();
 
         private Builder(String entityPackage) {
             this.entityPackage = entityPackage;
@@ -80,6 +110,9 @@ public final class EvictionRules {
         }
 
         public On on(Collection<Class<?>> entities) {
+            if (entityPackage.isEmpty()) {
+                throw new IllegalArgumentException("entity rules need the entity package: EvictionRules.in(...)");
+            }
             if (entities.isEmpty()) {
                 throw new IllegalArgumentException("a rule names at least one entity");
             }
@@ -92,10 +125,21 @@ public final class EvictionRules {
             return new On(this, new ArrayList<>(entities));
         }
 
+        @SafeVarargs
+        public final OnEvent onEvent(Class<? extends CacheEvent>... events) {
+            if (events.length == 0) {
+                throw new IllegalArgumentException("a rule names at least one event");
+            }
+            return new OnEvent(this, List.of(events));
+        }
+
         public EvictionRules build() {
             Map<Class<?>, Set<CacheRegion>> frozen = new LinkedHashMap<>();
             byEntity.forEach((entity, regions) -> frozen.put(entity, Collections.unmodifiableSet(regions)));
-            return new EvictionRules(entityPackage, Collections.unmodifiableMap(frozen));
+            Map<Class<? extends CacheEvent>, Set<CacheRegion>> frozenEvents = new LinkedHashMap<>();
+            byEvent.forEach((event, regions) -> frozenEvents.put(event, Collections.unmodifiableSet(regions)));
+            return new EvictionRules(entityPackage, Collections.unmodifiableMap(frozen),
+                    Collections.unmodifiableMap(frozenEvents));
         }
 
         /** The entities of one rule, waiting for their regions. */
@@ -116,10 +160,37 @@ public final class EvictionRules {
 
             public Builder evict(Collection<? extends CacheRegion> regions) {
                 if (regions.isEmpty()) {
-                    throw new IllegalArgumentException("a rule names at least one region");
+                    throw new IllegalArgumentException(NO_REGION);
                 }
                 for (Class<?> entity : entities) {
                     builder.byEntity.computeIfAbsent(entity, ignored -> new LinkedHashSet<>()).addAll(regions);
+                }
+                return builder;
+            }
+        }
+
+        /** The events of one rule, waiting for their regions. */
+        public static final class OnEvent {
+
+            private final Builder builder;
+
+            private final List<Class<? extends CacheEvent>> events;
+
+            private OnEvent(Builder builder, List<Class<? extends CacheEvent>> events) {
+                this.builder = builder;
+                this.events = events;
+            }
+
+            public Builder evict(CacheRegion... regions) {
+                return evict(List.of(regions));
+            }
+
+            public Builder evict(Collection<? extends CacheRegion> regions) {
+                if (regions.isEmpty()) {
+                    throw new IllegalArgumentException(NO_REGION);
+                }
+                for (Class<? extends CacheEvent> event : events) {
+                    builder.byEvent.computeIfAbsent(event, ignored -> new LinkedHashSet<>()).addAll(regions);
                 }
                 return builder;
             }
