@@ -9,117 +9,33 @@ never share an identity realm.
 | Port | 8001 | 8124 |
 | Who it authenticates | Platform staff, org owners, merchants/sellers | **Storefront shoppers** |
 | Reached via | `store-core-gateway` (:8000) | `spg` at `/cua` |
-| Front end | Embedded Angular SPA (`uaa-fe`, on `@cvhome-saas/ui-kit`): sign-in, users, roles, clients — plus a Thymeleaf consent page | **None — headless.** The storefront renders login and registration as theme pages and hands off to `/oauth2/authorize` |
-| User pools | One, fixed | **One per store** (see *Realms* below) |
-| Self-registration | No — admin-provisioned (`AdminUserController`) | **Yes** — `RegistrationController`, social login |
+| Front end | Embedded Angular SPA (`uaa-fe`) — the identity-first sign-in page and the admin console | **None** — headless. The storefront (`landing-ui`) renders login and registration as theme pages; cua redirects to them and processes the posted form |
+| Self-registration | No — admin-provisioned or **invited**: the account is created pending and its owner sets a password through a one-time link | **Yes** — `POST /api/v1/public/registration` (JSON, `?store=`), social login |
+| External providers | OIDC and OAuth 2.0 brokering, per-realm, with linking policy and just-in-time provisioning | Social login per store |
 | Serves tokens to | console-ui, tenancy, gateway, all `-service` s2s clients | landing-ui storefront sessions |
 | Deployment | One shared instance for the whole SaaS | One per pod |
 
-**They are the same program.** Both are thin shells over `store-commons/sso/sso-core`
-(`shared-libraries.md`), which holds every entity, service and security component; a shell supplies only its
-application class, its issuer pin, its realm resolver and its edge. They were separate codebases once, and the
-hardening that landed in uaa never reached the server that authenticates shoppers — lockout, rate limiting,
-audit, key rotation, a persistent token store. Anything added now lands in both by construction.
+Both use `spring-boot-starter-oauth2-authorization-server` with JDBC sessions, so they look nearly identical in
+code — the difference is *which realm they own*, not how they're built.
 
 **Practical consequence:** when you see an auth bug, first establish whether the actor is a seller/admin
 (→ `uaa`) or a shopper (→ `cua`). They have separate user tables, separate clients, separate issuers.
 
-## Two things are called realm
+## "Realm" means two different things — keep them apart
 
-They are unrelated, and mistaking one for the other is how this gets misread:
+The word is overloaded in this repo, and the two senses sit one layer apart:
 
-| | Answers | Named by | Where |
+| Term | Where | Means | Values |
 |---|---|---|---|
-| **Issuer realm** | *Which server minted this token, and may I trust it?* | `uaa`, `cua` | `s2s/jwt/IssuerRealm`, `store-pod-*-config.yml` |
-| **User realm** | *Whose users is this token about?* | a store id, or `platform` | `commons/domain/RealmId`, `sso/realm/*` |
+| **Issuer realm** | `store-commons/autoconfigure/.../s2s/jwt/IssuerRealm.java` | *Which authorization server minted this token.* What a resource server's trust list is written against, and what the `grants` ceiling and the `REALM_*` authority key on. | `uaa`, `cua` |
+| **Realm** | `store-commons/sso/sso-commons/.../RealmId.java` | *Which user pool a principal belongs to, inside one server.* What `users`, `roles`, `settings`, `identity_providers` and `audit_events` are scoped by. | `platform` (uaa) · one per store (cua) |
 
-A shopper token is issued by the **cua issuer realm** and belongs to the **user realm** of one store. Read the
-rest of this file with that split in mind: everything above this line is about issuers, everything below about
-user pools.
+They are independent: every realm lives inside exactly one issuer realm. uaa has one realm and always will —
+its staff and service accounts are a single pool, and there is no realm selector in its API or console. cua has
+one realm per store, which is what makes the same email address two different shoppers in two different stores.
 
-## Realms — one user pool per store
-
-uaa serves one realm forever (`platform`). cua serves **one realm per store on its pod**, which is what makes
-the four things cua exists for possible:
-
-- Each store has its own users. The same email in two stores is two accounts, with their own passwords,
-  their own lockout state and their own sessions.
-- Each store configures its own identity providers, with its own Google or GitHub credentials.
-- The endpoints are reached same-origin on the shopper's own store domain…
-- …while the **issuer stays pinned to one value per pod**, so a resource server's trust list is bounded by pod
-  count rather than store count. A per-store issuer would be an unbounded set no trust list could enumerate.
-
-`RealmMode` picks which: `SINGLE` for uaa, `MULTI` for cua, stated explicitly in each shell's `application.yml`
-because a deployment that forgot to say and defaulted to `SINGLE` would put every store's shoppers in one pool.
-
-**Isolation is the ORM's job, not the query author's.** Every `sso-core` entity carries Hibernate's `@TenantId`,
-and `SsoTenantIdentifierResolver` supplies the realm — so every query is filtered and every insert populated
-without a `where realm_id = ?` being written by hand. Unique constraints are realm-scoped
-(`(realm_id, lower(username))`), which is what lets one shopper exist in two stores.
-
-**Where the realm comes from.** The pod edge is authoritative: Caddy's `domain_lookup` resolves the storefront
-host to a store and injects `Store-Id`, and cua's realm filter reads that. A `client_id` form field or a
-`?store=` parameter is checked *against* it, never trusted as the source — letting the client name its own
-tenant is what the header replaced.
-
-**A signed-in session belongs to one realm.** It is stamped at sign-in and checked on every request
-(`SessionRealmFilter`); a mismatch refuses the request and leaves the session standing, because a session anybody
-can destroy by naming another store in a query parameter is a forced-logout button. Anonymous sessions — the one
-`/oauth2/authorize` creates to hold the saved request — carry no stamp and are not checked. This is the second
-lock: the first is that the cookie is host-scoped, which is why a `Domain` on the shared parent
-(`.spg-<pod>.gateway.com`) must never be set.
-
-**Background work has no request, so it has no realm.** `RealmContext.runIn` is how a scheduled job enters one,
-and jobs that sweep every realm (audit retention) iterate `RealmRegistry.all()`. Outside a realm the resolver
-answers a sentinel that matches nothing, so a mistake reads no rows rather than every realm's.
-
-### What is the realm's, and what is the platform's
-
-A merchant edits their own realm's policy — password rules, lockout, session and token lifetimes, audit
-retention — and the pod underneath is shared, so `SsoPlatformCeilings` bounds what they may set. It is
-configuration, returned by no API and written by no endpoint; a merchant sees only that a value was refused.
-
-The signing key is **one per deployment**, which on cua means one per pod. Its rotation interval comes from the
-platform realm's settings, never from whichever realm a background thread happened to be in. State this plainly
-in merchant-facing material: "your own SSO" does not mean cryptographic isolation, and a merchant who genuinely
-requires it needs a dedicated pod.
-
-**Merchant-supplied endpoints are fetched by this server**, so they are guarded rather than trusted. Every URL on
-an identity provider — issuer, authorization, token, userinfo, JWKS — is checked before it is stored and again
-before the `test` action fetches one: HTTPS only, no credentials in the URL, and no name that resolves inside the
-server's own network (loopback, RFC1918, link-local, unique-local, carrier-grade NAT, and the cloud metadata
-address). A name that does not resolve is refused rather than allowed, because an address that cannot be checked
-has not been. `test` is rationed per realm, since an unlimited one is a port scanner with a progress bar.
-
-The gap worth naming: between the check and the socket, the name is resolved again by the HTTP client, and
-nothing pins those two answers together. Every static case is closed; what remains needs an attacker who runs a
-DNS server and wins a race. Closing it means owning the connection factory.
-
-`allow-private-addresses` is the one way to lose this, and it is off by default — set only by the `lcl` slices and
-by the integration test whose stub provider answers on localhost. `EgressGuardTest` holds the defaults to being
-the strict ones.
-
-Rate limiting counts an attempt twice — once against the realm it was aimed at, once against the address it
-came from (at `spread` times the limit) — so one store cannot spend another's budget and spraying a thousand
-stores does not evade the brake.
-
-### Claims a realm-scoped token carries
-
-| Claim | Value |
-|---|---|
-| `sub` | the account id |
-| `uid` | the same account id — a user token always carries it, a `client_credentials` token never does |
-| `realm` | the user realm: the store id |
-| `username` / `preferred_username` | the human name, which is unique only within the realm |
-
-`StoreRoleAccessChecker.isStoreCustomer` and checkout's shopper gate both read `realm`. They read `clientId`
-once, which held the same value only because a store had exactly one client — a coincidence that would have
-stopped being true the first time a store got a second one.
-
-**The principal name is the account id, not the username.** Spring Session's `PRINCIPAL_NAME` index and
-`oauth2_authorization.principal_name` are both looked up by it, and one deployment holds every realm's rows: two
-shoppers called `user` in two stores shared a principal name, so each could list and end the other's sessions.
-`PrincipalNames` is what turns it back into a username for audit rows and lockout counters.
+If you are reading `IssuerRegistry`, `MultiIssuerJwtDecoder` or `RealmAwareJwtGrantedAuthoritiesConverter`, the
+realm is the *server*. If you are reading anything under `sso-core`, it is the *user pool*.
 
 ## Pod services accept tokens from both
 
@@ -271,19 +187,34 @@ switch is the context path and nothing a caller can put in a query string.
 `LinkAccept` in `@cvhome-saas/ui-kit/uaa` serves the invitation and password-reset pages for **both** consoles;
 `com.asrevo.cvhome.uaa.links.base-url` decides which origin the emailed link points at.
 
-**Shopper (store-pod):** the storefront (`landing-ui`) sends the shopper to `cua` through `spg` at `/cua`, using
-`@store-front/services`' `AuthService`; the template's `callback/` route completes the flow and
-`Common/Secured.tsx` + `useUser` guard `/customer/**` pages.
+**Shopper (store-pod):** the storefront (`landing-ui`) is a PKCE public client whose `client_id` is the store
+id. `AuthService.login()` sends the browser to `/cua/oauth2/authorize?…&lang=<locale>`; cua saves that request
+and its `HandoffLoginEntryPoint` (from `store-commons/sso/sso-core`, wired in `CuaSecurityConfig` with
+`StorefrontUrls` as the page locator) redirects to `{origin}/{lang}/login?auth=1` — same origin, because spg
+fronts both. landing-ui renders `theme.pages.Login` (or the shell fallback) as a plain HTML form that posts
+`username`, `password`, `client_id`, `lang` to `/cua/login`; on success `StorefrontLoginSuccessHandler` resumes
+the saved authorize request, which redirects to `/{lang}/callback?code=`, where the storefront exchanges the
+code. A failure is `…/login?auth=1&error=invalid|social` — a token, never text: cua has no strings, the
+storefront translates. Without the `auth=1` marker `/login` just starts the flow, which is what deep links and
+`shell/auth/secured.tsx` rely on. Registration is `POST /cua/api/v1/public/registration` from
+`theme.pages.Register` (`useRegisterForm`), then the same login flow. The helpers live in
+`store-pod/cua/.../security/StorefrontUrls.java`. The form is CSRF-protected without JavaScript: the hand-off
+redirect plants an `XSRF-TOKEN` cookie (path `/`), the storefront page reads it server-side and echoes it as a
+hidden `_csrf` input, and a stale form comes back as `error=expired`. `prompt=login` is enforced by
+`PromptLoginFilter` — a live cua session is logged out and sent to the form, once — so registering while another
+shopper's session is alive signs in as the new account.
 
 Each `-service` also has its own small `controller/v1/auth/AuthController` for exposing the current principal to
 its own clients.
 
 ## Managing users (as opposed to authenticating them)
 
-Creating, listing, enabling or role-assigning a **staff/seller** account means calling `uaa`'s admin API, and
-that goes through the `store-commons:uaa-client` / `uaa-client-impl` SDK (`UserAccountService` →
+Creating, listing, enabling, inviting or role-assigning a **staff/seller** account means calling `uaa`'s admin
+API, and that goes through the `store-commons:uaa-client` / `uaa-client-impl` SDK (`UserAccountService` →
 `AdminUserClient` → `/api/v1/admin/users`), authenticated by its own `admin-sdk` `client_credentials` token with
-scope `super_admin` — not the `s2s` registration. Because that scope is platform-wide, the caller is responsible
+scope `super_admin` — not the `s2s` registration. The contract covers the whole lifecycle, including
+`search(...)`, `counts()`, `invite(...)` and `createResetLink(...)`; a one-time link is answered once and must
+never be logged. Because that scope is platform-wide, the caller is responsible
 for tenant scoping via the `org`/`store` user metadata. Full guide: `uaa-client.md`.
 
 ## The authorization model, end to end

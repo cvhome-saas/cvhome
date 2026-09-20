@@ -8,9 +8,6 @@ store-commons/
 ├── autoconfigure/               Spring auto-config: security, JWT, web clients, shared YAML config
 ├── uaa-client/                  UAA admin SDK (interfaces + DTOs)
 ├── uaa-client-impl/             its implementation
-├── sso/                         the authorization server itself, deployed twice
-│   ├── sso-core/                    entities, services, security, @Configuration — uaa and cua are shells over it
-│   └── sso-events/                  its event contracts
 ├── secret-crypto/               pluggable secret encryption
 │   ├── secret-crypto-core/          SPI + local providers
 │   ├── secret-crypto-local/
@@ -31,25 +28,6 @@ Domain primitives shared by every layer. `java-library-conventions` plugin, `api
 `ZoneCode`, `Email`, `Domain`, `Pod`, `PodEndpoint`, `Theme`, `ColorTheme`, `Roles`, `UserOrgStoreIdentity`,
 `SubscriptionPlan*`, plus `BaseEntity`/`Identifier`/`Entity`. This is a load-bearing convention, not a style
 choice — argument resolvers and the permission evaluator dispatch on these types. See `api-conventions.md`.
-
-## `store-commons:sso`
-
-**The OAuth2 authorization server, as a library.** `store-core/uaa` and `store-pod/cua` are two deployments of
-one codebase: `sso-core` holds every entity, service, security component and `@Configuration`, and each shell
-holds only its application class, its issuer pin, its realm resolver and its own edge. They differ in three
-things and no more — how the issuer is pinned, how the realm is resolved, and what sits at the edge (an admin
-SPA for uaa, a storefront hand-off for cua).
-
-That the shells stay thin is enforced, not trusted: `SsoArchitectureTest` fails the build if a `@Service`,
-`@Entity` or `@Repository` appears in one. The whole point is that hardening lands once — the shopper-facing
-server cannot drift behind the staff-facing one again, which is exactly how it drifted the first time.
-
-`sso-core` ships one canonical `sso/schema-template.sql`; a Gradle task in each shell substitutes the schema
-name to produce that deployment's `schema.sql`. Both deployments share one database and are separated by
-schema, which is why **raw SQL in `sso-core` never names a schema** — the connection's own schema
-(`spring.datasource.hikari.schema`) decides, and `SsoSqlSchemaTest` fails the build if a qualifier reappears.
-
-See `authentication.md` for realms, claims and the trust layer.
 
 ## `store-commons:autoconfigure`
 
@@ -116,8 +94,22 @@ counterpart and the whole `lb://` resolution story: `service-discovery.md`.
 | Path | `:store-commons:commons` (and siblings) | `:store-pod:commons:store-commons` |
 | Folder | `store-commons/` | `store-pod/commons/store-commons/` |
 | Scope | Platform-wide: security, JWT, AWS, crypto, primitives | Pod business domain shared across pods |
-| Consumers | `uaa`, `gateway-service`, `tenancy/*`, `cua`, and every `-service` (for `autoconfigure`) | Nearly every `store-pod` module: catalog, checkout, merchant, payment, customer, reference, cua, `store-cms-commons` |
+| Consumers | `uaa`, `gateway-service`, `tenancy/*`, `cua`, and every `-service` (for `autoconfigure`) | Nearly every `store-pod` module: catalog, checkout, merchant, payment, customer, reference, cua |
 | Example usage | `implementation project(':store-commons:commons')` | `api project(':store-pod:commons:store-commons')` |
 
 **Rule of thumb:** cross-cutting infrastructure (auth, secrets, discovery, primitives) → root `store-commons`.
 Pod business domain reused across pods → `store-pod/commons/store-commons`.
+
+## `test-support` — shared test infrastructure
+
+`store-commons/test-support` (`com.asrevo.cvhome.testsupport`) is the one library that never reaches production: it is
+on the `integrationTest` classpath of every service (and on `testImplementation` where a service runs ArchUnit), and an
+architecture rule fails the build if any main class depends on it.
+
+It holds the Testcontainers configurations (`PostgresTestConfiguration`, `MinioTestConfiguration`), the test JWT
+decoder + signer (`ServletTestSecurityConfiguration`, `ReactiveTestSecurityConfiguration`, `TestJwtSigner`, `Tokens`),
+the non-throwing HTTP client (`ApiClient`), `MutableClock`, the `@ServiceIntegrationTest` /
+`@StorageIntegrationTest` / `@DatabaseIntegrationTest` meta-annotations, and `CvhomeArchitectureRules`.
+
+Before this module these were copy-pasted per service, and the JWT signer shipped inside `autoconfigure`'s production
+jar behind the `signer` profile — it no longer exists there. Details: `references/testing.md`.
