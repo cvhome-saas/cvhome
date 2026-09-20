@@ -613,7 +613,7 @@ The profile behind these cases, and the ideas measured and rejected, are in the 
   (Caddy's gzip beats Next's chunk-by-chunk gzip). CPU per render with gzip requested: home −21 %, category −8 %,
   product −7 %, search +2 % (noise).
 
-### PERF-04 — A store's layout data is fetched once per store every 30 s · high · [verified]
+### PERF-04 — Every anonymous read has a named data cache, its seconds set by the environment · high · [verified] (the three layout reads) / [unit only] (the names and the variables)
 
 - **Why** — the store record, the category tree and the site document behind every page's layout were fetched on
   every render. They are the same for every visitor of a store and change rarely, so Next's data cache now keeps
@@ -627,7 +627,13 @@ The profile behind these cases, and the ideas measured and rejected, are in the 
   render serves the cached copy and refreshes it in the background (one fetch each), then none again.
 - **Expected to differ** — a merchant's edit to the store record, the category tree or the site document (menus,
   footer pages, announcement, branding, social links) reaches the storefront up to 30 s later than before.
-  Product, listing, search, inventory, page content and anything a shopper's session touches are not cached.
+- **Since the page cache** (`libs/services/src/cache-policy.ts`) — every anonymous read names its cache, and each name
+  has seconds of its own: `store`, `categories`, `site`, `page`, `posts`, `post`, `banners`, `layout`, `faq`, `menu`,
+  `policy`, `redirect`, `productGroup`, `facets`, `suggest` 30; `product` and `listing` 10; `sitemap` 300.
+  `STOREFRONT_DATA_CACHE_<NAME>_SECONDS` (`PRODUCT_GROUP` for `productGroup`) changes one, `0` turns it off. Price and
+  stock are never cached, and a read with a preview token is not. `libs/services/test/cache-policy.test.ts` covers the
+  defaults, the variable names and the refused values; the reads themselves use the same `next: {revalidate}` option
+  this case verified, on more URLs.
 - **Seen** — 2026-09-13, local load stack behind the logging proxy: exactly as expected, per store; org1-store2
   and org1-store1 each titled with their own name through the shared cache. Backend calls per render: home 9 → 6,
   category 8 → 5, search 5 → 2. CPU per render, two runs against the build before: search −21 % and −23 %; home,
@@ -842,13 +848,106 @@ advisories, the versions that fix them, and what changed for this app between 16
 
 ---
 
-## LOAD — The 2026-09-14 load-test fixes
+## LOAD — The 2026-09-14 load-test fixes, and the page cache
 
-Findings 1 and 7 of *Where cvhome Breaks* (orchestrator `.agents/plans/load-bottlenecks.md`). **lcl runs landing-ui
-under `next dev`, which never goes through `start.mjs`**, so the page cache and the request signal are off on a plain lcl
-stack. (The page cache is its own PR; its cases LOAD-01/02/03/05/06/07 arrive with it.) To QA them: `npm run build` in `store-pod/landing-ui`, `lcl stop landing-ui --stack <name>`, then from
-`storefront/` run `PORT=<landing-ui port> INTERNAL_SPG=http://spg-507f1f77.gateway.com:<spg port> node start.mjs`, and
-browse through spg as usual.
+Findings 1 and 7 of *Where cvhome Breaks* (orchestrator `.agents/plans/load-bottlenecks.md`); the page cache's own
+plan is `.agents/plans/storefront-cache.md`, its map `references/landing-ui.md` § *The page cache, the edge headers
+and the request signal*. **lcl runs landing-ui under `next dev`, which never goes through `start.mjs`**, so the page
+cache, the edge headers and the request signal are off on a plain lcl stack. To QA them: `npm run build` in
+`store-pod/landing-ui`, a stack without landing-ui (`lcl start -d --stack <name> merchant content catalog checkout
+inventory`, or `lcl stop landing-ui --stack <name>`), then from `storefront/` run
+`PORT=<landing-ui port> INTERNAL_SPG=http://spg-507f1f77.gateway.com:<spg port> STOREFRONT_CACHE_DEBUG=true node start.mjs`
+and browse through spg as usual. `curl -s -D - -o /dev/null <url>` shows the headers every case below reads:
+`x-storefront-cache` (the state), and under `STOREFRONT_CACHE_DEBUG=true` `x-storefront-cache-class`, `-key`, `-reason`.
+`curl http://127.0.0.1:<port>/_storefront/cache/stats` is the cache's own count of what it did.
+
+### LOAD-01 — An anonymous page is served from the cache after its first render, by its class · high · [verified]
+
+- **Why** — a render costs tens of milliseconds of CPU and every route is dynamic; the home page's median under the
+  spike was 42 s. The server render reads no per-shopper state, so a document is a function of the host, spg's store
+  headers, the locale, the path and the query (`scripts/server/cache/key.mjs`), and the class it falls in says how long
+  it lives (`config.mjs`: home and category 30 s then stale 300 s, product 20/120, search 15/60, content 60/600, help
+  300/3600, the sitemap and robots 600/3600).
+- **Steps** — `curl` org1-store2's `/en` twice, its product page twice, its category page twice, `/sitemap.xml` twice;
+  then org1-store1's `/en`; then `/en?utm_source=x`; then `/en` again after 31 s, and once more.
+- **Expect** — each first request `miss` with its class, each second `hit` with the same bytes and a `content-length`;
+  the key names the host, the store id, the theme, the colour theme, the locale, the path and the (empty) query, and
+  the sitemap's only the host, the store and the path; the other store `miss` with its own store id in the key; the
+  tracking parameter `hit` (dropped from the key); after 31 s `stale`, sent at once, then `hit` on the next request
+  (the cache refreshed it with a request of its own: one more render, none for the shoppers).
+- **Seen** — 2026-09-20, stack `sfc` on this worktree, the production build behind spg: exactly as expected. Home
+  193,002 bytes, product 114,098, category 94,385, the same md5 on the hit; `stale` at 16 ms then `hit`; the stats
+  route counted 5 misses, 13 hits, 3 stale, 1 stale-refresh.
+
+### LOAD-02 — A page carries the headers an edge needs, and nothing else does · high · [verified]
+
+- **Why** — Next stamps `private, no-cache, no-store` on every dynamic render, so no cache between spg and the shopper
+  could ever help. The class's `Cache-Control` is set before the render and enforced as the head is written
+  (`edge-headers.mjs`), with a `Vary` naming the store headers. Nothing caches HTML at the edge today; this is the
+  contract for when something does.
+- **Steps** — the LOAD-01 requests, reading `cache-control` and `vary`; then `/en/login`, `/en/nope` (a 404),
+  `/en?theme=basic`, `/api/theme-manifest`.
+- **Expect** — home and category `public, s-maxage=30, stale-while-revalidate=300`, product `s-maxage=20, …=120`, the
+  sitemap `s-maxage=600, …=3600`, the same on the hit and the miss, `vary` = Next's RSC list plus `store-id, theme,
+  color-theme` (the sitemap: `store-id` alone); `/en/login` and the 404 `private, no-store`; the override
+  `private, no-store` too (one tester's page, whatever its class); the theme manifest keeps the value its route sets
+  (`private, max-age=60, stale-while-revalidate=60`).
+- **Seen** — 2026-09-20, as expected on every line.
+
+### LOAD-03 — Shoppers who arrive while a page is first rendering share one render · high · [verified]
+
+- **Steps** — 20 parallel `curl`s of a category page nobody has asked for.
+- **Expect** — one `miss`, the rest `shared` (they waited on that render) or `hit` (they arrived after it finished);
+  the stats route counts one miss.
+- **Seen** — 2026-09-20: 1 miss, 17 shared, 2 hit; the log shows one render.
+
+### LOAD-05 — Nothing that could carry a shopper, a draft or an override comes from the cache · critical · [verified]
+
+- **Why** — the cache is safe only because the server render reads no per-shopper state. Whatever could make a page
+  one shopper's is bypassed, and the reason is on the response under debug (`policy.mjs`).
+- **Steps** — `/en/login`, `/en/customer`, `/en/checkout`, `/en/callback`; `/en?theme=basic`, `/en?color=DARK`,
+  `/en/content/about?preview=x`; `/en` with `Cookie: storefront-theme=basic`; `/en` with `Authorization: Bearer x`;
+  `/en` with `RSC: 1`; a `POST /en`; a `HEAD /en` before and after a GET; a page the backend answered with a hole (stop
+  catalog, ask a page whose product strip degrades, restart catalog, ask again).
+- **Expect** — every one `bypass` with its reason (`class-disabled`, `override-param`, `override-cookie`,
+  `authorization`, `rsc`, `method`); a HEAD is `miss` (rendered, never kept) until a GET filled the page, then `hit`
+  with the content-length and no body; the page with a hole is `miss` again next time (a degraded render is not kept,
+  LOAD-06).
+- **Seen** — 2026-09-20: login, the override parameter, `RSC: 1`, the HEAD before and after, the 404 (`default`
+  class) as expected live; the cookie, the credential, the write and the degraded render by
+  `scripts/server/cache/page-cache.test.mjs` and `policy.test.mjs` (the degraded render's live half is a stack
+  exercise not run this time).
+
+### LOAD-06 — A page with a hole in it, or one that stopped short, is never kept; the cache stays within its bytes · critical · [unit only]
+
+- **Rules** (`capture.mjs`, `memory-store.mjs`) — never kept: a non-200; an HTML body that did not reach `</html>` (a
+  stream that failed after the shell); a render one of whose optional reads was aborted or timed out (`orUndefined`
+  marks it, `request-scope.mjs`); a response setting any cookie but `NEXT_LOCALE`; a body over
+  `STOREFRONT_CACHE_MAX_ENTRY_KB` (1024). The store is bounded by `STOREFRONT_CACHE_MAX_MB` (64), least recently used
+  first out, and each class by its share (product and category a quarter each, home a fifth, search and content a
+  tenth, help and the sitemap a twentieth), so ten thousand product pages cannot push the home page out. When more than
+  `STOREFRONT_CACHE_EVICTION_LOG_THRESHOLD` (100) pages are evicted for room in a minute, one log line says so, and
+  `storefront_page_cache_evictions{class,reason}` counts them.
+- **Covered by** — `page-cache.test.mjs` (the 404, the truncated body, the degraded render, the foreign cookie, the
+  entry limit), `memory-store.test.mjs` (the byte bound, the class share, expiry), `metrics.test.mjs` (the warning).
+- **Expected to differ live** — none; a live eviction run needs a store bigger than 64 MB of distinct pages.
+
+### LOAD-07 — The cache is tuned by the environment, without a rebuild · high · [verified]
+
+- **Why** — every setting has a default in `config.mjs`, and an environment changes any of them:
+  `STOREFRONT_CACHE_ENABLED`, `_MAX_MB`, `_MAX_ENTRY_KB`, `_STORE`, `_DEBUG`, `_STATS_TOKEN`,
+  `_EVICTION_LOG_THRESHOLD`; per class `STOREFRONT_CACHE_<CLASS>_TTL_SECONDS`, `_SWR_SECONDS`, `_ENABLED`; and
+  `STOREFRONT_CACHE_POLICY_JSON`, a partial table merged under the flat variables. A value the cache cannot run with
+  stops the start with its message, so a wrong variable is found at deploy, not by the first shopper.
+- **Steps** — start with `STOREFRONT_CACHE_PRODUCT_TTL_SECONDS=soon`; start with `STOREFRONT_CACHE_ENABLED=false
+  STOREFRONT_CACHE_PRODUCT_TTL_SECONDS=5` and ask `/en` twice and a product page; start with
+  `STOREFRONT_CACHE_POLICY_JSON='{"classes":{"help":{"enabled":false}}}'` and ask `/en/help`.
+- **Expect** — the first exits at once with `STOREFRONT_CACHE_PRODUCT_TTL_SECONDS must be a number, not "soon"`; the
+  second logs the effective policy once (`product: ttl 5`), answers `bypass` to everything, and the product page still
+  carries `public, s-maxage=5, stale-while-revalidate=120` (an edge may cache what this process does not); the third
+  answers `/en/help` with `bypass`, reason `class-disabled`, `private, no-store`.
+- **Seen** — 2026-09-20: the first two live as expected; the JSON policy by `policy.test.mjs` (merge order, the
+  refused values, a class turned off).
 
 ### LOAD-04 — A render stops when its shopper leaves, and a slow backend read fails in 3 s · high · [verified]
 
@@ -857,6 +956,10 @@ browse through spg as usual.
 - **Result** — the render's four backend calls are aborted at 929 ms when the client leaves, and no further call is
   made; for the waiting client each read is aborted at 3.0 s (`STOREFRONT_BACKEND_TIMEOUT_MS`, 0 waits). Writes have no
   budget. Covered also by `libs/services/test/http-utils.test.ts` and `scripts/server/request-scope.test.mjs`.
+- **Since the page cache** — a read Next keeps in its data cache (`publicCachedGet`) carries the budget only, not the
+  shopper's signal: other renders wait on that same fetch, and one shopper leaving must not fail their reads. So the
+  reads aborted when the client leaves are the uncached ones; a cached read runs to its answer or its 3 s. And a
+  render other shoppers are waiting on (LOAD-03) is not stopped when the first one leaves.
 
 
 ### LOAD-08 — A video section loads its player only when the shopper presses play · high · [not verified]
