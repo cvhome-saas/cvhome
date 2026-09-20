@@ -189,7 +189,8 @@ switch is the context path and nothing a caller can put in a query string.
 
 **Shopper (store-pod):** the storefront (`landing-ui`) is a PKCE public client whose `client_id` is the store
 id. `AuthService.login()` sends the browser to `/cua/oauth2/authorize?…&lang=<locale>`; cua saves that request
-and its `StorefrontLoginEntryPoint` redirects to `{origin}/{lang}/login?auth=1` — same origin, because spg
+and its `HandoffLoginEntryPoint` (from `store-commons/sso/sso-core`, wired in `CuaSecurityConfig` with
+`StorefrontUrls` as the page locator) redirects to `{origin}/{lang}/login?auth=1` — same origin, because spg
 fronts both. landing-ui renders `theme.pages.Login` (or the shell fallback) as a plain HTML form that posts
 `username`, `password`, `client_id`, `lang` to `/cua/login`; on success `StorefrontLoginSuccessHandler` resumes
 the saved authorize request, which redirects to `/{lang}/callback?code=`, where the storefront exchanges the

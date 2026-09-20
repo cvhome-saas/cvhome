@@ -11,40 +11,42 @@ store-pod/
 ├── spg/                          INFRA :80    Caddy edge proxy (Caddyfile, compose.yml)
 ├── landing-ui/                   FE    :8110  Next.js storefront + template system
 ├── cua/                          BE+FE :8124  shopper OAuth2 auth server (standalone)
-├── merchant/                     BE    :8120  store, branding, domains, routing
-├── content/                      BE    :8121  CMS pages, boxes, files, images
+├── merchant/                     BE    :8120  store config: languages, currency, domains, address
+├── content/                      BE    :8121  content platform (pages, posts, banners, FAQ, policies, menus,
+│                                              media, store appearance, home sections)
+├── content-deprecated/           —            the previous content service, kept as reference only (unregistered)
 ├── catalog/                      BE    :8122  products & categories
-├── checkout/                     BE    :8123  cart, orders, customers
+├── inventory/                    BE    :8126  stock, pricing & reservations, keyed by sku
+├── checkout/                     BE    :8123  cart, orders (durable placement, event ledger), customers
 ├── payment/                      BE    :8125  payment gateways & webhooks
 └── commons/                                   pod-shared libraries (grouping folder)
     ├── store-commons/                         pod-scoped shared domain
-    ├── store-modules/store-cms-commons/       CMS primitives
     ├── reference/{reference-commons, reference-core}    countries, zones, currencies, languages
     └── customer/{customer-commons, customer-core}       shared customer domain
 ```
 
 ## The 4-module pattern in detail
 
-The same shape holds for `merchant`, `catalog`, `checkout`, and `payment`.
+Using `merchant` as the worked example. The same shape holds for `catalog`, `checkout`, `payment`.
 
 ### `-commons` — domain model (leaf)
 
 JPA-annotated entities and read/write DTOs. Applies `java-library`; JPA/Hibernate/Lombok are `compileOnly` so
 the module stays dependency-light. Depends only on `store-pod:commons:store-commons` and `reference-commons`.
 
-Evidence: `ReadableMerchantStore` / `PersistableMerchantStore`, catalog's product DTOs, and checkout's order DTOs.
+Evidence: `MerchantStoreEntity`, `ContentEntity`, `ReadableMerchantStore`, `PersistableMerchantStore`,
+`ReadableContentFull`.
 
 The `Readable*` / `Persistable*` DTO pair is a repo-wide convention: `Readable*` goes out to clients,
 `Persistable*` comes in from them, and the entity is neither.
 
 ### `-core` — business logic
 
-Repositories, services, facades, and populators that map entity ↔ DTO. Depends on its own `-commons` plus
-`store-cms-commons`.
+Repositories, services, facades, and populators that map entity ↔ DTO. Depends on its own `-commons`.
 
-Evidence: `MerchantRepository`, `MerchantStoreService`/`Impl`, `StoreFacade`,
-`ReadableMerchantStorePopulator`, and `PersistableMerchantStorePopulator`. Content has the equivalent classes in
-its own `content-core` module.
+Evidence: `MerchantRepository`, `ContentRepository`/`ContentRepositoryImpl`, `MerchantStoreService`/`Impl`,
+`ContentService`/`Impl`, `StoreFacade`, `ContentFacade`, `ReadableMerchantStorePopulator`,
+`PersistableMerchantStorePopulator`.
 
 **So: `-commons` = the data model, `-core` = the logic that operates on it.**
 
@@ -71,19 +73,55 @@ Applies the `spring-boot` plugin, has the `*Application` main class, `*Api` cont
 directly (so `-commons` arrives transitively), plus cross-cutting infra: `fargate-task-info`,
 `ecs-service-discoveryclient`, `store-commons:autoconfigure`.
 
-Evidence: `MerchantApplication`, `MerchantStoreApi`, `ExternalMerchantStoreApi`, `AuthController`,
+Evidence: `MerchantApplication`, `MerchantStoreApi`, `ContentApi`, `ExternalMerchantStoreApi`, `AuthController`,
 `RouterController`.
 
 ## Per-pod breakdown
 
-### `merchant` and `content` — independent services
+### `merchant` — the store entity
 
-`merchant` owns store, branding, domain, and routing data. Its modules are `merchant-commons`, `merchant-core`,
-`merchant-external-api`, and `merchant-service`.
+`merchant-commons` / `merchant-core` / `merchant-external-api` / `merchant-service`, exposing `MerchantStoreApi`
+and `ExternalMerchantStoreApi`.
 
-`content` owns CMS pages, boxes, files, and images. Its modules are `content-commons`, `content-core`, and
-`content-service`; it has no external-api module. SPG routes legacy content paths under `/merchant` to
-`content-service` indefinitely.
+**Store configuration only.** Languages, currency, domains, address and contact — plus, for now, the theme and
+colour scheme. CMS content used to live here as a second sub-domain and moved to `content`; so, later, did the
+store's appearance: the logo, banner, slider images and social links are `content.site_settings` and CMS banners
+now, because content owns the media library they come from. The Caddy `/merchant*` handler still forwards the
+legacy `/api/v1/content*` and `/api/v1/private/files` paths to `content`.
+
+### `content` — the content platform (port 8121)
+
+`content-commons` / `content-core` / `content-external-api` / `content-service`, package root
+`com.asrevo.cvhome.content`, JPA, schema `content`. One `content` + `content_description` table pair holds every
+content type (`ContentType`: PAGE, SECTION, POST, BANNER, FAQ, POLICY); separate tables for revisions, status
+audit, redirects, menus, media, policy versions, FAQ groups and `site_settings`.
+
+**Content owns store appearance.** `site_settings` is one row per store carrying the logo, dark logo, favicon and
+share image as media asset ids, the social links, and the store's own per-locale SEO. `SECTION` rows are the
+home page's blocks, in `sort_order`. All of this used to be merchant's, or a legacy `BOX` "snippet" row — those
+are gone, and each moved to the component that supersedes it: site SEO, a STRIP banner, the live TERMS policy,
+SECTION rows.
+
+APIs under `api/v1/`:
+- private console API `/api/v1/private/content/{pages|posts|banners|faq|policies|sections}` — one
+  `WorkflowContentApi` base (list/get/create/update/delete/publish/unpublish/submit-review/archive/restore/
+  revisions/translations/slug-available/bulk) per type, plus `ContentAdminApi` (`summary`, `redirects`),
+  `SiteSettingsApi`, media and menus. Writes need `STORE-POD.CONTENT.*`, reads `STORE-POD.CONTENT.READ`.
+- public storefront API `/api/v1/storefront/**` (cache-friendly, locale fallback), including `site` and
+  `home-sections`.
+- `ExternalMediaApi` `/api/v1/private/content/external/media` — how catalog resolves asset ids and states which
+  of them a product uses. The usage write needs `STORE-POD.CONTENT.MEDIA-USAGE`, mapped to `isSameStorePod`,
+  because `CONTENT.*` means "org or store admin" and the caller is a service.
+
+`ScheduledPublishJob` promotes `SCHEDULED` rows once a minute. Plans: `.agents/plans/console-ui-content.md`,
+`.agents/plans/content-owns-appearance-and-media.md`.
+
+```
+'store-pod:content:content-commons'
+'store-pod:content:content-core'
+'store-pod:content:content-external-api'
+'store-pod:content:content-service'
+```
 
 ### `catalog` — products & categories
 
@@ -93,9 +131,23 @@ APIs under `api/v1/`: `ProductApi`, `CategoryApi`, `ProductInventoryApi`, `Produ
 
 ### `checkout` — cart, orders, customers
 
-APIs under `api/order/v1/` and `v2/`: `ShoppingCartApi`, `OrderApi`, `CustomerOrderApi`, `ExternalOrderApi`,
-`OrderStatusHistoryApi`, `CustomerApi`, `ReferencesApi`, and `v2/statistic/` (`OrderStatisticApi`,
-`ProductStatisticApi`, `CustomerStatisticApi`). Note the mixed API versioning — statistics are `v2`.
+Rewritten 2026-09 in the `catalog`/`inventory` shape: flat `entity/`, `repositories/`, `services/<domain>/{XService,
+XServiceImpl, XMapper}`, no facades or populators. The `Order` entity is the aggregate: every transition is a method
+(`reserved`, `paymentPending`, `applyPaymentSignal`, `fulfil`, `cancel`, …) that checks the current state, moves the
+three statuses and the `pendingAction` together under `@Version`, and appends a `sales_order_event` row. Placement
+(`OrderPlacementService` + `OrderStepRunner`) commits the order row first, then runs each remote step — reserve,
+initiate payment, commit — outside a transaction and applies the answer in its own; a crash leaves a `PendingAction`
+that `OrderRecoveryJob` finishes, and `OrderExpiryJob` cancels unpaid orders past their window after asking payment
+once. Customers (`customer_account`) and the JDK-backed country list live here; the former `commons/customer-core`
+and `commons/reference-core` modules are gone.
+
+APIs under `api/v1/` and `api/v2/`: `cart/CartApi` (public), `order/CheckoutApi` (`POST /cart/{code}/checkout`,
+`GET /order/{id}/status`), `order/OrderApi` (console list/detail/history + the one write, `POST …/history`, which
+is a guarded transition — 409 when illegal), `order/ExternalOrderSignalApi` (`POST /private/orders/{ref}/signals/
+payment|reservation-expired`, `STORE-POD.CHECKOUT.SIGNAL`), `customer/CustomerApi` (shopper, `STORE-POD.CUSTOMER.*`),
+`customer/CustomerAdminApi`, `reference/CountryApi`, `v2/statistic/StatisticApi`. Payment and inventory call the
+signal API through `checkout-external-api`'s `ExternalOrderSignalService`; both signals are idempotent and answer
+`APPLIED` / `DUPLICATE` / `IGNORED`, never a 4xx for a state the order cannot use.
 
 ### `payment` — gateways & webhooks
 
@@ -104,16 +156,23 @@ APIs under `api/order/v1/` and `v2/`: `ShoppingCartApi`, `OrderApi`, `CustomerOr
 `ExternalPaymentGatewayApi`. Stripe is the integrated provider.
 
 This is the one pod using the **transactional outbox**: the `Transaction` aggregate registers
-`PaymentPaidEvent` / `PaymentFailedEvent` / `PaymentCanceledEvent`, and `PaymentOutboxHandler` /
-`WebhookOutboxHandler` push the resulting status to checkout asynchronously. See `events-outbox.md`.
+`PaymentPaidEvent` / `PaymentFailedEvent` / `PaymentCanceledEvent` / `PaymentRejectedEvent`, and
+`PaymentOutboxHandler` / `WebhookOutboxHandler` push the resulting status to checkout's signal API asynchronously.
+See `events-outbox.md`.
 
 ## Pods that break the pattern
 
 - **`cua`** (:8124) — a single standalone Gradle module, no commons/core split. It's an OAuth2 authorization
-  server for storefront shoppers, with Thymeleaf-rendered login/registration UI. Controllers: `LoginController`,
-  `RegistrationController`, `SocialLoginConfigController`, `AuthController`, `oidc/UserInfoController`. Notably
-  it depends on `secret-crypto-autoconfigure` (for encrypted social-login credentials) and
-  `merchant-external-api` (to resolve which store a shopper belongs to).
+  server for storefront shoppers, and it is **headless**: it renders no HTML. The storefront (`landing-ui`) owns
+  the login and registration pages; cua's `HandoffLoginEntryPoint` (from `store-commons/sso/sso-core`, wired in
+  `CuaSecurityConfig`) redirects an unauthenticated shopper to `{origin}/{lang}/login?auth=1`, the storefront
+  posts the form back to `/cua/login`, and `StorefrontLoginSuccessHandler` resumes the authorize request
+  (`security/StorefrontUrls` is the one place that builds those URLs). The storefront is a PKCE public client
+  whose `client_id` is the store id (`config/StorefrontClientRepository`). Controllers: `web/LoginRedirectController`
+  (the old `GET /cua/login` page, now a redirect), `web/MerchantShopperController`,
+  `web/MerchantIdentityProviderController`, `web/PublicSocialLoginController`. Notably it depends on
+  `store-commons:sso:sso-core` (the shared authorization-server core it and `uaa` are both built on) and
+  `merchant-external-api` (to resolve which store a shopper belongs to). `authentication.md` has the full flow.
 - **`landing-ui`** (:8110) — npm/Next.js, see `landing-ui.md`.
 - **`spg`** (:80) — Caddy config, see below.
 
@@ -133,8 +192,9 @@ Caddy, not Java. Responsibilities, from the `Caddyfile`:
 
    | Path | → | Notes |
    |---|---|---|
-   | `/merchant*` | `merchant:8120` | `handle_path` (prefix stripped; legacy content subpaths are routed to content) |
-   | `/content*` | `content:8121` | `handle_path` |
+   | `/content*` | `content:8121` | `handle_path` (prefix stripped) |
+   | `/merchant*` | `merchant:8120` | `handle_path` |
+   | `/inventory*` | `inventory:8126` | `handle_path` |
    | `/catalog*` | `catalog:8122` | `handle_path` |
    | `/checkout*` | `checkout:8123` | `handle_path` |
    | `/payment*` | `payment:8125` | `handle_path` |
@@ -152,6 +212,5 @@ hand; `gateways-and-local-domains.md` has both edges' routing tables and the loc
 | Module | Role |
 |---|---|
 | `store-commons` (`:store-pod:commons:store-commons`) | Pod-scoped shared domain — consumed by essentially every pod module. **Not** the root `store-commons/`; see `shared-libraries.md`. |
-| `store-modules/store-cms-commons` | CMS primitives shared by content/catalog (`api project(':store-pod:commons:store-commons')`). |
-| `reference/{reference-commons, reference-core}` | Reference data: countries, zones, currencies, languages. |
-| `customer/{customer-commons, customer-core}` | Customer domain shared between checkout and cua. |
+| `reference/reference-commons` | Reference DTOs (`ReadableCountry`, addresses, units). `reference-core` was retired with the checkout rewrite; countries now come from the JDK. |
+| `customer/customer-commons` | Customer DTOs (`ReadableCustomer`, `CustomerAddress`) both frontends read. The `Customer` entity lives in `checkout-core` since the rewrite. |

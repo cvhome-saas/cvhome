@@ -18,7 +18,7 @@ never sees the old shapes, but a `LEGACY.*` code means that endpoint has not bee
 says nothing.
 
 Grepping `LEGACY.` measures the remaining work. As of this writing ~125 legacy throw sites remain, concentrated in
-`catalog-core` (69), `content-core` (13), `checkout-core` (13) and `store-cms-commons` (12). Payment, the
+`catalog-core` (69) and `content-core` (13). Payment, checkout (rewritten 2026-09), the
 `store-commons` roots and the s2s layer are fully migrated — payment is the reference implementation to copy.
 The bridge and its four classes are deleted in the final step; a repo-wide grep for the deleted types is the
 completion gate.
@@ -72,7 +72,6 @@ abstract BaseException extends Exception implements ErrorCodeAware     ← check
  ├── abstract ResourceNotFoundException        404
  ├── abstract DuplicateResourceException       409
  ├── abstract OperationNotAllowedException
- ├── abstract TooManyRequestsException           429, the same call succeeds later
  ├── abstract AccessDeniedStoreException       403
  ├── abstract ConversionException              400
  ├── abstract StoreIOException                 500, wraps java.io.IOException
@@ -93,7 +92,7 @@ transparently, so one that escapes still renders correctly instead of becoming a
 
 `ErrorCategory` holds the status as a plain `int` (no Spring in this module): `VALIDATION`/`MALFORMED`/`CONVERSION`
 400, `UNAUTHENTICATED` 401, `FORBIDDEN` 403, `NOT_FOUND` 404, `CONFLICT` 409, `PAYLOAD_TOO_LARGE` 413,
-`UNPROCESSABLE` 422, `TOO_MANY_REQUESTS` 429, `STORAGE`/`INTERNAL` 500, `REMOTE_SERVICE` 502, `TIMEOUT` 504.
+`UNPROCESSABLE` 422, `STORAGE`/`INTERNAL` 500, `REMOTE_SERVICE` 502, `TIMEOUT` 504.
 
 ## The rules
 

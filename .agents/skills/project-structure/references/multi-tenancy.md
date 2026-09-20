@@ -9,13 +9,14 @@ mapping between them, and everything else — routing, TLS, data isolation, regi
 |---|---|---|---|
 | **Organization** | `ManagerOrgId` | tenancy (`tenancy` schema) | The customer account that signs up and pays. Owns stores. |
 | **Store** | `StoreMerchantId` | tenancy + the pod's own DB | One storefront. The unit a shopper actually visits. |
-| **Pod** | `PodId` | tenancy (`org.pod` table) | A **physical deployment** of the whole `store-pod` stack. Hosts many stores. |
+| **Pod** | `PodId` | pod-registry (`pod_registry.pod` table) | A **physical deployment** of the whole `store-pod` stack. Hosts many stores. |
 
-A fourth unit exists inside the identity layer only: a **realm** (`RealmId`) is one user pool. On a pod's `cua`
-there is one per store, so the same email in two stores is two shoppers; on `uaa` there is exactly one,
-`platform`. It is the store id by value, and it is what Hibernate's `@TenantId` filters every identity query by.
-See `authentication.md` — and note that "realm" also names the *issuing server* elsewhere in that file, which is
-a different question entirely.
+Pods moved out of tenancy in 2026-08 (`.agents/plans/tenancy-and-pod-registry-split.md`,
+`extra/migrations/2026-08-12-move-pods-to-pod-registry.sql`): **pod-registry owns the pod** — identity, endpoint,
+private-org assignment, lifecycle, health, capacity and placement decisions, all of `/api/v1/pod/**` — while
+**tenancy owns the store → pod binding** (`manager_store.pod_id`, `RouterApi`, `StorePodClientFactory`,
+`StoreProvisioningService`). A store is placed by asking pod-registry (`PodPlacementApi`) and the answer is written
+onto the store row in tenancy.
 
 **One store id everywhere.** `StoreMerchantId` (a `String`) is the store's identifier in tenancy, billing,
 pod-registry, the gateway and every pod alike. It used to be two types — store-core carried an `ObjectId`
@@ -46,7 +47,7 @@ public record PodEndpoint(String endpoint, EndpointType type) { }   // EndpointT
 Two fields carry the architecture:
 
 - **`orgId`** — a pod may be **dedicated to one organization** (enterprise tenant, isolated infrastructure) or
-  **shared** (`listPublicPods()` — the default multi-tenant pool). This is the SaaS "shared or isolated
+  **shared** (the default multi-tenant pool; pod-registry derives `PodVisibility` from whether `orgId` is set). This is the SaaS "shared or isolated
   infrastructure" promise from the README, expressed as one nullable field.
 - **`endpoint.type`** — `INTERNAL` means the pod sits in the same cluster and is reached through service
   discovery; `EXTERNAL` means it is reached over a public URL. `ServiceUrlBuilder` switches on exactly this:
@@ -62,7 +63,7 @@ Two fields carry the architecture:
   ```
 
 **This is how a store lands in a specific region.** A pod deployed in eu-central-1 and one in us-east-1 are just
-two rows in `org.pod` with different endpoints. Assign a store to the EU pod and its data physically lives in
+two rows in `pod_registry.pod` with different endpoints. Assign a store to the EU pod and its data physically lives in
 the EU — no code path changes, because every caller resolves the pod through `ServiceUrlBuilder`. An
 `EXTERNAL`-typed pod can live in an entirely different account, region, or even another cloud, and store-core
 still reaches it uniformly.
@@ -118,11 +119,13 @@ The flow:
 4. `StorePodClientFactory` builds (and caches per `PodId`) a `MerchantStorePodClient` aimed at that specific pod:
 
    ```java
-   Pod pod = serviceDomainProperties.getPodByPodId(podId).orElseThrow(...);
-   return restClientBuilder.buildClient(pod, "merchant", MerchantStorePodClient.class);
+   Pod pod = podDirectory.find(podId).orElseThrow(...);   // CachingPodDirectory, from pod-registry-external-api
+   return restClientBuilder.buildClient(pod, "merchant", MerchantStorePodClient.class, RemoteErrorCatalog.none());
    ```
 
-   Note the **pod-aware overload** of `buildClient` — the same declarative-client machinery as any other
+   `CachingPodDirectory` asks pod-registry (`ExternalPodService.listPods()`) with a TTL cache, seeded from
+   `ServiceDomainProperties.pods()` so tenancy can still reach the pods it knows about while pod-registry is
+   down. Note the **pod-aware overload** of `buildClient` — the same declarative-client machinery as any other
    service call (`service-to-service.md`), but targeted at a pod resolved at runtime rather than a static
    service name.
 5. The pod's `merchant-service` creates the real store record in **its own** database. From then on, that store's
@@ -158,8 +161,10 @@ public Flux<RouteDefinition> getRouteDefinitions() {
 }
 ```
 
-- Pods come from tenancy via `ExternalPodClient.listPods()` (`GET /api/v1/pod/list`), with
-  `onErrorResume` so a tenancy outage degrades to the existing routes instead of dropping them.
+- Pods come from **pod-registry** via `ReactiveExternalPodService.listPods()` (`pod-registry-external-api`,
+  `GET /api/v1/pod/list`). The table is seeded from `ServiceDomainProperties.pods()` at start-up and the refresh
+  keeps its last-known-good set on failure, so a pod-registry outage degrades to the existing routes instead of
+  dropping them.
 - A request to `/spg/**?store=<id>&pod=<podId>` matches the route for that pod. `StripPrefix=1` removes `/spg`,
   and **`TokenRelay` forwards the seller's OAuth2 token** into the pod — which the pod accepts because `uaa` is
   one of its configured realms (`authentication.md`).
@@ -223,9 +228,7 @@ public Page<Pod> findAllPods(@OrgStorePrincipalInfo UserOrgStoreIdentity identit
 | Concern | Isolation |
 |---|---|
 | Store data (products, orders, customers) | Per **pod** database; never crosses pods |
-| Shopper identity | Per **store** — one `cua` per pod, one realm per store inside it |
-| Shopper sessions, tokens, lockout, identity providers | Per store, by `@TenantId` on every row |
-| Shopper signing key | Per **pod** — shared by every store on it, and not a merchant's to rotate |
+| Shopper identity | Per pod — each pod runs its own `cua` |
 | Seller/admin identity | **Shared** — one `uaa` in store-core for the whole platform |
 | Billing, subscriptions, org/store registry | **Shared** — tenancy |
 | TLS certificates | Per pod (S3-backed Caddy storage, pod-local `ask` check) |
@@ -240,5 +243,4 @@ If it's about accounts, plans, provisioning, or which pod hosts what, it belongs
 - `StoreCreatedEvent` / `StoreProvisionedEvent` and the outbox — `events-outbox.md`
 - The `spg` Caddyfile routing table — `store-pod.md`
 - Local pod identity config (`pod-info.pod`, `com.asrevo.cvhome.pods`) — `configuration.md`
-- Why pods accept both `uaa` and `cua` tokens, and what a realm is — `authentication.md`
-- The authorization server both deployments are built from — `shared-libraries.md`
+- Why pods accept both `uaa` and `cua` tokens — `authentication.md`

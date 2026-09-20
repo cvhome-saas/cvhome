@@ -1,6 +1,6 @@
 # QA testing — exercising the real stack
 
-Automated tests (`./gradlew unitTest` / `integrationTest`) prove a unit behaves; **QA proves the feature works
+Automated tests (`./gradlew test` / `integrationTest`) prove a unit behaves; **QA proves the feature works
 end to end through the same path a user takes** — browser → gateway → uaa → pod service → database. This file
 is the procedure for that: bring the stack up, drive it, read the evidence, tear it down.
 
@@ -37,6 +37,13 @@ tell you where that stack lives. Hostnames never change. Everything that has to 
 the Spring services through a generated `SPRING_APPLICATION_JSON`, spg's Caddyfile through `{$LCL_PORT_*}`,
 landing-ui through `INTERNAL_SPG`, and uaa's seeded `web-app` redirect URIs through an `after-up` hook.
 
+**One stack per worktree.** Each feature lives in its own git worktree (AGENTS.md, Working conventions), and
+each worktree runs its own stack: from inside the worktree, `lcl start -d --stack <short-name>` — lcl resolves
+`lcl.yml` upward from the cwd, so the stack builds and serves *that* worktree's code with its own `.lcl/<stack>/`
+state. The dynamic port shifting above is what lets any number of worktrees QA in parallel without conflicts;
+always pass `--stack` and read live ports from `lcl urls --stack <short-name>` rather than assuming the
+configured ones. Stop the stack before removing the worktree.
+
 | command | what it does |
 |---|---|
 | `lcl start [svc…] [-d] [--build] [--stack xxx] [--parallel N] [--infra core\|all]` | start the stack (or just those services plus their dependencies); `-d` returns once everything is healthy |
@@ -49,6 +56,13 @@ landing-ui through `INTERNAL_SPG`, and uaa's seeded `web-app` redirect URIs thro
 | `lcl validate` / `lcl doctor` | check `lcl.yml` against the schema / check Docker, `/etc/hosts`, working dirs, ports |
 | `lcl list` | every running stack |
 | `lcl stop [--hard]` | that stack only; `--hard` also deletes the compose volumes |
+
+**`lcl restart` of the whole stack is not reliable.** The services each run their own `./gradlew … bootRun`,
+and they compete for the shared `~/.gradle/caches/journal-1` lock — a restart has the previous run's daemons
+still alive while the new clients start, and the pod services, which have no ordering between them, lose the
+race and exit 1. The give-away is `Timeout waiting to lock journal cache` and a `landing-ui` stuck on
+`blocked by dependency`, so the storefronts are down while the platform services look healthy. Use
+`lcl stop` then `lcl start -d`; a cold start has no leftover daemons. Full write-up: `qa/lcl-qa.md` §05.
 
 **Check `lcl status` before starting another one.** A crashed service no longer takes the stack down: it is
 marked `crashed`, `status` shows it and `why` explains it. Stop with `lcl stop`, never with a manual `kill` of
@@ -302,13 +316,15 @@ plan nobody trusts.
 ## 9. Where automated tests fit
 
 ```bash
-./gradlew test                 # everything
-./gradlew unitTest             # only @Tag("unit-test")
-./gradlew integrationTest      # only @Tag("integration-test")
-./gradlew :store-pod:catalog:catalog-service:test --tests '*ProductApiTest*'
+./gradlew test                 # src/test — unit + architecture tests, no Docker
+./gradlew integrationTest      # src/integrationTest — Testcontainers, Docker required
+./gradlew perServiceCoverage   # coverage report per micro service
 ```
 
-Both tasks come from `com.asrevo.java-application-conventions`. Integration tests use **Testcontainers
-(Postgres, MinIO), so Docker must be running** — a `./gradlew test` failing at container startup is an
-environment problem, not a test failure. These gate the merge; the browser/`.http` pass above is what proves
-the feature.
+Unit and integration tests are separate **source sets** (`*Test` vs `*IntegrationTest`), not JUnit tags. Integration
+tests use **Testcontainers (Postgres, MinIO), so Docker must be running** — a failure at container startup is an
+environment problem, not a test failure. Every store-scoped integration test owes the same two cases this checklist
+demands: tenant isolation and the permission gate.
+
+These gate the merge; the browser/`.http` pass above is what proves the feature. **How to write them, the naming
+standard, the shared `test-support` helpers and the coverage ratchet: `references/testing.md`.**

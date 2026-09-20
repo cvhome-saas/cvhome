@@ -1,8 +1,8 @@
 ---
 name: project-structure
-description: Map of the cvhome monorepo - every service and what it does, whether it is backend / frontend / mixed, its port, and where its code lives. Covers store-commons (shared libs), store-core (platform services - uaa, gateway, tenancy, console-ui), store-pod (business pods - merchant, content, catalog, checkout, payment, cua, spg, landing-ui), the multi-tenancy model (orgs, stores, and pods as physical per-region deployments, store provisioning, pod routing), the -commons/-core/-external-api/-service module pattern, API conventions (every endpoint takes StoreMerchantId and LanguageCode, heavy use of value objects, @PreAuthorize hasPermission authorization), encryption of tenant secrets at rest via secret-crypto, the two OAuth2 authorization servers (uaa for staff, cua for shoppers), shared configuration in store-commons/autoconfigure, database schema per service (Spring Data JDBC vs JPA, schema.sql / init-sql DDL), how every service is reachable both on its own port and as a path behind its gateway (store-core-gateway and the pod's spg/Caddy), the local docker-compose-lcl setup and the configure-domain.sh /etc/hosts script, how to run the whole stack locally with lcl (several named stacks at once) and how QA is done here (demo logins, browser-driven QA, .http API QA, tenant-isolation and permission checks, logs and traces, known local gaps), service-to-service calls via @HttpExchange -external-api clients, service discovery unified behind lb:// (Spring SimpleDiscoveryClient locally, the ecs-service-discoveryclient module over AWS Cloud Map on Fargate), managing uaa users through the uaa-client / uaa-client-impl admin SDK, domain events and the namastack transactional outbox, the landing-ui Next.js template system, and the Gradle version catalog. Includes the full step-by-step guide for creating a new landing-ui storefront template/theme, and for creating a whole new service - backend like catalog or tenancy, UI like console-ui, or one deployable serving both like uaa - covering module layout, registering it in settings.gradle and the common/lcl/fargate config files, lcl.yml, gateway/Caddy routing and permissions. Trigger when navigating the repo, adding or scaffolding a new service or module, deciding where new code belongs, tracing a dependency or request path, writing or securing an API endpoint, adding a table or column or writing DDL, storing a secret or API key, working on tenancy/pods/store provisioning or where a store's data physically lives, calling another service, creating or looking up a user account, working out what URL to hit a service on or why a request is not reaching it, adding a service to discovery or debugging instance resolution, setting up or fixing local dev domains, running the app locally or QA-ing/verifying a change end to end or reproducing a UI bug in a browser, publishing a domain event, changing a port or config, adding a dependency version, creating or designing a storefront template or theme, or asking "where is X" / "what does this module do".
+description: Map of the cvhome monorepo - every service and what it does, whether it is backend / frontend / mixed, its port, and where its code lives. Covers store-commons (shared libs), store-core (platform services - gateway, uaa, console-ui, tenancy, billing, pod-registry), store-pod (business pods - merchant, content, inventory, catalog, checkout, payment, cua, spg, landing-ui), the multi-tenancy model (orgs, stores, and pods as physical per-region deployments, store provisioning, pod routing), the -commons/-core/-external-api/-service module pattern, API conventions (every endpoint takes StoreMerchantId and LanguageCode, heavy use of value objects, @PreAuthorize hasPermission authorization), encryption of tenant secrets at rest via secret-crypto, the two OAuth2 authorization servers (uaa for staff, cua for shoppers), shared configuration in store-commons/autoconfigure, database schema per service (Spring Data JDBC vs JPA, schema.sql / init-sql DDL), how every service is reachable both on its own port and as a path behind its gateway (store-core-gateway and the pod's spg/Caddy), the local docker-compose-lcl setup and the configure-domain.sh /etc/hosts script, how to run the whole stack locally with lcl (several named stacks at once) and how QA is done here (demo logins, browser-driven QA, .http API QA, tenant-isolation and permission checks, logs and traces, known local gaps), service-to-service calls via @HttpExchange -external-api clients, service discovery unified behind lb:// (Spring SimpleDiscoveryClient locally, the ecs-service-discoveryclient module over AWS Cloud Map on Fargate), managing uaa users through the uaa-client / uaa-client-impl admin SDK, domain events and the namastack transactional outbox, the landing-ui Next.js template system, and the Gradle version catalog. Includes the full step-by-step guide for creating a new landing-ui storefront template/theme, and for creating a whole new service - backend like catalog or tenancy, UI like console-ui, or one deployable serving both like uaa - covering module layout, registering it in settings.gradle and the common/lcl/fargate config files, lcl.yml, gateway/Caddy routing and permissions. Trigger when navigating the repo, adding or scaffolding a new service or module, deciding where new code belongs, tracing a dependency or request path, writing or securing an API endpoint, adding a table or column or writing DDL, storing a secret or API key, working on tenancy/pods/store provisioning or where a store's data physically lives, calling another service, creating or looking up a user account, working out what URL to hit a service on or why a request is not reaching it, adding a service to discovery or debugging instance resolution, setting up or fixing local dev domains, running the app locally or QA-ing/verifying a change end to end or reproducing a UI bug in a browser, publishing a domain event, changing a port or config, adding a dependency version, creating or designing a storefront template or theme, or asking "where is X" / "what does this module do".
 metadata:
-  version: '3.2'
+  version: '3.4'
 ---
 
 # cvhome monorepo
@@ -21,8 +21,8 @@ grouping folder. Check it there first.
 | Tree | Contains | Deployed? |
 |---|---|---|
 | `store-commons/` | Platform-wide shared **libraries** — no runnable app | No, libs only |
-| `store-core/` | **Control-plane / platform** services: identity, gateway, tenant management, admin UI. One shared instance for the whole SaaS. | Yes |
-| `store-pod/` | **Business pods** — the per-tenant "store" runtime: merchant, content, catalog, checkout, payment, customer auth, storefront, edge proxy. Deployed as an isolated pod, **many times over**. | Yes, once per pod |
+| `store-core/` | **Control-plane / platform** services: identity, gateway, tenant management, billing, the pod registry, admin UI. One shared instance for the whole SaaS. | Yes |
+| `store-pod/` | **Business pods** — the per-tenant "store" runtime: merchant, content, inventory, catalog, checkout, payment, customer auth, storefront, edge proxy. Deployed as an isolated pod, **many times over**. | Yes, once per pod |
 
 Plus `build-logic/` (Gradle convention plugins, a composite build) and `gradle/libs.versions.toml` (version
 catalog). See `references/build-system.md`.
@@ -36,9 +36,11 @@ catalog). See `references/build-system.md`.
 
 | Service | Category | Port | Purpose |
 |---|---|---|---|
-| `store-core/uaa` | **BE+FE** | 8001 | OAuth2 **Authorization Server** + OIDC provider for staff/admin identity. Issues tokens for all other services. Serves an **embedded Angular admin SPA** (`uaa-fe`) from its own `static/` folder — sign-in, users, roles and clients, built on `@cvhome-saas/ui-kit` — plus a Thymeleaf consent page. Controllers: `AuthController`, `AdminUserController`, `AdminClientController`, `AdminRoleController`, `UserInfoController`. |
-| `store-core/gateway/gateway-service` | **BE** | 8000 | Spring Cloud **Gateway** (WebFlux, reactive) for the platform layer. Terminates the browser OAuth2 login session, exchanges it for tokens, and proxies to `tenancy` / `console-ui`. Key classes: `GatewayRouteLocatorImpl`, `SecurityConfig`, `RedirectingServerAuthenticationSuccessHandler`, `PodClient`. |
-| `store-core/tenancy/tenancy-service` | **BE** | 8020 | The **SaaS control plane**: organizations, store provisioning, subscription plans, Stripe billing, usage statistics. Controllers: `PodController`, `StoreManagerController`, `OrgManagerController`, `SubscriptionController`, `StripeWebhookController`, `SignUpController`, `StoreStatisticApi`. |
+| `store-core/uaa` | **BE+FE** | 8001 | OAuth2 **Authorization Server** + OIDC provider for staff/admin identity. Issues tokens for all other services. Serves an **embedded Angular admin SPA** (`uaa-fe`) from its own `static/` folder, plus Thymeleaf login pages. Controllers: `AuthController`, `AdminUserController`, `AdminClientController`, `AdminRoleController`, `UserInfoController`. |
+| `store-core/gateway/gateway-service` | **BE** | 8000 | Spring Cloud **Gateway** (WebFlux, reactive) for the platform layer. Terminates the browser OAuth2 login session, exchanges it for tokens, and proxies `/tenancy/**`, `/billing/**`, `/pod-registry/**`, `/uaa/**` (prefix kept) and `/spg/**` (per-pod routes from `PodClient`, fed by pod-registry); everything else is the `console-ui` catch-all. Key classes: `GatewayRouteLocatorImpl`, `SecurityConfig`, `RedirectingServerAuthenticationSuccessHandler`, `PodClient`. |
+| `store-core/tenancy/tenancy-service` | **BE** | 8020 | The **tenants**: organizations, org members and invitations, signup, store lifecycle and provisioning, the store → pod binding (`manager_store.pod_id`), usage statistics. Pods moved to `pod-registry` and subscriptions to `billing` (2026-08). Controllers (`*Api`): `StoreManagerApi`, `StoreLifecycleApi`, `SignUpApi`, `UserAccountApi`, `OrgMemberApi`, `SaasApi`, `RouterApi`, `admin/OrgManagerApi`, `StoreStatisticApi`, `OrgStatisticApi`. |
+| `store-core/billing/billing-service` | **BE** | 8021 | **Plans, per-store subscriptions, Stripe, invoices, entitlements.** DB-driven plan catalog seeded from `plan-catalog.yml`; one subscription per store, one trial per org; webhooks with idempotency; audit trail; transactional outbox for subscription events. APIs: `PlanCatalogApi`, `SubscriptionApi`, `InvoiceApi`, `PlatformBillingApi`, `StripeWebhookApi`, `BillingStatisticApi`; s2s `ExternalEntitlementApi`, `ExternalStoreQuotaApi` (`STORE-CORE.BILLING.*`). Client lib `billing-external-api` used by tenancy and the gateway. |
+| `store-core/pod-registry/pod-registry-service` | **BE** | 8022 | The **pod catalog**: pod identity, endpoint, private-org assignment, lifecycle (drain/resume), health, capacity and **placement decisions**. Seeds itself from `ServiceDomainProperties` at start-up. APIs: `PodApi` (`api/v1/pod`, `STORE-CORE.POD.READ|MANAGE`), s2s `PodPlacementApi` (`STORE-CORE.POD.PLACEMENT`). Client lib `pod-registry-external-api` (`ExternalPodService`, `CachingPodDirectory`) used by the gateway's `PodClient` and tenancy. |
 | `store-core/console-ui` | **FE** | 8011 | Angular 20 (SSR) **seller/admin console** — the UI merchants and platform admins use. Feature areas under `src/app/features/`: dashboard, orders, catalogue, products, payments, customers, users, profile, store-management, content, billing, plus the platform-admin set. Logs in via `/oauth2/authorization/uaa`. |
 
 `tenancy` is backed by sibling library modules (`tenancy-commons`, `tenancy-events`, `pod-external-api`) — see
@@ -48,14 +50,15 @@ catalog). See `references/build-system.md`.
 
 | Service | Category | Port | Purpose |
 |---|---|---|---|
-| `store-pod/spg` | **INFRA** | 80 | "SaaS Pod Gateway" — a **Caddy** reverse proxy (not Java). Terminates TLS with **on-demand certificates** for custom tenant domains, resolves the domain → store via `domain_lookup`, adds tracing headers, and path-routes `/merchant*`, `/content*`, `/catalog*`, `/checkout*`, `/cua*`, `/payment*` to the pod services; everything else falls through to `landing-ui`. Config: `Caddyfile`. |
-| `store-pod/merchant` | **BE** | 8120 | Store entity, settings, branding, domains, and routing. APIs: `MerchantStoreApi`, `ExternalMerchantStoreApi`. |
-| `store-pod/content` | **BE** | 8121 | CMS pages, boxes, files, and images. API: `ContentApi`. |
-| `store-pod/catalog` | **BE** | 8122 | **Products & categories**: product CRUD, inventory, pricing, images, attributes/options, product types, groups, manufacturers, relationships, reservations. APIs: `ProductApi`, `CategoryApi`, `ProductInventoryApi`, `ProductPriceApi`, `ExternalProductApi`, `ExternalProductReservationApi`. |
-| `store-pod/checkout` | **BE** | 8123 | **Cart, orders, customers**: shopping cart, order lifecycle + status history, customer records, order/product/customer statistics. APIs: `ShoppingCartApi`, `OrderApi`, `CustomerOrderApi`, `OrderStatusHistoryApi`, `CustomerApi`, `OrderStatisticApi`. |
+| `store-pod/spg` | **INFRA** | 80 | "SaaS Pod Gateway" — a **Caddy** reverse proxy (not Java). Terminates TLS with **on-demand certificates** for custom tenant domains, resolves the domain → store via `domain_lookup`, adds tracing headers, and path-routes `/content*`, `/merchant*`, `/inventory*`, `/catalog*`, `/checkout*`, `/cua*`, `/payment*` to the pod services; everything else falls through to `landing-ui`. Config: `Caddyfile`. |
+| `store-pod/merchant` | **BE** | 8120 | The **store/merchant** pod: store entity, settings, branding, domains. APIs: `MerchantStoreApi`, `ExternalMerchantStoreApi`. |
+| `store-pod/content` | **BE** | 8121 | The **content platform**: pages, blog posts, banners, FAQ, legal policies, navigation menus, media library and store snippets, with status workflow, scheduling, revisions and per-locale translation state. Private console API, public storefront API and a deprecated legacy-compat read API. `store-pod/content-deprecated` is the previous service, unregistered, reference only. |
+| `store-pod/catalog` | **BE** | 8122 | **Product catalog**: products, categories (materialised-path tree), brands, product types, product groups / related items, images. Rewritten 2026-08 as a small readable service: per domain `entity` + `repositories/<X>Repository` + `services/<domain>/{XService, XServiceImpl, XMapper}` (plain static/bean mappers, no facade/populator layers). Responses carry **no price or quantity** (inventory owns those, by sku). APIs (`api/v1`, `api/v2`): `CategoryApi`, `ManufacturerApi`, `ProductTypeApi`, `ProductGroupApi`, `ProductRelationshipApi`, `ProductImageApi`, `ProductApi` (small writes), `ProductApiV2` (definition + storefront listing/PDP), `ExternalProductApi` (s2s by sku). Variants are **live** again since the 2026-08 rework: a store-wide option vocabulary (`ProductOptionApi`) assigned per product, and an atomic whole-set variant replace (`ProductVariantApi`, v2) — every product owns at least one `product_variant` and sku/price/stock live at the variant level. Descriptive (non-variant) product attributes remain unmodelled. |
+| `store-pod/inventory` | **BE** | 8126 | **Stock, pricing & reservations**, split out of catalog and keyed by **sku** (schema `inventory`; `product_id` is informational only, no FK to catalog). Deliberately tiny — one entity (`Inventory` + `InventoryPrice`), one service each for stock and reservations, no facade/mapper/populator layers. APIs: `InventoryApi` (sku-addressed upsert `PUT /private/inventory/{sku}`, batch upsert `PUT /private/inventory/bulk`, `DELETE /private/inventory/{sku}`, `DELETE /private/inventory/by-product/{id}`, product-addressed bulk read `GET /private/inventory/by-products?productIds=`), `ExternalInventoryApi` (public bulk `GET /availability?skus=` → `SkuInventory` with raw amounts, and `POST /availability/query` for a sku list too long for a query string), `ExternalProductReservationApi` (`STORE-POD.INVENTORY.RESERVE`). Consumers merge price/stock client-side (console-ui, landing-ui) or compose s2s (checkout's `ProductDetailsComposer`). |
+| `store-pod/checkout` | **BE** | 8123 | **Cart, orders, customers** — rewritten 2026-09 (`.agents/plans/checkout-rewrite.md`). One `Order` aggregate owns every status transition as a method under `@Version`, appending a row to the append-only `sales_order_event` ledger (dedup-keyed, so a redelivered signal is a recorded no-op). Placement is durable: order row → `RESERVE` → `INITIATE_PAYMENT` → (`COMMIT`), each remote step outside a transaction and applied in its own; `OrderRecoveryJob` re-drives any pending action, `OrderExpiryJob` closes unpaid orders after asking payment once. Customers live here (`customer_account`, unique per store + cua `sub`); `/country` is the JDK ISO list, no tables. APIs (`api/v1`, `api/v2`): `CartApi` (public), `CheckoutApi` (`POST /cart/{code}/checkout`, `GET /order/{id}/status`), `OrderApi` + `CustomerAdminApi` + `StatisticApi` (`STORE-POD.CHECKOUT.*`), `CustomerApi` (`STORE-POD.CUSTOMER.*`), `ExternalOrderSignalApi` (`STORE-POD.CHECKOUT.SIGNAL`, s2s from payment and inventory), `CountryApi`. The previous service was deleted with the rewrite; its schema is dropped by `init-sql/drop-legacy.sql`. |
 | `store-pod/payment` | **BE** | 8125 | **Payments**: gateway configuration per store, payment execution, provider webhooks. APIs: `PaymentConfigurationController`, `PrivatePaymentApi`, `PublicPaymentConfigurationController`, `PublicPaymentWebhookApi`, `ExternalPaymentGatewayApi`. Uses Stripe. |
-| `store-pod/cua` | **BE+FE** | 8124 | "Customer User Account" — a **second OAuth2 Authorization Server**, this one for *storefront shoppers* (separate identity realm from `uaa`, which is for staff). Self-registration, social login, Thymeleaf-rendered login/registration pages. Controllers: `LoginController`, `RegistrationController`, `SocialLoginConfigController`, `UserInfoController`. Standalone module (no commons/core split). |
-| `store-pod/landing-ui` | **FE** | 8110 | The customer-facing **storefront**. ONE Next.js 16 / React 19 app (`storefront/`) plus **theme packages** (`themes/<id>/`) inside an npm-workspaces monorepo; business logic in `libs/` (`types`, `services`, `hooks`), shared primitives in `libs/ui`, the theme contract in `libs/theme`. The theme is resolved per request from the `Theme` header spg injects; merchant colours come from the `Color-Theme` preset through a contrast-guarded bridge. Old one-app-per-theme templates are parked in `templates-deprecated/`. See `references/landing-ui.md`. |
+| `store-pod/cua` | **BE** | 8124 | "Customer User Account" — a **second OAuth2 Authorization Server**, this one for *storefront shoppers* (separate identity realm from `uaa`, which is for staff). Self-registration (JSON), social login, form-login *processing*. **Headless**: it renders no HTML — an unauthenticated `/oauth2/authorize` redirects to the storefront's own `/{lang}/login?auth=1`, landing-ui renders the themed form, and the form posts back to `/cua/login`. Controllers: `LoginRedirectController`, `MerchantShopperController`, `MerchantIdentityProviderController`, `PublicSocialLoginController`; the entry point is sso-core's `HandoffLoginEntryPoint`. Standalone module (no commons/core split), built on `store-commons/sso/sso-core` like `uaa`. |
+| `store-pod/landing-ui` | **FE** | 8110 | The customer-facing **storefront**. ONE Next.js 16 / React 19 app (`storefront/`) plus **theme packages** (`themes/<id>/`) inside an npm-workspaces monorepo; business logic in `libs/` (`types`, `services`, `hooks`), shared primitives in `libs/ui`, the theme contract in `libs/theme`. The theme is resolved per request from the `Theme` header spg injects; merchant colours come from the `Color-Theme` preset through a contrast-guarded bridge. `npm run build` is libs (`types` → `services` → `hooks`) then `storefront`. See `references/landing-ui.md`. |
 
 ## Every service sits behind a gateway
 
@@ -71,7 +74,7 @@ merchant, same endpoint, two addresses:
 
 Two edges: **`store-core-gateway`** (:8000, `gateway.com`) fronts `tenancy` (`/tenancy/**`),
 `console-ui`, and every pod under `/spg/**?store=&pod=`; **`spg`** (:80, the pod's Caddy) fronts the pod
-services under `/merchant*`, `/content*`, `/catalog*`, `/checkout*`, `/payment*`, `/cua*`, with everything else falling
+services under `/merchant*`, `/catalog*`, `/checkout*`, `/payment*`, `/cua*`, with everything else falling
 through to `landing-ui`. A seller request therefore crosses *both*:
 `gateway.com:8000/spg/catalog/...` → `spg` → `catalog:8122`.
 
@@ -242,13 +245,12 @@ Business pods (`merchant`, `catalog`, `checkout`, `payment`) are split into up t
 | `-external-api` | Thin **client contract** so *other* services can call this pod over HTTP without pulling in `-core`. | its own `-commons` only |
 | `-service` | The deployable Spring Boot app: `*Api` controllers, `SecurityConfig`, `*Application` main class. | `-core` + `-external-api` |
 
-A pod may host more than one sub-domain in one service (e.g. `merchant-service` serves both `merchant-*` and
-`content-*` modules). Details and per-pod module lists: `references/store-pod.md`.
+Details and per-pod module lists: `references/store-pod.md`.
 
 ## Adding a whole new service
 
 Decide the **shape** first — backend only (`catalog`, `tenancy`), frontend only (`console-ui`,
-`landing-ui`), or one deployable serving both (`uaa`, `cua`) — then the **tree** (`store-core/` = one shared
+`landing-ui`), or one deployable serving both (`uaa`) — then the **tree** (`store-core/` = one shared
 platform instance, `store-pod/` = deployed once per pod). Those two choices fix the module layout, the config
 slices, the s2s client and the fronting gateway.
 
@@ -262,6 +264,23 @@ path. Miss one of these and you get "no instances available", a gateway 503, or 
 your API.
 
 **Full procedure, per-shape skeletons and a checklist: `references/new-service.md`.**
+
+## Testing — unit, integration, coverage
+
+Two source sets, no `@Tag`: **`src/test`** holds `*Test` (unit + `*ArchitectureTest`, no Spring, no Docker) and
+**`src/integrationTest`** holds `*IntegrationTest` (full context + Testcontainers). `./gradlew test` is the fast
+build; `./gradlew integrationTest` needs Docker; `check` runs both plus checkstyle, `verifyTestNaming` and a
+per-module coverage gate. Test the code **in the module that owns it** — business logic lives in `-core`, so its
+unit tests do too.
+
+Integration tests never hand-roll infrastructure: `store-commons/test-support` provides `@ServiceIntegrationTest` /
+`@StorageIntegrationTest` / `@DatabaseIntegrationTest`, the Postgres/MinIO containers, `TestJwtSigner` + `Tokens`,
+`ApiClient` and `MutableClock`. Every store-scoped one owes a **tenant-isolation** case and a **permission-gate**
+case. Coverage: `./gradlew perServiceCoverage` writes one report per micro service under
+`build/reports/coverage/<service>/`; a module locks in a floor with `coverageMinimum = 0.6`.
+
+**Types, naming standard, the `test-support` catalogue, ArchUnit rules and the coverage ratchet:
+`references/testing.md`.**
 
 ## QA — proving a change works end to end
 
@@ -291,7 +310,9 @@ something is wrong, and `lcl stop` to tear that stack down. Several named stacks
 2. **Embedded Angular in Spring Boot** (`uaa`): `uaa-fe` lives at `store-core/uaa/src/main/resources/uaa-fe`,
    is **not** a Gradle module, is built by the `node` plugin, and its `dist` is copied into
    `src/main/resources/static` before `processResources` — so Spring Boot serves the SPA from its own port.
-3. **Server-rendered Thymeleaf** (`uaa` login pages, `cua`): classic server-side templates, no SPA.
+3. **Server-rendered Thymeleaf** (`uaa` login pages): classic server-side templates, no SPA. `cua` has none:
+   the shopper's login and register pages are landing-ui theme pages (`ThemePages.Login` / `Register`, with
+   shell fallbacks), and cua only redirects to them and processes the posted form.
 
 See `references/frontends.md`.
 
@@ -303,6 +324,9 @@ See `references/frontends.md`.
 | Find a REST endpoint | the `<domain>-service` module, in `**/api/**` or `**/controller/**` |
 | Write a new endpoint | take `StoreMerchantId merchantStore` + `LanguageCode language`, add `@PreAuthorize("hasPermission(...)")`, add its block to `<service>/http/<api-class>.http` |
 | Run an endpoint by hand | `<service>/http/<api-class>.http` — or write it there if it is missing |
+| Write a unit test / an integration test / an architecture test | `references/testing.md` — `src/test` vs `src/integrationTest`, naming, `test-support` |
+| See coverage for a service | `./gradlew perServiceCoverage` → `build/reports/coverage/<service>/index.html` |
+| Share test infrastructure (containers, JWTs, HTTP helper) | `store-commons/test-support` — never copy it into a service |
 | QA a change / reproduce a UI bug / drive the app in a browser | `references/qa-testing.md` — start with `lcl start -d` |
 | Write or extend a QA script for a tester | `<service>/qa/<module>-qa.md` — one per service, rules in `references/qa-testing.md` §7 |
 | Bring the local stack up or shut it down | `references/qa-testing.md` §1 (`lcl start/stop/restart/status/logs/why`) |
@@ -359,15 +383,20 @@ See `references/frontends.md`.
 - `references/uaa-client.md` — the UAA admin SDK: creating/reading users in `uaa`, tenant metadata, wiring.
 - `references/events-outbox.md` — aggregate roots, `@OutboxEvent`/`@OutboxHandler`, when to use events vs. calls.
 
+**Testing**
+- `references/testing.md` — **the testing architecture**: the three test types and their source sets, the class/method
+  naming standard, where a test belongs, the shared `store-commons/test-support` library, the ArchUnit layering rules
+  and their declared deviations, and per-service / aggregate coverage with the soft ratcheted gate.
+
 **Running & QA**
 - `references/qa-testing.md` — **how QA is done here**, including where a QA script lives
   (`<service>/qa/<module>-qa.md`, one per service): `lcl` and its commands, the seeded demo logins and
   entry points, browser-driven QA with the Chrome tooling, API QA through the `.http` files, logs/traces/outbox
-  as evidence, the known local gaps (no MinIO → broken images), the QA checklist, and where `unitTest` /
-  `integrationTest` fit.
+  as evidence, the known local gaps (no MinIO → broken images), the QA checklist, and where the
+  automated suites fit.
 
 **Frontend & build**
-- `references/frontends.md` — console-ui, the embedded `uaa-fe` build flow, `@cvhome-saas/ui-kit`, `ui-conventions`.
+- `references/frontends.md` — console-ui, the embedded `uaa-fe` build flow, `ui-conventions`.
 - `references/landing-ui.md` — landing-ui workspace layout and the template/theme system.
 - `references/new-landing-ui-template.md` — **step-by-step procedure + checklist for adding a storefront theme.**
 - `references/build-system.md` — version catalog, convention plugins, build commands.

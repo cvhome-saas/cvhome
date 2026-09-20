@@ -16,6 +16,7 @@ store-pod/
 │                                              media, store appearance, home sections)
 ├── content-deprecated/           —            the previous content service, kept as reference only (unregistered)
 ├── catalog/                      BE    :8122  products & categories
+├── inventory/                    BE    :8126  stock, pricing & reservations, keyed by sku
 ├── checkout/                     BE    :8123  cart, orders (durable placement, event ledger), customers
 ├── payment/                      BE    :8125  payment gateways & webhooks
 └── commons/                                   pod-shared libraries (grouping folder)
@@ -162,10 +163,16 @@ See `events-outbox.md`.
 ## Pods that break the pattern
 
 - **`cua`** (:8124) — a single standalone Gradle module, no commons/core split. It's an OAuth2 authorization
-  server for storefront shoppers, with Thymeleaf-rendered login/registration UI. Controllers: `LoginController`,
-  `RegistrationController`, `SocialLoginConfigController`, `AuthController`, `oidc/UserInfoController`. Notably
-  it depends on `secret-crypto-autoconfigure` (for encrypted social-login credentials) and
-  `merchant-external-api` (to resolve which store a shopper belongs to).
+  server for storefront shoppers, and it is **headless**: it renders no HTML. The storefront (`landing-ui`) owns
+  the login and registration pages; cua's `HandoffLoginEntryPoint` (from `store-commons/sso/sso-core`, wired in
+  `CuaSecurityConfig`) redirects an unauthenticated shopper to `{origin}/{lang}/login?auth=1`, the storefront
+  posts the form back to `/cua/login`, and `StorefrontLoginSuccessHandler` resumes the authorize request
+  (`security/StorefrontUrls` is the one place that builds those URLs). The storefront is a PKCE public client
+  whose `client_id` is the store id (`config/StorefrontClientRepository`). Controllers: `web/LoginRedirectController`
+  (the old `GET /cua/login` page, now a redirect), `web/MerchantShopperController`,
+  `web/MerchantIdentityProviderController`, `web/PublicSocialLoginController`. Notably it depends on
+  `store-commons:sso:sso-core` (the shared authorization-server core it and `uaa` are both built on) and
+  `merchant-external-api` (to resolve which store a shopper belongs to). `authentication.md` has the full flow.
 - **`landing-ui`** (:8110) — npm/Next.js, see `landing-ui.md`.
 - **`spg`** (:80) — Caddy config, see below.
 
@@ -185,7 +192,9 @@ Caddy, not Java. Responsibilities, from the `Caddyfile`:
 
    | Path | → | Notes |
    |---|---|---|
-   | `/merchant*` | `merchant:8120` | `handle_path` (prefix stripped) |
+   | `/content*` | `content:8121` | `handle_path` (prefix stripped) |
+   | `/merchant*` | `merchant:8120` | `handle_path` |
+   | `/inventory*` | `inventory:8126` | `handle_path` |
    | `/catalog*` | `catalog:8122` | `handle_path` |
    | `/checkout*` | `checkout:8123` | `handle_path` |
    | `/payment*` | `payment:8125` | `handle_path` |

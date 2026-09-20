@@ -14,7 +14,7 @@ app (`storefront/`) owns routes, data loading, i18n, auth and theme resolution; 
 
 ```
 storefront/                 THE Next.js app (shell) — never edited for a theme
-  src/proxy.ts                Store-Id gate, / → /{lang}, next-intl routing, ?theme= / ?color= dev overrides
+  src/proxy.ts                Store-Id gate, / → /{lang}, next-intl routing, ?theme= dev override
   src/shell/routes/*          the routes: one factory per route (loaders + metadata), each renders theme.pages.X
   src/app/(storefront)/t/<id>/[locale]/…   GENERATED: the theme's route tree, binding every factory to it
   src/app/theme-css/<id>.css  GENERATED: the theme's Tailwind entry (globals.css + @source of its folder)
@@ -22,7 +22,7 @@ storefront/                 THE Next.js app (shell) — never edited for a theme
   src/shell/theme/theme-id.ts GENERATED entries: the registered ids + resolveThemeId() (no theme imports)
   src/shell/theme/registry.ts GENERATED entries: dynamic imports, one per theme — /api/theme-manifest only
   src/shell/theme/legacy-theme-map.ts   Theme enum value → theme id (fallback for old values)
-  src/shell/tokens/merchant-tokens.ts   ColorTheme (DEFAULT → theme's own palette, else preset) → colour-role tokens (inline style on <html>)
+  src/shell/tokens/merchant-tokens.ts   ColorTheme preset → colour-role tokens (inline style on <html>)
 libs/theme                  @store-front/theme — ThemeDefinition, token schema, colour bridge, defineTheme()
 libs/ui                     @store-front/ui — shadcn primitives shared ONCE + Skeleton/EmptyState/ErrorState/
                             Price/QuantityStepper/Drawer/AspectBox. Themes never fork these.
@@ -34,9 +34,7 @@ locales/{en,ar,es,fr,ru}.json  SHARED translations — add keys to all five
 
 Request flow: spg/Caddy injects `Store-Id, Theme, Color-Theme, Default-Language, Supported-Languages` →
 `proxy.ts` → `resolveThemeId()` (cookie override → `theme` header → `STOREFRONT_THEME` → legacy map → fallback)
-→ rewrite to `/t/<id>/{locale}/…`, the theme's own route tree → `getColorThemeRequest()` (cookie override → `Color-Theme` header → store record) →
-`resolveColorScheme()` (a fixed preset wins; `DEFAULT` / unset / unknown → `theme.tokens.defaultColors`) → root
-layout sets `<html data-theme=<id> data-color-scheme data-color-theme=<DEFAULT|PRESET> style="--primary:…"
+→ rewrite to `/t/<id>/{locale}/…`, the theme's own route tree → root layout sets `<html data-theme=<id> data-color-scheme style="--primary:…"
 class="<font vars>">` → `theme.layout.Root` → page → `theme.pages.X`.
 
 **Who owns what**
@@ -44,7 +42,7 @@ class="<font vars>">` → `theme.layout.Root` → page → `theme.pages.X`.
 | Concern | Owner |
 |---|---|
 | Routes, data fetching, `notFound()`/errors, metadata, Suspense | shell |
-| Colour roles (`--primary`, `--primary-foreground`, `--muted`, `--sale`, …) | the theme's default palette (`src/colors.ts`, generated from `THEME_DEFAULTS` in `libs/types/scripts/build-color-schemas.mjs`, wired as `tokens.defaultColors`) or the merchant's preset, via the bridge; theme may re-map with `tokens.mapMerchantColors` |
+| Colour roles (`--primary`, `--primary-foreground`, `--muted`, `--sale`, …) | merchant preset via the bridge; theme may re-map with `tokens.mapMerchantColors` |
 | Fonts, type scale, spacing/density, radius, shadows, containers, motion, header height, product aspect | **theme** (`tokens.css`) |
 | Header/nav/footer/cart drawer/mobile nav structure | **theme** (`layout/`) |
 | Page composition for Home, Category, Product, Content, Checkout, CheckoutResult, Customer, Order | **theme** (`pages/`) |
@@ -68,7 +66,7 @@ The script copies `themes/starter` → `themes/<id>`, renames ids/selectors, and
 
 Run it with the local stack (`lcl start -d`) and open
 `http://org1-store1.spg-507f1f77.gateway.com/en?theme=<id>` — spg injects the store headers; `?theme=` is a dev-only
-override cookie (`STOREFRONT_THEME=<id>` also works), `?color=<PRESET|default>` likewise previews a colour theme. `http://localhost:8110` renders SSR via the `FALLBACK_STORE_ID`
+override cookie (`STOREFRONT_THEME=<id>` also works). `http://localhost:8110` renders SSR via the `FALLBACK_STORE_ID`
 fallback but browser-side API calls need spg (see `landing-ui.md`, "Local dev URLs").
 
 ---
@@ -106,7 +104,7 @@ themes/<id>/
     ├── config.ts           ThemeLayoutConfig (cart drawer/page, mobile nav kind, grid, aspect, container, search)
     ├── layout/             Root, Header, Nav, MobileNav, HeaderActions, CartDrawer, Announcement, Footer
     ├── pages/              Home, Category, Product, Content, Checkout, CheckoutResult, Customer, Order
-    │                       (+ Search — the only optional page; without it the shell renders a fallback)
+    │                       (+ Search, Login, Register — the optional pages; without them the shell renders fallbacks)
     ├── sections/           Hero, ProductRail, Listing, BuyBox, Gallery, SearchBox, SearchResults, CheckoutForm, …
     ├── components/         ProductCard, ProductGrid, ProductBadges, CartLineItem, Breadcrumbs, PageShell, …
     └── states/             ErrorState*, NotFound, EmptyState*, Redirecting*, skeletons/*   (* = 'use client')
@@ -136,7 +134,15 @@ exist. `white` / `black` / `transparent` remain.
 
 ## 5. Step 3 — contract checklist (before you call it done)
 
-### The Search page (the one optional page)
+### The optional pages: Search, Login, Register
+
+Three members of `ThemePages` are optional and get a shell fallback when a theme has none. `Login` and
+`Register` are the shopper's sign-in and sign-up screens (cua is headless — see `authentication.md`); every
+shipped theme has them, so copy the closest one's `pages/Login.tsx` + `sections/LoginForm.tsx` (a plain HTML form posting `LoginData.action`, with
+`client_id` and `lang` as hidden inputs, the `error` banner and the `socialLogins` anchors) and
+`pages/Register.tsx` + `sections/RegisterForm.tsx` (`'use client'`, `useRegisterForm`). Strings are
+`PAGE.LOGIN.*` and `PAGE.REGISTER.*`. Search is the third:
+
 
 `ThemePages.Search` is optional, and `defineTheme()` does not require it. A theme without one gets
 `storefront/src/shell/theme/default-search-page.tsx` — built only from design tokens, so it inherits the
@@ -196,17 +202,15 @@ link straight to `/search`) or `hidden`.
 ```bash
 cd store-pod/landing-ui
 npm run lint && npm run typecheck && npm run build     # contract, lint (incl. RTL warnings), Tailwind
-npm test --workspace=libs/theme                         # colour bridge (30 presets + theme defaults × AA)
-npm run gen:colors --workspace=libs/types               # after editing a THEME_DEFAULTS seed (regenerates src/colors.ts)
-npm run dev   # then http://localhost:8110/en?theme=<id>&color=default, /ar?theme=<id>, ?color=MIDNIGHT
+npm test --workspace=libs/theme                         # colour bridge (30 presets × AA)
+npm run dev   # then http://localhost:8110/en?theme=<id>, /ar?theme=<id>
 
 # full stack: spg injects the headers for the demo store
 lcl start -d
 open http://org1-store1.spg-507f1f77.gateway.com/en?theme=<id>
 ```
-Browser QA at desktop, tablet and mobile widths, first in the theme's own palette (`?color=default`, what a
-merchant on `DEFAULT` sees), then `?color=MIDNIGHT` (dark preset) and one light preset — or `Color-Theme: …`
-through spg / the store's colour theme in the seller console.
+Browser QA at desktop, tablet and mobile widths; `Color-Theme: MIDNIGHT` (dark preset) through spg or by
+switching the store's colour theme in the seller console.
 
 ---
 

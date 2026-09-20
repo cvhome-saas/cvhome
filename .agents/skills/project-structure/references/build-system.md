@@ -2,7 +2,8 @@
 
 ## Root layout
 
-There is **no root `build.gradle`**. The root holds only:
+The root `build.gradle` is one line of plugin: it aggregates coverage and nothing else. Everything about a module
+lives in that module's own `build.gradle` plus the convention plugins. The root also holds:
 
 - `settings.gradle` — `rootProject.name = 'cvhome'`, `pluginManagement { includeBuild('build-logic') }`, and an
   explicit `include(...)` list of every module (~44 paths). **This is the authoritative list of build units.**
@@ -57,9 +58,11 @@ itself in the `include(...)` list. Plugins in
 
 | Plugin id | Applied by | Provides |
 |---|---|---|
-| `com.asrevo.java-common-conventions` | (base) | Java toolchain, checkstyle, common test setup |
+| `com.asrevo.java-common-conventions` | (base) | Java toolchain, checkstyle, **unit-test wiring (`src/test`, JUnit/AssertJ/Mockito/ArchUnit) and JaCoCo** |
 | `com.asrevo.java-library-conventions` | every `-commons`, `-core`, `-external-api`, `-events` | `java-common-conventions` + `java-library` |
-| `com.asrevo.java-application-conventions` | every `-service`, `uaa`, `cua` | application/Spring Boot service setup |
+| `com.asrevo.java-integration-test-conventions` | (applied by application conventions) | the `src/integrationTest` source set, its Testcontainers classpath, `store-commons:test-support`, and the module's integration coverage report |
+| `com.asrevo.java-application-conventions` | every `-service`, `uaa`, `cua` | integration-test conventions + `application` + image helpers |
+| `com.asrevo.jacoco-aggregate-conventions` | the **root** project only | `coverageReport` (whole monorepo), `domainCoverage` / `printDomainCoverage` (unit, integration and merged reports per domain) and the three ratcheted gates `domainCoverageVerification` reads from `domainCoverageMinimum` in the root `build.gradle` |
 | `com.asrevo.docker-conventions` | services and UIs | `bootBuildImage` helpers `createImageName()` / `createImageTags()`, ECR publish wiring |
 | `com.asrevo.ui-conventions` | `console-ui`, `landing-ui` | node plugin + npm build/dev/clean wiring (see `frontends.md`) |
 
@@ -118,18 +121,21 @@ error. Reports land in `build/reports/checkstyle/`. The rules that bite in pract
 | `MissingSwitchDefault` | every `switch` needs a `default` |
 | `MultipleStringLiterals` | the same literal twice in one file → extract a constant |
 
-Two test tasks come from `java-application-conventions`, split by JUnit tag:
+Tests are split by **source set**, not by tag (`@Tag` is gone — do not reintroduce it): `src/test` holds `*Test`
+(no Spring, no Docker), `src/integrationTest` holds `*IntegrationTest` (full context + Testcontainers).
 
 ```bash
-./gradlew test                 # everything
-./gradlew unitTest             # only @Tag("unit-test")
-./gradlew integrationTest      # only @Tag("integration-test")
-./gradlew checkstyleMain checkstyleTest        # what CI's quality job runs
-./gradlew :store-pod:catalog:catalog-service:test --tests '*ProductApiTest*'
+./gradlew test                 # unit + architecture tests, no Docker
+./gradlew integrationTest      # Testcontainers; Docker MUST be running
+./gradlew check                # both + checkstyle + verifyTestNaming + the per-domain coverage gates
+./gradlew check -x integrationTest             # laptop without Docker
+./gradlew checkstyleMain checkstyleTest checkstyleIntegrationTest   # what CI's quality job runs
+./gradlew domainCoverage printDomainCoverage   # build/reports/coverage/<domain>/ + a domain × {unit, integration, merged} table
+./gradlew :store-pod:catalog:catalog-service:test --tests '*PagesTest*'
 ```
 
-Integration tests use **Testcontainers (Postgres, MinIO), so Docker must be running** for `./gradlew test` —
-a failure at container startup is an environment problem, not a test failure.
+A container failing to start is an environment problem, not a test failure. **Full rules, naming standard, the
+`test-support` catalogue and the coverage ratchet: `references/testing.md`.**
 
 **No bean exists or not because of configuration.** `verifyNoConfigurationSwitchedBeans` (in every module's `check`)
 fails on `@Profile`, `@ConditionalOnProperty`, `@ConditionalOnBooleanProperty` or `@ConditionalOnExpression` in main
@@ -155,7 +161,7 @@ is in `configuration.md`.
 ## Common commands
 
 ```bash
-./gradlew clean build -PskipAllTests   # normal build with every test and coverage task disabled
+./gradlew clean build -x test          # build everything, skip tests
 ./gradlew :store-pod:catalog:catalog-service:bootRun    # run one service
 ./gradlew :store-core:console-ui:bootRun                 # npm run dev, via ui-conventions
 ./gradlew :store-core:uaa:build                         # also builds + embeds uaa-fe
