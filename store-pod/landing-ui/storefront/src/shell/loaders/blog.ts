@@ -8,10 +8,14 @@ import {isApiError} from '@store-front/types';
 import type {BlogIndexData, BlogPostData} from '@store-front/theme';
 import {getStoreContext} from '@/shell/request/store-context';
 
-export const loadBlogIndex = cache(async (q: { page?: number; category?: string; tag?: string }): Promise<BlogIndexData> => {
+/**
+ * Positional arguments, not an options object: React's `cache()` compares arguments by identity, and an object
+ * literal built by the caller would miss the memo between `generateMetadata` and the page.
+ */
+export const loadBlogIndex = cache(async (page: number, category?: string, tag?: string): Promise<BlogIndexData> => {
     const ctx = await getStoreContext();
     const [posts, t] = await Promise.all([
-        ContentService.getPosts(ctx, {page: q.page ?? 0, count: 12, category: q.category, tag: q.tag}),
+        ContentService.getPosts(ctx, {page, count: 12, category, tag}),
         getTranslations('COMMON'),
     ]);
     const tb = await getTranslations('PAGE.BLOG');
@@ -20,8 +24,8 @@ export const loadBlogIndex = cache(async (q: { page?: number; category?: string;
     return {
         posts: posts ?? {totalPages: 0, size: 0, totalElements: 0, pageNumber: 0, content: []},
         categories,
-        category: q.category,
-        tag: q.tag,
+        category,
+        tag,
         breadcrumbs: [{id: 'home', name: t('HOME'), href: '/'}, {id: 'blog', name: tb('TITLE'), href: '/blog'}],
     };
 });

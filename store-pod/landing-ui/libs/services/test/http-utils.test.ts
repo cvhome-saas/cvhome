@@ -33,7 +33,7 @@ test('the rest of the request is untouched: method, body, headers, Next cache op
     assert.equal(sent.body, '{"a":1}');
     assert.equal(headersOf(seen[0]).get('Content-Type'), 'application/json');
 
-    await apiFetch('http://spg/b', publicCachedGet(30));
+    await apiFetch('http://spg/b', publicCachedGet('store'));
     assert.deepEqual((seen[1].init as {next?: unknown}).next, {revalidate: 30});
     assert.equal(headersOf(seen[1]).get('Accept-Encoding'), 'identity');
 });
@@ -110,7 +110,7 @@ test("a cached read keeps its budget but not the shopper's signal: other renders
             init?.signal?.addEventListener('abort', () => reject(init.signal?.reason));
             setTimeout(() => resolve(new Response('{}', {status: 200, headers: {'content-type': 'application/json'}})), 10);
         })) as typeof fetch;
-        const read = apiFetch('http://spg/cached', publicCachedGet(30));
+        const read = apiFetch('http://spg/cached', publicCachedGet('store'));
         shopper.abort(new Error('the client closed the connection'));
         assert.deepEqual(await read, {});
         assert.ok(given, 'the budget still applies');

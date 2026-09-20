@@ -7,6 +7,7 @@ import {
     ServerErrorCategory,
 } from "@store-front/types/api-error";
 import {AuthEventType} from "@store-front/types/auth";
+import {DataCacheName, dataCacheSeconds} from "./cache-policy";
 
 /**
  * Mirrors the status each `ErrorCategory` fixes, for the responses that carry no problem body at all —
@@ -364,21 +365,20 @@ export function publicGet(): RequestInit {
     return {method: 'GET', headers: {}};
 }
 
-/** How long a store's layout data (store record, category tree, site document) is served from Next's data cache. */
-export const LAYOUT_DATA_REVALIDATE_SECONDS = 30;
-
 /**
- * A {@link publicGet} that Next's data cache keeps across requests for `seconds` (a server-side render only; a
- * browser ignores `next`).
+ * A {@link publicGet} that Next's data cache keeps across requests for as long as the read called `name` is kept
+ * (`cache-policy.ts`: a default per read, `STOREFRONT_DATA_CACHE_<NAME>_SECONDS` to change it, `0` for none). A
+ * server-side render only; a browser ignores `next`.
  *
- * For reads every visitor of a store shares and a merchant changes rarely: the store record, the category tree and
- * the site document behind every page's layout, which were fetched afresh on every render. Safe because Next keys
- * the cache on the URL and these URLs carry `store=` and `lang=`, so one store's data never answers another's, and
- * because the request carries no credential, so there is nothing of a visitor's in it. Next keeps only a 200. A
- * merchant's edit reaches the storefront within `seconds`. Never use it for anything a shopper's session changes.
+ * For reads every visitor of a store shares: the store record, the category tree and the site document behind
+ * every page's layout, a product, a listing, a CMS page. Safe because Next keys the cache on the URL and these URLs
+ * carry `store=` and `lang=`, so one store's data never answers another's, and because the request carries no
+ * credential, so there is nothing of a visitor's in it. Next keeps only a 200. A merchant's edit reaches the
+ * storefront within the read's seconds. Never use it for anything a shopper's session changes, nor for a preview.
  */
-export function publicCachedGet(seconds: number): RequestInit & { next: { revalidate: number } } {
-    return {method: 'GET', headers: {}, next: {revalidate: seconds}};
+export function publicCachedGet(name: DataCacheName): RequestInit & {next?: {revalidate: number}} {
+    const seconds = dataCacheSeconds(name);
+    return seconds > 0 ? {method: 'GET', headers: {}, next: {revalidate: seconds}} : publicGet();
 }
 
 /** A POST that carries no credentials — the body form of a public read (`publicGet`'s reasoning applies). */

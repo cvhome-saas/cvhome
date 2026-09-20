@@ -1,6 +1,6 @@
 import {Category, CategoryPage} from "@store-front/types/category";
 import {storeBaseServiceUrl, StoreContext} from "@store-front/types/store-context";
-import {apiFetch, get, LAYOUT_DATA_REVALIDATE_SECONDS, orUndefined, publicCachedGet} from "./http-utils";
+import {apiFetch, orUndefined, publicCachedGet} from "./http-utils";
 
 export class CategoryService {
 
@@ -11,13 +11,13 @@ export class CategoryService {
     public static getCategories = async (storeContext: StoreContext): Promise<CategoryPage | undefined> => {
         return orUndefined(apiFetch<CategoryPage>(
             `${storeBaseServiceUrl('catalog', storeContext)}/api/v1/category-hierarchy?count=20&page=0&store=${storeContext.store}&lang=${storeContext.locale}`,
-            publicCachedGet(LAYOUT_DATA_REVALIDATE_SECONDS)));
+            publicCachedGet('categories')));
     }
 
     /** Must fail: this is the category page's own subject, not decoration around it. */
     public static getCategory = async (storeContext: StoreContext, category: string): Promise<Category> => {
         return apiFetch<Category>(
             `${storeBaseServiceUrl('catalog', storeContext)}/api/v1/category/${category}?store=${storeContext.store}&lang=${storeContext.locale}`,
-            get());
+            publicCachedGet('category'));
     }
 }
