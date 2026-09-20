@@ -57,13 +57,13 @@ Matched on the path after `/{locale}`. `enabled: no` classifies only (edge heade
 
 | class | match | enabled | ttl s | swr s | key parts | edge Cache-Control | share |
 |---|---|---|---|---|---|---|---|
-| home | `/` | yes | 30 | 300 | host, store-id, theme, color-theme, locale, path, query | `public, s-maxage=30, stale-while-revalidate=300` | 25 % |
+| home | `/` | yes | 30 | 300 | host, store-id, theme, color-theme, locale, path, query | `public, s-maxage=30, stale-while-revalidate=300` | 20 % |
 | category | `/category/*` | yes | 30 | 300 | same | same | 25 % |
 | product | `/product/*` | yes | 20 | 120 | same | `public, s-maxage=20, stale-while-revalidate=120` | 25 % |
 | search | `/search` | yes | 15 | 60 | same, query normalised | `public, s-maxage=15, stale-while-revalidate=60` | 10 % |
 | content | `/content/*`, `/blog`, `/blog/*` | yes | 60 | 600 | same | `public, s-maxage=60, stale-while-revalidate=600` | 10 % |
 | help | `/help`, `/policies/*` | yes | 300 | 3600 | same | `public, s-maxage=300, stale-while-revalidate=3600` | 5 % |
-| seo | `/sitemap.xml`, `/robots.txt` | yes | 600 | 3600 | host, store-id, path | `public, s-maxage=600, stale-while-revalidate=3600` | 2 % |
+| seo | `/sitemap.xml`, `/robots.txt` | yes | 600 | 3600 | host, store-id, path | `public, s-maxage=600, stale-while-revalidate=3600` | 5 % |
 | api-theme-manifest | `/api/theme-manifest` | no | | | | passthrough | |
 | shopper | `/login`, `/register`, `/customer/*`, `/checkout/*`, `/callback` | no | | | | `private, no-store` | |
 | next-internal | `/_next/*`, `/api/*`, `/store-not-found`, `/t/*`, bare `/` | no | | | | untouched | |
@@ -125,7 +125,15 @@ A Redis store; a purge API and its Java callers; the edge; a per-store policy he
 
 ## Deviations as built
 
-(filled in per phase)
+- The shares add up to exactly 1: home 20 % and seo 5 % (the plan had 25 % and 2 %, a sum of 1.02, which the
+  policy's own validation refuses). The home page is one document per store and never needed a quarter.
+- `api-theme-manifest` is matched before `next-internal`, since `/api/*` is in the latter; class order is match order.
+- `Vary` on a kept page names `store-id`, `theme` and `color-theme` (the class's header parts); `capture.mjs` accepts
+  those and Next's RSC headers as the only `Vary` a kept page may carry.
+- The metrics counters (`metrics.mjs`) arrived in phase 4 as plain counters so the stats route could ship with the
+  middleware; phase 5 added the OpenTelemetry instruments and the eviction warning to the same module.
+- The data-cache names grew past the plan's list to cover every anonymous read (`redirect`, `banners`, `menu`,
+  `category`, `facets`), so no read is left on the old constant.
 
 ## Verification
 
