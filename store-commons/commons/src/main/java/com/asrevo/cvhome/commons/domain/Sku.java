@@ -35,7 +35,7 @@ import tools.jackson.databind.deser.std.StdDeserializer;
  * </p>
  */
 @JsonDeserialize(using = Sku.Reader.class)
-public record Sku(String value) implements Serializable, Comparable<Sku> {
+public record Sku(String value) implements Serializable, KeyPart, Comparable<Sku> {
 
     /**
      * The whole rule, for {@code @Pattern} on a request body.
@@ -57,6 +57,11 @@ public record Sku(String value) implements Serializable, Comparable<Sku> {
     @JsonValue
     @Override
     public String value() {
+        return value;
+    }
+
+    @Override
+    public String cacheKeyPart() {
         return value;
     }
 

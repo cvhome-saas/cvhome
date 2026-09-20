@@ -12,6 +12,13 @@ com:
           # slow provider the spurious failure.
           read-timeouts:
             payment: 10s
+      # The cache regions (store-commons:cache, CacheProperties): every region a service declares runs on the
+      # default provider with the code's ttl and size unless a line here or in the service's own application.yml
+      # says otherwise, by service then by read: regions.catalog.product.ttl. A region's provider is switched
+      # the same way once another provider module is on the service; enabled: false turns a region off and its
+      # meters keep counting. The registry reads this at run time, never as a bean condition.
+      cache:
+        default-provider: caffeine
       app:
         domain: gateway.com
         sub:
@@ -144,6 +151,9 @@ spring:
       - org.springframework.boot.micrometer.tracing.opentelemetry.autoconfigure.OpenTelemetryTracingAutoConfiguration
       - org.springframework.boot.micrometer.tracing.opentelemetry.autoconfigure.otlp.OtlpTracingAutoConfiguration
   cache:
+    # Spring's own cache configuration, for the three CachedExternalMerchantStoreService copies (catalog, checkout,
+    # payment) that still run on Boot's Caffeine manager; it leaves with the last of them, once every service caches
+    # through store-commons:cache (com.asrevo.cvhome.cache above).
     # The one named cache the pods use (catalog, checkout, payment: the merchant store read). Declared here so the
     # cache exists at start-up: Boot binds cache meters to the caches a CacheManager knows when the context starts,
     # and a cache created lazily on its first @Cacheable hit is never bound. Services without @EnableCaching have

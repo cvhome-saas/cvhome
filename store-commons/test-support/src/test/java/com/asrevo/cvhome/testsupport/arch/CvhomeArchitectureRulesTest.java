@@ -5,10 +5,14 @@ import java.util.Set;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import com.asrevo.cvhome.testsupport.arch.fixtures.CartReads;
 import com.asrevo.cvhome.testsupport.arch.fixtures.ClassGatedApi;
 import com.asrevo.cvhome.testsupport.arch.fixtures.GatedApi;
 import com.asrevo.cvhome.testsupport.arch.fixtures.LeakyApi;
 import com.asrevo.cvhome.testsupport.arch.fixtures.NotAController;
+import com.asrevo.cvhome.testsupport.arch.fixtures.OwnCache;
+import com.asrevo.cvhome.testsupport.arch.fixtures.ProductReads;
+import com.asrevo.cvhome.testsupport.arch.fixtures.ProductService;
 import com.asrevo.cvhome.testsupport.arch.fixtures.PublicApi;
 import com.asrevo.cvhome.testsupport.arch.fixtures.SlashlessApi;
 import com.asrevo.cvhome.testsupport.arch.fixtures.StorefrontApi;
@@ -211,4 +215,34 @@ class CvhomeArchitectureRulesTest {
         }
     }
 
+
+    @Nested
+    class OnCachedReads {
+
+        @Test
+        void aStoreScopedReadInAReadsClassPasses() {
+            ArchRule rule = CvhomeArchitectureRules.cachedReadsAreStoreScoped(DOMAIN);
+
+            assertThatCode(() -> rule.check(classes(ProductReads.class, NotAController.class))).doesNotThrowAnyException();
+        }
+
+        @Test
+        void aReadThatDependsOnWhoAsksOrLivesOutsideAReadsClassFails() {
+            ArchRule rule = CvhomeArchitectureRules.cachedReadsAreStoreScoped(DOMAIN);
+
+            assertThatThrownBy(() -> rule.check(classes(CartReads.class))).isInstanceOf(AssertionError.class)
+                    .hasMessageContaining("takes a ShopperId");
+            assertThatThrownBy(() -> rule.check(classes(ProductService.class))).isInstanceOf(AssertionError.class)
+                    .hasMessageContaining("ProductService is not a *Reads class");
+        }
+
+        @Test
+        void aServiceWithACacheOfItsOwnFails() {
+            ArchRule rule = CvhomeArchitectureRules.noCacheInternalsOutsideTheCacheModule(DOMAIN);
+
+            assertThatCode(() -> rule.check(classes(ProductReads.class))).doesNotThrowAnyException();
+            assertThatThrownBy(() -> rule.check(classes(OwnCache.class))).isInstanceOf(AssertionError.class)
+                    .hasMessageContaining("Caffeine");
+        }
+    }
 }

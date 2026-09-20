@@ -57,6 +57,9 @@ section you keep is mandatory.** Every row here has a repo mechanism behind it t
 - [ ] New Gradle module in `settings.gradle`, applying a `build-logic` convention plugin
 - [ ] No dependency on another pod's `-core`/`-service` — cross-pod calls go through its `-external-api`
 
+**Caching**
+- [ ] A cached read is a `@Cacheable` method in `<Area>Reads`, keyed by store first, with its region in `<Service>Regions` and its `EvictionRules` line; nothing shopper-specific is cached
+
 **API**
 - [ ] Endpoint takes `StoreMerchantId merchantStore` + `LanguageCode language` (unannotated)
 - [ ] `@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.<DOMAIN>.<ACTION>')")` present (`STORE-CORE.*` for platform); no inline role/authority checks
