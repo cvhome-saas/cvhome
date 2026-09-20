@@ -66,3 +66,16 @@ export const DEFAULT_POLICY = Object.freeze({
         default: {match: [], enabled: false, edge: 'private'},
     },
 });
+
+/** The request headers a loopback refresh carries, so the render is the one a shopper of that host would get. */
+export const FORWARDED_HEADERS = Object.freeze(['host', 'x-forwarded-host', 'x-forwarded-proto', 'store-id', 'theme',
+    'color-theme', 'default-language', 'supported-languages', 'accept', 'accept-language']);
+
+/** The cache's own route: a JSON snapshot of the policy, the store and the counters. */
+export const STATS_PATH = '/_storefront/cache/stats';
+
+/** The header that authorises the stats route from beyond loopback, when `statsToken` is set. */
+export const STATS_TOKEN_HEADER = 'x-storefront-cache-token';
+
+/** next-intl's locale cookie: the one Set-Cookie a kept page may carry, replayed only to a shopper whose differs. */
+export const NEXT_LOCALE = 'NEXT_LOCALE';
