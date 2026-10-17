@@ -5,12 +5,20 @@ plugins {
 dependencies {
     testImplementation libs.jakarta.persistence.api
     testImplementation libs.spring.data.jpa
+    // The store reads (reads/) and the regions they declare.
+    api project(':store-commons:cache')
     api project(':store-pod:commons:store-commons')
     api project(':store-pod:merchant:merchant-commons')
     compileOnly libs.spring.data.jpa
     compileOnly libs.jakarta.validation.api
     compileOnly libs.jackson.annotations
+    // The cache events are outbox events; the annotation is read here, the starter lives in the service.
+    compileOnly libs.namastack.outbox.api
+    testImplementation libs.namastack.outbox.api
     compileOnly libs.lombok
     compileOnly libs.hibernate.core
     annotationProcessor libs.lombok
+    // The reads drive a real registry on the Caffeine provider in their unit tests.
+    testImplementation libs.caffeine
+    testImplementation libs.spring.boot.starter.cache
 }

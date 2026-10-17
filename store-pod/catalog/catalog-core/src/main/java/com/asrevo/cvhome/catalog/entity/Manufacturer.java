@@ -24,8 +24,10 @@ import jakarta.persistence.UniqueConstraint;
 
 import org.hibernate.annotations.BatchSize;
 
+import com.asrevo.cvhome.cache.event.ManufacturerChanged;
 import com.asrevo.cvhome.catalog.model.product.event.BrandRenamedEvent;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
+import com.asrevo.cvhome.commons.domain.ManufacturerId;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.commons.domain.StoreScoped;
 import com.asrevo.cvhome.store.core.constants.SchemaConstant;
@@ -104,10 +106,12 @@ public class Manufacturer extends SalesManagerEntity<Long, Manufacturer> impleme
     }
 
     /**
-     * This brand's name changed, so every product that carries it has a stale search document.
+     * This brand's name changed, so every product that carries it has a stale search document, and every cache that
+     * lists brands or shows a product with this one is stale.
      */
     public Manufacturer renamed() {
         this.registerEvent(BrandRenamedEvent.from(this.id, this.storeMerchantId.getId()));
+        this.registerEvent(new ManufacturerChanged(this.storeMerchantId, new ManufacturerId(this.id)));
         return this;
     }
 

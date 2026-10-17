@@ -45,6 +45,8 @@ dependencies {
     implementation libs.spring.boot.starter.oauth2.client
     implementation libs.spring.boot.starter.security.oauth2.resource.server
     implementation libs.spring.boot.starter.data.jpa
+    // The cache events the aggregates register go through the outbox (store-commons:cache, events-outbox.md).
+    implementation libs.namastack.outbox.starter.jpa
     runtimeOnly libs.postgresql
 
     implementation libs.spring.boot.starter.opentelemetry

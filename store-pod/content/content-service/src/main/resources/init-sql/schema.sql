@@ -388,3 +388,69 @@ create table if not exists content.section_preset
     modified_by       varchar(120)
 );
 create index if not exists section_preset_store_idx on content.section_preset (store_merchant_id, date_created desc);
+
+-- ---------------------------------------------------------------------------------------------------------------
+-- Outbox: the cache events (store-commons:cache, com.asrevo.cvhome.cache.event) this service's aggregates register are
+-- written here in the transaction that changed them and drained by CacheEventOutboxHandler a moment later.
+--
+-- The library's own schema initialisation is off (namastack.outbox.jpa.schema-initialization.enabled: false), the
+-- same as catalog-service, so the tables are declared here. Index names are schema-scoped, so these do not collide
+-- with the other services'.
+-- ---------------------------------------------------------------------------------------------------------------
+
+create table if not exists content.outbox_record
+(
+    id             varchar(255)             not null,
+    status         varchar(20)              not null,
+    record_key     varchar(255)             not null,
+    record_type    varchar(255)             not null,
+    payload        text                     not null,
+    context        text,
+    created_at     timestamp with time zone not null,
+    completed_at   timestamp with time zone,
+    failure_count  int                      not null,
+    failure_reason varchar(1000),
+    next_retry_at  timestamp with time zone not null,
+    partition_no   integer                  not null,
+    handler_id     varchar(1000)            not null,
+    primary key (id)
+);
+
+create table if not exists content.outbox_instance
+(
+    instance_id    varchar(255) primary key,
+    hostname       varchar(255)             not null,
+    port           integer                  not null,
+    status         varchar(50)              not null,
+    started_at     timestamp with time zone not null,
+    last_heartbeat timestamp with time zone not null,
+    created_at     timestamp with time zone not null,
+    updated_at     timestamp with time zone not null
+);
+
+create table if not exists content.outbox_partition
+(
+    partition_number integer primary key,
+    instance_id      varchar(255),
+    version          bigint                   not null default 0,
+    updated_at       timestamp with time zone not null
+);
+
+create index if not exists idx_outbox_record_record_key_created
+    on content.outbox_record (record_key, created_at);
+create index if not exists idx_outbox_record_partition_status_retry
+    on content.outbox_record (partition_no, status, next_retry_at);
+create index if not exists idx_outbox_record_status_retry
+    on content.outbox_record (status, next_retry_at);
+create index if not exists idx_outbox_record_status
+    on content.outbox_record (status);
+create index if not exists idx_outbox_record_record_key_completed_created
+    on content.outbox_record (record_key, completed_at, created_at);
+create index if not exists idx_outbox_instance_status_heartbeat
+    on content.outbox_instance (status, last_heartbeat);
+create index if not exists idx_outbox_instance_last_heartbeat
+    on content.outbox_instance (last_heartbeat);
+create index if not exists idx_outbox_instance_status
+    on content.outbox_instance (status);
+create index if not exists idx_outbox_partition_instance_id
+    on content.outbox_partition (instance_id);

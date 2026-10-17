@@ -22,7 +22,7 @@ public class MerchantStoreServiceImpl extends SalesManagerEntityServiceImpl<Stor
 
     @Override
     public void saveOrUpdate(MerchantStore store) {
-        super.save(store);
+        super.save(store.changed());
     }
 
     @Override

@@ -24,6 +24,7 @@ import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.payment.errors.InvalidWebhookSignatureException;
 import com.asrevo.cvhome.payment.errors.PaymentConfigurationNotFoundException;
 import com.asrevo.cvhome.payment.models.TransactionSearchFilter;
+import com.asrevo.cvhome.payment.reads.PaymentTypeReads;
 import com.asrevo.cvhome.payment.service.PaymentApprovalService;
 import com.asrevo.cvhome.payment.service.PaymentConfigurationService;
 import com.asrevo.cvhome.payment.service.PaymentGatewayService;
@@ -89,8 +90,10 @@ class PaymentApisTest {
 
     private final PaymentConfigurationController configurationController =
             new PaymentConfigurationController(configurationService);
+    private final PaymentTypeReads typeReads = Mockito.mock(PaymentTypeReads.class);
+
     private final PublicPaymentConfigurationController publicConfigurationController =
-            new PublicPaymentConfigurationController(configurationService);
+            new PublicPaymentConfigurationController(typeReads);
     private final PrivatePaymentApi privatePaymentApi = new PrivatePaymentApi(approvalService, transactionService);
     private final PublicPaymentWebhookApi webhookApi = new PublicPaymentWebhookApi(outbox, gatewayService);
 
@@ -118,11 +121,11 @@ class PaymentApisTest {
     @Test
     void theStorefrontAsksWhichTypesAStoreAcceptsByStoreIdInThePath() {
         // Public: the shopper has no token, so the store arrives in the path rather than from the resolver.
-        when(configurationService.getSupportedPaymentTypes(STORE)).thenReturn(new PaymentType[]{PaymentType.STRIPE});
+        when(typeReads.supported(STORE)).thenReturn(new PaymentType[]{PaymentType.STRIPE});
 
         assertThat(publicConfigurationController.getSupportedPaymentTypes(STORE_ID))
                 .containsExactly(PaymentType.STRIPE);
-        verify(configurationService).getSupportedPaymentTypes(STORE);
+        verify(typeReads).supported(STORE);
     }
 
     @Test

@@ -1,9 +1,12 @@
 package com.asrevo.cvhome.merchant.entity.merchant;
 
 import java.time.LocalDate;
+import java.util.Collection;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.test.util.ReflectionTestUtils;
 
+import com.asrevo.cvhome.cache.event.StoreChanged;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.model.references.MeasureUnit;
 
@@ -20,6 +23,11 @@ class MerchantStoreTest {
     private static final String NAME = "Shop";
 
     private static final String EMAIL = "shop@example.com";
+
+    /** {@code AbstractAggregateRoot.domainEvents()} is protected; Spring Data reads it reflectively after a save. */
+    private static Collection<Object> events(Object aggregate) {
+        return ReflectionTestUtils.invokeMethod(aggregate, "domainEvents");
+    }
 
     @Test
     void namedConstructorsSetIdentity() {
@@ -46,4 +54,13 @@ class MerchantStoreTest {
         assertThat(store.isRequireLoginForOrderPlacement()).isFalse();
     }
 
+
+    @Test
+    void aSaveRaisesStoreChangedForEveryServiceThatHoldsACopy() {
+        MerchantStore store = new MerchantStore(STORE, NAME);
+
+        assertThat(store.changed()).isSameAs(store);
+
+        assertThat(events(store)).containsExactly(new StoreChanged(STORE));
+    }
 }

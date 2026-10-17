@@ -4,6 +4,8 @@ plugins {
 
 dependencies {
     api project(':store-pod:commons:store-commons')
+    // The supported-payment-types read (reads/) and the region it declares.
+    api project(':store-commons:cache')
     api project(':store-pod:payment:payment-commons')
     api project(':store-pod:checkout:checkout-external-api')
     implementation project(':store-commons:secret-crypto:secret-crypto-autoconfigure')
@@ -17,4 +19,7 @@ dependencies {
     annotationProcessor libs.lombok
     testImplementation libs.spring.data.jpa
     testImplementation libs.hibernate.core
+    // The reads drive a real registry on the Caffeine provider in their unit tests.
+    testImplementation libs.caffeine
+    testImplementation libs.spring.boot.starter.cache
 }

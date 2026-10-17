@@ -20,8 +20,11 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 
+import com.asrevo.cvhome.cache.event.PriceChanged;
+import com.asrevo.cvhome.cache.event.StockChanged;
 import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.commons.domain.StoreScoped;
 import com.asrevo.cvhome.store.core.constants.SchemaConstant;
 import com.asrevo.cvhome.store.core.converter.SkuConverter;
 import com.asrevo.cvhome.store.core.entity.common.audit.AuditSection;
@@ -45,7 +48,7 @@ import lombok.Setter;
 @Table(name = "PRODUCT_AVAILABILITY")
 @Getter
 @Setter
-public class Inventory extends SalesManagerEntity<Long, Inventory> implements Auditable {
+public class Inventory extends SalesManagerEntity<Long, Inventory> implements Auditable, StoreScoped {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -109,5 +112,22 @@ public class Inventory extends SalesManagerEntity<Long, Inventory> implements Au
 
     public boolean canBePurchased() {
         return available && quantity > 0;
+    }
+
+    /** The quantity or the availability changed, by a merchant's upsert or a reservation: {@link StockChanged}. */
+    public Inventory stockChanged() {
+        this.registerEvent(new StockChanged(storeMerchantId, sku));
+        return this;
+    }
+
+    /** A price row of this sku changed: {@link PriceChanged}, for every cart line and page that shows it. */
+    public Inventory priceChanged() {
+        this.registerEvent(new PriceChanged(storeMerchantId, sku));
+        return this;
+    }
+
+    @Override
+    public StoreMerchantId scopedStore() {
+        return storeMerchantId;
     }
 }

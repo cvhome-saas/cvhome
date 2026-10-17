@@ -5,8 +5,10 @@ import java.util.Collection;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import com.asrevo.cvhome.cache.event.ProductChanged;
 import com.asrevo.cvhome.catalog.model.product.event.ProductSearchIndexPurgedEvent;
 import com.asrevo.cvhome.catalog.model.product.event.ProductSearchIndexStaleEvent;
+import com.asrevo.cvhome.commons.domain.ProductId;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -35,13 +37,27 @@ class ProductSearchEventsTest {
      * {@code AbstractAggregateRoot.domainEvents()} is protected, and Spring Data reads it reflectively after the
      * repository call — which is exactly the moment this reproduces.
      */
-    private static Collection<?> events(Product product) {
+    private static Collection<Object> allEvents(Product product) {
         return ReflectionTestUtils.invokeMethod(product, "domainEvents");
     }
 
+    /** The search events alone: every save also raises {@link ProductChanged} for the caches, asserted apart. */
+    private static Collection<Object> events(Product product) {
+        return allEvents(product).stream().filter(event -> !(event instanceof ProductChanged)).toList();
+    }
+
     @Test
-    void anUntouchedProductAnnouncesNothing() {
+    void anUntouchedProductAnnouncesNothingToTheSearchIndex() {
         assertThat(events(product())).isEmpty();
+    }
+
+    /** Whatever the save changed, every cache that shows the product is stale, here and in the other services. */
+    @Test
+    void everySaveAnnouncesProductChangedToTheCaches() {
+        assertThat(allEvents(product())).containsExactly(new ProductChanged(new StoreMerchantId(STORE),
+                new ProductId(PRODUCT_ID)));
+        assertThat(allEvents(product().searchIndexStale())).hasSize(2).first().isInstanceOf(ProductChanged.class);
+        assertThat(allEvents(new Product())).as("no id before the insert, so nothing to name yet").isEmpty();
     }
 
     @Test

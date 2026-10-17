@@ -9,7 +9,7 @@ supported languages, and the domains the edge routes on. It no longer owns appea
   being up
 - **Runs on** — `lcl start -d --stack <name>`; read the live port from `lcl urls`. Address it through the
   gateway, never `:8120`
-- **Cases** — 46 (6 verified, 5 unit only, 35 not verified)
+- **Cases** — 47 (6 verified, 6 unit only, 35 not verified)
 - **Also see** — [tenancy](../../../../store-core/tenancy/tenancy-service/qa/tenancy-qa.md) (which creates the
   store and calls merchant off the outbox), [spg](../../../spg/qa/spg-qa.md) (the edge that calls the router),
   [console-ui](../../../../store-core/console-ui/qa/console-ui-qa.md) (Store management),
@@ -587,6 +587,33 @@ Every row was a real defect. Several were invisible from the screen.
   store's currency, units or languages changed in the console reach a consumer within 5 minutes; the org-owner lookup
   the authorization layer makes reads through the same entry.
 - **Result** — `CachedMerchantStoreReadsTest`; every consumer's unit and integration suite. **Not verified** on a stack.
+
+### LOAD-03 — The store record is cached in merchant itself, five minutes per store, dropped the moment it is saved · high · [unit only]
+
+- **Expect** — `GET /api/v1/store` (the peers' read), `GET /api/v1/store/{code}` (per language) and
+  `GET /api/v1/store/languages` answer from the `merchant.store`, `merchant.store-by-language` and
+  `merchant.languages` regions; a save of the store in the console drops its three entries at once on the task that
+  took it and leaves the other stores' warm; the console's full read (`/api/v1/private/store`) is never cached. A
+  consumer still holds its own copy for up to five minutes (LOAD-02).
+- **Result** — `MerchantStoreReadsIntegrationTest`, `MerchantStoreReadsTest`, `MerchantArchitectureTest`.
+  **Not verified** on a stack.
+
+---
+
+### LOAD-04 — Every store save raises `StoreChanged` through merchant's own outbox · medium · [unit only]
+
+- **Setup** — a stack with merchant's logs at DEBUG for `com.asrevo.cvhome.cache` (`logging.level` in its
+  `application.yml`, or the console's log level endpoint).
+- **Steps** — save the store in the console (`PUT /api/v1/private/store`), then within a few seconds read
+  `select record_type, record_key, status from merchant.outbox_record order by created_at desc limit 3`, and
+  `cvhome_outbox_records` on merchant's `/actuator/prometheus`.
+- **Expect** — one `StoreChanged` row keyed by the store id, `COMPLETED` after the next poll (2 s); a DEBUG line
+  `cache event StoreChanged of store … applied locally, no transport configured`; the three `merchant.*` regions of
+  that store dropped on the task that drained it (the same as LOAD-03 on the task that took the save). No consumer
+  drops its `merchant.store-client` copy yet: that needs a transport (`references/caching.md` § Cache events).
+- **Result** — `MerchantStoreTest` (a save registers `StoreChanged`), `MerchantStoreServiceImplTest`, the library's
+  `CacheEventOutboxHandlerTest` and `CacheEventApplierTest`; `MerchantStoreReadsIntegrationTest` boots the service
+  with the outbox tables in `schema.sql`. **Not verified** on a stack.
 
 ---
 
