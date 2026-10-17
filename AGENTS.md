@@ -224,7 +224,9 @@ What binds every change:
 - **A read is cached through `store-commons:cache` only**: a constant in the service's `<Service>Regions`, a
   `@Cacheable` method in `<Area>Reads` keyed by `StoreMerchantId` first (`keyGenerator = storeScopedKeys`), an
   `EvictionRules` line for the entities whose writes stale it, and ttl/size in configuration. Never a `Caffeine`
-  of one's own, never a `CacheManager` per service, never a read that depends on who asks. `references/caching.md`.
+  of one's own, never a `CacheManager` per service, never a read that depends on who asks. A write that another
+  service or task caches a copy of raises its `CacheEvent` (`MerchantStore.changed()`, `Inventory.stockChanged()`)
+  through the outbox; the transport that carries it is a bean, never a switch. `references/caching.md`.
 - `schema.sql` (`src/main/resources/schema.sql` for tenancy's Spring Data JDBC, `init-sql/schema.sql`
   for the JPA pod services) is the source of truth for DDL, and Hibernate only checks it (`ddl-auto: validate`): an
   entity the DDL does not match stops the service at start-up, so a column change is a `schema.sql` change.

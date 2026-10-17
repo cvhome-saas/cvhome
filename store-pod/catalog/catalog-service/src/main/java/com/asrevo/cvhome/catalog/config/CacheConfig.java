@@ -4,6 +4,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.asrevo.cvhome.cache.CacheRegions;
+import com.asrevo.cvhome.cache.event.ManufacturerChanged;
+import com.asrevo.cvhome.cache.event.ProductChanged;
 import com.asrevo.cvhome.cache.eviction.EvictionRules;
 import com.asrevo.cvhome.catalog.entity.Category;
 import com.asrevo.cvhome.catalog.entity.CategoryDescription;
@@ -42,7 +44,9 @@ public class CacheConfig {
     /**
      * A product, its parts and its variants stale everything that shows a product; a category or a brand stales the
      * navigation and the listings; a group only what reads groups; the derived search rows only the search. An
-     * option or a type is shown on a product page, so it stales the product reads too.
+     * option or a type is shown on a product page, so it stales the product reads too. The events the aggregates raise
+     * ({@link ProductChanged}, {@link ManufacturerChanged}) map to the same regions as the entity that raised them:
+     * drained from the outbox they reach every task, where the commit only reached this one.
      */
     @Bean
     EvictionRules catalogEvictionRules() {
@@ -66,6 +70,13 @@ public class CacheConfig {
                         CatalogRegions.DETAILED_PRODUCT)
                 .on(ProductSearchIndex.class)
                 .evict(CatalogRegions.SEARCH, CatalogRegions.SUGGEST)
+                .onEvent(ProductChanged.class)
+                .evict(CatalogRegions.PRODUCT, CatalogRegions.LISTING, CatalogRegions.SEARCH, CatalogRegions.SUGGEST,
+                        CatalogRegions.RELATED, CatalogRegions.GROUP, CatalogRegions.CART_LINE,
+                        CatalogRegions.DETAILED_PRODUCT)
+                .onEvent(ManufacturerChanged.class)
+                .evict(CatalogRegions.BRANDS, CatalogRegions.LISTING, CatalogRegions.SEARCH, CatalogRegions.PRODUCT,
+                        CatalogRegions.SUGGEST)
                 .build();
     }
 }

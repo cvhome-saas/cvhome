@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.asrevo.cvhome.cache.CacheRegions;
+import com.asrevo.cvhome.cache.event.ContentChanged;
 import com.asrevo.cvhome.cache.eviction.EvictionRules;
 import com.asrevo.cvhome.content.entity.Content;
 import com.asrevo.cvhome.content.entity.ContentDescription;
@@ -24,7 +25,8 @@ import com.asrevo.cvhome.content.reads.ContentRegions;
  * What content caches ({@link ContentRegions}) and which committed write drops which of it. A content row is a
  * page, a post, a banner or a faq entry, and the site lists the policies and menus, so most writes reach several
  * regions; a media asset is shown by url on a page or a layout. A layout revision, a status audit and a media
- * usage row change nothing a shopper sees and have no rule.
+ * usage row change nothing a shopper sees and have no rule. A content row's {@link ContentChanged} maps to what the
+ * row itself does, so the other tasks drop the same regions once the outbox drains it.
  */
 @Configuration
 public class CacheConfig {
@@ -57,6 +59,10 @@ public class CacheConfig {
                 .evict(ContentRegions.SITEMAP)
                 .on(MediaAsset.class)
                 .evict(ContentRegions.PAGE, ContentRegions.POST, ContentRegions.LAYOUT, ContentRegions.BANNERS)
+                .onEvent(ContentChanged.class)
+                .evict(ContentRegions.PAGE, ContentRegions.POST, ContentRegions.POSTS, ContentRegions.POST_CATEGORIES,
+                        ContentRegions.BANNERS, ContentRegions.FAQ, ContentRegions.SITE, ContentRegions.SITEMAP,
+                        ContentRegions.MENU)
                 .build();
     }
 }

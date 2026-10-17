@@ -143,6 +143,7 @@ public class PublishingService {
     }
 
     private void apply(Content entity, ContentStatus from, ContentStatus to, String actor, String reason) {
+        entity.changed();
         entity.setStatus(to);
         entity.setVisible(to == ContentStatus.PUBLISHED);
         if (to == ContentStatus.DRAFT || to == ContentStatus.ARCHIVED) {

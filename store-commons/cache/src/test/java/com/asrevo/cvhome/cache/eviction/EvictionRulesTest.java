@@ -5,6 +5,9 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import com.asrevo.cvhome.cache.TestRegions;
+import com.asrevo.cvhome.cache.event.PriceChanged;
+import com.asrevo.cvhome.cache.event.StockChanged;
+import com.asrevo.cvhome.cache.event.StoreChanged;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -52,5 +55,34 @@ class EvictionRulesTest {
                 .hasMessageContaining("java.lang.String");
         assertThatThrownBy(() -> EvictionRules.in(PACKAGE).on(Product.class).evict())
                 .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void anEventRuleNamesTheRegionsAReceivedEventDrops() {
+        EvictionRules rules = EvictionRules.in(PACKAGE)
+                .on(Product.class).evict(TestRegions.PRODUCT)
+                .onEvent(StockChanged.class, PriceChanged.class).evict(TestRegions.PRODUCT)
+                .onEvent(StockChanged.class).evict(List.of(TestRegions.LISTING))
+                .build();
+
+        assertThat(rules.regionsForEvent(StockChanged.class)).containsExactly(TestRegions.PRODUCT, TestRegions.LISTING);
+        assertThat(rules.regionsForEvent(PriceChanged.class)).containsExactly(TestRegions.PRODUCT);
+        assertThat(rules.regionsForEvent(StoreChanged.class)).isEmpty();
+        assertThat(rules.events()).containsExactly(StockChanged.class, PriceChanged.class);
+        assertThat(EvictionRules.none().regionsForEvent(StockChanged.class)).isEmpty();
+        assertThatThrownBy(() -> EvictionRules.in(PACKAGE).onEvent()).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> EvictionRules.in(PACKAGE).onEvent(StockChanged.class).evict())
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void aServiceWithoutTablesOfItsOwnMapsEventsOnly() {
+        EvictionRules rules = EvictionRules.onEvents().onEvent(StoreChanged.class).evict(TestRegions.PRODUCT).build();
+
+        assertThat(rules.entityPackage()).isEmpty();
+        assertThat(rules.owns(Product.class.getName())).isFalse();
+        assertThat(rules.regionsForEvent(StoreChanged.class)).containsExactly(TestRegions.PRODUCT);
+        assertThatThrownBy(() -> EvictionRules.onEvents().on(Product.class))
+                .isInstanceOf(IllegalArgumentException.class).hasMessageContaining("EvictionRules.in");
     }
 }

@@ -29,3 +29,21 @@ reservation:
     max-hours: 72
   cleanup:
     interval: 60000
+namastack:
+  outbox:
+    multicaster:
+      enabled: true
+    polling:
+      fixed:
+        interval: 2s
+      batch-size: 10
+    jpa:
+      schema-initialization:
+        enabled: false
+      schema-name: ${spring.application.name}
+cvhome:
+  metrics:
+    outbox:
+      # Outbox gauges (cvhome_outbox_records, cvhome_outbox_oldest_pending_seconds) over this service's outbox table.
+      enabled: true
+      table: inventory.outbox_record
