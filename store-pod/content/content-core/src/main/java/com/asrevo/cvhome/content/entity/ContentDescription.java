@@ -13,6 +13,8 @@ import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.commons.domain.StoreScoped;
 import com.asrevo.cvhome.content.model.TranslationState;
 import com.asrevo.cvhome.store.core.constants.SchemaConstant;
 import com.asrevo.cvhome.store.core.entity.common.description.BaseDescription;
@@ -33,7 +35,7 @@ import lombok.Setter;
         allocationSize = SchemaConstant.ID_ALLOCATION_SIZE)
 @Getter
 @Setter
-public class ContentDescription extends BaseDescription implements Serializable {
+public class ContentDescription extends BaseDescription implements Serializable, StoreScoped {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -72,4 +74,8 @@ public class ContentDescription extends BaseDescription implements Serializable 
     @Column(name = "SUBTITLE", length = 300)
     private String subtitle;
 
+    @Override
+    public StoreMerchantId scopedStore() {
+        return content == null ? null : content.scopedStore();
+    }
 }

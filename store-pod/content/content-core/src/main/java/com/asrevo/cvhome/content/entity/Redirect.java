@@ -13,6 +13,9 @@ import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.commons.domain.StoreScoped;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -25,7 +28,7 @@ import lombok.Setter;
         columnNames = {"STORE_MERCHANT_ID", "FROM_PATH"}))
 @Getter
 @Setter
-public class Redirect implements Serializable {
+public class Redirect implements Serializable, StoreScoped {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -48,4 +51,8 @@ public class Redirect implements Serializable {
     @Column(name = "CREATED_AT", nullable = false)
     private Instant createdAt = Instant.now();
 
+    @Override
+    public StoreMerchantId scopedStore() {
+        return storeMerchantId == null ? null : new StoreMerchantId(storeMerchantId);
+    }
 }

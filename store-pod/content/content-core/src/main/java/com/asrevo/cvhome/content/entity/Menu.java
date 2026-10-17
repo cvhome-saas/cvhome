@@ -23,6 +23,8 @@ import jakarta.persistence.UniqueConstraint;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.commons.domain.StoreScoped;
 import com.asrevo.cvhome.content.model.MenuHandle;
 
 import lombok.Getter;
@@ -36,7 +38,7 @@ import lombok.Setter;
         columnNames = {"STORE_MERCHANT_ID", "HANDLE"}))
 @Getter
 @Setter
-public class Menu implements Serializable {
+public class Menu implements Serializable, StoreScoped {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -62,4 +64,8 @@ public class Menu implements Serializable {
     @OrderBy("position asc, id asc")
     private List<MenuItem> items = new ArrayList<>();
 
+    @Override
+    public StoreMerchantId scopedStore() {
+        return storeMerchantId == null ? null : new StoreMerchantId(storeMerchantId);
+    }
 }

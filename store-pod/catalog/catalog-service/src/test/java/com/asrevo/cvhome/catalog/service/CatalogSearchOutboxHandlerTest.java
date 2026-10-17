@@ -36,14 +36,14 @@ class CatalogSearchOutboxHandlerTest {
     void aStaleProductIsReindexed() {
         handler.handleProductSearchIndexStaleEvent(ProductSearchIndexStaleEvent.from(42L, STORE));
 
-        verify(indexer).reindex(42L);
+        verify(indexer).reindex(org.mockito.ArgumentMatchers.eq(42L), org.mockito.ArgumentMatchers.any());
     }
 
     @Test
     void aPurgedProductIsRemoved() {
         handler.handleProductSearchIndexPurgedEvent(ProductSearchIndexPurgedEvent.from(42L, STORE));
 
-        verify(indexer).purge(42L);
+        verify(indexer).purge(org.mockito.ArgumentMatchers.eq(42L), org.mockito.ArgumentMatchers.any());
     }
 
     @Test

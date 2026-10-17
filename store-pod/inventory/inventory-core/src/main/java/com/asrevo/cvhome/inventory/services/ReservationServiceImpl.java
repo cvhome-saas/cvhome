@@ -93,6 +93,8 @@ public class ReservationServiceImpl implements ReservationService {
             throw InsufficientInventoryException.of(sku, quantity, inventory.getQuantity());
         }
         inventory.setQuantity(inventory.getQuantity() - quantity);
+        // Saved explicitly: the row is managed and would flush anyway, but only a save publishes the event.
+        inventoryRepository.save(inventory.stockChanged());
         return inventory;
     }
 
@@ -133,6 +135,7 @@ public class ReservationServiceImpl implements ReservationService {
                     Inventory inventory = line.getInventory();
                     if (inventory != null) {
                         inventory.setQuantity(inventory.getQuantity() + line.getQuantity());
+                        inventoryRepository.save(inventory.stockChanged());
                     }
                 }
                 reservation.setStatus(ProductReservationStatus.ROLLBACK);

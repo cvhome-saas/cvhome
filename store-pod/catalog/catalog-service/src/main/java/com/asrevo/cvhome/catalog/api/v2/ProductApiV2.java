@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.asrevo.cvhome.billing.commons.errors.EntitlementExceededException;
+import com.asrevo.cvhome.cache.QueryKey;
 import com.asrevo.cvhome.catalog.errors.CategoryReferenceUnresolvableException;
 import com.asrevo.cvhome.catalog.errors.DuplicateVariantSkuException;
 import com.asrevo.cvhome.catalog.errors.ManufacturerReferenceUnresolvableException;
@@ -33,6 +34,8 @@ import com.asrevo.cvhome.catalog.model.product.ReadableProduct;
 import com.asrevo.cvhome.catalog.model.product.ReadableProductDefinition;
 import com.asrevo.cvhome.catalog.model.product.ReadableProductSearchResult;
 import com.asrevo.cvhome.catalog.model.product.ReadableProductSuggestion;
+import com.asrevo.cvhome.catalog.reads.StorefrontCatalogReads;
+import com.asrevo.cvhome.catalog.reads.SuggestQuery;
 import com.asrevo.cvhome.catalog.services.product.ProductSearchService;
 import com.asrevo.cvhome.catalog.services.product.ProductService;
 import com.asrevo.cvhome.commons.domain.Entity;
@@ -64,6 +67,8 @@ public class ProductApiV2 {
 
     private final ProductSearchService productSearchService;
 
+    private final StorefrontCatalogReads reads;
+
     /**
      * Public, like every storefront read, and also what the console's product table reads: a merchant sees exactly
      * what the shop can, filtered by {@code sku}, {@code available}, {@code categoryIds} and {@code manufacturerId}.
@@ -72,7 +77,7 @@ public class ProductApiV2 {
     @Parameter(name = "store", schema = @Schema(type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
     public ReadableEntityList<ReadableProduct> list(ProductFilter filter, StoreMerchantId merchantStore,
                                                     LanguageCode language, Pageable pageable) {
-        return productService.list(merchantStore, filter, language, pageable);
+        return reads.list(merchantStore, language, QueryKey.of(filter.normalised(), filter), pageable);
     }
 
     /**
@@ -87,7 +92,7 @@ public class ProductApiV2 {
     @Parameter(name = "store", schema = @Schema(type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
     public ReadableProductSearchResult search(ProductSearchCriteria criteria, StoreMerchantId merchantStore,
                                               LanguageCode language, Pageable pageable) {
-        return productSearchService.search(merchantStore, criteria, language, pageable);
+        return reads.search(merchantStore, language, QueryKey.of(criteria.normalised(), criteria), pageable);
     }
 
     /**
@@ -102,7 +107,7 @@ public class ProductApiV2 {
             StoreMerchantId merchantStore, LanguageCode language) {
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.maxAge(Duration.ofSeconds(30)).cachePublic())
-                .body(productSearchService.suggest(merchantStore, query, language, limit));
+                .body(reads.suggest(merchantStore, language, SuggestQuery.of(query, limit)));
     }
 
     /**
@@ -125,7 +130,7 @@ public class ProductApiV2 {
     @Parameter(name = "store", schema = @Schema(type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
     public ReadableProduct getByFriendlyUrl(@PathVariable String friendlyUrl, StoreMerchantId merchantStore,
                                             LanguageCode language) throws ProductNotFoundException {
-        return productService.getByFriendlyUrl(merchantStore, friendlyUrl, language);
+        return reads.product(merchantStore, language, friendlyUrl);
     }
 
     @GetMapping("/private/product/{id}")

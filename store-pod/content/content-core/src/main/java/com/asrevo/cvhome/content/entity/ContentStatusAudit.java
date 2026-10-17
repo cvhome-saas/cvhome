@@ -14,6 +14,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.commons.domain.StoreScoped;
 import com.asrevo.cvhome.content.model.ContentStatus;
 
 import lombok.Getter;
@@ -26,7 +28,7 @@ import lombok.Setter;
 @Table(name = "CONTENT_STATUS_AUDIT")
 @Getter
 @Setter
-public class ContentStatusAudit implements Serializable {
+public class ContentStatusAudit implements Serializable, StoreScoped {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -60,4 +62,8 @@ public class ContentStatusAudit implements Serializable {
     @Column(name = "OCCURRED_AT", nullable = false)
     private Instant occurredAt = Instant.now();
 
+    @Override
+    public StoreMerchantId scopedStore() {
+        return storeMerchantId == null ? null : new StoreMerchantId(storeMerchantId);
+    }
 }

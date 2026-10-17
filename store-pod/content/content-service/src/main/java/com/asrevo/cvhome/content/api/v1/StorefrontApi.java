@@ -33,7 +33,8 @@ import com.asrevo.cvhome.content.model.storefront.StorefrontPolicy;
 import com.asrevo.cvhome.content.model.storefront.StorefrontPost;
 import com.asrevo.cvhome.content.model.storefront.StorefrontPostList;
 import com.asrevo.cvhome.content.model.storefront.StorefrontSite;
-import com.asrevo.cvhome.content.service.MenuService;
+import com.asrevo.cvhome.content.reads.PostsFilter;
+import com.asrevo.cvhome.content.reads.StorefrontReads;
 
 import lombok.RequiredArgsConstructor;
 
@@ -52,11 +53,10 @@ public class StorefrontApi {
 
     private final StorefrontFacade storefront;
 
-    private final MenuService menus;
+    private final StorefrontReads reads;
 
     private final PreviewTokens previews;
 
-    private final java.time.Clock clock;
 
     private static <T> ResponseEntity<T> cached(T body) {
         return ResponseEntity.ok().cacheControl(CACHE).body(body);
@@ -64,7 +64,7 @@ public class StorefrontApi {
 
     @GetMapping("site")
     public ResponseEntity<StorefrontSite> site(StoreMerchantId merchantStore, LanguageCode language) {
-        return cached(storefront.site(merchantStore, language));
+        return cached(reads.site(merchantStore, language));
     }
 
     @GetMapping("pages/{slug}")
@@ -73,7 +73,8 @@ public class StorefrontApi {
                                                @RequestParam(required = false) String preview)
             throws ContentNotFoundException {
         boolean draft = previews.valid(preview, merchantStore, slug);
-        StorefrontPage page = storefront.page(merchantStore, language, slug, draft);
+        StorefrontPage page = draft ? storefront.page(merchantStore, language, slug, true)
+                : reads.page(merchantStore, language, slug);
         return draft ? ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(page) : cached(page);
     }
 
@@ -81,7 +82,7 @@ public class StorefrontApi {
     public ResponseEntity<StorefrontPostList> posts(StoreMerchantId merchantStore, LanguageCode language,
                                                     @RequestParam(required = false) String category,
                                                     @RequestParam(required = false) String tag, Pageable pageable) {
-        return cached(storefront.posts(merchantStore, language, category, tag, pageable));
+        return cached(reads.posts(merchantStore, language, PostsFilter.of(category, tag), pageable));
     }
 
     @GetMapping("posts/{slug}")
@@ -90,20 +91,21 @@ public class StorefrontApi {
                                                @RequestParam(required = false) String preview)
             throws ContentNotFoundException {
         boolean draft = previews.valid(preview, merchantStore, slug);
-        StorefrontPost post = storefront.post(merchantStore, language, slug, draft);
+        StorefrontPost post = draft ? storefront.post(merchantStore, language, slug, true)
+                : reads.post(merchantStore, language, slug);
         return draft ? ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(post) : cached(post);
     }
 
     @GetMapping("post-categories")
     public ResponseEntity<List<StorefrontLink>> postCategories(StoreMerchantId merchantStore,
                                                                LanguageCode language) {
-        return cached(storefront.postCategories(merchantStore, language));
+        return cached(reads.postCategories(merchantStore, language));
     }
 
     @GetMapping("banners")
     public ResponseEntity<List<StorefrontBanner>> banners(StoreMerchantId merchantStore, LanguageCode language,
                                                           @RequestParam(required = false) BannerPlacement placement) {
-        return cached(storefront.effectiveBanners(merchantStore, language, placement));
+        return cached(reads.banners(merchantStore, language, placement));
     }
 
     /**
@@ -116,20 +118,21 @@ public class StorefrontApi {
             StoreMerchantId merchantStore, LanguageCode language, @PathVariable PageKind page,
             @RequestParam(required = false) String preview) {
         boolean draft = previews.valid(preview, merchantStore, LayoutApi.previewSlug(page));
-        var layout = storefront.layout(merchantStore, language, page, draft);
+        var layout = draft ? storefront.layout(merchantStore, language, page, true)
+                : reads.layout(merchantStore, language, page);
         return draft ? ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(layout) : cached(layout);
     }
 
     @GetMapping("faq")
     public ResponseEntity<StorefrontFaq> faq(StoreMerchantId merchantStore, LanguageCode language,
                                              @RequestParam(required = false) String group) {
-        return cached(storefront.faq(merchantStore, language, group));
+        return cached(reads.faq(merchantStore, language, group));
     }
 
     @GetMapping("menus/{handle}")
     public ResponseEntity<List<StorefrontMenuNode>> menu(StoreMerchantId merchantStore, LanguageCode language,
                                                          @PathVariable MenuHandle handle) {
-        return cached(menus.resolved(merchantStore, handle, language, clock.instant()));
+        return cached(reads.menu(merchantStore, language, handle));
     }
 
     @GetMapping("policies/{type}")
@@ -137,12 +140,13 @@ public class StorefrontApi {
                                                    @PathVariable PolicyType type,
                                                    @RequestParam(name = "v", required = false) Integer version)
             throws ContentNotFoundException {
-        return cached(storefront.policy(merchantStore, language, type, version));
+        return cached(version == null ? reads.policy(merchantStore, language, type)
+                : storefront.policy(merchantStore, language, type, version));
     }
 
     @GetMapping("sitemap")
     public ResponseEntity<List<SitemapEntry>> sitemap(StoreMerchantId merchantStore, LanguageCode language) {
-        return cached(storefront.sitemap(merchantStore, language));
+        return cached(reads.sitemap(merchantStore, language));
     }
 
     /**

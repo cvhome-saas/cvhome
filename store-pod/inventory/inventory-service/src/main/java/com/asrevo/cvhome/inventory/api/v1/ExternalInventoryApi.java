@@ -15,6 +15,7 @@ import com.asrevo.cvhome.commons.domain.Sku;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.inventory.model.AvailabilityQuery;
 import com.asrevo.cvhome.inventory.model.SkuInventory;
+import com.asrevo.cvhome.inventory.reads.SkuInventoryReads;
 import com.asrevo.cvhome.inventory.services.ExternalInventoryService;
 import com.asrevo.cvhome.inventory.services.InventoryService;
 
@@ -38,17 +39,19 @@ public class ExternalInventoryApi implements ExternalInventoryService {
 
     private final InventoryService inventoryService;
 
+    private final SkuInventoryReads reads;
+
     @Override
     @GetMapping("/availability")
     @Parameter(name = "store", schema = @Schema(type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
     public List<SkuInventory> getBySkus(StoreMerchantId store, @RequestParam List<Sku> skus) {
-        return inventoryService.getBySkus(store, skus);
+        return reads.bySkus(store, skus);
     }
 
     @Override
     @PostMapping("/availability/query")
     @Parameter(name = "store", schema = @Schema(type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
     public List<SkuInventory> queryBySkus(StoreMerchantId store, @Valid @RequestBody AvailabilityQuery query) {
-        return inventoryService.getBySkus(store, query.skus());
+        return reads.bySkus(store, query.skus());
     }
 }

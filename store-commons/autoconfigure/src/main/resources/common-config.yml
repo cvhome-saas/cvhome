@@ -150,22 +150,6 @@ spring:
       - org.springframework.boot.micrometer.tracing.autoconfigure.MicrometerTracingAutoConfiguration
       - org.springframework.boot.micrometer.tracing.opentelemetry.autoconfigure.OpenTelemetryTracingAutoConfiguration
       - org.springframework.boot.micrometer.tracing.opentelemetry.autoconfigure.otlp.OtlpTracingAutoConfiguration
-  cache:
-    # Spring's own cache configuration, for the three CachedExternalMerchantStoreService copies (catalog, checkout,
-    # payment) that still run on Boot's Caffeine manager; it leaves with the last of them, once every service caches
-    # through store-commons:cache (com.asrevo.cvhome.cache above).
-    # The one named cache the pods use (catalog, checkout, payment: the merchant store read). Declared here so the
-    # cache exists at start-up: Boot binds cache meters to the caches a CacheManager knows when the context starts,
-    # and a cache created lazily on its first @Cacheable hit is never bound. Services without @EnableCaching have
-    # no CacheManager and ignore this.
-    cache-names: STORE
-    caffeine:
-      # Hit/miss/eviction counters for every Spring cache (cache_gets_total, cache_size, cache_evictions_total);
-      # Boot's CacheMetricsAutoConfiguration binds them once the cache records statistics.
-      # Bounded, and it expires: nothing evicts STORE, so without a TTL a merchant's change to a store's currency, units
-      # or languages never reached catalog, checkout or payment until they restarted. Five minutes is the staleness a
-      # settings change may have; one entry per store, so the bound is never near.
-      spec: maximumSize=10000,expireAfterWrite=5m,recordStats
   docker:
     compose:
       file: ${spring.application.name}/compose.yml

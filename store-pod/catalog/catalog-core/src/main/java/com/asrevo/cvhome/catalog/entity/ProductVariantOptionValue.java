@@ -14,6 +14,9 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.Table;
 
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.commons.domain.StoreScoped;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -25,7 +28,7 @@ import lombok.Setter;
 @Table(name = "PRODUCT_VARIANT_OPTION_VALUE")
 @Getter
 @Setter
-public class ProductVariantOptionValue implements Serializable {
+public class ProductVariantOptionValue implements Serializable, StoreScoped {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -88,5 +91,10 @@ public class ProductVariantOptionValue implements Serializable {
         public int hashCode() {
             return Objects.hash(variantId, optionId);
         }
+    }
+
+    @Override
+    public StoreMerchantId scopedStore() {
+        return variant == null ? null : variant.scopedStore();
     }
 }

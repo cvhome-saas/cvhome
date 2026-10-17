@@ -32,13 +32,13 @@ public class CatalogSearchOutboxHandler {
     @OutboxHandler
     public void handleProductSearchIndexStaleEvent(ProductSearchIndexStaleEvent event) {
         log.debug("reindexing product {} of store {}", event.productId(), event.storeId());
-        indexer.reindex(event.productId());
+        indexer.reindex(event.productId(), new StoreMerchantId(event.storeId()));
     }
 
     @OutboxHandler
     public void handleProductSearchIndexPurgedEvent(ProductSearchIndexPurgedEvent event) {
         log.debug("purging product {} of store {} from the search index", event.productId(), event.storeId());
-        indexer.purge(event.productId());
+        indexer.purge(event.productId(), new StoreMerchantId(event.storeId()));
     }
 
     @OutboxHandler

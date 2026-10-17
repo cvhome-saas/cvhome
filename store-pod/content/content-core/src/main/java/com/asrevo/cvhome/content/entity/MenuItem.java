@@ -19,6 +19,8 @@ import jakarta.persistence.Table;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.commons.domain.StoreScoped;
 import com.asrevo.cvhome.content.model.MenuTargetKind;
 
 import lombok.Getter;
@@ -28,7 +30,7 @@ import lombok.Setter;
 @Table(name = "MENU_ITEM")
 @Getter
 @Setter
-public class MenuItem implements Serializable {
+public class MenuItem implements Serializable, StoreScoped {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -66,4 +68,8 @@ public class MenuItem implements Serializable {
     @Column(name = "VISIBLE", nullable = false)
     private boolean visible = true;
 
+    @Override
+    public StoreMerchantId scopedStore() {
+        return menu == null ? null : menu.scopedStore();
+    }
 }

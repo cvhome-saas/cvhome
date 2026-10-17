@@ -24,12 +24,14 @@ import jakarta.persistence.Transient;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 
+import com.asrevo.cvhome.cache.event.StoreChanged;
 import com.asrevo.cvhome.commons.domain.ColorTheme;
 import com.asrevo.cvhome.commons.domain.CountryIsoCode;
 import com.asrevo.cvhome.commons.domain.CurrencyCode;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.ManagerStoreDomain;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.commons.domain.StoreScoped;
 import com.asrevo.cvhome.commons.domain.Theme;
 import com.asrevo.cvhome.commons.domain.ZoneCode;
 import com.asrevo.cvhome.store.core.converter.CountryIsoCodeConverter;
@@ -49,7 +51,7 @@ import lombok.Setter;
 @Table(name = "MERCHANT_STORE")
 @Getter
 @Setter
-public class MerchantStore extends SalesManagerEntity<StoreMerchantId, MerchantStore> implements Auditable {
+public class MerchantStore extends SalesManagerEntity<StoreMerchantId, MerchantStore> implements Auditable, StoreScoped {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -186,4 +188,17 @@ public class MerchantStore extends SalesManagerEntity<StoreMerchantId, MerchantS
     public MerchantStore() {
     }
 
+    /**
+     * The store was written: its name, languages, currency, domains or settings. Every service holds a copy of this
+     * row through the merchant client, so the save raises {@link StoreChanged} for them.
+     */
+    public MerchantStore changed() {
+        this.registerEvent(new StoreChanged(id));
+        return this;
+    }
+
+    @Override
+    public StoreMerchantId scopedStore() {
+        return id;
+    }
 }

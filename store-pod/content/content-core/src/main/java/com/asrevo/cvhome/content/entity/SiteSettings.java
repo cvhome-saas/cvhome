@@ -12,6 +12,9 @@ import jakarta.persistence.Table;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.commons.domain.StoreScoped;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -30,7 +33,7 @@ import lombok.Setter;
 @Table(name = "SITE_SETTINGS")
 @Getter
 @Setter
-public class SiteSettings implements Serializable {
+public class SiteSettings implements Serializable, StoreScoped {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -67,4 +70,8 @@ public class SiteSettings implements Serializable {
     @Column(name = "UPDATED_BY", length = 120)
     private String updatedBy;
 
+    @Override
+    public StoreMerchantId scopedStore() {
+        return storeMerchantId == null ? null : new StoreMerchantId(storeMerchantId);
+    }
 }

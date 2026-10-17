@@ -24,6 +24,8 @@ import jakarta.persistence.UniqueConstraint;
 import org.hibernate.annotations.BatchSize;
 
 import com.asrevo.cvhome.commons.domain.LanguageCode;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.commons.domain.StoreScoped;
 import com.asrevo.cvhome.store.core.constants.SchemaConstant;
 import com.asrevo.cvhome.store.core.entity.common.audit.AuditListener;
 import com.asrevo.cvhome.store.core.entity.common.audit.AuditSection;
@@ -43,7 +45,7 @@ import lombok.Setter;
         uniqueConstraints = @UniqueConstraint(columnNames = {"PRODUCT_OPTION_ID", "CODE"}))
 @Getter
 @Setter
-public class ProductOptionValue extends SalesManagerEntity<Long, ProductOptionValue> implements Auditable {
+public class ProductOptionValue extends SalesManagerEntity<Long, ProductOptionValue> implements Auditable, StoreScoped {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -82,5 +84,10 @@ public class ProductOptionValue extends SalesManagerEntity<Long, ProductOptionVa
 
     public Optional<ProductOptionValueDescription> description(LanguageCode language) {
         return descriptions.stream().filter(d -> language.equals(d.getLanguageCode())).findFirst();
+    }
+
+    @Override
+    public StoreMerchantId scopedStore() {
+        return option == null ? null : option.scopedStore();
     }
 }

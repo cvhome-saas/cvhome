@@ -10,7 +10,7 @@ kept apart on purpose — so most of this document is about failure, not the hap
   `/api/v1/public/webhook/{storeId}/{paymentType}`
 - **Runs on** — `lcl start -d --stack <name>`; read the live port from `lcl urls`. Address it through an edge,
   never `:8125`
-- **Cases** — 28 (0 verified, 4 unit only, 24 not verified)
+- **Cases** — 29 (0 verified, 5 unit only, 24 not verified)
 - **Also see** — [checkout](../../../checkout/checkout-service/qa/checkout-qa.md) (the caller that places the
   order), [merchant](../../../merchant/merchant-service/qa/merchant-qa.md) (the store record it caches),
   [billing](../../../../store-core/billing/billing-service/qa/billing-qa.md) (**a different thing entirely** —
@@ -302,6 +302,19 @@ authenticated against the store's enabled configuration *before* it is scheduled
 - **Steps** — `lcl stop payment`, then attempt a checkout.
 - **Expect** — the shopper is told payment is unavailable; checkout answers a typed 502 rather than a 500 or a
   cancelled order. Restart and confirm it recovers without a manual step.
+
+---
+
+## LOAD — The caching architecture
+
+### LOAD-01 — The payment types a store accepts are cached a minute per store · medium · [unit only]
+
+- **Expect** — `GET /api/v1/public/payment-configuration/{store}/supported-payment-types` answers from the
+  `payment.types` region (`cache_gets_total{cache="payment.types"}`); a configuration saved, enabled, disabled or
+  deleted in the console drops the store's entry at once on the task that took it and leaves the other stores' warm;
+  on another task the list is at most a minute old.
+- **Result** — `PaymentTypeReadsIntegrationTest`, `PaymentTypeReadsTest`, `PaymentArchitectureTest`. **Not verified**
+  on a stack.
 
 ---
 

@@ -16,6 +16,9 @@ import jakarta.persistence.UniqueConstraint;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.commons.domain.StoreScoped;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -28,7 +31,7 @@ import lombok.Setter;
         columnNames = {"CONTENT_ID", "VERSION"}))
 @Getter
 @Setter
-public class ContentRevision implements Serializable {
+public class ContentRevision implements Serializable, StoreScoped {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -58,4 +61,8 @@ public class ContentRevision implements Serializable {
     @Column(name = "CREATED_AT", nullable = false)
     private Instant createdAt = Instant.now();
 
+    @Override
+    public StoreMerchantId scopedStore() {
+        return storeMerchantId == null ? null : new StoreMerchantId(storeMerchantId);
+    }
 }

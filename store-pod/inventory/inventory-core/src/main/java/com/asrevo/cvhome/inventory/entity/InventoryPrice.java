@@ -17,6 +17,7 @@ import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.commons.domain.StoreScoped;
 import com.asrevo.cvhome.store.core.constants.SchemaConstant;
 import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
 
@@ -36,7 +37,7 @@ import lombok.Setter;
 @Table(name = "PRODUCT_PRICE")
 @Getter
 @Setter
-public class InventoryPrice extends SalesManagerEntity<Long, InventoryPrice> {
+public class InventoryPrice extends SalesManagerEntity<Long, InventoryPrice> implements StoreScoped {
 
     public static final String DEFAULT_CODE = "base";
 
@@ -94,5 +95,10 @@ public class InventoryPrice extends SalesManagerEntity<Long, InventoryPrice> {
         boolean started = specialStartDate == null || !specialStartDate.isAfter(day);
         boolean notEnded = specialEndDate == null || specialEndDate.isAfter(day);
         return hasSpecial && started && notEnded;
+    }
+
+    @Override
+    public StoreMerchantId scopedStore() {
+        return storeMerchantId;
     }
 }
