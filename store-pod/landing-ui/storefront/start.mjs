@@ -21,7 +21,8 @@ import module from 'node:module';
 import {ENV, SENTINEL} from './scripts/static-assets/constants.mjs';
 import {applyAssetPrefix, readState} from './scripts/static-assets/apply-prefix.mjs';
 import {syncStaticAssets} from './scripts/static-assets/sync-s3.mjs';
-import {installRequestSignal, withRequestSignal} from './scripts/server/request-scope.mjs';
+import {installRequestSignal, isDegraded, withRequestSignal} from './scripts/server/request-scope.mjs';
+import {installPageCache} from './scripts/server/cache/index.mjs';
 
 const require = module.createRequire(import.meta.url);
 const dir = fileURLToPath(new URL('.', import.meta.url));
@@ -80,9 +81,20 @@ if (Number.isNaN(keepAliveTimeout) || !Number.isFinite(keepAliveTimeout) || keep
 require('next');
 const {startServer} = require('next/dist/server/lib/start-server');
 
-// Every request runs with an abort signal that its render's backend calls carry (scripts/server/request-scope.mjs).
+// An anonymous page is served from the page cache when its class allows (scripts/server/cache/: the policy, its
+// STOREFRONT_CACHE_* variables, the store), and refreshed by a request of the cache's own to this port once stale.
+// What is rendered runs with an abort signal that its backend calls carry, and a render with a read that gave up is
+// not kept (scripts/server/request-scope.mjs). A policy the cache cannot run with stops the start: a wrong variable
+// is found at deploy, not by the first shopper.
 installRequestSignal();
-const serve = (req, res, next) => withRequestSignal(res, next);
+let cache;
+try {
+    cache = installPageCache({port: () => currentPort, degraded: isDegraded});
+} catch (err) {
+    console.error(err?.name === 'PolicyError' ? err.message : err);
+    process.exit(1);
+}
+const serve = (req, res, next) => cache.serve(req, res, keepAlive => withRequestSignal(res, next, keepAlive));
 
 // startServer builds its own http.Server and keeps it; its listener is the one thing we wrap. It calls
 // http.createServer(listener) synchronously, once, before its first await, so the wrapper is installed for exactly that

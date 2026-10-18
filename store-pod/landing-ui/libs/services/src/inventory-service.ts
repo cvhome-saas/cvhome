@@ -2,6 +2,7 @@ import {Product, ProductVariant} from "@store-front/types/product-groups";
 import {Store} from "@store-front/types/store";
 import {storeBaseServiceUrl, StoreContext} from "@store-front/types/store-context";
 import {currencyFormatter} from "./currency-format";
+import {dataCacheSeconds} from "./cache-policy";
 import {apiFetch, get, orUndefined, publicPost} from "./http-utils";
 import {StoreService} from "./store-service";
 
@@ -34,8 +35,13 @@ export interface SkuInventory {
  */
 export class InventoryService {
 
-    /** The store record, for the currency — one fetch per store, shared by every enrichment. */
-    private static storeBySite = new Map<string, Promise<Store | undefined>>();
+    /**
+     * The store record, for the currency: one read per store, shared by every enrichment of this process, for as
+     * long as the `store` read is kept in the data cache (`cache-policy.ts`), and for at most this many stores.
+     */
+    private static storeBySite = new Map<string, {pending: Promise<Store | undefined>; at: number}>();
+
+    private static readonly STORES_REMEMBERED = 500;
 
     /** Above this many skus the GET's query string gets uncomfortable; the POST body form takes over. */
     private static readonly QUERY_BODY_THRESHOLD = 40;
@@ -91,17 +97,26 @@ export class InventoryService {
     }
 
     private static storeFor(storeContext: StoreContext): Promise<Store | undefined> {
-        let pending = InventoryService.storeBySite.get(storeContext.store);
-        if (!pending) {
-            pending = StoreService.getStore(storeContext).then(
-                store => store,
-                () => {
-                    // A failed store read must not pin `undefined` forever — drop it so the next
-                    // enrichment retries, and fall back to unformatted amounts meanwhile.
-                    InventoryService.storeBySite.delete(storeContext.store);
-                    return undefined;
-                });
-            InventoryService.storeBySite.set(storeContext.store, pending);
+        const now = Date.now();
+        const remembered = InventoryService.storeBySite.get(storeContext.store);
+        if (remembered && now - remembered.at < dataCacheSeconds('store') * 1000) {
+            return remembered.pending;
+        }
+        const pending = StoreService.getStore(storeContext).then(
+            store => store,
+            () => {
+                // A failed store read must not pin `undefined` for its whole time — drop it so the next
+                // enrichment retries, and fall back to unformatted amounts meanwhile.
+                InventoryService.storeBySite.delete(storeContext.store);
+                return undefined;
+            });
+        InventoryService.storeBySite.delete(storeContext.store);
+        InventoryService.storeBySite.set(storeContext.store, {pending, at: now});
+        for (const oldest of InventoryService.storeBySite.keys()) {
+            if (InventoryService.storeBySite.size <= InventoryService.STORES_REMEMBERED) {
+                break;
+            }
+            InventoryService.storeBySite.delete(oldest);
         }
         return pending;
     }

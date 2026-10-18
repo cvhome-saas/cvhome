@@ -7,6 +7,7 @@ import {
     ServerErrorCategory,
 } from "@store-front/types/api-error";
 import {AuthEventType} from "@store-front/types/auth";
+import {DataCacheName, dataCacheSeconds} from "./cache-policy";
 
 /**
  * Mirrors the status each `ErrorCategory` fixes, for the responses that carry no problem body at all —
@@ -138,53 +139,88 @@ export async function handleResponse<T>(res: Response, url?: string): Promise<T>
  * directly: a bare `fetch` rejects with a `TypeError` that no caller can branch on.
  */
 export async function apiFetch<T>(url: string, init?: RequestInit): Promise<T> {
-    let response: Response;
+    const call = typeof window === 'undefined' ? forServer(init) : {init, release: () => undefined};
     try {
-        response = await fetch(url, typeof window === 'undefined' ? forServer(init) : init);
+        const response = await fetch(url, call.init);
+        if (response.status === 401 && sentCredential(init)) {
+            discardRejectedToken();
+        }
+        return await handleResponse<T>(response, url);
     } catch (cause) {
+        if (cause instanceof ApiError) {
+            throw cause;
+        }
         throw toNetworkError(cause, url);
+    } finally {
+        call.release();
     }
-    if (response.status === 401 && sentCredential(init)) {
-        discardRejectedToken();
-    }
-    return handleResponse<T>(response, url);
 }
 
 /** The global start.mjs sets to read the current request's abort signal (storefront/scripts/server/request-scope.mjs). */
 const REQUEST_SIGNAL = Symbol.for('cvhome.storefront.requestSignal');
 
+/** The global start.mjs sets to mark the current render as degraded, so the page cache does not keep it. */
+const REQUEST_DEGRADED = Symbol.for('cvhome.storefront.requestDegraded');
+
 /** How long a server-side read waits for the backend unless STOREFRONT_BACKEND_TIMEOUT_MS says otherwise; 0 waits. */
 const DEFAULT_READ_TIMEOUT_MS = 3000;
 
+type Globals = {[REQUEST_SIGNAL]?: () => AbortSignal | undefined; [REQUEST_DEGRADED]?: () => void};
+
 /**
- * A server-side call: identity encoding, the shopper's request's abort signal, and a time budget for reads.
+ * A server-side call: identity encoding, and for a read the shopper's request's abort signal and a time budget. The
+ * signal and timer it makes for a call are released when the call ends (`release`), whichever way it ended.
  *
  * - **Abort on disconnect.** A render went on for a shopper who had left: in the 2026-09-14 spike landing-ui stayed at
  *   its CPU cap 53–75 s after the load stopped, rendering pages whose clients had given up. The request's signal
- *   aborts when its connection closes early, so its next backend call fails at once and the render ends.
+ *   aborts when its connection closes early, so its next backend read fails at once and the render ends.
  * - **A budget for reads.** A backend that has slowed to seconds is waited on for {@link DEFAULT_READ_TIMEOUT_MS}, not
  *   for as long as it takes (catalog's p95 reached 6.6 s under the spike). A read wrapped in {@link orUndefined}
- *   renders without its section; a required one fails the page quickly. Writes keep no budget: a sign-in may take
- *   seconds under load, and giving up on it would not undo it.
+ *   renders without its section; a required one fails the page quickly.
+ * - **Writes keep neither.** A sign-in may take seconds under load, and giving up on it, or on a shopper's order
+ *   because their tab closed, would not undo what the backend already did.
+ * - **A cached read keeps the budget only.** Next fills its data cache with the first fetch and makes every other
+ *   render of the same URL wait on it, and the signal that fetch was given is the one Next aborts with
+ *   (`patch-fetch.js`). If it were one shopper's, that shopper leaving would fail the reads of every render waiting
+ *   on the same entry.
  */
-function forServer(init?: RequestInit): RequestInit {
+function forServer(init?: RequestInit): {init: RequestInit; release: () => void} {
     const request = withIdentityEncoding(init);
-    const signals: AbortSignal[] = [];
-    if (init?.signal) {
-        signals.push(init.signal);
+    if ((init?.method ?? 'GET').toUpperCase() !== 'GET') {
+        return {init: request, release: () => undefined};
     }
-    const requestSignal = (globalThis as {[REQUEST_SIGNAL]?: () => AbortSignal | undefined})[REQUEST_SIGNAL]?.();
-    if (requestSignal) {
-        signals.push(requestSignal);
-    }
+    const requestSignal = isCachedRead(init) ? undefined : (globalThis as Globals)[REQUEST_SIGNAL]?.();
     const budget = readTimeoutMs();
-    if (budget > 0 && (init?.method ?? 'GET').toUpperCase() === 'GET') {
-        signals.push(AbortSignal.timeout(budget));
+    if (!init?.signal && !requestSignal && budget <= 0) {
+        return {init: request, release: () => undefined};
     }
-    if (signals.length === 0) {
-        return request;
+    const controller = new AbortController();
+    const abort = (reason: unknown) => controller.abort(reason);
+    const forwarded = [init?.signal, requestSignal].filter((signal): signal is AbortSignal => signal !== undefined);
+    const onAbort = (event: Event) => abort((event.target as AbortSignal).reason);
+    for (const signal of forwarded) {
+        if (signal.aborted) {
+            abort(signal.reason);
+        } else {
+            signal.addEventListener('abort', onAbort, {once: true});
+        }
     }
-    return {...request, signal: signals.length === 1 ? signals[0] : AbortSignal.any(signals)};
+    const timer = budget > 0
+        ? setTimeout(() => abort(new DOMException(`the read took longer than ${budget} ms`, 'TimeoutError')), budget)
+        : undefined;
+    return {
+        init: {...request, signal: controller.signal},
+        release: () => {
+            clearTimeout(timer);
+            forwarded.forEach(signal => signal.removeEventListener('abort', onAbort));
+        },
+    };
+}
+
+/** A read Next keeps in its data cache and shares between renders ({@link publicCachedGet}). */
+function isCachedRead(init?: RequestInit): boolean {
+    const revalidate = (init as {next?: {revalidate?: number | false}} | undefined)?.next?.revalidate;
+    return typeof revalidate === 'number' && revalidate > 0;
 }
 
 function readTimeoutMs(): number {
@@ -254,6 +290,11 @@ export async function orUndefined<T>(promise: Promise<T>): Promise<T | undefined
     } catch (error) {
         console.warn('Optional request failed, rendering without it:',
             error instanceof ApiError ? error.toLogContext() : error);
+        if (error instanceof ApiError && error.category === 'NETWORK') {
+            // A read that was aborted or timed out, not an answer: the page is missing a section, and the page cache
+            // must not hand that page to every shopper of the store for its whole time-to-live.
+            (globalThis as Globals)[REQUEST_DEGRADED]?.();
+        }
         return undefined;
     }
 }
@@ -324,21 +365,20 @@ export function publicGet(): RequestInit {
     return {method: 'GET', headers: {}};
 }
 
-/** How long a store's layout data (store record, category tree, site document) is served from Next's data cache. */
-export const LAYOUT_DATA_REVALIDATE_SECONDS = 30;
-
 /**
- * A {@link publicGet} that Next's data cache keeps across requests for `seconds` (a server-side render only; a
- * browser ignores `next`).
+ * A {@link publicGet} that Next's data cache keeps across requests for as long as the read called `name` is kept
+ * (`cache-policy.ts`: a default per read, `STOREFRONT_DATA_CACHE_<NAME>_SECONDS` to change it, `0` for none). A
+ * server-side render only; a browser ignores `next`.
  *
- * For reads every visitor of a store shares and a merchant changes rarely: the store record, the category tree and
- * the site document behind every page's layout, which were fetched afresh on every render. Safe because Next keys
- * the cache on the URL and these URLs carry `store=` and `lang=`, so one store's data never answers another's, and
- * because the request carries no credential, so there is nothing of a visitor's in it. Next keeps only a 200. A
- * merchant's edit reaches the storefront within `seconds`. Never use it for anything a shopper's session changes.
+ * For reads every visitor of a store shares: the store record, the category tree and the site document behind
+ * every page's layout, a product, a listing, a CMS page. Safe because Next keys the cache on the URL and these URLs
+ * carry `store=` and `lang=`, so one store's data never answers another's, and because the request carries no
+ * credential, so there is nothing of a visitor's in it. Next keeps only a 200. A merchant's edit reaches the
+ * storefront within the read's seconds. Never use it for anything a shopper's session changes, nor for a preview.
  */
-export function publicCachedGet(seconds: number): RequestInit & { next: { revalidate: number } } {
-    return {method: 'GET', headers: {}, next: {revalidate: seconds}};
+export function publicCachedGet(name: DataCacheName): RequestInit & {next?: {revalidate: number}} {
+    const seconds = dataCacheSeconds(name);
+    return seconds > 0 ? {method: 'GET', headers: {}, next: {revalidate: seconds}} : publicGet();
 }
 
 /** A POST that carries no credentials — the body form of a public read (`publicGet`'s reasoning applies). */

@@ -17,8 +17,10 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql/data
   minio:
-    # quay.io, not Docker Hub: Docker Hub no longer serves minio/minio. Same release, same image digest.
-    image: quay.io/minio/minio:RELEASE.2025-09-07T16-13-09Z-cpuv1
+    # Bitnami's frozen archive: MinIO no longer serves minio/minio anonymously from Docker Hub or quay.io.
+    # Root, because the image's own uid 1001 cannot write /data (or a volume the old image filled).
+    image: bitnamilegacy/minio:2025.4.22
+    user: "0"
     command: server /data --console-address ":9001"
     ports:
       - "9000:9000"

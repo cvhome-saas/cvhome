@@ -13,8 +13,8 @@ Authenticating a user, validating a token, or reading the current principal is a
 | `store-commons:uaa-client-impl` | **Implementation**: `UserAccountServiceImpl`, the raw SDK (`AdminUserClient`, `AdminClientClient`, `AbstractAdminClient`, `OAuth2TokenManager`), `sdk/dto/*` | `uaa-client` |
 
 Same interface/impl split as `-external-api` vs `-service` elsewhere: business code compiles against
-`UserAccountService`, and only one `@Configuration` ever touches the concrete client. Today
-`tenancy-service` is the sole consumer:
+`UserAccountService`, and only one `@Configuration` ever touches the concrete client. `tenancy-service` is
+the only consumer today; nothing about the contract assumes that:
 
 ```gradle
 implementation project(":store-commons:uaa-client")
@@ -182,7 +182,11 @@ Base path `{baseUrl}/api/v1/admin/users`. Use it directly only for what `UserAcc
 
 | Method | Call |
 |---|---|
-| `listUsers(metadataFilters, pageRequest)` | `GET /` with `metadata[k]=v`, `page`, `size` |
+| `listUsers(metadataFilters, pageRequest)` | `GET /` with `metadata[k]=v`, `page`, `size` — delegates to `searchUsers` |
+| `searchUsers(filters, pageRequest)` | `GET /` with `q`, `status`, `role`, `metadata[k]=v`, `page`, `size` |
+| `counts()` | `GET /counts` |
+| `inviteUser(req)` | `POST /invitations` — answers the one-time link, once |
+| `createResetLink(id, revokeSessions)` | `POST /{id}/password-reset-links` — likewise |
 | `getUser(id)` / `createUser(req)` / `updateUser(id, req)` / `deleteUser(id)` | `GET` / `POST` / `PUT` / `DELETE /{id}` |
 | `usernameExist(username)` | `GET /exists?username=` |
 | `enableUser(id)` / `disableUser(id)` | `POST /{id}/enable` / `/disable` |
@@ -209,6 +213,30 @@ Base path `{baseUrl}/api/v1/admin/users`. Use it directly only for what `UserAcc
 Ask first whether you need it at all: a pod service dealing with *shoppers* wants `cua`, not `uaa`
 (`authentication.md`), and reading the current caller's identity needs no SDK — that comes from the JWT via
 `UserOrgStoreIdentity` (`api-conventions.md`).
+
+## What the contract answers
+
+`UserAccountService` covers the account lifecycle end to end:
+
+| Need | Method |
+|---|---|
+| create, read, update, delete, enable, disable, change password | `createUser` … `changePassword` |
+| a page filtered by metadata alone | `list(filters, page, size)` |
+| a page filtered by text, status, role **and** metadata | `search(UserSearchFilters, page, size)` |
+| how many accounts are active / pending / locked / disabled | `counts()` |
+| invite someone who will set their own password | `invite(InviteUserRequest)` |
+| issue a password-reset link for an existing account | `createResetLink(userId, revokeSessions)` |
+
+**A one-time link is answered exactly once.** uaa stores only the token's hash, so the `IssuedLink` a call
+returns is the single readable copy that will ever exist: hand it to the person and let it go. Writing it to a
+log puts a live credential in the log, and a caller that drops it must issue a new link rather than re-read the
+old one.
+
+**`ReadableUser.status` is not `active` restated.** uaa derives `ACTIVE` / `PENDING` / `LOCKED` / `DISABLED`
+from the account's own state, and an account can be enabled and still unable to sign in — invited and never
+accepted, or locked after failed attempts. Branching on `active` alone lets a locked account through.
+`emailVerified` and `lastSignInAt` come from the same read. The dead `lastAccess` and `loginTime` fields, which
+uaa never populated, are gone.
 
 ## Related
 

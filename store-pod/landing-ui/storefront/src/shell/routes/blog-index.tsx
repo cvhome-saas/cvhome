@@ -17,7 +17,7 @@ export function blogIndexPage(theme: ThemeDefinition) {
         const q = await searchParams;
         const page = Math.max(0, Number(q.page ?? 0) || 0);
         const [ctx, data] = await Promise.all([
-            loadPageContext(theme), loadBlogIndex({page, category: q.category, tag: q.tag}),
+            loadPageContext(theme), loadBlogIndex(page, q.category, q.tag),
         ]);
         return <theme.pages.BlogIndex ctx={ctx} data={data}/>;
     };

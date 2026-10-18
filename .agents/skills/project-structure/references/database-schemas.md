@@ -8,7 +8,7 @@ in before writing a repository or an entity.
 
 | | **Spring Data JDBC** | **Spring Data JPA / Hibernate** |
 |---|---|---|
-| Used by | `tenancy-service` | the `store-pod` services (`payment`, `catalog`, `checkout`, `merchant`, `content`) |
+| Used by | `tenancy-service` | the `store-pod` services (`payment`, `catalog`, `checkout`, `merchant`) |
 | Entity annotations | `org.springframework.data.relational.core.mapping.{Table, Column}` | `jakarta.persistence.{Entity, Table, Column, Id, …}` |
 | Base class | `BaseEntity<E, ID>` (`store-commons:commons`) | `SalesManagerEntity<K, E>` (`store-pod/commons/store-commons`) |
 | Outbox starter | `namastack-outbox-starter-jdbc` | `namastack-outbox-starter-jpa` |
@@ -83,11 +83,10 @@ no `schema-locations` entry at all.
 | Service | DDL file | Data seed |
 |---|---|---|
 | `tenancy-service` | `src/main/resources/schema.sql` | — |
-| `payment-service` | `src/main/resources/init-sql/schema.sql` | `init-sql/data-common.sql`, `init-sql/data-sequences.sql`, `init-sql/stores/` |
+| `payment-service` | `src/main/resources/init-sql/schema.sql` | `init-sql/data-common.sql`, `init-sql/data-test-stores.sql`, `init-sql/stores/` |
 
 Pod services follow the `init-sql/` convention: `schema.sql` + `data-common.sql` (reference data loaded always)
-+ `stores/<storeId>/*.sql` (seeded demo stores, tied to the `test-stores` profile — see `configuration.md`)
-+ `data-sequences.sql` last, which sets every id sequence above its table's highest seeded id.
++ `data-test-stores.sql` (seeded demo stores, tied to the `test-stores` profile — see `configuration.md`).
 
 ### Schemas actually created
 
@@ -103,8 +102,8 @@ context:
 That mirrors the module split (`tenancy-commons`, `tenancy-events`, `pod-external-api`) — the code
 boundaries are reflected in the database.
 
-**`payment-service`** uses a single `payment` schema: `payment_configuration`, `transaction`, plus the outbox
-tables.
+**`payment-service`** uses a single `payment` schema: `payment_configuration`, `transaction`, `sm_sequencer`,
+plus the outbox tables.
 
 ## Conventions visible in the DDL
 
@@ -112,10 +111,8 @@ tables.
   `StoreMerchantId` / `ManagerOrgId` (`api-conventions.md`). Pod-side ids are `varchar(50)`
   (`store_merchant_id`) — the same store id, in a wider column.
 - **`version int`** on tenancy tables — optimistic locking via Spring Data JDBC.
-- **Ids come from one Postgres sequence per table** (`<table>_seq`, `increment by 50`, read fifty at a time by
-  `@SequenceGenerator` with Hibernate's pooled-lo optimizer). `init-sql/data-sequences.sql` runs last and sets each
-  sequence above its table's highest id, so seeds with explicit ids never collide with generated ones. The
-  Shopizer `sm_sequencer` table is gone: it needed a second pooled connection per block.
+- **`sm_sequencer`** in pod schemas is the Shopizer-inherited `@TableGenerator` sequence table
+  (`SEQ_NAME`/`SEQ_COUNT`), used by JPA entities like `Transaction` instead of a Postgres sequence.
 - **Enums are `varchar` with a `CHECK` constraint**, not Postgres enum types:
   ```sql
   status varchar(255) check (status in ('PENDING','PROCESSING','PAID','FAILED','EXPIRED',

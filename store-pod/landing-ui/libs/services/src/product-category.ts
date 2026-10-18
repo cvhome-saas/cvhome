@@ -1,7 +1,7 @@
 import {storeBaseServiceUrl, StoreContext} from "@store-front/types/store-context";
 import {Manufacturer} from "@store-front/types/product-groups";
 import {ListingFacets, ListingQuery, ListingSort, OptionFacet, ProductListingPage} from "@store-front/types/listing";
-import {apiFetch, get, orUndefined, publicGet} from "./http-utils";
+import {apiFetch, orUndefined, publicCachedGet} from "./http-utils";
 import {InventoryService} from "./inventory-service";
 
 /**
@@ -33,7 +33,7 @@ export class ProductCategory {
     public static getManufacturers = async (storeContext: StoreContext, categoryId: number): Promise<Manufacturer[] | undefined> => {
         return orUndefined(apiFetch<Manufacturer[]>(
             `${storeBaseServiceUrl('catalog', storeContext)}/api/v1/category/${categoryId}/manufacturer?store=${storeContext.store}&lang=${storeContext.locale}`,
-            get()));
+            publicCachedGet('facets')));
     }
 
     /**
@@ -64,7 +64,7 @@ export class ProductCategory {
         }
         const result = await orUndefined(apiFetch<FacetsPayload>(
             `${storeBaseServiceUrl('catalog', storeContext)}/api/v2/products/search?store=${storeContext.store}&lang=${storeContext.locale}&categoryIds=${categoryId}&rows=false&facets=true&facetGroups=OPTIONS`,
-            publicGet()));
+            publicCachedGet('facets')));
         return result?.facets?.options?.map(option => ({
             id: option.optionId,
             code: option.code,
@@ -85,7 +85,7 @@ export class ProductCategory {
     public static getProducts = async (storeContext: StoreContext, query: ListingQuery, categoryId?: number): Promise<ProductListingPage> => {
         const page = await apiFetch<ProductListingPage>(
             `${storeBaseServiceUrl('catalog', storeContext)}/api/v2/products?store=${storeContext.store}&lang=${storeContext.locale}&${listingQueryToParams(query, categoryId)}`,
-            get());
+            publicCachedGet('listing'));
         // Stock and price live in the inventory service since the split. The merge degrades — a
         // listing without prices still lists — the page itself must not.
         await InventoryService.enrichProducts(storeContext, page.content);

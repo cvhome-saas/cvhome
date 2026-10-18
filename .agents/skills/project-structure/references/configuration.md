@@ -90,7 +90,6 @@ com.asrevo.cvhome:
     console-ui:          { ..., port: 8011, namespace: store-core.cvhome.lcl, gateway-service-name: store-core-gateway }
     spg:        { ..., port: 80,   namespace: store-pod-507f1f77.cvhome.lcl, gateway-service-name: spg }
     merchant:   { ..., port: 8120, namespace: store-pod-507f1f77.cvhome.lcl, gateway-service-name: spg }
-    content:    { ..., port: 8121, namespace: store-pod-507f1f77.cvhome.lcl, gateway-service-name: spg }
     catalog:    { ..., port: 8122, ... }
     checkout:   { ..., port: 8123, ... }
     cua:        { ..., port: 8124, ... }

@@ -31,8 +31,8 @@ Each `-ui` module's own `build.gradle` is therefore tiny — just the two plugin
 
 Angular 20, standalone components, SSR (`app.config.server.ts`, `app.routes.server.ts`,
 `serve:ssr:console-ui` → `node dist/console-ui/server/server.mjs`), Tailwind v4 over a three-theme token
-layer, Transloco (en/ar with RTL). Scripts: `ng serve`
-for dev, `ng build --watch --configuration development` for watch.
+layer, Transloco (en/ar with RTL). Scripts: `ng serve` for dev, `ng build --watch --configuration
+development` for watch.
 
 Auth is delegated: `src/environments/environment.ts` sets `loginUrl: '/oauth2/authorization/uaa'` and
 `apiUrl: ''` — the app is served behind the platform gateway, which owns the session, so it makes same-origin
@@ -51,30 +51,24 @@ Feature areas live under `src/app/features/`. Note this module also carries its 
 ### `landing-ui` specifics
 
 See `landing-ui.md` — it has its own npm-workspaces structure and template system. The one thing to carry
-across: its `npm run build` is a **strictly ordered chain** (libs → templates → app), because templates and
-app consume the libs as built output. Building `app` alone compiles against yesterday's types.
+across: its `npm run build` is a **strictly ordered chain** (`build:libs` — `types` → `services` → `hooks` — then
+the `storefront` app; `package.json` workspaces are `storefront`, `libs/*`, `themes/*`), because the storefront
+consumes the libs as built output. Building `storefront` alone compiles against yesterday's types.
 
 ## 2. Embedded Angular inside Spring Boot — `uaa-fe`
 
 `store-core/uaa/src/main/resources/uaa-fe` is a complete Angular 20 CLI app that lives **inside** the Java
-module's resources tree. It is **not** a Gradle module — it never appears in `settings.gradle` and has no
-`build.gradle`. It is driven entirely by tasks in `store-core/uaa/build.gradle`:
-
-Same stack as console-ui and for the same reason: standalone Angular 20, Tailwind v4 on the token layer, and
-Transloco en/ar, all consumed from **`@cvhome-saas/ui-kit`** (§4). Nebular, jQuery, Bootstrap, ngx-toastr and
-module-federation are gone. Four routes — `sign-in`, `users`, `roles`, `clients` — of which `/login` is the one
-Spring Security actually points at.
+module's resources tree. It is built on `@cvhome-saas/ui-kit` — the same component library and uaa API services
+console-ui uses — with Transloco for English and Arabic; the Nebular, module-federation and ngx-toastr stack it
+started from is gone. It renders both the signed-out sign-in page and the admin console. It is **not** a Gradle module — it never
+appears in `settings.gradle` and has no `build.gradle`. It is driven entirely by tasks in
+`store-core/uaa/build.gradle`:
 
 ```groovy
 node {
     version = '24.21.0'
     download = true
     nodeProjectDir = file('src/main/resources/uaa-fe')   // point the node plugin at the nested app
-}
-
-// npm resolves the kit by reading dist/ui-kit's package.json, so it must exist before install.
-tasks.named('npmInstall') {
-    dependsOn ':store-commons:ui-kit:build'
 }
 
 tasks.register('copyAngularApp', Copy) {
@@ -102,46 +96,18 @@ serves the SPA from the same origin and port as the UAA service — no separate 
 never commit them — edit `uaa-fe/` sources instead.
 
 To iterate on `uaa-fe` quickly, run `ng serve` inside `src/main/resources/uaa-fe` rather than rebuilding the
-Java module each time. `npm run start` builds the kit first; if you reach straight for `ng serve` after a fresh
-clone, run `npm run kit` once or the build fails with `Could not resolve "@cvhome-saas/ui-kit"`.
-
-**Sign-in is a native form POST.** `AppSecurityConfig` declares `formLogin(loginPage("/login"))`, so the page
-submits `username`/`password` to `/login` as a real form and Spring Security answers with a redirect. Posting it
-through `HttpClient` would strand the OAuth2 authorization flow, because that redirect is what resumes it.
+Java module each time.
 
 ## 3. Server-rendered Thymeleaf
 
-Both authorization servers render classic server-side pages with
-`spring-boot-starter-thymeleaf` + `thymeleaf-extras-springsecurity6`:
+Only `store-core/uaa` renders server-side pages, with `spring-boot-starter-thymeleaf` +
+`thymeleaf-extras-springsecurity6`: the staff login pages, alongside its embedded SPA. Templates live under
+`src/main/resources/templates/`.
 
-- **`store-core/uaa`** — staff login pages (alongside its embedded SPA).
-- **`store-pod/cua`** — shopper login, registration, and social-login pages. No SPA at all here.
-
-Templates live under each module's `src/main/resources/templates/`. This is where to look for login/consent
-screens — they are *not* in any Angular or Next.js app.
-
-## 4. The shared Angular library — `@cvhome-saas/ui-kit`
-
-`store-commons/ui-kit` is a Gradle module (`store-commons:ui-kit`) and an ng-packagr library with six entry
-points: the primary one (config, `CrudService`, the error stack, auth, platform access, routing helpers,
-`snapshot()`), `/ui` (the control catalogue), `/theme` (the four-theme token layer, shipped as CSS assets),
-`/i18n`, `/forms` and `/uaa` (clients for uaa's admin API, which both consoles call).
-
-console-ui and uaa-fe consume the **built** package through a `file:` dependency. Three things make that work,
-and each has a failure behind it:
-
-- **`preserveSymlinks: true`** on every consumer's `build` and `test` target. `file:` installs a symlink;
-  without this Angular resolves through it and hunts for `@angular/core` from `store-commons/ui-kit`.
-- **The kit must be built before a consumer installs.** npm does not fail when `dist/ui-kit` is missing — it
-  exits 0 and writes a dangling symlink, and the failure arrives later as
-  `Could not resolve "@cvhome-saas/ui-kit"`. Hence the `npm run kit` script, the `npmInstall` `dependsOn`, and
-  the `lcl.yml` prepare step.
-- **`@source '../node_modules/@cvhome-saas/ui-kit'`** in the consumer's stylesheet. Several controls use real
-  Tailwind utilities and ng-packagr does not run Tailwind over component CSS, so only the consumer's build can
-  emit them. Omit it and everything compiles with ~2.6 kB of utilities silently missing.
-
-The theme CSS is `@import`ed from inside the consumer's own stylesheet, never listed in `angular.json`'s
-`styles`: it is Tailwind v4 `@theme`/`@utility` source and must share the PostCSS pass with
-`@import 'tailwindcss'`.
-
-Full detail: `store-commons/ui-kit/README.md`.
+**`store-pod/cua` renders nothing.** It used to serve Thymeleaf login and registration pages, which meant every
+store on a pod got the same fixed screen. Now cua is headless: an unauthenticated `/oauth2/authorize` is
+answered with a redirect to the storefront's `/{lang}/login?auth=1`, landing-ui renders the login form as a
+theme page (`ThemePages.Login`, shell fallback when a theme has none), the form posts straight back to
+`/cua/login`, and cua resumes the saved authorize request. Registration is `POST /cua/api/v1/public/registration`
+(JSON), rendered by `ThemePages.Register`. Shopper login screens therefore live in `store-pod/landing-ui` —
+see `landing-ui.md`.

@@ -1,4 +1,5 @@
 export * from './auth-service';
+export * from './cache-policy';
 export * from './cart-manager';
 export * from './cart-service';
 export * from './category-service';

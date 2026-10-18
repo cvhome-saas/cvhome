@@ -18,14 +18,16 @@ The `/merchant` prefix is stripped by Caddy, so the service itself sees the iden
 
 | Edge | Service | Port | Local domain | Fronts |
 |---|---|---|---|---|
-| Platform | `store-core/gateway` (Spring Cloud Gateway) | 8000 | `gateway.com` | `tenancy`, `console-ui`, and **all pods** via `/spg/**` |
-| Pod | `store-pod/spg` (Caddy) | 80 / 443 | `spg-507f1f77.gateway.com` | `merchant`, `catalog`, `checkout`, `payment`, `cua`, `landing-ui` |
+| Platform | `store-core/gateway` (Spring Cloud Gateway) | 8000 | `gateway.com` | `tenancy`, `billing`, `pod-registry`, `uaa`, `console-ui` (catch-all), and **all pods** via `/spg/**` |
+| Pod | `store-pod/spg` (Caddy) | 80 / 443 | `spg-507f1f77.gateway.com` | `merchant`, `content`, `inventory`, `catalog`, `checkout`, `payment`, `cua`, `landing-ui` |
 
 ### `spg` — path → pod service (`store-pod/spg/Caddyfile`)
 
 | Path | Target | Prefix |
 |---|---|---|
-| `/merchant*` | `http://merchant.{$NAMESPACE}:8120` | stripped (`handle_path`) |
+| `/content*` | `http://content.{$NAMESPACE}:8121` | stripped (`handle_path`) |
+| `/merchant*` | `http://merchant.{$NAMESPACE}:8120` | stripped |
+| `/inventory*` | `http://inventory.{$NAMESPACE}:8126` | stripped |
 | `/catalog*` | `http://catalog.{$NAMESPACE}:8122` | stripped |
 | `/checkout*` | `http://checkout.{$NAMESPACE}:8123` | stripped |
 | `/payment*` | `http://payment.{$NAMESPACE}:8125` | stripped |
@@ -42,10 +44,16 @@ externally visible URL; that same `…/cua` string is what appears in the pod's 
 | Path | Target |
 |---|---|
 | `/tenancy/**` | `lb://tenancy` (`StripPrefix=1`, token relay) |
+| `/billing/**` | `lb://billing` (`StripPrefix=1`, token relay) |
+| `/pod-registry/**` | `lb://pod-registry` (`StripPrefix=1`, token relay) |
+| `/uaa/**` | `lb://uaa` — prefix **kept**, plus `X-Forwarded-Prefix: /uaa` (token relay) |
 | `/spg/**?store=<id>&pod=<podId>` | the matching pod's `spg`, route built at runtime by `PodClient` |
-| anything else on `gateway.com` / `www.` / `console-ui.` | `lb://console-ui` |
+| anything else on `gateway.com` / `www.` / `console-ui.` | `lb://console-ui` — the catch-all, built by negating the backend prefixes above |
 
-`uaa` (8001) is reached on its own host, `uaa.gateway.com:8001`, not through a gateway path.
+The backend prefix list (`GatewayRouteLocatorImpl.backendServices`: `tenancy`, `billing`, `pod-registry`, `uaa`,
+`spg`) is what the console catch-all negates, so a service missing from it is not merely unrouted — its calls get
+the console's shell HTML. `uaa` keeps its prefix for the same reason `cua` does behind spg: issuer and redirect
+URIs must match the externally visible URL. It is also still reachable directly on `uaa.gateway.com:8001`.
 
 So a seller editing a product traverses **two** gateways:
 `gateway.com:8000/spg/catalog/api/v1/products?store=…&pod=…` → strip `/spg` → pod's Caddy → strip `/catalog` →

@@ -86,14 +86,68 @@ cookie (`?theme=` clears it); unknown ids resolve through the legacy map to the 
 cross-origin requests to its `/_next` resources (the HMR socket among them), so `next.config.ts` allows the subdomains of
 the `INTERNAL_SPG` host (`*.spg-507f1f77.gateway.com` under lcl); any other dev host needs an `allowedDevOrigins` entry.
 
-### The request signal (`start.mjs` only)
+### The page cache, the edge headers and the request signal (`start.mjs` only)
 
-`start.mjs` puts the request signal in front of Next (`storefront/scripts/server/`), which `next dev` does not run (the page cache, its own PR, joins it here):
+`start.mjs` puts three things in front of Next (`storefront/scripts/server/`), none of which `next dev` runs:
+
+- **The page cache** (`scripts/server/cache/`). An anonymous document is kept and served by **route class**:
+
+  | class | paths (after `/{locale}`) | fresh | stale | edge `Cache-Control` | share |
+  |---|---|---|---|---|---|
+  | home | `/` | 30 s | 300 s | `public, s-maxage=30, stale-while-revalidate=300` | 20 % |
+  | category | `/category/*` | 30 s | 300 s | same | 25 % |
+  | product | `/product/*` | 20 s | 120 s | `public, s-maxage=20, stale-while-revalidate=120` | 25 % |
+  | search | `/search` | 15 s | 60 s | `public, s-maxage=15, stale-while-revalidate=60` | 10 % |
+  | content | `/content/*`, `/blog`, `/blog/*` | 60 s | 600 s | `public, s-maxage=60, stale-while-revalidate=600` | 10 % |
+  | help | `/help`, `/policies/*` | 300 s | 3600 s | `public, s-maxage=300, stale-while-revalidate=3600` | 5 % |
+  | seo | `/sitemap.xml`, `/robots.txt` | 600 s | 3600 s | `public, s-maxage=600, stale-while-revalidate=3600` | 5 % |
+  | shopper | `/login`, `/register`, `/customer/*`, `/checkout/*`, `/callback` | never | | `private, no-store` | |
+  | api-theme-manifest, next-internal | `/api/theme-manifest`; `/_next/*`, `/api/*`, `/t/*`, `/store-not-found`, bare `/` | never | | left as set | |
+  | default | anything else | never | | `private, no-store` | |
+
+  The modules, top down: `index.mjs` (what `start.mjs` imports) → `page-cache.mjs` (the decision per request) →
+  `policy.mjs` (the table above with the environment merged over it, and the classification of a request), `key.mjs`
+  (the key: `v1|<class>|host=…|store=…|theme=…|color=…|locale=…|path=…|q=<sorted, tracking parameters dropped>`,
+  only the parts the class names), `store.mjs` (the one interface a store implements; `memory-store.mjs` is the
+  in-process one, least recently used, bounded in bytes overall and per class), `capture.mjs` (the copy taken as
+  Next streams, and the rules for keeping it), `edge-headers.mjs`, `revalidate.mjs`, `metrics.mjs`.
+  A stale page is served at once and refreshed by a request of the cache's own to the same port
+  (`x-storefront-revalidate`, honoured from loopback only); shoppers who miss while a page renders share that render,
+  which their waiting keeps alive. Never kept: a non-200, an HTML body that did not reach `</html>`, a render with a
+  read that was aborted or timed out (`orUndefined` marks it), a response setting any cookie but `NEXT_LOCALE`, a
+  body over the entry limit. Bypassed whatever the class: a method other than GET/HEAD, `Authorization`, a client
+  navigation or prefetch (Next's `rsc` headers), the theme/colour override cookies or `?theme=`/`?color=`/`?preview=`.
+  It is safe because the server render reads no per-shopper state — **keep it that way**: a page that starts
+  reading a cookie or a session header must move to the `shopper` class (`config.mjs`), or it will serve one
+  shopper's page to another.
+
+  **Configuration** is the environment, every variable optional: `STOREFRONT_CACHE_ENABLED` (true), `_MAX_MB` (64),
+  `_MAX_ENTRY_KB` (1024), `_STORE` (`memory`), `_DEBUG` (false), `_STATS_TOKEN`, `_EVICTION_LOG_THRESHOLD` (100 a
+  minute); per class `STOREFRONT_CACHE_<CLASS>_TTL_SECONDS`, `_SWR_SECONDS`, `_ENABLED` (`API_THEME_MANIFEST` for the
+  hyphenated one); and `STOREFRONT_CACHE_POLICY_JSON`, a partial table deep-merged over the defaults, below the flat
+  variables. A value the cache cannot run with stops the start with its message; the effective policy is logged once.
+
+  **Every response says what happened**: `x-storefront-cache: hit | miss | stale | stale-refresh | shared | bypass`
+  (read by load-testing's k6, so the values are fixed); `x-storefront-cache-class`, `-key` and `-reason` under
+  `_DEBUG`. `GET /_storefront/cache/stats` (loopback, or `x-storefront-cache-token`) is a JSON snapshot. The
+  `storefront.cache` meter exports `storefront_page_cache_requests{state,class}`, `_entries{class}`, `_bytes{class}`
+  and `_evictions{class,reason}`.
+
+- **The edge headers** (`edge-headers.mjs`). Next stamps `private, no-cache, no-store` on every dynamic render unless
+  a `Cache-Control` is already set; the class's value is set before the render and enforced as the head is written,
+  so a 200 leaves with the table's value and a `Vary` naming the store headers, and anything else with
+  `private, no-store`. Nothing between spg and the shopper caches HTML today; when an edge does, this is its contract.
 
 - **The request signal** (`request-scope.mjs`). A render's backend reads (`apiFetch`, server side, GET only) abort when
-  its shopper disconnects, and give up after `STOREFRONT_BACKEND_TIMEOUT_MS` (3000; 0 waits); a write carries neither.
+  its shopper disconnects, and give up after `STOREFRONT_BACKEND_TIMEOUT_MS` (3000; 0 waits); a write carries neither,
+  and a read Next keeps in its data cache carries the budget only, since other renders wait on the same fetch.
 
-To QA them under lcl, run the production build in place of lcl's `next dev` (`qa/landing-ui-qa.md` LOAD).
+The **data cache** behind a miss is named the same way: `libs/services/src/cache-policy.ts` gives each anonymous read
+its seconds (`store`, `categories`, `site`, `page`, `posts`, `post`, `banners`, `layout`, `faq`, `menu`, `policy`,
+`sitemap`, `redirect`, `product`, `productGroup`, `listing`, `facets`, `suggest`), overridable through
+`STOREFRONT_DATA_CACHE_<NAME>_SECONDS` (`0` turns one off); price and stock are never cached, nor is a preview.
+
+To QA any of this under lcl, run the production build in place of lcl's `next dev` (`qa/landing-ui-qa.md` LOAD).
 
 ## Adding a theme
 

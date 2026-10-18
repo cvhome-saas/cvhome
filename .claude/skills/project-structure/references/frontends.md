@@ -51,8 +51,9 @@ Feature areas live under `src/app/features/`. Note this module also carries its 
 ### `landing-ui` specifics
 
 See `landing-ui.md` — it has its own npm-workspaces structure and template system. The one thing to carry
-across: its `npm run build` is a **strictly ordered chain** (libs → templates → app), because templates and
-app consume the libs as built output. Building `app` alone compiles against yesterday's types.
+across: its `npm run build` is a **strictly ordered chain** (`build:libs` — `types` → `services` → `hooks` — then
+the `storefront` app; `package.json` workspaces are `storefront`, `libs/*`, `themes/*`), because the storefront
+consumes the libs as built output. Building `storefront` alone compiles against yesterday's types.
 
 ## 2. Embedded Angular inside Spring Boot — `uaa-fe`
 
