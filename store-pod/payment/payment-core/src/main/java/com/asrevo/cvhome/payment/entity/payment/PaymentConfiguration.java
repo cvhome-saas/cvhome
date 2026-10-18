@@ -5,6 +5,9 @@ import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.commons.domain.StoreScoped;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,7 +15,7 @@ import lombok.Setter;
 @Table(name = "PAYMENT_CONFIGURATION")
 @Getter
 @Setter
-public class PaymentConfiguration implements PaymentSecret {
+public class PaymentConfiguration implements PaymentSecret, StoreScoped {
 
     @EmbeddedId
     private PaymentConfigurationId id;
@@ -28,4 +31,9 @@ public class PaymentConfiguration implements PaymentSecret {
 
     @Column(name = "ENABLED")
     private boolean enabled;
+
+    @Override
+    public StoreMerchantId scopedStore() {
+        return id == null ? null : id.getStoreMerchantId();
+    }
 }

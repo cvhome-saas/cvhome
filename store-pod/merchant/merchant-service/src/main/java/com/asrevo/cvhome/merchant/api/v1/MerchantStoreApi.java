@@ -25,6 +25,7 @@ import com.asrevo.cvhome.merchant.errors.MerchantStoreContextMismatchException;
 import com.asrevo.cvhome.merchant.errors.MerchantStoreNotFoundException;
 import com.asrevo.cvhome.merchant.model.merchant.PersistableMerchantStore;
 import com.asrevo.cvhome.merchant.model.merchant.ReadableMerchantStore;
+import com.asrevo.cvhome.merchant.reads.MerchantStoreReads;
 import com.asrevo.cvhome.merchant.service.facade.merchant.StoreFacade;
 import com.asrevo.cvhome.store.core.constants.Constants;
 
@@ -49,6 +50,8 @@ public class MerchantStoreApi {
 
     private final StoreFacade storeFacade;
 
+    private final MerchantStoreReads reads;
+
     @GetMapping(value = {"/store/{code}"}, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(method = "GET", description = "Get merchant store",
             responses = @ApiResponse(
@@ -63,7 +66,7 @@ public class MerchantStoreApi {
         if (!pathStore.equals(merchantStore)) {
             throw MerchantStoreContextMismatchException.of(pathStore, merchantStore);
         }
-        return storeFacade.getByMerchantStoreId(merchantStore, language);
+        return reads.store(merchantStore, language);
     }
 
     @GetMapping(value = {"/private/store"}, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -86,7 +89,7 @@ public class MerchantStoreApi {
 
     public List<LanguageCode> supportedLanguages(StoreMerchantId merchantStore) {
 
-        return storeFacade.supportedLanguages(merchantStore);
+        return reads.languages(merchantStore);
     }
 
     @ResponseStatus(HttpStatus.OK)

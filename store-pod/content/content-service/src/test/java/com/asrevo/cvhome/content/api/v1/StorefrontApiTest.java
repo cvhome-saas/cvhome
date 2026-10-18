@@ -1,8 +1,5 @@
 package com.asrevo.cvhome.content.api.v1;
 
-import java.time.Clock;
-import java.time.Instant;
-import java.time.ZoneOffset;
 import java.util.Map;
 import java.util.Optional;
 
@@ -17,7 +14,8 @@ import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.content.api.v1.support.PreviewTokens;
 import com.asrevo.cvhome.content.facade.StorefrontFacade;
 import com.asrevo.cvhome.content.model.layout.PageKind;
-import com.asrevo.cvhome.content.service.MenuService;
+import com.asrevo.cvhome.content.reads.PostsFilter;
+import com.asrevo.cvhome.content.reads.StorefrontReads;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -49,11 +47,10 @@ class StorefrontApiTest {
     private static final String FORGED = "forged";
 
     private final StorefrontFacade storefront = Mockito.mock(StorefrontFacade.class);
-    private final MenuService menus = Mockito.mock(MenuService.class);
+    private final StorefrontReads reads = Mockito.mock(StorefrontReads.class);
     private final PreviewTokens previews = Mockito.mock(PreviewTokens.class);
-    private final Clock clock = Clock.fixed(Instant.parse("2026-01-01T00:00:00Z"), ZoneOffset.UTC);
 
-    private final StorefrontApi api = new StorefrontApi(storefront, menus, previews, clock);
+    private final StorefrontApi api = new StorefrontApi(storefront, reads, previews);
 
     @Test
     void aPublishedPageIsCachedAtTheEdge() throws Exception {
@@ -62,7 +59,7 @@ class StorefrontApiTest {
         ResponseEntity<?> response = api.page(STORE, ENGLISH, SLUG, null);
 
         assertThat(response.getHeaders().getCacheControl()).contains(MAX_AGE).doesNotContain(NO_STORE);
-        verify(storefront).page(STORE, ENGLISH, SLUG, false);
+        verify(reads).page(STORE, ENGLISH, SLUG);
     }
 
     @Test
@@ -85,7 +82,7 @@ class StorefrontApiTest {
         assertThat(api.post(STORE, ENGLISH, SLUG, null).getHeaders().getCacheControl()).doesNotContain(NO_STORE);
 
         verify(storefront).post(STORE, ENGLISH, SLUG, true);
-        verify(storefront).post(STORE, ENGLISH, SLUG, false);
+        verify(reads).post(STORE, ENGLISH, SLUG);
     }
 
     @Test
@@ -95,7 +92,7 @@ class StorefrontApiTest {
         ResponseEntity<?> response = api.page(STORE, ENGLISH, SLUG, FORGED);
 
         assertThat(response.getHeaders().getCacheControl()).doesNotContain(NO_STORE);
-        verify(storefront).page(STORE, ENGLISH, SLUG, false);
+        verify(reads).page(STORE, ENGLISH, SLUG);
     }
 
     @Test
@@ -109,18 +106,18 @@ class StorefrontApiTest {
 
         assertThat(api.site(STORE, ENGLISH).getHeaders().getCacheControl())
                 .contains(MAX_AGE, "public", "stale-while-revalidate=60");
-        verify(storefront).posts(STORE, ENGLISH, null, null, PageRequest.of(0, 20));
-        verify(storefront).postCategories(STORE, ENGLISH);
-        verify(storefront).effectiveBanners(STORE, ENGLISH, null);
-        verify(storefront).faq(STORE, ENGLISH, null);
-        verify(storefront).sitemap(STORE, ENGLISH);
+        verify(reads).posts(STORE, ENGLISH, PostsFilter.of(null, null), PageRequest.of(0, 20));
+        verify(reads).postCategories(STORE, ENGLISH);
+        verify(reads).banners(STORE, ENGLISH, null);
+        verify(reads).faq(STORE, ENGLISH, null);
+        verify(reads).sitemap(STORE, ENGLISH);
     }
 
     @Test
     void aMenuIsResolvedAgainstTheClockSoScheduledItemsAppearOnTime() {
         api.menu(STORE, ENGLISH, null);
 
-        verify(menus).resolved(eq(STORE), eq(null), eq(ENGLISH), eq(clock.instant()));
+        verify(reads).menu(STORE, ENGLISH, null);
     }
 
     @Test
@@ -166,6 +163,6 @@ class StorefrontApiTest {
         ResponseEntity<?> response = api.layout(STORE, ENGLISH, PageKind.HOME, null);
 
         assertThat(response.getHeaders().getCacheControl()).doesNotContain(NO_STORE);
-        verify(storefront).layout(STORE, ENGLISH, PageKind.HOME, false);
+        verify(reads).layout(STORE, ENGLISH, PageKind.HOME);
     }
 }

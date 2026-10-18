@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.asrevo.cvhome.catalog.errors.ProductNotFoundException;
 import com.asrevo.cvhome.catalog.model.product.ReadableCartLineProduct;
 import com.asrevo.cvhome.catalog.model.product.ReadableMinimalProduct;
+import com.asrevo.cvhome.catalog.reads.CartLineReads;
 import com.asrevo.cvhome.catalog.services.product.ExternalProductService;
 import com.asrevo.cvhome.catalog.services.product.ProductService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
@@ -37,6 +38,8 @@ public class ExternalProductApi implements ExternalProductService {
 
     private final ProductService productService;
 
+    private final CartLineReads cartLines;
+
     @Override
     @GetMapping("/detailed-product")
     @Parameter(name = "store", schema = @Schema(type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
@@ -55,7 +58,7 @@ public class ExternalProductApi implements ExternalProductService {
     @Parameter(name = "store", schema = @Schema(type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
     public List<ReadableMinimalProduct> getDetailedProducts(StoreMerchantId store,
                                                             @RequestParam List<Sku> skus, LanguageCode lang) {
-        return productService.getBySkus(store, skus, lang);
+        return cartLines.detailedProducts(store, lang, skus);
     }
 
     /** What a cart line renders, per sku, and nothing more; what checkout reads on every cart operation. */
@@ -64,6 +67,6 @@ public class ExternalProductApi implements ExternalProductService {
     @Parameter(name = "store", schema = @Schema(type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
     public List<ReadableCartLineProduct> getCartLines(StoreMerchantId store, @RequestParam List<Sku> skus,
                                                       LanguageCode lang) {
-        return skus == null || skus.isEmpty() ? List.of() : productService.getCartLines(store, skus, lang);
+        return cartLines.cartLines(store, lang, skus);
     }
 }

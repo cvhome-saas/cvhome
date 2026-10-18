@@ -31,8 +31,10 @@ import jakarta.validation.constraints.NotEmpty;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import com.asrevo.cvhome.cache.event.ContentChanged;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.commons.domain.StoreScoped;
 import com.asrevo.cvhome.content.model.BannerPlacement;
 import com.asrevo.cvhome.content.model.ContentStatus;
 import com.asrevo.cvhome.content.model.PolicyType;
@@ -58,7 +60,7 @@ import lombok.Setter;
                 columnNames = {"STORE_MERCHANT_ID", "CODE"}))
 @Getter
 @Setter
-public class Content extends SalesManagerEntity<Long, Content> implements Serializable {
+public class Content extends SalesManagerEntity<Long, Content> implements Serializable, StoreScoped {
 
     @Serial
     private static final long serialVersionUID = 1772757159185494620L;
@@ -195,4 +197,19 @@ public class Content extends SalesManagerEntity<Long, Content> implements Serial
         return unpublishAt == null || unpublishAt.isAfter(now);
     }
 
+    /**
+     * The row was written or moved between statuses: {@link ContentChanged} for the store, once per save however
+     * many steps the save took (an edit and a transition register it twice and raise it once).
+     */
+    public Content changed() {
+        if (domainEvents().stream().noneMatch(ContentChanged.class::isInstance)) {
+            this.registerEvent(new ContentChanged(storeMerchantId, contentType == null ? "CONTENT" : contentType.name()));
+        }
+        return this;
+    }
+
+    @Override
+    public StoreMerchantId scopedStore() {
+        return storeMerchantId;
+    }
 }

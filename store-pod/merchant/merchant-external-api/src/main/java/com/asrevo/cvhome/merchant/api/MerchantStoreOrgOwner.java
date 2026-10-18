@@ -1,13 +1,9 @@
 package com.asrevo.cvhome.merchant.api;
 
-import java.time.Duration;
-
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.merchant.model.merchant.ReadableMerchantStore;
 import com.asrevo.cvhome.s2s.services.StoreOrgOwnerRetriever;
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,21 +27,14 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class MerchantStoreOrgOwner implements StoreOrgOwnerRetriever {
 
-    private static final Duration TTL = Duration.ofMinutes(30);
-
-    private static final long MAX_STORES = 10_000;
-
     private final ExternalMerchantStoreService stores;
-
-    private final Cache<String, ManagerOrgId> owners =
-            Caffeine.newBuilder().expireAfterWrite(TTL).maximumSize(MAX_STORES).build();
 
     @Override
     public ManagerOrgId owner(StoreMerchantId store) {
         if (store == null) {
             return null;
         }
-        return owners.get(store.getId(), id -> lookUp(store));
+        return lookUp(store);
     }
 
     private ManagerOrgId lookUp(StoreMerchantId store) {

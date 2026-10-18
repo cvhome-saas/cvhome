@@ -11,8 +11,14 @@ dependencies {
     testImplementation libs.jakarta.persistence.api
     // TsVectorType implements a Hibernate UserType, so the interface has to resolve to test it.
     testImplementation libs.hibernate.core
-    // StoreEntitlements is exercised for real rather than mocked: its cache is the behaviour under test.
+    // StoreEntitlements is exercised for real rather than mocked: its cache is the behaviour under test; CartLineReads
+    // drives a real registry on the Caffeine provider.
     testImplementation libs.caffeine
+    testImplementation libs.spring.boot.starter.cache
+    // The typed ids carry Jackson readers; loading them in a test needs databind.
+    testImplementation libs.jackson.databind
+    // The storefront's cached reads (reads/) and the regions they declare.
+    api project(':store-commons:cache')
     api project(':store-pod:commons:store-commons')
     api project(':store-pod:catalog:catalog-commons')
     api project(':store-pod:merchant:merchant-external-api')

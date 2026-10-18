@@ -12,6 +12,13 @@ com:
           # slow provider the spurious failure.
           read-timeouts:
             payment: 10s
+      # The cache regions (store-commons:cache, CacheProperties): every region a service declares runs on the
+      # default provider with the code's ttl and size unless a line here or in the service's own application.yml
+      # says otherwise, by service then by read: regions.catalog.product.ttl. A region's provider is switched
+      # the same way once another provider module is on the service; enabled: false turns a region off and its
+      # meters keep counting. The registry reads this at run time, never as a bean condition.
+      cache:
+        default-provider: caffeine
       app:
         domain: gateway.com
         sub:
@@ -143,19 +150,6 @@ spring:
       - org.springframework.boot.micrometer.tracing.autoconfigure.MicrometerTracingAutoConfiguration
       - org.springframework.boot.micrometer.tracing.opentelemetry.autoconfigure.OpenTelemetryTracingAutoConfiguration
       - org.springframework.boot.micrometer.tracing.opentelemetry.autoconfigure.otlp.OtlpTracingAutoConfiguration
-  cache:
-    # The one named cache the pods use (catalog, checkout, payment: the merchant store read). Declared here so the
-    # cache exists at start-up: Boot binds cache meters to the caches a CacheManager knows when the context starts,
-    # and a cache created lazily on its first @Cacheable hit is never bound. Services without @EnableCaching have
-    # no CacheManager and ignore this.
-    cache-names: STORE
-    caffeine:
-      # Hit/miss/eviction counters for every Spring cache (cache_gets_total, cache_size, cache_evictions_total);
-      # Boot's CacheMetricsAutoConfiguration binds them once the cache records statistics.
-      # Bounded, and it expires: nothing evicts STORE, so without a TTL a merchant's change to a store's currency, units
-      # or languages never reached catalog, checkout or payment until they restarted. Five minutes is the staleness a
-      # settings change may have; one entry per store, so the bound is never near.
-      spec: maximumSize=10000,expireAfterWrite=5m,recordStats
   docker:
     compose:
       file: ${spring.application.name}/compose.yml

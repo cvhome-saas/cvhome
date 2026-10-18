@@ -4,12 +4,14 @@ plugins {
 
 dependencies {
     api project(':store-pod:merchant:merchant-commons')
-    // The org-owner retriever implements an interface from the shared security layer, and caches its answer.
+    // The org-owner retriever implements an interface from the shared security layer.
     api project(':store-commons:autoconfigure')
-    implementation libs.caffeine
+    // The one cached client of the store read (CachedMerchantStoreReads) and the region it declares.
+    api project(':store-commons:cache')
     compileOnly libs.spring.web
     compileOnly libs.spring.boot.starter.autoconfigure
     compileOnly libs.lombok
     implementation libs.slf4j.api
     annotationProcessor libs.lombok
+    testImplementation libs.spring.boot.starter.cache
 }

@@ -3,6 +3,8 @@ plugins {
 }
 
 dependencies {
+    // The storefront's cached reads (reads/) and the regions they declare.
+    api project(':store-commons:cache')
     api project(':store-pod:commons:store-commons')
     api project(':store-pod:content:content-commons')
     compileOnly libs.spring.data.jpa
@@ -14,6 +16,9 @@ dependencies {
     compileOnly libs.commons.io
     compileOnly libs.slf4j.api
     implementation libs.jsoup
+    // The cache events are outbox events; the annotation is read here, the starter lives in the service.
+    compileOnly libs.namastack.outbox.api
+    testImplementation libs.namastack.outbox.api
     compileOnly libs.lombok
     compileOnly libs.hibernate.core
     annotationProcessor libs.lombok
@@ -26,4 +31,5 @@ dependencies {
     testImplementation libs.jakarta.validation.api
     testImplementation libs.aws.sdk.s3
     testImplementation libs.slf4j.api
+    testImplementation libs.spring.data.commons
 }
