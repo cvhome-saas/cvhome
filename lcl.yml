@@ -203,7 +203,8 @@ services:
     # a pull that adds a dependency (#318 added a font to the pink theme, ui-kit became a file: dependency of
     # the console) otherwise leaves the dev server failing on a module it cannot resolve, and "[ -d
     # node_modules ]" never notices. Build outputs carry package.json files of their own, so they are pruned
-    # from the search. `npm install`, not `npm ci`: no package-lock.json is committed for this app.
+    # from the search. `npm install`, not `npm ci`: a dev checkout may carry package.json edits the committed
+    # lock does not have yet; Gradle and CI use `npm ci` against that lock.
     prepare:
       # The shared Angular library first: console-ui links its build output as a file: dependency, and
       # npm reads that directory's package.json at install time, so `dist/ui-kit` must already exist.

@@ -6,6 +6,13 @@ node {
     version = '24.21.0'
     npmVersion = '11.6.1'
     download = true
+    /*
+     * `npm ci`, not `npm install`: install exactly what the committed package-lock.json says and fail if it
+     * disagrees with package.json. With `install` every machine resolved its own tree, so a stale local lock
+     * (or none) picked mismatched @angular/* patches and broke the build with ERESOLVE. Change a dependency
+     * with `npm install <pkg>` and commit the lock it rewrites.
+     */
+    npmInstallCommand = 'ci'
 }
 
 tasks.named('build') {
@@ -20,7 +27,6 @@ tasks.register('bootRun') {
 
 tasks.named('clean') {
     delete('dist')
-    delete('package-lock.json')
 }
 
 

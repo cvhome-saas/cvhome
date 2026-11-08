@@ -73,8 +73,11 @@ dependencyManagement {
 
 node {
     version = '24.21.0'
+    npmVersion = '11.6.1'
     download = true
     nodeProjectDir = file('src/main/resources/uaa-fe')
+    // `npm ci` against the committed package-lock.json; why: build-logic's com.asrevo.ui-conventions.gradle
+    npmInstallCommand = 'ci'
 }
 
 /*
