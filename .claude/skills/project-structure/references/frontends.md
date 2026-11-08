@@ -14,11 +14,11 @@ plugins {
     id 'com.asrevo.docker-conventions'
     id 'com.github.node-gradle.node'
 }
-node { version = '24.21.0'; npmVersion = '11.6.1'; download = true }
+node { version = '24.21.0'; npmVersion = '11.6.1'; download = true; npmInstallCommand = 'ci' }
 
 tasks.named('build')   { dependsOn('npm_run_build') }        // gradle build → npm run build
 tasks.register('bootRun') { dependsOn('npm_run_dev') }       // gradle bootRun → npm run dev
-tasks.named('clean')   { delete('dist'); delete('package-lock.json') }
+tasks.named('clean')   { delete('dist') }                    // package-lock.json is committed; npmInstall runs `npm ci`
 ```
 
 Node/npm are **auto-downloaded and version-pinned by Gradle** — you don't need a matching local Node install for

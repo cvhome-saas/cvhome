@@ -33,7 +33,6 @@ bin/
 
 ### VS Code ###
 .vscode/
-**/package-lock.json
 **/node_modules/
 **/dist/
 **/.next/
